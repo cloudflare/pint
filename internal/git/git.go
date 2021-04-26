@@ -100,7 +100,7 @@ type CommitRangeResults struct {
 }
 
 func (gcr CommitRangeResults) String() string {
-	return fmt.Sprintf("%s..%s", gcr.From, gcr.To)
+	return fmt.Sprintf("%s^..%s", gcr.From, gcr.To)
 }
 
 func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, err error) {
