@@ -1,0 +1,7 @@
+mkdir rules
+pint.error lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" [31merror=[0m[31m"no matching files"[0m

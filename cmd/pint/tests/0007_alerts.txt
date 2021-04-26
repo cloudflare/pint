@@ -1,0 +1,51 @@
+pint.error lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
+level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m3
+rules/0001.yml:1-2: url annotation is required (alerts/annotation)
+- alert: ServiceIsDown
+  expr: up == 0
+
+rules/0001.yml:1-2: severity label is required (rule/label)
+- alert: ServiceIsDown
+  expr: up == 0
+
+rules/0001.yml:6: severity label value must match regex: ^critical|warning|info$ (rule/label)
+    severity: bad
+
+rules/0001.yml:8: url annotation value must match regex: ^https://wiki.example.com/page/(.+).html$ (alerts/annotation)
+    url: bad
+
+level=info msg="Problems found" [36mBug=[0m2 [36mWarning=[0m2
+level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
+-- rules/0001.yml --
+- alert: ServiceIsDown
+  expr: up == 0
+- alert: ServiceIsDown
+  expr: up == 0
+  labels:
+    severity: bad
+  annotations:
+    url: bad
+- alert: ServiceIsDown
+  expr: up == 0
+  labels:
+    severity: warning
+  annotations:
+    url: "https://wiki.example.com/page/ServiceIsDown.html"
+
+-- .pint.hcl --
+rule {
+    annotation "url" {
+        severity = "bug"
+        value = "https://wiki.example.com/page/(.+).html"
+        required = true
+    }
+    label "severity" {
+        value = "critical|warning|info"
+        required = true
+    }
+}

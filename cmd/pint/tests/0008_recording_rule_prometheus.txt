@@ -1,0 +1,34 @@
+pint.error lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
+level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m1
+rules/0001.yml:5: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/by)
+      expr: sum by (instance) (http_inprogress_requests)
+
+rules/0001.yml:5: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/by)
+      expr: sum by (instance) (http_inprogress_requests)
+
+level=info msg="Problems found" [36mBug=[0m1 [36mWarning=[0m1
+level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
+-- rules/0001.yml --
+groups:
+  - name: example
+    rules:
+    - record: colo:http_inprogress_requests:sum
+      expr: sum by (instance) (http_inprogress_requests)
+
+-- .pint.hcl --
+rule {
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+}
+rule {
+    aggregate "colo(?:_.+)?:.+" {
+        severity = "bug"
+        strip = [ "instance" ]
+    }
+}

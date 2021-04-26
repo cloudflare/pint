@@ -1,0 +1,147 @@
+pint.error lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
+level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m3
+level=info msg="File parsed" [36mpath=[0mrules/0002.yaml [36mrules=[0m1
+level=info msg="File parsed" [36mpath=[0mrules/0003.yaml [36mrules=[0m10
+rules/0001.yml:2: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
+  expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+
+rules/0001.yml:6: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/without)
+  expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+
+rules/0003.yaml:11: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/without)
+  expr: sum(foo) without(job)
+
+rules/0003.yaml:11: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
+  expr: sum(foo) without(job)
+
+rules/0003.yaml:14: syntax error: unexpected right parenthesis ')' (promql/syntax)
+  expr: sum(foo) by ())
+
+rules/0003.yaml:22-25: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
+  expr: |
+    sum(
+      multiline
+    ) without(job, instance)
+
+rules/0003.yaml:28-31: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/without)
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+rules/0003.yaml:28-31: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/without)
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+rules/0003.yaml:28-31: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+rules/0003.yaml:28-31: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+rules/0003.yaml:34-37: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
+  expr: >-
+    sum(
+      multiline2
+    ) without(job, instance)
+
+rules/0003.yaml:40: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/by)
+  expr: sum(byinstance) by(instance)
+
+rules/0003.yaml:40: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/by)
+  expr: sum(byinstance) by(instance)
+
+level=info msg="Problems found" [36mFatal=[0m1 [36mWarning=[0m12
+level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
+-- rules/0001.yml --
+- record: colo_job:fl_cf_html_bytes_in:rate10m
+  expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+- record: colo_job:foo:rate1m
+  expr: sum(rate(foo[1m])) WITHOUT (instance)
+- record: colo_job:foo:irate3m
+  expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+
+-- rules/0002.yaml --
+- record: colo_job:down:count
+  expr: up == 0
+
+-- rules/0003.yaml --
+# pint ignore/begin
+{%- set foo = 1 %}
+{% set bar = 2 -%}
+{# comment #}
+{#
+  comment 
+#}
+# pint ignore/end
+
+- record: colo_job:up:count
+  expr: sum(foo) without(job)
+
+- record: invalid
+  expr: sum(foo) by ())
+
+# pint ignore/begin
+- record: colo_job:down:count
+  expr: up == {{ foo }}
+# pint ignore/end
+
+- record: colo:multiline
+  expr: |
+    sum(
+      multiline
+    ) without(job, instance)
+
+- record: colo:multiline:sum
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+- record: colo:multiline2
+  expr: >-
+    sum(
+      multiline2
+    ) without(job, instance)
+
+- record: colo_job:up:byinstance
+  expr: sum(byinstance) by(instance)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[4m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[5m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate5min
+  expr:  sum(irate(node_cpu_seconds_total[5m])) without (cpu)
+
+- alert: Instance Is Down
+  expr: up == 0
+
+-- .pint.hcl --
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+    aggregate "colo(?:_.+)?:.+" {
+        strip = [ "instance" ]
+    }
+}
+

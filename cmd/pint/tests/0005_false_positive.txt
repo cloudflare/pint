@@ -1,0 +1,22 @@
+pint.ok lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
+level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m2
+-- rules/0001.yml --
+- record: "colo:test1"
+  expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[5m])) BY (zoneId,job))
+- record: "colo:test2"
+  expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[10m])) without (instance))
+
+-- .pint.hcl --
+rule {
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+    aggregate "colo(?:_.+)?:.+" {
+        strip = [ "instance" ]
+    }
+}
