@@ -23,7 +23,7 @@ lint: $(GOBIN)/golangci-lint
 	$(GOBIN)/golangci-lint run -E golint,staticcheck,misspell
 
 .PHONY: test
-test: lint
+test:
 	mkdir -p $(COVER_DIR)
 	echo 'mode: atomic' > $(COVER_PROFILE)
 	go test \
