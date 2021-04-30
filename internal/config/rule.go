@@ -7,6 +7,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/rs/zerolog/log"
 )
 
 var (
@@ -152,32 +153,32 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			}
 			severity := aggr.getSeverity(checks.Warning)
 			for _, label := range aggr.Keep {
-				if isEnabled(enabledChecks, disabledChecks, checks.WithoutCheckName) {
+				if isEnabled(enabledChecks, disabledChecks, checks.WithoutCheckName, r) {
 					enabled = append(enabled, checks.NewWithoutCheck(nameRegex, label, true, severity))
 				}
-				if isEnabled(enabledChecks, disabledChecks, checks.ByCheckName) {
+				if isEnabled(enabledChecks, disabledChecks, checks.ByCheckName, r) {
 					enabled = append(enabled, checks.NewByCheck(nameRegex, label, true, severity))
 				}
 			}
 			for _, label := range aggr.Strip {
-				if isEnabled(enabledChecks, disabledChecks, checks.WithoutCheckName) {
+				if isEnabled(enabledChecks, disabledChecks, checks.WithoutCheckName, r) {
 					enabled = append(enabled, checks.NewWithoutCheck(nameRegex, label, false, severity))
 				}
-				if isEnabled(enabledChecks, disabledChecks, checks.ByCheckName) {
+				if isEnabled(enabledChecks, disabledChecks, checks.ByCheckName, r) {
 					enabled = append(enabled, checks.NewByCheck(nameRegex, label, false, severity))
 				}
 			}
 		}
 	}
 
-	if rule.Rate != nil && isEnabled(enabledChecks, disabledChecks, checks.RateCheckName) {
+	if rule.Rate != nil && isEnabled(enabledChecks, disabledChecks, checks.RateCheckName, r) {
 		for _, prom := range proms {
 			timeout, _ := parseDuration(prom.Timeout)
 			enabled = append(enabled, checks.NewRateCheck(prom.Name, prom.URI, timeout))
 		}
 	}
 
-	if rule.Cost != nil && isEnabled(enabledChecks, disabledChecks, checks.CostCheckName) {
+	if rule.Cost != nil && isEnabled(enabledChecks, disabledChecks, checks.CostCheckName, r) {
 		severity := rule.Cost.getSeverity(checks.Bug)
 		for _, prom := range proms {
 			timeout, _ := parseDuration(prom.Timeout)
@@ -185,7 +186,7 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if len(rule.Annotation) > 0 && isEnabled(enabledChecks, disabledChecks, checks.AnnotationCheckName) {
+	if len(rule.Annotation) > 0 && isEnabled(enabledChecks, disabledChecks, checks.AnnotationCheckName, r) {
 		for _, ann := range rule.Annotation {
 			var valueRegex *regexp.Regexp
 			if ann.Value != "" {
@@ -195,7 +196,7 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			enabled = append(enabled, checks.NewAnnotationCheck(ann.Key, valueRegex, ann.Required, severity))
 		}
 	}
-	if len(rule.Label) > 0 && isEnabled(enabledChecks, disabledChecks, checks.LabelCheckName) {
+	if len(rule.Label) > 0 && isEnabled(enabledChecks, disabledChecks, checks.LabelCheckName, r) {
 		for _, lab := range rule.Label {
 			var valueRegex *regexp.Regexp
 			if lab.Value != "" {
@@ -206,7 +207,7 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if rule.Series != nil && isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName) {
+	if rule.Series != nil && isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
 		severity := rule.Series.getSeverity(checks.Warning)
 		for _, prom := range proms {
 			timeout, _ := parseDuration(prom.Timeout)
@@ -214,7 +215,7 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if rule.Alerts != nil && isEnabled(enabledChecks, disabledChecks, checks.AlertsCheckName) {
+	if rule.Alerts != nil && isEnabled(enabledChecks, disabledChecks, checks.AlertsCheckName, r) {
 		qRange := time.Hour * 24
 		if rule.Alerts.Range != "" {
 			qRange, _ = parseDuration(rule.Alerts.Range)
@@ -233,12 +234,12 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if rule.Value != nil && isEnabled(enabledChecks, disabledChecks, checks.ValueCheckName) {
+	if rule.Value != nil && isEnabled(enabledChecks, disabledChecks, checks.ValueCheckName, r) {
 		severity := rule.Value.getSeverity(checks.Bug)
 		enabled = append(enabled, checks.NewValueCheck(severity))
 	}
 
-	if len(rule.Reject) > 0 && isEnabled(enabledChecks, disabledChecks, checks.RejectCheckName) {
+	if len(rule.Reject) > 0 && isEnabled(enabledChecks, disabledChecks, checks.RejectCheckName, r) {
 		for _, reject := range rule.Reject {
 			severity := reject.getSeverity(checks.Bug)
 			if reject.LabelKeys {
@@ -263,7 +264,14 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 	return enabled
 }
 
-func isEnabled(enabledChecks, disabledChecks []string, name string) bool {
+func isEnabled(enabledChecks, disabledChecks []string, name string, rule parser.Rule) bool {
+	if rule.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(name))) {
+		log.Debug().
+			Str("check", name).
+			Msg("Check disabled by comment")
+		return false
+	}
+
 	for _, c := range disabledChecks {
 		if c == name {
 			return false

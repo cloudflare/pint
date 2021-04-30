@@ -95,6 +95,12 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
 	for i, part := range node.Content {
+		if i == 0 && node.HeadComment != "" {
+			part.HeadComment = node.HeadComment
+		}
+		if i == len(node.Content)-1 && node.FootComment != "" {
+			part.FootComment = node.FootComment
+		}
 		if i%2 == 0 {
 			key = part
 		} else {
