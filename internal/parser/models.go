@@ -69,15 +69,30 @@ func (fp FilePosition) LastLine() (line int) {
 	return
 }
 
+func mergeComments(node *yaml.Node) (comments []string) {
+	if node.HeadComment != "" {
+		comments = append(comments, node.HeadComment)
+	}
+	if node.LineComment != "" {
+		comments = append(comments, node.LineComment)
+	}
+	if node.FootComment != "" {
+		comments = append(comments, node.FootComment)
+	}
+	return
+}
+
 type YamlNode struct {
 	Position FilePosition
 	Value    string
+	Comments []string
 }
 
 func newYamlNode(node *yaml.Node) *YamlNode {
 	return &YamlNode{
 		Position: NewFilePosition(nodeLines(node)),
 		Value:    node.Value,
+		Comments: mergeComments(node),
 	}
 }
 
@@ -85,6 +100,7 @@ func newYamlNodeWithParent(parent, node *yaml.Node) *YamlNode {
 	return &YamlNode{
 		Position: NewFilePosition(nodeLines(node)),
 		Value:    node.Value,
+		Comments: mergeComments(node),
 	}
 }
 
@@ -225,6 +241,32 @@ func (ar AlertingRule) Lines() (lines []int) {
 	return
 }
 
+func (ar AlertingRule) Comments() (comments []string) {
+	comments = append(comments, ar.Alert.Key.Comments...)
+	comments = append(comments, ar.Alert.Value.Comments...)
+	comments = append(comments, ar.Expr.Key.Comments...)
+	comments = append(comments, ar.Expr.Value.Comments...)
+	if ar.For != nil {
+		comments = append(comments, ar.For.Key.Comments...)
+		comments = append(comments, ar.For.Value.Comments...)
+	}
+	if ar.Labels != nil {
+		comments = append(comments, ar.Labels.Key.Comments...)
+		for _, label := range ar.Labels.Items {
+			comments = append(comments, label.Key.Comments...)
+			comments = append(comments, label.Value.Comments...)
+		}
+	}
+	if ar.Annotations != nil {
+		comments = append(comments, ar.Annotations.Key.Comments...)
+		for _, annotation := range ar.Annotations.Items {
+			comments = append(comments, annotation.Key.Comments...)
+			comments = append(comments, annotation.Value.Comments...)
+		}
+	}
+	return
+}
+
 type RecordingRule struct {
 	Record YamlKeyValue
 	Expr   PromQLExpr
@@ -236,6 +278,21 @@ func (rr RecordingRule) Lines() (lines []int) {
 	lines = appendLine(lines, rr.Expr.Lines()...)
 	if rr.Labels != nil {
 		lines = appendLine(lines, rr.Labels.Lines()...)
+	}
+	return
+}
+
+func (rr RecordingRule) Comments() (comments []string) {
+	comments = append(comments, rr.Record.Key.Comments...)
+	comments = append(comments, rr.Record.Value.Comments...)
+	comments = append(comments, rr.Expr.Key.Comments...)
+	comments = append(comments, rr.Expr.Value.Comments...)
+	if rr.Labels != nil {
+		comments = append(comments, rr.Labels.Key.Comments...)
+		for _, label := range rr.Labels.Items {
+			comments = append(comments, label.Key.Comments...)
+			comments = append(comments, label.Value.Comments...)
+		}
 	}
 	return
 }
@@ -267,6 +324,21 @@ func (r Rule) Lines() []int {
 		return r.AlertingRule.Lines()
 	}
 	return []int{r.Error.Line}
+}
+
+func (r Rule) HasComment(comment string) bool {
+	var comments []string
+	if r.RecordingRule != nil {
+		comments = r.RecordingRule.Comments()
+	} else if r.AlertingRule != nil {
+		comments = r.AlertingRule.Comments()
+	}
+	for _, c := range comments {
+		if hasComment(c, comment) {
+			return true
+		}
+	}
+	return false
 }
 
 type Result struct {

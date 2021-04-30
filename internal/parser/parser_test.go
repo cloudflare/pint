@@ -111,6 +111,83 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			content: []byte(`
+# head comment
+- record: foo # record comment
+  expr: foo offset 10m # expr comment
+  #  pre-labels comment
+  labels:
+    # pre-foo comment
+    foo: bar
+    # post-foo comment
+    bob: alice
+# foot comment
+`),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{3}},
+								Value:    "record",
+								Comments: []string{"# head comment"},
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{3}},
+								Value:    "foo",
+								Comments: []string{"# record comment"},
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "foo offset 10m",
+								Comments: []string{"# expr comment"},
+							},
+							Query: &parser.PromQLNode{
+								Expr: "foo offset 10m",
+							},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "labels",
+								Comments: []string{"#  pre-labels comment"},
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "foo",
+										Comments: []string{"# pre-foo comment"},
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "bar",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{10}},
+										Value:    "bob",
+										Comments: []string{"# post-foo comment"},
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{10}},
+										Value:    "alice",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			content: []byte("- record: foo\n  expr: foo[5m] offset 10m\n"),
 			output: []parser.Rule{
 				{

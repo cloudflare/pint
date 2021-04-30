@@ -652,3 +652,31 @@ groups:
     - record: job:http_inprogress_requests:sum
       expr: sum by (job) (http_inprogress_requests)
 ```
+
+## Disabling individual checks for specific rules
+
+To disable individual check for a specific rule use `# pint disable ...` comments.
+A single comment can only disable one check, so repeat it for every check you wish
+to disable.
+
+To disable `query/cost` check add `# pint disable query/cost` comment anywhere in
+the rule.
+
+Example:
+
+```YAML
+groups:
+  - name: example
+    rules:
+    - record: instance:http_requests_total:avg_over_time:1w
+      # pint disable query/cost
+      expr: avg_over_time(http_requests_total[1w]) by (instance)
+```
+
+```YAML
+groups:
+  - name: example
+    rules:
+    - record: instance:http_requests_total:avg_over_time:1w
+      expr: avg_over_time(http_requests_total[1w]) by (instance) # pint disable query/cost
+```

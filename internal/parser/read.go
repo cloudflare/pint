@@ -45,7 +45,7 @@ func hasComment(line, comment string) bool {
 
 	elems := strings.Split(strings.TrimSuffix(line, "\n"), "#")
 	lastComment := elems[len(elems)-1]
-	parts := strings.Split(removeRedundantSpaces(lastComment), " ")
+	parts := strings.SplitN(removeRedundantSpaces(lastComment), " ", 2)
 	if len(parts) < 2 {
 		return false
 	}

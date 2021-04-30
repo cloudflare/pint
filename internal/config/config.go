@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -53,7 +54,7 @@ func (cfg Config) String() string {
 func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName) {
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r) {
 		enabled = append(enabled, checks.NewSyntaxCheck())
 	}
 
@@ -64,7 +65,17 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 		}
 	}
 	for _, rule := range cfg.Rules {
-		enabled = append(enabled, rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms)...)
+		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms) {
+			if r.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(c.String()))) {
+				log.Debug().
+					Str("path", path).
+					Str("check", c.String()).
+					Msg("Check disabled by comment")
+				continue
+			}
+			enabled = append(enabled, c)
+
+		}
 	}
 
 	el := []string{}
@@ -199,4 +210,8 @@ func parseDuration(d string) (time.Duration, error) {
 		return 0, err
 	}
 	return time.Duration(mdur), nil
+}
+
+func removeRedundantSpaces(line string) string {
+	return strings.Join(strings.Fields(line), " ")
 }
