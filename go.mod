@@ -3,7 +3,7 @@ module github.com/cloudflare/pint
 go 1.16
 
 require (
-	github.com/fatih/color v1.10.0
+	github.com/fatih/color v1.11.0
 	github.com/getsentry/sentry-go v0.10.0
 	github.com/google/go-cmp v0.5.5
 	github.com/hashicorp/hcl/v2 v2.10.0
