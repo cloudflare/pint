@@ -11,7 +11,7 @@ require (
 	github.com/prometheus/common v0.23.0
 	github.com/prometheus/prometheus v1.8.2-0.20210331101223-3cafc58827d1
 	github.com/rogpeppe/go-internal v1.8.0
-	github.com/rs/zerolog v1.21.0
+	github.com/rs/zerolog v1.22.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
