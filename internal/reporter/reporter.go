@@ -3,6 +3,7 @@ package reporter
 import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -57,4 +58,18 @@ func (s Summary) CountBySeverity() map[checks.Severity]int {
 
 type Reporter interface {
 	Submit(Summary) error
+}
+
+func blameReports(reports []Report, gitCmd git.CommandRunner) (pb git.FileBlames, err error) {
+	pb = make(git.FileBlames)
+	for _, report := range reports {
+		if _, ok := pb[report.Path]; ok {
+			continue
+		}
+		pb[report.Path], err = git.Blame(report.Path, gitCmd)
+		if err != nil {
+			return
+		}
+	}
+	return
 }

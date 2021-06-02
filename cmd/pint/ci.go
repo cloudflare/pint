@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"time"
 
+	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
@@ -70,13 +72,53 @@ func actionCI(c *cli.Context) (err error) {
 		reps = append(reps, br)
 	}
 
+	if cfg.Repository != nil && cfg.Repository.GitHub != nil {
+		token, ok := os.LookupEnv("GITHUB_AUTH_TOKEN")
+		if !ok {
+			return fmt.Errorf("GITHUB_AUTH_TOKEN env variable is required when reporting to GitHub")
+		}
+
+		prVal, ok := os.LookupEnv("GITHUB_PULL_REQUEST_NUMBER")
+		if !ok {
+			return fmt.Errorf("GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub")
+		}
+
+		prNum, err := strconv.Atoi(prVal)
+		if err != nil {
+			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
+		}
+
+		timeout, _ := time.ParseDuration(cfg.Repository.GitHub.Timeout)
+		gr := reporter.NewGithubReporter(
+			cfg.Repository.GitHub.BaseURI,
+			cfg.Repository.GitHub.UploadURI,
+			timeout,
+			token,
+			cfg.Repository.GitHub.Owner,
+			cfg.Repository.GitHub.Repo,
+			prNum,
+			git.RunGit,
+		)
+		reps = append(reps, gr)
+	}
+
+	exitCode := 0
+
 	bySeverity := map[string]interface{}{}
 	for s, c := range summary.CountBySeverity() {
+		if s >= checks.Bug && c > 0 {
+			exitCode = 1
+		}
 		bySeverity[s.String()] = c
 	}
 	if len(bySeverity) > 0 {
 		log.Info().Fields(bySeverity).Msg("Problems found")
 	}
 
-	return submitReports(reps, summary)
+	if err := submitReports(reps, summary); err != nil {
+		return fmt.Errorf("submitting reports: %w", err)
+	}
+
+	return cli.Exit("", exitCode)
+
 }

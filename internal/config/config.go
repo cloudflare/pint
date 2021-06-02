@@ -126,6 +126,12 @@ func Load(path string) (cfg Config, err error) {
 		}
 	}
 
+	if cfg.Repository != nil && cfg.Repository.GitHub != nil {
+		if err = cfg.Repository.GitHub.validate(); err != nil {
+			return cfg, err
+		}
+	}
+
 	if cfg.Checks != nil {
 		if err = cfg.Checks.validate(); err != nil {
 			return cfg, err
