@@ -15,6 +15,6 @@ require (
 	github.com/rs/zerolog v1.22.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
+	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
