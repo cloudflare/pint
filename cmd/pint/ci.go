@@ -102,12 +102,11 @@ func actionCI(c *cli.Context) (err error) {
 		reps = append(reps, gr)
 	}
 
-	exitCode := 0
-
+	foundBugOrHigher := false
 	bySeverity := map[string]interface{}{}
 	for s, c := range summary.CountBySeverity() {
-		if s >= checks.Bug && c > 0 {
-			exitCode = 1
+		if s >= checks.Bug {
+			foundBugOrHigher = true
 		}
 		bySeverity[s.String()] = c
 	}
@@ -119,6 +118,9 @@ func actionCI(c *cli.Context) (err error) {
 		return fmt.Errorf("submitting reports: %w", err)
 	}
 
-	return cli.Exit("", exitCode)
+	if foundBugOrHigher {
+		return fmt.Errorf("problems found")
+	}
 
+	return nil
 }
