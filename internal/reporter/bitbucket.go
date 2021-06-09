@@ -60,7 +60,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 	}
 	log.Info().Str("commit", headCommit).Msg("Got HEAD commit from git")
 
-	pb, err := r.blameReports(summary.Reports)
+	pb, err := blameReports(summary.Reports, r.gitCmd)
 	if err != nil {
 		return fmt.Errorf("failed to run git blame: %w", err)
 	}
@@ -87,20 +87,6 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 	}
 
 	return nil
-}
-
-func (r BitBucketReporter) blameReports(reports []Report) (pb git.FileBlames, err error) {
-	pb = make(git.FileBlames)
-	for _, report := range reports {
-		if _, ok := pb[report.Path]; ok {
-			continue
-		}
-		pb[report.Path], err = git.Blame(report.Path, r.gitCmd)
-		if err != nil {
-			return
-		}
-	}
-	return
 }
 
 func (r BitBucketReporter) makeAnnotation(report Report, summary Summary, pb git.FileBlames) (annotations []BitBucketAnnotation) {

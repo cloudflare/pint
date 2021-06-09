@@ -30,10 +30,15 @@ ci {
 
 Configure supported code hosting repository, used for reporting PR checks from CI
 back to the repository, to be displayed in the PR UI.
-Currently only supports [BitBucket](https://bitbucket.org/).
+Currently only supports [BitBucket](https://bitbucket.org/) and [GitHub](https://github.com/).
 
 **NOTE**: BitBucket integration requires `BITBUCKET_AUTH_TOKEN` environment variable
 to be set. It should contain a personal access token used to authenticate with the API.
+
+**NOTE**: GitHub integration requires `GITHUB_AUTH_TOKEN` environment variable
+to be set to a personal access key that can access your repository. Also, `GITHUB_PULL_REQUEST_NUMBER`
+environment variable needs to point to the pull request number which will be used whilst
+submitting comments.
 
 Syntax:
 
@@ -52,7 +57,27 @@ repository {
   requests to the BitBucket API.
 - `bitbucket:timeout` - timeout to be used for API requests.
 - `bitbucket:project` - name of the BitBucket project for this repository.
-- `bitbucket:repository` - name of the BibBucket repository.
+- `bitbucket:repository` - name of the BitBucket repository.
+
+```JS
+repository {
+  github {
+    uri        = "https://..."
+    timeout    = "30s"
+    owner      = "..."
+    repo       = "..."
+  }
+}
+```
+
+- `github:baseuri` - base URI of GitHub or GitHub enterprise, will be used for HTTP requests to the GitHub API.
+- `github:uploaduri` - upload URI of GitHub or GitHub enterprise, will be used for HTTP requests to the GitHub API.
+
+If `github:baseuri` _or_ `github:uploaduri` are not specified then [GitHub](https://github.com) will be used.
+
+- `github:timeout` - timeout to be used for API requests;
+- `github:owner` - name of the GitHub owner i.e. the first part that comes before the repository's name in the URI;
+- `github:repo` - name of the GitHub repository (e.g. `monitoring`).
 
 ## Prometheus servers
 

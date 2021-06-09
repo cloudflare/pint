@@ -15,10 +15,12 @@ present in parent branch and scan all modified files included in those changes.
 
 Results can optionally be reported using
 [BitBucket API](https://docs.atlassian.com/bitbucket-server/rest/7.8.0/bitbucket-code-insights-rest.html)
-to generate a report with any found issues.
-Each issue will create an inline annotation in BitBucket with a description of
-the issue. Exit code will always be zero when this is used, the report itself will indicate
-if checks passed or not.
+or [GitHub API](https://docs.github.com/en/rest) to generate a report with any found issues.
+If you are using BitBucket API then each issue will create an inline annotation in BitBucket with a description of
+the issue. If you are using GitHub API then each issue with appear as a comment on your pull request.
+
+Exit code will be one (1) if any issues were detected with severity `Bug` or higher. This permits running
+`pint` in your CI system whilst at the same you will get detailed reports on your source control system.
 
 ### Ad-hoc
 
