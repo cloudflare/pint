@@ -6,7 +6,7 @@ require (
 	github.com/fatih/color v1.12.0
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/google/go-cmp v0.5.6
-	github.com/google/go-github/v35 v35.2.0
+	github.com/google/go-github/v35 v35.3.0
 	github.com/hashicorp/hcl/v2 v2.10.0
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.27.0
