@@ -1,0 +1,64 @@
+pint.ok lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
+level=info msg="File parsed" [36mpath=[0mrules/1.yaml [36mrules=[0m1
+level=warn msg="Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details" [36mpath=[0mrules/1.yaml
+rules/1.yaml:9-13: runbook_url annotation is required (alerts/annotation)
+        annotations:
+          summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
+          description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+
+-- rules/1.yaml --
+groups:
+  - name: "haproxy.api_server.rules"
+    rules:
+      - alert: HaproxyServerHealthcheckFailure
+        expr: increase(haproxy_server_check_failures_total[15m]) > 100
+        for: 5m
+        labels:
+          severity: 24x7
+        annotations:
+          summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
+          description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+-- .pint.hcl --
+rule {
+  match {
+    kind = "alerting"
+  }
+  # Each alert must have a 'severity' annotation that's either '24x7','10x5' or 'debug'.
+  label "severity" {
+    severity = "bug"
+    value    = "(24x7|10x5|debug)"
+    required = true
+  }
+  annotation "runbook_url" {
+    severity = "warning"
+    required = true
+  }
+}
+
+rule {
+  # Disallow spaces in label/annotation keys, they're only allowed in values.
+  reject ".* +.*" {
+    label_keys      = true
+    annotation_keys = true
+  }
+
+  # Disallow URLs in labels, they should go to annotations.
+  reject "https?://.+" {
+    label_keys   = true
+    label_values = true
+  }
+  # Check how many times each alert would fire in the last 1d.
+  alerts {
+    range   = "1d"
+    step    = "1m"
+    resolve = "5m"
+  }
+  # Check if '{{ $value }}'/'{{ .Value }}' is used in labels
+  # https://www.robustperception.io/dont-put-the-value-in-alert-labels
+  value {}
+}

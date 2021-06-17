@@ -613,6 +613,123 @@ data:
 `),
 			output: nil,
 		},
+		/*
+					FIXME https://github.com/cloudflare/pint/issues/20
+					{
+						content: []byte(`groups:
+			  - name: "haproxy.api_server.rules"
+			    rules:
+			      - alert: HaproxyServerHealthcheckFailure
+			        expr: increase(haproxy_server_check_failures_total[15m]) > 100
+			        for: 5m
+			        labels:
+			          severity: 24x7
+			        annotations:
+			          summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
+			          description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+			`),
+						output: []parser.Rule{
+							{
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlKeyValue{
+										Key: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{4}},
+											Value:    "alert",
+										},
+										Value: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{4}},
+											Value:    "HaproxyServerHealthcheckFailure",
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Key: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{5}},
+											Value:    "expr",
+										},
+										Value: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{5}},
+											Value:    "increase(haproxy_server_check_failures_total[15m]) > 100",
+										},
+										Query: &parser.PromQLNode{
+											Expr: "increase(haproxy_server_check_failures_total[15m]) > 100",
+											Children: []*parser.PromQLNode{
+												{
+													Expr: "increase(haproxy_server_check_failures_total[15m])",
+													Children: []*parser.PromQLNode{
+														{
+															Expr: "haproxy_server_check_failures_total[15m]",
+															Children: []*parser.PromQLNode{
+																{
+																	Expr: "haproxy_server_check_failures_total",
+																},
+															},
+														},
+													},
+												},
+												{Expr: "100"},
+											},
+										},
+									},
+									For: &parser.YamlKeyValue{
+										Key: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{6}},
+											Value:    "for",
+										},
+										Value: &parser.YamlNode{Position: parser.FilePosition{Lines: []int{6}},
+											Value: "5m",
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{7}},
+											Value:    "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Position: parser.FilePosition{Lines: []int{8}},
+													Value:    "severity",
+												},
+												Value: &parser.YamlNode{
+													Position: parser.FilePosition{Lines: []int{8}},
+													Value:    "24x7",
+												},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Position: parser.FilePosition{Lines: []int{9}},
+											Value:    "annotations",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Position: parser.FilePosition{Lines: []int{10}},
+													Value:    "summary",
+												},
+												Value: &parser.YamlNode{
+													Position: parser.FilePosition{Lines: []int{10}},
+													Value:    "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Position: parser.FilePosition{Lines: []int{11}},
+													Value:    "description",
+												},
+												Value: &parser.YamlNode{
+													Position: parser.FilePosition{Lines: []int{11}},
+													Value:    `Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}`,
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+		*/
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })

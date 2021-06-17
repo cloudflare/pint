@@ -123,9 +123,9 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 		}
 	}
 
-	if exprPart != nil && exprPart.Key.Position.FistLine() != exprPart.Value.Position.FistLine() {
+	if exprPart != nil && exprPart.Key.Position.FirstLine() != exprPart.Value.Position.FirstLine() {
 		for {
-			start := exprPart.Value.Position.FistLine() - 1
+			start := exprPart.Value.Position.FirstLine() - 1
 			end := exprPart.Value.Position.LastLine()
 			input := strings.Join(strings.Split(string(content), "\n")[start:end], "")
 			input = strings.ReplaceAll(input, " ", "")
