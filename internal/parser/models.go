@@ -51,7 +51,7 @@ type FilePosition struct {
 	Lines []int
 }
 
-func (fp FilePosition) FistLine() (line int) {
+func (fp FilePosition) FirstLine() (line int) {
 	for _, l := range fp.Lines {
 		if line == 0 || l < line {
 			line = l

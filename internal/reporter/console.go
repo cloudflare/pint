@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
+	"github.com/rs/zerolog/log"
 )
 
 func NewConsoleReporter(output io.Writer) ConsoleReporter {
@@ -68,7 +69,13 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 			msg = append(msg, output.MakeGray(report.Problem.Text))
 		}
 		msg = append(msg, output.MakeMagneta(" (%s)\n", report.Problem.Reporter))
-		for _, c := range strings.Split(content, "\n")[firstLine-1 : lastLine] {
+
+		lines := strings.Split(content, "\n")
+		if lastLine > len(lines)-1 {
+			lastLine = len(lines) - 1
+			log.Warn().Str("path", report.Path).Msgf("Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details")
+		}
+		for _, c := range lines[firstLine-1 : lastLine] {
 			msg = append(msg, output.MakeWhite("%s\n", c))
 		}
 		perFile[report.Path] = append(perFile[report.Path], strings.Join(msg, ""))
