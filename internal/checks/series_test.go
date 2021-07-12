@@ -7,12 +7,29 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 
 	"github.com/rs/zerolog"
 )
 
 func TestSeriesCheck(t *testing.T) {
 	zerolog.SetGlobalLevel(zerolog.FatalLevel)
+
+	p := parser.NewParser()
+	rules, err := p.Parse([]byte(`groups:
+  - name: testinggroup
+    rules:
+      - record: notfound
+        labels:
+          foo: bar
+        expr: vector(1)`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rules) != 1 {
+		t.Fatal("failed to parse rules")
+	}
+	rrSet := []*parser.RecordingRule{rules[0].RecordingRule}
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
@@ -108,12 +125,12 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning, false, nil),
 		},
 		{
 			description: "bad response",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning, false, nil),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo",
@@ -127,7 +144,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "simple query",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning, false, nil),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -141,7 +158,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "complex query",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning, false, nil),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -155,7 +172,31 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "complex query / bug",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug, false, nil),
+			problems: []checks.Problem{
+				{
+					Fragment: "notfound",
+					Lines:    []int{2},
+					Reporter: "query/series",
+					Text:     "query using prom completed without any results for notfound",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "complex query / bug but recording rule present",
+			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug, true, &rrSet),
+		},
+		{
+			description: "complex query / bug but recording rule present",
+			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum({foo=\"bar\"}))) / found_7\n",
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug, true, &rrSet),
+		},
+		{
+			description: "complex query / bug, recording rule present but setting off",
+			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug, false, &rrSet),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -189,17 +230,17 @@ func TestSeriesCheck(t *testing.T) {
     )
   for: 5m
 `,
-			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug),
+			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug, false, nil),
 		},
 		{
 			description: "offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset 5m\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Bug, false, nil),
 		},
 		{
 			description: "series found, label missing",
 			content:     "- record: foo\n  expr: found{job=\"notfound\"}\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning, false, nil),
 			problems: []checks.Problem{
 				{
 					Fragment: `found{job="notfound"}`,
@@ -213,7 +254,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "series missing, label missing",
 			content:     "- record: foo\n  expr: notfound{job=\"notfound\"}\n",
-			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			checker:     checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning, false, nil),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",

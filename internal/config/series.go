@@ -6,6 +6,7 @@ import (
 
 type SeriesSettings struct {
 	Severity string `hcl:"severity,optional"`
+	IgnoreRR bool   `hcl:"ignore_recordingrules,optional"`
 }
 
 func (rs SeriesSettings) validate() error {

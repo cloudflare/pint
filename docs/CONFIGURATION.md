@@ -470,6 +470,7 @@ series {
 - `severity` - set custom severity for reported issues, defaults to a warning.
 - `prometheus` - list of Prometheus servers to query. All servers must be first
   defined as `prometheus` blocks in global pint config.
+- `ignore_recordingrules` - if enabled then ignores issues when a metric name has been found in a recording rule. It is useful to enable this during CI because a user might add new recording rules together with alerting rules.
 
 Example:
 

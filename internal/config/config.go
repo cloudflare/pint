@@ -51,7 +51,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
+func (cfg Config) GetChecksForRule(path string, r parser.Rule, recordingRules *[]*parser.RecordingRule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r) {
@@ -65,7 +65,7 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 		}
 	}
 	for _, rule := range cfg.Rules {
-		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms) {
+		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms, recordingRules) {
 			if r.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(c.String()))) {
 				log.Debug().
 					Str("path", path).

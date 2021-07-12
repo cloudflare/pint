@@ -112,7 +112,7 @@ type Rule struct {
 	Reject     []RejectSettings     `hcl:"reject,block"`
 }
 
-func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {
+func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig, recordingRules *[]*parser.RecordingRule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	if rule.Match != nil && rule.Match.Kind != "" {
@@ -211,7 +211,7 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		severity := rule.Series.getSeverity(checks.Warning)
 		for _, prom := range proms {
 			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout, severity))
+			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout, severity, rule.Series.IgnoreRR, recordingRules))
 		}
 	}
 

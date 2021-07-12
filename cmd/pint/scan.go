@@ -52,6 +52,8 @@ func scanFiles(cfg config.Config, fcs discovery.FileFindResults, ld discovery.Li
 
 	p := parser.NewParser()
 
+	recordingRules := []*parser.RecordingRule{}
+
 	for _, path := range summary.FileChanges.Paths() {
 		path := path
 
@@ -100,6 +102,7 @@ func scanFiles(cfg config.Config, fcs discovery.FileFindResults, ld discovery.Li
 					Str("record", rule.RecordingRule.Record.Value.Value).
 					Str("lines", output.FormatLineRangeString(rule.Lines())).
 					Msg("Found recording rule")
+				recordingRules = append(recordingRules, rule.RecordingRule)
 			} else if rule.Error.Err != nil {
 				log.Debug().
 					Str("path", path).
@@ -112,7 +115,7 @@ func scanFiles(cfg config.Config, fcs discovery.FileFindResults, ld discovery.Li
 			}
 
 			if rule.Error.Err == nil {
-				checkList := cfg.GetChecksForRule(path, rule)
+				checkList := cfg.GetChecksForRule(path, rule, &recordingRules)
 				for _, check := range checkList {
 					check := check
 					scanJobs = append(scanJobs, scanJob{path: path, rule: rule, check: check})
