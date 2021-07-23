@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	CheckNames []string = []string{
+	CheckNames = []string{
 		AlertsCheckName,
 		ComparisonCheckName,
 		AnnotationCheckName,

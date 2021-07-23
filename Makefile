@@ -20,7 +20,7 @@ $(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
 	go install -modfile=tools/golangci-lint/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint
 .PHONY: lint
 lint: $(GOBIN)/golangci-lint
-	$(GOBIN)/golangci-lint run -E golint,staticcheck,misspell
+	$(GOBIN)/golangci-lint run -E revive,staticcheck,misspell
 
 .PHONY: test
 test:
