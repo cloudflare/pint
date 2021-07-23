@@ -7,7 +7,7 @@ require (
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/go-github/v35 v35.3.0
-	github.com/hashicorp/hcl/v2 v2.10.0
+	github.com/hashicorp/hcl/v2 v2.10.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.29.0
 	github.com/prometheus/prometheus v1.8.2-0.20210331101223-3cafc58827d1
@@ -15,6 +15,6 @@ require (
 	github.com/rs/zerolog v1.23.0
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
+	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
