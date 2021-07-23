@@ -205,6 +205,12 @@ func Load(path string) (cfg Config, err error) {
 			}
 
 		}
+
+		if rule.Comparison != nil {
+			if err = rule.Comparison.validate(); err != nil {
+				return cfg, err
+			}
+		}
 	}
 
 	return cfg, nil

@@ -403,6 +403,36 @@ rule {
 }
 ```
 
+## Comparison
+
+This check enforces use of a comparison operator in alert queries.
+Since any query result triggers an alert usual query would be something
+like `error_count > 10`, so we only get `error_count` series if the value
+is above 10. If we would remove `> 10` part query would always return `error_count`
+and so it would always trigger an alert.
+
+Syntax:
+
+```JS
+comparison {
+  severity = "bug|warning|info"
+}
+```
+
+- `severity` - set custom severity for reported issues, defaults to a bug.
+
+Example:
+
+```
+rule {
+  match {
+    kind = "alerting"
+  }
+  comparison {}
+}
+```
+
+
 ## Cost
 
 This check is used to calculate cost of a query and optionally report an issue
