@@ -9,6 +9,7 @@ import (
 var (
 	CheckNames []string = []string{
 		AlertsCheckName,
+		ComparisonCheckName,
 		AnnotationCheckName,
 		ValueCheckName,
 		ByCheckName,
