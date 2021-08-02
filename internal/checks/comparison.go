@@ -31,11 +31,8 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 		return
 	}
 
-	expr := rule.Expr()
-	if node, ok := expr.Query.Node.(*promParser.BinaryExpr); ok {
-		if node.Op.IsComparisonOperator() {
-			return
-		}
+	if hasComparision(rule.Expr().Query) {
+		return
 	}
 
 	problems = append(problems, Problem{
@@ -47,4 +44,20 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 	})
 
 	return
+}
+
+func hasComparision(n *parser.PromQLNode) bool {
+	if node, ok := n.Node.(*promParser.BinaryExpr); ok {
+		if node.Op.IsComparisonOperator() {
+			return true
+		}
+	}
+
+	for _, child := range n.Children {
+		if hasComparision(child) {
+			return true
+		}
+	}
+
+	return false
 }
