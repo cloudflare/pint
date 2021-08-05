@@ -6,11 +6,11 @@ require (
 	github.com/fatih/color v1.12.0
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/google/go-cmp v0.5.6
-	github.com/google/go-github/v35 v35.3.0
+	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/hcl/v2 v2.10.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.30.0
-	github.com/prometheus/prometheus v1.8.2-0.20210331101223-3cafc58827d1
+	github.com/prometheus/prometheus v1.8.2-0.20210701133801-b0944590a1c9
 	github.com/rogpeppe/go-internal v1.8.0
 	github.com/rs/zerolog v1.23.0
 	github.com/sergi/go-diff v1.2.0 // indirect
