@@ -92,12 +92,14 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 func (r BitBucketReporter) makeAnnotation(report Report, summary Summary, pb git.FileBlames) (annotations []BitBucketAnnotation) {
 	gitBlames, ok := pb[report.Path]
 	if !ok {
+		log.Debug().Str("path", report.Path).Msg("File not found in git blame")
 		return
 	}
 
 	reportLine := -1
 	for _, pl := range report.Problem.Lines {
 		commit := gitBlames.GetCommit(pl)
+		log.Debug().Str("commit", commit).Str("path", report.Path).Int("line", pl).Msg("Got commit for line")
 		if summary.FileChanges.HasCommit(commit) {
 			reportLine = pl
 		}
@@ -122,6 +124,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, summary Summary, pb git
 	}
 
 	if reportLine < 0 {
+		log.Debug().Str("path", report.Path).Msg("No file line found, skipping")
 		return
 	}
 

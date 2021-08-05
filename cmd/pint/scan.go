@@ -106,19 +106,15 @@ func scanFiles(cfg config.Config, fcs discovery.FileFindResults, ld discovery.Li
 					Str("lines", output.FormatLineRangeString(rule.Lines())).
 					Msg("Found invalid rule")
 			}
-			if !lineResults.HasLines(rule.Lines()) {
-				log.Debug().Str("path", path).Str("lines", output.FormatLineRangeString(rule.Lines())).Msg("Skipping rule")
-				continue
-			}
 
 			if rule.Error.Err == nil {
 				checkList := cfg.GetChecksForRule(path, rule)
 				for _, check := range checkList {
 					check := check
-					scanJobs = append(scanJobs, scanJob{path: path, rule: rule, check: check})
+					scanJobs = append(scanJobs, scanJob{path: path, rule: rule, check: check, lines: lineResults})
 				}
 			} else {
-				scanJobs = append(scanJobs, scanJob{path: path, rule: rule, check: nil})
+				scanJobs = append(scanJobs, scanJob{path: path, rule: rule, check: nil, lines: lineResults})
 			}
 		}
 	}
@@ -158,6 +154,7 @@ type scanJob struct {
 	path  string
 	rule  parser.Rule
 	check checks.RuleChecker
+	lines discovery.LineFindResults
 }
 
 func scanWorker(jobs <-chan scanJob, results chan<- reporter.Report) {
@@ -173,7 +170,11 @@ func scanWorker(jobs <-chan scanJob, results chan<- reporter.Report) {
 			}}
 		} else {
 			for _, problem := range job.check.Check(job.rule) {
-				results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: problem}
+				if job.lines.HasLines(problem.Lines) {
+					results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: problem}
+				} else {
+					log.Debug().Str("path", job.path).Str("lines", output.FormatLineRangeString(problem.Lines)).Msg("Problem reported on unmodified lines, ignoring")
+				}
 			}
 		}
 	}
