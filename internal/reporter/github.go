@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/cloudflare/pint/internal/git"
-	"github.com/google/go-github/v35/github"
+	"github.com/google/go-github/v37/github"
 	"golang.org/x/oauth2"
 )
 
