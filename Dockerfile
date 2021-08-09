@@ -1,4 +1,4 @@
-FROM golang:1.16.6-alpine
+FROM golang:1.16.7-alpine
 COPY . /src
 WORKDIR /src
 RUN go build ./cmd/pint
