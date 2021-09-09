@@ -171,3 +171,56 @@ func TestCommitRange(t *testing.T) {
 		})
 	}
 }
+
+func TestCurrentBranch(t *testing.T) {
+	type testCaseT struct {
+		mock        git.CommandRunner
+		output      string
+		shouldError bool
+	}
+
+	testCases := []testCaseT{
+		{
+			mock: func(args ...string) ([]byte, error) {
+				return nil, fmt.Errorf("mock error")
+			},
+			output:      "",
+			shouldError: true,
+		},
+		{
+			mock: func(args ...string) ([]byte, error) {
+				return []byte([]byte("")), nil
+			},
+			output:      "",
+			shouldError: false,
+		},
+		{
+			mock: func(args ...string) ([]byte, error) {
+				return []byte([]byte("foo")), nil
+			},
+			output: "foo",
+		},
+		{
+			mock: func(args ...string) ([]byte, error) {
+				return []byte([]byte("foo bar\n")), nil
+			},
+			output: "foo bar",
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			output, err := git.CurrentBranch(tc.mock)
+
+			hadError := (err != nil)
+			if hadError != tc.shouldError {
+				t.Errorf("git.CurrentBranch() returned err=%v, expected=%v", err, tc.shouldError)
+				return
+			}
+
+			if diff := cmp.Diff(tc.output, output); diff != "" {
+				t.Errorf("git.CurrentBranch() returned wrong output (-want +got):\n%s", diff)
+			}
+		})
+	}
+}

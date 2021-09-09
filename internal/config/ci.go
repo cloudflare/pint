@@ -3,7 +3,7 @@ package config
 import "regexp"
 
 type CI struct {
-	Include    []string `hcl:"include"`
+	Include    []string `hcl:"include,optional"`
 	MaxCommits int      `hcl:"maxCommits,optional"`
 	BaseBranch string   `hcl:"baseBranch,optional"`
 }
