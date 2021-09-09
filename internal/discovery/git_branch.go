@@ -25,15 +25,19 @@ func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
 		return nil, err
 	}
 
+	results := FileCommits{
+		pathCommits: map[string][]string{},
+	}
+	if cr.IsEmpty() {
+		log.Warn().Msg("Empty commit range, nothing to do")
+		return results, nil
+	}
+
 	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
 
 	out, err := gd.gitCmd("log", "--no-merges", "--pretty=format:%H", "--name-status", "--diff-filter=d", cr.String())
 	if err != nil {
 		return nil, err
-	}
-
-	results := FileCommits{
-		pathCommits: map[string][]string{},
 	}
 
 	var commit string

@@ -115,7 +115,7 @@ func TestCommitRange(t *testing.T) {
 				return []byte([]byte("")), nil
 			},
 			output:      git.CommitRangeResults{},
-			shouldError: true,
+			shouldError: false,
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {

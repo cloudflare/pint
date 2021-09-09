@@ -103,6 +103,10 @@ func (gcr CommitRangeResults) String() string {
 	return fmt.Sprintf("%s^..%s", gcr.From, gcr.To)
 }
 
+func (gcr CommitRangeResults) IsEmpty() bool {
+	return gcr.From == "" || gcr.To == "" || gcr.From == gcr.To
+}
+
 func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, err error) {
 	out, err := cmd("log", "--format=%H", "--no-abbrev-commit", "--reverse", fmt.Sprintf("%s..HEAD", baseBranch))
 	if err != nil {
@@ -118,7 +122,7 @@ func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, e
 	}
 
 	if len(lines) == 0 {
-		return cr, fmt.Errorf("empty commit range")
+		return cr, nil
 	}
 
 	cr.From = lines[0]

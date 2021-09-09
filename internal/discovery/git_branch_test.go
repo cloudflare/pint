@@ -96,6 +96,17 @@ C50     foo/bar/cp1.txt         foo/cp1.del
 				{Path: "foo/1.txt", Commits: []string{"commit1"}},
 			},
 		},
+		{
+			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
+				if args[0] == "rev-list" {
+					return []byte("\n"), nil
+				}
+				return []byte([]byte("")), nil
+			}, []*regexp.Regexp{
+				regexp.MustCompile(".*"),
+			}, "main"),
+			output: nil,
+		},
 	}
 
 	for i, tc := range testCases {
