@@ -126,3 +126,11 @@ func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, e
 
 	return
 }
+
+func CurrentBranch(cmd CommandRunner) (string, error) {
+	commit, err := cmd("rev-parse", "--abbrev-ref", "HEAD")
+	if err != nil {
+		return "", err
+	}
+	return strings.Trim(string(commit), "\n"), nil
+}

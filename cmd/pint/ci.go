@@ -5,6 +5,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -31,6 +32,17 @@ func actionCI(c *cli.Context) (err error) {
 	includeRe := []*regexp.Regexp{}
 	for _, pattern := range cfg.CI.Include {
 		includeRe = append(includeRe, regexp.MustCompile("^"+pattern+"$"))
+	}
+
+	baseBranch := strings.Split(cfg.CI.BaseBranch, "/")[len(strings.Split(cfg.CI.BaseBranch, "/"))-1]
+	currentBranch, err := git.CurrentBranch(git.RunGit)
+	if err != nil {
+		return fmt.Errorf("failed to get the name of current branch")
+	}
+	log.Debug().Str("current", currentBranch).Str("base", baseBranch).Msg("Got branch information")
+	if currentBranch == baseBranch {
+		log.Info().Str("branch", currentBranch).Msg("Running from base branch, skipping checks")
+		return nil
 	}
 
 	gitDiscovery := discovery.NewGitBranchFileFinder(git.RunGit, includeRe, cfg.CI.BaseBranch)
