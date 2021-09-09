@@ -130,6 +130,25 @@ func TestWithoutCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Right hand side of AND is ignored",
+			content:     "- record: foo\n  expr: foo AND on(instance) max(bar) without()\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "Left hand side of AND is checked",
+			content:     "- record: foo\n  expr: max (foo) without(job) AND on(instance) bar\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "max without(job) (foo)",
+					Lines:    []int{2},
+					Reporter: "promql/without",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, remove job from without()",
+					Severity: checks.Warning,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
