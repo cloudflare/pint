@@ -85,6 +85,25 @@ func TestByCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Right hand side of AND is ignored",
+			content:     "- record: foo\n  expr: foo AND on(instance) max(bar)\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "Left hand side of AND is checked",
+			content:     "- record: foo\n  expr: max (foo) by(instance) AND on(instance) bar\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "max by(instance) (foo)",
+					Lines:    []int{2},
+					Reporter: "promql/by",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, use by(job, ...)",
+					Severity: checks.Warning,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

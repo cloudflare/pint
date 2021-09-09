@@ -5,6 +5,7 @@ import (
 	"regexp"
 
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/rs/zerolog/log"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
@@ -60,7 +61,26 @@ func (c ByCheck) Check(rule parser.Rule) (problems []Problem) {
 }
 
 func (c ByCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.AggregateExpr); ok && !n.Without && n.Op != promParser.TOPK {
+	if n, ok := node.Node.(*promParser.AggregateExpr); ok && !n.Without {
+		switch n.Op {
+		case promParser.SUM:
+		case promParser.MIN:
+		case promParser.MAX:
+		case promParser.AVG:
+		case promParser.GROUP:
+		case promParser.STDDEV:
+		case promParser.STDVAR:
+		case promParser.COUNT:
+		case promParser.COUNT_VALUES:
+		case promParser.BOTTOMK:
+			goto NEXT
+		case promParser.TOPK:
+			goto NEXT
+		case promParser.QUANTILE:
+		default:
+			log.Warn().Str("op", n.Op.String()).Msg("Unsupported aggregation operation")
+		}
+
 		var found bool
 		for _, g := range n.Grouping {
 			if g == c.label {
@@ -82,6 +102,12 @@ func (c ByCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
 				text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, use by(%s, ...)", c.label, c.nameRegex, c.label),
 			})
 		}
+	}
+
+NEXT:
+	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.Op == promParser.LAND {
+		problems = append(problems, c.checkNode(node.Children[0])...)
+		return
 	}
 
 	for _, child := range node.Children {
