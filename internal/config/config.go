@@ -106,7 +106,12 @@ func Load(path string) (cfg Config, err error) {
 		Rules: []Rule{},
 	}
 
-	if _, err := os.Stat(path); err == nil {
+	if _, err := os.Stat(path); err != nil {
+
+		if path != ".pint.hcl" {
+			return cfg, err
+		}
+	} else {
 		log.Info().Str("path", path).Msg("Loading configuration file")
 		err = hclsimple.DecodeFile(path, nil, &cfg)
 		if err != nil {
