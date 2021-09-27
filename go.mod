@@ -9,7 +9,7 @@ require (
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/hcl/v2 v2.10.1
 	github.com/prometheus/client_golang v1.11.0
-	github.com/prometheus/common v0.30.0
+	github.com/prometheus/common v0.31.0
 	github.com/prometheus/prometheus v1.8.2-0.20210827082440-752c4f11ae86
 	github.com/rogpeppe/go-internal v1.8.0
 	github.com/rs/zerolog v1.25.0
