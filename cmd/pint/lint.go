@@ -24,7 +24,7 @@ func actionLint(c *cli.Context) (err error) {
 		return fmt.Errorf("at least one file or directory required")
 	}
 
-	cfg, err := config.Load(c.Path(configFlag))
+	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
 	if err != nil {
 		return fmt.Errorf("failed to load config file %q: %s", c.Path(configFlag), err)
 	}
