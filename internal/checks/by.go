@@ -105,8 +105,17 @@ func (c ByCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
 	}
 
 NEXT:
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.Op == promParser.LAND {
-		problems = append(problems, c.checkNode(node.Children[0])...)
+	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.VectorMatching != nil {
+		switch n.VectorMatching.Card {
+		case promParser.CardOneToOne:
+			// sum() + sum()
+		case promParser.CardManyToOne, promParser.CardManyToMany:
+			problems = append(problems, c.checkNode(node.Children[0])...)
+		case promParser.CardOneToMany:
+			problems = append(problems, c.checkNode(node.Children[1])...)
+		default:
+			log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
+		}
 		return
 	}
 

@@ -104,6 +104,44 @@ func TestByCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Right hand side of group_left() is ignored",
+			content:     "- record: foo\n  expr: sum by(job) (foo) / on(type) group_left() sum by(type) (bar)\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "Left hand side of group_left() is checked",
+			content:     "- record: foo\n  expr: sum by(type) (foo) / on(type) group_left() sum by(job) (bar)\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum by(type) (foo)",
+					Lines:    []int{2},
+					Reporter: "promql/by",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, use by(job, ...)",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "Left hand side of group_right() is ignored",
+			content:     "- record: foo\n  expr: sum by(type) (foo) / on(type) group_right() sum by(job) (bar)\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "Right hand side of group_right() is checked",
+			content:     "- record: foo\n  expr: sum by(job) (foo) / on(type) group_right() sum by(type) (bar)\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum by(type) (bar)",
+					Lines:    []int{2},
+					Reporter: "promql/by",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, use by(job, ...)",
+					Severity: checks.Warning,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
