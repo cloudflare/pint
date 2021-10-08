@@ -12,3 +12,7 @@ updates:
     directory: "/tools/golangci-lint"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
