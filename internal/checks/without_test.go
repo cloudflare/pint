@@ -149,6 +149,44 @@ func TestWithoutCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Right hand side of group_left() is ignored",
+			content:     "- record: foo\n  expr: sum without(id) (foo) / on(type) group_left() sum without(job) (bar)\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "Left hand side of group_left() is checked",
+			content:     "- record: foo\n  expr: sum without(job) (foo) / on(type) group_left() sum without(job) (bar)\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum without(job) (foo)",
+					Lines:    []int{2},
+					Reporter: "promql/without",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, remove job from without()",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "Left hand side of group_right() is ignored",
+			content:     "- record: foo\n  expr: sum without(job) (foo) / on(type) group_right() sum without(id) (bar)\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "Right hand side of group_right() is checked",
+			content:     "- record: foo\n  expr: sum without(job) (foo) / on(type) group_right() sum without(job) (bar)\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum without(job) (bar)",
+					Lines:    []int{2},
+					Reporter: "promql/without",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, remove job from without()",
+					Severity: checks.Warning,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
