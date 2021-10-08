@@ -57,6 +57,11 @@ func newApp() *cli.App {
 				Usage:  "Parse and print used config",
 				Action: actionConfig,
 			},
+			{
+				Name:   "parse",
+				Usage:  "Parse a query and print AST, use for debugging or understanding query details",
+				Action: actionParse,
+			},
 		},
 	}
 }

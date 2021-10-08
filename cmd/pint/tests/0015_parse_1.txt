@@ -1,0 +1,53 @@
+pint.ok parse 'sum(rate(foo[5m])) without(job) + sum(rate(bar[5m])) without(job)'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: sum without(job) (rate(foo[5m])) + sum without(job) (rate(bar[5m]))
+  BinaryExpr:
+    * Type: vector
+    * Op: +
+    * LHS: sum without(job) (rate(foo[5m]))
+    * RHS: sum without(job) (rate(bar[5m]))
+    * VectorMatching: &{one-to-one [] false []}
+    * ReturnBool: false
+  ++ node: sum without(job) (rate(foo[5m]))
+    AggregateExpr:
+      * Type: vector
+      * Op: sum
+      * Expr: rate(foo[5m])
+      * Param: <nil>
+      * Grouping: [job]
+      * Without: true
+        ++ node: rate(foo[5m])
+          Call:
+            * Type: vector
+            * Func: rate
+            * Args: foo[5m]
+              ++ node: foo[5m]
+                Expressions:
+                  ++ node: foo[5m]
+                    MatrixSelector:
+                      * Type: matrix
+                      * VectorSelector: foo
+                      * Range: 5m0s
+  ++ node: sum without(job) (rate(bar[5m]))
+    AggregateExpr:
+      * Type: vector
+      * Op: sum
+      * Expr: rate(bar[5m])
+      * Param: <nil>
+      * Grouping: [job]
+      * Without: true
+        ++ node: rate(bar[5m])
+          Call:
+            * Type: vector
+            * Func: rate
+            * Args: bar[5m]
+              ++ node: bar[5m]
+                Expressions:
+                  ++ node: bar[5m]
+                    MatrixSelector:
+                      * Type: matrix
+                      * VectorSelector: bar
+                      * Range: 5m0s
