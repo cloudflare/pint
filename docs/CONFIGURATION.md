@@ -645,6 +645,35 @@ rule {
 }
 ```
 
+## Template
+
+This check validates templating used in annotations and labels for alerting rules.
+See [Prometheus docs](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/)
+for details of supported templating syntax.
+
+Syntax:
+
+```JS
+template {
+  severity          = "bug|warning|info"
+}
+```
+
+- `severity` - set custom severity for reported issues, defaults to a bug.
+
+Example:
+
+```JS
+rule {
+  match {
+    kind = "alerting"
+  }
+
+  template {
+    severity = "fatal"
+  }
+}
+
 # Ignoring selected lines or files
 
 While parsing files pint will look for special comment blocks and use them to
