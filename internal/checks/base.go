@@ -20,6 +20,7 @@ var (
 		SyntaxCheckName,
 		WithoutCheckName,
 		RejectCheckName,
+		TemplateCheckName,
 	}
 )
 

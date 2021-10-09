@@ -5,6 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
 level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m5
+level=info msg="File parsed" [36mpath=[0mrules/0002.yml [36mrules=[0m1
 rules/0001.yml:1-2: url annotation is required (alerts/annotation)
 - alert: Always
   expr: up
@@ -30,7 +31,25 @@ rules/0001.yml:14: severity label value must match regex: ^critical|warning|info
 rules/0001.yml:16: url annotation value must match regex: ^https://wiki.example.com/page/(.+).html$ (alerts/annotation)
     url: bad
 
-level=info msg="Problems found" [36mBug=[0m4 [36mWarning=[0m3
+rules/0002.yml:5: template parse error: undefined variable "$label" (alerts/template)
+    summary: 'Instance {{ $label.instance }} down'
+
+rules/0002.yml:6: template parse error: undefined variable "$valuexx" (alerts/template)
+    func: '{{ $valuexx | xxx }}'
+
+rules/0002.yml:9: template parse error: undefined variable "$label" (alerts/template)
+    summary: 'Instance {{ $label.instance }} down'
+
+rules/0002.yml:10: template parse error: function "xxx" not defined (alerts/template)
+    func: '{{ $value | xxx }}'
+
+rules/0002.yml:10: using $value in labels will generate a new alert on every value change, move it to annotations (alerts/value)
+    func: '{{ $value | xxx }}'
+
+rules/0002.yml:11: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/value)
+    val: '{{ .Value|humanizeDuration }}'
+
+level=info msg="Problems found" [36mBug=[0m10 [36mWarning=[0m3
 level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
 -- rules/0001.yml --
 - alert: Always
@@ -56,6 +75,19 @@ level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
   annotations:
     url: "https://wiki.example.com/page/ServiceIsDown.html"
 
+-- rules/0002.yml --
+- alert: Foo Is Down
+  expr: up{job="foo"} == 0
+  annotations:
+    url: "https://wiki.example.com/page/ServiceIsDown.html"
+    summary: 'Instance {{ $label.instance }} down'
+    func: '{{ $valuexx | xxx }}'
+  labels:
+    severity: warning
+    summary: 'Instance {{ $label.instance }} down'
+    func: '{{ $value | xxx }}'
+    val: '{{ .Value|humanizeDuration }}'
+
 -- .pint.hcl --
 rule {
     annotation "url" {
@@ -68,4 +100,6 @@ rule {
         required = true
     }
     comparison {}
+    value {}
+    template {}
 }

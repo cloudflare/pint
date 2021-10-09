@@ -111,6 +111,7 @@ type Rule struct {
 	Value      *ValueSettings       `hcl:"value,block"`
 	Reject     []RejectSettings     `hcl:"reject,block"`
 	Comparison *ComparisonSettings  `hcl:"comparison,block"`
+	Template   *TemplateSettings    `hcl:"template,block"`
 }
 
 func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {
@@ -265,6 +266,11 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 	if rule.Comparison != nil && isEnabled(enabledChecks, disabledChecks, checks.ComparisonCheckName, r) {
 		severity := rule.Comparison.getSeverity(checks.Bug)
 		enabled = append(enabled, checks.NewComparisonCheck(severity))
+	}
+
+	if rule.Template != nil && isEnabled(enabledChecks, disabledChecks, checks.TemplateCheckName, r) {
+		severity := rule.Template.getSeverity(checks.Bug)
+		enabled = append(enabled, checks.NewTemplateCheck(severity))
 	}
 
 	return enabled
