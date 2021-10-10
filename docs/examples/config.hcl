@@ -62,10 +62,6 @@ rule {
     resolve = "5m"
   }
 
-  # Check if '{{ $value }}'/'{{ .Value }}' is used in labels
-  # https://www.robustperception.io/dont-put-the-value-in-alert-labels
-  value {}
-
   # Check if templates used in annotations and labels are valid.
   template {}
 }

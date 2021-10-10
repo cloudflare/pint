@@ -108,7 +108,6 @@ type Rule struct {
 	Series     *SeriesSettings      `hcl:"series,block"`
 	Cost       *CostSettings        `hcl:"cost,block"`
 	Alerts     *AlertsSettings      `hcl:"alerts,block"`
-	Value      *ValueSettings       `hcl:"value,block"`
 	Reject     []RejectSettings     `hcl:"reject,block"`
 	Comparison *ComparisonSettings  `hcl:"comparison,block"`
 	Template   *TemplateSettings    `hcl:"template,block"`
@@ -234,11 +233,6 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			timeout, _ := parseDuration(prom.Timeout)
 			enabled = append(enabled, checks.NewAlertsCheck(prom.Name, prom.URI, timeout, qRange, qStep, qResolve))
 		}
-	}
-
-	if rule.Value != nil && isEnabled(enabledChecks, disabledChecks, checks.ValueCheckName, r) {
-		severity := rule.Value.getSeverity(checks.Bug)
-		enabled = append(enabled, checks.NewValueCheck(severity))
 	}
 
 	if len(rule.Reject) > 0 && isEnabled(enabledChecks, disabledChecks, checks.RejectCheckName, r) {

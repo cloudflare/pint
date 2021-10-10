@@ -79,6 +79,153 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $labels.instance }} down'\n",
 			checker:     checks.NewTemplateCheck(checks.Bug),
 		},
+		{
+			description: "{{ $value}} in label key",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value}}': bar\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "{{ $value}}: bar",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{ $value }} in label key",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value }}': bar\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "{{ $value }}: bar",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{$value}} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{$value}}'\n",
+			checker:     checks.NewTemplateCheck(checks.Fatal),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: {{$value}}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Fatal,
+				},
+			},
+		},
+		{
+			description: "{{$value}} in multiple labels",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: '{{ .Value }}'\n    baz: '{{$value}}'\n",
+			checker:     checks.NewTemplateCheck(checks.Fatal),
+			problems: []checks.Problem{
+				{
+					Fragment: "foo: {{ .Value }}",
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     "using .Value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Fatal,
+				},
+				{
+					Fragment: "baz: {{$value}}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Fatal,
+				},
+			},
+		},
+		{
+			description: "{{  $value  }} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{  $value | humanizePercentage }}%\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: foo is {{  $value | humanizePercentage }}%\n",
+					Lines:    []int{5, 6},
+					Reporter: "alerts/template",
+					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{  $value  }} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{$value|humanizePercentage}}%\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: foo is {{$value|humanizePercentage}}%\n",
+					Lines:    []int{5, 6},
+					Reporter: "alerts/template",
+					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{ .Value }} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: 'value {{ .Value }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: value {{ .Value }}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using .Value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{ .Value|humanize }} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ .Value|humanize }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: {{ .Value|humanize }}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using .Value in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{ $foo := $value }} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := $value }}{{ $foo }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: {{ $foo := $value }}{{ $foo }}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using $foo in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "{{ $foo := .Value }} in label value",
+			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := .Value }}{{ $foo }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "baz: {{ $foo := .Value }}{{ $foo }}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     "using $foo in labels will generate a new alert on every value change, move it to annotations",
+					Severity: checks.Bug,
+				},
+			},
+		},
 		/*
 			{
 				description: "annotation label missing from metrics",

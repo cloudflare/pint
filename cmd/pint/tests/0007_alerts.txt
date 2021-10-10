@@ -43,10 +43,10 @@ rules/0002.yml:9: template parse error: undefined variable "$label" (alerts/temp
 rules/0002.yml:10: template parse error: function "xxx" not defined (alerts/template)
     func: '{{ $value | xxx }}'
 
-rules/0002.yml:10: using $value in labels will generate a new alert on every value change, move it to annotations (alerts/value)
-    func: '{{ $value | xxx }}'
+rules/0002.yml:11: using $value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
+    bar: 'Some {{$value}} value'
 
-rules/0002.yml:11: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/value)
+rules/0002.yml:12: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
     val: '{{ .Value|humanizeDuration }}'
 
 level=info msg="Problems found" [36mBug=[0m10 [36mWarning=[0m3
@@ -86,7 +86,9 @@ level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
     severity: warning
     summary: 'Instance {{ $label.instance }} down'
     func: '{{ $value | xxx }}'
+    bar: 'Some {{$value}} value'
     val: '{{ .Value|humanizeDuration }}'
+    ignore: '$value is not a variable'
 
 -- .pint.hcl --
 rule {
@@ -100,6 +102,5 @@ rule {
         required = true
     }
     comparison {}
-    value {}
     template {}
 }
