@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
   pull_request:
     branches:
       - main
@@ -20,16 +22,6 @@ jobs:
         with:
           go-version: 1.17.2
 
-      - name: Cache Go modules and build cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: ${{ runner.os }}-${{ env.GITHUB_REF_SLUG }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-main-go-
-
       - name: Check out code
         uses: actions/checkout@v2
         with:
@@ -38,4 +30,12 @@ jobs:
       - name: Compile binaries
         uses: goreleaser/goreleaser-action@v2
         with:
-          args: build -p 2 --snapshot --rm-dist
+          args: build --snapshot --rm-dist
+
+      - name: Release binaries
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
