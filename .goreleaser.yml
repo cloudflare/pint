@@ -1,0 +1,34 @@
+builds:
+  - main: ./cmd/pint
+    flags:
+      - '-trimpath'
+    ldflags:
+      - '-s -X main.version={{.Version}} -X main.commit={{.Commit}}'
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ignore:
+    - goos: windows
+      goarch: arm64
+    no_unique_dist_dir: true
+    binary: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
