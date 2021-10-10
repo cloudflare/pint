@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
@@ -14,6 +15,11 @@ const (
 	configFlag   = "config"
 	logLevelFlag = "log-level"
 	disabledFlag = "disabled"
+)
+
+var (
+	version = "unknown"
+	commit  = "unknown"
 )
 
 func newApp() *cli.App {
@@ -34,6 +40,11 @@ func newApp() *cli.App {
 			},
 		},
 		Commands: []*cli.Command{
+			{
+				Name:   "version",
+				Usage:  "Print version and exit",
+				Action: actionVersion,
+			},
 			{
 				Name:   "lint",
 				Usage:  "Lint specified files",
@@ -79,4 +90,13 @@ func main() {
 		log.Fatal().Err(err).Msg("Execution completed with error(s)s")
 		os.Exit(1)
 	}
+}
+
+func actionVersion(c *cli.Context) (err error) {
+	err = initLogger(c.String(logLevelFlag))
+	if err != nil {
+		return fmt.Errorf("failed to set log level: %s", err)
+	}
+	fmt.Printf("%s (revision: %s)\n", version, commit)
+	return nil
 }

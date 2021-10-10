@@ -32,6 +32,10 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Compile binaries
-        run: make
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          args: build -p 2 --snapshot --rm-dist
