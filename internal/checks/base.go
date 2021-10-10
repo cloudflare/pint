@@ -11,7 +11,6 @@ var (
 		AlertsCheckName,
 		ComparisonCheckName,
 		AnnotationCheckName,
-		ValueCheckName,
 		ByCheckName,
 		CostCheckName,
 		LabelCheckName,

@@ -550,48 +550,6 @@ rule {
 }
 ```
 
-## Values
-
-This check will inspect all alert rules and warn if any of them
-uses query return values inside alert labels.
-Two alerts are identical if they have identical labels, so using
-query value will generate a new unique alert every time it changes.
-If alerting rule is using `for` it might prevent it from ever firing
-if the value keeps changing before `for` is satisfied, because
-Prometheus will consider it to be a new alert and start `for` tracking
-from zero.
-
-If you want to include query value in the alert then use annotations
-for that. Annotations are not used to compare alerts identity and so
-the value of any annotation can change between alert evaluations.
-
-See [this blog post](https://www.robustperception.io/dont-put-the-value-in-alert-labels)
-for more details.
-
-Syntax:
-
-```JS
-series {
-  severity       = "bug|warning|info"
-}
-```
-
-- `severity` - set custom severity for reported issues, defaults to a bug.
-
-Example:
-
-```JS
-rule {
-  match {
-    kind = "alerting"
-  }
-
-  value {
-    severity = "fatal"
-  }
-}
-```
-
 ## Reject
 
 This check allows rejecting label or annotations keys and values
@@ -650,6 +608,22 @@ rule {
 This check validates templating used in annotations and labels for alerting rules.
 See [Prometheus docs](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/)
 for details of supported templating syntax.
+
+This check will also inspect all alert rules and warn if any of them
+uses query return values inside alert labels.
+Two alerts are identical if they have identical labels, so using
+query value will generate a new unique alert every time it changes.
+If alerting rule is using `for` it might prevent it from ever firing
+if the value keeps changing before `for` is satisfied, because
+Prometheus will consider it to be a new alert and start `for` tracking
+from zero.
+
+If you want to include query value in the alert then use annotations
+for that. Annotations are not used to compare alerts identity and so
+the value of any annotation can change between alert evaluations.
+
+See [this blog post](https://www.robustperception.io/dont-put-the-value-in-alert-labels)
+for more details.
 
 Syntax:
 

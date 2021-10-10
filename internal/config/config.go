@@ -193,12 +193,6 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			}
 		}
 
-		if rule.Value != nil {
-			if err = rule.Value.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
 		for _, reject := range rule.Reject {
 			if err = reject.validate(); err != nil {
 				return cfg, err
