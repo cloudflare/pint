@@ -77,6 +77,7 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 	var skipNext bool
 	var autoReset bool
 	var skipAll bool
+	var inBegin bool
 	for {
 		line, err = reader.ReadString('\n')
 		if err != nil && err != io.EOF {
@@ -96,8 +97,10 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 					skipAll = true
 				case skipCurrentLine:
 					out = append(out, []byte(emptyLine(line))...)
-					skipNext = false
-					autoReset = true
+					if !inBegin {
+						skipNext = false
+						autoReset = true
+					}
 				case skipNextLine:
 					out = append(out, []byte(line)...)
 					skipNext = true
@@ -106,10 +109,12 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 					out = append(out, []byte(line)...)
 					skipNext = true
 					autoReset = false
+					inBegin = true
 				case skipEnd:
 					out = append(out, []byte(line)...)
 					skipNext = false
 					autoReset = true
+					inBegin = false
 				}
 			} else if skipNext {
 				out = append(out, []byte(emptyLine(line))...)
