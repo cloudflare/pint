@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.1.2]
+
+### Fixed
+
+- `# pint skip/line` place between `# pint skip/begin` and `# pint skip/end` lines would
+  reset ignore rules causing lines that should be ignored to be parsed. 
+
 ## [v0.1.1]
 
 ### Changed
