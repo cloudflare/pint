@@ -5,8 +5,8 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=error msg="Failed to parse file content" [31merror=[0m[31m"yaml: line 4: did not find expected key"[0m [36mpath=[0mrules/bad.yaml
 level=info msg="File parsed" [36mpath=[0mrules/ok.yml [36mrules=[0m1
-rules/bad.yaml:5: did not find expected key (pint/parse)
-- xx
+rules/bad.yaml:4: did not find expected key (pint/parse)
+
 
 rules/ok.yml:2: syntax error: unclosed left bracket (promql/syntax)
   expr: sum(foo[5m)
