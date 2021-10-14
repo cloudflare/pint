@@ -27,7 +27,7 @@ func tryDecodingYamlError(e string) (int, string) {
 		if err != nil {
 			return 1, e
 		}
-		return line + 1, parts[2]
+		return line, parts[2]
 	}
 	return 1, e
 }

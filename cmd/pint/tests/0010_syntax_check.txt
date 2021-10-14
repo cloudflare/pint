@@ -4,8 +4,8 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=error msg="Failed to parse file content" [31merror=[0m[31m"yaml: line 6: did not find expected '-' indicator"[0m [36mpath=[0mrules/1.yaml
-rules/1.yaml:7: did not find expected '-' indicator (pint/parse)
-alert: Bad
+rules/1.yaml:6: did not find expected '-' indicator (pint/parse)
+
 
 level=info msg="Problems found" [36mFatal=[0m1
 level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
