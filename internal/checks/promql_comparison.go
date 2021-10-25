@@ -51,6 +51,9 @@ func hasComparision(n *parser.PromQLNode) bool {
 		if node.Op.IsComparisonOperator() {
 			return true
 		}
+		if node.Op == promParser.LUNLESS {
+			return true
+		}
 	}
 
 	for _, child := range n.Children {
