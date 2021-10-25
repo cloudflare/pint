@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.1.3]
+
+### Added
+
+- `vector_matching` check for finding queries with incorrect `on()` or `ignoring()`
+  keywords.
+
 ## [v0.1.2]
 
 ### Fixed

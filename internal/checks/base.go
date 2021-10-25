@@ -20,6 +20,7 @@ var (
 		WithoutCheckName,
 		RejectCheckName,
 		TemplateCheckName,
+		VectorMatchingCheckName,
 	}
 )
 

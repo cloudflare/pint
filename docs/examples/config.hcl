@@ -28,6 +28,9 @@ rule {
     label_keys   = true
     label_values = true
   }
+
+  # Check if all queries use correct vector matching rules
+  vector_matching {}
 }
 
 rule {
