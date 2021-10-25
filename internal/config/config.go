@@ -211,6 +211,12 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 				return cfg, err
 			}
 		}
+
+		if rule.VectorMatching != nil {
+			if err = rule.VectorMatching.validate(); err != nil {
+				return cfg, err
+			}
+		}
 	}
 
 	return cfg, nil

@@ -324,9 +324,7 @@ For `irate()` function:
 Syntax:
 
 ```JS
-rate {
-  prometheus = ["...", ...]
-}
+rate {}
 ```
 
 Example:
@@ -347,9 +345,7 @@ rule {
     kind = "recording"
   }
 
-  rate {
-    prometheus = ["prod", "dev"]
-  }
+  rate {}
 }
 ```
 
@@ -367,7 +363,6 @@ alerts {
   range      = "1h"
   step       = "1m"
   resolve    = "5m"
-  prometheus = [ "...", ... ]
 }
 ```
 
@@ -379,8 +374,6 @@ alerts {
   to `scrape_interval`, try to reduce it if that would load too many samples.
   Defaults to `1m`.
 - `resolve` - duration after which stale alerts are resolved. Defaults to `5m`.
-- `prometheus` - list of Prometheus servers to query. All servers must be first
-  defined as `prometheus` blocks in global pint config.
 
 Example:
 
@@ -398,7 +391,6 @@ rule {
     range      = "1d"
     step       = "1m"
     resolve    = "5m"
-    prometheus = [ "prod" ]
   }
 }
 ```
@@ -448,7 +440,6 @@ cost {
   severity       = "bug|warning|info"
   bytesPerSample = 1024
   maxSeries      = 5000
-  prometheus     = ["...", ...]
 }
 ```
 
@@ -460,8 +451,6 @@ cost {
   required to store returned series in Prometheus.
 - `maxSeries` - if set and number of results for given query exceeds this value
   it will be reported as a bug (or custom severity if `severity` is set).
-- `prometheus` - list of Prometheus servers to query. All servers must be first
-  defined as `prometheus` blocks in global pint config.
 
 Examples:
 
@@ -476,9 +465,7 @@ prometheus "dev" {
 }
 
 rule {
-  cost {
-    prometheus     = ["dev"]
-  }
+  cost {}
 }
 ```
 
@@ -497,7 +484,6 @@ like memory pressure, Go version, GOGC settings etc.
 ...
   cost {
     bytesPerSample = 4096
-    prometheus     = ["dev"]
   }
 }
 ```
@@ -518,13 +504,10 @@ Syntax:
 ```JS
 series {
   severity       = "bug|warning|info"
-  prometheus     = ["...", ...]
 }
 ```
 
 - `severity` - set custom severity for reported issues, defaults to a warning.
-- `prometheus` - list of Prometheus servers to query. All servers must be first
-  defined as `prometheus` blocks in global pint config.
 
 Example:
 
@@ -544,9 +527,7 @@ rule {
     kind = "recording"
   }
 
-  cost {
-    prometheus = ["dev", "prod"]
-  }
+  series {}
 }
 ```
 
@@ -647,6 +628,70 @@ rule {
     severity = "fatal"
   }
 }
+```
+
+## Vector Matching
+
+This check will try to find queries that try to
+[match vectors](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching)
+but have different sets of labels on both side of the query.
+
+Consider these two time series:
+
+```
+http_errors{job="node-exporter", cluster="prod", instance="server1"}
+```
+
+and
+
+```
+cluster:http_errors{job="node-exporter", cluster="prod"}
+```
+
+One of them tracks specific instance and one aggregates series for the whole cluster.
+Because they have different set of labels if we want to calculate some value using both
+of them, for example:
+
+```
+http_errors / cluster:http_errors
+```
+
+we wouldn't get any results. To fix that we need ignore extra labels:
+
+```
+http_errors / ignoring(instance) cluster:http_errors
+```
+
+This check aims to find all queries that using vector matching where both sides
+of the query have different sets of labels causing no results to be returned.
+
+Syntax:
+
+```JS
+vector_matching {
+  severity       = "bug|warning|info"
+}
+```
+
+- `severity` - set custom severity for reported issues, defaults to a warning.
+
+Example:
+
+```JS
+prometheus "dev" {
+  uri     = "https://prometheus-dev.example.com"
+  timeout = "30s"
+}
+
+prometheus "prod" {
+  uri     = "https://prometheus-prod.example.com"
+  timeout = "30s"
+}
+
+rule {
+  vector_matching {}
+}
+```
 
 # Ignoring selected lines or files
 

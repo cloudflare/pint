@@ -74,6 +74,11 @@ func TestComparisonCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "alert unless condition",
+			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: foo unless bar\n",
+			checker:     checks.NewComparisonCheck(checks.Bug),
+		},
 	}
 
 	runTests(t, testCases)

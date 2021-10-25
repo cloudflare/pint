@@ -100,17 +100,18 @@ func (m Match) validate() error {
 }
 
 type Rule struct {
-	Match      *Match               `hcl:"match,block"`
-	Aggregate  []AggregateSettings  `hcl:"aggregate,block"`
-	Rate       *RateSettings        `hcl:"rate,block"`
-	Annotation []AnnotationSettings `hcl:"annotation,block"`
-	Label      []AnnotationSettings `hcl:"label,block"`
-	Series     *SeriesSettings      `hcl:"series,block"`
-	Cost       *CostSettings        `hcl:"cost,block"`
-	Alerts     *AlertsSettings      `hcl:"alerts,block"`
-	Reject     []RejectSettings     `hcl:"reject,block"`
-	Comparison *ComparisonSettings  `hcl:"comparison,block"`
-	Template   *TemplateSettings    `hcl:"template,block"`
+	Match          *Match                  `hcl:"match,block"`
+	Aggregate      []AggregateSettings     `hcl:"aggregate,block"`
+	Rate           *RateSettings           `hcl:"rate,block"`
+	Annotation     []AnnotationSettings    `hcl:"annotation,block"`
+	Label          []AnnotationSettings    `hcl:"label,block"`
+	Series         *SeriesSettings         `hcl:"series,block"`
+	Cost           *CostSettings           `hcl:"cost,block"`
+	Alerts         *AlertsSettings         `hcl:"alerts,block"`
+	Reject         []RejectSettings        `hcl:"reject,block"`
+	Comparison     *ComparisonSettings     `hcl:"comparison,block"`
+	Template       *TemplateSettings       `hcl:"template,block"`
+	VectorMatching *VectorMatchingSettings `hcl:"vector_matching,block"`
 }
 
 func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {
@@ -265,6 +266,14 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 	if rule.Template != nil && isEnabled(enabledChecks, disabledChecks, checks.TemplateCheckName, r) {
 		severity := rule.Template.getSeverity(checks.Bug)
 		enabled = append(enabled, checks.NewTemplateCheck(severity))
+	}
+
+	if rule.VectorMatching != nil && isEnabled(enabledChecks, disabledChecks, checks.VectorMatchingCheckName, r) {
+		severity := rule.VectorMatching.getSeverity(checks.Warning)
+		for _, prom := range proms {
+			timeout, _ := parseDuration(prom.Timeout)
+			enabled = append(enabled, checks.NewVectorMatchingCheck(prom.Name, prom.URI, timeout, severity))
+		}
 	}
 
 	return enabled
