@@ -1,5 +1,12 @@
 # Changelog
 
+## [v0.1.4]
+
+### Changed
+
+- Retry queries that error with `query processing would load too many samples into memory`
+  using a smaller time range.
+
 ## [v0.1.3]
 
 ### Added

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/api"
@@ -64,7 +65,7 @@ func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.
 		Msg("Range query completed")
 	if err != nil {
 		log.Error().Err(err).Str("uri", uri).Str("query", expr).Msg("Range query failed")
-		if err, ok := err.(net.Error); ok && err.Timeout() {
+		if isRetryable(err) {
 			delta := end.Sub(start) / 2
 			log.Warn().Str("delta", HumanizeDuration(delta)).Msg("Retrying request with smaller range")
 			b, _ := start.MarshalText()
@@ -94,4 +95,14 @@ func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.
 	log.Debug().Str("uri", uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
 
 	return &qr, nil
+}
+
+func isRetryable(err error) bool {
+	if err, ok := err.(net.Error); ok && err.Timeout() {
+		return true
+	}
+	if strings.Contains(err.Error(), "query processing would load too many samples into memory in ") {
+		return true
+	}
+	return false
 }
