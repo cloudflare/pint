@@ -14,9 +14,10 @@ builds:
     - goos: windows
       goarch: arm64
     no_unique_dist_dir: true
-    binary: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+    binary: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}'
 archives:
-  - replacements:
+  - name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}'
+    replacements:
       darwin: Darwin
       linux: Linux
       windows: Windows
@@ -25,11 +26,15 @@ archives:
 checksum:
   name_template: 'checksums.txt'
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  name_template: '{{ incpatch .Version }}-next'
+release:
+  extra_files:
+    - glob: ./*.md
+    - glob: ./docs/*
+    - glob: ./docs/**/*
 changelog:
   use: github
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - '^Merge pull request '
