@@ -136,6 +136,7 @@ func checkTemplateSyntax(name, text string, data interface{}) error {
 		model.Time(timestamp.FromTime(time.Now())),
 		nil,
 		nil,
+		nil,
 	)
 	if err := tmpl.ParseTest(); err != nil {
 		e := strings.TrimPrefix(err.Error(), fmt.Sprintf("template: %s:", name))

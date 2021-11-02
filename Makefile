@@ -14,7 +14,7 @@ COVER_PROFILE = $(COVER_DIR)/coverage.out
 build: $(PINT_BIN)
 
 $(PINT_BIN): $(PINT_SRC) go.mod go.sum
-	go build ./cmd/pint
+	go build -trimpath -ldflags='-s -w' ./cmd/pint
 
 $(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
 	go install -modfile=tools/golangci-lint/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint

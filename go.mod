@@ -10,12 +10,11 @@ require (
 	github.com/hashicorp/hcl/v2 v2.10.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.32.1
-	github.com/prometheus/prometheus v1.8.2-0.20211005150130-f29caccc4255
+	github.com/prometheus/prometheus v1.8.2-0.20211102100715-d4c83da6d252
 	github.com/rogpeppe/go-internal v1.8.0
-	github.com/rs/zerolog v1.25.0
-	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/rs/zerolog v1.26.0
 	github.com/urfave/cli/v2 v2.3.0
-	golang.org/x/oauth2 v0.0.0-20211005180243-6b3c2da341f1
+	golang.org/x/oauth2 v0.0.0-20211028175245-ba495a64dcb5
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
 
@@ -23,7 +22,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/alecthomas/units v0.0.0-20210927113745-59d0afb8317a // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/aws/aws-sdk-go v1.41.10 // indirect
+	github.com/aws/aws-sdk-go v1.41.15 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
@@ -54,6 +53,8 @@ require (
 	github.com/prometheus/common/sigv4 v0.1.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/uber/jaeger-client-go v2.29.1+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
@@ -61,11 +62,10 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/goleak v1.1.12 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/net v0.0.0-20211020060615-d418f374d309 // indirect
+	golang.org/x/net v0.0.0-20211101193420-4a448f8816b3 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359 // indirect
+	golang.org/x/sys v0.0.0-20211102061401-a2f17f7b995c // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.7 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/errgo.v2 v2.1.0 // indirect
