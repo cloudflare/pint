@@ -3,7 +3,7 @@ builds:
     flags:
       - '-trimpath'
     ldflags:
-      - '-s -X main.version={{.Version}} -X main.commit={{.Commit}}'
+      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
     env:
       - CGO_ENABLED=0
     goos:
