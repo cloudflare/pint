@@ -1,5 +1,11 @@
 # Changelog
 
+## [v0.1.5]
+
+### Fixed
+
+- Fixed file descriptor leak due to missing file `Close()`  #69.
+
 ## [v0.1.4]
 
 ### Changed
