@@ -9,8 +9,7 @@ on:
       - main
 
 jobs:
-  test-go:
-    name: Test Go code
+  goreleaser-config:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
