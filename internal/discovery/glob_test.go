@@ -63,7 +63,7 @@ func TestGlobFileFinder(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			tmpDir, err := ioutil.TempDir("", "TestGlobFileFinder")
 			if err != nil {
-				t.Errorf("ioutil.TempDir() returned an error: %v", err)
+				t.Errorf("ioutil.TempDir() returned an error: %s", err)
 				return
 			}
 			defer func() {
@@ -78,28 +78,28 @@ func TestGlobFileFinder(t *testing.T) {
 				if dir := filepath.Dir(fullpath); dir != tmpDir {
 					if _, err := os.Stat(dir); os.IsNotExist(err) {
 						if err := os.Mkdir(dir, 0755); err != nil {
-							t.Errorf("os.Mkdir(%s) returned an error: %v", dir, err)
+							t.Errorf("os.Mkdir(%s) returned an error: %s", dir, err)
 							return
 						}
 
 					}
 				}
 				if _, err := os.Create(fullpath); err != nil {
-					t.Errorf("os.Create(%s) returned an error: %v", path, err)
+					t.Errorf("os.Create(%s) returned an error: %s", path, err)
 					return
 				}
 			}
 
 			err = os.Chdir(tmpDir)
 			if err != nil {
-				t.Errorf("os.Chdir(%s) returned an error: %v", tmpDir, err)
+				t.Errorf("os.Chdir(%s) returned an error: %s", tmpDir, err)
 			}
 
 			gd := discovery.NewGlobFileFinder()
 			output, err := gd.Find(tc.pattern)
 			hadError := err != nil
 			if hadError != tc.shouldError {
-				t.Errorf("GlobFileFinder.Discover() returned err=%v, expected=%v", err, tc.shouldError)
+				t.Errorf("GlobFileFinder.Discover() returned err=%s, expected=%v", err, tc.shouldError)
 			}
 
 			if hadError {

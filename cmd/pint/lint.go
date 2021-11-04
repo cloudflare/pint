@@ -16,7 +16,7 @@ import (
 func actionLint(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag))
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %s", err)
+		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
 	paths := c.Args().Slice()
@@ -26,7 +26,7 @@ func actionLint(c *cli.Context) (err error) {
 
 	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
 	if err != nil {
-		return fmt.Errorf("failed to load config file %q: %s", c.Path(configFlag), err)
+		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}
 
 	cfg.SetDisabledChecks(c.StringSlice(disabledFlag))

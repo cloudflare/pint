@@ -75,7 +75,7 @@ func Blame(path string, cmd CommandRunner) (lines LineBlames, err error) {
 			cl.Commit = parts[0]
 			cl.Line, err = strconv.Atoi(parts[2])
 			if err != nil {
-				return nil, fmt.Errorf("failed to parse line number from %q: %s", line, err)
+				return nil, fmt.Errorf("failed to parse line number from %q: %w", line, err)
 			}
 		}
 	}

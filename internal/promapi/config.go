@@ -37,12 +37,12 @@ func Config(uri string, timeout time.Duration) (*PrometheusConfig, error) {
 	resp, err := v1api.Config(ctx)
 	if err != nil {
 		log.Error().Err(err).Str("uri", uri).Msg("Failed to query Prometheus configuration")
-		return nil, fmt.Errorf("failed to query Prometheus config: %v", err)
+		return nil, fmt.Errorf("failed to query Prometheus config: %w", err)
 	}
 
 	var cfg PrometheusConfig
 	if err = yaml.Unmarshal([]byte(resp.YAML), &cfg); err != nil {
-		return nil, fmt.Errorf("failed to decode config data in /api/v1/status/config response: %s", err)
+		return nil, fmt.Errorf("failed to decode config data in /api/v1/status/config response: %w", err)
 	}
 
 	if cfg.Global.ScrapeInterval == 0 {

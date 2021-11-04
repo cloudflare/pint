@@ -62,7 +62,7 @@ func TestBitBucketReporter(t *testing.T) {
 				if err != nil && err.Error() == "failed to get HEAD commit: git head error" {
 					return nil
 				}
-				return fmt.Errorf("Expected git head error, got %v", err)
+				return fmt.Errorf("Expected git head error, got %w", err)
 			},
 		},
 		{
@@ -83,7 +83,7 @@ func TestBitBucketReporter(t *testing.T) {
 				if err != nil && err.Error() == "failed to run git blame: git blame error" {
 					return nil
 				}
-				return fmt.Errorf("Expected git head error, got %v", err)
+				return fmt.Errorf("Expected git head error, got %w", err)
 			},
 		},
 		{
@@ -109,7 +109,7 @@ func TestBitBucketReporter(t *testing.T) {
 				if err != nil && err.Error() == "failed to create BitBucket report: PUT request failed" {
 					return nil
 				}
-				return fmt.Errorf("Expected 'PUT request failed', got %q", err)
+				return fmt.Errorf("Expected 'PUT request failed', got %w", err)
 			},
 		},
 		{
@@ -133,10 +133,11 @@ func TestBitBucketReporter(t *testing.T) {
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
-				if err, ok := errors.Unwrap(err).(net.Error); ok && err.Timeout() {
+				var neterr net.Error
+				if ok := errors.As(errors.Unwrap(err), &neterr); ok && neterr.Timeout() {
 					return nil
 				}
-				return fmt.Errorf("Expected a timeout error, got %v", err)
+				return fmt.Errorf("Expected a timeout error, got %w", err)
 			},
 		},
 		{
@@ -160,10 +161,11 @@ func TestBitBucketReporter(t *testing.T) {
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
-				if err, ok := errors.Unwrap(err).(net.Error); ok && err.Timeout() {
+				var neterr net.Error
+				if ok := errors.As(errors.Unwrap(err), &neterr); ok && neterr.Timeout() {
 					return nil
 				}
-				return fmt.Errorf("Expected a timeout error, got %v", err)
+				return fmt.Errorf("Expected a timeout error, got %w", err)
 			},
 		},
 		{
@@ -269,7 +271,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			errorHandler: func(err error) error {
 				if err.Error() != "fatal error(s) reported" {
-					return fmt.Errorf("Unpexpected error: %v", err)
+					return fmt.Errorf("Unpexpected error: %w", err)
 				}
 				return nil
 			},
@@ -324,7 +326,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			errorHandler: func(err error) error {
 				if err.Error() != "fatal error(s) reported" {
-					return fmt.Errorf("Unpexpected error: %v", err)
+					return fmt.Errorf("Unpexpected error: %w", err)
 				}
 				return nil
 			},
@@ -348,7 +350,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			errorHandler: func(err error) error {
 				if err != nil {
-					return fmt.Errorf("Unpexpected error: %v", err)
+					return fmt.Errorf("Unpexpected error: %w", err)
 				}
 				return nil
 			},
@@ -442,7 +444,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			errorHandler: func(err error) error {
 				if err != nil {
-					return fmt.Errorf("Unpexpected error: %v", err)
+					return fmt.Errorf("Unpexpected error: %w", err)
 				}
 				return nil
 			},
@@ -474,7 +476,7 @@ func TestBitBucketReporter(t *testing.T) {
 					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations":
 						var resp reporter.BitBucketAnnotations
 						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-							t.Errorf("JSON decode error: %v", err)
+							t.Errorf("JSON decode error: %s", err)
 						}
 						if diff := cmp.Diff(tc.annotations, resp); diff != "" {
 							t.Errorf("Got wrong bitbucket annotations (-want +got):\n%s", diff)

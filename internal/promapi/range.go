@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
@@ -98,7 +99,8 @@ func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.
 }
 
 func isRetryable(err error) bool {
-	if err, ok := err.(net.Error); ok && err.Timeout() {
+	var neterr net.Error
+	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
 		return true
 	}
 	if strings.Contains(err.Error(), "query processing would load too many samples into memory in ") {

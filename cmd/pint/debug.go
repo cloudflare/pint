@@ -10,99 +10,99 @@ import (
 
 const levelStep = 2
 
-func print(ident int, format string, a ...interface{}) {
+func printNode(ident int, format string, a ...interface{}) {
 	prefix := strings.Repeat(" ", ident)
 	fmt.Printf(prefix+format+"\n", a...)
 }
 
 func parseNode(node parser.Node, level int) {
-	print(level, "++ node: %v", node)
+	printNode(level, "++ node: %v", node)
 	level += levelStep
 
 	switch n := node.(type) {
 	case parser.Expressions:
-		print(level, "Expressions:")
+		printNode(level, "Expressions:")
 		for _, e := range n {
 			parseNode(e, level+levelStep)
 		}
 	case *parser.AggregateExpr:
-		print(level, "AggregateExpr:")
+		printNode(level, "AggregateExpr:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Op: %v", n.Op)
-		print(level, "* Expr: %v", n.Expr)
-		print(level, "* Param: %v", n.Param)
-		print(level, "* Grouping: %v", n.Grouping)
-		print(level, "* Without: %v", n.Without)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Op: %v", n.Op)
+		printNode(level, "* Expr: %v", n.Expr)
+		printNode(level, "* Param: %v", n.Param)
+		printNode(level, "* Grouping: %v", n.Grouping)
+		printNode(level, "* Without: %v", n.Without)
 		parseNode(n.Expr, level+levelStep)
 	case *parser.BinaryExpr:
-		print(level, "BinaryExpr:")
+		printNode(level, "BinaryExpr:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Op: %v", n.Op)
-		print(level, "* LHS: %v", n.LHS)
-		print(level, "* RHS: %v", n.RHS)
-		print(level, "* VectorMatching: %v", n.VectorMatching)
-		print(level, "* ReturnBool: %v", n.ReturnBool)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Op: %v", n.Op)
+		printNode(level, "* LHS: %v", n.LHS)
+		printNode(level, "* RHS: %v", n.RHS)
+		printNode(level, "* VectorMatching: %v", n.VectorMatching)
+		printNode(level, "* ReturnBool: %v", n.ReturnBool)
 	case *parser.EvalStmt:
-		print(level, "EvalStmt:")
+		printNode(level, "EvalStmt:")
 		level += levelStep
-		print(level, "* Expr: %v", n.Expr)
-		print(level, "* Start: %v", n.Start)
-		print(level, "* End: %v", n.End)
-		print(level, "* Interval: %v", n.Interval)
+		printNode(level, "* Expr: %v", n.Expr)
+		printNode(level, "* Start: %v", n.Start)
+		printNode(level, "* End: %v", n.End)
+		printNode(level, "* Interval: %v", n.Interval)
 		parseNode(n.Expr, level+levelStep)
 	case *parser.Call:
-		print(level, "Call:")
+		printNode(level, "Call:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Func: %v", n.Func.Name)
-		print(level, "* Args: %v", n.Args)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Func: %v", n.Func.Name)
+		printNode(level, "* Args: %v", n.Args)
 		parseNode(n.Args, level+levelStep)
 	case *parser.ParenExpr:
-		print(level, "ParenExpr:")
+		printNode(level, "ParenExpr:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Expr: %v", n.Expr)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Expr: %v", n.Expr)
 		parseNode(n.Expr, level+levelStep)
 	case *parser.UnaryExpr:
-		print(level, "UnaryExpr:")
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Op: %v", n.Op)
-		print(level, "* Expr: %v", n.Expr)
+		printNode(level, "UnaryExpr:")
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Op: %v", n.Op)
+		printNode(level, "* Expr: %v", n.Expr)
 		parseNode(n.Expr, level+levelStep)
 	case *parser.SubqueryExpr:
-		print(level, "SubqueryExpr:")
+		printNode(level, "SubqueryExpr:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Expr: %v", n.Expr)
-		print(level, "* Step: %v", n.Step)
-		print(level, "* Range: %v", n.Range)
-		print(level, "* Offset: %v", n.Offset)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Expr: %v", n.Expr)
+		printNode(level, "* Step: %v", n.Step)
+		printNode(level, "* Range: %v", n.Range)
+		printNode(level, "* Offset: %v", n.Offset)
 		parseNode(n.Expr, level+levelStep)
 	case *parser.MatrixSelector:
-		print(level, "MatrixSelector:")
+		printNode(level, "MatrixSelector:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* VectorSelector: %v", n.VectorSelector)
-		print(level, "* Range: %v", n.Range)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* VectorSelector: %v", n.VectorSelector)
+		printNode(level, "* Range: %v", n.Range)
 	case *parser.VectorSelector:
-		print(level, "VectorSelector:")
+		printNode(level, "VectorSelector:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
-		print(level, "* Name: %v", n.Name)
-		print(level, "* Offset: %v", n.Offset)
-		print(level, "* LabelMatchers: %v", n.LabelMatchers)
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Name: %v", n.Name)
+		printNode(level, "* Offset: %v", n.Offset)
+		printNode(level, "* LabelMatchers: %v", n.LabelMatchers)
 	case *parser.NumberLiteral:
-		print(level, "NumberLiteral:")
+		printNode(level, "NumberLiteral:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
+		printNode(level, "* Type: %v", n.Type())
 	case *parser.StringLiteral:
-		print(level, "StringLiteral:")
+		printNode(level, "StringLiteral:")
 		level += levelStep
-		print(level, "* Type: %v", n.Type())
+		printNode(level, "* Type: %v", n.Type())
 	default:
-		print(level, "! Unsupported node")
+		printNode(level, "! Unsupported node")
 	}
 }
 
@@ -122,7 +122,7 @@ func parseQuery(query string) error {
 func actionParse(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag))
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %s", err)
+		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
 	parts := c.Args().Slice()
