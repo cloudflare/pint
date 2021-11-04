@@ -40,7 +40,7 @@ func (gbd *GitBlameLineFinder) Find(path string) (LineFindResults, error) {
 
 	lbs, err := git.Blame(path, gbd.gitCmd)
 	if err != nil {
-		return nil, fmt.Errorf("failed to run git blame for %s: %s", path, err)
+		return nil, fmt.Errorf("failed to run git blame for %s: %w", path, err)
 	}
 
 	for _, lb := range lbs {

@@ -21,12 +21,12 @@ import (
 func actionCI(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag))
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %s", err)
+		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
 	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
 	if err != nil {
-		return fmt.Errorf("failed to load config file %q: %s", c.Path(configFlag), err)
+		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}
 
 	includeRe := []*regexp.Regexp{}
@@ -48,7 +48,7 @@ func actionCI(c *cli.Context) (err error) {
 	gitDiscovery := discovery.NewGitBranchFileFinder(git.RunGit, includeRe, cfg.CI.BaseBranch)
 	toScan, err := gitDiscovery.Find()
 	if err != nil {
-		return fmt.Errorf("failed to get the list of modified files: %v", err)
+		return fmt.Errorf("failed to get the list of modified files: %w", err)
 	}
 	if len(toScan.Commits()) > cfg.CI.MaxCommits {
 		return fmt.Errorf("number of commits to check (%d) is higher than maxCommits(%d), exiting", len(toScan.Commits()), cfg.CI.MaxCommits)

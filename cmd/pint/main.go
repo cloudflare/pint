@@ -95,7 +95,7 @@ func main() {
 func actionVersion(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag))
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %s", err)
+		return fmt.Errorf("failed to set log level: %w", err)
 	}
 	fmt.Printf("%s (revision: %s)\n", version, commit)
 	return nil

@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"errors"
 	"io"
 	"strings"
 )
@@ -80,7 +81,7 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 	var inBegin bool
 	for {
 		line, err = reader.ReadString('\n')
-		if err != nil && err != io.EOF {
+		if err != nil && !errors.Is(err, io.EOF) {
 			break
 		}
 
@@ -131,7 +132,7 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 		}
 	}
 
-	if err != io.EOF {
+	if !errors.Is(err, io.EOF) {
 		return nil, err
 	}
 

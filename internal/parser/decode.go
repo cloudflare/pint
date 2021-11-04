@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"errors"
+
 	promparser "github.com/prometheus/prometheus/promql/parser"
 )
 
@@ -12,7 +14,8 @@ func decodeExpr(expr string) (*PromQLNode, error) {
 			Expr: expr,
 			Node: node,
 		}
-		if perrs, ok := err.(promparser.ParseErrors); ok {
+		var perrs promparser.ParseErrors
+		if ok := errors.As(err, &perrs); ok {
 			for _, perr := range perrs {
 				pqe.Err = perr.Err
 				pqe.node.Expr = perr.Query
