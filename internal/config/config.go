@@ -23,8 +23,13 @@ type Config struct {
 	Rules      []Rule             `hcl:"rule,block"`
 }
 
-func (cfg *Config) SetDisabledChecks(l []string) {
+func (cfg *Config) SetDisabledChecks(offline bool, l []string) {
 	disabled := map[string]struct{}{}
+	if offline {
+		for _, name := range checks.OnlineChecks {
+			disabled[name] = struct{}{}
+		}
+	}
 	for _, s := range l {
 		re := strictRegex(s)
 		for _, name := range checks.CheckNames {

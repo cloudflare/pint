@@ -22,6 +22,13 @@ var (
 		TemplateCheckName,
 		VectorMatchingCheckName,
 	}
+	OnlineChecks = []string{
+		AlertsCheckName,
+		CostCheckName,
+		RateCheckName,
+		SeriesCheckName,
+		VectorMatchingCheckName,
+	}
 )
 
 // Severity of the problem reported

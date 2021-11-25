@@ -208,7 +208,7 @@ func newPromQLExpr(key, val *yaml.Node) *PromQLExpr {
 		Value: newYamlNodeWithParent(key, val),
 	}
 
-	qlNode, err := decodeExpr(val.Value)
+	qlNode, err := DecodeExpr(val.Value)
 	if err != nil {
 		expr.SyntaxError = err
 		return &expr

@@ -39,7 +39,7 @@ func TestComparisonCheck(t *testing.T) {
 				{
 					Fragment: `up{job="foo"}`,
 					Lines:    []int{2},
-					Reporter: "alerts/count",
+					Reporter: "promql/comparison",
 					Text:     "alert query doesn't have any condition, it will always fire if the metric exists",
 					Severity: checks.Warning,
 				},
@@ -68,7 +68,7 @@ func TestComparisonCheck(t *testing.T) {
 				{
 					Fragment: `quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m]) AND ON (instance) rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])`,
 					Lines:    []int{3},
-					Reporter: "alerts/count",
+					Reporter: "promql/comparison",
 					Text:     "alert query doesn't have any condition, it will always fire if the metric exists",
 					Severity: checks.Warning,
 				},

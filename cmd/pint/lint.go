@@ -29,7 +29,7 @@ func actionLint(c *cli.Context) (err error) {
 		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}
 
-	cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
+	cfg.SetDisabledChecks(c.Bool(offlineFlag), c.StringSlice(disabledFlag))
 
 	d := discovery.NewGlobFileFinder()
 	toScan, err := d.Find(paths...)
