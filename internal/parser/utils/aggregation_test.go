@@ -11,7 +11,7 @@ import (
 func TestHasOuterAggregation(t *testing.T) {
 	type testCaseT struct {
 		expr   string
-		output string
+		output []string
 	}
 
 	testCases := []testCaseT{
@@ -20,30 +20,62 @@ func TestHasOuterAggregation(t *testing.T) {
 		},
 		{
 			expr:   "sum(foo)",
-			output: "sum(foo)",
+			output: []string{"sum(foo)"},
 		},
 		{
 			expr:   "sum(foo) by(job)",
-			output: "sum by(job) (foo)",
+			output: []string{"sum by(job) (foo)"},
 		},
 		{
 			expr:   "sum(foo) without(job)",
-			output: "sum without(job) (foo)",
+			output: []string{"sum without(job) (foo)"},
 		},
 		{
 			expr:   "1 + sum(foo)",
-			output: "sum(foo)",
+			output: []string{"sum(foo)"},
+		},
+		{
+			expr:   "vector(0) or sum(foo)",
+			output: []string{"sum(foo)"},
+		},
+		{
+			expr:   "sum(foo) or vector(0)",
+			output: []string{"sum(foo)"},
 		},
 		{
 			expr:   "sum(foo) + sum(bar)",
-			output: "sum(foo)",
+			output: []string{"sum(foo)", "sum(bar)"},
 		},
 		{
 			expr: "foo / on(bbb) sum(bar)",
 		},
 		{
 			expr:   "sum(foo) / on(bbb) sum(bar)",
-			output: "sum(foo)",
+			output: []string{"sum(foo)"},
+		},
+		{
+			expr:   "sum(foo) OR sum(bar) by(job)",
+			output: []string{"sum(foo)", "sum by(job) (bar)"},
+		},
+		{
+			expr:   "foo OR sum(foo) OR sum(bar) by(job)",
+			output: []string{"sum(foo)", "sum by(job) (bar)"},
+		},
+		{
+			expr:   "1 + sum(foo) by(job) + sum(foo) by(notjob)",
+			output: []string{"sum by(job) (foo)", "sum by(notjob) (foo)"},
+		},
+		{
+			expr:   "sum(foo) by (job) > count(bar)",
+			output: []string{"sum by(job) (foo)"},
+		},
+		{
+			expr:   "sum(foo) by (job) > count(foo) / 2 or sum(bar) by (job) > count(bar)",
+			output: []string{"sum by(job) (foo)", "sum by(job) (bar)"},
+		},
+		{
+			expr:   "(foo unless on(instance, version, package) bar) and on(instance) (sum(enabled) by(instance) > 0)",
+			output: []string{},
 		},
 	}
 
@@ -54,13 +86,17 @@ func TestHasOuterAggregation(t *testing.T) {
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.HasOuterAggregation(n)
-			if output == nil {
-				if tc.output != "" {
-					t.Errorf("HasOuterAggregation() returned nil, expected %q", tc.output)
+			aggs := utils.HasOuterAggregation(n)
+			if len(aggs) == 0 {
+				if len(tc.output) > 0 {
+					t.Errorf("HasOuterAggregation() returned nil, expected %s", tc.output)
 				}
 			} else {
-				if diff := cmp.Diff(tc.output, output.String()); diff != "" {
+				var output = []string{}
+				for _, a := range aggs {
+					output = append(output, a.String())
+				}
+				if diff := cmp.Diff(tc.output, output); diff != "" {
 					t.Errorf("HasOuterAggregation() returned wrong result (-want +got):\n%s", diff)
 					return
 				}

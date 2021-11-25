@@ -282,6 +282,34 @@ func TestTemplateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "annotation label missing from metrics (or)",
+			content:     "- alert: Foo Is Down\n  expr: sum(foo) by(job) or sum(bar)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ .Labels.job }}`,
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "annotation label missing from metrics (1+)",
+			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(job) + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ .Labels.job }}`,
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

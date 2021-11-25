@@ -7,7 +7,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func HasOuterAggregation(node *parser.PromQLNode) *promParser.AggregateExpr {
+func HasOuterAggregation(node *parser.PromQLNode) (aggs []*promParser.AggregateExpr) {
 	if n, ok := node.Node.(*promParser.AggregateExpr); ok {
 		switch n.Op {
 		case promParser.SUM:
@@ -27,19 +27,34 @@ func HasOuterAggregation(node *parser.PromQLNode) *promParser.AggregateExpr {
 		default:
 			log.Warn().Str("op", n.Op.String()).Msg("Unsupported aggregation operation")
 		}
-		return n
+		aggs = append(aggs, n)
+		return aggs
 	}
 
 NEXT:
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.VectorMatching != nil {
-		return HasOuterAggregation(node.Children[0])
-	}
-
-	for _, child := range node.Children {
-		if a := HasOuterAggregation(child); a != nil {
-			return a
+	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+		if n.Op.IsComparisonOperator() {
+			for _, child := range node.Children {
+				return HasOuterAggregation(child)
+			}
+		} else {
+			switch n.Op {
+			case promParser.LOR:
+				for _, child := range node.Children {
+					aggs = append(aggs, HasOuterAggregation(child)...)
+				}
+				return aggs
+			case promParser.DIV, promParser.LUNLESS, promParser.LAND:
+				for _, child := range node.Children {
+					return HasOuterAggregation(child)
+				}
+			}
 		}
 	}
 
-	return nil
+	for _, child := range node.Children {
+		aggs = append(aggs, HasOuterAggregation(child)...)
+	}
+
+	return aggs
 }

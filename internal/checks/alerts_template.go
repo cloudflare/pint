@@ -75,7 +75,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 		return nil
 	}
 
-	aggr := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
+	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
 
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
 
@@ -111,7 +111,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				})
 			}
 
-			if aggr != nil {
+			for _, aggr := range aggrs {
 				for _, msg := range checkMetricLabels(label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
@@ -137,7 +137,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				})
 			}
 
-			if aggr != nil {
+			for _, aggr := range aggrs {
 				for _, msg := range checkMetricLabels(annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
