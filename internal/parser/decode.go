@@ -6,7 +6,7 @@ import (
 	promparser "github.com/prometheus/prometheus/promql/parser"
 )
 
-func decodeExpr(expr string) (*PromQLNode, error) {
+func DecodeExpr(expr string) (*PromQLNode, error) {
 	node, err := promparser.ParseExpr(expr)
 	if err != nil {
 		pqe := PromQLError{Err: err}
@@ -30,7 +30,7 @@ func decodeExpr(expr string) (*PromQLNode, error) {
 	}
 
 	for _, child := range promparser.Children(node) {
-		c, err := decodeExpr(child.String())
+		c, err := DecodeExpr(child.String())
 		if err != nil {
 			return nil, err
 		}

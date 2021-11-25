@@ -38,7 +38,7 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 	problems = append(problems, Problem{
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    rule.AlertingRule.Expr.Lines(),
-		Reporter: AlertsCheckName,
+		Reporter: ComparisonCheckName,
 		Text:     "alert query doesn't have any condition, it will always fire if the metric exists",
 		Severity: c.severity,
 	})

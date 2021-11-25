@@ -226,22 +226,62 @@ func TestTemplateCheck(t *testing.T) {
 				},
 			},
 		},
-		/*
-			{
-				description: "annotation label missing from metrics",
-				content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
-				checker:     checks.NewTemplateCheck(checks.Bug),
-				problems: []checks.Problem{
-					{
-						Fragment: `summary: '{{ $labels.job }}`,
-						Lines:    []int{2, 3},
-						Reporter: "alerts/count",
-						Text:     "query using prom would trigger 1 alert(s) in the last 1d",
-						Severity: checks.Information,
-					},
+		{
+			description: "annotation label missing from metrics (by)",
+			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ $labels.job }}`,
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
 				},
 			},
-		*/
+		},
+		{
+			description: "annotation label missing from metrics (by)",
+			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ .Labels.job }}`,
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "annotation label missing from metrics (without)",
+			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ $labels.job }}`,
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "annotation label missing from metrics (without)",
+			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
+			checker:     checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ .Labels.job }}`,
+					Lines:    []int{4},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

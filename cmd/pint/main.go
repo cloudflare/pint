@@ -15,6 +15,7 @@ const (
 	configFlag   = "config"
 	logLevelFlag = "log-level"
 	disabledFlag = "disabled"
+	offlineFlag  = "offline"
 )
 
 var (
@@ -55,6 +56,12 @@ func newApp() *cli.App {
 						Aliases: []string{"d"},
 						Value:   cli.NewStringSlice(),
 						Usage:   "List of checks to disable (example: promql/cost)",
+					},
+					&cli.BoolFlag{
+						Name:    offlineFlag,
+						Aliases: []string{"o"},
+						Value:   false,
+						Usage:   "Disable all check that send live queries to Prometheus servers",
 					},
 				},
 			},

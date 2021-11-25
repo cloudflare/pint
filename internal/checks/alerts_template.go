@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/pkg/timestamp"
 	promTemplate "github.com/prometheus/prometheus/template"
@@ -74,6 +75,8 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 		return nil
 	}
 
+	aggr := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
+
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
 
 	if rule.AlertingRule.Labels != nil {
@@ -107,6 +110,18 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					Severity: c.severity,
 				})
 			}
+
+			if aggr != nil {
+				for _, msg := range checkMetricLabels(label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without) {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
+						Lines:    label.Lines(),
+						Reporter: TemplateCheckName,
+						Text:     msg,
+						Severity: c.severity,
+					})
+				}
+			}
 		}
 	}
 
@@ -120,6 +135,18 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					Text:     fmt.Sprintf("template parse error: %s", err),
 					Severity: c.severity,
 				})
+			}
+
+			if aggr != nil {
+				for _, msg := range checkMetricLabels(annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without) {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
+						Lines:    annotation.Lines(),
+						Reporter: TemplateCheckName,
+						Text:     msg,
+						Severity: c.severity,
+					})
+				}
 			}
 		}
 	}
@@ -160,7 +187,7 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 	}
 
 	var aliases = aliasMap{aliases: map[string]map[string]struct{}{}}
-	var vars []string
+	var vars = [][]string{}
 	for _, node := range t.Root.Nodes {
 		getAliases(node, &aliases)
 		vars = append(vars, getVariables(node)...)
@@ -168,8 +195,8 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 	var valAliases = aliases.varAliases(".Value")
 	for _, v := range vars {
 		for _, a := range valAliases {
-			if v == a {
-				msg := fmt.Sprintf("using %s in labels will generate a new alert on every value change, move it to annotations", v)
+			if v[0] == a {
+				msg := fmt.Sprintf("using %s in labels will generate a new alert on every value change, move it to annotations", v[0])
 				msgs = append(msgs, msg)
 			}
 		}
@@ -200,10 +227,10 @@ func getAliases(node parse.Node, aliases *aliasMap) {
 					for _, k := range getVariables(arg) {
 						for _, d := range n.Pipe.Decl {
 							for _, v := range getVariables(d) {
-								if _, ok := aliases.aliases[k]; !ok {
-									aliases.aliases[k] = map[string]struct{}{}
+								if _, ok := aliases.aliases[k[0]]; !ok {
+									aliases.aliases[k[0]] = map[string]struct{}{}
 								}
-								aliases.aliases[k][v] = struct{}{}
+								aliases.aliases[k[0]][v[0]] = struct{}{}
 							}
 						}
 					}
@@ -213,7 +240,7 @@ func getAliases(node parse.Node, aliases *aliasMap) {
 	}
 }
 
-func getVariables(node parse.Node) (vars []string) {
+func getVariables(node parse.Node) (vars [][]string) {
 	switch n := node.(type) {
 	case *parse.ActionNode:
 		if len(n.Pipe.Decl) == 0 && len(n.Pipe.Cmds) > 0 {
@@ -224,12 +251,51 @@ func getVariables(node parse.Node) (vars []string) {
 			vars = append(vars, getVariables(arg)...)
 		}
 	case *parse.FieldNode:
-		for _, i := range n.Ident {
-			vars = append(vars, "."+i)
-		}
+		n.Ident[0] = "." + n.Ident[0]
+		vars = append(vars, n.Ident)
 	case *parse.VariableNode:
-		vars = append(vars, n.Ident...)
+		vars = append(vars, n.Ident)
 	}
 
 	return vars
+}
+
+func checkMetricLabels(name, text string, metricLabels []string, excludeLabels bool) (msgs []string) {
+	t, err := textTemplate.
+		New(name).
+		Funcs(templateFuncMap).
+		Option("missingkey=zero").
+		Parse(strings.Join(append(templateDefs, text), ""))
+	if err != nil {
+		// no need to double report errors
+		return nil
+	}
+
+	var aliases = aliasMap{aliases: map[string]map[string]struct{}{}}
+	var vars = [][]string{}
+	for _, node := range t.Root.Nodes {
+		getAliases(node, &aliases)
+		vars = append(vars, getVariables(node)...)
+	}
+
+	var labelsAliases = aliases.varAliases(".Labels")
+	for _, v := range vars {
+		for _, a := range labelsAliases {
+			if len(v) > 1 && v[0] == a {
+				var found bool
+				for _, l := range metricLabels {
+					if len(v) > 1 && v[1] == l {
+						found = true
+					}
+				}
+				if found == excludeLabels {
+					msg := fmt.Sprintf("template is using %q label but the query doesn't preseve it", v[1])
+					msgs = append(msgs, msg)
+
+				}
+			}
+		}
+	}
+
+	return
 }
