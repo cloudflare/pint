@@ -289,7 +289,7 @@ func checkMetricLabels(name, text string, metricLabels []string, excludeLabels b
 					}
 				}
 				if found == excludeLabels {
-					msg := fmt.Sprintf("template is using %q label but the query doesn't preseve it", v[1])
+					msg := fmt.Sprintf("template is using %q label but the query removes it", v[1])
 					msgs = append(msgs, msg)
 
 				}
