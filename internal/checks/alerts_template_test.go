@@ -310,6 +310,26 @@ func TestTemplateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "annotation label missing from metrics (group_left)",
+			content: `
+- alert: Foo Is Down
+  expr: count(build_info) by (instance, version) != ignoring(package) group_left(foo) count(package_installed) by (instance, version, package)
+  annotations:
+    summary: '{{ $labels.instance }} on {{ .Labels.foo }} in down'
+    help: '{{ $labels.ixtance }}'
+`,
+			checker: checks.NewTemplateCheck(checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `help: {{ $labels.ixtance }}`,
+					Lines:    []int{6},
+					Reporter: "alerts/template",
+					Text:     `template is using "ixtance" label but the query doesn't preseve it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

@@ -77,6 +77,18 @@ func TestHasOuterAggregation(t *testing.T) {
 			expr:   "(foo unless on(instance, version, package) bar) and on(instance) (sum(enabled) by(instance) > 0)",
 			output: []string{},
 		},
+		{
+			expr:   "count(build_info) by (instance, version) != ignoring(bar) group_left(package) count(foo) by (instance, version, package)",
+			output: []string{"count by(instance, version, package) (build_info)"},
+		},
+		{
+			expr:   "sum(foo) without() != on() group_left(instance) sum(vector(0))",
+			output: []string{"sum without() (foo)"},
+		},
+		{
+			expr:   "sum(foo) != on() group_right(instance) sum(vector(0))",
+			output: []string{"sum by(instance) (vector(0))"},
+		},
 	}
 
 	for _, tc := range testCases {

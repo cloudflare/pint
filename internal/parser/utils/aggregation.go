@@ -33,9 +33,43 @@ func HasOuterAggregation(node *parser.PromQLNode) (aggs []*promParser.AggregateE
 
 NEXT:
 	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+		if n.VectorMatching != nil {
+			switch n.VectorMatching.Card {
+			case promParser.CardOneToOne:
+			case promParser.CardOneToMany:
+				for i, child := range node.Children {
+					if i == len(node.Children)-1 {
+						a := HasOuterAggregation(child)
+						if len(a) > 0 && !a[0].Without {
+							a[0].Grouping = append(a[0].Grouping, n.VectorMatching.Include...)
+						}
+						return a
+					}
+				}
+			case promParser.CardManyToOne:
+				a := HasOuterAggregation(node.Children[0])
+				if len(a) > 0 && !a[0].Without {
+					a[0].Grouping = append(a[0].Grouping, n.VectorMatching.Include...)
+				}
+				return a
+			case promParser.CardManyToMany:
+			default:
+				log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
+			}
+		}
+
 		if n.Op.IsComparisonOperator() {
-			for _, child := range node.Children {
-				return HasOuterAggregation(child)
+			for i, child := range node.Children {
+				if n.VectorMatching != nil {
+					a := HasOuterAggregation(child)
+					if len(a) > 0 && !a[0].Without {
+						a[0].Grouping = append(a[0].Grouping, n.VectorMatching.Include...)
+					}
+					return a
+				}
+				if i == 0 {
+					return HasOuterAggregation(child)
+				}
 			}
 		} else {
 			switch n.Op {
