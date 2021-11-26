@@ -79,7 +79,6 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 				continue
 			}
 			enabled = append(enabled, c)
-
 		}
 	}
 
@@ -151,7 +150,12 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 
 	for _, rule := range cfg.Rules {
 		if rule.Match != nil {
-			if err = rule.Match.validate(); err != nil {
+			if err = rule.Match.validate(true); err != nil {
+				return cfg, err
+			}
+		}
+		if rule.Ignore != nil {
+			if err = rule.Ignore.validate(false); err != nil {
 				return cfg, err
 			}
 		}

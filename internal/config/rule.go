@@ -71,13 +71,18 @@ func (ml MatchLabel) isMatching(rule parser.Rule) bool {
 
 type Match struct {
 	Path       string      `hcl:"path,optional"`
+	Name       string      `hcl:"name,optional"`
 	Kind       string      `hcl:"kind,optional"`
 	Label      *MatchLabel `hcl:"label,block"`
 	Annotation *MatchLabel `hcl:"annotation,block"`
 }
 
-func (m Match) validate() error {
+func (m Match) validate(allowEmpty bool) error {
 	if _, err := regexp.Compile(m.Path); err != nil {
+		return err
+	}
+
+	if _, err := regexp.Compile(m.Name); err != nil {
 		return err
 	}
 
@@ -96,11 +101,52 @@ func (m Match) validate() error {
 		}
 	}
 
+	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil {
+		return fmt.Errorf("ignore block must have at least one condition")
+	}
+
 	return nil
+}
+
+func (m Match) IsMatch(path string, r parser.Rule) bool {
+	if m.Kind != "" {
+		if r.AlertingRule != nil && m.Kind != alertingRuleType {
+			return false
+		}
+		if r.RecordingRule != nil && m.Kind != recordingRuleType {
+			return false
+		}
+	}
+
+	if m.Path != "" {
+		re := strictRegex(m.Path)
+		if !re.MatchString(path) {
+			return false
+		}
+	}
+
+	if m.Name != "" {
+		re := strictRegex(m.Name)
+		if r.AlertingRule != nil && !re.MatchString(r.AlertingRule.Alert.Value.Value) {
+			return false
+		}
+		if r.RecordingRule != nil && !re.MatchString(r.RecordingRule.Record.Value.Value) {
+			return false
+		}
+	}
+
+	if m.Label != nil {
+		if !m.Label.isMatching(r) {
+			return false
+		}
+	}
+
+	return true
 }
 
 type Rule struct {
 	Match          *Match                  `hcl:"match,block"`
+	Ignore         *Match                  `hcl:"ignore,block"`
 	Aggregate      []AggregateSettings     `hcl:"aggregate,block"`
 	Rate           *RateSettings           `hcl:"rate,block"`
 	Annotation     []AnnotationSettings    `hcl:"annotation,block"`
@@ -117,34 +163,12 @@ type Rule struct {
 func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	if rule.Match != nil && rule.Match.Kind != "" {
-		var isAllowed bool
-		recordingEnabled := rule.Match.Kind == recordingRuleType
-		alertingEnabled := rule.Match.Kind == alertingRuleType
-		if r.AlertingRule != nil && alertingEnabled {
-			isAllowed = true
-		}
-		if r.RecordingRule != nil && recordingEnabled {
-			isAllowed = true
-		}
-		if !isAllowed {
-			return enabled
-		}
+	if rule.Ignore != nil && rule.Ignore.IsMatch(path, r) {
+		return enabled
 	}
 
-	if rule.Match != nil {
-		if rule.Match.Path != "" {
-			re := strictRegex(rule.Match.Path)
-			if !re.MatchString(path) {
-				return enabled
-			}
-		}
-
-		if rule.Match.Label != nil {
-			if !rule.Match.Label.isMatching(r) {
-				return enabled
-			}
-		}
+	if rule.Match != nil && !rule.Match.IsMatch(path, r) {
+		return enabled
 	}
 
 	if len(rule.Aggregate) > 0 {
