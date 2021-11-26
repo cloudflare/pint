@@ -127,7 +127,19 @@ Syntax:
 ```JS
 rule {
   match {
-    path = "..."
+    path = "(.+)"
+    name = "(.+)"
+    kind = "alerting|recording"
+    annotation "(.*)" {
+      value = "(.*)"
+    }
+    label "(.*)" {
+      value = "(.*)"
+    }
+  }
+  ignore {
+    path = "(.+)"
+    name = "(.+)"
     kind = "alerting|recording"
     annotation "(.*)" {
       value = "(.*)"
@@ -144,12 +156,16 @@ rule {
 ```
 
 - `match:path` - only files matching this pattern will be checked by this rule
+- `match:name` - only rules with names (`record` for recording rules and `alert` for alerting
+  rules) matching this pattern will be checked rule
 - `match:kind` - optional rule type filter, only rule of this type will be checked
 - `match:annotation` - optional annotation filter, only alert rules with at least one
   annotation matching this pattern will be checked by this rule.
 - `match:label` - optional annotation filter, only rules with at least one label
    matching this pattern will be checked by this rule. For recording rules only static
    labels set on the recording rule are considered.
+- `ignore` - works exactly like `match` but does the opposite - any alerting or recording rule
+  matching all conditions defined on `ignore` will not be checked by this `rule` block.
 
 Example:
 

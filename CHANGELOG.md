@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.0
+
+### Added
+
+- `rule` block can now specify `ignore` conditions that have the same syntax as `match`
+  but will disable `rule` for matching alerting and recording rules #48.
+- `match` and `ignore` blocks can now filter alerting and recording rules by name.
+  `record` will be used as name for recording rules and `alert` for alerting rules.
+
 ## v0.2.0
 
 ### Added

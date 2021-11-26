@@ -13,6 +13,7 @@ require (
 	github.com/prometheus/prometheus v1.8.2-0.20211105201321-411021ada9ab
 	github.com/rogpeppe/go-internal v1.8.0
 	github.com/rs/zerolog v1.26.0
+	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
@@ -54,7 +55,6 @@ require (
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/stretchr/testify v1.7.0 // indirect
 	github.com/uber/jaeger-client-go v2.29.1+incompatible // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/zclconf/go-cty v1.10.0 // indirect
