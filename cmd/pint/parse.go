@@ -42,7 +42,13 @@ func parseNode(node parser.Node, level int) {
 		printNode(level, "* Op: %v", n.Op)
 		printNode(level, "* LHS: %v", n.LHS)
 		printNode(level, "* RHS: %v", n.RHS)
-		printNode(level, "* VectorMatching: %v", n.VectorMatching)
+		printNode(level, "* VectorMatching:")
+		if n.VectorMatching != nil {
+			printNode(level+levelStep, "* Card: %v", n.VectorMatching.Card)
+			printNode(level+levelStep, "* MatchingLabels: %v", n.VectorMatching.MatchingLabels)
+			printNode(level+levelStep, "* On: %v", n.VectorMatching.On)
+			printNode(level+levelStep, "* Include: %v", n.VectorMatching.Include)
+		}
 		printNode(level, "* ReturnBool: %v", n.ReturnBool)
 	case *parser.EvalStmt:
 		printNode(level, "EvalStmt:")

@@ -9,7 +9,11 @@ cmp stdout stdout.txt
     * Op: +
     * LHS: sum without(job) (rate(foo[5m]))
     * RHS: sum without(job) (rate(bar[5m]))
-    * VectorMatching: &{one-to-one [] false []}
+    * VectorMatching:
+      * Card: one-to-one
+      * MatchingLabels: []
+      * On: false
+      * Include: []
     * ReturnBool: false
   ++ node: sum without(job) (rate(foo[5m]))
     AggregateExpr:
