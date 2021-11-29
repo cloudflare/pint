@@ -1,5 +1,11 @@
 # Changelog
 
+## [next]
+
+### Added
+
+- `--offline` flag for `pint ci` command.
+
 ## v0.3.0
 
 ### Added
