@@ -69,6 +69,14 @@ func newApp() *cli.App {
 				Name:   "ci",
 				Usage:  "Lint CI changes",
 				Action: actionCI,
+				Flags: []cli.Flag{
+					&cli.BoolFlag{
+						Name:    offlineFlag,
+						Aliases: []string{"o"},
+						Value:   false,
+						Usage:   "Disable all check that send live queries to Prometheus servers",
+					},
+				},
 			},
 			{
 				Name:   "config",
