@@ -46,3 +46,14 @@ ifndef CI
 else
 	go tool cover -html=$(COVER_PROFILE) -o=.cover/all.html
 endif
+
+.PHONY: benchmark
+benchmark:
+	go test \
+		-v \
+		-count=20 \
+		-run=none \
+		-bench=. \
+		-benchmem \
+		-memprofile memprofile.out \
+		./cmd/pint

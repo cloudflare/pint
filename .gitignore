@@ -1,4 +1,4 @@
 /pint
 /.cover
-
-dist/
+/memprofile.out
+/dist/
