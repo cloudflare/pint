@@ -7,7 +7,7 @@ require (
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/go-github/v37 v37.0.0
-	github.com/hashicorp/hcl/v2 v2.10.1
+	github.com/hashicorp/hcl/v2 v2.11.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/prometheus/common v0.32.1
 	github.com/prometheus/prometheus v1.8.2-0.20211105201321-411021ada9ab
