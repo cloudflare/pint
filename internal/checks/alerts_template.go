@@ -75,6 +75,10 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 		return nil
 	}
 
+	if rule.AlertingRule.Expr.SyntaxError != nil {
+		return nil
+	}
+
 	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
 
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
