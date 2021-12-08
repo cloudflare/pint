@@ -31,6 +31,32 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 				}
 			}
 		})
+		t.Run(tc.description+" (bogus alerting rule)", func(t *testing.T) {
+			rules, err := p.Parse([]byte(`
+- alert: foo
+  expr: 'foo{}{} > 0'
+  annotations:
+    summary: '{{ $labels.job }} is incorrect'
+`))
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, rule := range rules {
+				_ = tc.checker.Check(rule)
+			}
+		})
+		t.Run(tc.description+" (bogus recording rule)", func(t *testing.T) {
+			rules, err := p.Parse([]byte(`
+- record: foo
+  expr: 'foo{}{}'
+`))
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, rule := range rules {
+				_ = tc.checker.Check(rule)
+			}
+		})
 	}
 }
 
