@@ -1,6 +1,10 @@
 # Changelog
 
-## [next]
+## v0.3.1
+
+### Fixed
+
+- Fixed `template` check panic when alert query had a syntax error.
 
 ### Added
 
@@ -21,7 +25,7 @@
 
 - `--offline` flag for `pint lint` command. When passed only checks that don't send
   any live queries to Prometheus server will be run.
-- `alerts/template` check will now warn if template if referencing a label that is being
+- `template` check will now warn if template if referencing a label that is being
   stripped by aggregation.
   Example:
 
