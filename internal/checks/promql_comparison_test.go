@@ -99,6 +99,11 @@ func TestComparisonCheck(t *testing.T) {
 			content:     "- alert: Error rate is high\n  expr: rate(error_count[5m]) > bool 5 == 1\n",
 			checker:     checks.NewComparisonCheck(checks.Warning),
 		},
+		{
+			description: "alert on absent",
+			content:     "- alert: Foo Is Missing\n  expr: absent(foo)\n",
+			checker:     checks.NewComparisonCheck(checks.Bug),
+		},
 	}
 
 	runTests(t, testCases)

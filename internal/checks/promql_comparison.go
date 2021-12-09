@@ -31,6 +31,10 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 		return
 	}
 
+	if isAbsent(rule.Expr().Query) {
+		return
+	}
+
 	if expr := hasComparision(rule.Expr().Query); expr != nil {
 		if expr.ReturnBool {
 			problems = append(problems, Problem{
@@ -72,4 +76,11 @@ func hasComparision(n *parser.PromQLNode) *promParser.BinaryExpr {
 	}
 
 	return nil
+}
+
+func isAbsent(n *parser.PromQLNode) bool {
+	if node, ok := n.Node.(*promParser.Call); ok && (node.Func.Name == "absent") {
+		return true
+	}
+	return false
 }

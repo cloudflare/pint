@@ -19,6 +19,10 @@
   that value is `> 5`. Since all results of an alerting rule `expr` are considered alerts such alert
   rule could always fire, regardless of the value returned by `rate(error_count[5m])`.
 
+### Fixed
+
+- `comparison` check will now ignore `absent(foo)` alert queries without any condition.
+
 ## v0.3.1
 
 ### Added
