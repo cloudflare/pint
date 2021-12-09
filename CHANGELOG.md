@@ -1,14 +1,33 @@
 # Changelog
 
+## v0.4.0
+
+### Added
+
+- `comparison` check will now warn when alert query uses
+  [bool](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators)
+  modifier after condition, which can cause alert to always fire.
+  Example:
+
+  ```
+  - alert: Foo
+    expr: rate(error_count[5m]) > bool 5
+  ```
+
+  Having `bool` as part of `> 5` condition means that the query will return value `1` when condition
+  is met, and `0` when it's not. Rather than returning value of `rate(error_count[5m])` only when
+  that value is `> 5`. Since all results of an alerting rule `expr` are considered alerts such alert
+  rule could always fire, regardless of the value returned by `rate(error_count[5m])`.
+
 ## v0.3.1
-
-### Fixed
-
-- Fixed `template` check panic when alert query had a syntax error.
 
 ### Added
 
 - `--offline` flag for `pint ci` command.
+
+### Fixed
+
+- Fixed `template` check panic when alert query had a syntax error.
 
 ## v0.3.0
 

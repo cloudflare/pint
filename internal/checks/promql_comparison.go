@@ -31,7 +31,16 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 		return
 	}
 
-	if hasComparision(rule.Expr().Query) {
+	if expr := hasComparision(rule.Expr().Query); expr != nil {
+		if expr.ReturnBool {
+			problems = append(problems, Problem{
+				Fragment: rule.AlertingRule.Expr.Value.Value,
+				Lines:    rule.AlertingRule.Expr.Lines(),
+				Reporter: ComparisonCheckName,
+				Text:     "alert query uses bool modifier for comparison, this means it will always return a result and the alert will always fire",
+				Severity: c.severity,
+			})
+		}
 		return
 	}
 
@@ -46,21 +55,21 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 	return
 }
 
-func hasComparision(n *parser.PromQLNode) bool {
+func hasComparision(n *parser.PromQLNode) *promParser.BinaryExpr {
 	if node, ok := n.Node.(*promParser.BinaryExpr); ok {
 		if node.Op.IsComparisonOperator() {
-			return true
+			return node
 		}
 		if node.Op == promParser.LUNLESS {
-			return true
+			return node
 		}
 	}
 
 	for _, child := range n.Children {
-		if hasComparision(child) {
-			return true
+		if node := hasComparision(child); node != nil {
+			return node
 		}
 	}
 
-	return false
+	return nil
 }
