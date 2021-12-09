@@ -30,7 +30,8 @@ func TestComparisonCheck(t *testing.T) {
 		{
 			description: "alert expr with == condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 1\n",
-			checker:     checks.NewComparisonCheck(checks.Bug)},
+			checker:     checks.NewComparisonCheck(checks.Bug),
+		},
 		{
 			description: "alert expr without any condition",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"}\n",
@@ -77,6 +78,30 @@ func TestComparisonCheck(t *testing.T) {
 		{
 			description: "alert unless condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: foo unless bar\n",
+			checker:     checks.NewComparisonCheck(checks.Bug),
+		},
+		{
+			description: "alert expr with bool",
+			content:     "- alert: Error rate is high\n  expr: rate(error_count[5m]) > bool 5\n",
+			checker:     checks.NewComparisonCheck(checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "rate(error_count[5m]) > bool 5",
+					Lines:    []int{2},
+					Reporter: "promql/comparison",
+					Text:     "alert query uses bool modifier for comparison, this means it will always return a result and the alert will always fire",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "alert expr with bool and condition",
+			content:     "- alert: Error rate is high\n  expr: rate(error_count[5m]) > bool 5 == 1\n",
+			checker:     checks.NewComparisonCheck(checks.Warning),
+		},
+		{
+			description: "alert on absent",
+			content:     "- alert: Foo Is Missing\n  expr: absent(foo)\n",
 			checker:     checks.NewComparisonCheck(checks.Bug),
 		},
 	}
