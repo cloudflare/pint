@@ -316,7 +316,7 @@ func TestTemplateCheck(t *testing.T) {
 - alert: Foo Is Down
   expr: count(build_info) by (instance, version) != ignoring(package) group_left(foo) count(package_installed) by (instance, version, package)
   annotations:
-    summary: '{{ $labels.instance }} on {{ .Labels.foo }} in down'
+    summary: '{{ $labels.instance }} on {{ .Labels.foo }} is down'
     help: '{{ $labels.ixtance }}'
 `,
 			checker: checks.NewTemplateCheck(checks.Bug),
@@ -327,6 +327,59 @@ func TestTemplateCheck(t *testing.T) {
 					Reporter: "alerts/template",
 					Text:     `template is using "ixtance" label but the query removes it`,
 					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "annotation label present from metrics (absent)",
+			content: `
+- alert: Foo Is Missing
+  expr: absent(foo{job="bar", instance="server1"})
+  annotations:
+    summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+`,
+			checker: checks.NewTemplateCheck(checks.Bug),
+		},
+		{
+			description: "annotation label missing from metrics (absent)",
+			content: `
+- alert: Foo Is Missing
+  expr: absent(foo{job="bar"}) AND on(job) foo
+  labels:
+    instance: '{{ $labels.instance }}'
+  annotations:
+    summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+    help: '{{ $labels.xxx }}'
+`,
+			checker: checks.NewTemplateCheck(checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "instance: {{ $labels.instance }}",
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     `template is using "instance" label but absent() is not passing it`,
+					Severity: checks.Warning,
+				},
+				{
+					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
+					Lines:    []int{7},
+					Reporter: "alerts/template",
+					Text:     `template is using "instance" label but absent() is not passing it`,
+					Severity: checks.Warning,
+				},
+				{
+					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
+					Lines:    []int{7},
+					Reporter: "alerts/template",
+					Text:     `template is using "foo" label but absent() is not passing it`,
+					Severity: checks.Warning,
+				},
+				{
+					Fragment: "help: {{ $labels.xxx }}",
+					Lines:    []int{8},
+					Reporter: "alerts/template",
+					Text:     `template is using "xxx" label but absent() is not passing it`,
+					Severity: checks.Warning,
 				},
 			},
 		},
