@@ -18,6 +18,9 @@ import (
 
 const (
 	TemplateCheckName = "alerts/template"
+
+	msgAggregation = "template is using %q label but the query removes it"
+	msgAbsent      = "template is using %q label but absent() is not passing it"
 )
 
 var (
@@ -80,6 +83,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 	}
 
 	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
+	absentCalls := utils.HasOuterAbsent(rule.AlertingRule.Expr.Query)
 
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
 
@@ -116,7 +120,19 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 			}
 
 			for _, aggr := range aggrs {
-				for _, msg := range checkMetricLabels(label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without) {
+				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without) {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
+						Lines:    label.Lines(),
+						Reporter: TemplateCheckName,
+						Text:     msg,
+						Severity: c.severity,
+					})
+				}
+			}
+
+			for _, call := range absentCalls {
+				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    label.Lines(),
@@ -142,7 +158,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 			}
 
 			for _, aggr := range aggrs {
-				for _, msg := range checkMetricLabels(annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without) {
+				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    annotation.Lines(),
@@ -152,6 +168,19 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					})
 				}
 			}
+
+			for _, call := range absentCalls {
+				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false) {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
+						Lines:    annotation.Lines(),
+						Reporter: TemplateCheckName,
+						Text:     msg,
+						Severity: c.severity,
+					})
+				}
+			}
+
 		}
 	}
 
@@ -264,7 +293,7 @@ func getVariables(node parse.Node) (vars [][]string) {
 	return vars
 }
 
-func checkMetricLabels(name, text string, metricLabels []string, excludeLabels bool) (msgs []string) {
+func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLabels bool) (msgs []string) {
 	t, err := textTemplate.
 		New(name).
 		Funcs(templateFuncMap).
@@ -293,7 +322,7 @@ func checkMetricLabels(name, text string, metricLabels []string, excludeLabels b
 					}
 				}
 				if found == excludeLabels {
-					msg := fmt.Sprintf("template is using %q label but the query removes it", v[1])
+					msg := fmt.Sprintf(msg, v[1])
 					msgs = append(msgs, msg)
 
 				}
@@ -302,4 +331,23 @@ func checkMetricLabels(name, text string, metricLabels []string, excludeLabels b
 	}
 
 	return
+}
+
+func absentLabels(node *parser.PromQLNode) []string {
+	labelMap := map[string]struct{}{}
+
+	for _, child := range node.Children {
+		for _, v := range utils.HasVectorSelector(child) {
+			for _, lm := range v.LabelMatchers {
+				labelMap[lm.Name] = struct{}{}
+			}
+		}
+	}
+
+	names := make([]string, 0, len(labelMap))
+	for name := range labelMap {
+		names = append(names, name)
+	}
+
+	return names
 }

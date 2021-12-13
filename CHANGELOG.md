@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.4.1
+
+- `template` check will now warn if any template is referencing a label that is not passed to
+  `absent()`.
+  Example:
+
+  ```
+  - alert: Foo
+    expr: absent(foo{env="prod"})
+    annotations:
+      summary: 'foo metric is missing for job {{ $labels.job }}'
+  ```
+
+  Would generate a warning since `absent()` can only return labels that are explicitly
+  passed to it and the above call only passes `env` label.
+  This can be fixed by updating the query to `absent(foo{env="prod", job="bar"})`.
+
 ## v0.4.0
 
 ### Added
