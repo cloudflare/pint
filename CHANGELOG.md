@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.2
+
+- Improve `template` check handling of `absent` calls on aggregated metrics, like
+  `absent(sum(nonexistent{job="myjob"}))`.
+
 ## v0.4.1
 
 - `template` check will now warn if any template is referencing a label that is not passed to

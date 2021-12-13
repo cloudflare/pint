@@ -331,7 +331,7 @@ func TestTemplateCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "annotation label present from metrics (absent)",
+			description: "annotation label present on metrics (absent)",
 			content: `
 - alert: Foo Is Missing
   expr: absent(foo{job="bar", instance="server1"})
@@ -380,6 +380,35 @@ func TestTemplateCheck(t *testing.T) {
 					Reporter: "alerts/template",
 					Text:     `template is using "xxx" label but absent() is not passing it`,
 					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "annotation label present on metrics (absent(sum))",
+			content: `
+- alert: Foo Is Missing
+  expr: absent(sum(foo) by(job, instance))
+  annotations:
+    summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+`,
+			checker: checks.NewTemplateCheck(checks.Bug),
+		},
+		{
+			description: "annotation label missing from metrics (absent(sum))",
+			content: `
+- alert: Foo Is Missing
+  expr: absent(sum(foo) by(job))
+  annotations:
+    summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+`,
+			checker: checks.NewTemplateCheck(checks.Information),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.job }} is missing`,
+					Lines:    []int{5},
+					Reporter: "alerts/template",
+					Text:     `template is using "instance" label but the query removes it`,
+					Severity: checks.Information,
 				},
 			},
 		},
