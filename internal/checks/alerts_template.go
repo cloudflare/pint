@@ -132,6 +132,9 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 			}
 
 			for _, call := range absentCalls {
+				if len(utils.HasOuterAggregation(call)) > 0 {
+					continue
+				}
 				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
@@ -170,6 +173,9 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 			}
 
 			for _, call := range absentCalls {
+				if len(utils.HasOuterAggregation(call)) > 0 {
+					continue
+				}
 				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),

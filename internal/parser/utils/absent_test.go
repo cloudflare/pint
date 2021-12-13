@@ -42,6 +42,10 @@ func TestHasOuterAbsent(t *testing.T) {
 			expr:   `up == 0 or absent(foo{job="bar"}) or absent(bar)`,
 			output: []string{`absent(foo{job="bar"})`, `absent(bar)`},
 		},
+		{
+			expr:   `absent(sum(nonexistent{job="myjob"}))`,
+			output: []string{`absent(sum(nonexistent{job="myjob"}))`},
+		},
 	}
 
 	for _, tc := range testCases {
