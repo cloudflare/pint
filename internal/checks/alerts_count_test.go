@@ -25,7 +25,9 @@ func TestAlertsCheck(t *testing.T) {
 			t.Fatal(err)
 		}
 		query := r.Form.Get("query")
-		if query != `up{job="foo"} == 0` {
+		if query != `up{job="foo"} == 0` &&
+			query != `{__name__="up", job="foo"} == 0` &&
+			query != `{__name__=~"(up|foo)", job="foo"} == 0` {
 			t.Fatalf("Prometheus got invalid query: %s", query)
 		}
 
@@ -142,6 +144,40 @@ func TestAlertsCheck(t *testing.T) {
 					Lines:    []int{2, 3},
 					Reporter: "alerts/count",
 					Text:     "query using prom would trigger 1 alert(s) in the last 1d",
+					Severity: checks.Information,
+				},
+			},
+		},
+		{
+			description: "{__name__=}",
+			content: `
+- alert: foo
+  expr: '{__name__="up", job="foo"} == 0'
+`,
+			checker: checks.NewAlertsCheck("prom", srv.URL+"/alerts/", time.Second*5, time.Hour*24, time.Minute*6, time.Minute*10),
+			problems: []checks.Problem{
+				{
+					Fragment: `{__name__="up", job="foo"} == 0`,
+					Lines:    []int{3},
+					Reporter: "alerts/count",
+					Text:     "query using prom would trigger 3 alert(s) in the last 1d",
+					Severity: checks.Information,
+				},
+			},
+		},
+		{
+			description: "{__name__=~}",
+			content: `
+- alert: foo
+  expr: '{__name__=~"(up|foo)", job="foo"} == 0'
+`,
+			checker: checks.NewAlertsCheck("prom", srv.URL+"/alerts/", time.Second*5, time.Hour*24, time.Minute*6, time.Minute*10),
+			problems: []checks.Problem{
+				{
+					Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,
+					Lines:    []int{3},
+					Reporter: "alerts/count",
+					Text:     "query using prom would trigger 3 alert(s) in the last 1d",
 					Severity: checks.Information,
 				},
 			},

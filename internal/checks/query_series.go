@@ -71,12 +71,15 @@ func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.Vec
 
 	if series == 0 {
 		if len(selector.LabelMatchers) > 1 {
-			// retry selector without labels
+			// retry selector with only __name__ label
 			s := promParser.VectorSelector{
-				Name: selector.Name,
-				LabelMatchers: []*labels.Matcher{
-					{Name: labels.MetricName, Value: selector.Name},
-				},
+				Name:          selector.Name,
+				LabelMatchers: []*labels.Matcher{},
+			}
+			for _, lm := range selector.LabelMatchers {
+				if lm.Name == labels.MetricName {
+					s.LabelMatchers = append(s.LabelMatchers, lm)
+				}
 			}
 			p := c.countSeries(expr, s)
 			// if we have zero series without any label selector then the whole

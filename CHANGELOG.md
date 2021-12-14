@@ -1,11 +1,21 @@
 # Changelog
 
+## v0.4.3
+
+### Fixed
+
+- Fixed `series` check handling of queries with `{__name__="foo"}` selectors.
+
 ## v0.4.2
 
-- Improve `template` check handling of `absent` calls on aggregated metrics, like
+### Fixed
+
+- Fixed `template` check handling of `absent` calls on aggregated metrics, like
   `absent(sum(nonexistent{job="myjob"}))`.
 
 ## v0.4.1
+
+### Added
 
 - `template` check will now warn if any template is referencing a label that is not passed to
   `absent()`.
