@@ -110,6 +110,56 @@ func TestRateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "irate{__name__} > 3x scrape_interval",
+			content: `
+- record: foo
+  expr: irate({__name__="foo"}[5m])
+`,
+			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+		},
+		{
+			description: "irate{__name__=~} > 3x scrape_interval",
+			content: `
+- record: foo
+  expr: irate({__name__=~"(foo|bar)_total"}[5m])
+`,
+			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+		},
+		{
+			description: "irate{__name__} < 3x scrape_interval",
+			content: `
+- record: foo
+  expr: irate({__name__="foo"}[2m])
+`,
+			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			problems: []checks.Problem{
+				{
+					Fragment: `irate({__name__="foo"}[2m])`,
+					Lines:    []int{3},
+					Reporter: "promql/rate",
+					Text:     "duration for irate() is recommended to be at least 3 x scrape_interval, prom is using 1m scrape_interval",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "irate{__name__=~} < 3x scrape_interval",
+			content: `
+- record: foo
+  expr: irate({__name__=~"(foo|bar)_total"}[2m])
+`,
+			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			problems: []checks.Problem{
+				{
+					Fragment: `irate({__name__=~"(foo|bar)_total"}[2m])`,
+					Lines:    []int{3},
+					Reporter: "promql/rate",
+					Text:     "duration for irate() is recommended to be at least 3 x scrape_interval, prom is using 1m scrape_interval",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
 			description: "irate == 3x scrape interval",
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
 			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),

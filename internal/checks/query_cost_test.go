@@ -25,7 +25,7 @@ func TestCostCheck(t *testing.T) {
 			t.Fatal(err)
 		}
 		query := r.Form.Get("query")
-		if query != "count(sum(foo))" {
+		if query != "count(sum(foo))" && query != `count(sum({__name__="foo"}))` {
 			t.Fatalf("Prometheus got invalid query: %s", query)
 		}
 
@@ -203,6 +203,23 @@ func TestCostCheck(t *testing.T) {
 					Lines:    []int{2},
 					Reporter: "query/cost",
 					Text:     `RE:query using prom completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`,
+					Severity: checks.Information,
+				},
+			},
+		},
+		{
+			description: "7 results",
+			content: `
+- record: foo
+  expr: 'sum({__name__="foo"})'
+`,
+			checker: checks.NewCostCheck("prom", srv.URL+"/7/", time.Second*5, 101, 0, checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `sum({__name__="foo"})`,
+					Lines:    []int{3},
+					Reporter: "query/cost",
+					Text:     `RE:query using prom completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`,
 					Severity: checks.Information,
 				},
 			},

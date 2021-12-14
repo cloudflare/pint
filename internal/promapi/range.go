@@ -86,9 +86,6 @@ func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.
 	case model.ValMatrix:
 		samples := result.(model.Matrix)
 		qr.Samples = samples
-
-	case model.ValString:
-		fmt.Println("ValString")
 	default:
 		log.Error().Err(err).Str("uri", uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result)
 		return nil, fmt.Errorf("unknown result type: %v", result)

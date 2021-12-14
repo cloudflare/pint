@@ -22,7 +22,7 @@ func TestSeriesCheck(t *testing.T) {
 		query := r.Form.Get("query")
 
 		switch query {
-		case "count(notfound)":
+		case "count(notfound)", `count({__name__="notfound",job="bar"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -32,7 +32,7 @@ func TestSeriesCheck(t *testing.T) {
 					"result":[]
 				}
 			}`))
-		case "count(found_1)":
+		case "count(found_1)", `count({__name__="notfound"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -220,6 +220,23 @@ func TestSeriesCheck(t *testing.T) {
 					Lines:    []int{2},
 					Reporter: "query/series",
 					Text:     "query using prom completed without any results for notfound",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "series missing, {__name__=}",
+			content: `
+- record: foo
+  expr: '{__name__="notfound", job="bar"}'
+`,
+			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: `{__name__="notfound",job="bar"}`,
+					Lines:    []int{3},
+					Reporter: "query/series",
+					Text:     `query using prom completed without any results for {__name__="notfound",job="bar"}`,
 					Severity: checks.Warning,
 				},
 			},

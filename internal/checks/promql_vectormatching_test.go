@@ -20,7 +20,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 		query := r.Form.Get("query")
 
 		switch query {
-		case "count(foo / ignoring(notfound) foo)", "count(foo_with_notfound / ignoring(notfound) foo_with_notfound)", "count(foo_with_notfound / ignoring(notfound) foo)", "count(foo / ignoring(notfound) foo_with_notfound)":
+		case "count(foo / ignoring(notfound) foo)",
+			"count(foo_with_notfound / ignoring(notfound) foo_with_notfound)",
+			`count({__name__="foo_with_notfound"} / ignoring(notfound) foo_with_notfound)`,
+			"count(foo_with_notfound / ignoring(notfound) foo)",
+			"count(foo / ignoring(notfound) foo_with_notfound)":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -297,6 +301,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 					Severity: checks.Warning,
 				},
 			},
+		},
+		{
+			description: "one to one matching with ignoring() - both present - {__name__=}",
+			content: `
+- record: foo
+  expr: '{__name__="foo_with_notfound"} / ignoring(notfound) foo_with_notfound'
+`,
+			checker: checks.NewVectorMatchingCheck("prom", srv.URL, time.Second*1, checks.Warning),
 		},
 	}
 	runTests(t, testCases)
