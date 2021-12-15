@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.4
+
+### Added
+
+- Support `parseDuration` function in alert templates added in Prometheus 2.32.0
+
 ## v0.4.3
 
 ### Fixed

@@ -12,7 +12,7 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/pkg/timestamp"
+	"github.com/prometheus/prometheus/model/timestamp"
 	promTemplate "github.com/prometheus/prometheus/template"
 )
 
@@ -54,6 +54,7 @@ var (
 		"humanizeTimestamp":  dummyFuncMap,
 		"pathPrefix":         dummyFuncMap,
 		"externalURL":        dummyFuncMap,
+		"parseDuration":      dummyFuncMap,
 	}
 )
 
