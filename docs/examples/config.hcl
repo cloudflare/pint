@@ -28,9 +28,6 @@ rule {
     label_keys   = true
     label_values = true
   }
-
-  # Check if all queries use correct vector matching rules
-  vector_matching {}
 }
 
 rule {
@@ -95,10 +92,6 @@ rule {
     severity = "bug"
     keep     = ["job"]
   }
-
-  # Enable series check that will warn if alert rules are using time series
-  # not present in any of configured Prometheus servers.
-  series {}
 
   # Enable cost checks that will print the number of returned time series and try
   # to estimate total memory usage assuming that each series require 4KB of memory.
