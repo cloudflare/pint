@@ -15,15 +15,14 @@ const (
 	SeriesCheckName = "query/series"
 )
 
-func NewSeriesCheck(name, uri string, timeout time.Duration, severity Severity) SeriesCheck {
-	return SeriesCheck{name: name, uri: uri, timeout: timeout, severity: severity}
+func NewSeriesCheck(name, uri string, timeout time.Duration) SeriesCheck {
+	return SeriesCheck{name: name, uri: uri, timeout: timeout}
 }
 
 type SeriesCheck struct {
-	name     string
-	uri      string
-	timeout  time.Duration
-	severity Severity
+	name    string
+	uri     string
+	timeout time.Duration
 }
 
 func (c SeriesCheck) String() string {
@@ -95,7 +94,7 @@ func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.Vec
 			Lines:    expr.Lines(),
 			Reporter: SeriesCheckName,
 			Text:     fmt.Sprintf("query using %s completed without any results for %s", c.name, selector.String()),
-			Severity: c.severity,
+			Severity: Warning,
 		})
 		return
 	}

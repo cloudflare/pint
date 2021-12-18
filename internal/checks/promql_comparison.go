@@ -10,12 +10,11 @@ const (
 	ComparisonCheckName = "promql/comparison"
 )
 
-func NewComparisonCheck(severity Severity) ComparisonCheck {
-	return ComparisonCheck{severity: severity}
+func NewComparisonCheck() ComparisonCheck {
+	return ComparisonCheck{}
 }
 
 type ComparisonCheck struct {
-	severity Severity
 }
 
 func (c ComparisonCheck) String() string {
@@ -42,7 +41,7 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 				Lines:    rule.AlertingRule.Expr.Lines(),
 				Reporter: ComparisonCheckName,
 				Text:     "alert query uses bool modifier for comparison, this means it will always return a result and the alert will always fire",
-				Severity: c.severity,
+				Severity: Bug,
 			})
 		}
 		return
@@ -53,7 +52,7 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 		Lines:    rule.AlertingRule.Expr.Lines(),
 		Reporter: ComparisonCheckName,
 		Text:     "alert query doesn't have any condition, it will always fire if the metric exists",
-		Severity: c.severity,
+		Severity: Warning,
 	})
 
 	return

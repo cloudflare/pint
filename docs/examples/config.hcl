@@ -64,9 +64,6 @@ rule {
     step    = "1m"
     resolve = "5m"
   }
-
-  # Check if templates used in annotations and labels are valid.
-  template {}
 }
 
 rule {

@@ -6,9 +6,12 @@ cmp stderr stderr.txt
 level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
 level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m2
 level=debug msg="Found recording rule" [36mlines=[0m1-2 [36mpath=[0mrules/0001.yml [36mrecord=[0mcolo:recording
-level=debug msg="Configured checks for rule" [36menabled=[0m["promql/syntax"] [36mpath=[0mrules/0001.yml [36mrule=[0mcolo:recording
+level=debug msg="Configured checks for rule" [36menabled=[0m["promql/syntax","alerts/for","promql/comparison","alerts/template"] [36mpath=[0mrules/0001.yml [36mrule=[0mcolo:recording
 level=debug msg="Found alerting rule" [36malert=[0mcolo:alerting [36mlines=[0m4-5 [36mpath=[0mrules/0001.yml
-level=debug msg="Configured checks for rule" [36menabled=[0m["promql/syntax","promql/without(job:true)","promql/by(job:true)"] [36mpath=[0mrules/0001.yml [36mrule=[0mcolo:alerting
+level=debug msg="Configured checks for rule" [36menabled=[0m["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/without(job:true)","promql/by(job:true)"] [36mpath=[0mrules/0001.yml [36mrule=[0mcolo:alerting
+rules/0001.yml:5: alert query doesn't have any condition, it will always fire if the metric exists (promql/comparison)
+  expr: sum(bar) without(job)
+
 rules/0001.yml:5: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
   expr: sum(bar) without(job)
 
