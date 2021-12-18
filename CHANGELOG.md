@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.5.0
+
+### Added
+
+- Added `alerts/for` check that will look for invalid `for` values in alerting rules.
+  This check is enabled by default.
+
+### Changed
+
+- `comparison` check is now enabled by default and require no configuration.
+  Remove `comparison{ ... }` blocks from pint config file when upgrading.
+- `template` check is now enabled by default and require no configuration.
+  Remove `template{ ... }` blocks from pint config file when upgrading.
+- `rate` check is now enabled by default for all configured Prometheus servers.
+  Remove `rate{ ... }` blocks from pint config file when upgrading.
+- `series` check is now enabled by default for all configured Prometheus servers.
+  Remove `series{ ... }` blocks from pint config file when upgrading.
+- `vector_matching` check is now enabled by default for all configured Prometheus servers.
+  Remove `vector_matching{ ... }` blocks from pint config file when upgrading.
+
 ## v0.4.4
 
 ### Added

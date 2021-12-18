@@ -11,78 +11,78 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "skips recording rule",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 		},
 		{
 			description: "invalid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $label.instance }} down'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: Instance {{ $label.instance }} down`,
 					Lines:    []int{4},
 					Reporter: "alerts/template",
 					Text:     "template parse error: undefined variable \"$label\"",
-					Severity: checks.Bug,
+					Severity: checks.Fatal,
 				},
 			},
 		},
 		{
 			description: "invalid function in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $value | xxx }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $value | xxx }}`,
 					Lines:    []int{4},
 					Reporter: "alerts/template",
 					Text:     "template parse error: function \"xxx\" not defined",
-					Severity: checks.Bug,
+					Severity: checks.Fatal,
 				},
 			},
 		},
 		{
 			description: "valid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $labels.instance }} down'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 		},
 		{
 			description: "invalid syntax in labels",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $label.instance }} down'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: Instance {{ $label.instance }} down`,
 					Lines:    []int{4},
 					Reporter: "alerts/template",
 					Text:     "template parse error: undefined variable \"$label\"",
-					Severity: checks.Bug,
+					Severity: checks.Fatal,
 				},
 			},
 		},
 		{
 			description: "invalid function in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: '{{ $value | xxx }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $value | xxx }}`,
 					Lines:    []int{4},
 					Reporter: "alerts/template",
 					Text:     "template parse error: function \"xxx\" not defined",
-					Severity: checks.Bug,
+					Severity: checks.Fatal,
 				},
 			},
 		},
 		{
 			description: "valid syntax in labels",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $labels.instance }} down'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 		},
 		{
 			description: "{{ $value}} in label key",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value}}': bar\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "{{ $value}}: bar",
@@ -96,7 +96,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{ $value }} in label key",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value }}': bar\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "{{ $value }}: bar",
@@ -110,42 +110,42 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{$value}} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{$value}}'\n",
-			checker:     checks.NewTemplateCheck(checks.Fatal),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: {{$value}}",
 					Lines:    []int{5},
 					Reporter: "alerts/template",
 					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
-					Severity: checks.Fatal,
+					Severity: checks.Bug,
 				},
 			},
 		},
 		{
 			description: "{{$value}} in multiple labels",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: '{{ .Value }}'\n    baz: '{{$value}}'\n",
-			checker:     checks.NewTemplateCheck(checks.Fatal),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo: {{ .Value }}",
 					Lines:    []int{4},
 					Reporter: "alerts/template",
 					Text:     "using .Value in labels will generate a new alert on every value change, move it to annotations",
-					Severity: checks.Fatal,
+					Severity: checks.Bug,
 				},
 				{
 					Fragment: "baz: {{$value}}",
 					Lines:    []int{5},
 					Reporter: "alerts/template",
 					Text:     "using $value in labels will generate a new alert on every value change, move it to annotations",
-					Severity: checks.Fatal,
+					Severity: checks.Bug,
 				},
 			},
 		},
 		{
 			description: "{{  $value  }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{  $value | humanizePercentage }}%\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: foo is {{  $value | humanizePercentage }}%\n",
@@ -159,7 +159,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{  $value  }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{$value|humanizePercentage}}%\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: foo is {{$value|humanizePercentage}}%\n",
@@ -173,7 +173,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{ .Value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: 'value {{ .Value }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: value {{ .Value }}",
@@ -187,7 +187,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{ .Value|humanize }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ .Value|humanize }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: {{ .Value|humanize }}",
@@ -201,7 +201,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{ $foo := $value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := $value }}{{ $foo }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: {{ $foo := $value }}{{ $foo }}",
@@ -215,7 +215,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "{{ $foo := .Value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := .Value }}{{ $foo }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "baz: {{ $foo := .Value }}{{ $foo }}",
@@ -229,7 +229,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "annotation label missing from metrics (by)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $labels.job }}`,
@@ -243,7 +243,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "annotation label missing from metrics (by)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
@@ -257,7 +257,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "annotation label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $labels.job }}`,
@@ -271,7 +271,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "annotation label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
@@ -285,7 +285,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "annotation label missing from metrics (or)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) by(job) or sum(bar)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
@@ -299,7 +299,7 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "annotation label missing from metrics (1+)",
 			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(job) + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
-			checker:     checks.NewTemplateCheck(checks.Bug),
+			checker:     checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
@@ -319,7 +319,7 @@ func TestTemplateCheck(t *testing.T) {
     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is down'
     help: '{{ $labels.ixtance }}'
 `,
-			checker: checks.NewTemplateCheck(checks.Bug),
+			checker: checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `help: {{ $labels.ixtance }}`,
@@ -338,7 +338,7 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
 `,
-			checker: checks.NewTemplateCheck(checks.Bug),
+			checker: checks.NewTemplateCheck(),
 		},
 		{
 			description: "annotation label missing from metrics (absent)",
@@ -351,35 +351,35 @@ func TestTemplateCheck(t *testing.T) {
     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
     help: '{{ $labels.xxx }}'
 `,
-			checker: checks.NewTemplateCheck(checks.Warning),
+			checker: checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: "instance: {{ $labels.instance }}",
 					Lines:    []int{5},
 					Reporter: "alerts/template",
 					Text:     `template is using "instance" label but absent() is not passing it`,
-					Severity: checks.Warning,
+					Severity: checks.Bug,
 				},
 				{
 					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
 					Lines:    []int{7},
 					Reporter: "alerts/template",
 					Text:     `template is using "instance" label but absent() is not passing it`,
-					Severity: checks.Warning,
+					Severity: checks.Bug,
 				},
 				{
 					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
 					Lines:    []int{7},
 					Reporter: "alerts/template",
 					Text:     `template is using "foo" label but absent() is not passing it`,
-					Severity: checks.Warning,
+					Severity: checks.Bug,
 				},
 				{
 					Fragment: "help: {{ $labels.xxx }}",
 					Lines:    []int{8},
 					Reporter: "alerts/template",
 					Text:     `template is using "xxx" label but absent() is not passing it`,
-					Severity: checks.Warning,
+					Severity: checks.Bug,
 				},
 			},
 		},
@@ -391,7 +391,7 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
 `,
-			checker: checks.NewTemplateCheck(checks.Bug),
+			checker: checks.NewTemplateCheck(),
 		},
 		{
 			description: "annotation label missing from metrics (absent(sum))",
@@ -401,14 +401,14 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
 `,
-			checker: checks.NewTemplateCheck(checks.Information),
+			checker: checks.NewTemplateCheck(),
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.job }} is missing`,
 					Lines:    []int{5},
 					Reporter: "alerts/template",
 					Text:     `template is using "instance" label but the query removes it`,
-					Severity: checks.Information,
+					Severity: checks.Bug,
 				},
 			},
 		},

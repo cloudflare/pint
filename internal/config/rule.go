@@ -145,19 +145,14 @@ func (m Match) IsMatch(path string, r parser.Rule) bool {
 }
 
 type Rule struct {
-	Match          *Match                  `hcl:"match,block"`
-	Ignore         *Match                  `hcl:"ignore,block"`
-	Aggregate      []AggregateSettings     `hcl:"aggregate,block"`
-	Rate           *RateSettings           `hcl:"rate,block"`
-	Annotation     []AnnotationSettings    `hcl:"annotation,block"`
-	Label          []AnnotationSettings    `hcl:"label,block"`
-	Series         *SeriesSettings         `hcl:"series,block"`
-	Cost           *CostSettings           `hcl:"cost,block"`
-	Alerts         *AlertsSettings         `hcl:"alerts,block"`
-	Reject         []RejectSettings        `hcl:"reject,block"`
-	Comparison     *ComparisonSettings     `hcl:"comparison,block"`
-	Template       *TemplateSettings       `hcl:"template,block"`
-	VectorMatching *VectorMatchingSettings `hcl:"vector_matching,block"`
+	Match      *Match               `hcl:"match,block"`
+	Ignore     *Match               `hcl:"ignore,block"`
+	Aggregate  []AggregateSettings  `hcl:"aggregate,block"`
+	Annotation []AnnotationSettings `hcl:"annotation,block"`
+	Label      []AnnotationSettings `hcl:"label,block"`
+	Cost       *CostSettings        `hcl:"cost,block"`
+	Alerts     *AlertsSettings      `hcl:"alerts,block"`
+	Reject     []RejectSettings     `hcl:"reject,block"`
 }
 
 func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {
@@ -197,7 +192,7 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if rule.Rate != nil && isEnabled(enabledChecks, disabledChecks, checks.RateCheckName, r) {
+	if isEnabled(enabledChecks, disabledChecks, checks.RateCheckName, r) {
 		for _, prom := range proms {
 			timeout, _ := parseDuration(prom.Timeout)
 			enabled = append(enabled, checks.NewRateCheck(prom.Name, prom.URI, timeout))
@@ -233,11 +228,10 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if rule.Series != nil && isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
-		severity := rule.Series.getSeverity(checks.Warning)
+	if isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
 		for _, prom := range proms {
 			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout, severity))
+			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout))
 		}
 	}
 
@@ -279,24 +273,6 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 				re := strictRegex(reject.Regex)
 				enabled = append(enabled, checks.NewRejectCheck(false, true, nil, re, severity))
 			}
-		}
-	}
-
-	if rule.Comparison != nil && isEnabled(enabledChecks, disabledChecks, checks.ComparisonCheckName, r) {
-		severity := rule.Comparison.getSeverity(checks.Bug)
-		enabled = append(enabled, checks.NewComparisonCheck(severity))
-	}
-
-	if rule.Template != nil && isEnabled(enabledChecks, disabledChecks, checks.TemplateCheckName, r) {
-		severity := rule.Template.getSeverity(checks.Bug)
-		enabled = append(enabled, checks.NewTemplateCheck(severity))
-	}
-
-	if rule.VectorMatching != nil && isEnabled(enabledChecks, disabledChecks, checks.VectorMatchingCheckName, r) {
-		severity := rule.VectorMatching.getSeverity(checks.Warning)
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewVectorMatchingCheck(prom.Name, prom.URI, timeout, severity))
 		}
 	}
 

@@ -21,6 +21,7 @@ var (
 		RejectCheckName,
 		TemplateCheckName,
 		VectorMatchingCheckName,
+		AlertForCheckName,
 	}
 	OnlineChecks = []string{
 		AlertsCheckName,

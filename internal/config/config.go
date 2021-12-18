@@ -63,10 +63,33 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 		enabled = append(enabled, checks.NewSyntaxCheck())
 	}
 
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.AlertForCheckName, r) {
+		enabled = append(enabled, checks.NewAlertsForCheck())
+	}
+
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.ComparisonCheckName, r) {
+		enabled = append(enabled, checks.NewComparisonCheck())
+	}
+
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.TemplateCheckName, r) {
+		enabled = append(enabled, checks.NewTemplateCheck())
+	}
+
 	proms := []PrometheusConfig{}
 	for _, prom := range cfg.Prometheus {
-		if prom.isEnabledForPath(path) {
-			proms = append(proms, prom)
+		if !prom.isEnabledForPath(path) {
+			continue
+		}
+		proms = append(proms, prom)
+		timeout, _ := parseDuration(prom.Timeout)
+		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.RateCheckName, r) {
+			enabled = append(enabled, checks.NewRateCheck(prom.Name, prom.URI, timeout))
+		}
+		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SeriesCheckName, r) {
+			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout))
+		}
+		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.VectorMatchingCheckName, r) {
+			enabled = append(enabled, checks.NewVectorMatchingCheck(prom.Name, prom.URI, timeout))
 		}
 	}
 	for _, rule := range cfg.Rules {
@@ -166,12 +189,6 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			}
 		}
 
-		if rule.Rate != nil {
-			if err = rule.Rate.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
 		for _, ann := range rule.Annotation {
 			if err = ann.validate(); err != nil {
 				return cfg, err
@@ -190,12 +207,6 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			}
 		}
 
-		if rule.Series != nil {
-			if err = rule.Series.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
 		if rule.Alerts != nil {
 			if err = rule.Alerts.validate(); err != nil {
 				return cfg, err
@@ -207,24 +218,6 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 				return cfg, err
 			}
 
-		}
-
-		if rule.Comparison != nil {
-			if err = rule.Comparison.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		if rule.Template != nil {
-			if err = rule.Template.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		if rule.VectorMatching != nil {
-			if err = rule.VectorMatching.validate(); err != nil {
-				return cfg, err
-			}
 		}
 	}
 

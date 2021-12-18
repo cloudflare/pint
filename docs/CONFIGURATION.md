@@ -337,11 +337,7 @@ For `irate()` function:
 - If duration is less than 2x `scrape_interval` it will report a bug.
 - If duration is between 2x and 3x `scrape_interval` it will report a warning.
 
-Syntax:
-
-```JS
-rate {}
-```
+This check is enabled by default for all configured Prometheus servers.
 
 Example:
 
@@ -349,19 +345,19 @@ Example:
 prometheus "prod" {
   uri     = "https://prometheus-prod.example.com"
   timeout = "60s"
+  paths = [
+    "rules/prod/.*",
+    "rules/common/.*",
+  ]
 }
 
 prometheus "dev" {
   uri     = "https://prometheus-dev.example.com"
   timeout = "30s"
-}
-
-rule {
-  match {
-    kind = "recording"
-  }
-
-  rate {}
+  paths = [
+    "rules/dev/.*",
+    "rules/common/.*",
+  ]
 }
 ```
 
@@ -419,27 +415,7 @@ like `error_count > 10`, so we only get `error_count` series if the value
 is above 10. If we would remove `> 10` part query would always return `error_count`
 and so it would always trigger an alert.
 
-Syntax:
-
-```JS
-comparison {
-  severity = "bug|warning|info"
-}
-```
-
-- `severity` - set custom severity for reported issues, defaults to a bug.
-
-Example:
-
-```
-rule {
-  match {
-    kind = "alerting"
-  }
-  comparison {}
-}
-```
-
+This check is enabled by default and doesn't require any configuration.
 
 ## Cost
 
@@ -515,15 +491,7 @@ Let's say we have a rule this query: `sum(my_metric{foo="bar"}) > 10`.
 This checks would query all configured server for the existence of
 `my_metric{foo="bar"}` series and report a warning if it's missing.
 
-Syntax:
-
-```JS
-series {
-  severity       = "bug|warning|info"
-}
-```
-
-- `severity` - set custom severity for reported issues, defaults to a warning.
+This check is enabled by default for all configured Prometheus servers.
 
 Example:
 
@@ -536,14 +504,6 @@ prometheus "dev" {
 prometheus "prod" {
   uri     = "https://prometheus-prod.example.com"
   timeout = "30s"
-}
-
-rule {
-  match {
-    kind = "recording"
-  }
-
-  series {}
 }
 ```
 
@@ -622,29 +582,7 @@ the value of any annotation can change between alert evaluations.
 See [this blog post](https://www.robustperception.io/dont-put-the-value-in-alert-labels)
 for more details.
 
-Syntax:
-
-```JS
-template {
-  severity          = "bug|warning|info"
-}
-```
-
-- `severity` - set custom severity for reported issues, defaults to a bug.
-
-Example:
-
-```JS
-rule {
-  match {
-    kind = "alerting"
-  }
-
-  template {
-    severity = "fatal"
-  }
-}
-```
+This check is enabled by default and doesn't require any configuration.
 
 ## Vector Matching
 
@@ -681,15 +619,7 @@ http_errors / ignoring(instance) cluster:http_errors
 This check aims to find all queries that using vector matching where both sides
 of the query have different sets of labels causing no results to be returned.
 
-Syntax:
-
-```JS
-vector_matching {
-  severity       = "bug|warning|info"
-}
-```
-
-- `severity` - set custom severity for reported issues, defaults to a warning.
+This check is enabled by default for all configured Prometheus servers.
 
 Example:
 
@@ -702,10 +632,6 @@ prometheus "dev" {
 prometheus "prod" {
   uri     = "https://prometheus-prod.example.com"
   timeout = "30s"
-}
-
-rule {
-  vector_matching {}
 }
 ```
 

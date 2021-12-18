@@ -49,7 +49,7 @@ rules/0002.yml:11: using $value in labels will generate a new alert on every val
 rules/0002.yml:12: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
     val: '{{ .Value|humanizeDuration }}'
 
-level=info msg="Problems found" [36mBug=[0m10 [36mWarning=[0m3
+level=info msg="Problems found" [36mBug=[0m5 [36mFatal=[0m4 [36mWarning=[0m4
 level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
 -- rules/0001.yml --
 - alert: Always
@@ -101,6 +101,4 @@ rule {
         value = "critical|warning|info"
         required = true
     }
-    comparison {}
-    template {}
 }

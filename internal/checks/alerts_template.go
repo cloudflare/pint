@@ -62,12 +62,11 @@ func dummyFuncMap(q string) string {
 	return q
 }
 
-func NewTemplateCheck(severity Severity) TemplateCheck {
-	return TemplateCheck{severity: severity}
+func NewTemplateCheck() TemplateCheck {
+	return TemplateCheck{}
 }
 
 type TemplateCheck struct {
-	severity Severity
 }
 
 func (c TemplateCheck) String() string {
@@ -96,7 +95,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					Lines:    label.Lines(),
 					Reporter: TemplateCheckName,
 					Text:     fmt.Sprintf("template parse error: %s", err),
-					Severity: c.severity,
+					Severity: Fatal,
 				})
 			}
 			// check key
@@ -106,7 +105,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					Lines:    label.Lines(),
 					Reporter: TemplateCheckName,
 					Text:     msg,
-					Severity: c.severity,
+					Severity: Bug,
 				})
 			}
 			// check value
@@ -116,7 +115,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					Lines:    label.Lines(),
 					Reporter: TemplateCheckName,
 					Text:     msg,
-					Severity: c.severity,
+					Severity: Bug,
 				})
 			}
 
@@ -127,7 +126,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 						Lines:    label.Lines(),
 						Reporter: TemplateCheckName,
 						Text:     msg,
-						Severity: c.severity,
+						Severity: Bug,
 					})
 				}
 			}
@@ -142,7 +141,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 						Lines:    label.Lines(),
 						Reporter: TemplateCheckName,
 						Text:     msg,
-						Severity: c.severity,
+						Severity: Bug,
 					})
 				}
 			}
@@ -157,7 +156,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					Lines:    annotation.Lines(),
 					Reporter: TemplateCheckName,
 					Text:     fmt.Sprintf("template parse error: %s", err),
-					Severity: c.severity,
+					Severity: Fatal,
 				})
 			}
 
@@ -168,7 +167,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 						Lines:    annotation.Lines(),
 						Reporter: TemplateCheckName,
 						Text:     msg,
-						Severity: c.severity,
+						Severity: Bug,
 					})
 				}
 			}
@@ -183,7 +182,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 						Lines:    annotation.Lines(),
 						Reporter: TemplateCheckName,
 						Text:     msg,
-						Severity: c.severity,
+						Severity: Bug,
 					})
 				}
 			}

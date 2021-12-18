@@ -17,15 +17,14 @@ const (
 	VectorMatchingCheckName = "promql/vector_matching"
 )
 
-func NewVectorMatchingCheck(name, uri string, timeout time.Duration, severity Severity) VectorMatchingCheck {
-	return VectorMatchingCheck{name: name, uri: uri, timeout: timeout, severity: severity}
+func NewVectorMatchingCheck(name, uri string, timeout time.Duration) VectorMatchingCheck {
+	return VectorMatchingCheck{name: name, uri: uri, timeout: timeout}
 }
 
 type VectorMatchingCheck struct {
-	name     string
-	uri      string
-	timeout  time.Duration
-	severity Severity
+	name    string
+	uri     string
+	timeout time.Duration
 }
 
 func (c VectorMatchingCheck) String() string {
@@ -44,7 +43,7 @@ func (c VectorMatchingCheck) Check(rule parser.Rule) (problems []Problem) {
 			Lines:    expr.Lines(),
 			Reporter: VectorMatchingCheckName,
 			Text:     problem.text,
-			Severity: c.severity,
+			Severity: Bug,
 		})
 	}
 

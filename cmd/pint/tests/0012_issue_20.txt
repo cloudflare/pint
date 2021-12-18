@@ -58,7 +58,4 @@ rule {
     step    = "1m"
     resolve = "5m"
   }
-  # Check if '{{ $value }}'/'{{ .Value }}' is used in labels
-  # https://www.robustperception.io/dont-put-the-value-in-alert-labels
-  template {}
 }
