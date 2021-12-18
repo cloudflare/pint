@@ -1,0 +1,31 @@
+name: Validate examples
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.5
+
+      - name: Build binary
+        run: make
+
+      - name: Verify examples
+        run: |
+          for CFG in docs/examples/* ; do
+            echo ">>> $CFG"
+            ./pint -c "$CFG" config
+          done
