@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.1
+
+### Fixed
+
+- Specifying multiple `# pint disable ...` comments on a single rule would only apply
+  last comment. This now works correctly and all comments will be applied.
+
 ## v0.5.0
 
 ### Added
