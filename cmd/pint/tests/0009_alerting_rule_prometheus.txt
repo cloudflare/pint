@@ -22,7 +22,7 @@ rules/0001.yml:19-21: link annotation is required (alerts/annotation)
       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 
 level=info msg="Problems found" [36mBug=[0m2 [36mWarning=[0m2
-level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
+level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
 -- rules/0001.yml --
 groups:
 - name: example

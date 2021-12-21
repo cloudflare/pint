@@ -50,7 +50,7 @@ rules/0002.yml:12: using .Value in labels will generate a new alert on every val
     val: '{{ .Value|humanizeDuration }}'
 
 level=info msg="Problems found" [36mBug=[0m5 [36mFatal=[0m4 [36mWarning=[0m4
-level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
+level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
 -- rules/0001.yml --
 - alert: Always
   expr: up

@@ -9,7 +9,7 @@ rules/0001.yml:5: incomplete rule, no alert or record key (pint/parse)
 - expr: sum(foo)
 
 level=info msg="Problems found" [36mFatal=[0m1
-level=fatal msg="Fatal error" [31merror=[0m[31m"problems found"[0m
+level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
 -- rules/0001.yml --
 - record: "colo:test1"
   expr: sum(foo) without(job)

@@ -4,4 +4,4 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" [36mpath=[0mnot_existed_config.hcl
-level=fatal msg="Fatal error" [31merror=[0m[31m"failed to load config file \"not_existed_config.hcl\": <nil>: Configuration file not found; The configuration file not_existed_config.hcl does not exist."[0m
+level=fatal msg="Fatal error" [36merror=[0m[31m"failed to load config file \"not_existed_config.hcl\": <nil>: Configuration file not found; The configuration file not_existed_config.hcl does not exist."[0m
