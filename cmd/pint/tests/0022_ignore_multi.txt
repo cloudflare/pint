@@ -1,0 +1,38 @@
+pint.ok lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
+level=info msg="File parsed" [36mpath=[0mrules/1.yaml [36mrules=[0m3
+rules/1.yaml:2: dropped label should be removed when aggregating "^.+$" rules, remove dropped from by() (promql/by)
+  expr: sum(errors_total) by(keep,dropped)
+
+rules/1.yaml:5: keep label is required and should be preserved when aggregating "^.+$" rules, remove keep from without() (promql/without)
+  expr: sum(errors_total) without(keep,dropped)
+
+-- rules/1.yaml --
+- record: disabled
+  expr: sum(errors_total) by(keep,dropped)
+
+- record: B
+  expr: sum(errors_total) without(keep,dropped)
+
+- record: C
+  # pint disable promql/by(keep:true)
+  # pint disable promql/without(keep:true)
+  # pint disable promql/by(dropped:false)
+  # pint disable promql/without(dropped:false)
+  expr: sum(sum(errors_total) without(keep)) by(dropped)
+
+-- .pint.hcl --
+rule {
+    aggregate ".+" {
+        keep = [ "keep" ]
+    }
+}
+rule {
+    aggregate ".+" {
+        strip = [ "dropped" ]
+    }
+}

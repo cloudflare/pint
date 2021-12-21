@@ -40,18 +40,19 @@ func emptyLine(line string) (emptied string) {
 }
 
 func hasComment(line, comment string) bool {
-	if !strings.Contains(line, "#") {
-		return false
+	sc := bufio.NewScanner(strings.NewReader(line))
+	for sc.Scan() {
+		elems := strings.Split(sc.Text(), "#")
+		lastComment := elems[len(elems)-1]
+		parts := strings.SplitN(removeRedundantSpaces(lastComment), " ", 2)
+		if len(parts) < 2 {
+			continue
+		}
+		if parts[0] == "pint" && parts[1] == comment {
+			return true
+		}
 	}
-
-	elems := strings.Split(strings.TrimSuffix(line, "\n"), "#")
-	lastComment := elems[len(elems)-1]
-	parts := strings.SplitN(removeRedundantSpaces(lastComment), " ", 2)
-	if len(parts) < 2 {
-		return false
-	}
-
-	return parts[0] == "pint" && parts[1] == comment
+	return false
 }
 
 func parseSkipComment(line string) (skipMode, bool) {
