@@ -1,22 +1,22 @@
 package config
 
 import (
-	"fmt"
+	"errors"
 	"regexp"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
 
 type AggregateSettings struct {
-	Name     string   `hcl:",label"`
-	Keep     []string `hcl:"keep,optional"`
-	Strip    []string `hcl:"strip,optional"`
-	Severity string   `hcl:"severity,optional"`
+	Name     string   `hcl:",label" json:"name"`
+	Keep     []string `hcl:"keep,optional" json:"keep,omitempty"`
+	Strip    []string `hcl:"strip,optional" json:"strip,omitempty"`
+	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (ag AggregateSettings) validate() error {
 	if ag.Name == "" {
-		return fmt.Errorf("empty name regex")
+		return errors.New("empty name regex")
 	}
 
 	if ag.Severity != "" {
@@ -28,6 +28,11 @@ func (ag AggregateSettings) validate() error {
 	if _, err := regexp.Compile(ag.Name); err != nil {
 		return err
 	}
+
+	if len(ag.Keep) == 0 && len(ag.Strip) == 0 {
+		return errors.New("must specify keep or strip list")
+	}
+
 	return nil
 }
 

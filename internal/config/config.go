@@ -16,11 +16,11 @@ import (
 )
 
 type Config struct {
-	CI         *CI                `hcl:"ci,block"`
-	Repository *Repository        `hcl:"repository,block"`
-	Prometheus []PrometheusConfig `hcl:"prometheus,block"`
-	Checks     *Checks            `hcl:"checks,block"`
-	Rules      []Rule             `hcl:"rule,block"`
+	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
+	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
+	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
+	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
+	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
 }
 
 func (cfg *Config) SetDisabledChecks(offline bool, l []string) {

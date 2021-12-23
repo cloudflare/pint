@@ -1,0 +1,160 @@
+pint.ok --no-color config
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "https://",
+      "timeout": "2m"
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/count",
+      "promql/comparison",
+      "alerts/annotation",
+      "promql/by",
+      "query/cost",
+      "rule/label",
+      "promql/rate",
+      "query/series",
+      "promql/syntax",
+      "promql/without",
+      "rule/reject",
+      "alerts/template",
+      "promql/vector_matching",
+      "alerts/for"
+    ]
+  },
+  "rules": [
+    {},
+    {
+      "reject": [
+        {
+          "key": ".* +.*",
+          "label_keys": true,
+          "annotation_keys": true
+        },
+        {
+          "key": "https?://.+",
+          "label_keys": true,
+          "label_values": true
+        }
+      ]
+    },
+    {
+      "match": {
+        "path": "foo/bar",
+        "kind": "alerting"
+      },
+      "ignore": {
+        "kind": "alerting",
+        "label": {
+          "key": "notify",
+          "value": "blackhole"
+        }
+      },
+      "annotation": [
+        {
+          "key": "summary",
+          "required": true,
+          "severity": "bug"
+        }
+      ],
+      "alerts": {
+        "range": "7d",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    },
+    {
+      "match": {
+        "kind": "recording"
+      },
+      "aggregate": [
+        {
+          "name": ".+",
+          "keep": [
+            "job"
+          ]
+        }
+      ]
+    },
+    {
+      "match": {
+        "kind": "recording"
+      },
+      "cost": {
+        "bytesPerSample": 4036
+      }
+    }
+  ]
+}
+-- .pint.hcl --
+prometheus "prom" {
+  uri     = "https://"
+  timeout = "2m"
+}
+
+rule{  }
+
+rule {
+  reject ".* +.*" {
+    label_keys      = true
+    annotation_keys = true
+  }
+
+  reject "https?://.+" {
+    label_keys   = true
+    label_values = true
+  }
+}
+
+
+rule {
+  match {
+    kind = "alerting"
+    path = "foo/bar"
+  }
+  ignore {
+    kind = "alerting"
+    label "notify" {
+      value = "blackhole"
+    }
+  }
+  alerts {
+    range   = "7d"
+    step    = "1m"
+    resolve = "5m"
+  }
+  annotation "summary" {
+    severity = "bug"
+    required = true
+  }
+}
+
+rule {
+  match {
+    kind = "recording"
+  }
+  aggregate ".+" {
+    keep = [ "job" ]
+  }
+}
+
+rule {
+  match {
+    kind = "recording"
+  }
+  cost {
+    bytesPerSample = 4036
+  }
+}

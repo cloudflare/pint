@@ -16,8 +16,8 @@ var (
 )
 
 type MatchLabel struct {
-	Key             string `hcl:",label"`
-	Value           string `hcl:"value"`
+	Key             string `hcl:",label" json:"key"`
+	Value           string `hcl:"value" json:"value"`
 	annotationCheck bool
 }
 
@@ -70,11 +70,11 @@ func (ml MatchLabel) isMatching(rule parser.Rule) bool {
 }
 
 type Match struct {
-	Path       string      `hcl:"path,optional"`
-	Name       string      `hcl:"name,optional"`
-	Kind       string      `hcl:"kind,optional"`
-	Label      *MatchLabel `hcl:"label,block"`
-	Annotation *MatchLabel `hcl:"annotation,block"`
+	Path       string      `hcl:"path,optional" json:"path,omitempty"`
+	Name       string      `hcl:"name,optional" json:"name,omitempty"`
+	Kind       string      `hcl:"kind,optional" json:"kind,omitempty"`
+	Label      *MatchLabel `hcl:"label,block" json:"label,omitempty"`
+	Annotation *MatchLabel `hcl:"annotation,block" json:"annotation,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {
@@ -145,14 +145,14 @@ func (m Match) IsMatch(path string, r parser.Rule) bool {
 }
 
 type Rule struct {
-	Match      *Match               `hcl:"match,block"`
-	Ignore     *Match               `hcl:"ignore,block"`
-	Aggregate  []AggregateSettings  `hcl:"aggregate,block"`
-	Annotation []AnnotationSettings `hcl:"annotation,block"`
-	Label      []AnnotationSettings `hcl:"label,block"`
-	Cost       *CostSettings        `hcl:"cost,block"`
-	Alerts     *AlertsSettings      `hcl:"alerts,block"`
-	Reject     []RejectSettings     `hcl:"reject,block"`
+	Match      *Match               `hcl:"match,block" json:"match,omitempty"`
+	Ignore     *Match               `hcl:"ignore,block" json:"ignore,omitempty"`
+	Aggregate  []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
+	Annotation []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
+	Label      []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
+	Cost       *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
+	Alerts     *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
+	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 }
 
 func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {

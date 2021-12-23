@@ -7,8 +7,8 @@ import (
 )
 
 type Checks struct {
-	Enabled  []string `hcl:"enabled,optional"`
-	Disabled []string `hcl:"disabled,optional"`
+	Enabled  []string `hcl:"enabled,optional" json:"enabled,omitempty"`
+	Disabled []string `hcl:"disabled,optional" json:"disabled,omitempty"`
 }
 
 func (c Checks) validate() error {

@@ -1,14 +1,21 @@
 package config
 
-import "regexp"
+import (
+	"errors"
+	"regexp"
+)
 
 type CI struct {
-	Include    []string `hcl:"include,optional"`
-	MaxCommits int      `hcl:"maxCommits,optional"`
-	BaseBranch string   `hcl:"baseBranch,optional"`
+	Include    []string `hcl:"include,optional" json:"include,omitempty"`
+	MaxCommits int      `hcl:"maxCommits,optional" json:"maxCommits,omitempty"`
+	BaseBranch string   `hcl:"baseBranch,optional" json:"baseBranch,omitempty"`
 }
 
 func (ci CI) validate() error {
+	if ci.MaxCommits <= 0 {
+		return errors.New("maxCommits cannot be <= 0")
+	}
+
 	for _, pattern := range ci.Include {
 		_, err := regexp.Compile(pattern)
 		if err != nil {

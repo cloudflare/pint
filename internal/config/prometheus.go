@@ -3,10 +3,10 @@ package config
 import "regexp"
 
 type PrometheusConfig struct {
-	Name    string   `hcl:",label"`
-	URI     string   `hcl:"uri"`
-	Timeout string   `hcl:"timeout"`
-	Paths   []string `hcl:"paths,optional"`
+	Name    string   `hcl:",label" json:"name"`
+	URI     string   `hcl:"uri" json:"uri"`
+	Timeout string   `hcl:"timeout"  json:"timeout"`
+	Paths   []string `hcl:"paths,optional" json:"paths,omitempty"`
 }
 
 func (pc PrometheusConfig) validate() error {

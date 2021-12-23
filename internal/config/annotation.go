@@ -1,27 +1,36 @@
 package config
 
 import (
+	"errors"
 	"regexp"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
 
 type AnnotationSettings struct {
-	Key      string `hcl:",label"`
-	Value    string `hcl:"value,optional"`
-	Required bool   `hcl:"required,optional"`
-	Severity string `hcl:"severity,optional"`
+	Key      string `hcl:",label" json:"key"`
+	Value    string `hcl:"value,optional" json:"value,omitempty"`
+	Required bool   `hcl:"required,optional" json:"required,omitempty"`
+	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (as AnnotationSettings) validate() error {
-	if as.Severity != "" {
-		if _, err := checks.ParseSeverity(as.Severity); err != nil {
-			return err
-		}
+	if as.Key == "" {
+		return errors.New("annotation key cannot be empty")
+	}
+
+	if _, err := regexp.Compile(as.Key); err != nil {
+		return err
 	}
 
 	if _, err := regexp.Compile(as.Value); err != nil {
 		return err
+	}
+
+	if as.Severity != "" {
+		if _, err := checks.ParseSeverity(as.Severity); err != nil {
+			return err
+		}
 	}
 
 	return nil
