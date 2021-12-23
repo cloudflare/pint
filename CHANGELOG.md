@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.2
+
+### Added
+
+- `--no-color` flag for disabling output colouring.
+
+### Fixed
+
+- Fixed duplicated warnings when multiple `rule {...}` blocks where configured.
+
 ## v0.5.1
 
 ### Fixed

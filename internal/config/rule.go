@@ -199,6 +199,20 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
+	if isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
+		for _, prom := range proms {
+			timeout, _ := parseDuration(prom.Timeout)
+			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout))
+		}
+	}
+
+	if isEnabled(enabledChecks, disabledChecks, checks.VectorMatchingCheckName, r) {
+		for _, prom := range proms {
+			timeout, _ := parseDuration(prom.Timeout)
+			enabled = append(enabled, checks.NewVectorMatchingCheck(prom.Name, prom.URI, timeout))
+		}
+	}
+
 	if rule.Cost != nil && isEnabled(enabledChecks, disabledChecks, checks.CostCheckName, r) {
 		severity := rule.Cost.getSeverity(checks.Bug)
 		for _, prom := range proms {
@@ -225,13 +239,6 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			}
 			severity := lab.getSeverity(checks.Warning)
 			enabled = append(enabled, checks.NewLabelCheck(lab.Key, valueRegex, lab.Required, severity))
-		}
-	}
-
-	if isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout))
 		}
 	}
 

@@ -18,10 +18,10 @@ func lvlFormatter(level interface{}) string {
 	return fmt.Sprintf("level=%s", level)
 }
 
-func initLogger(level string) error {
+func initLogger(level string, noColor bool) error {
 	log.Logger = log.Logger.Output(zerolog.ConsoleWriter{
 		Out:           os.Stderr,
-		NoColor:       false,
+		NoColor:       noColor,
 		FormatLevel:   lvlFormatter,
 		FormatMessage: msgFormatter,
 		FormatTimestamp: func(interface{}) string {

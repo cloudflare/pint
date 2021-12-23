@@ -16,6 +16,7 @@ const (
 	logLevelFlag = "log-level"
 	disabledFlag = "disabled"
 	offlineFlag  = "offline"
+	noColorFlag  = "no-color"
 )
 
 var (
@@ -38,6 +39,12 @@ func newApp() *cli.App {
 				Aliases: []string{"l"},
 				Value:   zerolog.InfoLevel.String(),
 				Usage:   "Log level",
+			},
+			&cli.BoolFlag{
+				Name:    noColorFlag,
+				Aliases: []string{"n"},
+				Value:   false,
+				Usage:   "Disable output colouring",
 			},
 		},
 		Commands: []*cli.Command{
@@ -108,7 +115,7 @@ func main() {
 }
 
 func actionVersion(c *cli.Context) (err error) {
-	err = initLogger(c.String(logLevelFlag))
+	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {
 		return fmt.Errorf("failed to set log level: %w", err)
 	}
