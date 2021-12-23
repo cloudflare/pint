@@ -153,8 +153,8 @@ func TestGithubReporter(t *testing.T) {
 			srv := httptest.NewServer(handler)
 			defer srv.Close()
 			reporter := reporter.NewGithubReporter(
-				&srv.URL,
-				&srv.URL,
+				srv.URL,
+				srv.URL,
 				tcase.timeout,
 				tcase.token,
 				tcase.owner,

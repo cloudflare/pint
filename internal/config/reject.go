@@ -1,29 +1,34 @@
 package config
 
 import (
+	"errors"
 	"regexp"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
 
 type RejectSettings struct {
-	Regex            string `hcl:",label"`
-	LabelKeys        bool   `hcl:"label_keys,optional"`
-	LabelValues      bool   `hcl:"label_values,optional"`
-	AnnotationKeys   bool   `hcl:"annotation_keys,optional"`
-	AnnotationValues bool   `hcl:"annotation_values,optional"`
-	Severity         string `hcl:"severity,optional"`
+	Regex            string `hcl:",label" json:"key,omitempty"`
+	LabelKeys        bool   `hcl:"label_keys,optional" json:"label_keys,omitempty"`
+	LabelValues      bool   `hcl:"label_values,optional" json:"label_values,omitempty"`
+	AnnotationKeys   bool   `hcl:"annotation_keys,optional" json:"annotation_keys,omitempty"`
+	AnnotationValues bool   `hcl:"annotation_values,optional" json:"annotation_values,omitempty"`
+	Severity         string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (rs RejectSettings) validate() error {
-	if rs.Severity != "" {
-		if _, err := checks.ParseSeverity(rs.Severity); err != nil {
-			return err
-		}
+	if rs.Regex == "" {
+		return errors.New("reject key must be set")
 	}
 
 	if _, err := regexp.Compile(rs.Regex); err != nil {
 		return err
+	}
+
+	if rs.Severity != "" {
+		if _, err := checks.ParseSeverity(rs.Severity); err != nil {
+			return err
+		}
 	}
 
 	return nil

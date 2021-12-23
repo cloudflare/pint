@@ -1,9 +1,9 @@
 package config
 
 type AlertsSettings struct {
-	Range   string `hcl:"range"`
-	Step    string `hcl:"step"`
-	Resolve string `hcl:"resolve"`
+	Range   string `hcl:"range" json:"range"`
+	Step    string `hcl:"step" json:"step"`
+	Resolve string `hcl:"resolve" json:"resolve"`
 }
 
 func (as AlertsSettings) validate() error {

@@ -12,8 +12,8 @@ import (
 )
 
 type GithubReporter struct {
-	baseURL   *string
-	uploadURL *string
+	baseURL   string
+	uploadURL string
 	timeout   time.Duration
 	authToken string
 	owner     string
@@ -24,7 +24,7 @@ type GithubReporter struct {
 
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
-func NewGithubReporter(baseURL, uploadURL *string, timeout time.Duration, token, owner, repo string, prNum int, gitCmd git.CommandRunner) GithubReporter {
+func NewGithubReporter(baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum int, gitCmd git.CommandRunner) GithubReporter {
 	return GithubReporter{
 		baseURL:   baseURL,
 		uploadURL: uploadURL,
@@ -49,9 +49,8 @@ func (gr GithubReporter) Submit(summary Summary) error {
 
 	var client *github.Client
 
-	if (gr.uploadURL != nil && *gr.uploadURL != "") &&
-		(gr.baseURL != nil && *gr.baseURL != "") {
-		ec, err := github.NewEnterpriseClient(*gr.baseURL, *gr.uploadURL, tc)
+	if gr.uploadURL != "" && gr.baseURL != "" {
+		ec, err := github.NewEnterpriseClient(gr.baseURL, gr.uploadURL, tc)
 		if err != nil {
 			return fmt.Errorf("creating new GitHub client: %w", err)
 		}

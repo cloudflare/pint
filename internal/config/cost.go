@@ -7,9 +7,9 @@ import (
 )
 
 type CostSettings struct {
-	BytesPerSample int    `hcl:"bytesPerSample,optional"`
-	MaxSeries      int    `hcl:"maxSeries,optional"`
-	Severity       string `hcl:"severity,optional"`
+	BytesPerSample int    `hcl:"bytesPerSample,optional" json:"bytesPerSample,omitempty"`
+	MaxSeries      int    `hcl:"maxSeries,optional" json:"maxSeries,omitempty"`
+	Severity       string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (cs CostSettings) validate() error {

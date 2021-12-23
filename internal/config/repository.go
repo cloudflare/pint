@@ -16,15 +16,21 @@ func (bb BitBucket) validate() error {
 	if _, err := parseDuration(bb.Timeout); err != nil {
 		return err
 	}
+	if bb.Project == "" {
+		return fmt.Errorf("project cannot be empty")
+	}
+	if bb.Repository == "" {
+		return fmt.Errorf("repository cannot be empty")
+	}
 	return nil
 }
 
 type GitHub struct {
-	BaseURI   *string `hcl:"baseuri"`
-	UploadURI *string `hcl:"uploaduri"`
-	Timeout   string  `hcl:"timeout"`
-	Owner     string  `hcl:"owner"`
-	Repo      string  `hcl:"repo"`
+	BaseURI   string `hcl:"baseuri,optional"`
+	UploadURI string `hcl:"uploaduri,optional"`
+	Timeout   string `hcl:"timeout"`
+	Owner     string `hcl:"owner"`
+	Repo      string `hcl:"repo"`
 }
 
 func (gh GitHub) validate() error {
@@ -32,21 +38,21 @@ func (gh GitHub) validate() error {
 		return err
 	}
 	if gh.Repo == "" {
-		return fmt.Errorf("repo is empty")
+		return fmt.Errorf("repo cannot be empty")
 	}
 	if gh.Owner == "" {
-		return fmt.Errorf("owner is empty")
+		return fmt.Errorf("owner cannot be empty")
 	}
-	if gh.BaseURI != nil && *gh.BaseURI != "" {
-		_, err := url.Parse(*gh.BaseURI)
+	if gh.BaseURI != "" {
+		_, err := url.Parse(gh.BaseURI)
 		if err != nil {
-			return fmt.Errorf("parsing baseuri: %w", err)
+			return fmt.Errorf("invalid baseuri: %w", err)
 		}
 	}
-	if gh.UploadURI != nil && *gh.UploadURI != "" {
-		_, err := url.Parse(*gh.UploadURI)
+	if gh.UploadURI != "" {
+		_, err := url.Parse(gh.UploadURI)
 		if err != nil {
-			return fmt.Errorf("parsing baseuri: %w", err)
+			return fmt.Errorf("invalid uploaduri: %w", err)
 		}
 	}
 
@@ -54,6 +60,6 @@ func (gh GitHub) validate() error {
 }
 
 type Repository struct {
-	BitBucket *BitBucket `hcl:"bitbucket,block"`
-	GitHub    *GitHub    `hcl:"github,block"`
+	BitBucket *BitBucket `hcl:"bitbucket,block" json:"bitbucket,omitempty"`
+	GitHub    *GitHub    `hcl:"github,block" json:"github,omitempty"`
 }
