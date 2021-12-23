@@ -1,11 +1,11 @@
-pint.error lint rules
+pint.error --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m5
-level=info msg="File parsed" [36mpath=[0mrules/0002.yml [36mrules=[0m1
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=5
+level=info msg="File parsed" path=rules/0002.yml rules=1
 rules/0001.yml:1-2: url annotation is required (alerts/annotation)
 - alert: Always
   expr: up
@@ -49,8 +49,8 @@ rules/0002.yml:11: using $value in labels will generate a new alert on every val
 rules/0002.yml:12: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
     val: '{{ .Value|humanizeDuration }}'
 
-level=info msg="Problems found" [36mBug=[0m5 [36mFatal=[0m4 [36mWarning=[0m4
-level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
+level=info msg="Problems found" Bug=5 Fatal=4 Warning=4
+level=fatal msg="Fatal error" error="problems found"
 -- rules/0001.yml --
 - alert: Always
   expr: up

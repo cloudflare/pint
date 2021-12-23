@@ -1,10 +1,10 @@
-pint.error lint rules
+pint.error --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m2
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=2
 rules/0001.yml:11-13: link annotation is required (alerts/annotation)
     annotations:
       summary: "Instance {{ $labels.instance }} down"
@@ -21,8 +21,8 @@ rules/0001.yml:19-21: link annotation is required (alerts/annotation)
       summary: "High request latency on {{ $labels.instance }}"
       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 
-level=info msg="Problems found" [36mBug=[0m2 [36mWarning=[0m2
-level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
+level=info msg="Problems found" Bug=2 Warning=2
+level=fatal msg="Fatal error" error="problems found"
 -- rules/0001.yml --
 groups:
 - name: example

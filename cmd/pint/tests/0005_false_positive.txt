@@ -1,10 +1,10 @@
-pint.ok lint rules
+pint.ok --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m2
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=2
 -- rules/0001.yml --
 - record: "colo:test1"
   expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[5m])) BY (zoneId,job))
