@@ -102,6 +102,12 @@ func (c ByCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
 				text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, use by(%s, ...)", c.label, c.nameRegex, c.label),
 			})
 		}
+
+		// most outer aggregation is stripping a label that we want to get rid of
+		// we can skip further checks
+		if !found && !c.keep {
+			return
+		}
 	}
 
 NEXT:
