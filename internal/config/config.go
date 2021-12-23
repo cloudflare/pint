@@ -81,17 +81,8 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 			continue
 		}
 		proms = append(proms, prom)
-		timeout, _ := parseDuration(prom.Timeout)
-		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.RateCheckName, r) {
-			enabled = append(enabled, checks.NewRateCheck(prom.Name, prom.URI, timeout))
-		}
-		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SeriesCheckName, r) {
-			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout))
-		}
-		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.VectorMatchingCheckName, r) {
-			enabled = append(enabled, checks.NewVectorMatchingCheck(prom.Name, prom.URI, timeout))
-		}
 	}
+
 	for _, rule := range cfg.Rules {
 		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms) {
 			if r.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(c.String()))) {
@@ -101,7 +92,17 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 					Msg("Check disabled by comment")
 				continue
 			}
-			enabled = append(enabled, c)
+			// check if rule was already enabled
+			var v bool
+			for _, er := range enabled {
+				if er.String() == c.String() {
+					v = true
+					break
+				}
+			}
+			if !v {
+				enabled = append(enabled, c)
+			}
 		}
 	}
 
