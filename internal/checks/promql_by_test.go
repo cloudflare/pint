@@ -142,6 +142,16 @@ func TestByCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "nested count",
+			content:     "- record: foo\n  expr: count(count(bar) by (instance))\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "instance", false, checks.Warning),
+		},
+		{
+			description: "nested count AND nested count",
+			content:     "- record: foo\n  expr: count(count(bar) by (instance)) AND count(count(bar) by (instance))\n",
+			checker:     checks.NewByCheck(regexp.MustCompile("^.+$"), "instance", false, checks.Warning),
+		},
 	}
 	runTests(t, testCases)
 }

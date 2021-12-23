@@ -62,7 +62,7 @@ func (c WithoutCheck) Check(rule parser.Rule) (problems []Problem) {
 }
 
 func (c WithoutCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.AggregateExpr); ok && n.Without {
+	if n, ok := node.Node.(*promParser.AggregateExpr); ok {
 		switch n.Op {
 		case promParser.SUM:
 		case promParser.MIN:
@@ -80,6 +80,16 @@ func (c WithoutCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 		case promParser.QUANTILE:
 		default:
 			log.Warn().Str("op", n.Op.String()).Msg("Unsupported aggregation operation")
+		}
+
+		if !n.Without && len(n.Grouping) == 0 {
+			// most outer aggregation is stripping a label that we want to get rid of
+			// we can skip further checks
+			return
+		}
+
+		if !n.Without {
+			goto NEXT
 		}
 
 		var found bool

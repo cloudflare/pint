@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.3
+
+### Fixed
+
+- Fixed false positive reports in `aggregate` check.
+
 ## v0.5.2
 
 ### Added

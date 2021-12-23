@@ -187,6 +187,11 @@ func TestWithoutCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "nested count",
+			content:     "- record: foo\n  expr: count(count(bar) without ())\n",
+			checker:     checks.NewWithoutCheck(regexp.MustCompile("^.+$"), "instance", false, checks.Warning),
+		},
 	}
 	runTests(t, testCases)
 }
