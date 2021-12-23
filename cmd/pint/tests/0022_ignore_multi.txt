@@ -1,10 +1,10 @@
-pint.ok lint rules
+pint.ok --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/1.yaml [36mrules=[0m3
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/1.yaml rules=3
 rules/1.yaml:2: dropped label should be removed when aggregating "^.+$" rules, remove dropped from by() (promql/by)
   expr: sum(errors_total) by(keep,dropped)
 

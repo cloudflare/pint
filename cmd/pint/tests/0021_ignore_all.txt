@@ -1,10 +1,10 @@
-pint.error -l debug lint rules
+pint.error --no-color -l debug lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=fatal msg="Fatal error" [36merror=[0m[31m"failed to load config file \".pint.hcl\": ignore block must have at least one condition"[0m
+level=info msg="Loading configuration file" path=.pint.hcl
+level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": ignore block must have at least one condition"
 -- rules/0001.yml --
 - record: "colo:recording"
   expr: sum(foo) without(job)

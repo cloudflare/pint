@@ -1,9 +1,9 @@
-pint.ok lint rules
+pint.ok --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="File parsed" [36mpath=[0mrules/0001.yaml [36mrules=[0m1
+level=info msg="File parsed" path=rules/0001.yaml rules=1
 -- rules/0001.yaml --
 - record: down
   expr: up == 0

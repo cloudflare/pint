@@ -1,15 +1,15 @@
-pint.error lint rules
+pint.error --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m2
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=2
 rules/0001.yml:5: incomplete rule, no alert or record key (pint/parse)
 - expr: sum(foo)
 
-level=info msg="Problems found" [36mFatal=[0m1
-level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
+level=info msg="Problems found" Fatal=1
+level=fatal msg="Fatal error" error="problems found"
 -- rules/0001.yml --
 - record: "colo:test1"
   expr: sum(foo) without(job)

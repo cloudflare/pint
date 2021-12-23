@@ -1,18 +1,18 @@
-pint.error lint rules
+pint.error --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m1
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=1
 rules/0001.yml:5: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/by)
       expr: sum by (instance) (http_inprogress_requests)
 
 rules/0001.yml:5: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/by)
       expr: sum by (instance) (http_inprogress_requests)
 
-level=info msg="Problems found" [36mBug=[0m1 [36mWarning=[0m1
-level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
+level=info msg="Problems found" Bug=1 Warning=1
+level=fatal msg="Fatal error" error="problems found"
 -- rules/0001.yml --
 groups:
   - name: example

@@ -1,7 +1,7 @@
 mkdir rules
-pint.error lint rules
+pint.error  --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" [36merror=[0m[31m"no matching files"[0m
+level=fatal msg="Fatal error" error="no matching files"

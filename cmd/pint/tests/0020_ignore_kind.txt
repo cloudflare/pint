@@ -1,14 +1,14 @@
-pint.ok -l debug lint rules
+pint.ok --no-color -l debug lint rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" [36mpath=[0m.pint.hcl
-level=info msg="File parsed" [36mpath=[0mrules/0001.yml [36mrules=[0m2
-level=debug msg="Found recording rule" [36mlines=[0m1-2 [36mpath=[0mrules/0001.yml [36mrecord=[0mcolo:recording
-level=debug msg="Configured checks for rule" [36menabled=[0m["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/without(job:true)","promql/by(job:true)"] [36mpath=[0mrules/0001.yml [36mrule=[0mcolo:recording
-level=debug msg="Found alerting rule" [36malert=[0mcolo:alerting [36mlines=[0m4-5 [36mpath=[0mrules/0001.yml
-level=debug msg="Configured checks for rule" [36menabled=[0m["promql/syntax","alerts/for","promql/comparison","alerts/template"] [36mpath=[0mrules/0001.yml [36mrule=[0mcolo:alerting
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=2
+level=debug msg="Found recording rule" lines=1-2 path=rules/0001.yml record=colo:recording
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/without(job:true)","promql/by(job:true)"] path=rules/0001.yml rule=colo:recording
+level=debug msg="Found alerting rule" alert=colo:alerting lines=4-5 path=rules/0001.yml
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template"] path=rules/0001.yml rule=colo:alerting
 rules/0001.yml:2: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/without)
   expr: sum(foo) without(job)
 
