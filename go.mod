@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/getsentry/sentry-go v0.11.0
+	github.com/getsentry/sentry-go v0.12.0
 	github.com/google/go-cmp v0.5.6
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/hcl/v2 v2.11.1
