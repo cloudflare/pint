@@ -174,19 +174,13 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			}
 			severity := aggr.getSeverity(checks.Warning)
 			for _, label := range aggr.Keep {
-				if isEnabled(enabledChecks, disabledChecks, checks.WithoutCheckName, r) {
-					enabled = append(enabled, checks.NewWithoutCheck(nameRegex, label, true, severity))
-				}
-				if isEnabled(enabledChecks, disabledChecks, checks.ByCheckName, r) {
-					enabled = append(enabled, checks.NewByCheck(nameRegex, label, true, severity))
+				if isEnabled(enabledChecks, disabledChecks, checks.AggregationCheckName, r) {
+					enabled = append(enabled, checks.NewAggregationCheck(nameRegex, label, true, severity))
 				}
 			}
 			for _, label := range aggr.Strip {
-				if isEnabled(enabledChecks, disabledChecks, checks.WithoutCheckName, r) {
-					enabled = append(enabled, checks.NewWithoutCheck(nameRegex, label, false, severity))
-				}
-				if isEnabled(enabledChecks, disabledChecks, checks.ByCheckName, r) {
-					enabled = append(enabled, checks.NewByCheck(nameRegex, label, false, severity))
+				if isEnabled(enabledChecks, disabledChecks, checks.AggregationCheckName, r) {
+					enabled = append(enabled, checks.NewAggregationCheck(nameRegex, label, false, severity))
 				}
 			}
 		}

@@ -8,27 +8,26 @@ import (
 
 var (
 	CheckNames = []string{
-		AlertsCheckName,
-		ComparisonCheckName,
 		AnnotationCheckName,
-		ByCheckName,
-		CostCheckName,
-		LabelCheckName,
-		RateCheckName,
-		SeriesCheckName,
-		SyntaxCheckName,
-		WithoutCheckName,
-		RejectCheckName,
-		TemplateCheckName,
-		VectorMatchingCheckName,
+		AlertsCheckName,
 		AlertForCheckName,
+		TemplateCheckName,
+		AggregationCheckName,
+		ComparisonCheckName,
+		RateCheckName,
+		SyntaxCheckName,
+		VectorMatchingCheckName,
+		CostCheckName,
+		SeriesCheckName,
+		LabelCheckName,
+		RejectCheckName,
 	}
 	OnlineChecks = []string{
 		AlertsCheckName,
-		CostCheckName,
 		RateCheckName,
-		SeriesCheckName,
 		VectorMatchingCheckName,
+		CostCheckName,
+		SeriesCheckName,
 	}
 )
 

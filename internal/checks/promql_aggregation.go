@@ -11,26 +11,26 @@ import (
 )
 
 const (
-	WithoutCheckName = "promql/without"
+	AggregationCheckName = "promql/aggregate"
 )
 
-func NewWithoutCheck(nameRegex *regexp.Regexp, label string, keep bool, severity Severity) WithoutCheck {
-	return WithoutCheck{nameRegex: nameRegex, label: label, keep: keep, severity: severity}
+func NewAggregationCheck(nameRegex *regexp.Regexp, label string, keep bool, severity Severity) AggregationCheck {
+	return AggregationCheck{nameRegex: nameRegex, label: label, keep: keep, severity: severity}
 }
 
-type WithoutCheck struct {
+type AggregationCheck struct {
 	nameRegex *regexp.Regexp
 	label     string
 	keep      bool
 	severity  Severity
 }
 
-func (c WithoutCheck) String() string {
-	return fmt.Sprintf("%s(%s:%v)", WithoutCheckName, c.label, c.keep)
+func (c AggregationCheck) String() string {
+	return fmt.Sprintf("%s(%s:%v)", AggregationCheckName, c.label, c.keep)
 
 }
 
-func (c WithoutCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c AggregationCheck) Check(rule parser.Rule) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -52,7 +52,7 @@ func (c WithoutCheck) Check(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
-			Reporter: WithoutCheckName,
+			Reporter: AggregationCheckName,
 			Text:     problem.text,
 			Severity: c.severity,
 		})
@@ -61,7 +61,7 @@ func (c WithoutCheck) Check(rule parser.Rule) (problems []Problem) {
 	return
 }
 
-func (c WithoutCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
+func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
 	if n, ok := node.Node.(*promParser.AggregateExpr); ok {
 		switch n.Op {
 		case promParser.SUM:
@@ -88,10 +88,6 @@ func (c WithoutCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 			return
 		}
 
-		if !n.Without {
-			goto NEXT
-		}
-
 		var found bool
 		for _, g := range n.Grouping {
 			if g == c.label {
@@ -100,24 +96,46 @@ func (c WithoutCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 			}
 		}
 
-		if found && c.keep {
-			problems = append(problems, exprProblem{
-				expr: node.Expr,
-				text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, remove %s from without()", c.label, c.nameRegex, c.label),
-			})
-		}
+		if n.Without {
+			if found && c.keep {
+				problems = append(problems, exprProblem{
+					expr: node.Expr,
+					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, remove %s from without()", c.label, c.nameRegex, c.label),
+				})
+			}
 
-		if !found && !c.keep {
-			problems = append(problems, exprProblem{
-				expr: node.Expr,
-				text: fmt.Sprintf("%s label should be removed when aggregating %q rules, use without(%s, ...)", c.label, c.nameRegex, c.label),
-			})
-		}
+			if !found && !c.keep {
+				problems = append(problems, exprProblem{
+					expr: node.Expr,
+					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, use without(%s, ...)", c.label, c.nameRegex, c.label),
+				})
+			}
 
-		// most outer aggregation is stripping a label that we want to get rid of
-		// we can skip further checks
-		if found && !c.keep {
-			return
+			// most outer aggregation is stripping a label that we want to get rid of
+			// we can skip further checks
+			if found && !c.keep {
+				return
+			}
+		} else {
+			if found && !c.keep {
+				problems = append(problems, exprProblem{
+					expr: node.Expr,
+					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, remove %s from by()", c.label, c.nameRegex, c.label),
+				})
+			}
+
+			if !found && c.keep {
+				problems = append(problems, exprProblem{
+					expr: node.Expr,
+					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, use by(%s, ...)", c.label, c.nameRegex, c.label),
+				})
+			}
+
+			// most outer aggregation is stripping a label that we want to get rid of
+			// we can skip further checks
+			if !found && !c.keep {
+				return
+			}
 		}
 	}
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.6.0
+
+### Changed
+
+- `aggregate` check was refactored and uses to run a single test for both
+  `by` and `without` conditions. As a result this check might now find issues
+  previously undetected.
+  Check suppression comments will need to be migrated:
+  * `# pint disable promql/by` becomes `# pint disable promql/aggregate`
+  * `# pint disable promql/without` becomes `# pint disable promql/aggregate`
+  * `# pint ignore promql/by` becomes `# pint ignore promql/aggregate`
+  * `# pint ignore promql/without` becomes `# pint ignore promql/aggregate`
+
 ## v0.5.3
 
 ### Fixed
