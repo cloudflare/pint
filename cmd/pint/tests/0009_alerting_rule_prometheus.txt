@@ -10,10 +10,10 @@ rules/0001.yml:11-13: link annotation is required (alerts/annotation)
       summary: "Instance {{ $labels.instance }} down"
       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
 
-rules/0001.yml:17: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/by)
+rules/0001.yml:17: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/aggregate)
     expr: sum by (instance) (http_inprogress_requests) > 0
 
-rules/0001.yml:17: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/by)
+rules/0001.yml:17: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
     expr: sum by (instance) (http_inprogress_requests) > 0
 
 rules/0001.yml:19-21: link annotation is required (alerts/annotation)

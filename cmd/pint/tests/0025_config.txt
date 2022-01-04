@@ -18,20 +18,19 @@ level=info msg="Loading configuration file" path=.pint.hcl
   ],
   "checks": {
     "enabled": [
-      "alerts/count",
-      "promql/comparison",
       "alerts/annotation",
-      "promql/by",
-      "query/cost",
-      "rule/label",
-      "promql/rate",
-      "query/series",
-      "promql/syntax",
-      "promql/without",
-      "rule/reject",
+      "alerts/count",
+      "alerts/for",
       "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
       "promql/vector_matching",
-      "alerts/for"
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
     ]
   },
   "rules": [
