@@ -12,6 +12,7 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/timestamp"
 	promTemplate "github.com/prometheus/prometheus/template"
 )
@@ -345,7 +346,9 @@ func absentLabels(node *parser.PromQLNode) []string {
 	for _, child := range node.Children {
 		for _, v := range utils.HasVectorSelector(child) {
 			for _, lm := range v.LabelMatchers {
-				labelMap[lm.Name] = struct{}{}
+				if lm.Type == labels.MatchEqual {
+					labelMap[lm.Name] = struct{}{}
+				}
 			}
 		}
 	}
