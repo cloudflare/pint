@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.1
+
+### Fixed
+
+- Labels returned by `absent()` are only from equal match types (`absent(foo="bar")`,
+  not `absent(foo=~"bar.+")` but `alerts/template` didn't test for match type when
+  checking for labels sourced from `absent()` queries.
+
 ## v0.6.0
 
 ### Changed
