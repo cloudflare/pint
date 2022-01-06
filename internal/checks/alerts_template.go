@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	textTemplate "text/template"
 	"text/template/parse"
@@ -124,7 +125,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
-						Lines:    label.Lines(),
+						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: TemplateCheckName,
 						Text:     msg,
 						Severity: Bug,
@@ -139,7 +140,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
-						Lines:    label.Lines(),
+						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: TemplateCheckName,
 						Text:     msg,
 						Severity: Bug,
@@ -165,7 +166,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
-						Lines:    annotation.Lines(),
+						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: TemplateCheckName,
 						Text:     msg,
 						Severity: Bug,
@@ -180,7 +181,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
-						Lines:    annotation.Lines(),
+						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: TemplateCheckName,
 						Text:     msg,
 						Severity: Bug,
@@ -359,4 +360,10 @@ func absentLabels(node *parser.PromQLNode) []string {
 	}
 
 	return names
+}
+
+func mergeLines(a, b []int) (l []int) {
+	l = append(a, b...)
+	sort.Ints(l)
+	return
 }
