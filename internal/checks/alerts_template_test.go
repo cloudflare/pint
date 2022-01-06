@@ -233,7 +233,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $labels.job }}`,
-					Lines:    []int{4},
+					Lines:    []int{2, 4},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but the query removes it`,
 					Severity: checks.Bug,
@@ -247,7 +247,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
-					Lines:    []int{4},
+					Lines:    []int{2, 4},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but the query removes it`,
 					Severity: checks.Bug,
@@ -261,7 +261,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $labels.job }}`,
-					Lines:    []int{4},
+					Lines:    []int{2, 4},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but the query removes it`,
 					Severity: checks.Bug,
@@ -275,7 +275,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
-					Lines:    []int{4},
+					Lines:    []int{2, 4},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but the query removes it`,
 					Severity: checks.Bug,
@@ -289,7 +289,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
-					Lines:    []int{4},
+					Lines:    []int{2, 4},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but the query removes it`,
 					Severity: checks.Bug,
@@ -303,7 +303,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }}`,
-					Lines:    []int{4},
+					Lines:    []int{2, 4},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but the query removes it`,
 					Severity: checks.Bug,
@@ -323,7 +323,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `help: {{ $labels.ixtance }}`,
-					Lines:    []int{6},
+					Lines:    []int{3, 6},
 					Reporter: "alerts/template",
 					Text:     `template is using "ixtance" label but the query removes it`,
 					Severity: checks.Bug,
@@ -355,28 +355,28 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: "instance: {{ $labels.instance }}",
-					Lines:    []int{5},
+					Lines:    []int{3, 5},
 					Reporter: "alerts/template",
 					Text:     `template is using "instance" label but absent() is not passing it`,
 					Severity: checks.Bug,
 				},
 				{
 					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
-					Lines:    []int{7},
+					Lines:    []int{3, 7},
 					Reporter: "alerts/template",
 					Text:     `template is using "instance" label but absent() is not passing it`,
 					Severity: checks.Bug,
 				},
 				{
 					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
-					Lines:    []int{7},
+					Lines:    []int{3, 7},
 					Reporter: "alerts/template",
 					Text:     `template is using "foo" label but absent() is not passing it`,
 					Severity: checks.Bug,
 				},
 				{
 					Fragment: "help: {{ $labels.xxx }}",
-					Lines:    []int{8},
+					Lines:    []int{3, 8},
 					Reporter: "alerts/template",
 					Text:     `template is using "xxx" label but absent() is not passing it`,
 					Severity: checks.Bug,
@@ -405,7 +405,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ $labels.instance }} on {{ .Labels.job }} is missing`,
-					Lines:    []int{5},
+					Lines:    []int{3, 5},
 					Reporter: "alerts/template",
 					Text:     `template is using "instance" label but the query removes it`,
 					Severity: checks.Bug,
@@ -424,7 +424,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems: []checks.Problem{
 				{
 					Fragment: `summary: {{ .Labels.job }} is missing`,
-					Lines:    []int{5},
+					Lines:    []int{3, 5},
 					Reporter: "alerts/template",
 					Text:     `template is using "job" label but absent() is not passing it`,
 					Severity: checks.Bug,

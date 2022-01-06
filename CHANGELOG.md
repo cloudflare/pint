@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.2
+
+### Changed
+
+- `template` check will now include alert query line numbers when reporting issues.
+
 ## v0.6.1
 
 ### Fixed
