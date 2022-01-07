@@ -38,3 +38,40 @@ changelog:
   filters:
     exclude:
       - '^Merge pull request '
+dockers:
+- image_templates: ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64"]
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - --platform=linux/amd64
+  - --label=org.opencontainers.image.title={{ .ProjectName }}
+  - --label=org.opencontainers.image.description={{ .ProjectName }}
+  - --label=org.opencontainers.image.url=https://github.com/cloudflare/{{ .ProjectName }}
+  - --label=org.opencontainers.image.source=https://github.com/cloudflare/{{ .ProjectName }}
+  - --label=org.opencontainers.image.version={{ .Version }}
+  - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+  - --label=org.opencontainers.image.revision={{ .FullCommit }}
+  - --label=org.opencontainers.image.licenses=Apache-2.0
+- image_templates: ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64"]
+  goarch: arm64
+  dockerfile: Dockerfile
+  use: buildx
+  build_flag_templates:
+  - --platform=linux/arm64
+  - --label=org.opencontainers.image.title={{ .ProjectName }}
+  - --label=org.opencontainers.image.description={{ .ProjectName }}
+  - --label=org.opencontainers.image.url=https://github.com/cloudflare/{{ .ProjectName }}
+  - --label=org.opencontainers.image.source=https://github.com/cloudflare/{{ .ProjectName }}
+  - --label=org.opencontainers.image.version={{ .Version }}
+  - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+  - --label=org.opencontainers.image.revision={{ .FullCommit }}
+  - --label=org.opencontainers.image.licenses=Apache-2.0
+docker_manifests:
+- name_template: ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}
+  image_templates:
+  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64
+  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64
+- name_template: ghcr.io/cloudflare/{{ .ProjectName }}:latest
+  image_templates:
+  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64
+  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64
