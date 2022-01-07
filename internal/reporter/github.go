@@ -2,12 +2,14 @@ package reporter
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"context"
 
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/google/go-github/v37/github"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 )
 
@@ -94,6 +96,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 				Line: github.Int(linesWithBlame[0]),
 			}
 		} else if len(linesWithBlame) > 1 {
+			sort.Ints(linesWithBlame)
 			start, end := linesWithBlame[0], linesWithBlame[len(linesWithBlame)-1]
 			comment = &github.DraftReviewComment{
 				Path:      github.String(rep.Path),
@@ -107,12 +110,14 @@ func (gr GithubReporter) Submit(summary Summary) error {
 	}
 
 	if len(comments) > 0 {
-		if _, _, err := client.PullRequests.CreateReview(ctx, gr.owner, gr.repo, gr.prNum, &github.PullRequestReviewRequest{
+		_, resp, err := client.PullRequests.CreateReview(ctx, gr.owner, gr.repo, gr.prNum, &github.PullRequestReviewRequest{
 			Event:    github.String("COMMENT"),
 			Comments: comments,
-		}); err != nil {
+		})
+		if err != nil {
 			return fmt.Errorf("creating review: %w", err)
 		}
+		log.Info().Str("status", resp.Status).Msg("Report submitted")
 	}
 
 	return nil
