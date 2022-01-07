@@ -1,13 +1,13 @@
-pint.ok parse 'sum(rate(foo[5m])) without(job) / on(instance) group_left() sum(rate(bar[5m])) without(job)'
+pint.ok parse 'sum(rate(foo[5m:1m])) without(job) / on(instance) group_left() sum(rate(bar[5m])) without(job)'
 cmp stdout stdout.txt
 ! stderr .
 
 -- stdout.txt --
-++ node: sum without(job) (rate(foo[5m])) / on(instance) group_left() sum without(job) (rate(bar[5m]))
+++ node: sum without(job) (rate(foo[5m:1m])) / on(instance) group_left() sum without(job) (rate(bar[5m]))
   BinaryExpr:
     * Type: vector
     * Op: /
-    * LHS: sum without(job) (rate(foo[5m]))
+    * LHS: sum without(job) (rate(foo[5m:1m]))
     * RHS: sum without(job) (rate(bar[5m]))
     * VectorMatching:
       * Card: many-to-one
@@ -15,43 +15,51 @@ cmp stdout stdout.txt
       * On: true
       * Include: []
     * ReturnBool: false
-  ++ node: sum without(job) (rate(foo[5m]))
-    AggregateExpr:
-      * Type: vector
-      * Op: sum
-      * Expr: rate(foo[5m])
-      * Param: <nil>
-      * Grouping: [job]
-      * Without: true
-        ++ node: rate(foo[5m])
-          Call:
-            * Type: vector
-            * Func: rate
-            * Args: foo[5m]
-              ++ node: foo[5m]
-                Expressions:
-                  ++ node: foo[5m]
-                    MatrixSelector:
-                      * Type: matrix
-                      * VectorSelector: foo
-                      * Range: 5m0s
-  ++ node: sum without(job) (rate(bar[5m]))
-    AggregateExpr:
-      * Type: vector
-      * Op: sum
-      * Expr: rate(bar[5m])
-      * Param: <nil>
-      * Grouping: [job]
-      * Without: true
-        ++ node: rate(bar[5m])
-          Call:
-            * Type: vector
-            * Func: rate
-            * Args: bar[5m]
-              ++ node: bar[5m]
-                Expressions:
+      ++ node: sum without(job) (rate(foo[5m:1m]))
+        AggregateExpr:
+          * Type: vector
+          * Op: sum
+          * Expr: rate(foo[5m:1m])
+          * Param: <nil>
+          * Grouping: [job]
+          * Without: true
+            ++ node: rate(foo[5m:1m])
+              Call:
+                * Type: vector
+                * Func: rate
+                * Args: foo[5m:1m]
+                  ++ node: foo[5m:1m]
+                    Expressions:
+                      ++ node: foo[5m:1m]
+                        SubqueryExpr:
+                          * Type: matrix
+                          * Expr: foo
+                          * Step: 1m0s
+                          * Range: 5m0s
+                          * Offset: 0s
+                            ++ node: foo
+                              VectorSelector:
+                                * Type: vector
+                                * Name: foo
+                                * Offset: 0s
+                                * LabelMatchers: [__name__="foo"]
+      ++ node: sum without(job) (rate(bar[5m]))
+        AggregateExpr:
+          * Type: vector
+          * Op: sum
+          * Expr: rate(bar[5m])
+          * Param: <nil>
+          * Grouping: [job]
+          * Without: true
+            ++ node: rate(bar[5m])
+              Call:
+                * Type: vector
+                * Func: rate
+                * Args: bar[5m]
                   ++ node: bar[5m]
-                    MatrixSelector:
-                      * Type: matrix
-                      * VectorSelector: bar
-                      * Range: 5m0s
+                    Expressions:
+                      ++ node: bar[5m]
+                        MatrixSelector:
+                          * Type: matrix
+                          * VectorSelector: bar
+                          * Range: 5m0s
