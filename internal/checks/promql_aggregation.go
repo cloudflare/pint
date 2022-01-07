@@ -36,14 +36,23 @@ func (c AggregationCheck) Check(rule parser.Rule) (problems []Problem) {
 		return nil
 	}
 
-	if c.nameRegex != nil &&
-		rule.RecordingRule != nil &&
-		!c.nameRegex.MatchString(rule.RecordingRule.Record.Value.Value) {
-		return nil
+	if c.nameRegex != nil {
+		if rule.RecordingRule != nil && !c.nameRegex.MatchString(rule.RecordingRule.Record.Value.Value) {
+			return nil
+		}
+		if rule.AlertingRule != nil && !c.nameRegex.MatchString(rule.AlertingRule.Alert.Value.Value) {
+			return nil
+		}
 	}
 
 	if rule.RecordingRule != nil && rule.RecordingRule.Labels != nil {
 		if val := rule.RecordingRule.Labels.GetValue(c.label); val != nil {
+			return nil
+		}
+	}
+
+	if rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
+		if val := rule.AlertingRule.Labels.GetValue(c.label); val != nil {
 			return nil
 		}
 	}
@@ -82,7 +91,7 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 			log.Warn().Str("op", n.Op.String()).Msg("Unsupported aggregation operation")
 		}
 
-		if !n.Without && len(n.Grouping) == 0 {
+		if !n.Without && !c.keep && len(n.Grouping) == 0 {
 			// most outer aggregation is stripping a label that we want to get rid of
 			// we can skip further checks
 			return

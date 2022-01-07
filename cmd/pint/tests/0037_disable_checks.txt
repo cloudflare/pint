@@ -1,0 +1,30 @@
+pint.ok --no-color lint -d alerts/for -d promql/comparison rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=3
+rules/0001.yml:6: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
+  expr: sum(foo)
+
+-- rules/0001.yml --
+- alert: default-for
+  expr: foo > 1
+  for: 0m
+
+- record: sum-job
+  expr: sum(foo)
+
+- alert: no-comparison
+  expr: foo
+
+-- .pint.hcl --
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+}

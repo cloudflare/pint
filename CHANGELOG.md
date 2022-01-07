@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.3
+
+### Fixed
+
+- `aggregate` check didn't report stripping required labels on queries
+  using aggregation with no grouping labels (`sum(foo)`).
+- `aggregate` check didn't test for name and label matches on alert rules.
+
 ## v0.6.2
 
 ### Changed
