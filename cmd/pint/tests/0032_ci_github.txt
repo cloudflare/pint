@@ -1,0 +1,107 @@
+exec bash -x ./webserver.sh &
+exec bash -c 'while [ ! -f server.pid ]; do sleep 1 ; done'
+
+mkdir testrepo
+cd testrepo
+exec git init --initial-branch=main .
+
+cp ../src/v1.yml rules.yml
+cp ../src/.pint.hcl .
+env GIT_AUTHOR_NAME=pint
+env GIT_AUTHOR_EMAIL=pint@example.com
+env GIT_COMMITTER_NAME=pint
+env GIT_COMMITTER_EMAIL=pint@example.com
+exec git add .
+exec git commit -am 'import rules and config'
+
+exec git checkout -b v2
+cp ../src/v2.yml rules.yml
+exec git commit -am 'v2'
+
+env GITHUB_AUTH_TOKEN=12345
+env GITHUB_PULL_REQUEST_NUMBER=1
+pint.ok -l debug --no-color ci
+! stdout .
+stderr 'level=info msg="Report submitted" status="200 OK"'
+
+exec sh -c 'cat ../server.pid | xargs kill'
+
+-- src/v1.yml --
+- alert: rule1
+  expr: sum(foo) by(job)
+- alert: rule2
+  expr: sum(foo) by(job)
+  for: 0s
+
+-- src/v2.yml --
+- alert: rule1
+  expr: sum(foo) by(job)
+  for: 0s
+- alert: rule2
+  expr: sum(foo) by(job)
+  for: 0s
+
+-- src/.pint.hcl --
+ci {
+  baseBranch = "main"
+}
+repository {
+  github {
+    baseuri   = "http://127.0.0.1:8081"
+	uploaduri = "http://127.0.0.1:8081"
+    timeout   = "10s"
+    owner     = "cloudflare"
+    repo      = "pint"
+  }
+}
+
+-- webserver.go --
+package main
+
+import (
+	"context"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "{}")
+	})
+
+	listener, err := net.Listen("tcp", "127.0.0.1:8081")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server := &http.Server{
+		Addr: "127.0.0.1:8081",
+	}
+
+	go func() {
+		_ = server.Serve(listener)
+	}()
+
+	pid := os.Getpid()
+	err = os.WriteFile("server.pid", []byte(strconv.Itoa(pid)), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+}
+
+-- webserver.sh --
+env GOCACHE=$TMPDIR go run webserver.go
