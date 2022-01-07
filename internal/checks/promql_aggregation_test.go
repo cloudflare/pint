@@ -15,13 +15,23 @@ func TestAggregationCheck(t *testing.T) {
 			checker:     checks.NewAggregationCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
 		},
 		{
-			description: "name must match",
+			description: "name must match / recording",
 			content:     "- record: foo\n  expr: sum(foo) without(job)\n",
 			checker:     checks.NewAggregationCheck(regexp.MustCompile("^bar$"), "job", true, checks.Warning),
 		},
 		{
-			description: "uses label from labels map",
+			description: "name must match  /alerting",
+			content:     "- alert: foo\n  expr: sum(foo) without(job)\n",
+			checker:     checks.NewAggregationCheck(regexp.MustCompile("^bar$"), "job", true, checks.Warning),
+		},
+		{
+			description: "uses label from labels map / recording",
 			content:     "- record: foo\n  expr: sum(foo) without(job)\n  labels:\n    job: foo\n",
+			checker:     checks.NewAggregationCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+		},
+		{
+			description: "uses label from labels map / alerting",
+			content:     "- alert: foo\n  expr: sum(foo) without(job)\n  labels:\n    job: foo\n",
 			checker:     checks.NewAggregationCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
 		},
 		{
@@ -402,6 +412,48 @@ func TestAggregationCheck(t *testing.T) {
 					Lines:    []int{2},
 					Reporter: "promql/aggregate",
 					Text:     `instance label should be removed when aggregating "^.+$" rules, remove instance from by()`,
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "must keep job label / sum()",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker:     checks.NewAggregationCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum(foo)",
+					Lines:    []int{2},
+					Reporter: "promql/aggregate",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, use by(job, ...)",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "must keep job label / sum() by()",
+			content:     "- record: foo\n  expr: sum(foo) by()\n",
+			checker:     checks.NewAggregationCheck(regexp.MustCompile("^.+$"), "job", true, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum(foo) by()",
+					Lines:    []int{2},
+					Reporter: "promql/aggregate",
+					Text:     "job label is required and should be preserved when aggregating \"^.+$\" rules, use by(job, ...)",
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "must strip job label / sum() without()",
+			content:     "- record: foo\n  expr: sum(foo) without()\n",
+			checker:     checks.NewAggregationCheck(regexp.MustCompile("^.+$"), "job", false, checks.Warning),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum(foo) without()",
+					Lines:    []int{2},
+					Reporter: "promql/aggregate",
+					Text:     `job label should be removed when aggregating "^.+$" rules, use without(job, ...)`,
 					Severity: checks.Warning,
 				},
 			},

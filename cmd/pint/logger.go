@@ -31,7 +31,7 @@ func initLogger(level string, noColor bool) error {
 
 	l, err := zerolog.ParseLevel(level)
 	if err != nil {
-		return err
+		return fmt.Errorf("'%s' is not a valid log level", level)
 	}
 	zerolog.SetGlobalLevel(l)
 

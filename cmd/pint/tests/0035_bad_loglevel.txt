@@ -1,0 +1,6 @@
+pint.error -l invalid --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="failed to set log level: 'invalid' is not a valid log level"
