@@ -109,7 +109,7 @@ func main() {
 	app := newApp()
 	err = app.Run(os.Args)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Execution completed with error(s)s")
+		log.Fatal().Err(err).Msg("Execution completed with error(s)")
 		os.Exit(1)
 	}
 }

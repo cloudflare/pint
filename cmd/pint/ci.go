@@ -52,7 +52,7 @@ func actionCI(c *cli.Context) (err error) {
 		return fmt.Errorf("failed to get the list of modified files: %w", err)
 	}
 	if len(toScan.Commits()) > cfg.CI.MaxCommits {
-		return fmt.Errorf("number of commits to check (%d) is higher than maxCommits(%d), exiting", len(toScan.Commits()), cfg.CI.MaxCommits)
+		return fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(toScan.Commits()), cfg.CI.MaxCommits)
 	}
 
 	for _, fc := range toScan.Results() {
