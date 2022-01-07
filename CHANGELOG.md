@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.4
+
+### Fixed
+
+- Fixed docker builds.
+
 ## v0.6.3
 
 ### Fixed

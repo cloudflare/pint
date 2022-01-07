@@ -1,9 +1,9 @@
 builds:
   - main: ./cmd/pint
     flags:
-      - '-trimpath'
+      - "-trimpath"
     ldflags:
-      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
+      - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}"
     env:
       - CGO_ENABLED=0
     goos:
@@ -11,12 +11,12 @@ builds:
       - windows
       - darwin
     ignore:
-    - goos: windows
-      goarch: arm64
+      - goos: windows
+        goarch: arm64
     no_unique_dist_dir: true
-    binary: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}'
+    binary: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
 archives:
-  - name_template: '{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}'
+  - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
     replacements:
       darwin: Darwin
       linux: Linux
@@ -24,9 +24,9 @@ archives:
       386: i386
       amd64: x86_64
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
-  name_template: '{{ incpatch .Version }}-next'
+  name_template: "{{ incpatch .Version }}-next"
 release:
   extra_files:
     - glob: ./*.md
@@ -37,41 +37,53 @@ changelog:
   sort: asc
   filters:
     exclude:
-      - '^Merge pull request '
+      - "^Merge pull request "
 dockers:
-- image_templates: ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64"]
-  dockerfile: Dockerfile
-  use: buildx
-  build_flag_templates:
-  - --platform=linux/amd64
-  - --label=org.opencontainers.image.title={{ .ProjectName }}
-  - --label=org.opencontainers.image.description={{ .ProjectName }}
-  - --label=org.opencontainers.image.url=https://github.com/cloudflare/{{ .ProjectName }}
-  - --label=org.opencontainers.image.source=https://github.com/cloudflare/{{ .ProjectName }}
-  - --label=org.opencontainers.image.version={{ .Version }}
-  - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
-  - --label=org.opencontainers.image.revision={{ .FullCommit }}
-  - --label=org.opencontainers.image.licenses=Apache-2.0
-- image_templates: ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64"]
-  goarch: arm64
-  dockerfile: Dockerfile
-  use: buildx
-  build_flag_templates:
-  - --platform=linux/arm64
-  - --label=org.opencontainers.image.title={{ .ProjectName }}
-  - --label=org.opencontainers.image.description={{ .ProjectName }}
-  - --label=org.opencontainers.image.url=https://github.com/cloudflare/{{ .ProjectName }}
-  - --label=org.opencontainers.image.source=https://github.com/cloudflare/{{ .ProjectName }}
-  - --label=org.opencontainers.image.version={{ .Version }}
-  - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
-  - --label=org.opencontainers.image.revision={{ .FullCommit }}
-  - --label=org.opencontainers.image.licenses=Apache-2.0
+  - image_templates:
+      ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64"]
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/cloudflare/{{ .ProjectName }}
+      - --label=org.opencontainers.image.source=https://github.com/cloudflare/{{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+    extra_files:
+      - cmd
+      - internal
+      - go.mod
+      - go.sum
+  - image_templates:
+      ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64"]
+    goarch: arm64
+    dockerfile: Dockerfile
+    use: buildx
+    build_flag_templates:
+      - --platform=linux/arm64
+      - --label=org.opencontainers.image.title={{ .ProjectName }}
+      - --label=org.opencontainers.image.description={{ .ProjectName }}
+      - --label=org.opencontainers.image.url=https://github.com/cloudflare/{{ .ProjectName }}
+      - --label=org.opencontainers.image.source=https://github.com/cloudflare/{{ .ProjectName }}
+      - --label=org.opencontainers.image.version={{ .Version }}
+      - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
+      - --label=org.opencontainers.image.revision={{ .FullCommit }}
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+    extra_files:
+      - cmd
+      - internal
+      - go.mod
+      - go.sum
 docker_manifests:
-- name_template: ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}
-  image_templates:
-  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64
-  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64
-- name_template: ghcr.io/cloudflare/{{ .ProjectName }}:latest
-  image_templates:
-  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64
-  - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64
+  - name_template: ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}
+    image_templates:
+      - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64
+      - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64
+  - name_template: ghcr.io/cloudflare/{{ .ProjectName }}:latest
+    image_templates:
+      - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64
+      - ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64
