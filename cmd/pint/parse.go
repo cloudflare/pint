@@ -50,14 +50,8 @@ func parseNode(node parser.Node, level int) {
 			printNode(level+levelStep, "* Include: %v", n.VectorMatching.Include)
 		}
 		printNode(level, "* ReturnBool: %v", n.ReturnBool)
-	case *parser.EvalStmt:
-		printNode(level, "EvalStmt:")
-		level += levelStep
-		printNode(level, "* Expr: %v", n.Expr)
-		printNode(level, "* Start: %v", n.Start)
-		printNode(level, "* End: %v", n.End)
-		printNode(level, "* Interval: %v", n.Interval)
-		parseNode(n.Expr, level+levelStep)
+		parseNode(n.LHS, level+levelStep)
+		parseNode(n.RHS, level+levelStep)
 	case *parser.Call:
 		printNode(level, "Call:")
 		level += levelStep
@@ -69,12 +63,6 @@ func parseNode(node parser.Node, level int) {
 		printNode(level, "ParenExpr:")
 		level += levelStep
 		printNode(level, "* Type: %v", n.Type())
-		printNode(level, "* Expr: %v", n.Expr)
-		parseNode(n.Expr, level+levelStep)
-	case *parser.UnaryExpr:
-		printNode(level, "UnaryExpr:")
-		printNode(level, "* Type: %v", n.Type())
-		printNode(level, "* Op: %v", n.Op)
 		printNode(level, "* Expr: %v", n.Expr)
 		parseNode(n.Expr, level+levelStep)
 	case *parser.SubqueryExpr:
@@ -117,11 +105,7 @@ func parseQuery(query string) error {
 	if err != nil {
 		return err
 	}
-
 	parseNode(expr, 0)
-	for _, c := range parser.Children(expr) {
-		parseNode(c, levelStep)
-	}
 	return nil
 }
 

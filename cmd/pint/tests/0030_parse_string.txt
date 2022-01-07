@@ -1,0 +1,8 @@
+pint.ok parse '"foo"'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: "foo"
+  StringLiteral:
+    * Type: string
