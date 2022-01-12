@@ -39,6 +39,13 @@ func (c SeriesCheck) Check(rule parser.Rule) (problems []Problem) {
 	done := map[string]bool{}
 
 	for _, selector := range getSelectors(expr.Query) {
+		bareSelector := stripLabels(selector)
+		c1 := fmt.Sprintf("disable %s(%s)", SeriesCheckName, selector.String())
+		c2 := fmt.Sprintf("disable %s(%s)", SeriesCheckName, bareSelector.String())
+		if rule.HasComment(c1) || rule.HasComment(c2) {
+			done[selector.String()] = true
+			continue
+		}
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
@@ -71,15 +78,7 @@ func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.Vec
 	if series == 0 {
 		if len(selector.LabelMatchers) > 1 {
 			// retry selector with only __name__ label
-			s := promParser.VectorSelector{
-				Name:          selector.Name,
-				LabelMatchers: []*labels.Matcher{},
-			}
-			for _, lm := range selector.LabelMatchers {
-				if lm.Name == labels.MetricName {
-					s.LabelMatchers = append(s.LabelMatchers, lm)
-				}
-			}
+			s := stripLabels(selector)
 			p := c.countSeries(expr, s)
 			// if we have zero series without any label selector then the whole
 			// series is missing, but if we have some then report missing series
@@ -117,4 +116,17 @@ func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) 
 	}
 
 	return
+}
+
+func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
+	s := promParser.VectorSelector{
+		Name:          selector.Name,
+		LabelMatchers: []*labels.Matcher{},
+	}
+	for _, lm := range selector.LabelMatchers {
+		if lm.Name == labels.MetricName {
+			s.LabelMatchers = append(s.LabelMatchers, lm)
+		}
+	}
+	return s
 }

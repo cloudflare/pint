@@ -725,3 +725,24 @@ groups:
     - record: instance:http_requests_total:avg_over_time:1w
       expr: avg_over_time(http_requests_total[1w]) by (instance) # pint disable query/cost
 ```
+
+Some checks allow to specify extra parameters.
+
+### query/series
+
+You can disable `query/series` for specific metric using `# pint disable query/series(selector)`
+comment.
+Just like with PromQL if a selector doesn't have any labels then it will match all instances,
+if you pass any labels it will only pass time series with those labels.
+
+Disable warnings about missing `my_metric_name`:
+
+```YAML
+# pint disable query/series(my_metric_name)
+```
+
+Disable it only for `my_metric_name{cluster="dev"}` but still warn about `my_metric_name{cluster="prod"}`:
+
+```YAML
+# pint disable query/series(my_metric_name{cluster="dev"})
+```

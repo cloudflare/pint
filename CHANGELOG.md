@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.5
+
+### Added
+
+- Allow disabling `query/series` check for individual series using
+  `# pint disable query/series(my_metric_name)` comments.
+
 ## v0.6.4
 
 ### Fixed
