@@ -22,7 +22,7 @@ func TestSeriesCheck(t *testing.T) {
 		query := r.Form.Get("query")
 
 		switch query {
-		case "count(notfound)", `count({__name__="notfound",job="bar"})`:
+		case "count(notfound)", `count(notfound{job="foo"})`, `count(notfound{job!="foo"})`, `count({__name__="notfound",job="bar"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -237,6 +237,51 @@ func TestSeriesCheck(t *testing.T) {
 					Lines:    []int{3},
 					Reporter: "query/series",
 					Text:     `query using prom completed without any results for {__name__="notfound",job="bar"}`,
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
+			description: "series missing but check disabled",
+			content: `
+# pint disable query/series(notfound)
+- record: foo
+  expr: count(notfound) == 0
+`,
+			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5),
+		},
+		{
+			description: "series missing but check disabled, labels",
+			content: `
+# pint disable query/series(notfound)
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5),
+		},
+		{
+			description: "series missing but check disabled, negative labels",
+			content: `
+# pint disable query/series(notfound)
+- record: foo
+  expr: count(notfound{job!="foo"}) == 0
+`,
+			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5),
+		},
+		{
+			description: "series missing, disabled comment for labels",
+			content: `
+# pint disable query/series(notfound{job="foo"})
+- record: foo
+  expr: count(notfound) == 0
+`,
+			checker: checks.NewSeriesCheck("prom", srv.URL, time.Second*5),
+			problems: []checks.Problem{
+				{
+					Fragment: `notfound`,
+					Lines:    []int{4},
+					Reporter: "query/series",
+					Text:     `query using prom completed without any results for notfound`,
 					Severity: checks.Warning,
 				},
 			},
