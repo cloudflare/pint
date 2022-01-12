@@ -4,9 +4,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cloudflare/pint/internal/keylock"
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+
+	"github.com/cloudflare/pint/internal/keylock"
 )
 
 type Prometheus struct {
@@ -14,7 +16,7 @@ type Prometheus struct {
 	uri     string
 	api     v1.API
 	timeout time.Duration
-	cache   *sync.Map
+	cache   *lru.Cache
 	lock    *keylock.PartitionLocker
 }
 
@@ -26,12 +28,13 @@ func NewPrometheus(name, uri string, timeout time.Duration) *Prometheus {
 		// use this code in tests
 		panic(err)
 	}
+	cache, _ := lru.New(1000)
 	return &Prometheus{
 		name:    name,
 		uri:     uri,
 		api:     v1.NewAPI(client),
 		timeout: timeout,
-		cache:   &sync.Map{},
+		cache:   cache,
 		lock:    keylock.NewPartitionLocker((&sync.Mutex{})),
 	}
 }
@@ -41,8 +44,5 @@ func (p *Prometheus) Name() string {
 }
 
 func (p *Prometheus) ClearCache() {
-	p.cache.Range(func(key interface{}, value interface{}) bool {
-		p.cache.Delete(key)
-		return true
-	})
+	p.cache.Purge()
 }

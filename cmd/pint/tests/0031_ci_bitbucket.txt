@@ -48,7 +48,7 @@ ci {
 }
 repository {
   bitbucket {
-    uri        = "http://127.0.0.1:8080"
+    uri        = "http://127.0.0.1:6031"
     timeout    = "10s"
     project    = "prometheus"
     repository = "rules"
@@ -76,13 +76,13 @@ func main() {
 		io.WriteString(w, "OK")
 	})
 
-	listener, err := net.Listen("tcp", "127.0.0.1:8080")
+	listener, err := net.Listen("tcp", "127.0.0.1:6031")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	server := &http.Server{
-		Addr: "127.0.0.1:8080",
+		Addr: "127.0.0.1:6031",
 	}
 
 	go func() {

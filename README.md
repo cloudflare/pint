@@ -8,6 +8,8 @@ There are two modes it works in:
 
 - CI PR linting
 - Ad-hoc linting of a selected files or directories
+- A daemon that continuously checks selected files or directories and expose metrics describing
+  all discovered problems.
 
 ### Pull Requests
 
@@ -43,6 +45,33 @@ or both:
 
 ```SHELL
 pint lint path/to/dir file.yml path/file.yml path/dir
+```
+
+### Daemon
+
+Run the daemon:
+
+```SHELL
+pint watch rules.yml
+```
+
+By default it will start a HTTP server on port `8080` and run all checks every
+10 minutes. This can be customized by passing extra flags to the `watch` command.
+Run `pint watch -h` to see all available flags.
+
+Query `/metrics` to see all expose metrics, example with default flags:
+
+```SHELL
+curl -s http://localhost:8080/metrics
+```
+
+Or setup Prometheus scrape job:
+
+```YAML
+scrape_configs:
+  - job_name: pint
+    static_configs:
+      - targets: ['localhost:8080']
 ```
 
 ## Quick start

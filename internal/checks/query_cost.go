@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/parser"
@@ -34,7 +35,11 @@ func (c CostCheck) String() string {
 	return fmt.Sprintf("%s(%s)", CostCheckName, c.prom.Name())
 }
 
-func (c CostCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c CostCheck) Reporter() string {
+	return CostCheckName
+}
+
+func (c CostCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -42,12 +47,12 @@ func (c CostCheck) Check(rule parser.Rule) (problems []Problem) {
 	}
 
 	query := fmt.Sprintf("count(%s)", expr.Value.Value)
-	qr, err := c.prom.Query(query)
+	qr, err := c.prom.Query(ctx, query)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
-			Reporter: CostCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
 			Severity: Bug,
 		})
@@ -74,7 +79,7 @@ func (c CostCheck) Check(rule parser.Rule) (problems []Problem) {
 	problems = append(problems, Problem{
 		Fragment: expr.Value.Value,
 		Lines:    expr.Lines(),
-		Reporter: CostCheckName,
+		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("query using %s completed in %.2fs returning %d result(s)%s%s", c.prom.Name(), qr.DurationSeconds, series, estimate, above),
 		Severity: severity,
 	})

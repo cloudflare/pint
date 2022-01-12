@@ -7,11 +7,12 @@ import (
 	"path"
 	"testing"
 
+	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/gkampitakis/go-snaps/snaps"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(t *testing.M) {

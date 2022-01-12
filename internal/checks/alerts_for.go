@@ -1,10 +1,12 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/prometheus/common/model"
+
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -22,7 +24,11 @@ func (c AlertsForChecksFor) String() string {
 	return AlertForCheckName
 }
 
-func (c AlertsForChecksFor) Check(rule parser.Rule) (problems []Problem) {
+func (c AlertsForChecksFor) Reporter() string {
+	return AlertForCheckName
+}
+
+func (c AlertsForChecksFor) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule == nil || rule.AlertingRule.For == nil {
 		return
 	}
@@ -32,7 +38,7 @@ func (c AlertsForChecksFor) Check(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: rule.AlertingRule.For.Value.Value,
 			Lines:    rule.AlertingRule.For.Lines(),
-			Reporter: AlertForCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("invalid duration: %s", err),
 			Severity: Bug,
 		})
@@ -43,7 +49,7 @@ func (c AlertsForChecksFor) Check(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: rule.AlertingRule.For.Value.Value,
 			Lines:    rule.AlertingRule.For.Lines(),
-			Reporter: AlertForCheckName,
+			Reporter: c.Reporter(),
 			Text: fmt.Sprintf("%q is the default value of %q, consider removing this line",
 				rule.AlertingRule.For.Value.Value, rule.AlertingRule.For.Key.Value),
 			Severity: Information,

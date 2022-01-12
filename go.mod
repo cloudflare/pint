@@ -8,8 +8,10 @@ require (
 	github.com/gkampitakis/go-snaps v0.2.2
 	github.com/google/go-cmp v0.5.6
 	github.com/google/go-github/v37 v37.0.0
+	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/hcl/v2 v2.11.1
 	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.32.1
 	github.com/prometheus/prometheus v1.8.2-0.20211217191541-41f1a8125e66
 	github.com/rogpeppe/go-internal v1.8.1
@@ -54,7 +56,6 @@ require (
 	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common/sigv4 v0.1.0 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect

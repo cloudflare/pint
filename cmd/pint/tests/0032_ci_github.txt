@@ -1,5 +1,6 @@
 exec bash -x ./webserver.sh &
-exec bash -c 'while [ ! -f server.pid ]; do sleep 1 ; done'
+#exec bash -c 'while [ ! -f server.pid ]; do sleep 1 ; done'
+exec sleep 5
 
 mkdir testrepo
 cd testrepo
@@ -47,8 +48,8 @@ ci {
 }
 repository {
   github {
-    baseuri   = "http://127.0.0.1:8081"
-	uploaduri = "http://127.0.0.1:8081"
+    baseuri   = "http://127.0.0.1:6032"
+	uploaduri = "http://127.0.0.1:6032"
     timeout   = "10s"
     owner     = "cloudflare"
     repo      = "pint"
@@ -76,13 +77,13 @@ func main() {
 		io.WriteString(w, "{}")
 	})
 
-	listener, err := net.Listen("tcp", "127.0.0.1:8081")
+	listener, err := net.Listen("tcp", "127.0.0.1:6032")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	server := &http.Server{
-		Addr: "127.0.0.1:8081",
+		Addr: "127.0.0.1:6032",
 	}
 
 	go func() {

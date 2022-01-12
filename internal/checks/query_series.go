@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/parser"
@@ -26,7 +27,11 @@ func (c SeriesCheck) String() string {
 	return fmt.Sprintf("%s(%s)", SeriesCheckName, c.prom.Name())
 }
 
-func (c SeriesCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c SeriesCheck) Reporter() string {
+	return SeriesCheckName
+}
+
+func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -46,21 +51,21 @@ func (c SeriesCheck) Check(rule parser.Rule) (problems []Problem) {
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
-		problems = append(problems, c.countSeries(expr, selector)...)
+		problems = append(problems, c.countSeries(ctx, expr, selector)...)
 		done[selector.String()] = true
 	}
 
 	return
 }
 
-func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.VectorSelector) (problems []Problem) {
+func (c SeriesCheck) countSeries(ctx context.Context, expr parser.PromQLExpr, selector promParser.VectorSelector) (problems []Problem) {
 	q := fmt.Sprintf("count(%s)", selector.String())
-	qr, err := c.prom.Query(q)
+	qr, err := c.prom.Query(ctx, q)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: selector.String(),
 			Lines:    expr.Lines(),
-			Reporter: SeriesCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
 			Severity: Bug,
 		})
@@ -76,7 +81,7 @@ func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.Vec
 		if len(selector.LabelMatchers) > 1 {
 			// retry selector with only __name__ label
 			s := stripLabels(selector)
-			p := c.countSeries(expr, s)
+			p := c.countSeries(ctx, expr, s)
 			// if we have zero series without any label selector then the whole
 			// series is missing, but if we have some then report missing series
 			// with labels
@@ -88,7 +93,7 @@ func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.Vec
 		problems = append(problems, Problem{
 			Fragment: selector.String(),
 			Lines:    expr.Lines(),
-			Reporter: SeriesCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("query using %s completed without any results for %s", c.prom.Name(), selector.String()),
 			Severity: Warning,
 		})

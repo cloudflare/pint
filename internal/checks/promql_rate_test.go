@@ -6,9 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/promapi"
-	"github.com/rs/zerolog"
 )
 
 func TestRateCheck(t *testing.T) {

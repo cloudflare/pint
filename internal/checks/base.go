@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/parser"
@@ -90,7 +91,8 @@ func (p Problem) LineRange() (int, int) {
 
 type RuleChecker interface {
 	String() string
-	Check(rule parser.Rule) []Problem
+	Reporter() string
+	Check(ctx context.Context, rule parser.Rule) []Problem
 }
 
 type exprProblem struct {

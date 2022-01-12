@@ -1,15 +1,17 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"sort"
 	"strings"
 
-	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/prometheus/common/model"
 	promParser "github.com/prometheus/prometheus/promql/parser"
+
+	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
 const (
@@ -28,17 +30,21 @@ func (c VectorMatchingCheck) String() string {
 	return fmt.Sprintf("%s(%s)", VectorMatchingCheckName, c.prom.Name())
 }
 
-func (c VectorMatchingCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c VectorMatchingCheck) Reporter() string {
+	return VectorMatchingCheckName
+}
+
+func (c VectorMatchingCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
 	}
 
-	for _, problem := range c.checkNode(expr.Query) {
+	for _, problem := range c.checkNode(ctx, expr.Query) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
-			Reporter: VectorMatchingCheckName,
+			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Severity: Bug,
 		})
@@ -47,10 +53,10 @@ func (c VectorMatchingCheck) Check(rule parser.Rule) (problems []Problem) {
 	return
 }
 
-func (c VectorMatchingCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
+func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLNode) (problems []exprProblem) {
 	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.VectorMatching != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
 		q := fmt.Sprintf("count(%s)", node.Expr)
-		qr, err := c.prom.Query(q)
+		qr, err := c.prom.Query(ctx, q)
 		if err != nil || len(qr.Series) != 0 {
 			goto NEXT
 		}
@@ -62,12 +68,12 @@ func (c VectorMatchingCheck) checkNode(node *parser.PromQLNode) (problems []expr
 			}
 		}
 
-		leftLabels, err := c.seriesLabels(fmt.Sprintf("topk(1, %s)", n.LHS.String()), ignored...)
+		leftLabels, err := c.seriesLabels(ctx, fmt.Sprintf("topk(1, %s)", n.LHS.String()), ignored...)
 		if leftLabels == nil || err != nil {
 			goto NEXT
 		}
 
-		rightLabels, err := c.seriesLabels(fmt.Sprintf("topk(1, %s)", n.RHS.String()), ignored...)
+		rightLabels, err := c.seriesLabels(ctx, fmt.Sprintf("topk(1, %s)", n.RHS.String()), ignored...)
 		if rightLabels == nil || err != nil {
 			goto NEXT
 		}
@@ -112,14 +118,14 @@ func (c VectorMatchingCheck) checkNode(node *parser.PromQLNode) (problems []expr
 
 NEXT:
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(child)...)
+		problems = append(problems, c.checkNode(ctx, child)...)
 	}
 
 	return
 }
 
-func (c VectorMatchingCheck) seriesLabels(query string, ignored ...model.LabelName) ([]string, error) {
-	qr, err := c.prom.Query(query)
+func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) ([]string, error) {
+	qr, err := c.prom.Query(ctx, query)
 	if err != nil {
 		return nil, err
 	}

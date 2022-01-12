@@ -6,8 +6,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/cloudflare/pint/internal/discovery"
 )
 
 func TestModifiedFiles(t *testing.T) {

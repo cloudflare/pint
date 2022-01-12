@@ -5,6 +5,8 @@
 ### Added
 
 - Cache each Prometheus server responses to minimize the number of API calls.
+- `pint watch` will start a daemon that will continuously check all matching rules
+  and expose metrics describing all discovered problems.
 
 ### Changed
 

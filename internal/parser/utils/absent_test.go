@@ -3,9 +3,10 @@ package utils_test
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestHasOuterAbsent(t *testing.T) {

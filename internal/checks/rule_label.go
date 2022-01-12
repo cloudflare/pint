@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 
@@ -26,7 +27,11 @@ func (c LabelCheck) String() string {
 	return fmt.Sprintf("%s(%s:%v)", LabelCheckName, c.key, c.isReguired)
 }
 
-func (c LabelCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c LabelCheck) Reporter() string {
+	return LabelCheckName
+}
+
+func (c LabelCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if rule.RecordingRule != nil {
 		problems = append(problems, c.checkRecordingRule(rule.RecordingRule)...)
 	}
@@ -44,7 +49,7 @@ func (c LabelCheck) checkRecordingRule(rule *parser.RecordingRule) (problems []P
 			problems = append(problems, Problem{
 				Fragment: fmt.Sprintf("%s: %s", rule.Record.Key.Value, rule.Record.Value.Value),
 				Lines:    rule.Lines(),
-				Reporter: LabelCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("%s label is required", c.key),
 				Severity: c.severity,
 			})
@@ -58,7 +63,7 @@ func (c LabelCheck) checkRecordingRule(rule *parser.RecordingRule) (problems []P
 			problems = append(problems, Problem{
 				Fragment: fmt.Sprintf("%s:", rule.Labels.Key.Value),
 				Lines:    rule.Labels.Lines(),
-				Reporter: LabelCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("%s label is required", c.key),
 				Severity: c.severity,
 			})
@@ -77,7 +82,7 @@ func (c LabelCheck) checkAlertingRule(rule *parser.AlertingRule) (problems []Pro
 			problems = append(problems, Problem{
 				Fragment: fmt.Sprintf("%s: %s", rule.Alert.Key.Value, rule.Alert.Value.Value),
 				Lines:    rule.Lines(),
-				Reporter: LabelCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("%s label is required", c.key),
 				Severity: c.severity,
 			})
@@ -91,7 +96,7 @@ func (c LabelCheck) checkAlertingRule(rule *parser.AlertingRule) (problems []Pro
 			problems = append(problems, Problem{
 				Fragment: fmt.Sprintf("%s:", rule.Labels.Key.Value),
 				Lines:    rule.Labels.Lines(),
-				Reporter: LabelCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("%s label is required", c.key),
 				Severity: c.severity,
 			})
@@ -109,7 +114,7 @@ func (c LabelCheck) checkValue(val *parser.YamlNode) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: fmt.Sprintf("%s: %s", c.key, val.Value),
 			Lines:    val.Position.Lines,
-			Reporter: LabelCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s label value must match regex: %s", c.key, c.valueRe.String()),
 			Severity: c.severity,
 		})

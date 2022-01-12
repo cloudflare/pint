@@ -10,12 +10,13 @@ import (
 	"text/template/parse"
 	"time"
 
-	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/timestamp"
 	promTemplate "github.com/prometheus/prometheus/template"
+
+	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
 const (
@@ -75,7 +76,11 @@ func (c TemplateCheck) String() string {
 	return TemplateCheckName
 }
 
-func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c TemplateCheck) Reporter() string {
+	return TemplateCheckName
+}
+
+func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return nil
 	}
@@ -95,7 +100,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				problems = append(problems, Problem{
 					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
-					Reporter: TemplateCheckName,
+					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("template parse error: %s", err),
 					Severity: Fatal,
 				})
@@ -105,7 +110,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				problems = append(problems, Problem{
 					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
-					Reporter: TemplateCheckName,
+					Reporter: c.Reporter(),
 					Text:     msg,
 					Severity: Bug,
 				})
@@ -115,7 +120,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				problems = append(problems, Problem{
 					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
-					Reporter: TemplateCheckName,
+					Reporter: c.Reporter(),
 					Text:     msg,
 					Severity: Bug,
 				})
@@ -126,7 +131,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
-						Reporter: TemplateCheckName,
+						Reporter: c.Reporter(),
 						Text:     msg,
 						Severity: Bug,
 					})
@@ -141,7 +146,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
-						Reporter: TemplateCheckName,
+						Reporter: c.Reporter(),
 						Text:     msg,
 						Severity: Bug,
 					})
@@ -156,7 +161,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 				problems = append(problems, Problem{
 					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 					Lines:    annotation.Lines(),
-					Reporter: TemplateCheckName,
+					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("template parse error: %s", err),
 					Severity: Fatal,
 				})
@@ -167,7 +172,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
-						Reporter: TemplateCheckName,
+						Reporter: c.Reporter(),
 						Text:     msg,
 						Severity: Bug,
 					})
@@ -182,7 +187,7 @@ func (c TemplateCheck) Check(rule parser.Rule) (problems []Problem) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
-						Reporter: TemplateCheckName,
+						Reporter: c.Reporter(),
 						Text:     msg,
 						Severity: Bug,
 					})
@@ -319,6 +324,7 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 		vars = append(vars, getVariables(node)...)
 	}
 
+	done := map[string]struct{}{}
 	var labelsAliases = aliases.varAliases(".Labels")
 	for _, v := range vars {
 		for _, a := range labelsAliases {
@@ -330,9 +336,11 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 					}
 				}
 				if found == excludeLabels {
-					msg := fmt.Sprintf(msg, v[1])
-					msgs = append(msgs, msg)
-
+					if _, ok := done[v[1]]; !ok {
+						msg := fmt.Sprintf(msg, v[1])
+						msgs = append(msgs, msg)
+						done[v[1]] = struct{}{}
+					}
 				}
 			}
 		}

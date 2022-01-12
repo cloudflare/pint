@@ -4,8 +4,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/cloudflare/pint/internal/output"
 )
 
 func TestFormatLineRangeString(t *testing.T) {

@@ -1,11 +1,13 @@
 package checks_test
 
 import (
+	"context"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/google/go-cmp/cmp"
 )
 
 type checkTest struct {
@@ -17,6 +19,7 @@ type checkTest struct {
 
 func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 	p := parser.NewParser()
+	ctx := context.Background()
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			rules, err := p.Parse([]byte(tc.content))
@@ -24,7 +27,7 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 				t.Fatal(err)
 			}
 			for _, rule := range rules {
-				problems := tc.checker.Check(rule)
+				problems := tc.checker.Check(ctx, rule)
 				if diff := cmp.Diff(tc.problems, problems, opts...); diff != "" {
 					t.Errorf("Check() returned wrong problem list (-want +got):\n%s", diff)
 					return
@@ -42,7 +45,7 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 				t.Fatal(err)
 			}
 			for _, rule := range rules {
-				_ = tc.checker.Check(rule)
+				_ = tc.checker.Check(ctx, rule)
 			}
 		})
 		t.Run(tc.description+" (bogus recording rule)", func(t *testing.T) {
@@ -54,7 +57,7 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 				t.Fatal(err)
 			}
 			for _, rule := range rules {
-				_ = tc.checker.Check(rule)
+				_ = tc.checker.Check(ctx, rule)
 			}
 		})
 	}

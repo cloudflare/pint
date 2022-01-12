@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 
@@ -29,7 +30,11 @@ func (c AnnotationCheck) String() string {
 	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.key, c.isReguired)
 }
 
-func (c AnnotationCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c AnnotationCheck) Reporter() string {
+	return AnnotationCheckName
+}
+
+func (c AnnotationCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return nil
 	}
@@ -39,7 +44,7 @@ func (c AnnotationCheck) Check(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Fragment: fmt.Sprintf("%s: %s", rule.AlertingRule.Alert.Key.Value, rule.AlertingRule.Alert.Value.Value),
 				Lines:    rule.Lines(),
-				Reporter: AnnotationCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("%s annotation is required", c.key),
 				Severity: c.severity,
 			})
@@ -53,7 +58,7 @@ func (c AnnotationCheck) Check(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Fragment: fmt.Sprintf("%s:", rule.AlertingRule.Annotations.Key.Value),
 				Lines:    rule.AlertingRule.Annotations.Lines(),
-				Reporter: AnnotationCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("%s annotation is required", c.key),
 				Severity: c.severity,
 			})
@@ -65,7 +70,7 @@ func (c AnnotationCheck) Check(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: fmt.Sprintf("%s: %s", c.key, val.Value),
 			Lines:    val.Position.Lines,
-			Reporter: AnnotationCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s annotation value must match regex: %s", c.key, c.valueRe.String()),
 			Severity: c.severity,
 		})

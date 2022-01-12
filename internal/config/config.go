@@ -24,6 +24,12 @@ type Config struct {
 	prometheusServers []*promapi.Prometheus
 }
 
+func (cfg *Config) ClearCache() {
+	for _, prom := range cfg.prometheusServers {
+		prom.ClearCache()
+	}
+}
+
 func (cfg *Config) DisableOnlineChecks() {
 	for _, name := range checks.OnlineChecks {
 		var found bool

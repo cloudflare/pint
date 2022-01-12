@@ -5,10 +5,11 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
-	"github.com/rs/zerolog/log"
 )
 
 var (

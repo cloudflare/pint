@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -43,7 +44,7 @@ func actionLint(c *cli.Context) (err error) {
 		return fmt.Errorf("no matching files")
 	}
 
-	summary := scanFiles(cfg, toScan, &discovery.NoopLineFinder{})
+	summary := scanFiles(context.Background(), cfg, toScan, &discovery.NoopLineFinder{})
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)

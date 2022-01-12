@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
@@ -33,7 +34,11 @@ func (c AlertsCheck) String() string {
 	return fmt.Sprintf("%s(%s)", AlertsCheckName, c.prom.Name())
 }
 
-func (c AlertsCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c AlertsCheck) Reporter() string {
+	return AlertsCheckName
+}
+
+func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return
 	}
@@ -45,12 +50,12 @@ func (c AlertsCheck) Check(rule parser.Rule) (problems []Problem) {
 	end := time.Now()
 	start := end.Add(-1 * c.lookBack)
 
-	qr, err := c.prom.RangeQuery(rule.AlertingRule.Expr.Value.Value, start, end, c.step)
+	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, start, end, c.step)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: rule.AlertingRule.Expr.Value.Value,
 			Lines:    rule.AlertingRule.Expr.Lines(),
-			Reporter: AlertsCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
 			Severity: Bug,
 		})
@@ -99,7 +104,7 @@ func (c AlertsCheck) Check(rule parser.Rule) (problems []Problem) {
 	problems = append(problems, Problem{
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,
-		Reporter: AlertsCheckName,
+		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("query using %s would trigger %d alert(s) in the last %s", c.prom.Name(), alerts, promapi.HumanizeDuration(delta)),
 		Severity: Information,
 	})

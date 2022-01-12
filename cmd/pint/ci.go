@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"regexp"
@@ -63,7 +64,7 @@ func actionCI(c *cli.Context) (err error) {
 	log.Debug().Strs("commits", toScan.Commits()).Msg("Found commits to scan")
 
 	gitBlame := discovery.NewGitBlameLineFinder(git.RunGit, toScan.Commits())
-	summary := scanFiles(cfg, toScan, gitBlame)
+	summary := scanFiles(context.Background(), cfg, toScan, gitBlame)
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),

@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -35,7 +36,11 @@ func (c Reject) String() string {
 	return fmt.Sprintf("%s(%s)", RejectCheckName, strings.Join(r, " "))
 }
 
-func (c Reject) Check(rule parser.Rule) (problems []Problem) {
+func (c Reject) Reporter() string {
+	return RejectCheckName
+}
+
+func (c Reject) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if c.checkLabels && rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {
 			problems = append(problems, c.reject(label, "label")...)
@@ -59,7 +64,7 @@ func (c Reject) reject(label *parser.YamlKeyValue, kind string) (problems []Prob
 		problems = append(problems, Problem{
 			Fragment: label.Key.Value,
 			Lines:    label.Lines(),
-			Reporter: RejectCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s key %s is not allowed to match %s", kind, label.Key.Value, c.keyRe),
 			Severity: c.severity,
 		})
@@ -68,7 +73,7 @@ func (c Reject) reject(label *parser.YamlKeyValue, kind string) (problems []Prob
 		problems = append(problems, Problem{
 			Fragment: label.Value.Value,
 			Lines:    label.Lines(),
-			Reporter: RejectCheckName,
+			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s value %s is not allowed to match %s", kind, label.Value.Value, c.valueRe),
 			Severity: c.severity,
 		})
