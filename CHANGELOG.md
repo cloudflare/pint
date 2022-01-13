@@ -6,6 +6,11 @@
 
 - Cache each Prometheus server responses to minimize the number of API calls.
 
+### Fixed
+
+- `promql/rate`, `query/series` and `promql/vector_matching` checks were not enabled
+  for all defined `prometheus {}` blocks  unless there was at least one `rule {}` block.
+
 ## v0.6.6
 
 ### Fixed

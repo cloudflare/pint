@@ -25,13 +25,23 @@ type Config struct {
 	prometheusServers []*promapi.Prometheus
 }
 
-func (cfg *Config) SetDisabledChecks(offline bool, l []string) {
-	disabled := map[string]struct{}{}
-	if offline {
-		for _, name := range checks.OnlineChecks {
-			disabled[name] = struct{}{}
+func (cfg *Config) DisableOnlineChecks() {
+	for _, name := range checks.OnlineChecks {
+		var found bool
+		for _, n := range cfg.Checks.Disabled {
+			if n == name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			cfg.Checks.Disabled = append(cfg.Checks.Disabled, name)
 		}
 	}
+}
+
+func (cfg *Config) SetDisabledChecks(l []string) {
+	disabled := map[string]struct{}{}
 	for _, s := range l {
 		re := strictRegex(s)
 		for _, name := range checks.CheckNames {
@@ -86,6 +96,24 @@ func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChe
 			if p.Name() == prom.Name {
 				proms = append(proms, p)
 			}
+		}
+	}
+
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.RateCheckName, r) {
+		for _, prom := range proms {
+			enabled = append(enabled, checks.NewRateCheck(prom))
+		}
+	}
+
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SeriesCheckName, r) {
+		for _, prom := range proms {
+			enabled = append(enabled, checks.NewSeriesCheck(prom))
+		}
+	}
+
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.VectorMatchingCheckName, r) {
+		for _, prom := range proms {
+			enabled = append(enabled, checks.NewVectorMatchingCheck(prom))
 		}
 	}
 

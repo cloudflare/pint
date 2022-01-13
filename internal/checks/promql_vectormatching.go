@@ -25,7 +25,7 @@ type VectorMatchingCheck struct {
 }
 
 func (c VectorMatchingCheck) String() string {
-	return VectorMatchingCheckName
+	return fmt.Sprintf("%s(%s)", VectorMatchingCheckName, c.prom.Name())
 }
 
 func (c VectorMatchingCheck) Check(rule parser.Rule) (problems []Problem) {

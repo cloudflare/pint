@@ -28,7 +28,9 @@ func actionCI(c *cli.Context) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}
-	cfg.SetDisabledChecks(c.Bool(offlineFlag), nil)
+	if c.Bool(offlineFlag) {
+		cfg.DisableOnlineChecks()
+	}
 
 	includeRe := []*regexp.Regexp{}
 	for _, pattern := range cfg.CI.Include {

@@ -187,24 +187,6 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		}
 	}
 
-	if isEnabled(enabledChecks, disabledChecks, checks.RateCheckName, r) {
-		for _, prom := range prometheusServers {
-			enabled = append(enabled, checks.NewRateCheck(prom))
-		}
-	}
-
-	if isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
-		for _, prom := range prometheusServers {
-			enabled = append(enabled, checks.NewSeriesCheck(prom))
-		}
-	}
-
-	if isEnabled(enabledChecks, disabledChecks, checks.VectorMatchingCheckName, r) {
-		for _, prom := range prometheusServers {
-			enabled = append(enabled, checks.NewVectorMatchingCheck(prom))
-		}
-	}
-
 	if rule.Cost != nil && isEnabled(enabledChecks, disabledChecks, checks.CostCheckName, r) {
 		severity := rule.Cost.getSeverity(checks.Bug)
 		for _, prom := range prometheusServers {
