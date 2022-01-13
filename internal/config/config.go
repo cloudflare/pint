@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/prometheus/common/model"
@@ -16,11 +17,12 @@ import (
 )
 
 type Config struct {
-	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
-	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
-	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
-	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
-	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+	CI                *CI                `hcl:"ci,block" json:"ci,omitempty"`
+	Repository        *Repository        `hcl:"repository,block" json:"repository,omitempty"`
+	Prometheus        []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
+	Checks            *Checks            `hcl:"checks,block" json:"checks,omitempty"`
+	Rules             []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+	prometheusServers []*promapi.Prometheus
 }
 
 func (cfg *Config) SetDisabledChecks(offline bool, l []string) {
@@ -56,7 +58,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r) {
@@ -75,12 +77,16 @@ func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChec
 		enabled = append(enabled, checks.NewTemplateCheck())
 	}
 
-	proms := []PrometheusConfig{}
+	proms := []*promapi.Prometheus{}
 	for _, prom := range cfg.Prometheus {
 		if !prom.isEnabledForPath(path) {
 			continue
 		}
-		proms = append(proms, prom)
+		for _, p := range cfg.prometheusServers {
+			if p.Name() == prom.Name {
+				proms = append(proms, p)
+			}
+		}
 	}
 
 	for _, rule := range cfg.Rules {
@@ -170,6 +176,8 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		if err = prom.validate(); err != nil {
 			return cfg, err
 		}
+		timeout, _ := parseDuration(prom.Timeout)
+		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewPrometheus(prom.Name, prom.URI, timeout))
 	}
 
 	for _, rule := range cfg.Rules {

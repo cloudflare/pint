@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.0
+
+### Added
+
+- Cache each Prometheus server responses to minimize the number of API calls.
+
 ## v0.6.6
 
 ### Fixed

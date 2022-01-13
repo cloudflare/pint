@@ -14,18 +14,16 @@ const (
 	RateCheckName = "promql/rate"
 )
 
-func NewRateCheck(name, uri string, timeout time.Duration) RateCheck {
-	return RateCheck{name: name, uri: uri, timeout: timeout}
+func NewRateCheck(prom *promapi.Prometheus) RateCheck {
+	return RateCheck{prom: prom}
 }
 
 type RateCheck struct {
-	name    string
-	uri     string
-	timeout time.Duration
+	prom *promapi.Prometheus
 }
 
 func (c RateCheck) String() string {
-	return fmt.Sprintf("%s(%s)", RateCheckName, c.name)
+	return fmt.Sprintf("%s(%s)", RateCheckName, c.prom.Name())
 }
 
 func (c RateCheck) Check(rule parser.Rule) (problems []Problem) {
@@ -42,7 +40,7 @@ func (c RateCheck) Check(rule parser.Rule) (problems []Problem) {
 				Fragment: expr.Value.Value,
 				Lines:    expr.Lines(),
 				Reporter: RateCheckName,
-				Text:     fmt.Sprintf("failed to query %s prometheus config: %s", c.name, err),
+				Text:     fmt.Sprintf("failed to query %s prometheus config: %s", c.prom.Name(), err),
 				Severity: Bug,
 			})
 			return
@@ -64,7 +62,7 @@ func (c RateCheck) Check(rule parser.Rule) (problems []Problem) {
 
 func (c RateCheck) getScrapeInterval() (interval time.Duration, err error) {
 	var cfg *promapi.PrometheusConfig
-	cfg, err = promapi.Config(c.uri, c.timeout)
+	cfg, err = c.prom.Config()
 	if err != nil {
 		return
 	}
@@ -88,14 +86,14 @@ func (c RateCheck) checkNode(node *parser.PromQLNode, scrapeInterval time.Durati
 				if m.Range < scrapeInterval*time.Duration(minIntervals) {
 					p := exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, minIntervals, c.name, promapi.HumanizeDuration(scrapeInterval)),
+						text:     fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, minIntervals, c.prom.Name(), promapi.HumanizeDuration(scrapeInterval)),
 						severity: Bug,
 					}
 					problems = append(problems, p)
 				} else if m.Range < scrapeInterval*time.Duration(recIntervals) {
 					p := exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("duration for %s() is recommended to be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, recIntervals, c.name, promapi.HumanizeDuration(scrapeInterval)),
+						text:     fmt.Sprintf("duration for %s() is recommended to be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, recIntervals, c.prom.Name(), promapi.HumanizeDuration(scrapeInterval)),
 						severity: Warning,
 					}
 					problems = append(problems, p)

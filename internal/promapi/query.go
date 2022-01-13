@@ -3,56 +3,46 @@ package promapi
 import (
 	"context"
 	"fmt"
-	"sync"
 	"time"
 
-	"github.com/cloudflare/pint/internal/keylock"
-
-	"github.com/prometheus/client_golang/api"
-	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
 )
-
-var km = keylock.NewPartitionLocker((&sync.Mutex{}))
 
 type QueryResult struct {
 	Series          model.Vector
 	DurationSeconds float64
 }
 
-func Query(uri string, timeout time.Duration, expr string, lockKey *string) (*QueryResult, error) {
-	log.Debug().Str("uri", uri).Str("query", expr).Msg("Scheduling prometheus query")
-	key := uri
-	if lockKey != nil {
-		key = *lockKey
-	}
-	km.Lock(key)
-	defer km.Unlock((key))
+func (p *Prometheus) Query(expr string) (*QueryResult, error) {
+	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
 
-	log.Debug().Str("uri", uri).Str("query", expr).Msg("Query started")
+	lockKey := "/api/v1/query"
+	p.lock.Lock(lockKey)
+	defer p.lock.Unlock((lockKey))
 
-	client, err := api.NewClient(api.Config{Address: uri})
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to setup new Prometheus API client")
-		return nil, err
+	if v, ok := p.cache.Load(expr); ok {
+		log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache hit")
+		r := v.(QueryResult)
+		return &r, nil
 	}
 
-	v1api := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Query started")
+
+	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
 	defer cancel()
 
 	start := time.Now()
-	result, _, err := v1api.Query(ctx, expr, start)
+	result, _, err := p.api.Query(ctx, expr, start)
 	duration := time.Since(start)
 	log.Debug().
-		Str("uri", uri).
+		Str("uri", p.uri).
 		Str("query", expr).
 		Str("duration", HumanizeDuration(duration)).
 		Msg("Query completed")
 	if err != nil {
 		log.Error().Err(err).
-			Str("uri", uri).
+			Str("uri", p.uri).
 			Str("query", expr).
 			Msg("Query failed")
 		return nil, err
@@ -67,10 +57,13 @@ func Query(uri string, timeout time.Duration, expr string, lockKey *string) (*Qu
 		vectorVal := result.(model.Vector)
 		qr.Series = vectorVal
 	default:
-		log.Error().Err(err).Str("uri", uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result)
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result)
 		return nil, fmt.Errorf("unknown result type: %v", result)
 	}
-	log.Debug().Str("uri", uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
+	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
+
+	log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache miss")
+	p.cache.Store(expr, qr)
 
 	return &qr, nil
 }

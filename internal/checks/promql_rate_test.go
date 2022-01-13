@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/rs/zerolog"
 )
 
@@ -46,12 +47,12 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewRateCheck("prom", srv.URL, time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL, time.Second)),
 		},
 		{
 			description: "rate < 2x scrape_interval",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "rate(foo[1m])",
@@ -65,7 +66,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "rate < 4x scrape_interval",
 			content:     "- record: foo\n  expr: rate(foo[3m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "rate(foo[3m])",
@@ -79,12 +80,12 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "rate == 4x scrape interval",
 			content:     "- record: foo\n  expr: rate(foo[2m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/30s/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/30s/", time.Second)),
 		},
 		{
 			description: "irate < 2x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[1m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "irate(foo[1m])",
@@ -98,7 +99,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "irate < 3x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "irate(foo[2m])",
@@ -115,7 +116,7 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__="foo"}[5m])
 `,
-			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker: checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 		},
 		{
 			description: "irate{__name__=~} > 3x scrape_interval",
@@ -123,7 +124,7 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__=~"(foo|bar)_total"}[5m])
 `,
-			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker: checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 		},
 		{
 			description: "irate{__name__} < 3x scrape_interval",
@@ -131,7 +132,7 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__="foo"}[2m])
 `,
-			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker: checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: `irate({__name__="foo"}[2m])`,
@@ -148,7 +149,7 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__=~"(foo|bar)_total"}[2m])
 `,
-			checker: checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker: checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: `irate({__name__=~"(foo|bar)_total"}[2m])`,
@@ -162,17 +163,17 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "irate == 3x scrape interval",
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 		},
 		{
 			description: "valid range selector",
 			content:     "- record: foo\n  expr: foo[1m]\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 		},
 		{
 			description: "nested invalid rate",
 			content:     "- record: foo\n  expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/1m/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/1m/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "rate(foo[3m])",
@@ -193,7 +194,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "500 error from Prometheus API",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/error/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/error/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "rate(foo[5m])",
@@ -207,7 +208,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "invalid status",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL, time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL, time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "rate(foo[5m])",
@@ -221,7 +222,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "invalid YAML",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/badYaml/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/badYaml/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "rate(foo[5m])",
@@ -235,12 +236,12 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "irate == 3 x default 1m",
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/default/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/default/", time.Second)),
 		},
 		{
 			description: "irate < 3 x default 1m",
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
-			checker:     checks.NewRateCheck("prom", srv.URL+"/default/", time.Second),
+			checker:     checks.NewRateCheck(promapi.NewPrometheus("prom", srv.URL+"/default/", time.Second)),
 			problems: []checks.Problem{
 				{
 					Fragment: "irate(foo[2m])",

@@ -2,7 +2,6 @@ package checks
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -15,18 +14,16 @@ const (
 	SeriesCheckName = "query/series"
 )
 
-func NewSeriesCheck(name, uri string, timeout time.Duration) SeriesCheck {
-	return SeriesCheck{name: name, uri: uri, timeout: timeout}
+func NewSeriesCheck(prom *promapi.Prometheus) SeriesCheck {
+	return SeriesCheck{prom: prom}
 }
 
 type SeriesCheck struct {
-	name    string
-	uri     string
-	timeout time.Duration
+	prom *promapi.Prometheus
 }
 
 func (c SeriesCheck) String() string {
-	return fmt.Sprintf("%s(%s)", SeriesCheckName, c.name)
+	return fmt.Sprintf("%s(%s)", SeriesCheckName, c.prom.Name())
 }
 
 func (c SeriesCheck) Check(rule parser.Rule) (problems []Problem) {
@@ -58,13 +55,13 @@ func (c SeriesCheck) Check(rule parser.Rule) (problems []Problem) {
 
 func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.VectorSelector) (problems []Problem) {
 	q := fmt.Sprintf("count(%s)", selector.String())
-	qr, err := promapi.Query(c.uri, c.timeout, q, &q)
+	qr, err := c.prom.Query(q)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: selector.String(),
 			Lines:    expr.Lines(),
 			Reporter: SeriesCheckName,
-			Text:     fmt.Sprintf("query using %s failed with: %s", c.name, err),
+			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
 			Severity: Bug,
 		})
 		return
@@ -92,7 +89,7 @@ func (c SeriesCheck) countSeries(expr parser.PromQLExpr, selector promParser.Vec
 			Fragment: selector.String(),
 			Lines:    expr.Lines(),
 			Reporter: SeriesCheckName,
-			Text:     fmt.Sprintf("query using %s completed without any results for %s", c.name, selector.String()),
+			Text:     fmt.Sprintf("query using %s completed without any results for %s", c.prom.Name(), selector.String()),
 			Severity: Warning,
 		})
 		return

@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/prometheus/client_golang/api"
-	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
@@ -22,27 +20,31 @@ type PrometheusConfig struct {
 	Global ConfigSectionGlobal `yaml:"global"`
 }
 
-func Config(uri string, timeout time.Duration) (*PrometheusConfig, error) {
-	log.Debug().Str("uri", uri).Msg("Query Prometheus configuration")
+func (p *Prometheus) Config() (*PrometheusConfig, error) {
+	log.Debug().Str("uri", p.uri).Msg("Query Prometheus configuration")
 
-	client, err := api.NewClient(api.Config{Address: uri})
-	if err != nil {
-		return nil, err
+	key := "/api/v1/status/config"
+	p.lock.Lock(key)
+	defer p.lock.Unlock((key))
+
+	if v, ok := p.cache.Load(key); ok {
+		log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache hit")
+		cfg := v.(PrometheusConfig)
+		return &cfg, nil
 	}
 
-	v1api := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
 	defer cancel()
 
-	resp, err := v1api.Config(ctx)
+	resp, err := p.api.Config(ctx)
 	if err != nil {
-		log.Error().Err(err).Str("uri", uri).Msg("Failed to query Prometheus configuration")
+		log.Error().Err(err).Str("uri", p.uri).Msg("Failed to query Prometheus configuration")
 		return nil, fmt.Errorf("failed to query Prometheus config: %w", err)
 	}
 
 	var cfg PrometheusConfig
 	if err = yaml.Unmarshal([]byte(resp.YAML), &cfg); err != nil {
-		return nil, fmt.Errorf("failed to decode config data in /api/v1/status/config response: %w", err)
+		return nil, fmt.Errorf("failed to decode config data in %s response: %w", key, err)
 	}
 
 	if cfg.Global.ScrapeInterval == 0 {
@@ -54,6 +56,9 @@ func Config(uri string, timeout time.Duration) (*PrometheusConfig, error) {
 	if cfg.Global.EvaluationInterval == 0 {
 		cfg.Global.EvaluationInterval = time.Minute
 	}
+
+	log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache miss")
+	p.cache.Store(key, cfg)
 
 	return &cfg, nil
 }

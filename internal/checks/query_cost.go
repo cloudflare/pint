@@ -2,7 +2,6 @@ package checks
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -12,11 +11,9 @@ const (
 	CostCheckName = "query/cost"
 )
 
-func NewCostCheck(name, uri string, timeout time.Duration, bps, maxSeries int, severity Severity) CostCheck {
+func NewCostCheck(prom *promapi.Prometheus, bps, maxSeries int, severity Severity) CostCheck {
 	return CostCheck{
-		name:           name,
-		uri:            uri,
-		timeout:        timeout,
+		prom:           prom,
 		bytesPerSample: bps,
 		maxSeries:      maxSeries,
 		severity:       severity,
@@ -24,16 +21,14 @@ func NewCostCheck(name, uri string, timeout time.Duration, bps, maxSeries int, s
 }
 
 type CostCheck struct {
-	name           string
-	uri            string
-	timeout        time.Duration
+	prom           *promapi.Prometheus
 	bytesPerSample int
 	maxSeries      int
 	severity       Severity
 }
 
 func (c CostCheck) String() string {
-	return fmt.Sprintf("%s(%s)", CostCheckName, c.name)
+	return fmt.Sprintf("%s(%s)", CostCheckName, c.prom.Name())
 }
 
 func (c CostCheck) Check(rule parser.Rule) (problems []Problem) {
@@ -44,13 +39,13 @@ func (c CostCheck) Check(rule parser.Rule) (problems []Problem) {
 	}
 
 	query := fmt.Sprintf("count(%s)", expr.Value.Value)
-	qr, err := promapi.Query(c.uri, c.timeout, query, nil)
+	qr, err := c.prom.Query(query)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: CostCheckName,
-			Text:     fmt.Sprintf("query using %s failed with: %s", c.name, err),
+			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
 			Severity: Bug,
 		})
 		return
@@ -77,7 +72,7 @@ func (c CostCheck) Check(rule parser.Rule) (problems []Problem) {
 		Fragment: expr.Value.Value,
 		Lines:    expr.Lines(),
 		Reporter: CostCheckName,
-		Text:     fmt.Sprintf("query using %s completed in %.2fs returning %d result(s)%s%s", c.name, qr.DurationSeconds, series, estimate, above),
+		Text:     fmt.Sprintf("query using %s completed in %.2fs returning %d result(s)%s%s", c.prom.Name(), qr.DurationSeconds, series, estimate, above),
 		Severity: severity,
 	})
 	return

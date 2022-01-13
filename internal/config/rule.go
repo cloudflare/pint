@@ -7,6 +7,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/rs/zerolog/log"
 )
 
@@ -155,7 +156,7 @@ type Rule struct {
 	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 }
 
-func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, proms []PrometheusConfig) []checks.RuleChecker {
+func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	if rule.Ignore != nil && rule.Ignore.IsMatch(path, r) {
@@ -187,31 +188,27 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 	}
 
 	if isEnabled(enabledChecks, disabledChecks, checks.RateCheckName, r) {
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewRateCheck(prom.Name, prom.URI, timeout))
+		for _, prom := range prometheusServers {
+			enabled = append(enabled, checks.NewRateCheck(prom))
 		}
 	}
 
 	if isEnabled(enabledChecks, disabledChecks, checks.SeriesCheckName, r) {
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewSeriesCheck(prom.Name, prom.URI, timeout))
+		for _, prom := range prometheusServers {
+			enabled = append(enabled, checks.NewSeriesCheck(prom))
 		}
 	}
 
 	if isEnabled(enabledChecks, disabledChecks, checks.VectorMatchingCheckName, r) {
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewVectorMatchingCheck(prom.Name, prom.URI, timeout))
+		for _, prom := range prometheusServers {
+			enabled = append(enabled, checks.NewVectorMatchingCheck(prom))
 		}
 	}
 
 	if rule.Cost != nil && isEnabled(enabledChecks, disabledChecks, checks.CostCheckName, r) {
 		severity := rule.Cost.getSeverity(checks.Bug)
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewCostCheck(prom.Name, prom.URI, timeout, rule.Cost.BytesPerSample, rule.Cost.MaxSeries, severity))
+		for _, prom := range prometheusServers {
+			enabled = append(enabled, checks.NewCostCheck(prom, rule.Cost.BytesPerSample, rule.Cost.MaxSeries, severity))
 		}
 	}
 
@@ -249,9 +246,8 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 		if rule.Alerts.Resolve != "" {
 			qResolve, _ = parseDuration(rule.Alerts.Resolve)
 		}
-		for _, prom := range proms {
-			timeout, _ := parseDuration(prom.Timeout)
-			enabled = append(enabled, checks.NewAlertsCheck(prom.Name, prom.URI, timeout, qRange, qStep, qResolve))
+		for _, prom := range prometheusServers {
+			enabled = append(enabled, checks.NewAlertsCheck(prom, qRange, qStep, qResolve))
 		}
 	}
 

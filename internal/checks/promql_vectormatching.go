@@ -5,7 +5,6 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -17,14 +16,12 @@ const (
 	VectorMatchingCheckName = "promql/vector_matching"
 )
 
-func NewVectorMatchingCheck(name, uri string, timeout time.Duration) VectorMatchingCheck {
-	return VectorMatchingCheck{name: name, uri: uri, timeout: timeout}
+func NewVectorMatchingCheck(prom *promapi.Prometheus) VectorMatchingCheck {
+	return VectorMatchingCheck{prom: prom}
 }
 
 type VectorMatchingCheck struct {
-	name    string
-	uri     string
-	timeout time.Duration
+	prom *promapi.Prometheus
 }
 
 func (c VectorMatchingCheck) String() string {
@@ -53,7 +50,7 @@ func (c VectorMatchingCheck) Check(rule parser.Rule) (problems []Problem) {
 func (c VectorMatchingCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
 	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.VectorMatching != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
 		q := fmt.Sprintf("count(%s)", node.Expr)
-		qr, err := promapi.Query(c.uri, c.timeout, q, &q)
+		qr, err := c.prom.Query(q)
 		if err != nil || len(qr.Series) != 0 {
 			goto NEXT
 		}
@@ -122,7 +119,7 @@ NEXT:
 }
 
 func (c VectorMatchingCheck) seriesLabels(query string, ignored ...model.LabelName) ([]string, error) {
-	qr, err := promapi.Query(c.uri, c.timeout, query, &query)
+	qr, err := c.prom.Query(query)
 	if err != nil {
 		return nil, err
 	}

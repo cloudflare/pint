@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
@@ -21,34 +20,30 @@ type RangeQueryResult struct {
 	DurationSeconds float64
 }
 
-func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.Time, step time.Duration, lockKey *string) (*RangeQueryResult, error) {
-	key := uri
-	if lockKey != nil {
-		key = *lockKey
-	}
+func (p *Prometheus) RangeQuery(expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
 
 	log.Debug().
-		Str("key", key).
-		Str("uri", uri).
+		Str("uri", p.uri).
 		Str("query", expr).
 		Time("start", start).
 		Time("end", end).
 		Str("step", HumanizeDuration(step)).
 		Msg("Scheduling prometheus range query")
 
-	km.Lock(key)
-	defer km.Unlock((key))
+	lockKey := "/api/v1/query/range"
+	p.lock.Lock(lockKey)
+	defer p.lock.Unlock((lockKey))
 
-	log.Debug().Str("uri", uri).Str("query", expr).Msg("Range query started")
-
-	client, err := api.NewClient(api.Config{Address: uri})
-	if err != nil {
-		log.Error().Err(err).Msg("Failed to setup new Prometheus API client")
-		return nil, err
+	cacheKey := strings.Join([]string{expr, start.String(), end.String(), step.String()}, "\n")
+	if v, ok := p.cache.Load(cacheKey); ok {
+		log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache hit")
+		r := v.(RangeQueryResult)
+		return &r, nil
 	}
 
-	v1api := v1.NewAPI(client)
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Range query started")
+
+	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
 	defer cancel()
 
 	r := v1.Range{
@@ -57,21 +52,19 @@ func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.
 		Step:  step,
 	}
 	qstart := time.Now()
-	result, _, err := v1api.QueryRange(ctx, expr, r)
+	result, _, err := p.api.QueryRange(ctx, expr, r)
 	duration := time.Since(qstart)
 	log.Debug().
-		Str("uri", uri).
+		Str("uri", p.uri).
 		Str("query", expr).
 		Str("duration", HumanizeDuration(duration)).
 		Msg("Range query completed")
 	if err != nil {
-		log.Error().Err(err).Str("uri", uri).Str("query", expr).Msg("Range query failed")
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
 		if isRetryable(err) {
 			delta := end.Sub(start) / 2
 			log.Warn().Str("delta", HumanizeDuration(delta)).Msg("Retrying request with smaller range")
-			b, _ := start.MarshalText()
-			newKey := fmt.Sprintf("%s/retry/%s", key, string(b))
-			return RangeQuery(uri, timeout, expr, start.Add(delta), end, step, &newKey)
+			return p.RangeQuery(expr, start.Add(delta), end, step)
 		}
 		return nil, err
 	}
@@ -87,10 +80,13 @@ func RangeQuery(uri string, timeout time.Duration, expr string, start, end time.
 		samples := result.(model.Matrix)
 		qr.Samples = samples
 	default:
-		log.Error().Err(err).Str("uri", uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result)
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result)
 		return nil, fmt.Errorf("unknown result type: %v", result)
 	}
-	log.Debug().Str("uri", uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
+	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
+
+	log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache miss")
+	p.cache.Store(cacheKey, qr)
 
 	return &qr, nil
 }
