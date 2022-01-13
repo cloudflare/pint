@@ -97,7 +97,7 @@ func TestSetDisabledChecks(t *testing.T) {
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
 	cfg.SetDisabledChecks([]string{checks.RateCheckName})
-	assert.Equal(cfg.Checks.Disabled, []string{checks.SyntaxCheckName, checks.RateCheckName})
+	assert.Equal([]string{checks.SyntaxCheckName, checks.RateCheckName}, cfg.Checks.Disabled)
 }
 
 func newRule(t *testing.T, content string) parser.Rule {
@@ -111,8 +111,6 @@ func newRule(t *testing.T, content string) parser.Rule {
 }
 
 func TestGetChecksForRule(t *testing.T) {
-	assert := assert.New(t)
-
 	type testCaseT struct {
 		title  string
 		config string
@@ -219,16 +217,142 @@ prometheus "ignore" {
 				checks.VectorMatchingCheckName + "(prom)",
 			},
 		},
+		{
+			title:  "single empty rule",
+			config: "rule{}\n",
+			path:   "rules.yml",
+			rule:   newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "rule with aggregate checks",
+			config: `
+rule {
+  aggregate ".+" {
+    severity = "bug"
+	keep     = ["job"]
+  }
+  aggregate ".+" {
+    severity = "bug"
+	strip    = ["instance", "rack"]
+  }
+}`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.AggregationCheckName + "(job:true)",
+				checks.AggregationCheckName + "(instance:false)",
+				checks.AggregationCheckName + "(rack:false)",
+			},
+		},
+		{
+			title: "multiple checks and disable comment",
+			config: `
+rule {
+  aggregate ".+" {
+    severity = "bug"
+	keep     = ["job"]
+  }
+  aggregate ".+" {
+    severity = "bug"
+	strip    = ["instance", "rack"]
+  }
+}`,
+			path: "rules.yml",
+			rule: newRule(t, `
+- record: foo
+  # pint disable promql/aggregate(instance:false)
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.AggregationCheckName + "(job:true)",
+				checks.AggregationCheckName + "(rack:false)",
+			},
+		},
+		{
+			title: "prometheus check without prometheus server",
+			config: `
+rule {
+  cost {
+    bytesPerSample = 4096
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "prometheus check with prometheus servers and disable comment",
+			config: `
+rule {
+  cost {
+    bytesPerSample = 4096
+  }
+}
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+prometheus "prom2" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}  
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint disable query/series(prom1)
+# pint disable query/cost(prom2)
+- record: foo
+  # pint disable promql/rate(prom2)
+  # pint disable promql/vector_matching(prom1)
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.RateCheckName + "(prom1)",
+				checks.SeriesCheckName + "(prom2)",
+				checks.VectorMatchingCheckName + "(prom2)",
+				checks.CostCheckName + "(prom1)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
 	for i, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
-			err := ioutil.WriteFile(path, []byte(tc.config), 0644)
-			assert.NoError(err)
+			assert := assert.New(t)
 
-			cfg, err := config.Load(path, true)
+			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
+			if tc.config != "" {
+				err := ioutil.WriteFile(path, []byte(tc.config), 0644)
+				assert.NoError(err)
+			}
+
+			cfg, err := config.Load(path, false)
 			assert.NoError(err)
 
 			checks := cfg.GetChecksForRule(tc.path, tc.rule)
@@ -236,7 +360,7 @@ prometheus "ignore" {
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())
 			}
-			assert.Equal(checkNames, tc.checks)
+			assert.Equal(tc.checks, checkNames)
 		})
 	}
 }

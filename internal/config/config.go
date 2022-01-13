@@ -71,19 +71,19 @@ func (cfg Config) String() string {
 func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r) {
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r, nil) {
 		enabled = append(enabled, checks.NewSyntaxCheck())
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.AlertForCheckName, r) {
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.AlertForCheckName, r, nil) {
 		enabled = append(enabled, checks.NewAlertsForCheck())
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.ComparisonCheckName, r) {
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.ComparisonCheckName, r, nil) {
 		enabled = append(enabled, checks.NewComparisonCheck())
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.TemplateCheckName, r) {
+	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.TemplateCheckName, r, nil) {
 		enabled = append(enabled, checks.NewTemplateCheck())
 	}
 
@@ -95,30 +95,33 @@ func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChe
 		for _, p := range cfg.prometheusServers {
 			if p.Name() == prom.Name {
 				proms = append(proms, p)
+				break
 			}
 		}
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.RateCheckName, r) {
-		for _, prom := range proms {
+	for _, prom := range proms {
+		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.RateCheckName, r, prom) {
 			enabled = append(enabled, checks.NewRateCheck(prom))
 		}
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SeriesCheckName, r) {
-		for _, prom := range proms {
+	for _, prom := range proms {
+		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SeriesCheckName, r, prom) {
+
 			enabled = append(enabled, checks.NewSeriesCheck(prom))
 		}
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.VectorMatchingCheckName, r) {
-		for _, prom := range proms {
+	for _, prom := range proms {
+		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.VectorMatchingCheckName, r, prom) {
 			enabled = append(enabled, checks.NewVectorMatchingCheck(prom))
 		}
 	}
 
 	for _, rule := range cfg.Rules {
 		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms) {
+			// FIXME redundant ?
 			if r.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(c.String()))) {
 				log.Debug().
 					Str("path", path).
