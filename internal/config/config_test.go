@@ -339,6 +339,44 @@ prometheus "prom2" {
 				checks.CostCheckName + "(prom1)",
 			},
 		},
+		{
+			title: "duplicated rules",
+			config: `
+rule {
+  label "team" {
+    severity = "bug"
+    required = true
+  }
+}
+rule {
+  annotation "summary" {
+    severity = "bug"
+    required = true
+  }
+}
+rule {
+  label "team" {
+    severity = "warning"
+    required = false
+  }
+  annotation "summary" {
+    severity = "bug"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.LabelCheckName + "(team:true)",
+				checks.AnnotationCheckName + "(summary:true)",
+				checks.LabelCheckName + "(team:false)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
