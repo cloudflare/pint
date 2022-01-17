@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.7.0
+
+### Added
+
+- Cache each Prometheus server responses to minimize the number of API calls.
+
+### Changed
+
+- `alerts/annotation` and `rule/label` now include `required` flag value in
+  `# pint disable ...` comments.
+  Rename `# pint disable alerts/annotation($name)` to
+  `# pint disable alerts/annotation($name:$required)` and
+  `# pint disable rule/label($name)` to `# pint disable rule/label($name:$required)`.
+
+### Fixed
+
+- `promql/rate`, `query/series` and `promql/vector_matching` checks were not enabled
+  for all defined `prometheus {}` blocks  unless there was at least one `rule {}` block.
+
 ## v0.6.6
 
 ### Fixed

@@ -23,7 +23,7 @@ type AnnotationCheck struct {
 }
 
 func (c AnnotationCheck) String() string {
-	return fmt.Sprintf("%s(%s)", AnnotationCheckName, c.key)
+	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.key, c.isReguired)
 }
 
 func (c AnnotationCheck) Check(rule parser.Rule) (problems []Problem) {

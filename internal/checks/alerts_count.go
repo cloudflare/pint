@@ -13,11 +13,9 @@ const (
 	AlertsCheckName = "alerts/count"
 )
 
-func NewAlertsCheck(name, uri string, timeout, lookBack, step, resolve time.Duration) AlertsCheck {
+func NewAlertsCheck(prom *promapi.Prometheus, lookBack, step, resolve time.Duration) AlertsCheck {
 	return AlertsCheck{
-		name:     name,
-		uri:      uri,
-		timeout:  timeout,
+		prom:     prom,
 		lookBack: lookBack,
 		step:     step,
 		resolve:  resolve,
@@ -25,16 +23,14 @@ func NewAlertsCheck(name, uri string, timeout, lookBack, step, resolve time.Dura
 }
 
 type AlertsCheck struct {
-	name     string
-	uri      string
-	timeout  time.Duration
+	prom     *promapi.Prometheus
 	lookBack time.Duration
 	step     time.Duration
 	resolve  time.Duration
 }
 
 func (c AlertsCheck) String() string {
-	return fmt.Sprintf("%s(%s)", AlertsCheckName, c.name)
+	return fmt.Sprintf("%s(%s)", AlertsCheckName, c.prom.Name())
 }
 
 func (c AlertsCheck) Check(rule parser.Rule) (problems []Problem) {
@@ -49,13 +45,13 @@ func (c AlertsCheck) Check(rule parser.Rule) (problems []Problem) {
 	end := time.Now()
 	start := end.Add(-1 * c.lookBack)
 
-	qr, err := promapi.RangeQuery(c.uri, c.timeout, rule.AlertingRule.Expr.Value.Value, start, end, c.step, nil)
+	qr, err := c.prom.RangeQuery(rule.AlertingRule.Expr.Value.Value, start, end, c.step)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: rule.AlertingRule.Expr.Value.Value,
 			Lines:    rule.AlertingRule.Expr.Lines(),
 			Reporter: AlertsCheckName,
-			Text:     fmt.Sprintf("query using %s failed with: %s", c.name, err),
+			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
 			Severity: Bug,
 		})
 		return
@@ -104,7 +100,7 @@ func (c AlertsCheck) Check(rule parser.Rule) (problems []Problem) {
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,
 		Reporter: AlertsCheckName,
-		Text:     fmt.Sprintf("query using %s would trigger %d alert(s) in the last %s", c.name, alerts, promapi.HumanizeDuration(delta)),
+		Text:     fmt.Sprintf("query using %s would trigger %d alert(s) in the last %s", c.prom.Name(), alerts, promapi.HumanizeDuration(delta)),
 		Severity: Information,
 	})
 	return

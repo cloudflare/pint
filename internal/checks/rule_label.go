@@ -23,7 +23,7 @@ type LabelCheck struct {
 }
 
 func (c LabelCheck) String() string {
-	return fmt.Sprintf("%s(%s)", LabelCheckName, c.key)
+	return fmt.Sprintf("%s(%s:%v)", LabelCheckName, c.key, c.isReguired)
 }
 
 func (c LabelCheck) Check(rule parser.Rule) (problems []Problem) {

@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/prometheus/common/model"
@@ -16,20 +16,31 @@ import (
 )
 
 type Config struct {
-	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
-	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
-	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
-	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
-	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+	CI                *CI                `hcl:"ci,block" json:"ci,omitempty"`
+	Repository        *Repository        `hcl:"repository,block" json:"repository,omitempty"`
+	Prometheus        []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
+	Checks            *Checks            `hcl:"checks,block" json:"checks,omitempty"`
+	Rules             []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+	prometheusServers []*promapi.Prometheus
 }
 
-func (cfg *Config) SetDisabledChecks(offline bool, l []string) {
-	disabled := map[string]struct{}{}
-	if offline {
-		for _, name := range checks.OnlineChecks {
-			disabled[name] = struct{}{}
+func (cfg *Config) DisableOnlineChecks() {
+	for _, name := range checks.OnlineChecks {
+		var found bool
+		for _, n := range cfg.Checks.Disabled {
+			if n == name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			cfg.Checks.Disabled = append(cfg.Checks.Disabled, name)
 		}
 	}
+}
+
+func (cfg *Config) SetDisabledChecks(l []string) {
+	disabled := map[string]struct{}{}
 	for _, s := range l {
 		re := strictRegex(s)
 		for _, name := range checks.CheckNames {
@@ -56,53 +67,75 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r) {
-		enabled = append(enabled, checks.NewSyntaxCheck())
+	allChecks := []checkMeta{
+		{
+			name:  checks.SyntaxCheckName,
+			check: checks.NewSyntaxCheck(),
+		},
+		{
+			name:  checks.AlertForCheckName,
+			check: checks.NewAlertsForCheck(),
+		},
+		{
+			name:  checks.ComparisonCheckName,
+			check: checks.NewComparisonCheck(),
+		},
+		{
+			name:  checks.TemplateCheckName,
+			check: checks.NewTemplateCheck(),
+		},
 	}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.AlertForCheckName, r) {
-		enabled = append(enabled, checks.NewAlertsForCheck())
-	}
-
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.ComparisonCheckName, r) {
-		enabled = append(enabled, checks.NewComparisonCheck())
-	}
-
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.TemplateCheckName, r) {
-		enabled = append(enabled, checks.NewTemplateCheck())
-	}
-
-	proms := []PrometheusConfig{}
+	proms := []*promapi.Prometheus{}
 	for _, prom := range cfg.Prometheus {
 		if !prom.isEnabledForPath(path) {
 			continue
 		}
-		proms = append(proms, prom)
+		for _, p := range cfg.prometheusServers {
+			if p.Name() == prom.Name {
+				proms = append(proms, p)
+				break
+			}
+		}
+	}
+
+	for _, p := range proms {
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.RateCheckName,
+			check: checks.NewRateCheck(p),
+		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.SeriesCheckName,
+			check: checks.NewSeriesCheck(p),
+		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.VectorMatchingCheckName,
+			check: checks.NewVectorMatchingCheck(p),
+		})
 	}
 
 	for _, rule := range cfg.Rules {
-		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms) {
-			if r.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(c.String()))) {
-				log.Debug().
-					Str("path", path).
-					Str("check", c.String()).
-					Msg("Check disabled by comment")
-				continue
+		allChecks = append(allChecks, rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms)...)
+	}
+
+	for _, cm := range allChecks {
+		// check if rule was disabled
+		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, r, cm.name, cm.check) {
+			continue
+		}
+		// check if rule was already enabled
+		var v bool
+		for _, er := range enabled {
+			if er.String() == cm.check.String() {
+				v = true
+				break
 			}
-			// check if rule was already enabled
-			var v bool
-			for _, er := range enabled {
-				if er.String() == c.String() {
-					v = true
-					break
-				}
-			}
-			if !v {
-				enabled = append(enabled, c)
-			}
+		}
+		if !v {
+			enabled = append(enabled, cm.check)
 		}
 	}
 
@@ -170,6 +203,8 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		if err = prom.validate(); err != nil {
 			return cfg, err
 		}
+		timeout, _ := parseDuration(prom.Timeout)
+		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewPrometheus(prom.Name, prom.URI, timeout))
 	}
 
 	for _, rule := range cfg.Rules {
@@ -233,6 +268,7 @@ func parseDuration(d string) (time.Duration, error) {
 	return time.Duration(mdur), nil
 }
 
-func removeRedundantSpaces(line string) string {
-	return strings.Join(strings.Fields(line), " ")
+type checkMeta struct {
+	name  string
+	check checks.RuleChecker
 }
