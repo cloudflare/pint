@@ -23,7 +23,6 @@ func TestRejectSettings(t *testing.T) {
 		},
 		{
 			conf: RejectSettings{},
-			err:  errors.New("reject key must be set"),
 		},
 		{
 			conf: RejectSettings{

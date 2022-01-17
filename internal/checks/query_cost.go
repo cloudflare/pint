@@ -28,6 +28,9 @@ type CostCheck struct {
 }
 
 func (c CostCheck) String() string {
+	if c.maxSeries > 0 {
+		return fmt.Sprintf("%s(%s:%d)", CostCheckName, c.prom.Name(), c.maxSeries)
+	}
 	return fmt.Sprintf("%s(%s)", CostCheckName, c.prom.Name())
 }
 

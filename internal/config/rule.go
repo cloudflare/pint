@@ -156,8 +156,8 @@ type Rule struct {
 	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 }
 
-func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checks.RuleChecker {
-	enabled := []checks.RuleChecker{}
+func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checkMeta {
+	enabled := []checkMeta{}
 
 	if rule.Ignore != nil && rule.Ignore.IsMatch(path, r) {
 		return enabled
@@ -175,47 +175,59 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			}
 			severity := aggr.getSeverity(checks.Warning)
 			for _, label := range aggr.Keep {
-				if isEnabled(enabledChecks, disabledChecks, checks.AggregationCheckName, r, nil) {
-					enabled = append(enabled, checks.NewAggregationCheck(nameRegex, label, true, severity))
-				}
+				enabled = append(enabled, checkMeta{
+					name:  checks.AggregationCheckName,
+					check: checks.NewAggregationCheck(nameRegex, label, true, severity),
+				})
 			}
 			for _, label := range aggr.Strip {
-				if isEnabled(enabledChecks, disabledChecks, checks.AggregationCheckName, r, nil) {
-					enabled = append(enabled, checks.NewAggregationCheck(nameRegex, label, false, severity))
-				}
+				enabled = append(enabled, checkMeta{
+					name:  checks.AggregationCheckName,
+					check: checks.NewAggregationCheck(nameRegex, label, false, severity),
+				})
 			}
 		}
 	}
 
-	if rule.Cost != nil && isEnabled(enabledChecks, disabledChecks, checks.CostCheckName, r, nil) {
+	if rule.Cost != nil {
 		severity := rule.Cost.getSeverity(checks.Bug)
 		for _, prom := range prometheusServers {
-			enabled = append(enabled, checks.NewCostCheck(prom, rule.Cost.BytesPerSample, rule.Cost.MaxSeries, severity))
+			enabled = append(enabled, checkMeta{
+				name:  checks.CostCheckName,
+				check: checks.NewCostCheck(prom, rule.Cost.BytesPerSample, rule.Cost.MaxSeries, severity),
+			})
 		}
 	}
 
-	if len(rule.Annotation) > 0 && isEnabled(enabledChecks, disabledChecks, checks.AnnotationCheckName, r, nil) {
+	if len(rule.Annotation) > 0 {
 		for _, ann := range rule.Annotation {
 			var valueRegex *regexp.Regexp
 			if ann.Value != "" {
 				valueRegex = strictRegex(ann.Value)
 			}
 			severity := ann.getSeverity(checks.Warning)
-			enabled = append(enabled, checks.NewAnnotationCheck(ann.Key, valueRegex, ann.Required, severity))
+			enabled = append(enabled, checkMeta{
+				name:  checks.AnnotationCheckName,
+				check: checks.NewAnnotationCheck(ann.Key, valueRegex, ann.Required, severity),
+			})
 		}
 	}
-	if len(rule.Label) > 0 && isEnabled(enabledChecks, disabledChecks, checks.LabelCheckName, r, nil) {
+
+	if len(rule.Label) > 0 {
 		for _, lab := range rule.Label {
 			var valueRegex *regexp.Regexp
 			if lab.Value != "" {
 				valueRegex = strictRegex(lab.Value)
 			}
 			severity := lab.getSeverity(checks.Warning)
-			enabled = append(enabled, checks.NewLabelCheck(lab.Key, valueRegex, lab.Required, severity))
+			enabled = append(enabled, checkMeta{
+				name:  checks.LabelCheckName,
+				check: checks.NewLabelCheck(lab.Key, valueRegex, lab.Required, severity),
+			})
 		}
 	}
 
-	if rule.Alerts != nil && isEnabled(enabledChecks, disabledChecks, checks.AlertsCheckName, r, nil) {
+	if rule.Alerts != nil {
 		qRange := time.Hour * 24
 		if rule.Alerts.Range != "" {
 			qRange, _ = parseDuration(rule.Alerts.Range)
@@ -229,28 +241,40 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 			qResolve, _ = parseDuration(rule.Alerts.Resolve)
 		}
 		for _, prom := range prometheusServers {
-			enabled = append(enabled, checks.NewAlertsCheck(prom, qRange, qStep, qResolve))
+			enabled = append(enabled, checkMeta{
+				name:  checks.AlertsCheckName,
+				check: checks.NewAlertsCheck(prom, qRange, qStep, qResolve),
+			})
 		}
 	}
 
-	if len(rule.Reject) > 0 && isEnabled(enabledChecks, disabledChecks, checks.RejectCheckName, r, nil) {
+	if len(rule.Reject) > 0 {
 		for _, reject := range rule.Reject {
 			severity := reject.getSeverity(checks.Bug)
+			re := strictRegex(reject.Regex)
 			if reject.LabelKeys {
-				re := strictRegex(reject.Regex)
-				enabled = append(enabled, checks.NewRejectCheck(true, false, re, nil, severity))
+				enabled = append(enabled, checkMeta{
+					name:  checks.RejectCheckName,
+					check: checks.NewRejectCheck(true, false, re, nil, severity),
+				})
 			}
 			if reject.LabelValues {
-				re := strictRegex(reject.Regex)
-				enabled = append(enabled, checks.NewRejectCheck(true, false, nil, re, severity))
+				enabled = append(enabled, checkMeta{
+					name:  checks.RejectCheckName,
+					check: checks.NewRejectCheck(true, false, nil, re, severity),
+				})
 			}
 			if reject.AnnotationKeys {
-				re := strictRegex(reject.Regex)
-				enabled = append(enabled, checks.NewRejectCheck(false, true, re, nil, severity))
+				enabled = append(enabled, checkMeta{
+					name:  checks.RejectCheckName,
+					check: checks.NewRejectCheck(false, true, re, nil, severity),
+				})
 			}
 			if reject.AnnotationValues {
-				re := strictRegex(reject.Regex)
-				enabled = append(enabled, checks.NewRejectCheck(false, true, nil, re, severity))
+				enabled = append(enabled, checkMeta{
+					name:  checks.RejectCheckName,
+					check: checks.NewRejectCheck(false, true, nil, re, severity),
+				})
 			}
 		}
 	}
@@ -258,17 +282,16 @@ func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabl
 	return enabled
 }
 
-func isEnabled(enabledChecks, disabledChecks []string, name string, rule parser.Rule, prom *promapi.Prometheus) bool {
+func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker) bool {
+	instance := check.String()
 	comments := []string{
-		fmt.Sprintf("disable %s", removeRedundantSpaces(name)),
-	}
-	if prom != nil {
-		comments = append(comments, fmt.Sprintf("disable %s(%s)", removeRedundantSpaces(name), prom.Name()))
+		fmt.Sprintf("disable %s", name),
+		fmt.Sprintf("disable %s", instance),
 	}
 	for _, comment := range comments {
 		if rule.HasComment(comment) {
 			log.Debug().
-				Str("check", name).
+				Str("check", instance).
 				Str("comment", comment).
 				Msg("Check disabled by comment")
 			return false
@@ -276,7 +299,7 @@ func isEnabled(enabledChecks, disabledChecks []string, name string, rule parser.
 	}
 
 	for _, c := range disabledChecks {
-		if c == name {
+		if c == name || c == instance {
 			return false
 		}
 	}

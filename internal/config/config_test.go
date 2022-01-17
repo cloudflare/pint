@@ -288,6 +288,8 @@ rule {
 rule {
   cost {
     bytesPerSample = 4096
+	maxSeries = 10000
+	severity  = "warning"
   }
 }
 `,
@@ -375,6 +377,198 @@ rule {
 				checks.LabelCheckName + "(team:true)",
 				checks.AnnotationCheckName + "(summary:true)",
 				checks.LabelCheckName + "(team:false)",
+			},
+		},
+		{
+			title: "multiple cost checks",
+			config: `
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+prometheus "prom2" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+rule {
+  cost {
+    bytesPerSample = 4096
+    severity  = "info"
+  }
+}
+rule {
+  cost {
+    bytesPerSample = 4096
+	maxSeries = 10000
+	severity  = "warning"
+  }
+}
+rule {
+  cost {
+    bytesPerSample = 4096
+    maxSeries = 20000
+    severity  = "bug"
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint disable query/series
+# pint disable promql/rate
+# pint disable promql/vector_matching(prom1)
+# pint disable promql/vector_matching(prom2)
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.CostCheckName + "(prom1)",
+				checks.CostCheckName + "(prom2)",
+				checks.CostCheckName + "(prom1:10000)",
+				checks.CostCheckName + "(prom2:10000)",
+				checks.CostCheckName + "(prom1:20000)",
+				checks.CostCheckName + "(prom2:20000)",
+			},
+		},
+		{
+			title: "reject rules",
+			config: `
+rule {
+  reject "http://.+" {
+    label_keys = true
+    label_values = true
+  }
+  reject ".* +.*" {
+    annotation_keys = true
+    label_keys = true
+  }
+  reject "" {
+    annotation_values = true
+	severity = "bug"
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.RejectCheckName + "(key=~'^http://.+$')",
+				checks.RejectCheckName + "(val=~'^http://.+$')",
+				checks.RejectCheckName + "(key=~'^.* +.*$')",
+				checks.RejectCheckName + "(val=~'^$')",
+			},
+		},
+		{
+			title: "rule with label match / type mismatch",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    label "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "rule with label match / no label",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    label "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "rule with label match / label mismatch",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    label "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "rule with label match / label match",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    label "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.LabelCheckName + "(priority:true)",
 			},
 		},
 	}

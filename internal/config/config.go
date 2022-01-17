@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -71,20 +70,23 @@ func (cfg Config) String() string {
 func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SyntaxCheckName, r, nil) {
-		enabled = append(enabled, checks.NewSyntaxCheck())
-	}
-
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.AlertForCheckName, r, nil) {
-		enabled = append(enabled, checks.NewAlertsForCheck())
-	}
-
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.ComparisonCheckName, r, nil) {
-		enabled = append(enabled, checks.NewComparisonCheck())
-	}
-
-	if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.TemplateCheckName, r, nil) {
-		enabled = append(enabled, checks.NewTemplateCheck())
+	allChecks := []checkMeta{
+		{
+			name:  checks.SyntaxCheckName,
+			check: checks.NewSyntaxCheck(),
+		},
+		{
+			name:  checks.AlertForCheckName,
+			check: checks.NewAlertsForCheck(),
+		},
+		{
+			name:  checks.ComparisonCheckName,
+			check: checks.NewComparisonCheck(),
+		},
+		{
+			name:  checks.TemplateCheckName,
+			check: checks.NewTemplateCheck(),
+		},
 	}
 
 	proms := []*promapi.Prometheus{}
@@ -100,46 +102,40 @@ func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChe
 		}
 	}
 
-	for _, prom := range proms {
-		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.RateCheckName, r, prom) {
-			enabled = append(enabled, checks.NewRateCheck(prom))
-		}
-	}
-
-	for _, prom := range proms {
-		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.SeriesCheckName, r, prom) {
-
-			enabled = append(enabled, checks.NewSeriesCheck(prom))
-		}
-	}
-
-	for _, prom := range proms {
-		if isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, checks.VectorMatchingCheckName, r, prom) {
-			enabled = append(enabled, checks.NewVectorMatchingCheck(prom))
-		}
+	for _, p := range proms {
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.RateCheckName,
+			check: checks.NewRateCheck(p),
+		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.SeriesCheckName,
+			check: checks.NewSeriesCheck(p),
+		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.VectorMatchingCheckName,
+			check: checks.NewVectorMatchingCheck(p),
+		})
 	}
 
 	for _, rule := range cfg.Rules {
-		for _, c := range rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms) {
-			// FIXME redundant ?
-			if r.HasComment(fmt.Sprintf("disable %s", removeRedundantSpaces(c.String()))) {
-				log.Debug().
-					Str("path", path).
-					Str("check", c.String()).
-					Msg("Check disabled by comment")
-				continue
+		allChecks = append(allChecks, rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms)...)
+	}
+
+	for _, cm := range allChecks {
+		// check if rule was disabled
+		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, r, cm.name, cm.check) {
+			continue
+		}
+		// check if rule was already enabled
+		var v bool
+		for _, er := range enabled {
+			if er.String() == cm.check.String() {
+				v = true
+				break
 			}
-			// check if rule was already enabled
-			var v bool
-			for _, er := range enabled {
-				if er.String() == c.String() {
-					v = true
-					break
-				}
-			}
-			if !v {
-				enabled = append(enabled, c)
-			}
+		}
+		if !v {
+			enabled = append(enabled, cm.check)
 		}
 	}
 
@@ -272,6 +268,7 @@ func parseDuration(d string) (time.Duration, error) {
 	return time.Duration(mdur), nil
 }
 
-func removeRedundantSpaces(line string) string {
-	return strings.Join(strings.Fields(line), " ")
+type checkMeta struct {
+	name  string
+	check checks.RuleChecker
 }
