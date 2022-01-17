@@ -3,14 +3,36 @@ package config_test
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMain(t *testing.M) {
+	v := t.Run()
+	snaps.Clean()
+	os.Exit(v)
+}
+
+func TestConfigLoadMissingFile(t *testing.T) {
+	assert := assert.New(t)
+
+	_, err := config.Load("/foo/bar/pint.hcl", true)
+	assert.EqualError(err, "<nil>: Configuration file not found; The configuration file /foo/bar/pint.hcl does not exist.")
+}
+
+func TestConfigLoadMissingFileOk(t *testing.T) {
+	assert := assert.New(t)
+
+	_, err := config.Load("/foo/bar/pint.hcl", false)
+	assert.Nil(err)
+}
 
 func TestDisableOnlineChecksWithPrometheus(t *testing.T) {
 	assert := assert.New(t)
@@ -593,6 +615,133 @@ rule {
 				checkNames = append(checkNames, c.String())
 			}
 			assert.Equal(tc.checks, checkNames)
+			snaps.MatchSnapshot(t, cfg.String())
 		})
 	}
+}
+
+func TestConfigErrors(t *testing.T) {
+	type testCaseT struct {
+		config string
+		err    string
+	}
+
+	testCases := []testCaseT{
+		{
+			config: "ci {maxCommits = -1}",
+			err:    "maxCommits cannot be <= 0",
+		},
+		{
+			config: `ci {include = [".+", ".+++"]}`,
+			err:    "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `repository {
+  bitbucket {
+    project    = ""
+    repository = ""
+    timeout    = ""
+	uri        = ""
+  }
+}`,
+			err: "empty duration string",
+		},
+		{
+			config: `repository {
+  github {
+    baseuri = ""
+    timeout = ""
+    owner   = ""
+    repo    = ""
+  }
+}`,
+			err: "empty duration string",
+		},
+		{
+			config: `checks { enabled = ["foo"] }`,
+			err:    "unknown check name foo",
+		},
+		{
+			config: `prometheus "prom" {
+  uri     = "http://localhost"
+  timeout = "abc"
+}`,
+			err: `not a valid duration string: "abc"`,
+		},
+		{
+			config: `rule {
+  match {
+    path = ".+++"
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  ignore {
+    name = ".+++"
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  aggregate ".+++" {}
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  annotation ".+++" {}
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  label ".+++" {}
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  reject ".+++" {}
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  cost {
+    bytesPerSample = -34343
+  }
+}`,
+			err: "bytesPerSample value must be >= 0",
+		},
+		{
+			config: `rule {
+  alerts {
+    range   = "abc"
+	step    = "abc"
+	resolve = "abc"
+  }
+}`,
+			err: `not a valid duration string: "abc"`,
+		},
+	}
+
+	dir := t.TempDir()
+	for i, tc := range testCases {
+		t.Run(tc.err, func(t *testing.T) {
+			assert := assert.New(t)
+
+			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
+			if tc.config != "" {
+				err := ioutil.WriteFile(path, []byte(tc.config), 0644)
+				assert.NoError(err)
+			}
+
+			_, err := config.Load(path, false)
+			assert.EqualError(err, tc.err)
+		})
+	}
+
 }

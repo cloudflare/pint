@@ -18,6 +18,9 @@ func (cs CostSettings) validate() error {
 			return err
 		}
 	}
+	if cs.BytesPerSample < 0 {
+		return fmt.Errorf("bytesPerSample value must be >= 0")
+	}
 	if cs.MaxSeries < 0 {
 		return fmt.Errorf("maxSeries value must be >= 0")
 	}

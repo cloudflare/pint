@@ -22,6 +22,9 @@ func (bb BitBucket) validate() error {
 	if bb.Repository == "" {
 		return fmt.Errorf("repository cannot be empty")
 	}
+	if bb.URI == "" {
+		return fmt.Errorf("uri cannot be empty")
+	}
 	return nil
 }
 

@@ -27,6 +27,13 @@ func TestCostSettings(t *testing.T) {
 		},
 		{
 			conf: CostSettings{
+				BytesPerSample: -1,
+				Severity:       "bug",
+			},
+			err: errors.New("bytesPerSample value must be >= 0"),
+		},
+		{
+			conf: CostSettings{
 				Severity: "foo",
 			},
 			err: errors.New("unknown severity: foo"),
