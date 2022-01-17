@@ -62,7 +62,8 @@ repository {
 ```JS
 repository {
   github {
-    uri        = "https://..."
+    baseuri    = "https://..."
+    uploaduri  = "https://..."
     timeout    = "30s"
     owner      = "..."
     repo       = "..."

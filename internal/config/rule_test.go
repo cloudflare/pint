@@ -121,6 +121,114 @@ func TestMatch(t *testing.T) {
 		{
 			path: "foo.yaml",
 			rule: parser.Rule{
+				RecordingRule: &parser.RecordingRule{
+					Labels: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					}},
+			},
+			match: config.Match{
+				Label: &config.MatchLabel{Key: "foo", Value: "bar"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				RecordingRule: &parser.RecordingRule{
+					Labels: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					}},
+			},
+			match: config.Match{
+				Annotation: &config.MatchAnnotation{Key: "foo", Value: "bar"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				RecordingRule: &parser.RecordingRule{
+					Labels: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					}},
+			},
+			match: config.Match{
+				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "dev"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				RecordingRule: &parser.RecordingRule{
+					Labels: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					}},
+			},
+			match: config.Match{
+				Label: &config.MatchLabel{Key: "cluster", Value: "dev"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				RecordingRule: &parser.RecordingRule{
+					Labels: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					}},
+			},
+			match: config.Match{
+				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				RecordingRule: &parser.RecordingRule{
+					Labels: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					}},
+			},
+			match: config.Match{
+				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},
+			},
+			isMatch: true,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{},
 			},
 			match: config.Match{
@@ -163,6 +271,98 @@ func TestMatch(t *testing.T) {
 			},
 			match: config.Match{
 				Kind: "alerting",
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				AlertingRule: &parser.AlertingRule{
+					Annotations: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					},
+				},
+			},
+			match: config.Match{
+				Label: &config.MatchLabel{Key: "foo", Value: "bar"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				AlertingRule: &parser.AlertingRule{
+					Annotations: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					},
+				},
+			},
+			match: config.Match{
+				Annotation: &config.MatchAnnotation{Key: "foo", Value: "bar"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				AlertingRule: &parser.AlertingRule{
+					Annotations: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					},
+				},
+			},
+			match: config.Match{
+				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{
+				AlertingRule: &parser.AlertingRule{
+					Annotations: &parser.YamlMap{
+						Items: []*parser.YamlKeyValue{
+							{
+								Key:   &parser.YamlNode{Value: "cluster"},
+								Value: &parser.YamlNode{Value: "prod"},
+							},
+						},
+					},
+				},
+			},
+			match: config.Match{
+				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
+			},
+			isMatch: true,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{},
+			match: config.Match{
+				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
+			},
+			isMatch: false,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{},
+			match: config.Match{
+				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},
 			},
 			isMatch: false,
 		},

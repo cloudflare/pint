@@ -49,6 +49,24 @@ func TestBitBucketSettings(t *testing.T) {
 			},
 			err: errors.New("repository cannot be empty"),
 		},
+		{
+			conf: BitBucket{
+				URI:        "",
+				Timeout:    "5m",
+				Project:    "foo",
+				Repository: "bar",
+			},
+			err: errors.New("uri cannot be empty"),
+		},
+		{
+			conf: BitBucket{
+				URI:        "http://localhost",
+				Timeout:    "abc",
+				Project:    "foo",
+				Repository: "bar",
+			},
+			err: errors.New(`not a valid duration string: "abc"`),
+		},
 	}
 
 	for _, tc := range testCases {

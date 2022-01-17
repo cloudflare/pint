@@ -208,52 +208,8 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 	}
 
 	for _, rule := range cfg.Rules {
-		if rule.Match != nil {
-			if err = rule.Match.validate(true); err != nil {
-				return cfg, err
-			}
-		}
-		if rule.Ignore != nil {
-			if err = rule.Ignore.validate(false); err != nil {
-				return cfg, err
-			}
-		}
-
-		for _, aggr := range rule.Aggregate {
-			if err = aggr.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		for _, ann := range rule.Annotation {
-			if err = ann.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		for _, lab := range rule.Label {
-			if err = lab.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		if rule.Cost != nil {
-			if err = rule.Cost.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		if rule.Alerts != nil {
-			if err = rule.Alerts.validate(); err != nil {
-				return cfg, err
-			}
-		}
-
-		for _, reject := range rule.Reject {
-			if err = reject.validate(); err != nil {
-				return cfg, err
-			}
-
+		if err = rule.validate(); err != nil {
+			return cfg, err
 		}
 	}
 
