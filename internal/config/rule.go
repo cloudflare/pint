@@ -17,9 +17,8 @@ var (
 )
 
 type MatchLabel struct {
-	Key             string `hcl:",label" json:"key"`
-	Value           string `hcl:"value" json:"value"`
-	annotationCheck bool
+	Key   string `hcl:",label" json:"key"`
+	Value string `hcl:"value" json:"value"`
 }
 
 func (ml MatchLabel) validate() error {
@@ -35,18 +34,6 @@ func (ml MatchLabel) validate() error {
 func (ml MatchLabel) isMatching(rule parser.Rule) bool {
 	keyRe := strictRegex(ml.Key)
 	valRe := strictRegex(ml.Value)
-
-	if ml.annotationCheck {
-		if rule.AlertingRule == nil || rule.AlertingRule.Annotations == nil {
-			return false
-		}
-		for _, ann := range rule.AlertingRule.Annotations.Items {
-			if keyRe.MatchString(ann.Key.Value) && valRe.MatchString(ann.Value.Value) {
-				return true
-			}
-		}
-		return false
-	}
 
 	if rule.AlertingRule != nil {
 		if rule.AlertingRule.Labels != nil {
@@ -70,12 +57,42 @@ func (ml MatchLabel) isMatching(rule parser.Rule) bool {
 	return false
 }
 
+type MatchAnnotation struct {
+	Key   string `hcl:",label" json:"key"`
+	Value string `hcl:"value" json:"value"`
+}
+
+func (ma MatchAnnotation) validate() error {
+	if _, err := regexp.Compile(ma.Key); err != nil {
+		return err
+	}
+	if _, err := regexp.Compile(ma.Value); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (ma MatchAnnotation) isMatching(rule parser.Rule) bool {
+	keyRe := strictRegex(ma.Key)
+	valRe := strictRegex(ma.Value)
+
+	if rule.AlertingRule == nil || rule.AlertingRule.Annotations == nil {
+		return false
+	}
+	for _, ann := range rule.AlertingRule.Annotations.Items {
+		if keyRe.MatchString(ann.Key.Value) && valRe.MatchString(ann.Value.Value) {
+			return true
+		}
+	}
+	return false
+}
+
 type Match struct {
-	Path       string      `hcl:"path,optional" json:"path,omitempty"`
-	Name       string      `hcl:"name,optional" json:"name,omitempty"`
-	Kind       string      `hcl:"kind,optional" json:"kind,omitempty"`
-	Label      *MatchLabel `hcl:"label,block" json:"label,omitempty"`
-	Annotation *MatchLabel `hcl:"annotation,block" json:"annotation,omitempty"`
+	Path       string           `hcl:"path,optional" json:"path,omitempty"`
+	Name       string           `hcl:"name,optional" json:"name,omitempty"`
+	Kind       string           `hcl:"kind,optional" json:"kind,omitempty"`
+	Label      *MatchLabel      `hcl:"label,block" json:"label,omitempty"`
+	Annotation *MatchAnnotation `hcl:"annotation,block" json:"annotation,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {
@@ -98,7 +115,13 @@ func (m Match) validate(allowEmpty bool) error {
 
 	if m.Label != nil {
 		if err := m.Label.validate(); err != nil {
-			return nil
+			return err
+		}
+	}
+
+	if m.Annotation != nil {
+		if err := m.Annotation.validate(); err != nil {
+			return err
 		}
 	}
 
@@ -142,6 +165,12 @@ func (m Match) IsMatch(path string, r parser.Rule) bool {
 		}
 	}
 
+	if m.Annotation != nil {
+		if !m.Annotation.isMatching(r) {
+			return false
+		}
+	}
+
 	return true
 }
 
@@ -154,6 +183,58 @@ type Rule struct {
 	Cost       *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
 	Alerts     *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
 	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
+}
+
+func (rule Rule) validate() (err error) {
+	if rule.Match != nil {
+		if err = rule.Match.validate(true); err != nil {
+			return err
+		}
+	}
+	if rule.Ignore != nil {
+		if err = rule.Ignore.validate(false); err != nil {
+			return err
+		}
+	}
+
+	for _, aggr := range rule.Aggregate {
+		if err = aggr.validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, ann := range rule.Annotation {
+		if err = ann.validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, lab := range rule.Label {
+		if err = lab.validate(); err != nil {
+			return err
+		}
+	}
+
+	if rule.Cost != nil {
+		if err = rule.Cost.validate(); err != nil {
+			return err
+		}
+	}
+
+	if rule.Alerts != nil {
+		if err = rule.Alerts.validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, reject := range rule.Reject {
+		if err = reject.validate(); err != nil {
+			return err
+		}
+
+	}
+
+	return nil
 }
 
 func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checkMeta {

@@ -23,6 +23,9 @@ type AnnotationCheck struct {
 }
 
 func (c AnnotationCheck) String() string {
+	if c.valueRe != nil {
+		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.key, c.valueRe, c.isReguired)
+	}
 	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.key, c.isReguired)
 }
 

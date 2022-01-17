@@ -388,6 +388,13 @@ rule {
     required = true
   }
 }
+rule {
+  annotation "summary" {
+    value    = "foo.+"
+    severity = "bug"
+    required = true
+  }
+}
 `,
 			path: "rules.yml",
 			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
@@ -399,6 +406,7 @@ rule {
 				checks.LabelCheckName + "(team:true)",
 				checks.AnnotationCheckName + "(summary:true)",
 				checks.LabelCheckName + "(team:false)",
+				checks.AnnotationCheckName + "(summary=~^foo.+$:true)",
 			},
 		},
 		{
@@ -593,6 +601,257 @@ rule {
 				checks.LabelCheckName + "(priority:true)",
 			},
 		},
+		{
+			title: "rule with annotation match / no annotation",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    annotation "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "rule with annotation match / annotation mismatch",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    annotation "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+			},
+		},
+		{
+			title: "rule with annotation match / annotation match",
+			config: `
+rule {
+  match {
+    kind = "alerting"
+    annotation "cluster" {
+      value = "prod"
+    }
+  }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.LabelCheckName + "(priority:true)",
+			},
+		},
+		{
+			title: "checks disabled via config",
+			config: `
+rule {
+  alerts {
+	range      = "1h"
+	step       = "1m"
+	resolve    = "5m"
+  }
+}
+checks {
+  disabled = [
+    "promql/rate",
+	"promql/vector_matching",
+  ]
+}
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+  # pint disable query/series
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.AlertsCheckName + "(prom1)",
+			},
+		},
+		{
+			title: "single check enabled via config",
+			config: `
+rule {
+  alerts {
+	range      = "1h"
+	step       = "1m"
+	resolve    = "5m"
+  }
+}
+checks {
+  enabled = []
+}
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.RateCheckName + "(prom1)",
+				checks.SeriesCheckName + "(prom1)",
+				checks.VectorMatchingCheckName + "(prom1)",
+				checks.AlertsCheckName + "(prom1)",
+			},
+		},
+		{
+			title: "two checks enabled via config",
+			config: `
+rule {
+  alerts {
+	range      = "1h"
+	step       = "1m"
+	resolve    = "5m"
+  }
+}
+checks {
+  enabled = [
+    "promql/syntax",
+	"alerts/count",
+  ]
+}
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertsCheckName + "(prom1)",
+			},
+		},
+		{
+			title: "rule with ignore block / mismatch",
+			config: `
+rule {
+  ignore {
+    path = "foo.xml"
+  }
+  alerts {
+	range      = "1h"
+	step       = "1m"
+	resolve    = "5m"
+  }
+}
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+checks {
+  enabled = [
+    "promql/syntax",
+    "alerts/count",
+  ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+- alert: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertsCheckName + "(prom1)",
+			},
+		},
+		{
+			title: "rule with ignore block / match",
+			config: `
+rule {
+  ignore {
+    path = "rules.yml"
+  }
+  alerts {
+	range      = "1h"
+	step       = "1m"
+	resolve    = "5m"
+  }
+}
+prometheus "prom1" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  paths   = [ "rules.yml" ]
+}
+checks {
+  enabled = [
+    "promql/syntax",
+    "alerts/count",
+  ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+- alert: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -670,22 +929,6 @@ func TestConfigErrors(t *testing.T) {
 		},
 		{
 			config: `rule {
-  match {
-    path = ".+++"
-  }
-}`,
-			err: "error parsing regexp: invalid nested repetition operator: `++`",
-		},
-		{
-			config: `rule {
-  ignore {
-    name = ".+++"
-  }
-}`,
-			err: "error parsing regexp: invalid nested repetition operator: `++`",
-		},
-		{
-			config: `rule {
   aggregate ".+++" {}
 }`,
 			err: "error parsing regexp: invalid nested repetition operator: `++`",
@@ -726,6 +969,76 @@ func TestConfigErrors(t *testing.T) {
 }`,
 			err: `not a valid duration string: "abc"`,
 		},
+		{
+			config: `rule {
+  match {
+    path = ".+++"
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  match {
+    label ".+++" {
+	  value = "bar"
+    }
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  match {
+    label "foo" {
+	  value = ".+++"
+    }
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  match {
+    annotation ".***" {
+	  value = "bar"
+    }
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `**`",
+		},
+		{
+			config: `rule {
+  match {
+    annotation "foo" {
+	  value = ".+++"
+    }
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  match {
+    kind = "foo"
+  }
+}`,
+			err: "unknown rule type: foo",
+		},
+		{
+			config: `rule {
+  ignore {
+    name = ".+++"
+  }
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  ignore {}
+}`,
+			err: "ignore block must have at least one condition",
+		},
 	}
 
 	dir := t.TempDir()
@@ -740,7 +1053,7 @@ func TestConfigErrors(t *testing.T) {
 			}
 
 			_, err := config.Load(path, false)
-			assert.EqualError(err, tc.err)
+			assert.EqualError(err, tc.err, tc.config)
 		})
 	}
 

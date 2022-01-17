@@ -18,6 +18,7 @@
 
 - `promql/rate`, `query/series` and `promql/vector_matching` checks were not enabled
   for all defined `prometheus {}` blocks  unless there was at least one `rule {}` block.
+- `annotation` based `match` blocks didn't work correctly.
 
 ## v0.6.6
 

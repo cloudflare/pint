@@ -439,6 +439,16 @@
           "severity": "warning"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ]
 }
@@ -731,6 +741,327 @@
           "severity": "bug"
         }
       ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_checks_enabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_mismatch - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "foo.xml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "rules.yml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
     }
   ]
 }
@@ -1176,6 +1507,16 @@
           "severity": "warning"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ]
 }
@@ -1468,6 +1809,327 @@
           "severity": "bug"
         }
       ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_checks_enabled_via_config - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_mismatch - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "foo.xml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_match - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "rules.yml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
     }
   ]
 }
@@ -1913,6 +2575,16 @@
           "severity": "warning"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ]
 }
@@ -2205,6 +2877,327 @@
           "severity": "bug"
         }
       ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_checks_enabled_via_config - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_mismatch - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "foo.xml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_match - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "rules.yml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
     }
   ]
 }
@@ -2650,6 +3643,16 @@
           "severity": "warning"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ]
 }
@@ -2942,6 +3945,327 @@
           "severity": "bug"
         }
       ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_checks_enabled_via_config - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_mismatch - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "foo.xml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_match - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "rules.yml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
     }
   ]
 }
@@ -3387,6 +4711,16 @@
           "severity": "warning"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ]
 }
@@ -3679,6 +5013,327 @@
           "severity": "bug"
         }
       ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": {
+        "kind": "alerting",
+        "annotation": {
+          "key": "cluster",
+          "value": "prod"
+        }
+      },
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "promql/comparison",
+      "promql/rate",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "query/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_checks_enabled_via_config - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_mismatch - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "foo.xml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/rule_with_ignore_block_/_match - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "paths": [
+        "rules.yml"
+      ]
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "promql/syntax",
+      "alerts/count"
+    ]
+  },
+  "rules": [
+    {
+      "ignore": {
+        "path": "rules.yml"
+      },
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
     }
   ]
 }
