@@ -96,6 +96,31 @@ C50     foo/bar/cp1.txt         foo/cp1.del
 				{Path: "foo/1.txt", Commits: []string{"commit1"}},
 			},
 		},
+		{
+			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
+				if args[0] == "rev-list" {
+					return []byte("commit1\ncommit3\n"), nil
+				}
+				content := `commit1
+M       file1
+M       file2
+
+commit2
+M       file1
+M       file3
+
+commit3
+R100    file1  file4
+M       file2
+`
+				return []byte([]byte(content)), nil
+			}, nil, "main"),
+			output: []discovery.File{
+				{Path: "file2", Commits: []string{"commit1", "commit3"}},
+				{Path: "file3", Commits: []string{"commit2"}},
+				{Path: "file4", Commits: []string{"commit1", "commit2", "commit3"}},
+			},
+		},
 	}
 
 	for i, tc := range testCases {

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.6.6
+
+### Fixed
+
+- File renames were not handled correctly when running `git ci` on branches with
+  multiple commits.
+
 ## v0.6.5
 
 ### Added
