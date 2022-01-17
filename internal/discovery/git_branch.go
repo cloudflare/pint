@@ -27,7 +27,7 @@ func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
 
 	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
 
-	out, err := gd.gitCmd("log", "--no-merges", "--pretty=format:%H", "--name-status", "--diff-filter=d", cr.String())
+	out, err := gd.gitCmd("log", "--reverse", "--no-merges", "--pretty=format:%H", "--name-status", "--diff-filter=d", cr.String())
 	if err != nil {
 		return nil, err
 	}
@@ -42,19 +42,29 @@ func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
 		if len(parts) == 1 && parts[0] != "" {
 			commit = parts[0]
 		} else if len(parts) >= 2 {
-			path := parts[len(parts)-1]
+			op := parts[0]
+			srcPath := parts[1]
+			dstPath := parts[len(parts)-1]
 			log.Debug().
-				Str("path", path).
+				Str("path", dstPath).
 				Str("commit", commit).
-				Bool("allowed", gd.isPathAllowed(path)).
+				Bool("allowed", gd.isPathAllowed(dstPath)).
 				Msg("Git file change")
-			if !gd.isPathAllowed(path) {
+			if !gd.isPathAllowed(dstPath) {
 				continue
 			}
-			if _, ok := results.pathCommits[path]; !ok {
-				results.pathCommits[path] = []string{}
+			if _, ok := results.pathCommits[dstPath]; !ok {
+				results.pathCommits[dstPath] = []string{}
 			}
-			results.pathCommits[path] = append(results.pathCommits[path], commit)
+			// check if we're dealing with a rename and if so we need to
+			// rename results in pathCommits
+			if strings.HasPrefix(op, "R") {
+				if v, ok := results.pathCommits[srcPath]; ok {
+					results.pathCommits[dstPath] = append(results.pathCommits[dstPath], v...)
+					delete(results.pathCommits, srcPath)
+				}
+			}
+			results.pathCommits[dstPath] = append(results.pathCommits[dstPath], commit)
 		}
 	}
 
