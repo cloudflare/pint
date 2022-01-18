@@ -31,13 +31,13 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		Msg("Scheduling prometheus range query")
 
 	lockKey := "/api/v1/query/range"
-	p.lock.Lock(lockKey)
+	p.lock.lock(lockKey)
 
 	cacheKey := strings.Join([]string{expr, start.String(), end.String(), step.String()}, "\n")
 	if v, ok := p.cache.Get(cacheKey); ok {
 		log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache hit")
 		r := v.(RangeQueryResult)
-		p.lock.Unlock((lockKey))
+		p.lock.unlock((lockKey))
 		return &r, nil
 	}
 
@@ -52,7 +52,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	qstart := time.Now()
 	result, _, err := p.api.QueryRange(rctx, expr, r)
 	duration := time.Since(qstart)
-	p.lock.Unlock((lockKey))
+	p.lock.unlock((lockKey))
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
@@ -83,8 +83,8 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		samples := result.(model.Matrix)
 		qr.Samples = samples
 	default:
-		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result)
-		return nil, fmt.Errorf("unknown result type: %v", result)
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.Type())
+		return nil, fmt.Errorf("unknown result type: %v", result.Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
 

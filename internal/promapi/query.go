@@ -18,8 +18,8 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
 
 	lockKey := "/api/v1/query"
-	p.lock.Lock(lockKey)
-	defer p.lock.Unlock((lockKey))
+	p.lock.lock(lockKey)
+	defer p.lock.unlock((lockKey))
 
 	if v, ok := p.cache.Get(expr); ok {
 		log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache hit")
@@ -57,8 +57,8 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 		vectorVal := result.(model.Vector)
 		qr.Series = vectorVal
 	default:
-		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result)
-		return nil, fmt.Errorf("unknown result type: %v", result)
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result.Type())
+		return nil, fmt.Errorf("unknown result type: %v", result.Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 

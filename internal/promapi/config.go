@@ -24,8 +24,8 @@ func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
 	log.Debug().Str("uri", p.uri).Msg("Query Prometheus configuration")
 
 	key := "/api/v1/status/config"
-	p.lock.Lock(key)
-	defer p.lock.Unlock((key))
+	p.lock.lock(key)
+	defer p.lock.unlock((key))
 
 	if v, ok := p.cache.Get(key); ok {
 		log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache hit")
@@ -44,7 +44,7 @@ func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
 
 	var cfg PrometheusConfig
 	if err = yaml.Unmarshal([]byte(resp.YAML), &cfg); err != nil {
-		return nil, fmt.Errorf("failed to decode config data in %s response: %w", key, err)
+		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.uri, err)
 	}
 
 	if cfg.Global.ScrapeInterval == 0 {

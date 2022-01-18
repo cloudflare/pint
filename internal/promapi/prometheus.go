@@ -7,8 +7,6 @@ import (
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-
-	"github.com/cloudflare/pint/internal/keylock"
 )
 
 type Prometheus struct {
@@ -17,7 +15,7 @@ type Prometheus struct {
 	api     v1.API
 	timeout time.Duration
 	cache   *lru.Cache
-	lock    *keylock.PartitionLocker
+	lock    *partitionLocker
 }
 
 func NewPrometheus(name, uri string, timeout time.Duration) *Prometheus {
@@ -35,7 +33,7 @@ func NewPrometheus(name, uri string, timeout time.Duration) *Prometheus {
 		api:     v1.NewAPI(client),
 		timeout: timeout,
 		cache:   cache,
-		lock:    keylock.NewPartitionLocker((&sync.Mutex{})),
+		lock:    newPartitionLocker((&sync.Mutex{})),
 	}
 }
 
