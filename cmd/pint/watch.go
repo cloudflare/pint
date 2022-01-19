@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -50,7 +51,6 @@ var watchCmd = &cli.Command{
 		&cli.StringFlag{
 			Name:    pidfileFlag,
 			Aliases: []string{"p"},
-			Value:   "",
 			Usage:   "Write pid file to this path",
 		},
 	},
@@ -74,6 +74,23 @@ func actionWatch(c *cli.Context) (err error) {
 	cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
 	if c.Bool(offlineFlag) {
 		cfg.DisableOnlineChecks()
+	}
+
+	pidfile := c.String(pidfileFlag)
+	if pidfile != "" {
+		pid := os.Getpid()
+		err := ioutil.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0644)
+		if err != nil {
+			return err
+		}
+		log.Info().Str("path", pidfile).Msg("Pidfile created")
+		defer func() {
+			err := os.RemoveAll(pidfile)
+			if err != nil {
+				log.Error().Err(err).Str("path", pidfile).Msg("Failed to remove pidfile")
+			}
+			log.Info().Str("path", pidfile).Msg("Pidfile removed")
+		}()
 	}
 
 	// start HTTP server for metrics
