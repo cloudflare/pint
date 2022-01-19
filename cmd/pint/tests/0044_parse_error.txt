@@ -1,0 +1,6 @@
+pint.error parse 'sum(foo) by('
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" [36merror=[0m[31m"1:13: parse error: unclosed left parenthesis"[0m

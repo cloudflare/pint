@@ -16,7 +16,7 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	done := map[string]struct{}{}
+	done := sync.Map{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/30s/api/v1/status/config":
@@ -32,7 +32,7 @@ func TestConfig(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
 		case "/once/api/v1/status/config":
-			if _, wasDone := done[r.URL.Path]; wasDone {
+			if _, wasDone := done.Load(r.URL.Path); wasDone {
 				w.WriteHeader(500)
 				_, _ = w.Write([]byte("path already requested\n"))
 				return
@@ -40,7 +40,7 @@ func TestConfig(t *testing.T) {
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-			done[r.URL.Path] = struct{}{}
+			done.Store(r.URL.Path, true)
 		case "/slow/api/v1/status/config":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")

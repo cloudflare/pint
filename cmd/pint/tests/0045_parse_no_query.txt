@@ -1,0 +1,6 @@
+pint.error --no-color parse
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="a query string is required"
