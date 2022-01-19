@@ -16,7 +16,7 @@ import (
 )
 
 func TestQuery(t *testing.T) {
-	done := map[string]struct{}{}
+	done := sync.Map{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -60,7 +60,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "once":
-			if _, wasDone := done[r.URL.Path]; wasDone {
+			if _, wasDone := done.Load(r.URL.Path); wasDone {
 				w.WriteHeader(500)
 				_, _ = w.Write([]byte("query already requested\n"))
 				return
@@ -74,7 +74,7 @@ func TestQuery(t *testing.T) {
 					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-			done[r.URL.Path] = struct{}{}
+			done.Store(r.URL.Path, true)
 		case "matrix":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")

@@ -16,8 +16,6 @@ import (
 )
 
 func TestRange(t *testing.T) {
-	// done := map[string]struct{}{}
-
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
