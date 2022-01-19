@@ -1,0 +1,80 @@
+exec bash -x ./prometheus.sh &
+exec bash -c 'while [ ! -f prometheus.pid ]; do sleep 1 ; done'
+
+exec bash -x ./test.sh &
+
+pint.ok --no-color watch --interval=1h --listen=:6043 --pidfile=pint.pid rules
+! stdout .
+stderr 'level=info msg="Shutting down"'
+stderr 'level=error msg="Failed to query Prometheus configuration" error="Get \\"http://127.0.0.1:7043/api/v1/status/config\\": context canceled" uri=http://127.0.0.1:7043'
+stderr 'level=error msg="Query failed" error="Post \\"http://127.0.0.1:7043/api/v1/query\\": context canceled" query=count\(foo\) uri=http://127.0.0.1:7043'
+stderr 'level=info msg="Waiting for all background tasks to finish"'
+stderr 'level=info msg="Background worker finished"'
+
+-- test.sh --
+sleep 5
+cat pint.pid | xargs kill
+cat prometheus.pid | xargs kill
+
+-- rules/1.yml --
+- record: aggregate
+  expr: sum(foo) without(job)
+
+-- .pint.hcl --
+prometheus "slow" {
+  uri     = "http://127.0.0.1:7043"
+  timeout = "2m"
+}
+
+-- prometheus.go --
+package main
+
+import (
+	"context"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+        w.WriteHeader(500)
+        time.Sleep(time.Second*30)
+		io.WriteString(w, "Fatal error")
+	})
+
+	listener, err := net.Listen("tcp", "127.0.0.1:7043")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server := &http.Server{
+		Addr: "127.0.0.1:7043",
+	}
+
+	go func() {
+		_ = server.Serve(listener)
+	}()
+
+	pid := os.Getpid()
+	err = os.WriteFile("prometheus.pid", []byte(strconv.Itoa(pid)), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+}
+
+-- prometheus.sh --
+env GOCACHE=$TMPDIR go run prometheus.go

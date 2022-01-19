@@ -9,6 +9,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -244,7 +245,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			1,
 			kind,
 			name,
-			report.Problem.Severity.String(),
+			strings.ToLower(report.Problem.Severity.String()),
 			report.Problem.Reporter,
 			report.Problem.Text,
 			output.FormatLineRangeString(report.Problem.Lines),

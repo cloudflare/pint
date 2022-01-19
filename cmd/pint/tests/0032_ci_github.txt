@@ -1,5 +1,5 @@
 exec bash -x ./webserver.sh &
-#exec bash -c 'while [ ! -f server.pid ]; do sleep 1 ; done'
+exec bash -c 'while [ ! -f server.pid ]; do sleep 1 ; done'
 exec sleep 5
 
 mkdir testrepo
