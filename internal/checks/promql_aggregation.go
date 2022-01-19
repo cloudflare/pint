@@ -29,7 +29,6 @@ type AggregationCheck struct {
 
 func (c AggregationCheck) String() string {
 	return fmt.Sprintf("%s(%s:%v)", AggregationCheckName, c.label, c.keep)
-
 }
 
 func (c AggregationCheck) Reporter() string {

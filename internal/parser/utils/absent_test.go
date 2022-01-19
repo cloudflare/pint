@@ -62,7 +62,7 @@ func TestHasOuterAbsent(t *testing.T) {
 					t.Errorf("HasOuterAbsent() returned nil, expected %s", tc.output)
 				}
 			} else {
-				var output = []string{}
+				output := []string{}
 				for _, a := range calls {
 					output = append(output, a.Node.String())
 				}

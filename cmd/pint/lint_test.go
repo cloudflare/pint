@@ -22,7 +22,7 @@ func mockRules(dir string, filesCount, rulesPerFile int) error {
 			}
 		}
 
-		if err = os.WriteFile(rulePath, []byte(content.String()), 0644); err != nil {
+		if err = os.WriteFile(rulePath, []byte(content.String()), 0o644); err != nil {
 			return err
 		}
 	}
@@ -132,7 +132,7 @@ rule {
   }
 }    
 `
-	return os.WriteFile(configPath, []byte(content), 0644)
+	return os.WriteFile(configPath, []byte(content), 0o644)
 }
 
 func BenchmarkLint(b *testing.B) {
@@ -151,7 +151,7 @@ func BenchmarkLint(b *testing.B) {
 	}
 
 	app := newApp()
-	var args = []string{"pint", "-c", configPath, "-l", "error", "lint", "--offline", rulesDir + "/*.yaml"}
+	args := []string{"pint", "-c", configPath, "-l", "error", "lint", "--offline", rulesDir + "/*.yaml"}
 	for n := 0; n < b.N; n++ {
 		if err = app.Run(args); err != nil {
 			b.Error(err)

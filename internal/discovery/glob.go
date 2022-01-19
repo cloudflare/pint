@@ -9,8 +9,7 @@ func NewGlobFileFinder() GlobFileFinder {
 	return GlobFileFinder{}
 }
 
-type GlobFileFinder struct {
-}
+type GlobFileFinder struct{}
 
 func (gd GlobFileFinder) Find(pattern ...string) (FileFindResults, error) {
 	results := FileCommits{

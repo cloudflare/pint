@@ -80,7 +80,7 @@ func actionWatch(c *cli.Context) (err error) {
 	pidfile := c.String(pidfileFlag)
 	if pidfile != "" {
 		pid := os.Getpid()
-		err := ioutil.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0644)
+		err := ioutil.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0o644)
 		if err != nil {
 			return err
 		}

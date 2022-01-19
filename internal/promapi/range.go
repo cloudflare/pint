@@ -21,7 +21,6 @@ type RangeQueryResult struct {
 }
 
 func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
-
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).

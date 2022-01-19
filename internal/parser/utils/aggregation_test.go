@@ -105,7 +105,7 @@ func TestHasOuterAggregation(t *testing.T) {
 					t.Errorf("HasOuterAggregation() returned nil, expected %s", tc.output)
 				}
 			} else {
-				var output = []string{}
+				output := []string{}
 				for _, a := range aggs {
 					output = append(output, a.String())
 				}

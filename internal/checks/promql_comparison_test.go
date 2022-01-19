@@ -26,7 +26,8 @@ func TestComparisonCheck(t *testing.T) {
 		{
 			description: "alert expr with >= condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} >= 1\n",
-			checker:     checks.NewComparisonCheck()},
+			checker:     checks.NewComparisonCheck(),
+		},
 		{
 			description: "alert expr with == condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 1\n",

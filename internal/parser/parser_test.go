@@ -419,8 +419,9 @@ groups:
 								Position: parser.FilePosition{Lines: []int{4}},
 								Value:    "for",
 							},
-							Value: &parser.YamlNode{Position: parser.FilePosition{Lines: []int{5}},
-								Value: "11m\n",
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "11m\n",
 							},
 						},
 						Labels: &parser.YamlMap{
@@ -485,10 +486,11 @@ groups:
 							Query: &parser.PromQLNode{
 								Expr: "bar\n/\nbaz > 1",
 								Children: []*parser.PromQLNode{
-									{Expr: "bar / baz", Children: []*parser.PromQLNode{
-										{Expr: "bar"},
-										{Expr: "baz"},
-									},
+									{
+										Expr: "bar / baz", Children: []*parser.PromQLNode{
+											{Expr: "bar"},
+											{Expr: "baz"},
+										},
 									},
 									{Expr: "1"},
 								},
@@ -578,8 +580,9 @@ groups:
 								Position: parser.FilePosition{Lines: []int{9}},
 								Value:    "for",
 							},
-							Value: &parser.YamlNode{Position: parser.FilePosition{Lines: []int{9}},
-								Value: "30m",
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{9}},
+								Value:    "30m",
 							},
 						},
 					},

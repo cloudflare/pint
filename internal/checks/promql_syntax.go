@@ -15,8 +15,7 @@ func NewSyntaxCheck() SyntaxCheck {
 	return SyntaxCheck{}
 }
 
-type SyntaxCheck struct {
-}
+type SyntaxCheck struct{}
 
 func (c SyntaxCheck) String() string {
 	return SyntaxCheckName

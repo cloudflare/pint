@@ -129,7 +129,8 @@ func TestMatch(t *testing.T) {
 								Value: &parser.YamlNode{Value: "prod"},
 							},
 						},
-					}},
+					},
+				},
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "foo", Value: "bar"},
@@ -147,7 +148,8 @@ func TestMatch(t *testing.T) {
 								Value: &parser.YamlNode{Value: "prod"},
 							},
 						},
-					}},
+					},
+				},
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "foo", Value: "bar"},
@@ -165,7 +167,8 @@ func TestMatch(t *testing.T) {
 								Value: &parser.YamlNode{Value: "prod"},
 							},
 						},
-					}},
+					},
+				},
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "dev"},
@@ -183,7 +186,8 @@ func TestMatch(t *testing.T) {
 								Value: &parser.YamlNode{Value: "prod"},
 							},
 						},
-					}},
+					},
+				},
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "cluster", Value: "dev"},
@@ -201,7 +205,8 @@ func TestMatch(t *testing.T) {
 								Value: &parser.YamlNode{Value: "prod"},
 							},
 						},
-					}},
+					},
+				},
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
@@ -219,7 +224,8 @@ func TestMatch(t *testing.T) {
 								Value: &parser.YamlNode{Value: "prod"},
 							},
 						},
-					}},
+					},
+				},
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},

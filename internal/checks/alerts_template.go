@@ -69,8 +69,7 @@ func NewTemplateCheck() TemplateCheck {
 	return TemplateCheck{}
 }
 
-type TemplateCheck struct {
-}
+type TemplateCheck struct{}
 
 func (c TemplateCheck) String() string {
 	return TemplateCheckName
@@ -232,13 +231,13 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 		return nil
 	}
 
-	var aliases = aliasMap{aliases: map[string]map[string]struct{}{}}
-	var vars = [][]string{}
+	aliases := aliasMap{aliases: map[string]map[string]struct{}{}}
+	vars := [][]string{}
 	for _, node := range t.Root.Nodes {
 		getAliases(node, &aliases)
 		vars = append(vars, getVariables(node)...)
 	}
-	var valAliases = aliases.varAliases(".Value")
+	valAliases := aliases.varAliases(".Value")
 	for _, v := range vars {
 		for _, a := range valAliases {
 			if v[0] == a {
@@ -317,15 +316,15 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 		return nil
 	}
 
-	var aliases = aliasMap{aliases: map[string]map[string]struct{}{}}
-	var vars = [][]string{}
+	aliases := aliasMap{aliases: map[string]map[string]struct{}{}}
+	vars := [][]string{}
 	for _, node := range t.Root.Nodes {
 		getAliases(node, &aliases)
 		vars = append(vars, getVariables(node)...)
 	}
 
 	done := map[string]struct{}{}
-	var labelsAliases = aliases.varAliases(".Labels")
+	labelsAliases := aliases.varAliases(".Labels")
 	for _, v := range vars {
 		for _, a := range labelsAliases {
 			if len(v) > 1 && v[0] == a {

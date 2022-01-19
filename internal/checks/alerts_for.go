@@ -17,8 +17,7 @@ func NewAlertsForCheck() AlertsForChecksFor {
 	return AlertsForChecksFor{}
 }
 
-type AlertsForChecksFor struct {
-}
+type AlertsForChecksFor struct{}
 
 func (c AlertsForChecksFor) String() string {
 	return AlertForCheckName

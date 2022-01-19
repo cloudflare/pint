@@ -45,7 +45,7 @@ prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
 }
-`), 0644)
+`), 0o644)
 	assert.NoError(err)
 
 	cfg, err := config.Load(path, true)
@@ -63,7 +63,7 @@ func TestDisableOnlineChecksWithoutPrometheus(t *testing.T) {
 
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
-	err := ioutil.WriteFile(path, []byte(``), 0644)
+	err := ioutil.WriteFile(path, []byte(``), 0o644)
 	assert.NoError(err)
 
 	cfg, err := config.Load(path, true)
@@ -86,7 +86,7 @@ prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
 }
-`), 0644)
+`), 0o644)
 	assert.NoError(err)
 
 	cfg, err := config.Load(path, true)
@@ -110,7 +110,7 @@ func TestSetDisabledChecks(t *testing.T) {
 
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
-	err := ioutil.WriteFile(path, []byte(``), 0644)
+	err := ioutil.WriteFile(path, []byte(``), 0o644)
 	assert.NoError(err)
 
 	cfg, err := config.Load(path, true)
@@ -862,7 +862,7 @@ checks {
 
 			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
 			if tc.config != "" {
-				err := ioutil.WriteFile(path, []byte(tc.config), 0644)
+				err := ioutil.WriteFile(path, []byte(tc.config), 0o644)
 				assert.NoError(err)
 			}
 
@@ -1049,7 +1049,7 @@ func TestConfigErrors(t *testing.T) {
 
 			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
 			if tc.config != "" {
-				err := ioutil.WriteFile(path, []byte(tc.config), 0644)
+				err := ioutil.WriteFile(path, []byte(tc.config), 0o644)
 				assert.NoError(err)
 			}
 
@@ -1057,5 +1057,4 @@ func TestConfigErrors(t *testing.T) {
 			assert.EqualError(err, tc.err, tc.config)
 		})
 	}
-
 }

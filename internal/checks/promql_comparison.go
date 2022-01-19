@@ -16,8 +16,7 @@ func NewComparisonCheck() ComparisonCheck {
 	return ComparisonCheck{}
 }
 
-type ComparisonCheck struct {
-}
+type ComparisonCheck struct{}
 
 func (c ComparisonCheck) String() string {
 	return ComparisonCheckName

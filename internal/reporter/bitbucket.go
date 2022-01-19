@@ -163,7 +163,7 @@ func (r BitBucketReporter) bitBucketRequest(method, url string, body []byte) err
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", r.authToken))
 
-	var netClient = &http.Client{
+	netClient := &http.Client{
 		Timeout: r.timeout,
 	}
 
