@@ -6,8 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestReadContent(t *testing.T) {

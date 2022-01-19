@@ -10,13 +10,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/rs/zerolog"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
-	"github.com/google/go-cmp/cmp"
-	"github.com/rs/zerolog"
 )
 
 func blameLine(sha string, line int, filename, content string) string {

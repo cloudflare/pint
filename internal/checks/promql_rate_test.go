@@ -1,14 +1,16 @@
 package checks_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/promapi"
-	"github.com/rs/zerolog"
 )
 
 func TestRateCheck(t *testing.T) {
@@ -228,7 +230,7 @@ func TestRateCheck(t *testing.T) {
 					Fragment: "rate(foo[5m])",
 					Lines:    []int{2},
 					Reporter: "promql/rate",
-					Text:     "failed to query prom prometheus config: failed to decode config data in /api/v1/status/config response: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `invalid...` into promapi.PrometheusConfig",
+					Text:     fmt.Sprintf("failed to query prom prometheus config: failed to decode config data in %s/badYaml/ response: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `invalid...` into promapi.PrometheusConfig", srv.URL),
 					Severity: checks.Bug,
 				},
 			},

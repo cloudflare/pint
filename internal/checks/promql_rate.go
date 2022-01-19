@@ -1,6 +1,7 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -26,20 +27,24 @@ func (c RateCheck) String() string {
 	return fmt.Sprintf("%s(%s)", RateCheckName, c.prom.Name())
 }
 
-func (c RateCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c RateCheck) Reporter() string {
+	return RateCheckName
+}
+
+func (c RateCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
 		return
 	}
 
-	scrapeInterval, err := c.getScrapeInterval()
+	scrapeInterval, err := c.getScrapeInterval(ctx)
 	if err != nil {
 		if err != nil {
 			problems = append(problems, Problem{
 				Fragment: expr.Value.Value,
 				Lines:    expr.Lines(),
-				Reporter: RateCheckName,
+				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("failed to query %s prometheus config: %s", c.prom.Name(), err),
 				Severity: Bug,
 			})
@@ -51,7 +56,7 @@ func (c RateCheck) Check(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
-			Reporter: RateCheckName,
+			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Severity: problem.severity,
 		})
@@ -60,9 +65,9 @@ func (c RateCheck) Check(rule parser.Rule) (problems []Problem) {
 	return
 }
 
-func (c RateCheck) getScrapeInterval() (interval time.Duration, err error) {
+func (c RateCheck) getScrapeInterval(ctx context.Context) (interval time.Duration, err error) {
 	var cfg *promapi.PrometheusConfig
-	cfg, err = c.prom.Config()
+	cfg, err = c.prom.Config(ctx)
 	if err != nil {
 		return
 	}

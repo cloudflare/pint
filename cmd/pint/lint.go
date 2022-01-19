@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -12,6 +13,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
+
+var lintCmd = &cli.Command{
+	Name:   "lint",
+	Usage:  "Lint specified files",
+	Action: actionLint,
+}
 
 func actionLint(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
@@ -43,7 +50,7 @@ func actionLint(c *cli.Context) (err error) {
 		return fmt.Errorf("no matching files")
 	}
 
-	summary := scanFiles(cfg, toScan, &discovery.NoopLineFinder{})
+	summary := scanFiles(context.Background(), cfg, toScan, &discovery.NoopLineFinder{})
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)

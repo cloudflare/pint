@@ -1,11 +1,13 @@
 package checks
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/rs/zerolog/log"
+
+	"github.com/cloudflare/pint/internal/parser"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
@@ -30,7 +32,11 @@ func (c AggregationCheck) String() string {
 
 }
 
-func (c AggregationCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c AggregationCheck) Reporter() string {
+	return AggregationCheckName
+}
+
+func (c AggregationCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -61,7 +67,7 @@ func (c AggregationCheck) Check(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
-			Reporter: AggregationCheckName,
+			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Severity: c.severity,
 		})

@@ -52,8 +52,8 @@ ci {
 }
 repository {
   github {
-    baseuri   = "http://127.0.0.1:8082"
-	uploaduri = "http://127.0.0.1:8082"
+    baseuri   = "http://127.0.0.1:6033"
+	uploaduri = "http://127.0.0.1:6033"
     timeout   = "10s"
     owner     = "cloudflare"
     repo      = "pint"
@@ -81,13 +81,13 @@ func main() {
 		io.WriteString(w, "{}")
 	})
 
-	listener, err := net.Listen("tcp", "127.0.0.1:8082")
+	listener, err := net.Listen("tcp", "127.0.0.1:6033")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	server := &http.Server{
-		Addr: "127.0.0.1:8082",
+		Addr: "127.0.0.1:6033",
 	}
 
 	go func() {

@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
-	"github.com/rs/zerolog"
 )
 
 func TestGithubReporter(t *testing.T) {

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"os"
 	"regexp"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
@@ -45,7 +47,7 @@ func scanProblem(path string, err error) reporter.Report {
 	}
 }
 
-func scanFiles(cfg config.Config, fcs discovery.FileFindResults, ld discovery.LineFinder) (summary reporter.Summary) {
+func scanFiles(ctx context.Context, cfg config.Config, fcs discovery.FileFindResults, ld discovery.LineFinder) (summary reporter.Summary) {
 	summary.FileChanges = fcs
 
 	scanJobs := []scanJob{}
@@ -128,7 +130,7 @@ func scanFiles(cfg config.Config, fcs discovery.FileFindResults, ld discovery.Li
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			scanWorker(jobs, results)
+			scanWorker(ctx, jobs, results)
 		}()
 	}
 
@@ -157,23 +159,33 @@ type scanJob struct {
 	lines discovery.LineFindResults
 }
 
-func scanWorker(jobs <-chan scanJob, results chan<- reporter.Report) {
+func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporter.Report) {
 	for job := range jobs {
 		job := job
-		if job.rule.Error.Err != nil {
-			results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: checks.Problem{
-				Fragment: job.rule.Error.Fragment,
-				Lines:    []int{job.rule.Error.Line},
-				Reporter: "pint/parse",
-				Text:     job.rule.Error.Err.Error(),
-				Severity: checks.Fatal,
-			}}
-		} else {
-			for _, problem := range job.check.Check(job.rule) {
-				if job.lines.HasLines(problem.Lines) {
-					results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: problem}
-				} else {
-					log.Debug().Str("path", job.path).Str("lines", output.FormatLineRangeString(problem.Lines)).Msg("Problem reported on unmodified lines, ignoring")
+
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			if job.rule.Error.Err != nil {
+				results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: checks.Problem{
+					Fragment: job.rule.Error.Fragment,
+					Lines:    []int{job.rule.Error.Line},
+					Reporter: "pint/parse",
+					Text:     job.rule.Error.Err.Error(),
+					Severity: checks.Fatal,
+				}}
+			} else {
+				start := time.Now()
+				probles := job.check.Check(ctx, job.rule)
+				duration := time.Since(start)
+				checkDuration.WithLabelValues(job.check.Reporter()).Observe(duration.Seconds())
+				for _, problem := range probles {
+					if job.lines.HasLines(problem.Lines) {
+						results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: problem}
+					} else {
+						log.Debug().Str("path", job.path).Str("lines", output.FormatLineRangeString(problem.Lines)).Msg("Problem reported on unmodified lines, ignoring")
+					}
 				}
 			}
 		}

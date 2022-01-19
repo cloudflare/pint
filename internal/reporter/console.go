@@ -8,9 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/rs/zerolog/log"
 )
 
 func NewConsoleReporter(output io.Writer) ConsoleReporter {

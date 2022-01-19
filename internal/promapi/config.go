@@ -20,20 +20,20 @@ type PrometheusConfig struct {
 	Global ConfigSectionGlobal `yaml:"global"`
 }
 
-func (p *Prometheus) Config() (*PrometheusConfig, error) {
+func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
 	log.Debug().Str("uri", p.uri).Msg("Query Prometheus configuration")
 
 	key := "/api/v1/status/config"
-	p.lock.Lock(key)
-	defer p.lock.Unlock((key))
+	p.lock.lock(key)
+	defer p.lock.unlock((key))
 
-	if v, ok := p.cache.Load(key); ok {
+	if v, ok := p.cache.Get(key); ok {
 		log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache hit")
 		cfg := v.(PrometheusConfig)
 		return &cfg, nil
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
+	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
 	resp, err := p.api.Config(ctx)
@@ -44,7 +44,7 @@ func (p *Prometheus) Config() (*PrometheusConfig, error) {
 
 	var cfg PrometheusConfig
 	if err = yaml.Unmarshal([]byte(resp.YAML), &cfg); err != nil {
-		return nil, fmt.Errorf("failed to decode config data in %s response: %w", key, err)
+		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.uri, err)
 	}
 
 	if cfg.Global.ScrapeInterval == 0 {
@@ -58,7 +58,7 @@ func (p *Prometheus) Config() (*PrometheusConfig, error) {
 	}
 
 	log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache miss")
-	p.cache.Store(key, cfg)
+	p.cache.Add(key, cfg)
 
 	return &cfg, nil
 }

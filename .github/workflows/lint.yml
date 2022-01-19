@@ -22,3 +22,20 @@ jobs:
 
       - name: Lint code
         run: make lint
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6
+
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Format code
+        run: make format
+
+      - name: Check for local changes
+        run: git diff --exit-code

@@ -9,6 +9,12 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var configCmd = &cli.Command{
+	Name:   "config",
+	Usage:  "Parse and print used config",
+	Action: actionConfig,
+}
+
 func actionConfig(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {

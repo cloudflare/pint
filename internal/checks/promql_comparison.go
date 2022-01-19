@@ -1,6 +1,8 @@
 package checks
 
 import (
+	"context"
+
 	"github.com/cloudflare/pint/internal/parser"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
@@ -21,7 +23,11 @@ func (c ComparisonCheck) String() string {
 	return ComparisonCheckName
 }
 
-func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
+func (c ComparisonCheck) Reporter() string {
+	return ComparisonCheckName
+}
+
+func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return
 	}
@@ -39,7 +45,7 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Fragment: rule.AlertingRule.Expr.Value.Value,
 				Lines:    rule.AlertingRule.Expr.Lines(),
-				Reporter: ComparisonCheckName,
+				Reporter: c.Reporter(),
 				Text:     "alert query uses bool modifier for comparison, this means it will always return a result and the alert will always fire",
 				Severity: Bug,
 			})
@@ -50,7 +56,7 @@ func (c ComparisonCheck) Check(rule parser.Rule) (problems []Problem) {
 	problems = append(problems, Problem{
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    rule.AlertingRule.Expr.Lines(),
-		Reporter: ComparisonCheckName,
+		Reporter: c.Reporter(),
 		Text:     "alert query doesn't have any condition, it will always fire if the metric exists",
 		Severity: Warning,
 	})

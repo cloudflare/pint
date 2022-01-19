@@ -14,14 +14,14 @@ type QueryResult struct {
 	DurationSeconds float64
 }
 
-func (p *Prometheus) Query(expr string) (*QueryResult, error) {
+func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
 	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
 
 	lockKey := "/api/v1/query"
-	p.lock.Lock(lockKey)
-	defer p.lock.Unlock((lockKey))
+	p.lock.lock(lockKey)
+	defer p.lock.unlock((lockKey))
 
-	if v, ok := p.cache.Load(expr); ok {
+	if v, ok := p.cache.Get(expr); ok {
 		log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache hit")
 		r := v.(QueryResult)
 		return &r, nil
@@ -29,7 +29,7 @@ func (p *Prometheus) Query(expr string) (*QueryResult, error) {
 
 	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Query started")
 
-	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
+	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
 	start := time.Now()
@@ -57,13 +57,13 @@ func (p *Prometheus) Query(expr string) (*QueryResult, error) {
 		vectorVal := result.(model.Vector)
 		qr.Series = vectorVal
 	default:
-		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result)
-		return nil, fmt.Errorf("unknown result type: %v", result)
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result.Type())
+		return nil, fmt.Errorf("unknown result type: %v", result.Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 
 	log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache miss")
-	p.cache.Store(expr, qr)
+	p.cache.Add(expr, qr)
 
 	return &qr, nil
 }

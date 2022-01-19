@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"regexp"
@@ -17,6 +18,12 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
+
+var ciCmd = &cli.Command{
+	Name:   "ci",
+	Usage:  "Lint CI changes",
+	Action: actionCI,
+}
 
 func actionCI(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
@@ -63,7 +70,7 @@ func actionCI(c *cli.Context) (err error) {
 	log.Debug().Strs("commits", toScan.Commits()).Msg("Found commits to scan")
 
 	gitBlame := discovery.NewGitBlameLineFinder(git.RunGit, toScan.Commits())
-	summary := scanFiles(cfg, toScan, gitBlame)
+	summary := scanFiles(context.Background(), cfg, toScan, gitBlame)
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),

@@ -20,7 +20,7 @@ type RangeQueryResult struct {
 	DurationSeconds float64
 }
 
-func (p *Prometheus) RangeQuery(expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
+func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
 
 	log.Debug().
 		Str("uri", p.uri).
@@ -31,19 +31,17 @@ func (p *Prometheus) RangeQuery(expr string, start, end time.Time, step time.Dur
 		Msg("Scheduling prometheus range query")
 
 	lockKey := "/api/v1/query/range"
-	p.lock.Lock(lockKey)
-	defer p.lock.Unlock((lockKey))
+	p.lock.lock(lockKey)
 
 	cacheKey := strings.Join([]string{expr, start.String(), end.String(), step.String()}, "\n")
-	if v, ok := p.cache.Load(cacheKey); ok {
+	if v, ok := p.cache.Get(cacheKey); ok {
 		log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache hit")
 		r := v.(RangeQueryResult)
+		p.lock.unlock((lockKey))
 		return &r, nil
 	}
 
-	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Range query started")
-
-	ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
+	rctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
 	r := v1.Range{
@@ -52,8 +50,9 @@ func (p *Prometheus) RangeQuery(expr string, start, end time.Time, step time.Dur
 		Step:  step,
 	}
 	qstart := time.Now()
-	result, _, err := p.api.QueryRange(ctx, expr, r)
+	result, _, err := p.api.QueryRange(rctx, expr, r)
 	duration := time.Since(qstart)
+	p.lock.unlock((lockKey))
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
@@ -63,8 +62,12 @@ func (p *Prometheus) RangeQuery(expr string, start, end time.Time, step time.Dur
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
 		if isRetryable(err) {
 			delta := end.Sub(start) / 2
+			if delta < step*2 {
+				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
+				return nil, errors.New("no more retries possible")
+			}
 			log.Warn().Str("delta", HumanizeDuration(delta)).Msg("Retrying request with smaller range")
-			return p.RangeQuery(expr, start.Add(delta), end, step)
+			return p.RangeQuery(ctx, expr, start.Add(delta), end, step)
 		}
 		return nil, err
 	}
@@ -80,13 +83,13 @@ func (p *Prometheus) RangeQuery(expr string, start, end time.Time, step time.Dur
 		samples := result.(model.Matrix)
 		qr.Samples = samples
 	default:
-		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result)
-		return nil, fmt.Errorf("unknown result type: %v", result)
+		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.Type())
+		return nil, fmt.Errorf("unknown result type: %v", result.Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
 
-	log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache miss")
-	p.cache.Store(cacheKey, qr)
+	log.Debug().Str("query", expr).Str("uri", p.uri).Msg("Range query cache miss")
+	p.cache.Add(cacheKey, qr)
 
 	return &qr, nil
 }

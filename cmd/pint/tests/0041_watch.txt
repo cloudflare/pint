@@ -1,0 +1,26 @@
+exec bash -x ./test.sh &
+
+pint.ok --no-color -l debug watch --interval=10s --listen=:6041 --pidfile=pint.pid rules
+! stdout .
+cmp stderr stderr.txt
+grep '^pint_check_iterations_total 2$' curl.txt
+
+-- test.sh --
+sleep 15
+curl -so curl.txt http://127.0.0.1:6041/metrics
+cat pint.pid | xargs kill
+
+-- stderr.txt --
+level=info msg="Pidfile created" path=pint.pid
+level=info msg="Started HTTP server" address=:6041
+level=info msg="Will continuously run checks until terminated" interval=10s
+level=debug msg="Clearing cache"
+level=debug msg="Running checks"
+level=error msg="Got an error when running checks" error="no matching files"
+level=debug msg="Clearing cache"
+level=debug msg="Running checks"
+level=error msg="Got an error when running checks" error="no matching files"
+level=info msg="Shutting down"
+level=info msg="Waiting for all background tasks to finish"
+level=info msg="Background worker finished"
+level=info msg="Pidfile removed" path=pint.pid

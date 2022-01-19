@@ -431,6 +431,32 @@ func TestTemplateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "annotation label missing from metrics (absent()) / multiple",
+			content: `
+- alert: Foo Is Missing
+  expr: absent(foo) or absent(bar)
+  annotations:
+    summary: '{{ .Labels.job }} / {{$labels.job}} is missing'
+`,
+			checker: checks.NewTemplateCheck(),
+			problems: []checks.Problem{
+				{
+					Fragment: `summary: {{ .Labels.job }} / {{$labels.job}} is missing`,
+					Lines:    []int{3, 5},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but absent() is not passing it`,
+					Severity: checks.Bug,
+				},
+				{
+					Fragment: `summary: {{ .Labels.job }} / {{$labels.job}} is missing`,
+					Lines:    []int{3, 5},
+					Reporter: "alerts/template",
+					Text:     `template is using "job" label but absent() is not passing it`,
+					Severity: checks.Bug,
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
