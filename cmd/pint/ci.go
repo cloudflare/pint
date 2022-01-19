@@ -23,14 +23,6 @@ var ciCmd = &cli.Command{
 	Name:   "ci",
 	Usage:  "Lint CI changes",
 	Action: actionCI,
-	Flags: []cli.Flag{
-		&cli.BoolFlag{
-			Name:    offlineFlag,
-			Aliases: []string{"o"},
-			Value:   false,
-			Usage:   "Disable all check that send live queries to Prometheus servers",
-		},
-	},
 }
 
 func actionCI(c *cli.Context) (err error) {

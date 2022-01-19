@@ -16,8 +16,6 @@ const (
 	disabledFlag = "disabled"
 	offlineFlag  = "offline"
 	noColorFlag  = "no-color"
-	intervalFlag = "interval"
-	listenFlag   = "listen"
 )
 
 var (
@@ -46,6 +44,18 @@ func newApp() *cli.App {
 				Aliases: []string{"n"},
 				Value:   false,
 				Usage:   "Disable output colouring",
+			},
+			&cli.StringSliceFlag{
+				Name:    disabledFlag,
+				Aliases: []string{"d"},
+				Value:   cli.NewStringSlice(),
+				Usage:   "List of checks to disable (example: promql/cost)",
+			},
+			&cli.BoolFlag{
+				Name:    offlineFlag,
+				Aliases: []string{"o"},
+				Value:   false,
+				Usage:   "Disable all check that send live queries to Prometheus servers",
 			},
 		},
 		Commands: []*cli.Command{

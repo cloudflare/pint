@@ -18,20 +18,6 @@ var lintCmd = &cli.Command{
 	Name:   "lint",
 	Usage:  "Lint specified files",
 	Action: actionLint,
-	Flags: []cli.Flag{
-		&cli.StringSliceFlag{
-			Name:    disabledFlag,
-			Aliases: []string{"d"},
-			Value:   cli.NewStringSlice(),
-			Usage:   "List of checks to disable (example: promql/cost)",
-		},
-		&cli.BoolFlag{
-			Name:    offlineFlag,
-			Aliases: []string{"o"},
-			Value:   false,
-			Usage:   "Disable all check that send live queries to Prometheus servers",
-		},
-	},
 }
 
 func actionLint(c *cli.Context) (err error) {

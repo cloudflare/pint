@@ -15,6 +15,8 @@
   Rename `# pint disable alerts/annotation($name)` to
   `# pint disable alerts/annotation($name:$required)` and
   `# pint disable rule/label($name)` to `# pint disable rule/label($name:$required)`.
+- `--offline` and `--disabled` flags are now global, use `pint --offline lint` instead
+  of `pint lint --offline`.
 
 ### Fixed
 
