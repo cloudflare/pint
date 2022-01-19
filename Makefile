@@ -57,9 +57,10 @@ coverhtml: test
 benchmark:
 	go test \
 		-v \
-		-count=20 \
+		-count=10 \
 		-run=none \
 		-bench=. \
 		-benchmem \
-		-memprofile memprofile.out \
+		-cpuprofile cpu.prof \
+		-memprofile mem.prof \
 		./cmd/pint
