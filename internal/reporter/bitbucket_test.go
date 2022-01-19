@@ -284,12 +284,11 @@ func TestBitBucketReporter(t *testing.T) {
 					return []byte("fake-commit-id"), nil
 				}
 				if args[0] == "blame" {
-					content :=
-						blameLine("fake-commit-00", 1, "foo.txt", "ignore") +
-							blameLine("fake-commit-00", 2, "foo.txt", "ignore") +
-							blameLine("fake-commit-id", 3, "foo.txt", "ok") +
-							blameLine("fake-commit-id", 4, "foo.txt", "syntax error") +
-							blameLine("fake-commit-01", 5, "foo.txt", "ignore")
+					content := blameLine("fake-commit-00", 1, "foo.txt", "ignore") +
+						blameLine("fake-commit-00", 2, "foo.txt", "ignore") +
+						blameLine("fake-commit-id", 3, "foo.txt", "ok") +
+						blameLine("fake-commit-id", 4, "foo.txt", "syntax error") +
+						blameLine("fake-commit-01", 5, "foo.txt", "ignore")
 					return []byte(content), nil
 				}
 				return nil, nil

@@ -1,11 +1,10 @@
 package reporter
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
-
-	"context"
 
 	"github.com/google/go-github/v37/github"
 	"github.com/rs/zerolog/log"

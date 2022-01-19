@@ -18,9 +18,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var (
-	yamlErrRe = regexp.MustCompile("^yaml: line (.+): (.+)$")
-)
+var yamlErrRe = regexp.MustCompile("^yaml: line (.+): (.+)$")
 
 func tryDecodingYamlError(e string) (int, string) {
 	parts := yamlErrRe.FindStringSubmatch(e)

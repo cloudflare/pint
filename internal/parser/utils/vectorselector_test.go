@@ -55,7 +55,7 @@ func TestHasVectorSelector(t *testing.T) {
 					t.Errorf("HasVectorSelector() returned nil, expected %s", tc.output)
 				}
 			} else {
-				var output = []string{}
+				output := []string{}
 				for _, v := range vs {
 					output = append(output, v.String())
 				}

@@ -77,11 +77,10 @@ func TestGlobFileFinder(t *testing.T) {
 				fullpath := filepath.Join(tmpDir, path)
 				if dir := filepath.Dir(fullpath); dir != tmpDir {
 					if _, err := os.Stat(dir); os.IsNotExist(err) {
-						if err := os.Mkdir(dir, 0755); err != nil {
+						if err := os.Mkdir(dir, 0o755); err != nil {
 							t.Errorf("os.Mkdir(%s) returned an error: %s", dir, err)
 							return
 						}
-
 					}
 				}
 				if _, err := os.Create(fullpath); err != nil {

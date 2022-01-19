@@ -11,7 +11,7 @@ import (
 )
 
 func TestVectorMatchingCheck(t *testing.T) {
-	//zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	// zerolog.SetGlobalLevel(zerolog.FatalLevel)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()

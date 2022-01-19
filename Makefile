@@ -22,12 +22,15 @@ $(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
 lint: $(GOBIN)/golangci-lint
 	$(GOBIN)/golangci-lint run -E staticcheck,misspell,promlinter,revive,tenv,errorlint,exportloopref,predeclared,bodyclose
 
+$(GOBIN)/gofumpt: tools/gofumpt/go.mod tools/gofumpt/go.sum
+	go install -modfile=tools/gofumpt/go.mod mvdan.cc/gofumpt
 $(GOBIN)/goimports: tools/goimports/go.mod tools/goimports/go.sum
 	go install -modfile=tools/goimports/go.mod golang.org/x/tools/cmd/goimports
 .PHONY: format
-format: $(GOBIN)/goimports
-	gofmt -l -s -w .
+format: $(GOBIN)/gofumpt $(GOBIN)/goimports
+	$(GOBIN)/gofumpt -l -w .
 	$(GOBIN)/goimports -local github.com/cloudflare/pint -w .
+
 
 .PHONY: test
 test:

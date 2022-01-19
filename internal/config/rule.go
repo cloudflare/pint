@@ -232,7 +232,6 @@ func (rule Rule) validate() (err error) {
 		if err = reject.validate(); err != nil {
 			return err
 		}
-
 	}
 
 	return nil

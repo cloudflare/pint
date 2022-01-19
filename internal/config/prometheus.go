@@ -18,7 +18,6 @@ func (pc PrometheusConfig) validate() error {
 		if _, err := regexp.Compile(path); err != nil {
 			return err
 		}
-
 	}
 
 	return nil
