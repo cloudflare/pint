@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"time"
 
@@ -50,84 +49,12 @@ func newApp() *cli.App {
 			},
 		},
 		Commands: []*cli.Command{
-			{
-				Name:   "version",
-				Usage:  "Print version and exit",
-				Action: actionVersion,
-			},
-			{
-				Name:   "lint",
-				Usage:  "Lint specified files",
-				Action: actionLint,
-				Flags: []cli.Flag{
-					&cli.StringSliceFlag{
-						Name:    disabledFlag,
-						Aliases: []string{"d"},
-						Value:   cli.NewStringSlice(),
-						Usage:   "List of checks to disable (example: promql/cost)",
-					},
-					&cli.BoolFlag{
-						Name:    offlineFlag,
-						Aliases: []string{"o"},
-						Value:   false,
-						Usage:   "Disable all check that send live queries to Prometheus servers",
-					},
-				},
-			},
-			{
-				Name:   "ci",
-				Usage:  "Lint CI changes",
-				Action: actionCI,
-				Flags: []cli.Flag{
-					&cli.BoolFlag{
-						Name:    offlineFlag,
-						Aliases: []string{"o"},
-						Value:   false,
-						Usage:   "Disable all check that send live queries to Prometheus servers",
-					},
-				},
-			},
-			{
-				Name:   "watch",
-				Usage:  "Continuously lint specified files",
-				Action: actionWatch,
-				Flags: []cli.Flag{
-					&cli.StringSliceFlag{
-						Name:    disabledFlag,
-						Aliases: []string{"d"},
-						Value:   cli.NewStringSlice(),
-						Usage:   "List of checks to disable (example: promql/cost)",
-					},
-					&cli.BoolFlag{
-						Name:    offlineFlag,
-						Aliases: []string{"o"},
-						Value:   false,
-						Usage:   "Disable all check that send live queries to Prometheus servers",
-					},
-					&cli.DurationFlag{
-						Name:    intervalFlag,
-						Aliases: []string{"i"},
-						Value:   time.Minute * 10,
-						Usage:   "How often to run all checks",
-					},
-					&cli.StringFlag{
-						Name:    listenFlag,
-						Aliases: []string{"s"},
-						Value:   ":8080",
-						Usage:   "Listen address for HTTP web server exposing metrics",
-					},
-				},
-			},
-			{
-				Name:   "config",
-				Usage:  "Parse and print used config",
-				Action: actionConfig,
-			},
-			{
-				Name:   "parse",
-				Usage:  "Parse a query and print AST, use for debugging or understanding query details",
-				Action: actionParse,
-			},
+			versionCmd,
+			lintCmd,
+			ciCmd,
+			watchCmd,
+			configCmd,
+			parseCmd,
 		},
 	}
 }
@@ -145,13 +72,4 @@ func main() {
 		log.Fatal().Err(err).Msg("Execution completed with error(s)")
 		os.Exit(1)
 	}
-}
-
-func actionVersion(c *cli.Context) (err error) {
-	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
-	if err != nil {
-		return fmt.Errorf("failed to set log level: %w", err)
-	}
-	fmt.Printf("%s (revision: %s)\n", version, commit)
-	return nil
 }

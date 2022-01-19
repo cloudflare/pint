@@ -10,6 +10,12 @@ import (
 
 const levelStep = 2
 
+var parseCmd = &cli.Command{
+	Name:   "parse",
+	Usage:  "Parse a query and print AST, use for debugging or understanding query details",
+	Action: actionParse,
+}
+
 func printNode(ident int, format string, a ...interface{}) {
 	prefix := strings.Repeat(" ", ident)
 	fmt.Printf(prefix+format+"\n", a...)

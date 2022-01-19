@@ -24,6 +24,38 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var watchCmd = &cli.Command{
+	Name:   "watch",
+	Usage:  "Continuously lint specified files",
+	Action: actionWatch,
+	Flags: []cli.Flag{
+		&cli.StringSliceFlag{
+			Name:    disabledFlag,
+			Aliases: []string{"d"},
+			Value:   cli.NewStringSlice(),
+			Usage:   "List of checks to disable (example: promql/cost)",
+		},
+		&cli.BoolFlag{
+			Name:    offlineFlag,
+			Aliases: []string{"o"},
+			Value:   false,
+			Usage:   "Disable all check that send live queries to Prometheus servers",
+		},
+		&cli.DurationFlag{
+			Name:    intervalFlag,
+			Aliases: []string{"i"},
+			Value:   time.Minute * 10,
+			Usage:   "How often to run all checks",
+		},
+		&cli.StringFlag{
+			Name:    listenFlag,
+			Aliases: []string{"s"},
+			Value:   ":8080",
+			Usage:   "Listen address for HTTP web server exposing metrics",
+		},
+	},
+}
+
 func actionWatch(c *cli.Context) (err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {
