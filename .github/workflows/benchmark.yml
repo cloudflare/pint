@@ -1,0 +1,30 @@
+name: Benchmark Go code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-go:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6
+
+      - name: Test
+        run: make benchmark
+
+      - name: CPU
+        run: go tool pprof -top cpu.prof
+
+      - name: Memory
+        run: go tool pprof -top mem.prof

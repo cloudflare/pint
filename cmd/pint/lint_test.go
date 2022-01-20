@@ -41,8 +41,6 @@ rule {
     label_keys   = true
     label_values = true
   }
-
-  vector_matching {}
 }
 
 rule {
@@ -81,10 +79,6 @@ rule {
     step    = "1m"
     resolve = "5m"
   }
-
-  series {}
-
-  template {}
 }
 
 rule {
@@ -101,8 +95,6 @@ rule {
     value    = "https://alert-references.(?:s3.)?cfdata.org/(.+)"
     required = true
   }
-
-  comparison {}
 }
 
 rule {
@@ -151,7 +143,7 @@ func BenchmarkLint(b *testing.B) {
 	}
 
 	app := newApp()
-	args := []string{"pint", "-c", configPath, "-l", "error", "lint", "--offline", rulesDir + "/*.yaml"}
+	args := []string{"pint", "-c", configPath, "-l", "error", "--offline", "lint", rulesDir + "/*.yaml"}
 	for n := 0; n < b.N; n++ {
 		if err = app.Run(args); err != nil {
 			b.Error(err)
