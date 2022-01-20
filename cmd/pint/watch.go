@@ -113,7 +113,7 @@ func actionWatch(c *cli.Context) (err error) {
 	}()
 	log.Info().Str("address", listen).Msg("Started HTTP server")
 
-	mainCtx, cancel := context.WithCancel(context.Background())
+	mainCtx, cancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
 
 	// start timer to run every $interval
 	interval := c.Duration(intervalFlag)

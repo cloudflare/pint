@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -73,7 +74,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.Rule) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	allChecks := []checkMeta{
@@ -124,7 +125,7 @@ func (cfg *Config) GetChecksForRule(path string, r parser.Rule) []checks.RuleChe
 	}
 
 	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms)...)
+		allChecks = append(allChecks, rule.resolveChecks(ctx, path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms)...)
 	}
 
 	for _, cm := range allChecks {

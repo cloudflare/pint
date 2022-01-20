@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
@@ -372,12 +373,29 @@ func TestMatch(t *testing.T) {
 			},
 			isMatch: false,
 		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{},
+			match: config.Match{
+				Command: &config.LintCommand,
+			},
+			isMatch: true,
+		},
+		{
+			path: "foo.yaml",
+			rule: parser.Rule{},
+			match: config.Match{
+				Command: &config.WatchCommand,
+			},
+			isMatch: false,
+		},
 	}
 
+	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			assert := assert.New(t)
-			isMatch := tc.match.IsMatch(tc.path, tc.rule)
+			isMatch := tc.match.IsMatch(ctx, tc.path, tc.rule)
 			assert.Equal(tc.isMatch, isMatch)
 		})
 	}

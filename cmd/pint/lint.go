@@ -50,7 +50,8 @@ func actionLint(c *cli.Context) (err error) {
 		return fmt.Errorf("no matching files")
 	}
 
-	summary := scanFiles(context.Background(), cfg, toScan, &discovery.NoopLineFinder{})
+	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
+	summary := scanFiles(ctx, cfg, toScan, &discovery.NoopLineFinder{})
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)

@@ -1,6 +1,7 @@
 package config_test
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -856,6 +857,7 @@ checks {
 	}
 
 	dir := t.TempDir()
+	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
 	for i, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			assert := assert.New(t)
@@ -869,7 +871,7 @@ checks {
 			cfg, err := config.Load(path, false)
 			assert.NoError(err)
 
-			checks := cfg.GetChecksForRule(tc.path, tc.rule)
+			checks := cfg.GetChecksForRule(ctx, tc.path, tc.rule)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())

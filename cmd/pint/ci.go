@@ -70,7 +70,8 @@ func actionCI(c *cli.Context) (err error) {
 	log.Debug().Strs("commits", toScan.Commits()).Msg("Found commits to scan")
 
 	gitBlame := discovery.NewGitBlameLineFinder(git.RunGit, toScan.Commits())
-	summary := scanFiles(context.Background(), cfg, toScan, gitBlame)
+	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
+	summary := scanFiles(ctx, cfg, toScan, gitBlame)
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),

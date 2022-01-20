@@ -1,6 +1,7 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"regexp"
 	"time"
@@ -12,9 +13,21 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
-var (
+const (
 	alertingRuleType  = "alerting"
 	recordingRuleType = "recording"
+)
+
+type (
+	ContextCommandKey string
+	ContextCommandVal string
+)
+
+var (
+	CommandKey   ContextCommandKey = "command"
+	CICommand    ContextCommandVal = "ci"
+	LintCommand  ContextCommandVal = "lint"
+	WatchCommand ContextCommandVal = "watch"
 )
 
 type MatchLabel struct {
@@ -89,11 +102,12 @@ func (ma MatchAnnotation) isMatching(rule parser.Rule) bool {
 }
 
 type Match struct {
-	Path       string           `hcl:"path,optional" json:"path,omitempty"`
-	Name       string           `hcl:"name,optional" json:"name,omitempty"`
-	Kind       string           `hcl:"kind,optional" json:"kind,omitempty"`
-	Label      *MatchLabel      `hcl:"label,block" json:"label,omitempty"`
-	Annotation *MatchAnnotation `hcl:"annotation,block" json:"annotation,omitempty"`
+	Path       string             `hcl:"path,optional" json:"path,omitempty"`
+	Name       string             `hcl:"name,optional" json:"name,omitempty"`
+	Kind       string             `hcl:"kind,optional" json:"kind,omitempty"`
+	Label      *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
+	Annotation *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
+	Command    *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {
@@ -126,14 +140,14 @@ func (m Match) validate(allowEmpty bool) error {
 		}
 	}
 
-	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil {
+	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil && m.Command == nil {
 		return fmt.Errorf("ignore block must have at least one condition")
 	}
 
 	return nil
 }
 
-func (m Match) IsMatch(path string, r parser.Rule) bool {
+func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 	if m.Kind != "" {
 		if r.AlertingRule != nil && m.Kind != alertingRuleType {
 			return false
@@ -168,6 +182,13 @@ func (m Match) IsMatch(path string, r parser.Rule) bool {
 
 	if m.Annotation != nil {
 		if !m.Annotation.isMatching(r) {
+			return false
+		}
+	}
+
+	if m.Command != nil {
+		cmd := ctx.Value(CommandKey).(ContextCommandVal)
+		if cmd != *m.Command {
 			return false
 		}
 	}
@@ -237,14 +258,14 @@ func (rule Rule) validate() (err error) {
 	return nil
 }
 
-func (rule Rule) resolveChecks(path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checkMeta {
+func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checkMeta {
 	enabled := []checkMeta{}
 
-	if rule.Ignore != nil && rule.Ignore.IsMatch(path, r) {
+	if rule.Ignore != nil && rule.Ignore.IsMatch(ctx, path, r) {
 		return enabled
 	}
 
-	if rule.Match != nil && !rule.Match.IsMatch(path, r) {
+	if rule.Match != nil && !rule.Match.IsMatch(ctx, path, r) {
 		return enabled
 	}
 

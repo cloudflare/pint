@@ -131,6 +131,7 @@ rule {
     path = "(.+)"
     name = "(.+)"
     kind = "alerting|recording"
+    command = "ci|lint|watch"
     annotation "(.*)" {
       value = "(.*)"
     }
@@ -142,6 +143,7 @@ rule {
     path = "(.+)"
     name = "(.+)"
     kind = "alerting|recording"
+    command = "ci|lint|watch"
     annotation "(.*)" {
       value = "(.*)"
     }
@@ -160,6 +162,8 @@ rule {
 - `match:name` - only rules with names (`record` for recording rules and `alert` for alerting
   rules) matching this pattern will be checked rule
 - `match:kind` - optional rule type filter, only rule of this type will be checked
+- `match:command` - optional command type filter, this allows to include or ignore rules
+  based on the command pint is run with `pint ci`, `pint lint` or `pint watch`.
 - `match:annotation` - optional annotation filter, only alert rules with at least one
   annotation matching this pattern will be checked by this rule.
 - `match:label` - optional annotation filter, only rules with at least one label

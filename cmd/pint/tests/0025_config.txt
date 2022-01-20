@@ -59,7 +59,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
         "label": {
           "key": "notify",
           "value": "blackhole"
-        }
+        },
+        "command": "watch"
       },
       "annotation": [
         {
@@ -125,6 +126,7 @@ rule {
   }
   ignore {
     kind = "alerting"
+    command = "watch"
     label "notify" {
       value = "blackhole"
     }
