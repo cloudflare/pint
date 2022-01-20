@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.7.1
+
+### Added
+
+- Added `command` filter to `match` / `ignore` blocks. This allows to include
+  skip some checks when (for example) running `pint watch` but include them
+  in `pint lint` run.
+
 ## v0.7.0
 
 ### Added

@@ -108,7 +108,7 @@ func scanFiles(ctx context.Context, cfg config.Config, fcs discovery.FileFindRes
 			}
 
 			if rule.Error.Err == nil {
-				checkList := cfg.GetChecksForRule(path, rule)
+				checkList := cfg.GetChecksForRule(ctx, path, rule)
 				for _, check := range checkList {
 					check := check
 					scanJobs = append(scanJobs, scanJob{path: path, rule: rule, check: check, lines: lineResults})
