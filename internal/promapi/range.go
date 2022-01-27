@@ -59,8 +59,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		Msg("Range query completed")
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
-		if isRetryable(err) {
-			delta := end.Sub(start) / 2
+		if delta, retryOK := canRetry(err, end.Sub(start)); retryOK {
 			if delta < step*2 {
 				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
 				return nil, errors.New("no more retries possible")
@@ -93,13 +92,13 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	return &qr, nil
 }
 
-func isRetryable(err error) bool {
+func canRetry(err error, delta time.Duration) (time.Duration, bool) {
 	var neterr net.Error
 	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
-		return true
+		return delta / 2, true
 	}
 	if strings.Contains(err.Error(), "query processing would load too many samples into memory in ") {
-		return true
+		return (delta / 4) * 3, true
 	}
-	return false
+	return delta, false
 }
