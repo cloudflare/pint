@@ -1,7 +1,8 @@
 FROM golang:1.17.6-alpine
 COPY . /src
 WORKDIR /src
-RUN go build ./cmd/pint
+RUN apk add make git
+RUN make
 
 FROM debian:stable
 RUN apt-get update --yes && \

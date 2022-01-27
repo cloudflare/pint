@@ -1,6 +1,8 @@
 PINT_BIN     := pint
 PINT_GO_DIRS := cmd internal
 PINT_SRC     := $(shell find $(PINT_GO_DIRS) -type f -name '*.go')
+PINT_VERSION ?= $(shell git describe --tags --always --dirty='-dev')
+PINT_COMMIT  ?= $(shell git rev-parse HEAD)
 
 GOBIN := $(shell go env GOBIN)
 ifeq ($(GOBIN),)
@@ -14,7 +16,7 @@ COVER_PROFILE = $(COVER_DIR)/coverage.out
 build: $(PINT_BIN)
 
 $(PINT_BIN): $(PINT_SRC) go.mod go.sum
-	go build -trimpath -ldflags='-s -w' ./cmd/pint
+	CGO_ENABLED=0 go build -trimpath -ldflags='-X main.version=$(PINT_VERSION) -X main.commit=$(PINT_COMMIT) -s -w' ./cmd/pint
 
 $(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
 	go install -modfile=tools/golangci-lint/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint
