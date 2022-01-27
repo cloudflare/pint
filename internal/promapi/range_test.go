@@ -61,7 +61,7 @@ func TestRange(t *testing.T) {
 			diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 			t.Log(diff.String())
 			switch diff.String() {
-			case "168h0m0s", "84h0m0s", "42h0m0s", "21h0m0s", "10h30m0s", "5h15m0s", "2h37m30s", "1h18m45s", "39m23s", "19m42s":
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h37m30s", "39m23s", "9m51s":
 				w.WriteHeader(422)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{
@@ -81,7 +81,7 @@ func TestRange(t *testing.T) {
 			diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 			t.Log(diff.String())
 			switch diff.String() {
-			case "168h0m0s", "84h0m0s", "42h0m0s", "21h0m0s", "10h30m0s", "5h15m0s", "2h37m30s", "1h18m45s", "19m42s":
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h37m30s":
 				w.WriteHeader(422)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{

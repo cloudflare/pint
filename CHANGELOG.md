@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.7.2
+
+### Changed
+
+- More aggressive range reduction for `query processing would load too many samples into memory`
+  errors when sending range queries to Prometheus servers.
+
 ## v0.7.1
 
 ### Added
