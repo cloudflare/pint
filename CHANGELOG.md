@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.0
+
+### Added
+
+- Added new `promql/fragile` check.
+
 ## v0.7.3
 
 ### Added
