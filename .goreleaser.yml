@@ -58,6 +58,7 @@ dockers:
       - internal
       - go.mod
       - go.sum
+      - Makefile
   - image_templates:
       ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64"]
     goarch: arm64
@@ -78,6 +79,7 @@ dockers:
       - internal
       - go.mod
       - go.sum
+      - Makefile
 docker_manifests:
   - name_template: ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}
     image_templates:

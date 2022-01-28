@@ -26,6 +26,11 @@ func actionLint(c *cli.Context) (err error) {
 		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
+	workers := c.Int(workersFlag)
+	if workers < 1 {
+		return fmt.Errorf("--%s flag must be > 0", workersFlag)
+	}
+
 	paths := c.Args().Slice()
 	if len(paths) == 0 {
 		return fmt.Errorf("at least one file or directory required")
@@ -51,7 +56,7 @@ func actionLint(c *cli.Context) (err error) {
 	}
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
-	summary := scanFiles(ctx, cfg, toScan, &discovery.NoopLineFinder{})
+	summary := scanFiles(ctx, workers, cfg, toScan, &discovery.NoopLineFinder{})
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)

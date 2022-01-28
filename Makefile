@@ -47,6 +47,10 @@ test:
 		-timeout=5m \
 		./...
 
+.PHONY: debug-testscript
+debug-testscript:
+	for I in ./cmd/pint/tests/*.txt ; do T=`basename "$${I}" | cut -d. -f1`; echo ">>> $${T}" ; go test -count=1 -timeout=30s -v -run=TestScript/$${T} ./cmd/pint ; done
+
 .PHONY: cover
 cover: test
 	go tool cover -func=$(COVER_PROFILE)

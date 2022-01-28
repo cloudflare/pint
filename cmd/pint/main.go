@@ -16,6 +16,7 @@ const (
 	disabledFlag = "disabled"
 	offlineFlag  = "offline"
 	noColorFlag  = "no-color"
+	workersFlag  = "workers"
 )
 
 var (
@@ -32,6 +33,12 @@ func newApp() *cli.App {
 				Aliases: []string{"c"},
 				Value:   ".pint.hcl",
 				Usage:   "Configuration file to use",
+			},
+			&cli.IntFlag{
+				Name:    workersFlag,
+				Aliases: []string{"w"},
+				Value:   10,
+				Usage:   "Number of worker threads for running checks",
 			},
 			&cli.StringFlag{
 				Name:    logLevelFlag,
