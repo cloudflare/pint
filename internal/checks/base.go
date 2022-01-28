@@ -15,6 +15,7 @@ var (
 		TemplateCheckName,
 		AggregationCheckName,
 		ComparisonCheckName,
+		FragileCheckName,
 		RateCheckName,
 		SyntaxCheckName,
 		VectorMatchingCheckName,

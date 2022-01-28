@@ -94,6 +94,10 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 			name:  checks.TemplateCheckName,
 			check: checks.NewTemplateCheck(),
 		},
+		{
+			name:  checks.FragileCheckName,
+			check: checks.NewFragileCheck(),
+		},
 	}
 
 	proms := []*promapi.Prometheus{}

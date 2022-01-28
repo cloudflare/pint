@@ -154,6 +154,7 @@ func TestGetChecksForRule(t *testing.T) {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -171,6 +172,7 @@ prometheus "prom" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
@@ -192,6 +194,7 @@ prometheus "prom" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -210,6 +213,7 @@ prometheus "prom" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
@@ -236,6 +240,7 @@ prometheus "ignore" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
@@ -251,6 +256,7 @@ prometheus "ignore" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -273,6 +279,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.AggregationCheckName + "(job:true)",
 				checks.AggregationCheckName + "(instance:false)",
 				checks.AggregationCheckName + "(rack:false)",
@@ -302,6 +309,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.AggregationCheckName + "(job:true)",
 				checks.AggregationCheckName + "(rack:false)",
 			},
@@ -324,6 +332,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -359,6 +368,7 @@ prometheus "prom2" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.RateCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
@@ -405,6 +415,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.LabelCheckName + "(team:true)",
 				checks.AnnotationCheckName + "(summary:true)",
 				checks.LabelCheckName + "(team:false)",
@@ -452,6 +463,7 @@ rule {
 # pint disable promql/vector_matching(prom1)
 # pint disable promql/vector_matching(prom2)
 - record: foo
+  # pint disable promql/fragile
   expr: sum(foo)
 `),
 			checks: []string{
@@ -492,6 +504,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.RejectCheckName + "(key=~'^http://.+$')",
 				checks.RejectCheckName + "(val=~'^http://.+$')",
 				checks.RejectCheckName + "(key=~'^.* +.*$')",
@@ -522,6 +535,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -548,6 +562,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -574,6 +589,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -600,6 +616,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.LabelCheckName + "(priority:true)",
 			},
 		},
@@ -627,6 +644,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -653,6 +671,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 			},
 		},
 		{
@@ -679,6 +698,7 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.LabelCheckName + "(priority:true)",
 			},
 		},
@@ -715,6 +735,7 @@ prometheus "prom1" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.AlertsCheckName + "(prom1)",
 			},
 		},
@@ -747,6 +768,7 @@ prometheus "prom1" {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.FragileCheckName,
 				checks.RateCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom1)",
 				checks.VectorMatchingCheckName + "(prom1)",

@@ -51,6 +51,10 @@ test:
 debug-testscript:
 	for I in ./cmd/pint/tests/*.txt ; do T=`basename "$${I}" | cut -d. -f1`; echo ">>> $${T}" ; go test -count=1 -timeout=30s -v -run=TestScript/$${T} ./cmd/pint ; done
 
+.PHONY: update-snapshots
+update-snapshots:
+	UPDATE_SNAPS=true UPDATE_SNAPSHOTS=1 go test -count=1  ./...
+
 .PHONY: cover
 cover: test
 	go tool cover -func=$(COVER_PROFILE)
