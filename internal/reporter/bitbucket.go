@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -25,6 +26,7 @@ type BitBucketAnnotation struct {
 	Message  string `json:"message"`
 	Severity string `json:"severity"`
 	Type     string `json:"type"`
+	Link     string `json:"link"`
 }
 
 type BitBucketAnnotations struct {
@@ -147,6 +149,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, summary Summary, pb git
 		Message:  fmt.Sprintf("%s: %s", report.Problem.Reporter, report.Problem.Text),
 		Severity: severity,
 		Type:     atype,
+		Link:     fmt.Sprintf("https://cloudflare.github.io/pint/docs/CONFIGURATION.html#%s", strings.ReplaceAll(report.Problem.Reporter, "/", "")),
 	}
 	annotations = append(annotations, a)
 

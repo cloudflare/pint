@@ -5,6 +5,7 @@
 ### Added
 
 - Added new `promql/fragile` check.
+- BitBucket reports will now include a link to documentation.
 
 ## v0.7.3
 

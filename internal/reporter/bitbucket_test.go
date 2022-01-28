@@ -253,6 +253,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Message:  "mock: bad name",
 						Severity: "HIGH",
 						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/docs/CONFIGURATION.html#mock",
 					},
 					{
 						Path:     "foo.txt",
@@ -260,6 +261,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Message:  "mock: mock text",
 						Severity: "MEDIUM",
 						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/docs/CONFIGURATION.html#mock",
 					},
 					{
 						Path:     "foo.txt",
@@ -267,6 +269,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Message:  "mock: mock text 2",
 						Severity: "LOW",
 						Type:     "CODE_SMELL",
+						Link:     "https://cloudflare.github.io/pint/docs/CONFIGURATION.html#mock",
 					},
 				},
 			},
@@ -301,7 +304,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Problem: checks.Problem{
 							Fragment: "syntax error",
 							Lines:    []int{1},
-							Reporter: "mock",
+							Reporter: "test/mock",
 							Text:     "syntax error",
 							Severity: checks.Fatal,
 						},
@@ -318,9 +321,10 @@ func TestBitBucketReporter(t *testing.T) {
 					{
 						Path:     "foo.txt",
 						Line:     3,
-						Message:  "mock: syntax error",
+						Message:  "test/mock: syntax error",
 						Severity: "HIGH",
 						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/docs/CONFIGURATION.html#testmock",
 					},
 				},
 			},
@@ -439,6 +443,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Message:  "mock: mock text 2",
 						Severity: "LOW",
 						Type:     "CODE_SMELL",
+						Link:     "https://cloudflare.github.io/pint/docs/CONFIGURATION.html#mock",
 					},
 				},
 			},
