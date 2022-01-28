@@ -189,7 +189,12 @@ rule {
 
 # Check definitions
 
-## Aggregation
+## promql/syntax
+
+This check will report any syntax errors in a PromQL query on any rule.
+It's enabled by default.
+
+## promql/aggregate
 
 This check is used to inspect promql expressions and ensure that specific labels
 are kept or stripped away when aggregating results. It's mostly useful in recording
@@ -249,7 +254,7 @@ aggregate ".+" {
 }
 ```
 
-## Annotations
+## alerts/annotation
 
 This check is used to ensure that all required annotations are set on alerts and that
 they have correct values.
@@ -293,7 +298,12 @@ rule {
 }
 ```
 
-## Labels
+## alerts/for
+
+This check will warn if an alert rule uses invalid `for` value
+or if it passes default value that can be removed to simplify rule.
+
+## rule/label
 
 This check works the same way as `annotation` check, but it operates on
 labels instead.
@@ -327,7 +337,7 @@ rule {
 }
 ```
 
-## Rate
+## promql/rate
 
 This check inspects `rate()` and `irate()` functions and warns if used duration
 is too low. It does so by first getting global `scrape_interval` value for selected
@@ -366,7 +376,7 @@ prometheus "dev" {
 }
 ```
 
-## Alerts
+## alerts/count
 
 This check is used to estimate how many times given alert would fire.
 It will run `expr` query from every alert rule against selected Prometheus
@@ -412,7 +422,7 @@ rule {
 }
 ```
 
-## Comparison
+## promql/comparison
 
 This check enforces use of a comparison operator in alert queries.
 Since any query result triggers an alert usual query would be something
@@ -422,7 +432,7 @@ and so it would always trigger an alert.
 
 This check is enabled by default and doesn't require any configuration.
 
-## Cost
+## query/cost
 
 This check is used to calculate cost of a query and optionally report an issue
 if that cost is too high. It will run `expr` query from every rule against
@@ -485,7 +495,7 @@ like memory pressure, Go version, GOGC settings etc.
 }
 ```
 
-## Series
+## query/series
 
 This check will also query Prometheus servers, it is used to warn about queries
 that are using metrics not currently present in Prometheus.
@@ -512,7 +522,7 @@ prometheus "prod" {
 }
 ```
 
-## Reject
+## rule/reject
 
 This check allows rejecting label or annotations keys and values
 using regexp rules.
@@ -565,7 +575,7 @@ rule {
 }
 ```
 
-## Template
+## alerts/template
 
 This check validates templating used in annotations and labels for alerting rules.
 See [Prometheus docs](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/)
@@ -589,7 +599,7 @@ for more details.
 
 This check is enabled by default and doesn't require any configuration.
 
-## Vector Matching
+## promql/vector_matching
 
 This check will try to find queries that try to
 [match vectors](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching)
@@ -640,7 +650,7 @@ prometheus "prod" {
 }
 ```
 
-## Fragile
+## promql/fragile
 
 This check will try to find rules with queries that can be rewritten in a way
 which makes them more resilient to label changes.

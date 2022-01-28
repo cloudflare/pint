@@ -4,7 +4,7 @@ pint is a Prometheus rule linter.
 
 ## Usage
 
-There are two modes it works in:
+There are three modes it works in:
 
 - CI PR linting
 - Ad-hoc linting of a selected files or directories
@@ -12,6 +12,8 @@ There are two modes it works in:
   all discovered problems.
 
 ### Pull Requests
+
+Run it with `pint ci`.
 
 It currently supports git for which it will find all commits on the current branch that are not
 present in parent branch and scan all modified files included in those changes.
@@ -74,12 +76,16 @@ scrape_configs:
       - targets: ['localhost:8080']
 ```
 
+## Release Notes
+
+See [CHANGELOG.md](/CHANGELOG.md) for history of changes.
+
 ## Quick start
 
 Requirements:
 
 - [Git](https://git-scm.com/)
-- [Go](https://golang.org/) >=1.17
+- [Go](https://golang.org/) - current stable release
 
 1. Build the binary:
 
