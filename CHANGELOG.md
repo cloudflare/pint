@@ -176,12 +176,14 @@
   `absent()`.
   Example:
 
-  ```
+  {% raw %}
+  ```YAML
   - alert: Foo
     expr: absent(foo{env="prod"})
     annotations:
       summary: 'foo metric is missing for job {{ $labels.job }}'
   ```
+  {% endraw %}
 
   Would generate a warning since `absent()` can only return labels that are explicitly
   passed to it and the above call only passes `env` label.
@@ -196,7 +198,7 @@
   modifier after condition, which can cause alert to always fire.
   Example:
 
-  ```
+  ```YAML
   - alert: Foo
     expr: rate(error_count[5m]) > bool 5
   ```
@@ -239,12 +241,14 @@
   stripped by aggregation.
   Example:
 
-  ```
+  {% raw %}
+  ```YAML
   - alert: Foo
     expr: count(up) without(instance) == 0
     annotations:
       summary: 'foo is down on {{ $labels.instance }}'
   ```
+  {% endraw %}
 
   Would generate a warning since `instance` label is being stripped by `without(instance)`.
 
