@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.7.3
+
+### Added
+
+- `--workers` flag to control the number of worker threads for running checks.
+
 ## v0.7.2
 
 ### Changed

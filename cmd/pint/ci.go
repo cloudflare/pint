@@ -31,6 +31,11 @@ func actionCI(c *cli.Context) (err error) {
 		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
+	workers := c.Int(workersFlag)
+	if workers < 1 {
+		return fmt.Errorf("--%s flag must be > 0", workersFlag)
+	}
+
 	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
 	if err != nil {
 		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
@@ -71,7 +76,7 @@ func actionCI(c *cli.Context) (err error) {
 
 	gitBlame := discovery.NewGitBlameLineFinder(git.RunGit, toScan.Commits())
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
-	summary := scanFiles(ctx, cfg, toScan, gitBlame)
+	summary := scanFiles(ctx, workers, cfg, toScan, gitBlame)
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),

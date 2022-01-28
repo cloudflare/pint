@@ -63,6 +63,11 @@ func actionWatch(c *cli.Context) (err error) {
 		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
+	workers := c.Int(workersFlag)
+	if workers < 1 {
+		return fmt.Errorf("--%s flag must be > 0", workersFlag)
+	}
+
 	paths := c.Args().Slice()
 	if len(paths) == 0 {
 		return fmt.Errorf("at least one file or directory required")
@@ -118,7 +123,7 @@ func actionWatch(c *cli.Context) (err error) {
 	// start timer to run every $interval
 	interval := c.Duration(intervalFlag)
 	ack := make(chan bool, 1)
-	stop := startTimer(mainCtx, cfg, interval, ack, collector)
+	stop := startTimer(mainCtx, cfg, workers, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -140,7 +145,7 @@ func actionWatch(c *cli.Context) (err error) {
 	return nil
 }
 
-func startTimer(ctx context.Context, cfg config.Config, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
+func startTimer(ctx context.Context, cfg config.Config, workers int, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
 	ticker := time.NewTicker(time.Second)
 	stop := make(chan bool, 1)
 	wasBootstrapped := false
@@ -156,7 +161,7 @@ func startTimer(ctx context.Context, cfg config.Config, interval time.Duration, 
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
-				if err := collector.scan(ctx); err != nil {
+				if err := collector.scan(ctx, workers); err != nil {
 					log.Error().Err(err).Msg("Got an error when running checks")
 				}
 				checkIterationsTotal.Inc()
@@ -194,7 +199,7 @@ func newProblemCollector(cfg config.Config, paths []string) *problemCollector {
 	}
 }
 
-func (c *problemCollector) scan(ctx context.Context) error {
+func (c *problemCollector) scan(ctx context.Context, workers int) error {
 	d := discovery.NewGlobFileFinder()
 	toScan, err := d.Find(c.paths...)
 	if err != nil {
@@ -205,7 +210,7 @@ func (c *problemCollector) scan(ctx context.Context) error {
 		return fmt.Errorf("no matching files")
 	}
 
-	s := scanFiles(ctx, c.cfg, toScan, &discovery.NoopLineFinder{})
+	s := scanFiles(ctx, workers, c.cfg, toScan, &discovery.NoopLineFinder{})
 
 	c.lock.Lock()
 	c.summary = &s

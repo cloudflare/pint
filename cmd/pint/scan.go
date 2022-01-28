@@ -45,7 +45,7 @@ func scanProblem(path string, err error) reporter.Report {
 	}
 }
 
-func scanFiles(ctx context.Context, cfg config.Config, fcs discovery.FileFindResults, ld discovery.LineFinder) (summary reporter.Summary) {
+func scanFiles(ctx context.Context, workers int, cfg config.Config, fcs discovery.FileFindResults, ld discovery.LineFinder) (summary reporter.Summary) {
 	summary.FileChanges = fcs
 
 	scanJobs := []scanJob{}
@@ -119,12 +119,11 @@ func scanFiles(ctx context.Context, cfg config.Config, fcs discovery.FileFindRes
 		}
 	}
 
-	jobs := make(chan scanJob, 100)
-	results := make(chan reporter.Report, 100)
+	jobs := make(chan scanJob, workers*5)
+	results := make(chan reporter.Report, workers*5)
 	wg := sync.WaitGroup{}
 
-	// run 10 workers
-	for w := 1; w <= 10; w++ {
+	for w := 1; w <= workers; w++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
