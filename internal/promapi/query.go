@@ -17,7 +17,7 @@ type QueryResult struct {
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
 	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
 
-	lockKey := "/api/v1/query"
+	lockKey := expr
 	p.lock.lock(lockKey)
 	defer p.lock.unlock((lockKey))
 
