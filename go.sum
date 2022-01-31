@@ -473,8 +473,8 @@ github.com/gin-gonic/gin v1.4.0/go.mod h1:OW2EZn3DO8Ln9oIKOvM++LBO+5UPHJJDH72/q/
 github.com/gin-gonic/gin v1.5.0/go.mod h1:Nd6IXA8m5kNZdNEHMBd93KT+mdY3+bewLgRvmCsR2Do=
 github.com/gkampitakis/ciinfo v0.1.0 h1:hPvgzhg7q6xlTNl4hWgEy13esbW847lWTREf0GoezRQ=
 github.com/gkampitakis/ciinfo v0.1.0/go.mod h1:PoTj49S/eZLL7PvEdBeu9D1qpd3JsEHOCyf5Y5hVYOs=
-github.com/gkampitakis/go-snaps v0.2.2 h1:rDC0Dg6yxDhETsyogVUJIvgI4o7yvkSBqakfOATEAGc=
-github.com/gkampitakis/go-snaps v0.2.2/go.mod h1:0HSAq6psKeEEgZJpcBcYjEwYVqCh4ZDHbSV2+SH0V84=
+github.com/gkampitakis/go-snaps v0.2.3 h1:4pQiQ9GbxlWps/LSR/I72CDWXVQs2lpxEHqhZi9pw4s=
+github.com/gkampitakis/go-snaps v0.2.3/go.mod h1:0HSAq6psKeEEgZJpcBcYjEwYVqCh4ZDHbSV2+SH0V84=
 github.com/globalsign/mgo v0.0.0-20180905125535-1ca0a4f7cbcb/go.mod h1:xkRDCp4j0OGD1HRkm4kmhM+pmpv3AKq5SU7GMg4oO/Q=
 github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8/go.mod h1:xkRDCp4j0OGD1HRkm4kmhM+pmpv3AKq5SU7GMg4oO/Q=
 github.com/glycerine/go-unsnap-stream v0.0.0-20180323001048-9f0cb55181dd/go.mod h1:/20jfyN9Y5QPEAprSgKAUr+glWDY39ZiUEAYOEv5dsE=
