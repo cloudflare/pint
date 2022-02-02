@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.8.1
+
+### Changed
+
+- Updated Prometheus modules to [v2.33.0](https://github.com/prometheus/prometheus/releases/tag/v2.33.0).
+  This adds support for `stripPort` template function.
+
 ## v0.8.0
 
 ### Added
