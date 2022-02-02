@@ -1,0 +1,34 @@
+exec bash -x ./test.sh &
+
+pint.ok watch --listen=:6048 --max-problems=2 --pidfile=pint.pid rules
+cmp curl.txt metrics.txt
+
+-- test.sh --
+sleep 5
+curl -s http://127.0.0.1:6048/metrics | grep -E '^pint_problem' > curl.txt
+cat pint.pid | xargs kill
+
+-- rules/1.yml --
+- record: broken
+  expr: foo / count())
+
+- record: aggregate
+  expr: sum(foo) without(job)
+
+- alert: comparison
+  expr: foo
+
+-- .pint.hcl --
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+}
+
+-- metrics.txt --
+pint_problem{kind="alerting",lines="8",name="comparison",problem="alert query doesn't have any condition, it will always fire if the metric exists",reporter="promql/comparison",severity="warning"} 1
+pint_problem{kind="recording",lines="2",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"} 1
+pint_problems 3

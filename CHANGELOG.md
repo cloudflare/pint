@@ -2,6 +2,10 @@
 
 ## v0.8.1
 
+### Added
+
+- Added `--max-problems` flag to `pint watch` command.
+
 ### Changed
 
 - Updated Prometheus modules to [v2.33.0](https://github.com/prometheus/prometheus/releases/tag/v2.33.0).

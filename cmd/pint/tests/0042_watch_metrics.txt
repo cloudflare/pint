@@ -275,6 +275,9 @@ pint_check_iterations_total
 pint_problem{kind="alerting",lines="8",name="comparison",problem="alert query doesn't have any condition, it will always fire if the metric exists",reporter="promql/comparison",severity="warning"}
 pint_problem{kind="recording",lines="2",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 pint_problem{kind="recording",lines="5",name="aggregate",problem="job label is required and should be preserved when aggregating \"^.+$\" rules, remove job from without()",reporter="promql/aggregate",severity="warning"}
+# HELP pint_problems Total number of problems reported by pint
+# TYPE pint_problems gauge
+pint_problems
 # HELP prometheus_template_text_expansion_failures_total The total number of template text expansion failures.
 # TYPE prometheus_template_text_expansion_failures_total counter
 prometheus_template_text_expansion_failures_total
