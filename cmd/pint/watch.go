@@ -9,6 +9,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"sort"
 	"strings"
 	"sync"
 	"syscall"
@@ -27,9 +28,10 @@ import (
 )
 
 const (
-	intervalFlag = "interval"
-	listenFlag   = "listen"
-	pidfileFlag  = "pidfile"
+	intervalFlag    = "interval"
+	listenFlag      = "listen"
+	pidfileFlag     = "pidfile"
+	maxProblemsFlag = "max-problems"
 )
 
 var watchCmd = &cli.Command{
@@ -53,6 +55,12 @@ var watchCmd = &cli.Command{
 			Name:    pidfileFlag,
 			Aliases: []string{"p"},
 			Usage:   "Write pid file to this path",
+		},
+		&cli.IntFlag{
+			Name:    maxProblemsFlag,
+			Aliases: []string{"m"},
+			Value:   0,
+			Usage:   "Maximum number of problems to report on metrics, 0 - no limit",
 		},
 	},
 }
@@ -100,7 +108,7 @@ func actionWatch(c *cli.Context) (err error) {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(cfg, paths)
+	collector := newProblemCollector(cfg, paths, c.Int(maxProblemsFlag))
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
@@ -179,14 +187,16 @@ func startTimer(ctx context.Context, cfg config.Config, workers int, interval ti
 }
 
 type problemCollector struct {
-	lock    sync.Mutex
-	cfg     config.Config
-	paths   []string
-	summary *reporter.Summary
-	problem *prometheus.Desc
+	lock        sync.Mutex
+	cfg         config.Config
+	paths       []string
+	summary     *reporter.Summary
+	problem     *prometheus.Desc
+	problems    *prometheus.Desc
+	maxProblems int
 }
 
-func newProblemCollector(cfg config.Config, paths []string) *problemCollector {
+func newProblemCollector(cfg config.Config, paths []string, maxProblems int) *problemCollector {
 	return &problemCollector{
 		cfg:   cfg,
 		paths: paths,
@@ -196,6 +206,13 @@ func newProblemCollector(cfg config.Config, paths []string) *problemCollector {
 			[]string{"kind", "name", "severity", "reporter", "problem", "lines"},
 			prometheus.Labels{},
 		),
+		problems: prometheus.NewDesc(
+			"pint_problems",
+			"Total number of problems reported by pint",
+			[]string{},
+			prometheus.Labels{},
+		),
+		maxProblems: maxProblems,
 	}
 }
 
@@ -231,7 +248,8 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	done := map[string]struct{}{}
+	done := map[string]prometheus.Metric{}
+	keys := []string{}
 
 	for _, report := range c.summary.Reports {
 		kind := "invalid"
@@ -264,11 +282,21 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 
 		key := out.String()
-		if _, ok := done[key]; ok {
-			continue
+		if _, ok := done[key]; !ok {
+			done[key] = metric
+			keys = append(keys, key)
 		}
+	}
 
-		ch <- metric
-		done[key] = struct{}{}
+	ch <- prometheus.MustNewConstMetric(c.problems, prometheus.GaugeValue, float64(len(done)))
+
+	sort.Strings(keys)
+	var reported int
+	for _, key := range keys {
+		ch <- done[key]
+		reported++
+		if c.maxProblems > 0 && reported >= c.maxProblems {
+			break
+		}
 	}
 }

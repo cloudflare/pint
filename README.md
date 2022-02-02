@@ -76,6 +76,14 @@ scrape_configs:
       - targets: ['localhost:8080']
 ```
 
+Available metrics:
+
+- `pint_problem` - exported for every problem detected by pint.
+  To avoid exposing too many metrics at once pass `--max-problems` flag to watch command.
+  When set pint will expose only up to `--max-problems` value number of `pint_problem` metrics.
+- `pint_problems` - this metric is the total number of all problems detected by pint,
+  including those not exported due to `--max-problems` flag.
+
 ## Release Notes
 
 See [CHANGELOG.md](/CHANGELOG.md) for history of changes.
