@@ -1,0 +1,19 @@
+pint.ok parse 'sum(http_requests_total{method="GET"} @ 1609746000)'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: sum(http_requests_total{method="GET"} @ 1609746000.000)
+  AggregateExpr:
+    * Type: vector
+    * Op: sum
+    * Expr: http_requests_total{method="GET"} @ 1609746000.000
+    * Param: <nil>
+    * Grouping: []
+    * Without: false
+      ++ node: http_requests_total{method="GET"} @ 1609746000.000
+        VectorSelector:
+          * Type: vector
+          * Name: http_requests_total
+          * Offset: 0s
+          * LabelMatchers: [method="GET" __name__="http_requests_total"]

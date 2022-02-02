@@ -1,0 +1,17 @@
+pint.ok parse 'rate(http_requests_total[5m] offset -1w)'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: rate(http_requests_total[5m] offset -1w)
+  Call:
+    * Type: vector
+    * Func: rate
+    * Args: http_requests_total[5m] offset -1w
+      ++ node: http_requests_total[5m] offset -1w
+        Expressions:
+          ++ node: http_requests_total[5m] offset -1w
+            MatrixSelector:
+              * Type: matrix
+              * VectorSelector: http_requests_total offset -1w
+              * Range: 5m0s

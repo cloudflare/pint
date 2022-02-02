@@ -50,6 +50,7 @@ var (
 		"graphLink":          dummyFuncMap,
 		"tableLink":          dummyFuncMap,
 		"sortByLabel":        dummyFuncMap,
+		"stripPort":          dummyFuncMap,
 		"humanize":           dummyFuncMap,
 		"humanize1024":       dummyFuncMap,
 		"humanizeDuration":   dummyFuncMap,

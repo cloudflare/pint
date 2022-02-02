@@ -198,6 +198,11 @@ func TestSeriesCheck(t *testing.T) {
 			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
 		},
 		{
+			description: "negative offset",
+			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset -15m\n",
+			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+		},
+		{
 			description: "series found, label missing",
 			content:     "- record: foo\n  expr: found{job=\"notfound\"}\n",
 			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),

@@ -111,6 +111,38 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
+			content: []byte("- record: foo\n  expr: foo offset -10m\n"),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{1}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{1}},
+								Value:    "foo",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{2}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{2}},
+								Value:    "foo offset -10m",
+							},
+							Query: &parser.PromQLNode{
+								Expr: "foo offset -10m",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			content: []byte(`
 # head comment
 - record: foo # record comment
