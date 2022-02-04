@@ -18,7 +18,6 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -219,7 +218,7 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 		problem: prometheus.NewDesc(
 			"pint_problem",
 			"Prometheus rule problem reported by pint",
-			[]string{"kind", "name", "severity", "reporter", "problem", "lines"},
+			[]string{"kind", "name", "severity", "reporter", "problem"},
 			prometheus.Labels{},
 		),
 		problems: prometheus.NewDesc(
@@ -293,7 +292,6 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			strings.ToLower(report.Problem.Severity.String()),
 			report.Problem.Reporter,
 			report.Problem.Text,
-			output.FormatLineRangeString(report.Problem.Lines),
 		)
 
 		var out dto.Metric

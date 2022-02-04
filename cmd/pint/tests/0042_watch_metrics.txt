@@ -272,7 +272,7 @@ pint_check_duration_seconds_count{check="promql/syntax"}
 pint_check_iterations_total
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{kind="recording",lines="2",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{kind="recording",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems

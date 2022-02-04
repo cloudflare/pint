@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.0
+
+### Changed
+
+- Removed `lines` label from `pint_problem` metric exported when running `pint watch`.
+
 ## v0.8.2
 
 ### Added
