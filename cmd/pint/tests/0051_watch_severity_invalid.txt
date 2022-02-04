@@ -1,0 +1,6 @@
+pint.error --no-color watch --min-severity=foo bar
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="invalid min-severity value: unknown severity: foo"

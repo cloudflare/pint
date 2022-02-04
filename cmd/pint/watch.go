@@ -15,6 +15,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -32,6 +33,7 @@ const (
 	listenFlag      = "listen"
 	pidfileFlag     = "pidfile"
 	maxProblemsFlag = "max-problems"
+	minSeverityFlag = "min-severity"
 )
 
 var watchCmd = &cli.Command{
@@ -62,6 +64,12 @@ var watchCmd = &cli.Command{
 			Value:   0,
 			Usage:   "Maximum number of problems to report on metrics, 0 - no limit",
 		},
+		&cli.StringFlag{
+			Name:    minSeverityFlag,
+			Aliases: []string{"n"},
+			Value:   strings.ToLower(checks.Bug.String()),
+			Usage:   "Set minimum severity for problems reported via metrics",
+		},
 	},
 }
 
@@ -79,6 +87,11 @@ func actionWatch(c *cli.Context) (err error) {
 	paths := c.Args().Slice()
 	if len(paths) == 0 {
 		return fmt.Errorf("at least one file or directory required")
+	}
+
+	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
+	if err != nil {
+		return fmt.Errorf("invalid %s value: %w", minSeverityFlag, err)
 	}
 
 	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
@@ -108,7 +121,7 @@ func actionWatch(c *cli.Context) (err error) {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(cfg, paths, c.Int(maxProblemsFlag))
+	collector := newProblemCollector(cfg, paths, minSeverity, c.Int(maxProblemsFlag))
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
@@ -195,10 +208,11 @@ type problemCollector struct {
 	summary     *reporter.Summary
 	problem     *prometheus.Desc
 	problems    *prometheus.Desc
+	minSeverity checks.Severity
 	maxProblems int
 }
 
-func newProblemCollector(cfg config.Config, paths []string, maxProblems int) *problemCollector {
+func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.Severity, maxProblems int) *problemCollector {
 	return &problemCollector{
 		cfg:   cfg,
 		paths: paths,
@@ -214,6 +228,7 @@ func newProblemCollector(cfg config.Config, paths []string, maxProblems int) *pr
 			[]string{},
 			prometheus.Labels{},
 		),
+		minSeverity: minSeverity,
 		maxProblems: maxProblems,
 	}
 }
@@ -254,6 +269,11 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 	keys := []string{}
 
 	for _, report := range c.summary.Reports {
+		if report.Problem.Severity < c.minSeverity {
+			log.Debug().Stringer("severity", report.Problem.Severity).Msg("Skipping report")
+			continue
+		}
+
 		kind := "invalid"
 		name := "unknown"
 		if report.Rule.AlertingRule != nil {
