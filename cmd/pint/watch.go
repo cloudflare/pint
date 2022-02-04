@@ -112,6 +112,8 @@ func actionWatch(c *cli.Context) (err error) {
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
+	prometheus.MustRegister(pintVersion)
+	pintVersion.WithLabelValues(version).Set(1)
 	http.Handle("/metrics", promhttp.Handler())
 	listen := c.String(listenFlag)
 	server := http.Server{

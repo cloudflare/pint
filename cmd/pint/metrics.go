@@ -3,6 +3,13 @@ package main
 import "github.com/prometheus/client_golang/prometheus"
 
 var (
+	pintVersion = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "pint_version",
+			Help: "Version information",
+		},
+		[]string{"version"},
+	)
 	checkIterationsTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "pint_check_iterations_total",

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.8.2
+
+### Added
+
+- Export `pint_version` metric when running `pint watch`.
+
 ## v0.8.1
 
 ### Added
