@@ -51,18 +51,24 @@ level=info msg="Loading configuration file" path=.pint.hcl
       ]
     },
     {
-      "match": {
-        "path": "foo/bar",
-        "kind": "alerting"
-      },
-      "ignore": {
-        "kind": "alerting",
-        "label": {
-          "key": "notify",
-          "value": "blackhole"
+      "match": [
+        {
+          "path": "foo/bar",
+          "kind": "alerting"
+        }
+      ],
+      "ignore": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "notify",
+            "value": "blackhole"
+          }
         },
-        "command": "watch"
-      },
+        {
+          "command": "watch"
+        }
+      ],
       "annotation": [
         {
           "key": "summary",
@@ -77,9 +83,11 @@ level=info msg="Loading configuration file" path=.pint.hcl
       }
     },
     {
-      "match": {
-        "kind": "recording"
-      },
+      "match": [
+        {
+          "kind": "recording"
+        }
+      ],
       "aggregate": [
         {
           "name": ".+",
@@ -90,9 +98,11 @@ level=info msg="Loading configuration file" path=.pint.hcl
       ]
     },
     {
-      "match": {
-        "kind": "recording"
-      },
+      "match": [
+        {
+          "kind": "recording"
+        }
+      ],
       "cost": {
         "bytesPerSample": 4036
       }
@@ -127,10 +137,12 @@ rule {
   }
   ignore {
     kind = "alerting"
-    command = "watch"
     label "notify" {
       value = "blackhole"
     }
+  }
+  ignore {
+    command = "watch"
   }
   alerts {
     range   = "7d"

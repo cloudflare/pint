@@ -605,13 +605,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -651,13 +653,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -697,13 +701,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -743,13 +749,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -789,13 +797,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -835,13 +845,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -881,13 +893,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1038,9 +1052,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "foo.xml"
-      },
+      "ignore": [
+        {
+          "path": "foo.xml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -1075,9 +1091,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "rules.yml"
-      },
+      "ignore": [
+        {
+          "path": "rules.yml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -1694,13 +1712,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1740,13 +1760,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1786,13 +1808,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1832,13 +1856,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1878,13 +1904,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1924,13 +1952,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -1970,13 +2000,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -2127,9 +2159,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "foo.xml"
-      },
+      "ignore": [
+        {
+          "path": "foo.xml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -2164,9 +2198,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "rules.yml"
-      },
+      "ignore": [
+        {
+          "path": "rules.yml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -2783,13 +2819,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -2829,13 +2867,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -2875,13 +2915,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -2921,13 +2963,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -2967,13 +3011,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -3013,13 +3059,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -3059,13 +3107,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -3216,9 +3266,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "foo.xml"
-      },
+      "ignore": [
+        {
+          "path": "foo.xml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -3253,9 +3305,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "rules.yml"
-      },
+      "ignore": [
+        {
+          "path": "rules.yml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -3872,13 +3926,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -3918,13 +3974,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -3964,13 +4022,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -4010,13 +4070,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -4056,13 +4118,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -4102,13 +4166,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -4148,13 +4214,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -4305,9 +4373,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "foo.xml"
-      },
+      "ignore": [
+        {
+          "path": "foo.xml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -4342,9 +4412,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "rules.yml"
-      },
+      "ignore": [
+        {
+          "path": "rules.yml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -4961,13 +5033,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5007,13 +5081,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5053,13 +5129,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5099,13 +5177,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "label": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5145,13 +5225,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5191,13 +5273,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5237,13 +5321,15 @@
   },
   "rules": [
     {
-      "match": {
-        "kind": "alerting",
-        "annotation": {
-          "key": "cluster",
-          "value": "prod"
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
         }
-      },
+      ],
       "label": [
         {
           "key": "priority",
@@ -5394,9 +5480,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "foo.xml"
-      },
+      "ignore": [
+        {
+          "path": "foo.xml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",
@@ -5431,9 +5519,11 @@
   },
   "rules": [
     {
-      "ignore": {
-        "path": "rules.yml"
-      },
+      "ignore": [
+        {
+          "path": "rules.yml"
+        }
+      ],
       "alerts": {
         "range": "1h",
         "step": "1m",

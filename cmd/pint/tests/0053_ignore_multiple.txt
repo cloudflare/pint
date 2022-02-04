@@ -1,0 +1,30 @@
+pint.ok --no-color -l debug lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/0001.yml rules=2
+level=debug msg="Found recording rule" lines=1-2 path=rules/0001.yml record=colo:recording
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile"] path=rules/0001.yml rule=colo:recording
+level=debug msg="Found alerting rule" alert=colo:alerting lines=4-5 path=rules/0001.yml
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile"] path=rules/0001.yml rule=colo:alerting
+-- rules/0001.yml --
+- record: "colo:recording"
+  expr: sum(foo) without(job)
+
+- alert: "colo:alerting"
+  expr: sum(bar) without(job) > 0
+
+-- .pint.hcl --
+rule {
+    ignore {
+        kind = "recording"
+    }
+    ignore {
+        kind = "alerting"
+    }
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+}

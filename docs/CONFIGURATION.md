@@ -139,6 +139,8 @@ rule {
       value = "(.*)"
     }
   }
+  match { ... }
+  match { ... }
   ignore {
     path = "(.+)"
     name = "(.+)"
@@ -151,6 +153,8 @@ rule {
       value = "(.*)"
     }
   }
+  ignore { ... }
+  ignore { ... }
 
   [ check definition ]
   ...
@@ -172,7 +176,11 @@ rule {
 - `ignore` - works exactly like `match` but does the opposite - any alerting or recording rule
   matching all conditions defined on `ignore` will not be checked by this `rule` block.
 
-Example:
+Note: both `match` and `ignore` require all defined filters to be satisfied to work.
+If multiple `match` and/or `ignore` rules are present any of then needs to match for the rule to
+be matched / ignored.
+
+Examples:
 
 ```JS
 rule {
@@ -182,8 +190,23 @@ rule {
     label "severity" {
       value = "(warning|critical)"
     }
-    [ check applied only to severity="critical" and severity="warning" alerts ]
   }
+  ignore {
+    command = "watch"
+  }
+  [ check applied only to severity="critical" and severity="warning" alerts in "ci" or "lint" command is run ]
+}
+```
+
+```JS
+rule {
+  ignore {
+    command = "watch"
+  }
+  ignore {
+    command = "lint"
+  }
+  [ check applied unless "watch" or "lint" command is run ]
 }
 ```
 

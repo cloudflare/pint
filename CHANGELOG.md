@@ -5,6 +5,7 @@
 ### Changed
 
 - Removed `lines` label from `pint_problem` metric exported when running `pint watch`.
+- Multiple `match` and `ignore` blocks can now be specified per each `rule`.
 
 ## v0.8.2
 
