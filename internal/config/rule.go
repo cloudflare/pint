@@ -197,8 +197,8 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 }
 
 type Rule struct {
-	Match      *Match               `hcl:"match,block" json:"match,omitempty"`
-	Ignore     *Match               `hcl:"ignore,block" json:"ignore,omitempty"`
+	Match      []Match              `hcl:"match,block" json:"match,omitempty"`
+	Ignore     []Match              `hcl:"ignore,block" json:"ignore,omitempty"`
 	Aggregate  []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
 	Annotation []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
 	Label      []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
@@ -208,13 +208,14 @@ type Rule struct {
 }
 
 func (rule Rule) validate() (err error) {
-	if rule.Match != nil {
-		if err = rule.Match.validate(true); err != nil {
+	for _, match := range rule.Match {
+		if err = match.validate(true); err != nil {
 			return err
 		}
 	}
-	if rule.Ignore != nil {
-		if err = rule.Ignore.validate(false); err != nil {
+
+	for _, ignore := range rule.Ignore {
+		if err = ignore.validate(false); err != nil {
 			return err
 		}
 	}
@@ -261,12 +262,23 @@ func (rule Rule) validate() (err error) {
 func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checkMeta {
 	enabled := []checkMeta{}
 
-	if rule.Ignore != nil && rule.Ignore.IsMatch(ctx, path, r) {
-		return enabled
+	for _, ignore := range rule.Ignore {
+		if ignore.IsMatch(ctx, path, r) {
+			return enabled
+		}
 	}
 
-	if rule.Match != nil && !rule.Match.IsMatch(ctx, path, r) {
-		return enabled
+	if len(rule.Match) > 0 {
+		var found bool
+		for _, match := range rule.Match {
+			if match.IsMatch(ctx, path, r) {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return enabled
+		}
 	}
 
 	if len(rule.Aggregate) > 0 {

@@ -13,6 +13,7 @@ import (
 
 func TestMatch(t *testing.T) {
 	type testCaseT struct {
+		cmd     config.ContextCommandVal
 		path    string
 		rule    parser.Rule
 		match   config.Match
@@ -21,12 +22,15 @@ func TestMatch(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			path:    "foo.yaml",
-			rule:    parser.Rule{},
+			cmd:  config.LintCommand,
+			path: "foo.yaml",
+			rule: parser.Rule{},
+
 			match:   config.Match{},
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -35,6 +39,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -43,6 +48,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -51,6 +57,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -59,6 +66,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -74,6 +82,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -90,6 +99,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -105,6 +115,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -120,6 +131,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -139,6 +151,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -158,6 +171,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -177,6 +191,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -196,6 +211,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -215,6 +231,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
@@ -234,6 +251,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{},
@@ -244,14 +262,17 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{},
 			},
+
 			match:   config.Match{},
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{},
@@ -262,6 +283,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{},
@@ -272,6 +294,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{},
@@ -282,6 +305,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -301,6 +325,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -320,6 +345,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -339,6 +365,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
@@ -358,6 +385,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -366,6 +394,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -374,6 +403,7 @@ func TestMatch(t *testing.T) {
 			isMatch: false,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -382,6 +412,7 @@ func TestMatch(t *testing.T) {
 			isMatch: true,
 		},
 		{
+			cmd:  config.LintCommand,
 			path: "foo.yaml",
 			rule: parser.Rule{},
 			match: config.Match{
@@ -389,12 +420,22 @@ func TestMatch(t *testing.T) {
 			},
 			isMatch: false,
 		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			rule: parser.Rule{},
+			match: config.Match{
+				Command: &config.CICommand,
+				Path:    "bar.yaml",
+			},
+			isMatch: false,
+		},
 	}
 
-	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			assert := assert.New(t)
+			ctx := context.WithValue(context.Background(), config.CommandKey, tc.cmd)
 			isMatch := tc.match.IsMatch(ctx, tc.path, tc.rule)
 			assert.Equal(tc.isMatch, isMatch)
 		})
