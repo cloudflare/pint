@@ -5,6 +5,7 @@
 ### Added
 
 - Export `pint_version` metric when running `pint watch`.
+- Added `--min-severity` flag to `pint watch` command.
 
 ## v0.8.1
 

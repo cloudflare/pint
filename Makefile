@@ -54,6 +54,7 @@ debug-testscript:
 .PHONY: update-snapshots
 update-snapshots:
 	UPDATE_SNAPS=true UPDATE_SNAPSHOTS=1 go test -count=1  ./...
+	$(MAKE) test
 
 .PHONY: cover
 cover: test
