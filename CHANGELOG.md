@@ -1,12 +1,5 @@
 # Changelog
 
-## [next]
-
-### Changed
-
-- `query/series` check now uses `/api/v1/series` Prometheus API instead of running
-  instant queries.
-
 ## v0.9.0
 
 ### Changed

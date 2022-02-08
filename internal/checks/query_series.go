@@ -59,7 +59,8 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 }
 
 func (c SeriesCheck) countSeries(ctx context.Context, expr parser.PromQLExpr, selector promParser.VectorSelector) (problems []Problem) {
-	sets, err := c.prom.Series(ctx, []string{selector.String()})
+	q := fmt.Sprintf("count(%s)", selector.String())
+	qr, err := c.prom.Query(ctx, q)
 	if err != nil {
 		problems = append(problems, Problem{
 			Fragment: selector.String(),
@@ -71,7 +72,12 @@ func (c SeriesCheck) countSeries(ctx context.Context, expr parser.PromQLExpr, se
 		return
 	}
 
-	if len(sets) == 0 {
+	var series int
+	for _, s := range qr.Series {
+		series += int(s.Value)
+	}
+
+	if series == 0 {
 		if len(selector.LabelMatchers) > 1 {
 			// retry selector with only __name__ label
 			s := stripLabels(selector)

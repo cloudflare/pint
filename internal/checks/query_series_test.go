@@ -3,7 +3,6 @@ package checks_test
 import (
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 	"time"
 
@@ -17,65 +16,82 @@ func TestSeriesCheck(t *testing.T) {
 	zerolog.SetGlobalLevel(zerolog.FatalLevel)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		match := r.URL.Query()[("match[]")]
+		err := r.ParseForm()
+		if err != nil {
+			t.Fatal(err)
+		}
+		query := r.Form.Get("query")
 
-		switch strings.Join(match, ", ") {
-		case "notfound", `notfound{job="foo"}`, `notfound{job!="foo"}`, `{__name__="notfound",job="bar"}`:
+		switch query {
+		case "count(notfound)", `count(notfound{job="foo"})`, `count(notfound{job!="foo"})`, `count({__name__="notfound",job="bar"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": []
+				"data":{
+					"resultType":"vector",
+					"result":[]
+				}
 			}`))
-		case "found_1", `{__name__="notfound"}`:
+		case "count(found_1)", `count({__name__="notfound"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": [{"__name__":"single", "foo": "bar"}]
+				"data":{
+					"resultType":"vector",
+					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
+				}
 			}`))
-		case "found_7":
+		case "count(found_7)":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": [
-					{"__name__":"seven", "id": "1"},
-					{"__name__":"seven", "id": "2"},
-					{"__name__":"seven", "id": "3"},
-					{"__name__":"seven", "id": "4"},
-					{"__name__":"seven", "id": "5"},
-					{"__name__":"seven", "id": "6"},
-					{"__name__":"seven", "id": "7"}
-				]
+				"data":{
+					"resultType":"vector",
+					"result":[{"metric":{},"value":[1614859502.068,"7"]}]
+				}
 			}`))
-		case `node_filesystem_readonly{mountpoint!=""}`:
+		case `count(node_filesystem_readonly{mountpoint!=""})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": [{"__name__":"single", "foo": "bar"}]
+				"data":{
+					"resultType":"vector",
+					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
+				}
 			}`))
-		case `disk_info{interface_speed!="6.0 Gb/s",type="sat"}`:
+		case `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": [{"__name__":"disk_info"}]
+				"data":{
+					"resultType":"vector",
+					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
+				}
 			}`))
-		case `found{job="notfound"}`, `notfound{job="notfound"}`:
+		case `count(found{job="notfound"})`, `count(notfound{job="notfound"})`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": []
+				"data":{
+					"resultType":"vector",
+					"result":[]
+				}
 			}`))
-		case `found`:
+		case `count(found)`:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
-				"data": [{"__name__":"found"}]
+				"data":{
+					"resultType":"vector",
+					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
+				}
 			}`))
 		default:
 			w.WriteHeader(400)
