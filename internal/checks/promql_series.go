@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	SeriesCheckName = "query/series"
+	SeriesCheckName = "promql/series"
 )
 
 func NewSeriesCheck(prom *promapi.Prometheus) SeriesCheck {

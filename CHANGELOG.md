@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.10.0
+
+### Changed
+
+- `query/series` check was renamed to `promql/series`.
+
+
 ## v0.9.0
 
 ### Changed

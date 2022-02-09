@@ -356,7 +356,7 @@ prometheus "prom2" {
 `,
 			path: "rules.yml",
 			rule: newRule(t, `
-# pint disable query/series(prom1)
+# pint disable promql/series(prom1)
 # pint disable query/cost(prom2)
 - record: foo
   # pint disable promql/rate(prom2)
@@ -458,7 +458,7 @@ rule {
 `,
 			path: "rules.yml",
 			rule: newRule(t, `
-# pint disable query/series
+# pint disable promql/series
 # pint disable promql/rate
 # pint disable promql/vector_matching(prom1)
 # pint disable promql/vector_matching(prom2)
@@ -728,7 +728,7 @@ prometheus "prom1" {
 			rule: newRule(t, `
 - record: foo
   expr: sum(foo)
-  # pint disable query/series
+  # pint disable promql/series
 `),
 			checks: []string{
 				checks.SyntaxCheckName,

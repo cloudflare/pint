@@ -18,7 +18,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -52,7 +52,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -89,7 +89,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -126,7 +126,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -171,7 +171,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -198,7 +198,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -228,7 +228,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -276,7 +276,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -324,7 +324,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -378,7 +378,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -412,7 +412,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -502,7 +502,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -551,7 +551,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -598,7 +598,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -646,7 +646,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -694,7 +694,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -742,7 +742,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -790,7 +790,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -838,7 +838,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -886,7 +886,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -944,7 +944,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ],
@@ -1125,7 +1125,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1159,7 +1159,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1196,7 +1196,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1233,7 +1233,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1278,7 +1278,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1305,7 +1305,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1335,7 +1335,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1383,7 +1383,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1431,7 +1431,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1485,7 +1485,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1519,7 +1519,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1609,7 +1609,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1658,7 +1658,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1705,7 +1705,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1753,7 +1753,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1801,7 +1801,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1849,7 +1849,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1897,7 +1897,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1945,7 +1945,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -1993,7 +1993,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2051,7 +2051,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ],
@@ -2232,7 +2232,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2266,7 +2266,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2303,7 +2303,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2340,7 +2340,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2385,7 +2385,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2412,7 +2412,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2442,7 +2442,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2490,7 +2490,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2538,7 +2538,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2592,7 +2592,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2626,7 +2626,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2716,7 +2716,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2765,7 +2765,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2812,7 +2812,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2860,7 +2860,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2908,7 +2908,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -2956,7 +2956,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3004,7 +3004,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3052,7 +3052,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3100,7 +3100,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3158,7 +3158,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ],
@@ -3339,7 +3339,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3373,7 +3373,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3410,7 +3410,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3447,7 +3447,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3492,7 +3492,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3519,7 +3519,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3549,7 +3549,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3597,7 +3597,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3645,7 +3645,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3699,7 +3699,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3733,7 +3733,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3823,7 +3823,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3872,7 +3872,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3919,7 +3919,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -3967,7 +3967,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4015,7 +4015,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4063,7 +4063,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4111,7 +4111,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4159,7 +4159,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4207,7 +4207,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4265,7 +4265,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ],
@@ -4446,7 +4446,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4480,7 +4480,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4517,7 +4517,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4554,7 +4554,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4599,7 +4599,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4626,7 +4626,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4656,7 +4656,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4704,7 +4704,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4752,7 +4752,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4806,7 +4806,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4840,7 +4840,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4930,7 +4930,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -4979,7 +4979,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5026,7 +5026,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5074,7 +5074,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5122,7 +5122,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5170,7 +5170,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5218,7 +5218,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5266,7 +5266,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5314,7 +5314,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ]
@@ -5372,7 +5372,7 @@
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
-      "query/series",
+      "promql/series",
       "rule/label",
       "rule/reject"
     ],
