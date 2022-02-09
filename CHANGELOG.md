@@ -6,6 +6,9 @@
 
 - `query/series` check was renamed to `promql/series`.
 
+### Fixed
+
+- Improved the logic of `promql/vector_matching` check.
 
 ## v0.9.0
 
