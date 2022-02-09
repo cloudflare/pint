@@ -119,7 +119,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: "foo",
 					Lines:    []int{2},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     "query using prom failed with: bad_data: unhandled query",
 					Severity: checks.Bug,
 				},
@@ -133,7 +133,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: "notfound",
 					Lines:    []int{2},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     "query using prom completed without any results for notfound",
 					Severity: checks.Warning,
 				},
@@ -147,7 +147,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: "notfound",
 					Lines:    []int{2},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     "query using prom completed without any results for notfound",
 					Severity: checks.Warning,
 				},
@@ -161,7 +161,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: "notfound",
 					Lines:    []int{2},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     "query using prom completed without any results for notfound",
 					Severity: checks.Warning,
 				},
@@ -210,7 +210,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: `found{job="notfound"}`,
 					Lines:    []int{2},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     `query using prom completed without any results for found{job="notfound"}`,
 					Severity: checks.Warning,
 				},
@@ -224,7 +224,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: "notfound",
 					Lines:    []int{2},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     "query using prom completed without any results for notfound",
 					Severity: checks.Warning,
 				},
@@ -241,7 +241,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: `{__name__="notfound",job="bar"}`,
 					Lines:    []int{3},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     `query using prom completed without any results for {__name__="notfound",job="bar"}`,
 					Severity: checks.Warning,
 				},
@@ -250,7 +250,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "series missing but check disabled",
 			content: `
-# pint disable query/series(notfound)
+# pint disable promql/series(notfound)
 - record: foo
   expr: count(notfound) == 0
 `,
@@ -259,7 +259,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "series missing but check disabled, labels",
 			content: `
-# pint disable query/series(notfound)
+# pint disable promql/series(notfound)
 - record: foo
   expr: count(notfound{job="foo"}) == 0
 `,
@@ -268,7 +268,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "series missing but check disabled, negative labels",
 			content: `
-# pint disable query/series(notfound)
+# pint disable promql/series(notfound)
 - record: foo
   expr: count(notfound{job!="foo"}) == 0
 `,
@@ -277,7 +277,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "series missing, disabled comment for labels",
 			content: `
-# pint disable query/series(notfound{job="foo"})
+# pint disable promql/series(notfound{job="foo"})
 - record: foo
   expr: count(notfound) == 0
 `,
@@ -286,7 +286,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					Fragment: `notfound`,
 					Lines:    []int{4},
-					Reporter: "query/series",
+					Reporter: "promql/series",
 					Text:     `query using prom completed without any results for notfound`,
 					Severity: checks.Warning,
 				},
