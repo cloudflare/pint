@@ -29,8 +29,7 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 			for _, rule := range rules {
 				problems := tc.checker.Check(ctx, rule)
 				if diff := cmp.Diff(tc.problems, problems, opts...); diff != "" {
-					t.Errorf("Check() returned wrong problem list (-want +got):\n%s", diff)
-					return
+					t.Fatalf("Check() returned wrong problem list (-want +got):\n%s", diff)
 				}
 			}
 		})
@@ -85,8 +84,7 @@ func TestParseSeverity(t *testing.T) {
 			hadError := err != nil
 
 			if hadError != tc.shouldError {
-				t.Errorf("checks.ParseSeverity() returned err=%v, expected=%v", err, tc.shouldError)
-				return
+				t.Fatalf("checks.ParseSeverity() returned err=%v, expected=%v", err, tc.shouldError)
 			}
 
 			if hadError {
@@ -94,7 +92,7 @@ func TestParseSeverity(t *testing.T) {
 			}
 
 			if sev.String() != tc.output {
-				t.Errorf("checks.ParseSeverity() returned severity=%q, expected=%q", sev, tc.output)
+				t.Fatalf("checks.ParseSeverity() returned severity=%q, expected=%q", sev, tc.output)
 			}
 		})
 	}

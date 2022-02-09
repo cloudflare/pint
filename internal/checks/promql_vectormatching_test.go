@@ -25,7 +25,9 @@ func TestVectorMatchingCheck(t *testing.T) {
 			"count(foo_with_notfound / ignoring(notfound) foo_with_notfound)",
 			`count({__name__="foo_with_notfound"} / ignoring(notfound) foo_with_notfound)`,
 			"count(foo_with_notfound / ignoring(notfound) foo)",
-			"count(foo / ignoring(notfound) foo_with_notfound)":
+			"count(foo / ignoring(notfound) foo_with_notfound)",
+			"count(foo / bar)",
+			"count(up and foo)":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -35,7 +37,18 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "count(foo_with_notfound / bar)", "count(xxx / foo)", "count(foo / xxx)", "count(missing / foo)", "count(foo / missing)", "count(foo / ignoring(xxx) app_registry)", "count(foo / on(notfound) bar)", "count(memory_bytes / ignoring(job) (memory_limit > 0))", "count((memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry)", "count(foo / on(notfound) bar_with_notfound)", "count(foo_with_notfound / on(notfound) bar)", "count(foo_with_notfound / ignoring(notfound) bar)":
+		case "count(foo_with_notfound / bar)",
+			"count(xxx / foo)", "count(foo / xxx)",
+			"count(missing / foo)",
+			"count(foo / missing)",
+			"count(foo / ignoring(xxx) app_registry)",
+			"count(foo / on(notfound) bar)",
+			"count(memory_bytes / ignoring(job) (memory_limit))",
+			"count((memory_bytes / ignoring(job) (memory_limit)) * on(app_name) group_left(a, b, c) app_registry)",
+			"count(foo / on(notfound) bar_with_notfound)",
+			"count(foo_with_notfound / on(notfound) bar)",
+			"count(foo_with_notfound / ignoring(notfound) bar)",
+			"count(min_over_time((foo_with_notfound)[30m:1m]) / bar)":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -65,7 +78,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[{"metric":{"__name__": "bar", "instance": "instance1", "job": "bar_job"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "topk(1, foo_with_notfound)":
+		case "topk(1, foo_with_notfound)", "topk(1, min_over_time((foo_with_notfound)[30m:1m]))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -85,7 +98,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[{"metric":{"__name__": "bar", "instance": "instance1", "job": "bar_job", "notfound": "xxx"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "topk(1, (memory_bytes / ignoring(job) (memory_limit > 0)))":
+		case "topk(1, (memory_bytes / ignoring(job) (memory_limit)))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -105,7 +118,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[{"metric":{"__name__": "memory_bytes", "instance": "instance1", "job": "foo_job"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "topk(1, (memory_limit > 0))":
+		case "topk(1, (memory_limit))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -153,7 +166,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				"errorType":"bad_data",
 				"error":"unhandled query"
 			}`))
-			t.FailNow()
+			t.Fatalf("Unhandled query: %s", query)
 		}
 	}))
 	defer srv.Close()
@@ -310,6 +323,40 @@ func TestVectorMatchingCheck(t *testing.T) {
   expr: '{__name__="foo_with_notfound"} / ignoring(notfound) foo_with_notfound'
 `,
 			checker: checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "skips number comparison on LHS",
+			content:     "- record: foo\n  expr: 2 < foo / bar\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "skips number comparison on RHS",
+			content:     "- record: foo\n  expr: foo / bar > 0\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "skips number comparison on both sides",
+			content:     "- record: foo\n  expr: 1 > bool 1\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "up == 0 AND foo > 0",
+			content:     "- alert: foo\n  expr: up == 0 AND foo > 0\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "subquery is trimmed",
+			content:     "- alert: foo\n  expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			problems: []checks.Problem{
+				{
+					Fragment: "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar",
+					Lines:    []int{2},
+					Reporter: "promql/vector_matching",
+					Text:     `both sides of the query have different labels: [instance job notfound] != [instance job]`,
+					Severity: checks.Bug,
+				},
+			},
 		},
 	}
 	runTests(t, testCases)

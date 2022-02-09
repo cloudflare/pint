@@ -54,10 +54,21 @@ func (c VectorMatchingCheck) Check(ctx context.Context, rule parser.Rule) (probl
 }
 
 func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLNode) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.VectorMatching != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
-		q := fmt.Sprintf("count(%s)", node.Expr)
+	if n, ok := removeConditions(node.Node.String()).(*promParser.BinaryExpr); ok &&
+		n.VectorMatching != nil &&
+		n.Op != promParser.LOR &&
+		n.Op != promParser.LUNLESS {
+
+		q := fmt.Sprintf("count(%s)", n.String())
 		qr, err := c.prom.Query(ctx, q)
-		if err != nil || len(qr.Series) != 0 {
+		if err == nil && len(qr.Series) > 0 {
+			return
+		}
+
+		if _, ok := n.LHS.(*promParser.BinaryExpr); ok {
+			goto NEXT
+		}
+		if _, ok := n.RHS.(*promParser.BinaryExpr); ok {
 			goto NEXT
 		}
 
@@ -83,13 +94,13 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				if !stringInSlice(leftLabels, name) && stringInSlice(rightLabels, name) {
 					problems = append(problems, exprProblem{
 						expr: node.Expr,
-						text: fmt.Sprintf("using on(%q) won't produce any results because left hand side of the query doesn't have this label: %q", name, n.LHS),
+						text: fmt.Sprintf("using on(%q) won't produce any results because left hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).LHS),
 					})
 				}
 				if stringInSlice(leftLabels, name) && !stringInSlice(rightLabels, name) {
 					problems = append(problems, exprProblem{
 						expr: node.Expr,
-						text: fmt.Sprintf("using on(%q) won't produce any results because right hand side of the query doesn't have this label: %q", name, n.RHS),
+						text: fmt.Sprintf("using on(%q) won't produce any results because right hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).RHS),
 					})
 				}
 				if !stringInSlice(leftLabels, name) && !stringInSlice(rightLabels, name) {
@@ -164,4 +175,58 @@ func stringInSlice(sl []string, v string) bool {
 
 func areStringSlicesEqual(sla, slb []string) bool {
 	return reflect.DeepEqual(sla, slb)
+}
+
+func removeConditions(source string) promParser.Node {
+	node, _ := promParser.ParseExpr(source)
+	switch n := node.(type) {
+	case *promParser.AggregateExpr:
+		n.Expr = removeConditions(n.Expr.String()).(promParser.Expr)
+		return n
+	case *promParser.BinaryExpr:
+		var ln, rn bool
+		if _, ok := n.LHS.(*promParser.NumberLiteral); ok {
+			ln = true
+		}
+		if _, ok := n.RHS.(*promParser.NumberLiteral); ok {
+			rn = true
+		}
+		if ln && rn {
+			return &promParser.ParenExpr{}
+		}
+		if ln {
+			return removeConditions(n.RHS.String())
+		}
+		if rn {
+			return removeConditions(n.LHS.String())
+		}
+		n.LHS = removeConditions(n.LHS.String()).(promParser.Expr)
+		n.RHS = removeConditions(n.RHS.String()).(promParser.Expr)
+		return n
+	case *promParser.Call:
+		ret := promParser.Expressions{}
+		for _, e := range n.Args {
+			ret = append(ret, removeConditions(e.String()).(promParser.Expr))
+		}
+		n.Args = ret
+		return n
+	case *promParser.SubqueryExpr:
+		n.Expr = removeConditions(n.Expr.String()).(promParser.Expr)
+		return n
+	case *promParser.ParenExpr:
+		n.Expr = removeConditions(n.Expr.String()).(promParser.Expr)
+		return n
+	case *promParser.UnaryExpr:
+		n.Expr = removeConditions(n.Expr.String()).(promParser.Expr)
+		return n
+	case *promParser.MatrixSelector:
+		return node
+	case *promParser.StepInvariantExpr:
+		n.Expr = removeConditions(n.Expr.String()).(promParser.Expr)
+		return n
+	case *promParser.NumberLiteral, *promParser.StringLiteral, *promParser.VectorSelector:
+		return n
+	default:
+		return node
+	}
 }

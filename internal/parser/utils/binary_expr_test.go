@@ -35,6 +35,10 @@ func TestHasOuterBinaryExpr(t *testing.T) {
 			expr:   "foo / bar / bob",
 			output: "foo / bar / bob",
 		},
+		{
+			expr:   "foo / bar > 0",
+			output: "foo / bar > 0",
+		},
 	}
 
 	for _, tc := range testCases {
