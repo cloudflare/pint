@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.11.0
+
+### Added
+
+- Added `promql/regexp` check that will warn about unnecessary regexp matchers.
+
 ## v0.10.1
 
 ### Fixed

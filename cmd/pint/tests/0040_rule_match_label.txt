@@ -6,13 +6,13 @@ cmp stderr stderr.txt
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/rules.yml rules=4
 level=debug msg="Found recording rule" lines=1-2 path=rules/rules.yml record=ignore
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile"] path=rules/rules.yml rule=ignore
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
 level=debug msg="Found recording rule" lines=4-7 path=rules/rules.yml record=match
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
 level=debug msg="Found alerting rule" alert=ignore lines=9-10 path=rules/rules.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile"] path=rules/rules.yml rule=ignore
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
 level=debug msg="Found alerting rule" alert=match lines=12-15 path=rules/rules.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
 rules/rules.yml:5: job label is required and should be preserved when aggregating "^.*$" rules, use by(job, ...) (promql/aggregate)
   expr: sum(foo)
 

@@ -1,9 +1,9 @@
 pint.error -l debug --no-color lint rules
 ! stdout .
-stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/1.yaml rule=one'
-stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/1.yaml rule=two'
-stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/2.yaml rule=one'
-stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/2.yaml rule=two'
+stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/1.yaml rule=one'
+stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/1.yaml rule=two'
+stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/2.yaml rule=one'
+stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/rate\(prom\)","promql/series\(prom\)","promql/vector_matching\(prom\)"\] path=rules/2.yaml rule=two'
 
 -- rules/1.yaml --
 - record: one
