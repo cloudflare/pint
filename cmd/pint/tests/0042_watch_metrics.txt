@@ -265,6 +265,8 @@ pint_check_duration_seconds_sum{check="promql/comparison"}
 pint_check_duration_seconds_count{check="promql/comparison"}
 pint_check_duration_seconds_sum{check="promql/fragile"}
 pint_check_duration_seconds_count{check="promql/fragile"}
+pint_check_duration_seconds_sum{check="promql/regexp"}
+pint_check_duration_seconds_count{check="promql/regexp"}
 pint_check_duration_seconds_sum{check="promql/syntax"}
 pint_check_duration_seconds_count{check="promql/syntax"}
 # HELP pint_check_iterations_total Total number of completed check iterations since pint start

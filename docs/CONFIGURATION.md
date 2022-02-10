@@ -764,6 +764,28 @@ by adding labels we use in `by()` to `on()`:
 errors / on(cluster, instance) sum(requests) by(cluster, instance)
 ```
 
+## promql/regexp
+
+This check will warn if metric selector uses a regexp match but the regexp query
+doesn't have any patterns and so a simple string equality match can be used.
+Since regexp checks are more expensive using a simple equality check if
+preferable.
+
+Example of a query that would trigger this warning:
+
+```
+foo{job=~"bar"}
+```
+
+`job=~"bar"` uses a regexp match but since it matches `job` value to a static string
+there's no need to use a regexp here and `job="bar"` should be used instead.
+
+Example of a query that wouldn't trigger this warning:
+
+```
+foo{job=~"bar|baz"}
+```
+
 # Ignoring selected lines or files
 
 While parsing files pint will look for special comment blocks and use them to

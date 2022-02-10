@@ -17,6 +17,7 @@ var (
 		ComparisonCheckName,
 		FragileCheckName,
 		RateCheckName,
+		RegexpCheckName,
 		SyntaxCheckName,
 		VectorMatchingCheckName,
 		CostCheckName,
