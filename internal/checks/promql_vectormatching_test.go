@@ -27,7 +27,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 			"count(foo_with_notfound / ignoring(notfound) foo)",
 			"count(foo / ignoring(notfound) foo_with_notfound)",
 			"count(foo / bar)",
-			"count(up and foo)":
+			"count(up and foo)",
+			"count(memory_bytes / ignoring(job) memory_limit)":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -43,12 +44,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 			"count(foo / missing)",
 			"count(foo / ignoring(xxx) app_registry)",
 			"count(foo / on(notfound) bar)",
-			"count(memory_bytes / ignoring(job) (memory_limit))",
-			"count((memory_bytes / ignoring(job) (memory_limit)) * on(app_name) group_left(a, b, c) app_registry)",
+			"count((memory_bytes / ignoring(job) memory_limit) * on(app_name) group_left(a, b, c) app_registry)",
 			"count(foo / on(notfound) bar_with_notfound)",
 			"count(foo_with_notfound / on(notfound) bar)",
 			"count(foo_with_notfound / ignoring(notfound) bar)",
-			"count(min_over_time((foo_with_notfound)[30m:1m]) / bar)":
+			"count(min_over_time(foo_with_notfound[30m:1m]) / bar)",
+			"count((foo / ignoring(notfound) foo_with_notfound) / (foo / ignoring(notfound) foo_with_notfound))",
+			"count((foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -58,7 +60,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[]
 				}
 			}`))
-		case "topk(1, foo)":
+		case "topk(1, foo)", "topk(1, (foo / ignoring(notfound) foo_with_notfound))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -78,7 +80,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[{"metric":{"__name__": "bar", "instance": "instance1", "job": "bar_job"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "topk(1, foo_with_notfound)", "topk(1, min_over_time((foo_with_notfound)[30m:1m]))":
+		case "topk(1, foo_with_notfound)", "topk(1, min_over_time(foo_with_notfound[30m:1m]))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -98,34 +100,24 @@ func TestVectorMatchingCheck(t *testing.T) {
 					"result":[{"metric":{"__name__": "bar", "instance": "instance1", "job": "bar_job", "notfound": "xxx"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "topk(1, (memory_bytes / ignoring(job) (memory_limit)))":
+		case "topk(1, memory_bytes)", "topk(1, (memory_bytes / ignoring(job) memory_limit))":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
 				"data":{
 					"resultType":"vector",
-					"result":[{"metric":{"instance": "instance1", "job": "foo_job"},"value":[1614859502.068,"1"]}]
+					"result":[{"metric":{"__name__": "memory_bytes", "instance": "instance1", "job": "foo_job", "dev": "mem"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "topk(1, memory_bytes)":
+		case "topk(1, memory_limit)":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
 				"data":{
 					"resultType":"vector",
-					"result":[{"metric":{"__name__": "memory_bytes", "instance": "instance1", "job": "foo_job"},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case "topk(1, (memory_limit))":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{"instance": "instance1", "job": "bar_job"},"value":[1614859502.068,"1"]}]
+					"result":[{"metric":{"instance": "instance1", "job": "bar_job", "dev": "mem"},"value":[1614859502.068,"1"]}]
 				}
 			}`))
 		case "topk(1, app_registry)":
@@ -354,6 +346,30 @@ func TestVectorMatchingCheck(t *testing.T) {
 					Lines:    []int{2},
 					Reporter: "promql/vector_matching",
 					Text:     `both sides of the query have different labels: [instance job notfound] != [instance job]`,
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "scalar",
+			content:     "- alert: foo\n  expr: (100*(1024^2))\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "binary expression on both sides / passing",
+			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (foo / ignoring(notfound) foo_with_notfound)\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+		},
+		{
+			description: "binary expression on both sides / mismatch",
+			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)\n",
+			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			problems: []checks.Problem{
+				{
+					Fragment: "(foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)",
+					Lines:    []int{2},
+					Reporter: "promql/vector_matching",
+					Text:     "both sides of the query have different labels: [instance job] != [dev instance job]",
 					Severity: checks.Bug,
 				},
 			},
