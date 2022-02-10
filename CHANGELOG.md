@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.10.1
+
+### Fixed
+
+- Fixed a number of bug with `promql/vector_matching` check.
+
 ## v0.10.0
 
 ### Changed
