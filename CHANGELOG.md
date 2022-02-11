@@ -5,6 +5,8 @@
 ### Added
 
 - Added `promql/regexp` check that will warn about unnecessary regexp matchers.
+- Add  `pint_prometheus_queries_total` and `pint_prometheus_query_errors_total`
+  metric when running `pint watch`.
 
 ## v0.10.1
 

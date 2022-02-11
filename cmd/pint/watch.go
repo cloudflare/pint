@@ -18,6 +18,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -125,6 +126,7 @@ func actionWatch(c *cli.Context) (err error) {
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
 	prometheus.MustRegister(pintVersion)
+	promapi.RegisterMetrics()
 	pintVersion.WithLabelValues(version).Set(1)
 	http.Handle("/metrics", promhttp.Handler())
 	listen := c.String(listenFlag)
