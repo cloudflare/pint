@@ -1,0 +1,150 @@
+exec bash -x ./prometheus.sh &
+exec bash -c 'while [ ! -f prometheus.pid ]; do sleep 1 ; done'
+
+exec bash -x ./test.sh &
+
+pint.ok watch --listen=:6054 --pidfile=pint.pid rules
+cmp curl.txt metrics.txt
+
+-- test.sh --
+sleep 15
+curl -s http://127.0.0.1:6054/metrics | grep 'pint_' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
+cat pint.pid | xargs kill
+cat prometheus.pid | xargs kill
+
+-- rules/1.yml --
+- record: broken
+  expr: foo / count())
+
+- record: aggregate
+  expr: sum(foo) without(job)
+
+- alert: comparison
+  expr: foo
+
+-- .pint.hcl --
+prometheus "prom1" {
+  uri     = "http://127.0.0.1:7054"
+  timeout = "5s"
+}
+
+prometheus "prom2" {
+  uri     = "http://127.0.0.1:1054"
+  timeout = "5s"
+}
+
+-- metrics.txt --
+# HELP pint_check_duration_seconds How long did a check took to complete
+# TYPE pint_check_duration_seconds summary
+pint_check_duration_seconds_sum{check="alerts/for"}
+pint_check_duration_seconds_count{check="alerts/for"}
+pint_check_duration_seconds_sum{check="alerts/template"}
+pint_check_duration_seconds_count{check="alerts/template"}
+pint_check_duration_seconds_sum{check="promql/comparison"}
+pint_check_duration_seconds_count{check="promql/comparison"}
+pint_check_duration_seconds_sum{check="promql/fragile"}
+pint_check_duration_seconds_count{check="promql/fragile"}
+pint_check_duration_seconds_sum{check="promql/rate"}
+pint_check_duration_seconds_count{check="promql/rate"}
+pint_check_duration_seconds_sum{check="promql/regexp"}
+pint_check_duration_seconds_count{check="promql/regexp"}
+pint_check_duration_seconds_sum{check="promql/series"}
+pint_check_duration_seconds_count{check="promql/series"}
+pint_check_duration_seconds_sum{check="promql/syntax"}
+pint_check_duration_seconds_count{check="promql/syntax"}
+pint_check_duration_seconds_sum{check="promql/vector_matching"}
+pint_check_duration_seconds_count{check="promql/vector_matching"}
+# HELP pint_check_iterations_total Total number of completed check iterations since pint start
+# TYPE pint_check_iterations_total counter
+pint_check_iterations_total
+# HELP pint_problem Prometheus rule problem reported by pint
+# TYPE pint_problem gauge
+pint_problem{kind="alerting",name="comparison",problem="failed to query prom1 prometheus config: failed to query Prometheus config: server_error: server error: 500",reporter="promql/rate",severity="bug"}
+pint_problem{kind="alerting",name="comparison",problem="failed to query prom2 prometheus config: failed to query Prometheus config: Get \"http://127.0.0.1:1054/api/v1/status/config\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/rate",severity="bug"}
+pint_problem{kind="alerting",name="comparison",problem="query using prom1 failed with: bad_response: Unmarshal: there are bytes left after unmarshal, error found in #10 byte of ...|ry\"\n    }Fatal error|..., bigger context ...|pe\":\"bad_data\",\n      \"error\":\"bogus query\"\n    }Fatal error|...",reporter="promql/series",severity="bug"}
+pint_problem{kind="alerting",name="comparison",problem="query using prom2 failed with: Post \"http://127.0.0.1:1054/api/v1/query\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/series",severity="bug"}
+pint_problem{kind="recording",name="aggregate",problem="failed to query prom1 prometheus config: failed to query Prometheus config: server_error: server error: 500",reporter="promql/rate",severity="bug"}
+pint_problem{kind="recording",name="aggregate",problem="failed to query prom2 prometheus config: failed to query Prometheus config: Get \"http://127.0.0.1:1054/api/v1/status/config\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/rate",severity="bug"}
+pint_problem{kind="recording",name="aggregate",problem="query using prom1 failed with: bad_response: Unmarshal: there are bytes left after unmarshal, error found in #10 byte of ...|ry\"\n    }Fatal error|..., bigger context ...|pe\":\"bad_data\",\n      \"error\":\"bogus query\"\n    }Fatal error|...",reporter="promql/series",severity="bug"}
+pint_problem{kind="recording",name="aggregate",problem="query using prom2 failed with: Post \"http://127.0.0.1:1054/api/v1/query\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/series",severity="bug"}
+pint_problem{kind="recording",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+# HELP pint_problems Total number of problems reported by pint
+# TYPE pint_problems gauge
+pint_problems
+# HELP pint_prometheus_queries_total Total number of all prometheus queries
+# TYPE pint_prometheus_queries_total counter
+pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom1"}
+pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom2"}
+pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom1"}
+pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom2"}
+# HELP pint_prometheus_query_errors_total Total number of failed prometheus queries
+# TYPE pint_prometheus_query_errors_total counter
+pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason="api/bad_response"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
+# HELP pint_version Version information
+# TYPE pint_version gauge
+pint_version{version="unknown"}
+-- prometheus.go --
+package main
+
+import (
+	"context"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/api/v1/status/config", func(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(500)
+		io.WriteString(w, "Fatal error")
+	})
+
+	http.HandleFunc("/api/v1/query", func(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(400)
+    w.Header().Set("Content-Type", "application/json")
+    _, _ = w.Write([]byte(`{
+      "status":"error",
+      "errorType":"bad_data",
+      "error":"bogus query"
+    }`))
+		io.WriteString(w, "Fatal error")
+	})
+
+	listener, err := net.Listen("tcp", "127.0.0.1:7054")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server := &http.Server{
+		Addr: "127.0.0.1:7054",
+	}
+
+	go func() {
+		_ = server.Serve(listener)
+	}()
+
+	pid := os.Getpid()
+	err = os.WriteFile("prometheus.pid", []byte(strconv.Itoa(pid)), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+}
+
+-- prometheus.sh --
+env GOCACHE=$TMPDIR go run prometheus.go
