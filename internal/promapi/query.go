@@ -32,7 +32,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query")
+	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query").Inc()
 	start := time.Now()
 	result, _, err := p.api.Query(ctx, expr, start)
 	duration := time.Since(start)
@@ -46,7 +46,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 			Str("uri", p.uri).
 			Str("query", expr).
 			Msg("Query failed")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", errReason(err))
+		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", errReason(err)).Inc()
 		return nil, err
 	}
 
@@ -60,7 +60,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 		qr.Series = vectorVal
 	default:
 		log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result.Type())
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", "unknown result type")
+		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", "unknown result type").Inc()
 		return nil, fmt.Errorf("unknown result type: %v", result.Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")

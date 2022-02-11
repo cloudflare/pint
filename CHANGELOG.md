@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.11.1
+
+### Fixed
+
+- `pint_prometheus_queries_total` and `pint_prometheus_query_errors_total` metrics
+  were not incremented correctly.
+
 ## v0.11.0
 
 ### Added
