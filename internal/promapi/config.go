@@ -40,13 +40,13 @@ func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
 	resp, err := p.api.Config(ctx)
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Msg("Failed to query Prometheus configuration")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err))
+		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
 		return nil, fmt.Errorf("failed to query Prometheus config: %w", err)
 	}
 
 	var cfg PrometheusConfig
 	if err = yaml.Unmarshal([]byte(resp.YAML), &cfg); err != nil {
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err))
+		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
 		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.uri, err)
 	}
 

@@ -43,7 +43,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	rctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query_range")
+	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
 	r := v1.Range{
 		Start: start,
 		End:   end,
@@ -60,7 +60,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		Msg("Range query completed")
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", errReason(err))
+		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", errReason(err)).Inc()
 		if delta, retryOK := canRetry(err, end.Sub(start)); retryOK {
 			if delta < step*2 {
 				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
@@ -84,7 +84,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		qr.Samples = samples
 	default:
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.Type())
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", "unknown result type")
+		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", "unknown result type").Inc()
 		return nil, fmt.Errorf("unknown result type: %v", result.Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
