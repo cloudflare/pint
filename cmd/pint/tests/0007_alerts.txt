@@ -14,7 +14,7 @@ rules/0001.yml:1-2: severity label is required (rule/label)
 - alert: Always
   expr: up
 
-rules/0001.yml:2: alert query doesn't have any condition, it will always fire if the metric exists (promql/comparison)
+rules/0001.yml:2: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
   expr: up
 
 rules/0001.yml:9-10: url annotation is required (alerts/annotation)
@@ -55,7 +55,7 @@ level=fatal msg="Fatal error" error="problems found"
 - alert: Always
   expr: up
 - alert: AlwaysIgnored
-  expr: up # pint disable promql/comparison
+  expr: up # pint disable alerts/comparison
   labels:
     severity: warning
   annotations:

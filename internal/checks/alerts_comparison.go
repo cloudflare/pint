@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ComparisonCheckName = "promql/comparison"
+	ComparisonCheckName = "alerts/comparison"
 )
 
 func NewComparisonCheck() ComparisonCheck {

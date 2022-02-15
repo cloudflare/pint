@@ -1,4 +1,4 @@
-pint.ok --no-color -d alerts/for -d promql/comparison lint rules
+pint.ok --no-color -d alerts/for -d alerts/comparison lint rules
 ! stdout .
 cmp stderr stderr.txt
 

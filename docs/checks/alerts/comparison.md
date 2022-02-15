@@ -1,0 +1,46 @@
+---
+layout: default
+parent: Checks
+grand_parent: Documentation
+---
+
+# alerts/comparison
+
+This check enforces use of a comparison operator in alert queries.
+Any result returned by alerting rule query will trigger an alert, so it's
+recommended for all alert queries to have some condition `errors > 10`, so we
+only get `errors` series if the value is above 10.
+If we would remove `> 10` part query would always return `errors` and so it
+would always trigger an alert, even when `errors` value is `0`.
+
+In some cases time series or specific label values will only be exported to
+Prometheus under some conditions, for example `http_responses_total{code="504"}`
+might only be exported if there's at least one 504 error observed.
+This means that an alert with a query `http_responses_total{code="504"}` might
+work perfectly fine, since in practice we'll never have this specific time
+series in Prometheus with zero value.
+But this setup is fragile and unpredictable, so it's highly recommended to
+have always set conditions on alerts, especially that adding `> 0` shouldn't
+have any negative side effects.
+
+## Configuration
+
+This check doesn't have any configuration options.
+
+## How to enable it
+
+This check is enabled by default.
+
+## How to disable it
+
+You can disable this check globally by adding this config block:
+
+```js
+checks {
+  disabled = ["alerts/comparison"]
+}
+```
+
+Or you can disable it per rule by adding a comment to it.
+
+`# pint disable alerts/comparison`

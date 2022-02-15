@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.12.0
+
+### Changed
+
+- `promql/comparison` only applies to alerts, so it was renamed to
+  `alerts/comparison`.
+- Online documentation hosted at [cloudflare.github.io/pint](https://cloudflare.github.io/pint/)
+  was reworked.
+
 ## v0.11.1
 
 ### Fixed
@@ -234,7 +243,7 @@
   Example:
 
   {% raw %}
-  ```YAML
+  ```yaml
   - alert: Foo
     expr: absent(foo{env="prod"})
     annotations:
@@ -255,7 +264,7 @@
   modifier after condition, which can cause alert to always fire.
   Example:
 
-  ```YAML
+  ```yaml
   - alert: Foo
     expr: rate(error_count[5m]) > bool 5
   ```
@@ -299,7 +308,7 @@
   Example:
 
   {% raw %}
-  ```YAML
+  ```yaml
   - alert: Foo
     expr: count(up) without(instance) == 0
     annotations:
