@@ -67,13 +67,18 @@ checks {
 
 Or you can disable it per rule by adding a comment to it.
 
-### If `value` is set
+`# pint disable alerts/annotation`
+
+If you want to disable only individual instances of this check
+you can add a more specific comment.
+
+### If `value` is NOT set
 
 ```yaml
 groups:
   - name: ...
     rules:
-    # pint disable alerts/annotation($pattern:$value:$required)
+    # pint disable alerts/annotation($pattern:$required)
     - record: ...
       expr: ...
 ```
@@ -90,13 +95,13 @@ Example comment disabling that rule:
 
 `# pint disable alerts/annotation(summary:true)`
 
-### If `value` is NOT set
+### If `value` is set
 
 ```yaml
 groups:
   - name: ...
     rules:
-    # pint disable alerts/annotation($pattern:$required)
+    # pint disable alerts/annotation($pattern:$value:$required)
     - record: ...
       expr: ...
 ```

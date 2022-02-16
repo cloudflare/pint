@@ -84,7 +84,12 @@ checks {
 }
 ```
 
-Or you can disable it per rule by adding a comment to it.
+Or you can disable it per rule by adding a comment to it:
+
+`# pint disable promql/aggregate`
+
+If you want to disable only individual instances of this check
+you can add a more specific comment.
 
 ### If `keep` is set
 
