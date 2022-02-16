@@ -29,9 +29,8 @@ snapshot:
   name_template: "{{ incpatch .Version }}-next"
 release:
   extra_files:
-    - glob: ./*.md
-    - glob: ./docs/*
-    - glob: ./docs/**/*
+    - glob: ./README.md
+    - glob: ./docs/changelog.md
 changelog:
   use: github
   sort: asc

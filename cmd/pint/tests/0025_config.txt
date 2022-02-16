@@ -23,7 +23,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "alerts/for",
       "alerts/template",
       "promql/aggregate",
-      "promql/comparison",
+      "alerts/comparison",
       "promql/fragile",
       "promql/rate",
       "promql/regexp",

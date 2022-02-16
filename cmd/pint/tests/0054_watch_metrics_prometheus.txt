@@ -36,12 +36,12 @@ prometheus "prom2" {
 -- metrics.txt --
 # HELP pint_check_duration_seconds How long did a check took to complete
 # TYPE pint_check_duration_seconds summary
+pint_check_duration_seconds_sum{check="alerts/comparison"}
+pint_check_duration_seconds_count{check="alerts/comparison"}
 pint_check_duration_seconds_sum{check="alerts/for"}
 pint_check_duration_seconds_count{check="alerts/for"}
 pint_check_duration_seconds_sum{check="alerts/template"}
 pint_check_duration_seconds_count{check="alerts/template"}
-pint_check_duration_seconds_sum{check="promql/comparison"}
-pint_check_duration_seconds_count{check="promql/comparison"}
 pint_check_duration_seconds_sum{check="promql/fragile"}
 pint_check_duration_seconds_count{check="promql/fragile"}
 pint_check_duration_seconds_sum{check="promql/rate"}

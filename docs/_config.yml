@@ -1,0 +1,4 @@
+remote_theme: pdmosses/just-the-docs@combination
+aux_links:
+  "cloudflare/pint on GitHub":
+    - "//github.com/cloudflare/pint"

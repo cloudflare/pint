@@ -6,11 +6,11 @@ cmp stderr stderr.txt
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/0001.yml rules=3
 level=debug msg="Found alerting rule" alert=first lines=1-3 path=rules/0001.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=first
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=first
 level=debug msg="Found recording rule" lines=5-6 path=rules/0001.yml record=second
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
 level=debug msg="Found alerting rule" alert=third lines=8-9 path=rules/0001.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","promql/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=third
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=third
 rules/0001.yml:6: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
   expr: sum(bar)
 

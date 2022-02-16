@@ -1,0 +1,115 @@
+---
+layout: default
+parent: Checks
+grand_parent: Documentation
+---
+
+# alerts/annotation
+
+This check can be used to enforce annotations on alerting rules.
+
+## Configuration
+
+Syntax:
+
+```js
+annotation "$pattern" {
+  severity = "bug|warning|info"
+  value    = "(.*)"
+  required = true|false
+}
+```
+
+- `$pattern` - regexp pattern to match annotation name on
+- `severity` - set custom severity for reported issues, defaults to a warning
+- `value` - optional value pattern to enforce, if not set only the 
+- `required` - if `true` pint will require every alert to have this annotation set,
+  if `false` it will only check values where annotation is set
+
+## How to enable it
+
+This check is not enabled by default as it requires explicit configuration
+to work.
+To enable it add one or more `rule {...}` blocks and specify all required
+annotations there.
+
+Example set of rules that will:
+- require `summary` annotation to be present, if missing it will be reported as a warning
+- if a `dashboard` annotation is provided it must match `https://grafana\.example\.com/.+`
+  pattern, if it doesn't match that pattern it will be reported as a bug
+
+```js
+rule {
+  match {
+    kind = "alerting"
+  }
+
+  annotation "summary" {
+    required = true
+  }
+
+  annotation "dashboard" {
+    severity = "bug"
+    value    = "https://grafana\.example\.com/.+"
+  }
+}
+```
+
+## How to disable it
+
+You can disable this check globally by adding this config block:
+
+```js
+checks {
+  disabled = ["alerts/annotations"]
+}
+```
+
+Or you can disable it per rule by adding a comment to it.
+
+### If `value` is set
+
+```yaml
+groups:
+  - name: ...
+    rules:
+    # pint disable alerts/annotation($pattern:$value:$required)
+    - record: ...
+      expr: ...
+```
+
+Example rule:
+
+```js
+annotation "summary" {
+  required = true
+}
+```
+
+Example comment disabling that rule:
+
+`# pint disable alerts/annotation(summary:true)`
+
+### If `value` is NOT set
+
+```yaml
+groups:
+  - name: ...
+    rules:
+    # pint disable alerts/annotation($pattern:$required)
+    - record: ...
+      expr: ...
+```
+
+Example rule:
+
+```js
+annotation "dashboard" {
+  severity = "bug"
+  value    = "https://grafana\.example\.com/.+"
+}
+```
+
+Example comment disabling that rule:
+
+`# pint disable alerts/annotation(dashboard:https://grafana\.example\.com/.+:true)`
