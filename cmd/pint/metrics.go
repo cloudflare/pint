@@ -23,4 +23,10 @@ var (
 		},
 		[]string{"check"},
 	)
+	lastRunTime = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "pint_last_run_time_seconds",
+			Help: "Last checks run completion time since unix epoch in seconds",
+		},
+	)
 )

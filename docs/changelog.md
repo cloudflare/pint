@@ -2,6 +2,10 @@
 
 ## v0.12.0
 
+### Added
+
+- Added  `pint_last_run_time_seconds` metric when running `pint watch`.
+
 ### Changed
 
 - `promql/comparison` only applies to alerts, so it was renamed to
@@ -21,7 +25,7 @@
 ### Added
 
 - Added `promql/regexp` check that will warn about unnecessary regexp matchers.
-- Add  `pint_prometheus_queries_total` and `pint_prometheus_query_errors_total`
+- Added  `pint_prometheus_queries_total` and `pint_prometheus_query_errors_total`
   metric when running `pint watch`.
 
 ## v0.10.1
