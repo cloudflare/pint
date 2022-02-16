@@ -75,6 +75,34 @@ func TestRange(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`unknown start/end`))
 			}
+		case "duplicate_series":
+			start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+			end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+			diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
+			t.Log(diff.String())
+			switch diff.String() {
+			case "168h0m0s", "84h0m0s", "42h0m0s", "21h0m0s", "10h30m0s":
+				w.WriteHeader(422)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{
+					"status":"error",
+					"errorType":"execution",
+					"error":"found duplicate series for the match group {...} on the right hand-side of the operation: [{...}, {...}];many-to-many matching not allowed: matching labels must be unique on one side"
+				}`))
+			case "5h15m0s":
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[
+							{"metric":{"instance":"1"},"values":[
+								[1614859502.068,"0"]
+							]}
+						]}}`))
+			default:
+				t.Errorf("invalid duplicate_series diff: %s", diff)
+				w.WriteHeader(500)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`unknown start/end`))
+			}
 		case "retry_until_success":
 			start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 			end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
@@ -300,6 +328,24 @@ func TestRange(t *testing.T) {
 				},
 			},
 			runs: 5,
+		},
+		// duplicate series
+		{
+			query: "duplicate_series",
+			args: func() (time.Time, time.Time, time.Duration) {
+				start := time.Unix(1577836800, 0)
+				end := time.Unix(1578441600, 0)
+				return start, end, time.Minute * 5
+			},
+			timeout: time.Second,
+			samples: []*model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: []model.SamplePair{
+						{Timestamp: 1614859502068, Value: 0},
+					},
+				},
+			}, runs: 5,
 		},
 	}
 

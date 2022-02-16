@@ -103,5 +103,8 @@ func canRetry(err error, delta time.Duration) (time.Duration, bool) {
 	if strings.Contains(err.Error(), "query processing would load too many samples into memory in ") {
 		return (delta / 4) * 3, true
 	}
+	if strings.Contains(err.Error(), "found duplicate series for the match group") {
+		return delta / 2, true
+	}
 	return delta, false
 }
