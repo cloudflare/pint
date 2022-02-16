@@ -12,6 +12,8 @@
   `alerts/comparison`.
 - Online documentation hosted at [cloudflare.github.io/pint](https://cloudflare.github.io/pint/)
   was reworked.
+- `alerts/count` check will now retry range queries with shorter time window
+  on `found duplicate series for the match group ...` errors from Prometheus.
 
 ## v0.11.1
 
