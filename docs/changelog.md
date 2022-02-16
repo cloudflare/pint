@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added  `pint_last_run_time_seconds` metric when running `pint watch`.
+- Added  `pint_last_run_time_seconds` and `pint_rules_parsed_total` metrics when running `pint watch`.
 
 ### Changed
 

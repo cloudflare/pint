@@ -29,4 +29,11 @@ var (
 			Help: "Last checks run completion time since unix epoch in seconds",
 		},
 	)
+	rulesParsedTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "pint_rules_parsed_total",
+			Help: "Total number of rules parsed since startup",
+		},
+		[]string{"kind"},
+	)
 )

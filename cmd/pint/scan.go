@@ -89,6 +89,7 @@ func scanFiles(ctx context.Context, workers int, cfg config.Config, fcs discover
 			rule := rule
 
 			if rule.AlertingRule != nil {
+				rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
 				log.Debug().
 					Str("path", path).
 					Str("alert", rule.AlertingRule.Alert.Value.Value).
@@ -100,11 +101,13 @@ func scanFiles(ctx context.Context, workers int, cfg config.Config, fcs discover
 					Str("record", rule.RecordingRule.Record.Value.Value).
 					Str("lines", output.FormatLineRangeString(rule.Lines())).
 					Msg("Found recording rule")
+				rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
 			} else if rule.Error.Err != nil {
 				log.Debug().
 					Str("path", path).
 					Str("lines", output.FormatLineRangeString(rule.Lines())).
 					Msg("Found invalid rule")
+				rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
 			}
 
 			if rule.Error.Err == nil {
@@ -146,6 +149,9 @@ func scanFiles(ctx context.Context, workers int, cfg config.Config, fcs discover
 	for result := range results {
 		summary.Reports = append(summary.Reports, result)
 	}
+
+	lastRunTime.SetToCurrentTime()
+
 	return
 }
 
