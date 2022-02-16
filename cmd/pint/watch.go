@@ -126,6 +126,7 @@ func actionWatch(c *cli.Context) (err error) {
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
 	prometheus.MustRegister(pintVersion)
+	prometheus.MustRegister(lastRunTime)
 	promapi.RegisterMetrics()
 	pintVersion.WithLabelValues(version).Set(1)
 	http.Handle("/metrics", promhttp.Handler())
@@ -235,6 +236,10 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 }
 
 func (c *problemCollector) scan(ctx context.Context, workers int) error {
+	defer func() {
+		lastRunTime.SetToCurrentTime()
+	}()
+
 	d := discovery.NewGlobFileFinder()
 	toScan, err := d.Find(c.paths...)
 	if err != nil {

@@ -57,6 +57,9 @@ pint_check_duration_seconds_count{check="promql/vector_matching"}
 # HELP pint_check_iterations_total Total number of completed check iterations since pint start
 # TYPE pint_check_iterations_total counter
 pint_check_iterations_total
+# HELP pint_last_run_time_seconds Last checks run completion time since unix epoch in seconds
+# TYPE pint_last_run_time_seconds gauge
+pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
 pint_problem{kind="alerting",name="comparison",problem="failed to query prom1 prometheus config: failed to query Prometheus config: server_error: server error: 500",reporter="promql/rate",severity="bug"}
