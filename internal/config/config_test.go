@@ -180,6 +180,37 @@ prometheus "prom" {
 			},
 		},
 		{
+			title: "two prometheus servers / disable all checks via comment",
+			config: `
+prometheus "prom1" {
+  uri     = "http://localhost/1"
+  timeout = "1s"
+}
+prometheus "prom2" {
+  uri     = "http://localhost/2"
+  timeout = "1s"
+}
+checks {
+  disabled = [ "alerts/template" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint disable promql/rate
+# pint disable promql/series
+# pint disable promql/vector_matching
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
 			title: "single prometheus server / path mismatch",
 			config: `
 prometheus "prom" {

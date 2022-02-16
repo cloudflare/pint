@@ -72,6 +72,11 @@ checks {
 
 Or you can disable it per rule by adding a comment to it.
 
+`# pint disable alerts/count`
+
+If you want to disable only individual instances of this check
+you can add a more specific comment.
+
 `# pint disable alerts/count($prometheus)`
 
 Where `$prometheus` is the name of Prometheus server to disable.

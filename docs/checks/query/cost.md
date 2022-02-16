@@ -86,24 +86,29 @@ checks {
 }
 ```
 
-Or you can disable it per rule by adding a comment to it.
+Or you can disable it per rule by adding a comment to it:
+
+`# pint disable query/cost`
+
+If you want to disable only individual instances of this check
+you can add a more specific comment.
 
 ### If `maxSeries` is set
 
-`# pint disable promql/aggregate($prometheus:$maxSeries)`
+`# pint disable query/cost($prometheus:$maxSeries)`
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable promql/aggregate(dev:5000)`
+`# pint disable query/cost(dev:5000)`
 
 ### If `maxSeries` is NOT set
 
-`# pint disable promql/aggregate($prometheus)`
+`# pint disable query/cost($prometheus)`
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable promql/aggregate(dev)`
+`# pint disable query/cost(dev)`

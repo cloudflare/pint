@@ -1127,6 +1127,49 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s"
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s"
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/defaults - 2]
 {
   "ci": {
@@ -1185,6 +1228,49 @@
       "promql/series",
       "rule/label",
       "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s"
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s"
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
     ]
   }
 }
@@ -2318,6 +2404,49 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s"
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s"
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/single_prometheus_server_/_path_mismatch - 3]
 {
   "ci": {
@@ -3446,6 +3575,49 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s"
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s"
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/single_prometheus_server_/_path_mismatch - 4]
 {
   "ci": {
@@ -4569,6 +4741,49 @@
       "promql/series",
       "rule/label",
       "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s"
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s"
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
     ]
   }
 }

@@ -94,7 +94,7 @@ Available metrics:
 
 ## Release Notes
 
-See [changelog](changelog.html) for history of changes.
+See [changelog](changelog.md) for history of changes.
 
 ## Quick start
 
