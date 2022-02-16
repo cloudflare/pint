@@ -122,13 +122,21 @@ func actionWatch(c *cli.Context) (err error) {
 
 	// start HTTP server for metrics
 	collector := newProblemCollector(cfg, paths, minSeverity, c.Int(maxProblemsFlag))
+	// register all metrics
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
 	prometheus.MustRegister(pintVersion)
 	prometheus.MustRegister(lastRunTime)
+	prometheus.MustRegister(rulesParsedTotal)
 	promapi.RegisterMetrics()
+
+	// init metrics if needed
 	pintVersion.WithLabelValues(version).Set(1)
+	rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Add(0)
+	rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Add(0)
+	rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Add(0)
+
 	http.Handle("/metrics", promhttp.Handler())
 	listen := c.String(listenFlag)
 	server := http.Server{
@@ -236,10 +244,6 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 }
 
 func (c *problemCollector) scan(ctx context.Context, workers int) error {
-	defer func() {
-		lastRunTime.SetToCurrentTime()
-	}()
-
 	d := discovery.NewGlobFileFinder()
 	toScan, err := d.Find(c.paths...)
 	if err != nil {

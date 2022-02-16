@@ -86,6 +86,11 @@ pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason=
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
+# HELP pint_rules_parsed_total Total number of rules parsed since startup
+# TYPE pint_rules_parsed_total counter
+pint_rules_parsed_total{kind="alerting"}
+pint_rules_parsed_total{kind="invalid"}
+pint_rules_parsed_total{kind="recording"}
 # HELP pint_version Version information
 # TYPE pint_version gauge
 pint_version{version="unknown"}

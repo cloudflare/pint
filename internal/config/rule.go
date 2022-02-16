@@ -14,8 +14,9 @@ import (
 )
 
 const (
-	alertingRuleType  = "alerting"
-	recordingRuleType = "recording"
+	AlertingRuleType  = "alerting"
+	RecordingRuleType = "recording"
+	InvalidRuleType   = "invalid"
 )
 
 type (
@@ -122,7 +123,7 @@ func (m Match) validate(allowEmpty bool) error {
 	switch m.Kind {
 	case "":
 		// not set
-	case alertingRuleType, recordingRuleType:
+	case AlertingRuleType, RecordingRuleType:
 		// pass
 	default:
 		return fmt.Errorf("unknown rule type: %s", m.Kind)
@@ -149,10 +150,10 @@ func (m Match) validate(allowEmpty bool) error {
 
 func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 	if m.Kind != "" {
-		if r.AlertingRule != nil && m.Kind != alertingRuleType {
+		if r.AlertingRule != nil && m.Kind != AlertingRuleType {
 			return false
 		}
-		if r.RecordingRule != nil && m.Kind != recordingRuleType {
+		if r.RecordingRule != nil && m.Kind != RecordingRuleType {
 			return false
 		}
 	}
