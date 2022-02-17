@@ -1,5 +1,5 @@
 exec bash -x ./prometheus.sh &
-exec bash -c 'while [ ! -f prometheus.pid ]; do sleep 1 ; done'
+exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
 
 exec bash -x ./test.sh &
 
@@ -148,6 +148,10 @@ func main() {
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		time.Sleep(time.Minute*2)
+		stop <- syscall.SIGTERM
+	}()
 	<-stop
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
