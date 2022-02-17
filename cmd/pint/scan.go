@@ -38,7 +38,7 @@ func scanProblem(path string, err error) reporter.Report {
 		Path: path,
 		Problem: checks.Problem{
 			Lines:    []int{line},
-			Reporter: "pint/parse",
+			Reporter: "yaml/parse",
 			Text:     e,
 			Severity: checks.Fatal,
 		},
@@ -174,7 +174,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 				results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: checks.Problem{
 					Fragment: job.rule.Error.Fragment,
 					Lines:    []int{job.rule.Error.Line},
-					Reporter: "pint/parse",
+					Reporter: "yaml/parse",
 					Text:     job.rule.Error.Err.Error(),
 					Severity: checks.Fatal,
 				}}
