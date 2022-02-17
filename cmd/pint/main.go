@@ -2,9 +2,7 @@ package main
 
 import (
 	"os"
-	"time"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
@@ -77,14 +75,8 @@ func newApp() *cli.App {
 }
 
 func main() {
-	err := sentry.Init(sentry.ClientOptions{})
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to init sentry")
-	}
-	defer sentry.Flush(time.Second * 10)
-
 	app := newApp()
-	err = app.Run(os.Args)
+	err := app.Run(os.Args)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Execution completed with error(s)")
 		os.Exit(1)
