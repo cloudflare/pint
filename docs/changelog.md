@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.12.1
+
+### Changed
+
+- Renamed `pint/parse` to `yaml/parse` and added missing documentation for it.
+
 ## v0.12.0
 
 ### Added
