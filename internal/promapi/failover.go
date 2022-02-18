@@ -6,14 +6,16 @@ import (
 )
 
 type FailoverGroup struct {
-	name    string
-	servers []*Prometheus
+	name         string
+	servers      []*Prometheus
+	strictErrors bool
 }
 
-func NewFailoverGroup(name string, servers []*Prometheus) *FailoverGroup {
+func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool) *FailoverGroup {
 	return &FailoverGroup{
-		name:    name,
-		servers: servers,
+		name:         name,
+		servers:      servers,
+		strictErrors: strictErrors,
 	}
 }
 
@@ -34,7 +36,7 @@ func (fg *FailoverGroup) Config(ctx context.Context) (cfg *PrometheusConfig, err
 			return
 		}
 	}
-	return
+	return nil, &Error{err: err, isStrict: fg.strictErrors}
 }
 
 func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResult, err error) {
@@ -44,7 +46,7 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 			return
 		}
 	}
-	return
+	return nil, &Error{err: err, isStrict: fg.strictErrors}
 }
 
 func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (rqr *RangeQueryResult, err error) {
@@ -54,5 +56,5 @@ func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, start, end
 			return
 		}
 	}
-	return
+	return nil, &Error{err: err, isStrict: fg.strictErrors}
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net"
 	"strings"
 	"time"
 
@@ -63,7 +62,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
 		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", errReason(err)).Inc()
-		if delta, retryOK := canRetry(err, end.Sub(start)); retryOK {
+		if delta, retryOK := CanRetryError(err, end.Sub(start)); retryOK {
 			if delta < step*2 {
 				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
 				return nil, errors.New("no more retries possible")
@@ -95,18 +94,4 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	p.cache.Add(cacheKey, qr)
 
 	return &qr, nil
-}
-
-func canRetry(err error, delta time.Duration) (time.Duration, bool) {
-	var neterr net.Error
-	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
-		return delta / 2, true
-	}
-	if strings.Contains(err.Error(), "query processing would load too many samples into memory in ") {
-		return (delta / 4) * 3, true
-	}
-	if strings.Contains(err.Error(), "found duplicate series for the match group") {
-		return delta / 2, true
-	}
-	return delta, false
 }

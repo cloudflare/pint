@@ -62,12 +62,13 @@ func (c SeriesCheck) countSeries(ctx context.Context, expr parser.PromQLExpr, se
 	q := fmt.Sprintf("count(%s)", selector.String())
 	qr, err := c.prom.Query(ctx, q)
 	if err != nil {
+		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
 			Fragment: selector.String(),
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
-			Severity: Bug,
+			Text:     text,
+			Severity: severity,
 		})
 		return
 	}

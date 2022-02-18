@@ -18,8 +18,9 @@ stderr 'level=debug msg="Configured checks for rule" enabled=\["promql/syntax","
 
 -- .pint.hcl --
 prometheus "prom" {
-  uri     = "https://"
-  timeout = "2m"
+  uri      = "https://"
+  timeout  = "2m"
+  required = true
 }
 
 rule{}

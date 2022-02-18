@@ -20,6 +20,8 @@ import (
 
 var yamlErrRe = regexp.MustCompile("^yaml: line (.+): (.+)$")
 
+const yamlParseReporter = "yaml/parse"
+
 func tryDecodingYamlError(e string) (int, string) {
 	parts := yamlErrRe.FindStringSubmatch(e)
 	if len(parts) > 2 {
@@ -38,7 +40,7 @@ func scanProblem(path string, err error) reporter.Report {
 		Path: path,
 		Problem: checks.Problem{
 			Lines:    []int{line},
-			Reporter: "yaml/parse",
+			Reporter: yamlParseReporter,
 			Text:     e,
 			Severity: checks.Fatal,
 		},
@@ -174,7 +176,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 				results <- reporter.Report{Path: job.path, Rule: job.rule, Problem: checks.Problem{
 					Fragment: job.rule.Error.Fragment,
 					Lines:    []int{job.rule.Error.Line},
-					Reporter: "yaml/parse",
+					Reporter: yamlParseReporter,
 					Text:     job.rule.Error.Err.Error(),
 					Severity: checks.Fatal,
 				}}

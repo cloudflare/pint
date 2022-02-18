@@ -37,7 +37,8 @@
     {
       "name": "prom",
       "uri": "http://localhost",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -75,7 +76,8 @@
       "timeout": "1s",
       "paths": [
         "foo.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -113,7 +115,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -151,7 +154,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "ignore",
@@ -159,7 +163,8 @@
       "timeout": "1s",
       "paths": [
         "foo.+"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -363,7 +368,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -371,7 +377,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -489,7 +496,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -497,7 +505,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -948,7 +957,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -999,7 +1009,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {},
@@ -1028,7 +1039,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1062,7 +1074,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1101,7 +1114,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1137,12 +1151,14 @@
     {
       "name": "prom1",
       "uri": "http://localhost/1",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -1184,7 +1200,8 @@
         "http://localhost/1",
         "http://localhost/2"
       ],
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -1247,7 +1264,8 @@
     {
       "name": "prom",
       "uri": "http://localhost",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -1286,7 +1304,8 @@
         "http://localhost/1",
         "http://localhost/2"
       ],
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -1321,12 +1340,14 @@
     {
       "name": "prom1",
       "uri": "http://localhost/1",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -1367,7 +1388,8 @@
       "timeout": "1s",
       "paths": [
         "foo.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1405,7 +1427,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1443,7 +1466,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "ignore",
@@ -1451,7 +1475,8 @@
       "timeout": "1s",
       "paths": [
         "foo.+"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1655,7 +1680,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -1663,7 +1689,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -1781,7 +1808,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -1789,7 +1817,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2240,7 +2269,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2291,7 +2321,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {},
@@ -2320,7 +2351,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2354,7 +2386,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2393,7 +2426,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2457,7 +2491,8 @@
     {
       "name": "prom",
       "uri": "http://localhost",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -2496,7 +2531,8 @@
         "http://localhost/1",
         "http://localhost/2"
       ],
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -2531,12 +2567,14 @@
     {
       "name": "prom1",
       "uri": "http://localhost/1",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -2577,7 +2615,8 @@
       "timeout": "1s",
       "paths": [
         "foo.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2615,7 +2654,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2653,7 +2693,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "ignore",
@@ -2661,7 +2702,8 @@
       "timeout": "1s",
       "paths": [
         "foo.+"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2865,7 +2907,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -2873,7 +2916,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -2991,7 +3035,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -2999,7 +3044,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3450,7 +3496,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3501,7 +3548,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {},
@@ -3530,7 +3578,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3564,7 +3613,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3603,7 +3653,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3667,7 +3718,8 @@
     {
       "name": "prom",
       "uri": "http://localhost",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -3706,7 +3758,8 @@
         "http://localhost/1",
         "http://localhost/2"
       ],
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -3741,12 +3794,14 @@
     {
       "name": "prom1",
       "uri": "http://localhost/1",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -3787,7 +3842,8 @@
       "timeout": "1s",
       "paths": [
         "foo.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3825,7 +3881,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -3863,7 +3920,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "ignore",
@@ -3871,7 +3929,8 @@
       "timeout": "1s",
       "paths": [
         "foo.+"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4075,7 +4134,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -4083,7 +4143,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4201,7 +4262,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -4209,7 +4271,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4660,7 +4723,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4711,7 +4775,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {},
@@ -4740,7 +4805,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4774,7 +4840,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4813,7 +4880,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -4877,7 +4945,8 @@
     {
       "name": "prom",
       "uri": "http://localhost",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -4916,7 +4985,8 @@
         "http://localhost/1",
         "http://localhost/2"
       ],
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -4951,12 +5021,14 @@
     {
       "name": "prom1",
       "uri": "http://localhost/1",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
-      "timeout": "1s"
+      "timeout": "1s",
+      "required": false
     }
   ],
   "checks": {
@@ -4997,7 +5069,8 @@
       "timeout": "1s",
       "paths": [
         "foo.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5035,7 +5108,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5073,7 +5147,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "ignore",
@@ -5081,7 +5156,8 @@
       "timeout": "1s",
       "paths": [
         "foo.+"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5285,7 +5361,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -5293,7 +5370,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5411,7 +5489,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     },
     {
       "name": "prom2",
@@ -5419,7 +5498,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5870,7 +5950,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5921,7 +6002,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {},
@@ -5950,7 +6032,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -5984,7 +6067,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {
@@ -6023,7 +6107,8 @@
       "timeout": "1s",
       "paths": [
         "rules.yml"
-      ]
+      ],
+      "required": false
     }
   ],
   "checks": {

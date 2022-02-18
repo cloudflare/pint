@@ -41,16 +41,15 @@ func (c RateCheck) Check(ctx context.Context, rule parser.Rule) (problems []Prob
 
 	scrapeInterval, err := c.getScrapeInterval(ctx)
 	if err != nil {
-		if err != nil {
-			problems = append(problems, Problem{
-				Fragment: expr.Value.Value,
-				Lines:    expr.Lines(),
-				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("failed to query %s prometheus config: %s", c.prom.Name(), err),
-				Severity: Bug,
-			})
-			return
-		}
+		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+		problems = append(problems, Problem{
+			Fragment: expr.Value.Value,
+			Lines:    expr.Lines(),
+			Reporter: c.Reporter(),
+			Text:     text,
+			Severity: severity,
+		})
+		return
 	}
 
 	for _, problem := range c.checkNode(expr.Query, scrapeInterval) {

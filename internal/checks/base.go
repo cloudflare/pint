@@ -2,9 +2,11 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
 var (
@@ -39,15 +41,16 @@ type Severity int
 
 func (s Severity) String() string {
 	switch s {
-	case Fatal:
-		return "Fatal"
 	case Information:
 		return "Information"
 	case Warning:
 		return "Warning"
-	default:
+	case Bug:
 		return "Bug"
+	case Fatal:
+		return "Fatal"
 	}
+	return "Unknown"
 }
 
 func ParseSeverity(s string) (Severity, error) {
@@ -56,10 +59,10 @@ func ParseSeverity(s string) (Severity, error) {
 		return Fatal, nil
 	case "bug":
 		return Bug, nil
-	case "info":
-		return Information, nil
 	case "warning":
 		return Warning, nil
+	case "info":
+		return Information, nil
 	default:
 		return Fatal, fmt.Errorf("unknown severity: %s", s)
 	}
@@ -101,4 +104,24 @@ type exprProblem struct {
 	expr     string
 	text     string
 	severity Severity
+}
+
+func textAndSeverityFromError(err error, reporter, prom string, s Severity) (text string, severity Severity) {
+	if promapi.IsUnavailableError(err) {
+		text = fmt.Sprintf("cound't run %q checks due to %q prometheus connection error: %s", reporter, prom, err)
+		var perr *promapi.Error
+		if errors.As(err, &perr) {
+			if perr.IsStrict() {
+				severity = Bug
+			} else {
+				severity = Warning
+			}
+		} else {
+			severity = Warning
+		}
+	} else {
+		text = fmt.Sprintf("query using %s failed with: %s", prom, err)
+		severity = s
+	}
+	return
 }

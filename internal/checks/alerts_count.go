@@ -53,12 +53,13 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 
 	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, start, end, c.step)
 	if err != nil {
+		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
 			Fragment: rule.AlertingRule.Expr.Value.Value,
 			Lines:    rule.AlertingRule.Expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
-			Severity: Bug,
+			Text:     text,
+			Severity: severity,
 		})
 		return
 	}

@@ -50,12 +50,13 @@ func (c CostCheck) Check(ctx context.Context, rule parser.Rule) (problems []Prob
 	query := fmt.Sprintf("count(%s)", expr.Value.Value)
 	qr, err := c.prom.Query(ctx, query)
 	if err != nil {
+		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
 			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("query using %s failed with: %s", c.prom.Name(), err),
-			Severity: Bug,
+			Text:     text,
+			Severity: severity,
 		})
 		return
 	}

@@ -85,17 +85,17 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: up == 0\n",
-			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
 		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- alert: Foo Is Down\n  expr: sum(\n",
-			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
 		},
 		{
 			description: "bad request",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -107,9 +107,23 @@ func TestAlertsCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "connection refused",
+			content:     content,
+			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://127.0.0.1", time.Second*5, false), time.Hour*24, time.Minute, time.Minute*5),
+			problems: []checks.Problem{
+				{
+					Fragment: `up{job="foo"} == 0`,
+					Lines:    []int{2},
+					Reporter: "alerts/count",
+					Text:     `cound't run "alerts/count" checks due to "prom" prometheus connection error: Post "http://127.0.0.1/api/v1/query_range": dial tcp 127.0.0.1:80: connect: connection refused`,
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
 			description: "empty response",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -123,7 +137,7 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "multiple alerts",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -137,7 +151,7 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "for: 10m",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute*6, time.Minute*10),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -154,7 +168,7 @@ func TestAlertsCheck(t *testing.T) {
 - alert: foo
   expr: '{__name__="up", job="foo"} == 0'
 `,
-			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
+			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute*6, time.Minute*10),
 			problems: []checks.Problem{
 				{
 					Fragment: `{__name__="up", job="foo"} == 0`,
@@ -171,7 +185,7 @@ func TestAlertsCheck(t *testing.T) {
 - alert: foo
   expr: '{__name__=~"(up|foo)", job="foo"} == 0'
 `,
-			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
+			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute*6, time.Minute*10),
 			problems: []checks.Problem{
 				{
 					Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,
