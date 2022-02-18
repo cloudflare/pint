@@ -3,11 +3,13 @@ package checks_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
 type checkTest struct {
@@ -96,4 +98,13 @@ func TestParseSeverity(t *testing.T) {
 			}
 		})
 	}
+}
+
+func simpleProm(name, uri string, timeout time.Duration) *promapi.FailoverGroup {
+	return promapi.NewFailoverGroup(
+		name,
+		[]*promapi.Prometheus{
+			promapi.NewPrometheus(name, uri, timeout),
+		},
+	)
 }

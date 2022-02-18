@@ -103,15 +103,22 @@ Syntax:
 
 ```js
 prometheus "$name" {
-  uri     = "https://..."
-  timeout = "60s"
-  paths   = ["...", ...]
+  uri      = "https://..."
+  failover = ["https://...", ...]
+  timeout  = "60s"
+  paths    = ["...", ...]
 }
 ```
 
 - `$name` - each defined server should have a unique name that can be used in check
   definitions.
 - `uri` - base URI of this Prometheus server, used for API requests and queries.
+- `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
+  to requests or returns an error. This allows to configure failover Prometheus servers
+  to avoid CI failures in case main Prometheus server is unreachable.
+  It's highly recommended that all URIs point to Prometheus servers with identical
+  configuration, otherwise pint checks might return unreliable results and potential
+  false positives.
 - `timeout` - timeout to be used for API requests.
 - `paths` - optional path filter, if specified only paths matching one of listed regex
   patterns will use this Prometheus server for checks.

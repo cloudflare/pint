@@ -15,12 +15,12 @@ const (
 	SeriesCheckName = "promql/series"
 )
 
-func NewSeriesCheck(prom *promapi.Prometheus) SeriesCheck {
+func NewSeriesCheck(prom *promapi.FailoverGroup) SeriesCheck {
 	return SeriesCheck{prom: prom}
 }
 
 type SeriesCheck struct {
-	prom *promapi.Prometheus
+	prom *promapi.FailoverGroup
 }
 
 func (c SeriesCheck) String() string {

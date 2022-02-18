@@ -1,0 +1,58 @@
+package promapi
+
+import (
+	"context"
+	"time"
+)
+
+type FailoverGroup struct {
+	name    string
+	servers []*Prometheus
+}
+
+func NewFailoverGroup(name string, servers []*Prometheus) *FailoverGroup {
+	return &FailoverGroup{
+		name:    name,
+		servers: servers,
+	}
+}
+
+func (fg *FailoverGroup) Name() string {
+	return fg.name
+}
+
+func (fg *FailoverGroup) ClearCache() {
+	for _, prom := range fg.servers {
+		prom.cache.Purge()
+	}
+}
+
+func (fg *FailoverGroup) Config(ctx context.Context) (cfg *PrometheusConfig, err error) {
+	for _, prom := range fg.servers {
+		cfg, err = prom.Config(ctx)
+		if err == nil {
+			return
+		}
+	}
+	return
+}
+
+func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResult, err error) {
+	for _, prom := range fg.servers {
+		qr, err = prom.Query(ctx, expr)
+		if err == nil {
+			return
+		}
+	}
+	return
+}
+
+func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (rqr *RangeQueryResult, err error) {
+	for _, prom := range fg.servers {
+		rqr, err = prom.RangeQuery(ctx, expr, start, end, step)
+		if err == nil {
+			return
+		}
+	}
+	return
+}

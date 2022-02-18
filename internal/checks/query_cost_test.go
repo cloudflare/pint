@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/rs/zerolog"
@@ -80,12 +79,12 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", "http://localhost", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", "http://localhost", time.Second*5), 4096, 0, checks.Bug),
 		},
 		{
 			description: "empty response",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/empty/", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -99,7 +98,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "response timeout",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/empty/", time.Millisecond*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Millisecond*5), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -113,7 +112,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "bad request",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/400/", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -127,7 +126,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "1 result",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/1/", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/1/", time.Second*5), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -141,7 +140,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/7/", time.Second*5), 101, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 101, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -155,7 +154,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 result with MB",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/7/", time.Second*5), 1024*1024, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 1024*1024, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -169,7 +168,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results with 1 series max (1KB bps)",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/7/", time.Second*5), 1024, 1, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 1024, 1, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -183,7 +182,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results with 5 series max",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/7/", time.Second*5), 0, 5, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 0, 5, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -197,7 +196,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results with 5 series max / infi",
 			content:     content,
-			checker:     checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/7/", time.Second*5), 0, 5, checks.Information),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 0, 5, checks.Information),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -214,7 +213,7 @@ func TestCostCheck(t *testing.T) {
 - record: foo
   expr: 'sum({__name__="foo"})'
 `,
-			checker: checks.NewCostCheck(promapi.NewPrometheus("prom", srv.URL+"/7/", time.Second*5), 101, 0, checks.Bug),
+			checker: checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 101, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: `sum({__name__="foo"})`,

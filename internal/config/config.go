@@ -22,7 +22,7 @@ type Config struct {
 	Prometheus        []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Checks            *Checks            `hcl:"checks,block" json:"checks,omitempty"`
 	Rules             []Rule             `hcl:"rule,block" json:"rules,omitempty"`
-	prometheusServers []*promapi.Prometheus
+	prometheusServers []*promapi.FailoverGroup
 }
 
 func (cfg *Config) ClearCache() {
@@ -104,7 +104,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 		},
 	}
 
-	proms := []*promapi.Prometheus{}
+	proms := []*promapi.FailoverGroup{}
 	for _, prom := range cfg.Prometheus {
 		if !prom.isEnabledForPath(path) {
 			continue
@@ -219,7 +219,13 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			return cfg, err
 		}
 		timeout, _ := parseDuration(prom.Timeout)
-		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewPrometheus(prom.Name, prom.URI, timeout))
+		upstreams := []*promapi.Prometheus{
+			promapi.NewPrometheus(prom.Name, prom.URI, timeout),
+		}
+		for _, uri := range prom.Failover {
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout))
+		}
+		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams))
 	}
 
 	for _, rule := range cfg.Rules {

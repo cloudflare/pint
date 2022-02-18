@@ -19,12 +19,12 @@ const (
 	VectorMatchingCheckName = "promql/vector_matching"
 )
 
-func NewVectorMatchingCheck(prom *promapi.Prometheus) VectorMatchingCheck {
+func NewVectorMatchingCheck(prom *promapi.FailoverGroup) VectorMatchingCheck {
 	return VectorMatchingCheck{prom: prom}
 }
 
 type VectorMatchingCheck struct {
-	prom *promapi.Prometheus
+	prom *promapi.FailoverGroup
 }
 
 func (c VectorMatchingCheck) String() string {

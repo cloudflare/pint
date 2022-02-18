@@ -260,7 +260,7 @@ func (rule Rule) validate() (err error) {
 	return nil
 }
 
-func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.Prometheus) []checkMeta {
+func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, enabledChecks, disabledChecks []string, prometheusServers []*promapi.FailoverGroup) []checkMeta {
 	enabled := []checkMeta{}
 
 	for _, ignore := range rule.Ignore {

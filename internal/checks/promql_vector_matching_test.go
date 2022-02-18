@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func TestVectorMatchingCheck(t *testing.T) {
@@ -167,12 +166,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "one to one matching",
 			content:     "- record: foo\n  expr: foo_with_notfound / bar\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo_with_notfound / bar",
@@ -186,37 +185,37 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "ignore left query errors",
 			content:     "- record: foo\n  expr: xxx / foo\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "ignore righ query errors",
 			content:     "- record: foo\n  expr: foo / xxx\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "ignore missing left series",
 			content:     "- record: foo\n  expr: missing / foo\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "ignore missing or vector",
 			content:     "- record: foo\n  expr: sum(missing or vector(0))\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "ignore present or vector",
 			content:     "- record: foo\n  expr: sum(foo or vector(0))\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "ignore missing right series",
 			content:     "- record: foo\n  expr: foo / missing\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "ignore with mismatched series",
 			content:     "- record: foo\n  expr: foo / ignoring(xxx) app_registry\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo / ignoring(xxx) app_registry",
@@ -230,7 +229,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "one to one matching with on() - both missing",
 			content:     "- record: foo\n  expr: foo / on(notfound) bar\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo / on(notfound) bar",
@@ -244,32 +243,32 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "one to one matching with ignoring() - both missing",
 			content:     "- record: foo\n  expr: foo / ignoring(notfound) foo\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "one to one matching with ignoring() - both present",
 			content:     "- record: foo\n  expr: foo_with_notfound / ignoring(notfound) foo_with_notfound\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "one to one matching with ignoring() - left missing",
 			content:     "- record: foo\n  expr: foo / ignoring(notfound) foo_with_notfound\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "one to one matching with ignoring() - right missing",
 			content:     "- record: foo\n  expr: foo_with_notfound / ignoring(notfound) foo\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "one to one matching with ignoring() - mismatch",
 			content:     "- record: foo\n  expr: foo_with_notfound / ignoring(notfound) bar\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "one to one matching with on() - left missing",
 			content:     "- record: foo\n  expr: foo / on(notfound) bar_with_notfound\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo / on(notfound) bar_with_notfound",
@@ -283,7 +282,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "one to one matching with on() - right missing",
 			content:     "- record: foo\n  expr: foo_with_notfound / on(notfound) bar\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo_with_notfound / on(notfound) bar",
@@ -297,7 +296,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "nested query",
 			content:     "- alert: foo\n  expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "(memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry",
@@ -314,32 +313,32 @@ func TestVectorMatchingCheck(t *testing.T) {
 - record: foo
   expr: '{__name__="foo_with_notfound"} / ignoring(notfound) foo_with_notfound'
 `,
-			checker: checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker: checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "skips number comparison on LHS",
 			content:     "- record: foo\n  expr: 2 < foo / bar\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "skips number comparison on RHS",
 			content:     "- record: foo\n  expr: foo / bar > 0\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "skips number comparison on both sides",
 			content:     "- record: foo\n  expr: 1 > bool 1\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "up == 0 AND foo > 0",
 			content:     "- alert: foo\n  expr: up == 0 AND foo > 0\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "subquery is trimmed",
 			content:     "- alert: foo\n  expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar",
@@ -353,17 +352,17 @@ func TestVectorMatchingCheck(t *testing.T) {
 		{
 			description: "scalar",
 			content:     "- alert: foo\n  expr: (100*(1024^2))\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "binary expression on both sides / passing",
 			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (foo / ignoring(notfound) foo_with_notfound)\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 		},
 		{
 			description: "binary expression on both sides / mismatch",
 			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)\n",
-			checker:     checks.NewVectorMatchingCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*1)),
+			checker:     checks.NewVectorMatchingCheck(simpleProm("prom", srv.URL, time.Second*1)),
 			problems: []checks.Problem{
 				{
 					Fragment: "(foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)",

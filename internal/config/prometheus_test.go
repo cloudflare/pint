@@ -24,11 +24,25 @@ func TestPrometheusConfig(t *testing.T) {
 			},
 		},
 		{
-			conf: PrometheusConfig{},
+			conf: PrometheusConfig{
+				Name:     "prom",
+				URI:      "http://localhost",
+				Failover: []string{"http://localhost", "http://localhost"},
+				Timeout:  "5m",
+				Paths:    []string{"foo", "bar"},
+			},
+		},
+		{
+			conf: PrometheusConfig{URI: "http://localhost"},
 			err:  errors.New("empty duration string"),
 		},
 		{
+			conf: PrometheusConfig{},
+			err:  errors.New("prometheus URI cannot be empty"),
+		},
+		{
 			conf: PrometheusConfig{
+				URI:     "http://localhost",
 				Timeout: "foo",
 			},
 			err: errors.New(`not a valid duration string: "foo"`),

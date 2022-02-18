@@ -12,7 +12,7 @@ const (
 	CostCheckName = "query/cost"
 )
 
-func NewCostCheck(prom *promapi.Prometheus, bps, maxSeries int, severity Severity) CostCheck {
+func NewCostCheck(prom *promapi.FailoverGroup, bps, maxSeries int, severity Severity) CostCheck {
 	return CostCheck{
 		prom:           prom,
 		bytesPerSample: bps,
@@ -22,7 +22,7 @@ func NewCostCheck(prom *promapi.Prometheus, bps, maxSeries int, severity Severit
 }
 
 type CostCheck struct {
-	prom           *promapi.Prometheus
+	prom           *promapi.FailoverGroup
 	bytesPerSample int
 	maxSeries      int
 	severity       Severity
