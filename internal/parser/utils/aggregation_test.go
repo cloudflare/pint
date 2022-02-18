@@ -90,6 +90,44 @@ func TestHasOuterAggregation(t *testing.T) {
 			expr:   "sum(foo) != on() group_right(instance) sum(vector(0))",
 			output: []string{"sum by(instance) (vector(0))"},
 		},
+		{
+			expr:   "min(foo) by(bar) and max by(bar) (foo)",
+			output: []string{"min by(bar) (foo)"},
+		},
+		{
+			expr:   "max(foo)",
+			output: []string{"max(foo)"},
+		},
+		{
+			expr:   "avg(foo) by(bar)",
+			output: []string{"avg by(bar) (foo)"},
+		},
+		{
+			expr:   "group(foo)",
+			output: []string{"group(foo)"},
+		},
+		{
+			expr:   "stddev(foo)",
+			output: []string{"stddev(foo)"},
+		},
+		{
+			expr:   "(stdvar(foo))",
+			output: []string{"stdvar(foo)"},
+		},
+		{
+			expr:   `(1 - count_values("job", foo))`,
+			output: []string{`count_values("job", foo)`},
+		},
+		{
+			expr: "(topk(5, foo))",
+		},
+		{
+			expr: "(bottomk(5, foo))",
+		},
+		{
+			expr:   "(quantile(0.9, foo))",
+			output: []string{"quantile(0.9, foo)"},
+		},
 	}
 
 	for _, tc := range testCases {

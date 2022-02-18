@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
 )
 
 func NewConsoleReporter(output io.Writer) ConsoleReporter {
@@ -60,16 +60,16 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 
 		msg := []string{}
 		firstLine, lastLine := report.Problem.LineRange()
-		msg = append(msg, output.MakeBlue("%s:%s: ", report.Path, printLineRange(firstLine, lastLine)))
+		msg = append(msg, color.CyanString("%s:%s: ", report.Path, printLineRange(firstLine, lastLine)))
 		switch report.Problem.Severity {
 		case checks.Bug, checks.Fatal:
-			msg = append(msg, output.MakeRed(report.Problem.Text))
+			msg = append(msg, color.RedString(report.Problem.Text))
 		case checks.Warning:
-			msg = append(msg, output.MakeYellow(report.Problem.Text))
+			msg = append(msg, color.YellowString(report.Problem.Text))
 		default:
-			msg = append(msg, output.MakeGray(report.Problem.Text))
+			msg = append(msg, color.HiBlackString(report.Problem.Text))
 		}
-		msg = append(msg, output.MakeMagneta(" (%s)\n", report.Problem.Reporter))
+		msg = append(msg, color.MagentaString(" (%s)\n", report.Problem.Reporter))
 
 		lines := strings.Split(content, "\n")
 		if lastLine > len(lines)-1 {
@@ -77,7 +77,7 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 			log.Warn().Str("path", report.Path).Msgf("Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details")
 		}
 		for _, c := range lines[firstLine-1 : lastLine] {
-			msg = append(msg, output.MakeWhite("%s\n", c))
+			msg = append(msg, color.WhiteString("%s\n", c))
 		}
 		perFile[report.Path] = append(perFile[report.Path], strings.Join(msg, ""))
 	}
