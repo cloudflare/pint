@@ -1,15 +1,23 @@
 package config
 
-import "regexp"
+import (
+	"errors"
+	"regexp"
+)
 
 type PrometheusConfig struct {
-	Name    string   `hcl:",label" json:"name"`
-	URI     string   `hcl:"uri" json:"uri"`
-	Timeout string   `hcl:"timeout"  json:"timeout"`
-	Paths   []string `hcl:"paths,optional" json:"paths,omitempty"`
+	Name     string   `hcl:",label" json:"name"`
+	URI      string   `hcl:"uri" json:"uri"`
+	Failover []string `hcl:"failover,optional" json:"failover,omitempty"`
+	Timeout  string   `hcl:"timeout"  json:"timeout"`
+	Paths    []string `hcl:"paths,optional" json:"paths,omitempty"`
 }
 
 func (pc PrometheusConfig) validate() error {
+	if pc.URI == "" {
+		return errors.New("prometheus URI cannot be empty")
+	}
+
 	if _, err := parseDuration(pc.Timeout); err != nil {
 		return err
 	}

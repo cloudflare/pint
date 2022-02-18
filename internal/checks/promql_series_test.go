@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/rs/zerolog"
 )
@@ -109,12 +108,12 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "bad response",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: "foo",
@@ -128,7 +127,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "simple query",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -142,7 +141,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "complex query",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -156,7 +155,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "complex query / bug",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -190,22 +189,22 @@ func TestSeriesCheck(t *testing.T) {
     )
   for: 5m
 `,
-			checker: checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset 5m\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "negative offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset -15m\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "series found, label missing",
 			content:     "- record: foo\n  expr: found{job=\"notfound\"}\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: `found{job="notfound"}`,
@@ -219,7 +218,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "series missing, label missing",
 			content:     "- record: foo\n  expr: notfound{job=\"notfound\"}\n",
-			checker:     checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: "notfound",
@@ -236,7 +235,7 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: '{__name__="notfound", job="bar"}'
 `,
-			checker: checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: `{__name__="notfound",job="bar"}`,
@@ -254,7 +253,7 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound) == 0
 `,
-			checker: checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "series missing but check disabled, labels",
@@ -263,7 +262,7 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound{job="foo"}) == 0
 `,
-			checker: checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "series missing but check disabled, negative labels",
@@ -272,7 +271,7 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound{job!="foo"}) == 0
 `,
-			checker: checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 		},
 		{
 			description: "series missing, disabled comment for labels",
@@ -281,7 +280,7 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound) == 0
 `,
-			checker: checks.NewSeriesCheck(promapi.NewPrometheus("prom", srv.URL, time.Second*5)),
+			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5)),
 			problems: []checks.Problem{
 				{
 					Fragment: `notfound`,

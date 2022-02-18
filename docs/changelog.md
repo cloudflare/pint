@@ -1,9 +1,12 @@
 # Changelog
 
-## v0.12.1
+## v0.13.0
 
 ### Changed
 
+- `prometheus` config block now allows to specify failover URIs using `failover` field.
+  If failover URIs are set and main URI fails to respond pint will attempt to use them
+  in the order specified until one of them works.
 - Renamed `pint/parse` to `yaml/parse` and added missing documentation for it.
 
 ## v0.12.0

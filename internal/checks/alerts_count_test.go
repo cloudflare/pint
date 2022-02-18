@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/rs/zerolog"
 )
@@ -86,17 +85,17 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: up == 0\n",
-			checker:     checks.NewAlertsCheck(promapi.NewPrometheus("prom", "http://localhost", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
 		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- alert: Foo Is Down\n  expr: sum(\n",
-			checker:     checks.NewAlertsCheck(promapi.NewPrometheus("prom", "http://localhost", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
 		},
 		{
 			description: "bad request",
 			content:     content,
-			checker:     checks.NewAlertsCheck(promapi.NewPrometheus("prom", srv.URL+"/400/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -110,7 +109,7 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "empty response",
 			content:     content,
-			checker:     checks.NewAlertsCheck(promapi.NewPrometheus("prom", srv.URL+"/empty/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -124,7 +123,7 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "multiple alerts",
 			content:     content,
-			checker:     checks.NewAlertsCheck(promapi.NewPrometheus("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute, time.Minute*5),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -138,7 +137,7 @@ func TestAlertsCheck(t *testing.T) {
 		{
 			description: "for: 10m",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
-			checker:     checks.NewAlertsCheck(promapi.NewPrometheus("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
+			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
 			problems: []checks.Problem{
 				{
 					Fragment: `up{job="foo"} == 0`,
@@ -155,7 +154,7 @@ func TestAlertsCheck(t *testing.T) {
 - alert: foo
   expr: '{__name__="up", job="foo"} == 0'
 `,
-			checker: checks.NewAlertsCheck(promapi.NewPrometheus("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
+			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
 			problems: []checks.Problem{
 				{
 					Fragment: `{__name__="up", job="foo"} == 0`,
@@ -172,7 +171,7 @@ func TestAlertsCheck(t *testing.T) {
 - alert: foo
   expr: '{__name__=~"(up|foo)", job="foo"} == 0'
 `,
-			checker: checks.NewAlertsCheck(promapi.NewPrometheus("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
+			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5), time.Hour*24, time.Minute*6, time.Minute*10),
 			problems: []checks.Problem{
 				{
 					Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,

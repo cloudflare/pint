@@ -15,12 +15,12 @@ const (
 	RateCheckName = "promql/rate"
 )
 
-func NewRateCheck(prom *promapi.Prometheus) RateCheck {
+func NewRateCheck(prom *promapi.FailoverGroup) RateCheck {
 	return RateCheck{prom: prom}
 }
 
 type RateCheck struct {
-	prom *promapi.Prometheus
+	prom *promapi.FailoverGroup
 }
 
 func (c RateCheck) String() string {

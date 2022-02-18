@@ -180,6 +180,28 @@ prometheus "prom" {
 			},
 		},
 		{
+			title: "multiple URIs",
+			config: `
+prometheus "prom" {
+  uri      = "http://localhost"
+  failover = ["http://localhost/1", "http://localhost/2"]
+  timeout  = "1s"
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.SeriesCheckName + "(prom)",
+				checks.VectorMatchingCheckName + "(prom)",
+			},
+		},
+		{
 			title: "two prometheus servers / disable all checks via comment",
 			config: `
 prometheus "prom1" {

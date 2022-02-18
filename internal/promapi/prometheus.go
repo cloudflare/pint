@@ -36,11 +36,3 @@ func NewPrometheus(name, uri string, timeout time.Duration) *Prometheus {
 		lock:    newPartitionLocker((&sync.Mutex{})),
 	}
 }
-
-func (p *Prometheus) Name() string {
-	return p.name
-}
-
-func (p *Prometheus) ClearCache() {
-	p.cache.Purge()
-}

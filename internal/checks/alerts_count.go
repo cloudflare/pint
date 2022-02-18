@@ -14,7 +14,7 @@ const (
 	AlertsCheckName = "alerts/count"
 )
 
-func NewAlertsCheck(prom *promapi.Prometheus, lookBack, step, resolve time.Duration) AlertsCheck {
+func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Duration) AlertsCheck {
 	return AlertsCheck{
 		prom:     prom,
 		lookBack: lookBack,
@@ -24,7 +24,7 @@ func NewAlertsCheck(prom *promapi.Prometheus, lookBack, step, resolve time.Durat
 }
 
 type AlertsCheck struct {
-	prom     *promapi.Prometheus
+	prom     *promapi.FailoverGroup
 	lookBack time.Duration
 	step     time.Duration
 	resolve  time.Duration
