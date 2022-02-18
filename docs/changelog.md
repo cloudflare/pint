@@ -7,6 +7,13 @@
 - `prometheus` config block now allows to specify failover URIs using `failover` field.
   If failover URIs are set and main URI fails to respond pint will attempt to use them
   in the order specified until one of them works.
+- `prometheus` config block now allows to define how upstream errors are handled using
+  `required` field. If `required` is set to `true` any check that depends on remote
+  Prometheus server will be reported as `bug` if it's unable to talk to it.
+  If `required` is set to `false` pint will only emit `warning` level results.
+  Default value for `required` is `false`. Set it to `true` if you want to hard fail
+  in case of remote Prometheus issues. Note that setting it to `true` might block
+  PRs when running `pint ci` until pint is able to talk to Prometheus again.
 - Renamed `pint/parse` to `yaml/parse` and added missing documentation for it.
 
 ## v0.12.0

@@ -24,6 +24,7 @@ cat prometheus.pid | xargs kill
 prometheus "slow" {
   uri     = "http://127.0.0.1:7043"
   timeout = "2m"
+  required = true
 }
 
 -- prometheus.go --

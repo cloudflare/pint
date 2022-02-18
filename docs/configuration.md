@@ -106,6 +106,7 @@ prometheus "$name" {
   uri      = "https://..."
   failover = ["https://...", ...]
   timeout  = "60s"
+  required = true|false
   paths    = ["...", ...]
 }
 ```
@@ -120,6 +121,13 @@ prometheus "$name" {
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
 - `timeout` - timeout to be used for API requests.
+- `required` - decides how pint will report errors if it's unable to get a valid response
+  from this Prometheus server. If `required` is `true` and all API calls to this Prometheus
+  fail pint will report those as `bug` level problem. If it's set to `false` pint will
+  report those with `warning` level.
+  Default value for `required` is `false`. Set it to `true` if you want to hard fail
+  in case of remote Prometheus issues. Note that setting it to `true` might block
+  PRs when running `pint ci` until pint is able to talk to Prometheus again.
 - `paths` - optional path filter, if specified only paths matching one of listed regex
   patterns will use this Prometheus server for checks.
 

@@ -13,7 +13,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
     {
       "name": "prom",
       "uri": "https://",
-      "timeout": "2m"
+      "timeout": "2m",
+      "required": true
     }
   ],
   "checks": {
@@ -114,6 +115,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
 prometheus "prom" {
   uri     = "https://"
   timeout = "2m"
+  required = true
 }
 
 rule{  }

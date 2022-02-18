@@ -11,6 +11,7 @@ type PrometheusConfig struct {
 	Failover []string `hcl:"failover,optional" json:"failover,omitempty"`
 	Timeout  string   `hcl:"timeout"  json:"timeout"`
 	Paths    []string `hcl:"paths,optional" json:"paths,omitempty"`
+	Required bool     `hcl:"required,optional" json:"required"`
 }
 
 func (pc PrometheusConfig) validate() error {

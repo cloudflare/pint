@@ -13,27 +13,9 @@ type Report struct {
 	Problem checks.Problem
 }
 
-func (r Report) IsPassing() bool {
-	switch r.Problem.Severity {
-	case checks.Information, checks.Warning:
-		return true
-	default:
-		return false
-	}
-}
-
 type Summary struct {
 	Reports     []Report
 	FileChanges discovery.FileFindResults
-}
-
-func (s Summary) IsPassing() bool {
-	for _, r := range s.Reports {
-		if p := r.IsPassing(); !p {
-			return false
-		}
-	}
-	return true
 }
 
 func (s Summary) HasFatalProblems() bool {

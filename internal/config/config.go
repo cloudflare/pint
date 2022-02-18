@@ -225,7 +225,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		for _, uri := range prom.Failover {
 			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout))
 		}
-		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams))
+		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
 	}
 
 	for _, rule := range cfg.Rules {

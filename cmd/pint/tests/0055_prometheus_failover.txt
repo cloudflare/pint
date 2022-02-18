@@ -18,6 +18,7 @@ prometheus "prom" {
   uri      = "http://127.0.0.1:1055"
   failover = ["http://127.0.0.1:7055"]
   timeout  = "5s"
+  required = true
 }
 
 -- prometheus.go --

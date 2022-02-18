@@ -47,7 +47,7 @@ func (c VectorMatchingCheck) Check(ctx context.Context, rule parser.Rule) (probl
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     problem.text,
-			Severity: Bug,
+			Severity: problem.severity,
 		})
 	}
 
@@ -62,7 +62,16 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 
 		q := fmt.Sprintf("count(%s)", n.String())
 		qr, err := c.prom.Query(ctx, q)
-		if err == nil && len(qr.Series) > 0 {
+		if err != nil {
+			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+			problems = append(problems, exprProblem{
+				expr:     node.Expr,
+				text:     text,
+				severity: severity,
+			})
+			return
+		}
+		if len(qr.Series) > 0 {
 			return
 		}
 
@@ -74,12 +83,30 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		}
 
 		leftLabels, err := c.seriesLabels(ctx, fmt.Sprintf("topk(1, %s)", n.LHS.String()), ignored...)
-		if leftLabels == nil || err != nil {
+		if err != nil {
+			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+			problems = append(problems, exprProblem{
+				expr:     node.Expr,
+				text:     text,
+				severity: severity,
+			})
+			return
+		}
+		if leftLabels == nil {
 			goto NEXT
 		}
 
 		rightLabels, err := c.seriesLabels(ctx, fmt.Sprintf("topk(1, %s)", n.RHS.String()), ignored...)
-		if rightLabels == nil || err != nil {
+		if err != nil {
+			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+			problems = append(problems, exprProblem{
+				expr:     node.Expr,
+				text:     text,
+				severity: severity,
+			})
+			return
+		}
+		if rightLabels == nil {
 			goto NEXT
 		}
 
@@ -87,20 +114,23 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !stringInSlice(leftLabels, name) && stringInSlice(rightLabels, name) {
 					problems = append(problems, exprProblem{
-						expr: node.Expr,
-						text: fmt.Sprintf("using on(%q) won't produce any results because left hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).LHS),
+						expr:     node.Expr,
+						text:     fmt.Sprintf("using on(%q) won't produce any results because left hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).LHS),
+						severity: Bug,
 					})
 				}
 				if stringInSlice(leftLabels, name) && !stringInSlice(rightLabels, name) {
 					problems = append(problems, exprProblem{
-						expr: node.Expr,
-						text: fmt.Sprintf("using on(%q) won't produce any results because right hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).RHS),
+						expr:     node.Expr,
+						text:     fmt.Sprintf("using on(%q) won't produce any results because right hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).RHS),
+						severity: Bug,
 					})
 				}
 				if !stringInSlice(leftLabels, name) && !stringInSlice(rightLabels, name) {
 					problems = append(problems, exprProblem{
-						expr: node.Expr,
-						text: fmt.Sprintf("using on(%q) won't produce any results because both sides of the query don't have this label", name),
+						expr:     node.Expr,
+						text:     fmt.Sprintf("using on(%q) won't produce any results because both sides of the query don't have this label", name),
+						severity: Bug,
 					})
 				}
 			}
@@ -108,13 +138,15 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			if !areStringSlicesEqual(leftLabels, rightLabels) {
 				if len(n.VectorMatching.MatchingLabels) == 0 {
 					problems = append(problems, exprProblem{
-						expr: node.Expr,
-						text: fmt.Sprintf("both sides of the query have different labels: %s != %s", leftLabels, rightLabels),
+						expr:     node.Expr,
+						text:     fmt.Sprintf("both sides of the query have different labels: %s != %s", leftLabels, rightLabels),
+						severity: Bug,
 					})
 				} else {
 					problems = append(problems, exprProblem{
-						expr: node.Expr,
-						text: fmt.Sprintf("using ignoring(%q) won't produce any results because both sides of the query have different labels: %s != %s", strings.Join(n.VectorMatching.MatchingLabels, ","), leftLabels, rightLabels),
+						expr:     node.Expr,
+						text:     fmt.Sprintf("using ignoring(%q) won't produce any results because both sides of the query have different labels: %s != %s", strings.Join(n.VectorMatching.MatchingLabels, ","), leftLabels, rightLabels),
+						severity: Bug,
 					})
 				}
 			}

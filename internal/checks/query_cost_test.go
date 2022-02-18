@@ -79,12 +79,12 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewCostCheck(simpleProm("prom", "http://localhost", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", "http://localhost", time.Second*5, true), 4096, 0, checks.Bug),
 		},
 		{
 			description: "empty response",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5, true), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -98,13 +98,13 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "response timeout",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Millisecond*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Millisecond*5, true), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     `RE:query using prom failed with: Post "http://.+/empty/api/v1/query": context deadline exceeded`,
+					Text:     `RE:cound't run "query/cost" checks due to "prom" prometheus connection error: Post "http://127.0.0.1:.+/empty/api/v1/query": context deadline exceeded`,
 					Severity: checks.Bug,
 				},
 			},
@@ -112,7 +112,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "bad request",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5, true), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -124,9 +124,23 @@ func TestCostCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "bad request",
+			content:     content,
+			checker:     checks.NewCostCheck(simpleProm("prom", "http://127.0.0.1", time.Second*5, false), 4096, 0, checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: "sum(foo)",
+					Lines:    []int{2},
+					Reporter: "query/cost",
+					Text:     `cound't run "query/cost" checks due to "prom" prometheus connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
+					Severity: checks.Warning,
+				},
+			},
+		},
+		{
 			description: "1 result",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/1/", time.Second*5), 4096, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/1/", time.Second*5, true), 4096, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -140,7 +154,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 101, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 101, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -154,7 +168,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 result with MB",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 1024*1024, 0, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 1024*1024, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -168,7 +182,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results with 1 series max (1KB bps)",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 1024, 1, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 1024, 1, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -182,7 +196,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results with 5 series max",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 0, 5, checks.Bug),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 0, 5, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -196,7 +210,7 @@ func TestCostCheck(t *testing.T) {
 		{
 			description: "7 results with 5 series max / infi",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 0, 5, checks.Information),
+			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 0, 5, checks.Information),
 			problems: []checks.Problem{
 				{
 					Fragment: "sum(foo)",
@@ -213,7 +227,7 @@ func TestCostCheck(t *testing.T) {
 - record: foo
   expr: 'sum({__name__="foo"})'
 `,
-			checker: checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5), 101, 0, checks.Bug),
+			checker: checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 101, 0, checks.Bug),
 			problems: []checks.Problem{
 				{
 					Fragment: `sum({__name__="foo"})`,

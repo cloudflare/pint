@@ -100,11 +100,12 @@ func TestParseSeverity(t *testing.T) {
 	}
 }
 
-func simpleProm(name, uri string, timeout time.Duration) *promapi.FailoverGroup {
+func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi.FailoverGroup {
 	return promapi.NewFailoverGroup(
 		name,
 		[]*promapi.Prometheus{
 			promapi.NewPrometheus(name, uri, timeout),
 		},
+		required,
 	)
 }
