@@ -1,4 +1,4 @@
-package promapi
+package output
 
 import (
 	"fmt"
@@ -14,6 +14,7 @@ func HumanizeDuration(d time.Duration) string {
 	minutes := int64(math.Mod(d.Minutes(), 60))
 	seconds := int64(math.Mod(d.Seconds(), 60))
 	ms := int64(math.Mod(float64(d.Milliseconds()), 1000))
+	mc := int64(math.Mod(float64(d.Microseconds()), 1000))
 
 	chunks := []struct {
 		singularName string
@@ -25,6 +26,7 @@ func HumanizeDuration(d time.Duration) string {
 		{"m", minutes},
 		{"s", seconds},
 		{"ms", ms},
+		{"µs", mc},
 	}
 
 	parts := []string{}
@@ -33,6 +35,10 @@ func HumanizeDuration(d time.Duration) string {
 		if chunk.amount > 0 {
 			parts = append(parts, fmt.Sprintf("%d%s", chunk.amount, chunk.singularName))
 		}
+	}
+
+	if len(parts) == 0 {
+		return "0"
 	}
 
 	return strings.Join(parts, "")

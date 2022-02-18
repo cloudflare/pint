@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -66,7 +67,7 @@ func (c CostCheck) Check(ctx context.Context, rule parser.Rule) (problems []Prob
 
 	var estimate string
 	if c.bytesPerSample > 0 && series > 0 {
-		estimate = fmt.Sprintf(" with %s estimated memory usage", promapi.HumanizeBytes(c.bytesPerSample*series))
+		estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(c.bytesPerSample*series))
 	}
 
 	var above string

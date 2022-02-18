@@ -7,6 +7,8 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
+
+	"github.com/cloudflare/pint/internal/output"
 )
 
 type QueryResult struct {
@@ -39,7 +41,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
-		Str("duration", HumanizeDuration(duration)).
+		Str("duration", output.HumanizeDuration(duration)).
 		Msg("Query completed")
 	if err != nil {
 		log.Error().Err(err).
