@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -105,7 +106,7 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,
 		Reporter: c.Reporter(),
-		Text:     fmt.Sprintf("query using %s would trigger %d alert(s) in the last %s", c.prom.Name(), alerts, promapi.HumanizeDuration(delta)),
+		Text:     fmt.Sprintf("query using %s would trigger %d alert(s) in the last %s", c.prom.Name(), alerts, output.HumanizeDuration(delta)),
 		Severity: Information,
 	})
 	return

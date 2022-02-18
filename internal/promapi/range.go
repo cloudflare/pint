@@ -11,6 +11,8 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
+
+	"github.com/cloudflare/pint/internal/output"
 )
 
 type RangeQueryResult struct {
@@ -26,7 +28,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		Str("query", expr).
 		Time("start", start).
 		Time("end", end).
-		Str("step", HumanizeDuration(step)).
+		Str("step", output.HumanizeDuration(step)).
 		Msg("Scheduling prometheus range query")
 
 	lockKey := "/api/v1/query/range"
@@ -56,7 +58,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
-		Str("duration", HumanizeDuration(duration)).
+		Str("duration", output.HumanizeDuration(duration)).
 		Msg("Range query completed")
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
@@ -66,7 +68,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
 				return nil, errors.New("no more retries possible")
 			}
-			log.Warn().Str("delta", HumanizeDuration(delta)).Msg("Retrying request with smaller range")
+			log.Warn().Str("delta", output.HumanizeDuration(delta)).Msg("Retrying request with smaller range")
 			return p.RangeQuery(ctx, expr, start.Add(delta), end, step)
 		}
 		return nil, err

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 
@@ -91,14 +92,14 @@ func (c RateCheck) checkNode(node *parser.PromQLNode, scrapeInterval time.Durati
 				if m.Range < scrapeInterval*time.Duration(minIntervals) {
 					p := exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, minIntervals, c.prom.Name(), promapi.HumanizeDuration(scrapeInterval)),
+						text:     fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, minIntervals, c.prom.Name(), output.HumanizeDuration(scrapeInterval)),
 						severity: Bug,
 					}
 					problems = append(problems, p)
 				} else if m.Range < scrapeInterval*time.Duration(recIntervals) {
 					p := exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("duration for %s() is recommended to be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, recIntervals, c.prom.Name(), promapi.HumanizeDuration(scrapeInterval)),
+						text:     fmt.Sprintf("duration for %s() is recommended to be at least %d x scrape_interval, %s is using %s scrape_interval", n.Func.Name, recIntervals, c.prom.Name(), output.HumanizeDuration(scrapeInterval)),
 						severity: Warning,
 					}
 					problems = append(problems, p)
