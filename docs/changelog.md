@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.13.1
+
+### Fixed
+
+- Don't use failover Prometheus servers in case of errors caused by the query
+  itself, like `many-to-many matching not allowed`.
+
 ## v0.13.0
 
 ### Added

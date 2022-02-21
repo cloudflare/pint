@@ -117,6 +117,8 @@ prometheus "$name" {
 - `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
   to requests or returns an error. This allows to configure failover Prometheus servers
   to avoid CI failures in case main Prometheus server is unreachable.
+  Failover URIs are not used if Prometheus returns an error caused by the query, like
+  `many-to-many matching not allowed`.
   It's highly recommended that all URIs point to Prometheus servers with identical
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
