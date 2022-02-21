@@ -107,32 +107,32 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 			switch key.Value {
 			case recordKey:
 				if recordPart != nil {
-					return duplicatedKeyError(node.Line, recordKey, nil)
+					return duplicatedKeyError(part.Line, recordKey, nil)
 				}
 				recordPart = newYamlKeyValue(key, part)
 			case alertKey:
 				if alertPart != nil {
-					return duplicatedKeyError(node.Line, alertKey, nil)
+					return duplicatedKeyError(part.Line, alertKey, nil)
 				}
 				alertPart = newYamlKeyValue(key, part)
 			case exprKey:
 				if exprPart != nil {
-					return duplicatedKeyError(node.Line, exprKey, nil)
+					return duplicatedKeyError(part.Line, exprKey, nil)
 				}
 				exprPart = newPromQLExpr(key, part)
 			case forKey:
 				if forPart != nil {
-					return duplicatedKeyError(node.Line, forKey, nil)
+					return duplicatedKeyError(part.Line, forKey, nil)
 				}
 				forPart = newYamlKeyValue(key, part)
 			case labelsKey:
 				if labelsPart != nil {
-					return duplicatedKeyError(node.Line, labelsKey, nil)
+					return duplicatedKeyError(part.Line, labelsKey, nil)
 				}
 				labelsPart = newYamlMap(key, part)
 			case annotationsKey:
 				if annotationsPart != nil {
-					return duplicatedKeyError(node.Line, annotationsKey, nil)
+					return duplicatedKeyError(part.Line, annotationsKey, nil)
 				}
 				annotationsPart = newYamlMap(key, part)
 			default:
