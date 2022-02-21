@@ -23,7 +23,7 @@ func TestHumanizeDuration(t *testing.T) {
 		},
 		{
 			input:  time.Microsecond * 3,
-			output: "3µs",
+			output: "0",
 		},
 		{
 			input:  time.Millisecond * 542,
@@ -55,7 +55,7 @@ func TestHumanizeDuration(t *testing.T) {
 		},
 		{
 			input:  (time.Hour * (24*7*14 + 24*6 + 3)) + time.Minute*33 + time.Second*3 + time.Millisecond + 999 + time.Microsecond*5,
-			output: "14w6d3h33m3s1ms5µs",
+			output: "14w6d3h33m3s1ms",
 		},
 	}
 

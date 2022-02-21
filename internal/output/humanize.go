@@ -14,7 +14,6 @@ func HumanizeDuration(d time.Duration) string {
 	minutes := int64(math.Mod(d.Minutes(), 60))
 	seconds := int64(math.Mod(d.Seconds(), 60))
 	ms := int64(math.Mod(float64(d.Milliseconds()), 1000))
-	mc := int64(math.Mod(float64(d.Microseconds()), 1000))
 
 	chunks := []struct {
 		singularName string
@@ -26,7 +25,6 @@ func HumanizeDuration(d time.Duration) string {
 		{"m", minutes},
 		{"s", seconds},
 		{"ms", ms},
-		{"µs", mc},
 	}
 
 	parts := []string{}
