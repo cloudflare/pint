@@ -78,7 +78,7 @@ func TestParse(t *testing.T) {
   expr: bar
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 4}},
 			},
 		},
 		{
@@ -88,7 +88,7 @@ func TestParse(t *testing.T) {
   record: bar
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated record key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated record key"), Line: 4}},
 			},
 		},
 		{
@@ -98,7 +98,7 @@ func TestParse(t *testing.T) {
   expr: bar
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated alert key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated alert key"), Line: 3}},
 			},
 		},
 		{
@@ -109,7 +109,7 @@ func TestParse(t *testing.T) {
   for: 1m
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated for key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated for key"), Line: 5}},
 			},
 		},
 		{
@@ -120,7 +120,7 @@ func TestParse(t *testing.T) {
   labels: {}
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5}},
 			},
 		},
 		{
@@ -131,7 +131,7 @@ func TestParse(t *testing.T) {
   labels: {}
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5}},
 			},
 		},
 		{
@@ -142,7 +142,7 @@ func TestParse(t *testing.T) {
   annotations: {}
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated annotations key"), Line: 2}},
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated annotations key"), Line: 5}},
 			},
 		},
 		{

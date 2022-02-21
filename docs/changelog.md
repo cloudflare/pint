@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.13.2
+
+### Fixed
+
+- `yaml/parse` was using incorrect line numbers for errors caused by duplicated
+  YAML keys.
+
 ## v0.13.1
 
 ### Fixed
