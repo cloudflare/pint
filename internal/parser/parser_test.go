@@ -69,8 +69,81 @@ func TestParse(t *testing.T) {
 		},
 		{
 			content:     []byte("- record\n\texpr: foo\n"),
-			output:      nil,
 			shouldError: true,
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  expr: bar
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 2}},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  record: bar
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated record key"), Line: 2}},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  alert: bar
+  expr: bar
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated alert key"), Line: 2}},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  for: 5m
+  expr: bar
+  for: 1m
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated for key"), Line: 2}},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  labels: {}
+  expr: bar
+  labels: {}
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 2}},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  labels: {}
+  expr: bar
+  labels: {}
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 2}},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  annotations: {}
+  expr: bar
+  annotations: {}
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated annotations key"), Line: 2}},
+			},
 		},
 		{
 			content: []byte("- record: foo\n  expr: foo\n  extra: true\n"),
