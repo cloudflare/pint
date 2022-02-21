@@ -2,6 +2,16 @@
 
 ## v0.13.0
 
+### Added
+
+- `yaml/parse` error will be raised if a rule file contains duplicated keys, example:
+
+  ```yaml
+  - record: foo
+    expr: sum(my_metric)
+    expr: sum(my_metric) without(instance)
+  ```
+
 ### Changed
 
 - `prometheus` config block now allows to specify failover URIs using `failover` field.
