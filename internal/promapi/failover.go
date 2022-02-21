@@ -32,7 +32,7 @@ func (fg *FailoverGroup) ClearCache() {
 func (fg *FailoverGroup) Config(ctx context.Context) (cfg *PrometheusConfig, err error) {
 	for _, prom := range fg.servers {
 		cfg, err = prom.Config(ctx)
-		if err == nil {
+		if err == nil || !IsUnavailableError(err) {
 			return
 		}
 	}
@@ -42,7 +42,7 @@ func (fg *FailoverGroup) Config(ctx context.Context) (cfg *PrometheusConfig, err
 func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResult, err error) {
 	for _, prom := range fg.servers {
 		qr, err = prom.Query(ctx, expr)
-		if err == nil {
+		if err == nil || !IsUnavailableError(err) {
 			return
 		}
 	}
@@ -52,7 +52,7 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (rqr *RangeQueryResult, err error) {
 	for _, prom := range fg.servers {
 		rqr, err = prom.RangeQuery(ctx, expr, start, end, step)
-		if err == nil {
+		if err == nil || !IsUnavailableError(err) {
 			return
 		}
 	}
