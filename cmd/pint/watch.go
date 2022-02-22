@@ -229,7 +229,7 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 		problem: prometheus.NewDesc(
 			"pint_problem",
 			"Prometheus rule problem reported by pint",
-			[]string{"kind", "name", "severity", "reporter", "problem"},
+			[]string{"filename", "kind", "name", "severity", "reporter", "problem"},
 			prometheus.Labels{},
 		),
 		problems: prometheus.NewDesc(
@@ -298,6 +298,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			c.problem,
 			prometheus.GaugeValue,
 			1,
+			report.Path,
 			kind,
 			name,
 			strings.ToLower(report.Problem.Severity.String()),
