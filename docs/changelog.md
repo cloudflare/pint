@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.14.0
+
+### Changed
+
+- Added `filename` label to `pint_problem` metric - #170.
+
 ## v0.13.2
 
 ### Fixed
