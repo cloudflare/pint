@@ -168,6 +168,7 @@ rule {
     label "(.*)" {
       value = "(.*)"
     }
+    for = "..."
   }
   match { ... }
   match { ... }
@@ -182,6 +183,7 @@ rule {
     label "(.*)" {
       value = "(.*)"
     }
+    for = "..."
   }
   ignore { ... }
   ignore { ... }
@@ -203,6 +205,10 @@ rule {
 - `match:label` - optional annotation filter, only rules with at least one label
    matching this pattern will be checked by this rule. For recording rules only static
    labels set on the recording rule are considered.
+- `match:for` - optional alerting rule `for` filter. If set only alerting rules with `for`
+  field present and matching provided value will be checked by this rule. Recording rules
+  will never match it as they don't have `for` field.
+  Syntax is `OP DURATION` where `OP` can be any of `=`, `!=`, `>`, `>=`, `<`, `<=`.
 - `ignore` - works exactly like `match` but does the opposite - any alerting or recording rule
   matching all conditions defined on `ignore` will not be checked by this `rule` block.
 
@@ -237,5 +243,14 @@ rule {
     command = "lint"
   }
   [ check applied unless "watch" or "lint" command is run ]
+}
+```
+
+```js
+rule {
+  match {
+    for = ">= 5m"
+  }
+  [ check applied only to alerting rules with "for" field value that is >= 5m ]
 }
 ```

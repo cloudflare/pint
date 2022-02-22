@@ -2,6 +2,18 @@
 
 ## v0.14.0
 
+### Added
+
+- Allow matching alerting rules by `for` field - #148. Example:
+
+  ```js
+  rule {
+    match {
+      for = ">= 10m"
+    }
+  }
+  ```
+
 ### Changed
 
 - Added `filename` label to `pint_problem` metric - #170.

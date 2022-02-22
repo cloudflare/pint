@@ -939,6 +939,147 @@ checks {
 				checks.SyntaxCheckName,
 			},
 		},
+		{
+			title: "for match / passing",
+			config: `
+rule {
+  match {
+	for = "> 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AnnotationCheckName + "(summary:true)",
+			},
+		},
+		{
+			title: "for match / not passing",
+			config: `
+rule {
+  match {
+	for = "> 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "for match / recording rules / not passing",
+			config: `
+rule {
+  match {
+	for = "!= 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "for ignore / passing",
+			config: `
+rule {
+  ignore {
+	for = "< 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AnnotationCheckName + "(summary:true)",
+			},
+		},
+		{
+			title: "for ignore / not passing",
+			config: `
+rule {
+  ignore {
+	for = "< 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "for ignore / recording rules / passing",
+			config: `
+rule {
+  ignore {
+	for = "> 0"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AnnotationCheckName + "(summary:true)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -1126,6 +1267,14 @@ func TestConfigErrors(t *testing.T) {
   ignore {}
 }`,
 			err: "ignore block must have at least one condition",
+		},
+		{
+			config: `rule {
+  match {
+	for = "!1s"
+  }
+}`,
+			err: `not a valid duration string: "!1s"`,
 		},
 	}
 
