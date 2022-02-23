@@ -58,6 +58,7 @@ Example that enforces all alerting rules with `for` value present and greater
 than 5 minutes field to have a label called `alert_for` and value equal to
 `for` field.
 
+{% raw %}
 ```js
 rule {
   match {
@@ -70,6 +71,7 @@ rule {
   }
 }
 ```
+{% endraw }
 
 ## How to disable it
 
