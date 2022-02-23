@@ -1,8 +1,6 @@
 package config
 
 import (
-	"regexp"
-
 	"github.com/cloudflare/pint/internal/checks"
 )
 
@@ -16,7 +14,7 @@ type RejectSettings struct {
 }
 
 func (rs RejectSettings) validate() error {
-	if _, err := regexp.Compile(rs.Regex); err != nil {
+	if _, err := checks.NewTemplatedRegexp(rs.Regex); err != nil {
 		return err
 	}
 

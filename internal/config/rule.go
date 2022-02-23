@@ -99,10 +99,10 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 	}
 
 	if len(rule.Aggregate) > 0 {
-		var nameRegex *regexp.Regexp
+		var nameRegex *checks.TemplatedRegexp
 		for _, aggr := range rule.Aggregate {
 			if aggr.Name != "" {
-				nameRegex = strictRegex(aggr.Name)
+				nameRegex = checks.MustTemplatedRegexp(aggr.Name)
 			}
 			severity := aggr.getSeverity(checks.Warning)
 			for _, label := range aggr.Keep {
@@ -132,9 +132,9 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 
 	if len(rule.Annotation) > 0 {
 		for _, ann := range rule.Annotation {
-			var valueRegex *regexp.Regexp
+			var valueRegex *checks.TemplatedRegexp
 			if ann.Value != "" {
-				valueRegex = strictRegex(ann.Value)
+				valueRegex = checks.MustTemplatedRegexp(ann.Value)
 			}
 			severity := ann.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
@@ -146,9 +146,9 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 
 	if len(rule.Label) > 0 {
 		for _, lab := range rule.Label {
-			var valueRegex *regexp.Regexp
+			var valueRegex *checks.TemplatedRegexp
 			if lab.Value != "" {
-				valueRegex = strictRegex(lab.Value)
+				valueRegex = checks.MustTemplatedRegexp(lab.Value)
 			}
 			severity := lab.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
@@ -182,7 +182,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 	if len(rule.Reject) > 0 {
 		for _, reject := range rule.Reject {
 			severity := reject.getSeverity(checks.Bug)
-			re := strictRegex(reject.Regex)
+			re := checks.MustTemplatedRegexp(reject.Regex)
 			if reject.LabelKeys {
 				enabled = append(enabled, checkMeta{
 					name:  checks.RejectCheckName,

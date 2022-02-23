@@ -22,7 +22,9 @@ aggregate "$pattern" {
 }
 ```
 
-- `$pattern` - regexp pattern to match rule name on
+- `$pattern` - regexp pattern to match rule name on, this can be templated
+  to reference checked rule fields, see [Configuration](../../configuration.md)
+  for details
 - `severity` - set custom severity for reported issues, defaults to a warning
 - `keep` - list of label names that must be preserved
 - `strip` - list of label names that must be stripped

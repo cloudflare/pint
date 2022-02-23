@@ -23,7 +23,9 @@ label "$pattern" {
 }
 ```
 
-- `$pattern` - regexp pattern to match label name on
+- `$pattern` - regexp pattern to match label name on, this can be templated
+  to reference checked rule fields, see [Configuration](../../configuration.md)
+  for details
 - `severity` - set custom severity for reported issues, defaults to a warning
 - `value` - optional value pattern to enforce, if not set only the 
 - `required` - if `true` pint will require every rule to have this label set,
@@ -36,9 +38,8 @@ to work.
 To enable it add one or more `rule {...}` blocks and specify all required
 labels there.
 
-Example:
-
-Require `severity` label to be set on alert rules with two all possible values:
+Example that will require `severity` label to be set on alert rules with two
+all possible values:
 
 ```js
 rule {
@@ -49,6 +50,23 @@ rule {
   label "severity" {
     value    = "(warning|critical)"
     required = true
+  }
+}
+```
+
+Example that enforces all alerting rules with `for` value present and greater
+than 5 minutes field to have a label called `alert_for` and value equal to
+`for` field.
+
+```js
+rule {
+  match {
+    for = "> 5m"
+  }
+
+  label "alert_for" {
+    required = true
+    value    = "{{ $for }}"
   }
 }
 ```

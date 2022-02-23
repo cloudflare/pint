@@ -39,6 +39,19 @@ func TestAnnotationSettings(t *testing.T) {
 		},
 		{
 			conf: AnnotationSettings{
+				Key: "{{nil}}",
+			},
+			err: errors.New(`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`),
+		},
+		{
+			conf: AnnotationSettings{
+				Key:   ".+",
+				Value: "{{nil}}",
+			},
+			err: errors.New(`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`),
+		},
+		{
+			conf: AnnotationSettings{
 				Key:      ".+",
 				Severity: "foo",
 			},

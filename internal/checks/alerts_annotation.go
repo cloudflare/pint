@@ -3,7 +3,6 @@ package checks
 import (
 	"context"
 	"fmt"
-	"regexp"
 
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -12,20 +11,20 @@ const (
 	AnnotationCheckName = "alerts/annotation"
 )
 
-func NewAnnotationCheck(key string, valueRe *regexp.Regexp, isReguired bool, severity Severity) AnnotationCheck {
+func NewAnnotationCheck(key string, valueRe *TemplatedRegexp, isReguired bool, severity Severity) AnnotationCheck {
 	return AnnotationCheck{key: key, valueRe: valueRe, isReguired: isReguired, severity: severity}
 }
 
 type AnnotationCheck struct {
 	key        string
-	valueRe    *regexp.Regexp
+	valueRe    *TemplatedRegexp
 	isReguired bool
 	severity   Severity
 }
 
 func (c AnnotationCheck) String() string {
 	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.key, c.valueRe, c.isReguired)
+		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.key, c.valueRe.anchored, c.isReguired)
 	}
 	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.key, c.isReguired)
 }
@@ -66,12 +65,12 @@ func (c AnnotationCheck) Check(ctx context.Context, rule parser.Rule) (problems 
 		return
 	}
 
-	if c.valueRe != nil && !c.valueRe.MatchString(val.Value) {
+	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(val.Value) {
 		problems = append(problems, Problem{
 			Fragment: fmt.Sprintf("%s: %s", c.key, val.Value),
 			Lines:    val.Position.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s annotation value must match regex: %s", c.key, c.valueRe.String()),
+			Text:     fmt.Sprintf("%s annotation value must match %q", c.key, c.valueRe.anchored),
 			Severity: c.severity,
 		})
 		return

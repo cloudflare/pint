@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"regexp"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
@@ -25,7 +24,7 @@ func (ag AggregateSettings) validate() error {
 		}
 	}
 
-	if _, err := regexp.Compile(ag.Name); err != nil {
+	if _, err := checks.NewTemplatedRegexp(ag.Name); err != nil {
 		return err
 	}
 

@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"regexp"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
@@ -19,11 +18,11 @@ func (as AnnotationSettings) validate() error {
 		return errors.New("annotation key cannot be empty")
 	}
 
-	if _, err := regexp.Compile(as.Key); err != nil {
+	if _, err := checks.NewTemplatedRegexp(as.Key); err != nil {
 		return err
 	}
 
-	if _, err := regexp.Compile(as.Value); err != nil {
+	if _, err := checks.NewTemplatedRegexp(as.Value); err != nil {
 		return err
 	}
 

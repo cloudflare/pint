@@ -1,14 +1,13 @@
 package checks_test
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
 
 func TestRejectCheck(t *testing.T) {
-	badRe := regexp.MustCompile("^bad$")
+	badRe := checks.MustTemplatedRegexp("bad")
 	testCases := []checkTest{
 		{
 			description: "no rules / alerting",
@@ -54,7 +53,7 @@ func TestRejectCheck(t *testing.T) {
 					Fragment: `bad`,
 					Lines:    []int{4},
 					Reporter: "rule/reject",
-					Text:     "label key bad is not allowed to match ^bad$",
+					Text:     `label key bad is not allowed to match "^bad$"`,
 					Severity: checks.Bug,
 				},
 			},
@@ -68,7 +67,7 @@ func TestRejectCheck(t *testing.T) {
 					Fragment: `bad`,
 					Lines:    []int{4},
 					Reporter: "rule/reject",
-					Text:     "label value bad is not allowed to match ^bad$",
+					Text:     `label value bad is not allowed to match "^bad$"`,
 					Severity: checks.Warning,
 				},
 			},
@@ -82,7 +81,7 @@ func TestRejectCheck(t *testing.T) {
 					Fragment: `bad`,
 					Lines:    []int{4},
 					Reporter: "rule/reject",
-					Text:     "label key bad is not allowed to match ^bad$",
+					Text:     `label key bad is not allowed to match "^bad$"`,
 					Severity: checks.Bug,
 				},
 			},
@@ -96,7 +95,7 @@ func TestRejectCheck(t *testing.T) {
 					Fragment: `bad`,
 					Lines:    []int{4},
 					Reporter: "rule/reject",
-					Text:     "label value bad is not allowed to match ^bad$",
+					Text:     `label value bad is not allowed to match "^bad$"`,
 					Severity: checks.Bug,
 				},
 			},
@@ -121,7 +120,7 @@ func TestRejectCheck(t *testing.T) {
 					Fragment: `bad`,
 					Lines:    []int{4},
 					Reporter: "rule/reject",
-					Text:     "annotation key bad is not allowed to match ^bad$",
+					Text:     `annotation key bad is not allowed to match "^bad$"`,
 					Severity: checks.Information,
 				},
 			},
@@ -135,7 +134,26 @@ func TestRejectCheck(t *testing.T) {
 					Fragment: `bad`,
 					Lines:    []int{4},
 					Reporter: "rule/reject",
-					Text:     "annotation value bad is not allowed to match ^bad$",
+					Text:     `annotation value bad is not allowed to match "^bad$"`,
+					Severity: checks.Bug,
+				},
+			},
+		},
+		{
+			description: "reject templated regexp / passing",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    foo: alert\n",
+			checker:     checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug),
+		},
+		{
+			description: "reject templated regexp / not passing",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    alert: foo\n",
+			checker:     checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug),
+			problems: []checks.Problem{
+				{
+					Fragment: `foo`,
+					Lines:    []int{4},
+					Reporter: "rule/reject",
+					Text:     `annotation value foo is not allowed to match "^{{ $alert }}$"`,
 					Severity: checks.Bug,
 				},
 			},

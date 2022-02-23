@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp/syntax"
 
+	"github.com/prometheus/prometheus/model/labels"
+
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -35,7 +37,7 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 	for _, selector := range getSelectors(expr.Query) {
 		for _, lm := range selector.LabelMatchers {
 			if s := lm.GetRegexString(); s != "" {
-				var isUseful, isEmpty bool
+				var isUseful bool
 				r, _ := syntax.Parse(s, syntax.Perl)
 				for _, s := range r.Sub {
 					switch s.Op {
@@ -44,20 +46,23 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 					case syntax.OpEndText:
 						continue
 					case syntax.OpLiteral:
-						isEmpty = false
+						continue
 					case syntax.OpEmptyMatch:
-						isEmpty = true
+						continue
 					default:
 						isUseful = true
 					}
 				}
 				if !isUseful {
 					var text string
-					if isEmpty {
-						text = fmt.Sprintf("unnecessary regexp match on empty string: %s", lm)
-					} else {
-						text = fmt.Sprintf("unnecessary regexp match on static string: %s", lm)
+					var op labels.MatchType
+					switch lm.Type {
+					case labels.MatchRegexp:
+						op = labels.MatchEqual
+					case labels.MatchNotRegexp:
+						op = labels.MatchNotEqual
 					}
+					text = fmt.Sprintf(`unnecessary regexp match on static string %s, use %s%s%q instead`, lm, lm.Name, op, lm.Value)
 					problems = append(problems, Problem{
 						Fragment: selector.String(),
 						Lines:    expr.Lines(),
