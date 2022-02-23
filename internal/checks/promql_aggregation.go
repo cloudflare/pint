@@ -3,7 +3,6 @@ package checks
 import (
 	"context"
 	"fmt"
-	"regexp"
 
 	"github.com/rs/zerolog/log"
 
@@ -16,12 +15,12 @@ const (
 	AggregationCheckName = "promql/aggregate"
 )
 
-func NewAggregationCheck(nameRegex *regexp.Regexp, label string, keep bool, severity Severity) AggregationCheck {
+func NewAggregationCheck(nameRegex *TemplatedRegexp, label string, keep bool, severity Severity) AggregationCheck {
 	return AggregationCheck{nameRegex: nameRegex, label: label, keep: keep, severity: severity}
 }
 
 type AggregationCheck struct {
-	nameRegex *regexp.Regexp
+	nameRegex *TemplatedRegexp
 	label     string
 	keep      bool
 	severity  Severity
@@ -42,10 +41,10 @@ func (c AggregationCheck) Check(ctx context.Context, rule parser.Rule) (problems
 	}
 
 	if c.nameRegex != nil {
-		if rule.RecordingRule != nil && !c.nameRegex.MatchString(rule.RecordingRule.Record.Value.Value) {
+		if rule.RecordingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.RecordingRule.Record.Value.Value) {
 			return nil
 		}
-		if rule.AlertingRule != nil && !c.nameRegex.MatchString(rule.AlertingRule.Alert.Value.Value) {
+		if rule.AlertingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.AlertingRule.Alert.Value.Value) {
 			return nil
 		}
 	}
@@ -114,14 +113,14 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 			if found && c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, remove %s from without()", c.label, c.nameRegex, c.label),
+					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, remove %s from without()", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
 			if !found && !c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, use without(%s, ...)", c.label, c.nameRegex, c.label),
+					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, use without(%s, ...)", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
@@ -134,14 +133,14 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 			if found && !c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, remove %s from by()", c.label, c.nameRegex, c.label),
+					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, remove %s from by()", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
 			if !found && c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, use by(%s, ...)", c.label, c.nameRegex, c.label),
+					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, use by(%s, ...)", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 

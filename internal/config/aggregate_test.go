@@ -40,6 +40,13 @@ func TestAggregateSettings(t *testing.T) {
 		},
 		{
 			conf: AggregateSettings{
+				Name: "{{nil}}",
+				Keep: []string{"foo"},
+			},
+			err: errors.New(`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`),
+		},
+		{
+			conf: AggregateSettings{
 				Name:     ".+",
 				Keep:     []string{"foo"},
 				Severity: "foo",

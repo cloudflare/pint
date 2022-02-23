@@ -23,7 +23,9 @@ reject "$pattern" {
 }
 ```
 
-- `$pattern` - regexp pattern to reject
+- `$pattern` - regexp pattern to reject, this can be templated
+  to reference checked rule fields, see [Configuration](../../configuration.md)
+  for details
 - `severity` - set custom severity for reported issues, defaults to a bug.
 - `label_keys` - if true label keys for recording and alerting rules will
   be checked.
@@ -39,7 +41,7 @@ to work.
 To enable it add one or more `rule {...}` blocks and specify all rejected patterns
 there.
 
-Example:
+Examples:
 
 Disallow using URLs as label keys or values:
 
@@ -63,6 +65,21 @@ rule {
   reject ".* +.*" {
     annotation_keys = true
     label_keys = true
+  }
+}
+```
+
+Disallow label and annotation values equal to alert name:
+
+```js
+rule {
+  match {
+    kind = "alerting"
+  }
+
+  reject "{{ $alert }}" {
+    annotation_values = true
+    label_values = true
   }
 }
 ```

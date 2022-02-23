@@ -32,6 +32,12 @@ func TestRejectSettings(t *testing.T) {
 		},
 		{
 			conf: RejectSettings{
+				Regex: "{{nil}}",
+			},
+			err: errors.New(`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`),
+		},
+		{
+			conf: RejectSettings{
 				Regex:    "foo",
 				Severity: "bugx",
 			},

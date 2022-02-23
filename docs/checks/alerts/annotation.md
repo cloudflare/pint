@@ -20,7 +20,9 @@ annotation "$pattern" {
 }
 ```
 
-- `$pattern` - regexp pattern to match annotation name on
+- `$pattern` - regexp pattern to match annotation name on, this can be templated
+  to reference checked rule fields, see [Configuration](../../configuration.md)
+  for details
 - `severity` - set custom severity for reported issues, defaults to a warning
 - `value` - optional value pattern to enforce, if not set only the 
 - `required` - if `true` pint will require every alert to have this annotation set,
@@ -51,6 +53,22 @@ rule {
   annotation "dashboard" {
     severity = "bug"
     value    = "https://grafana\.example\.com/.+"
+  }
+}
+```
+
+Example that enforces all alerting rules with non-zero `for` field to have an
+annotation called `alert_for` and value equal to `for` field.
+
+```js
+rule {
+  match {
+    for = "> 0"
+  }
+
+  annotation "alert_for" {
+    required = true
+    value    = "{{ $for }}"
   }
 }
 ```

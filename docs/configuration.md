@@ -13,7 +13,28 @@ nav_order: 2
 1. TOC
 {:toc}
 
-**NOTE**: all regex patterns are anchored.
+## Regexp matchers
+
+All regexp patterns use [Go regexp](https://pkg.go.dev/regexp) module and are fully anchored.
+This means that when you pass `.*` regexp expression internally it will be represented as
+`^.*$`, where `^` indicates beginning of a string and `$` is the end of string.
+This follow [PromQL behavior](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+for consistency with Prometheus.
+If you have a string `alice bob john` and you want to match a substring `bob`, then be sure to use
+`.*bob.*`.
+
+When using regexp matcher in checks configuration you can reference alerting and recording rule
+fields in the regexp using [Go text/template](https://pkg.go.dev/text/template) syntax.
+Rule fields are exposed as:
+
+- `$alert` - rule `alert` field
+- `$record` - rule `record` field
+- `$expr` - rule `expr` field
+- `$for` - rule `for` field
+- `$labels` - rule `labels` map, individual labels can be accessed as `$labels.foo`
+- `$annotations` - rule `annotations` map, individual annotations can be accessed as `$annotations.foo`
+
+Accessing a field that's not present in the rule will return an empty string.
 
 ## CI
 
@@ -30,7 +51,7 @@ ci {
 ```
 
 - `include` - list of file patterns to check when running checks. Only files
-  matching those regex rules will be checked, other modified files will be ignored.
+  matching those regexp rules will be checked, other modified files will be ignored.
 - `maxCommits` - by default pint will try to find all commits on the current branch,
   this requires full git history to be present, if we have a shallow clone this
   might fail to find only current branch commits and give us a huge list.
@@ -130,7 +151,7 @@ prometheus "$name" {
   Default value for `required` is `false`. Set it to `true` if you want to hard fail
   in case of remote Prometheus issues. Note that setting it to `true` might block
   PRs when running `pint ci` until pint is able to talk to Prometheus again.
-- `paths` - optional path filter, if specified only paths matching one of listed regex
+- `paths` - optional path filter, if specified only paths matching one of listed regexp
   patterns will use this Prometheus server for checks.
 
 Example:

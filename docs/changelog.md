@@ -13,6 +13,8 @@
     }
   }
   ```
+- Regexp matchers used in check rules can now reference rule fields.
+  See [Configuration](configuration.md) for details.
 
 ### Changed
 
