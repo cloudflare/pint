@@ -9,6 +9,14 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "gomod"
+    directory: "/tools/gofumpt"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "goimports"
+    directory: "/tools/goimports"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gomod"
     directory: "/tools/golangci-lint"
     schedule:
       interval: "weekly"
