@@ -71,7 +71,7 @@ rule {
   }
 }
 ```
-{% endraw }
+{% endraw %}
 
 ## How to disable it
 
