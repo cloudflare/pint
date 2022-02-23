@@ -60,6 +60,7 @@ rule {
 Example that enforces all alerting rules with non-zero `for` field to have an
 annotation called `alert_for` and value equal to `for` field.
 
+{% raw %}
 ```js
 rule {
   match {
@@ -72,6 +73,7 @@ rule {
   }
 }
 ```
+{% endraw %}
 
 ## How to disable it
 
