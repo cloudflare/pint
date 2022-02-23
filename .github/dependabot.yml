@@ -12,7 +12,7 @@ updates:
     directory: "/tools/gofumpt"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "goimports"
+  - package-ecosystem: "gomod"
     directory: "/tools/goimports"
     schedule:
       interval: "weekly"
