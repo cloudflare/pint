@@ -122,6 +122,26 @@ M       file2
 				{Path: "file4", Commits: []string{"commit1", "commit2", "commit3"}},
 			},
 		},
+		{
+			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
+				if args[0] == "rev-list" {
+					return []byte("commit1\ncommit3\n"), nil
+				}
+				content := `commit1
+A       file1
+
+commit2
+A       file2
+
+commit3
+D       file1
+`
+				return []byte([]byte(content)), nil
+			}, nil, "main"),
+			output: []discovery.File{
+				{Path: "file2", Commits: []string{"commit2"}},
+			},
+		},
 	}
 
 	for i, tc := range testCases {

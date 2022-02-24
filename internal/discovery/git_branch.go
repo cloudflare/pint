@@ -27,7 +27,7 @@ func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
 
 	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
 
-	out, err := gd.gitCmd("log", "--reverse", "--no-merges", "--pretty=format:%H", "--name-status", "--diff-filter=d", cr.String())
+	out, err := gd.gitCmd("log", "--reverse", "--no-merges", "--pretty=format:%H", "--name-status", cr.String())
 	if err != nil {
 		return nil, err
 	}
@@ -63,6 +63,11 @@ func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
 					results.pathCommits[dstPath] = append(results.pathCommits[dstPath], v...)
 					delete(results.pathCommits, srcPath)
 				}
+			}
+			// check if file is being removed, if so drop it from the results
+			if strings.HasPrefix(op, "D") {
+				delete(results.pathCommits, srcPath)
+				continue
 			}
 			results.pathCommits[dstPath] = append(results.pathCommits[dstPath], commit)
 		}
