@@ -20,6 +20,11 @@
 
 - Added `filename` label to `pint_problem` metric - #170.
 
+### Fixed
+
+- Fixed `pint ci` handling when a file was added to git and then removed in the
+  next commit.
+
 ## v0.13.2
 
 ### Fixed
