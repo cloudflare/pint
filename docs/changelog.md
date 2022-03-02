@@ -19,6 +19,7 @@
 ### Changed
 
 - Added `filename` label to `pint_problem` metric - #170.
+- Include Prometheus server URI in reported problems.
 
 ### Fixed
 

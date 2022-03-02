@@ -20,7 +20,12 @@ type PrometheusConfig struct {
 	Global ConfigSectionGlobal `yaml:"global"`
 }
 
-func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
+type ConfigResult struct {
+	URI    string
+	Config PrometheusConfig
+}
+
+func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	log.Debug().Str("uri", p.uri).Msg("Query Prometheus configuration")
 
 	key := "/api/v1/status/config"
@@ -29,7 +34,7 @@ func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
 
 	if v, ok := p.cache.Get(key); ok {
 		log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache hit")
-		cfg := v.(PrometheusConfig)
+		cfg := v.(ConfigResult)
 		return &cfg, nil
 	}
 
@@ -60,8 +65,10 @@ func (p *Prometheus) Config(ctx context.Context) (*PrometheusConfig, error) {
 		cfg.Global.EvaluationInterval = time.Minute
 	}
 
-	log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache miss")
-	p.cache.Add(key, cfg)
+	r := ConfigResult{URI: p.uri, Config: cfg}
 
-	return &cfg, nil
+	log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache miss")
+	p.cache.Add(key, r)
+
+	return &r, nil
 }

@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -119,7 +120,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: "foo",
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     "query using prom failed with: bad_data: unhandled query",
+					Text:     fmt.Sprintf(`query using "prom" on %s failed with: bad_data: unhandled query`, srv.URL),
 					Severity: checks.Bug,
 				},
 			},
@@ -133,7 +134,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: "foo",
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     `cound't run "promql/series" checks due to "prom" prometheus connection error: Post "http:///api/v1/query": http: no Host in request URL`,
+					Text:     `cound't run "promql/series" checks due to "prom" on http:// connection error: Post "http:///api/v1/query": http: no Host in request URL`,
 					Severity: checks.Warning,
 				},
 			},
@@ -147,7 +148,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: "notfound",
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     "query using prom completed without any results for notfound",
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for notfound`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},
@@ -161,7 +162,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: "notfound",
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     "query using prom completed without any results for notfound",
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for notfound`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},
@@ -175,7 +176,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: "notfound",
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     "query using prom completed without any results for notfound",
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for notfound`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},
@@ -224,7 +225,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: `found{job="notfound"}`,
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     `query using prom completed without any results for found{job="notfound"}`,
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for found{job="notfound"}`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},
@@ -238,7 +239,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: "notfound",
 					Lines:    []int{2},
 					Reporter: "promql/series",
-					Text:     "query using prom completed without any results for notfound",
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for notfound`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},
@@ -255,7 +256,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: `{__name__="notfound",job="bar"}`,
 					Lines:    []int{3},
 					Reporter: "promql/series",
-					Text:     `query using prom completed without any results for {__name__="notfound",job="bar"}`,
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for {__name__="notfound",job="bar"}`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},
@@ -300,7 +301,7 @@ func TestSeriesCheck(t *testing.T) {
 					Fragment: `notfound`,
 					Lines:    []int{4},
 					Reporter: "promql/series",
-					Text:     `query using prom completed without any results for notfound`,
+					Text:     fmt.Sprintf(`query using "prom" on %s completed without any results for notfound`, srv.URL),
 					Severity: checks.Warning,
 				},
 			},

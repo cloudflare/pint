@@ -111,7 +111,7 @@ func TestQuery(t *testing.T) {
 	type testCaseT struct {
 		query   string
 		timeout time.Duration
-		series  model.Vector
+		result  promapi.QueryResult
 		err     string
 		runs    int
 	}
@@ -120,17 +120,23 @@ func TestQuery(t *testing.T) {
 		{
 			query:   "empty",
 			timeout: time.Second,
-			series:  model.Vector{},
-			runs:    5,
+			result: promapi.QueryResult{
+				URI:    srv.URL,
+				Series: model.Vector{},
+			},
+			runs: 5,
 		},
 		{
 			query:   "single_result",
 			timeout: time.Second,
-			series: model.Vector{
-				&model.Sample{
-					Metric:    model.Metric{},
-					Value:     model.SampleValue(1),
-					Timestamp: model.Time(1614859502068),
+			result: promapi.QueryResult{
+				URI: srv.URL,
+				Series: model.Vector{
+					&model.Sample{
+						Metric:    model.Metric{},
+						Value:     model.SampleValue(1),
+						Timestamp: model.Time(1614859502068),
+					},
 				},
 			},
 			runs: 5,
@@ -138,21 +144,24 @@ func TestQuery(t *testing.T) {
 		{
 			query:   "three_results",
 			timeout: time.Second,
-			series: model.Vector{
-				&model.Sample{
-					Metric:    model.Metric{"instance": "1"},
-					Value:     model.SampleValue(1),
-					Timestamp: model.Time(1614859502068),
-				},
-				&model.Sample{
-					Metric:    model.Metric{"instance": "2"},
-					Value:     model.SampleValue(2),
-					Timestamp: model.Time(1614859502168),
-				},
-				&model.Sample{
-					Metric:    model.Metric{"instance": "3"},
-					Value:     model.SampleValue(3),
-					Timestamp: model.Time(1614859503000),
+			result: promapi.QueryResult{
+				URI: srv.URL,
+				Series: model.Vector{
+					&model.Sample{
+						Metric:    model.Metric{"instance": "1"},
+						Value:     model.SampleValue(1),
+						Timestamp: model.Time(1614859502068),
+					},
+					&model.Sample{
+						Metric:    model.Metric{"instance": "2"},
+						Value:     model.SampleValue(2),
+						Timestamp: model.Time(1614859502168),
+					},
+					&model.Sample{
+						Metric:    model.Metric{"instance": "3"},
+						Value:     model.SampleValue(3),
+						Timestamp: model.Time(1614859503000),
+					},
 				},
 			},
 			runs: 5,
@@ -178,11 +187,14 @@ func TestQuery(t *testing.T) {
 		{
 			query:   "once",
 			timeout: time.Second,
-			series: model.Vector{
-				&model.Sample{
-					Metric:    model.Metric{},
-					Value:     model.SampleValue(1),
-					Timestamp: model.Time(1614859502068),
+			result: promapi.QueryResult{
+				URI: srv.URL,
+				Series: model.Vector{
+					&model.Sample{
+						Metric:    model.Metric{},
+						Value:     model.SampleValue(1),
+						Timestamp: model.Time(1614859502068),
+					},
 				},
 			},
 			runs: 5,
@@ -213,7 +225,8 @@ func TestQuery(t *testing.T) {
 						assert.NoError(err)
 					}
 					if qr != nil {
-						assert.Equal(qr.Series, tc.series)
+						assert.Equal(tc.result.URI, qr.URI)
+						assert.Equal(tc.result.Series, qr.Series)
 					}
 					wg.Done()
 				}()
