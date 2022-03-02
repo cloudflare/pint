@@ -108,9 +108,12 @@ type exprProblem struct {
 
 func textAndSeverityFromError(err error, reporter, prom string, s Severity) (text string, severity Severity) {
 	if promapi.IsUnavailableError(err) {
-		text = fmt.Sprintf("cound't run %q checks due to %q prometheus connection error: %s", reporter, prom, err)
-		var perr *promapi.Error
+		text = fmt.Sprintf("cound't run %q checks due to %q connection error: %s", reporter, prom, err)
+		var perr *promapi.FailoverGroupError
 		if errors.As(err, &perr) {
+			if uri := perr.URI(); uri != "" {
+				text = fmt.Sprintf("cound't run %q checks due to %q on %s connection error: %s", reporter, prom, uri, err)
+			}
 			if perr.IsStrict() {
 				severity = Bug
 			} else {
@@ -120,7 +123,11 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 			severity = Warning
 		}
 	} else {
-		text = fmt.Sprintf("query using %s failed with: %s", prom, err)
+		text = fmt.Sprintf("query using %q failed with: %s", prom, err)
+		var perr *promapi.FailoverGroupError
+		if errors.As(err, &perr) {
+			text = fmt.Sprintf("query using %q on %s failed with: %s", prom, perr.URI(), err)
+		}
 		severity = s
 	}
 	return

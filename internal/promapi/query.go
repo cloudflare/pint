@@ -12,6 +12,7 @@ import (
 )
 
 type QueryResult struct {
+	URI             string
 	Series          model.Vector
 	DurationSeconds float64
 }
@@ -53,6 +54,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	}
 
 	qr := QueryResult{
+		URI:             p.uri,
 		DurationSeconds: duration.Seconds(),
 	}
 

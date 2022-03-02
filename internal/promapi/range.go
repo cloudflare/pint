@@ -15,6 +15,7 @@ import (
 )
 
 type RangeQueryResult struct {
+	URI             string
 	Samples         []*model.SampleStream
 	Start           time.Time
 	End             time.Time
@@ -74,6 +75,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	}
 
 	qr := RangeQueryResult{
+		URI:             p.uri,
 		DurationSeconds: duration.Seconds(),
 		Start:           start,
 		End:             end,

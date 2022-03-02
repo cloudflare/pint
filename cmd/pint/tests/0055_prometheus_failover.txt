@@ -5,9 +5,8 @@ pint.ok --no-color lint rules
 ! stdout .
 stderr 'level=error msg="Query failed" error="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" query=count\(foo\) uri=http://127.0.0.1:1055'
 stderr 'level=error msg="Failed to query Prometheus configuration" error="Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055'
-stderr 'rules/1.yml:2: query using prom completed without any results for foo \(promql/series\)'
-
-exec sh -c 'cat prometheus.pid | xargs kill'
+stderr 'rules/1.yml:2: query using "prom" on http://127.0.0.1:7055 completed without any results for foo \(promql/series\)'
+exec bash -c 'cat prometheus.pid | xargs kill'
 
 -- rules/1.yml --
 - record: aggregate

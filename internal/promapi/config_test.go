@@ -64,7 +64,7 @@ func TestConfig(t *testing.T) {
 	type testCaseT struct {
 		prefix  string
 		timeout time.Duration
-		cfg     promapi.PrometheusConfig
+		cfg     promapi.ConfigResult
 		err     string
 		runs    int
 	}
@@ -82,24 +82,33 @@ func TestConfig(t *testing.T) {
 		{
 			prefix:  "/default",
 			timeout: time.Second,
-			cfg:     defaults,
-			runs:    5,
+			cfg: promapi.ConfigResult{
+				URI:    srv.URL + "/default",
+				Config: defaults,
+			},
+			runs: 5,
 		},
 		{
 			prefix:  "/1m",
 			timeout: time.Second,
-			cfg:     defaults,
-			runs:    5,
+			cfg: promapi.ConfigResult{
+				URI:    srv.URL + "/1m",
+				Config: defaults,
+			},
+			runs: 5,
 		},
 		{
 			prefix:  "/30s",
 			timeout: time.Second,
-			cfg: promapi.PrometheusConfig{
-				Global: promapi.ConfigSectionGlobal{
-					ScrapeInterval:     time.Second * 30,
-					ScrapeTimeout:      time.Second * 10,
-					EvaluationInterval: time.Minute,
-					ExternalLabels:     nil,
+			cfg: promapi.ConfigResult{
+				URI: srv.URL + "/30s",
+				Config: promapi.PrometheusConfig{
+					Global: promapi.ConfigSectionGlobal{
+						ScrapeInterval:     time.Second * 30,
+						ScrapeTimeout:      time.Second * 10,
+						EvaluationInterval: time.Minute,
+						ExternalLabels:     nil,
+					},
 				},
 			},
 			runs: 1,
@@ -125,8 +134,11 @@ func TestConfig(t *testing.T) {
 		{
 			prefix:  "/once",
 			timeout: time.Second,
-			cfg:     defaults,
-			runs:    10,
+			cfg: promapi.ConfigResult{
+				URI:    srv.URL + "/once",
+				Config: defaults,
+			},
+			runs: 10,
 		},
 		// make sure /once fails on second query
 		{

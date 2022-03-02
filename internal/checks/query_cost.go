@@ -82,7 +82,7 @@ func (c CostCheck) Check(ctx context.Context, rule parser.Rule) (problems []Prob
 		Fragment: expr.Value.Value,
 		Lines:    expr.Lines(),
 		Reporter: c.Reporter(),
-		Text:     fmt.Sprintf("query using %s completed in %.2fs returning %d result(s)%s%s", c.prom.Name(), qr.DurationSeconds, series, estimate, above),
+		Text:     fmt.Sprintf("query using %q on %s completed in %.2fs returning %d result(s)%s%s", c.prom.Name(), qr.URI, qr.DurationSeconds, series, estimate, above),
 		Severity: severity,
 	})
 	return

@@ -95,7 +95,7 @@ func (c SeriesCheck) countSeries(ctx context.Context, expr parser.PromQLExpr, se
 			Fragment: selector.String(),
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("query using %s completed without any results for %s", c.prom.Name(), selector.String()),
+			Text:     fmt.Sprintf("query using %q on %s completed without any results for %s", c.prom.Name(), qr.URI, selector.String()),
 			Severity: Warning,
 		})
 		return

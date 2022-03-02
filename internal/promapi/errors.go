@@ -10,23 +10,6 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
 
-type Error struct {
-	err      error
-	isStrict bool
-}
-
-func (e *Error) Unwrap() error {
-	return e.err
-}
-
-func (e *Error) Error() string {
-	return e.err.Error()
-}
-
-func (e *Error) IsStrict() bool {
-	return e.isStrict
-}
-
 func IsUnavailableError(err error) bool {
 	var apiErr *v1.Error
 	if ok := errors.As(err, &apiErr); ok {
