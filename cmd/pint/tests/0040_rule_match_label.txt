@@ -19,6 +19,7 @@ rules/rules.yml:5: job label is required and should be preserved when aggregatin
 rules/rules.yml:13: job label is required and should be preserved when aggregating "^.*$" rules, use by(job, ...) (promql/aggregate)
   expr: sum(foo) > 0
 
+level=info msg="Problems found" Warning=2
 -- rules/rules.yml --
 - record: ignore
   expr: sum(foo)

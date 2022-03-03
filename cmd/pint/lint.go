@@ -72,8 +72,10 @@ func actionLint(c *cli.Context) (err error) {
 			problems += c
 		}
 	}
-	if problems > 0 {
+	if len(bySeverity) > 0 {
 		log.Info().Fields(bySeverity).Msg("Problems found")
+	}
+	if problems > 0 {
 		return fmt.Errorf("problems found")
 	}
 
