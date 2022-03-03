@@ -14,6 +14,7 @@ level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/fo
 rules/0001.yml:6: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
   expr: sum(bar)
 
+level=info msg="Problems found" Warning=1
 -- rules/0001.yml --
 - alert: first
   expr: foo > 1

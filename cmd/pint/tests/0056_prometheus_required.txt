@@ -2,7 +2,7 @@ pint.ok -l debug --no-color lint rules
 ! stdout .
 stderr 'level=error msg=\"Query failed" error=\"Post \\"https:///api/v1/query\\": http: no Host in request URL\" query=count\(up\) uri=https://'
 stderr 'level=error msg=\"Failed to query Prometheus configuration\" error=\"Get \\"https:///api/v1/status/config\\": http: no Host in request URL\" uri=https://'
-! stderr 'level=info msg="Problems found"'
+stderr 'level=info msg="Problems found" Warning=8'
 
 -- rules/1.yaml --
 - record: one

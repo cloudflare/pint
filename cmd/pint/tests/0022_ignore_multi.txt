@@ -11,6 +11,7 @@ rules/1.yaml:2: dropped label should be removed when aggregating "^.+$" rules, r
 rules/1.yaml:5: keep label is required and should be preserved when aggregating "^.+$" rules, remove keep from without() (promql/aggregate)
   expr: sum(errors_total) without(keep,dropped)
 
+level=info msg="Problems found" Warning=2
 -- rules/1.yaml --
 - record: disabled
   expr: sum(errors_total) by(keep,dropped)

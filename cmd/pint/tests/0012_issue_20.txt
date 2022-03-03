@@ -11,6 +11,7 @@ rules/1.yaml:9-13: runbook_url annotation is required (alerts/annotation)
           summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
           description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 
+level=info msg="Problems found" Warning=1
 -- rules/1.yaml --
 groups:
   - name: "haproxy.api_server.rules"

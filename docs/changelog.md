@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.14.1
+
+### Changed
+
+- Always print the number of detected problems when running `pint lint`.
+
 ## v0.14.0
 
 ### Added
