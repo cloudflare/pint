@@ -1,10 +1,11 @@
 # Changelog
 
-## v0.14.1
+## v0.15.0
 
 ### Changed
 
 - Always print the number of detected problems when running `pint lint`.
+- Raise `promql/series` severity from `Warning` to `Bug`.
 
 ## v0.14.0
 

@@ -1,7 +1,7 @@
 exec bash -x ./prometheus.sh &
 exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
 
-pint.ok --no-color lint rules
+pint.error --no-color lint rules
 ! stdout .
 stderr 'level=error msg="Query failed" error="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" query=count\(foo\) uri=http://127.0.0.1:1055'
 stderr 'level=error msg="Failed to query Prometheus configuration" error="Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055'
