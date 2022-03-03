@@ -12,7 +12,7 @@ stderr 'level=info msg="Waiting for all background tasks to finish"'
 stderr 'level=info msg="Background worker finished"'
 
 -- test.sh --
-sleep 5
+sleep 3
 cat pint.pid | xargs kill
 cat prometheus.pid | xargs kill
 
@@ -76,7 +76,7 @@ func main() {
 		stop <- syscall.SIGTERM
 	}()
 	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	server.Shutdown(ctx)
 }

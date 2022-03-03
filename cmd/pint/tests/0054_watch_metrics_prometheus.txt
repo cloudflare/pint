@@ -7,7 +7,7 @@ pint.ok watch --listen=:6054 --pidfile=pint.pid rules
 cmp curl.txt metrics.txt
 
 -- test.sh --
-sleep 15
+sleep 3
 curl -s http://127.0.0.1:6054/metrics | grep 'pint_' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
 cat pint.pid | xargs kill
 cat prometheus.pid | xargs kill
