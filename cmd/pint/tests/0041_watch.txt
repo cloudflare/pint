@@ -1,11 +1,11 @@
 exec bash -x ./test.sh &
 
-pint.ok --no-color -l debug watch --interval=10s --listen=:6041 --pidfile=pint.pid rules
+pint.ok --no-color -l debug watch --interval=5s --listen=:6041 --pidfile=pint.pid rules
 ! stdout .
 
 stderr 'level=info msg="Pidfile created" path=pint.pid'
 stderr 'level=info msg="Started HTTP server" address=:6041'
-stderr 'level=info msg="Will continuously run checks until terminated" interval=10s'
+stderr 'level=info msg="Will continuously run checks until terminated" interval=5s'
 stderr 'level=debug msg="Clearing cache"'
 stderr 'level=debug msg="Running checks"'
 stderr 'level=error msg="Got an error when running checks" error="no matching files"'
@@ -20,6 +20,7 @@ stderr 'level=info msg="Pidfile removed" path=pint.pid'
 grep '^pint_check_iterations_total 2$' curl.txt
 
 -- test.sh --
-sleep 15
+sleep 7
 curl -so curl.txt http://127.0.0.1:6041/metrics
+grep -E '^pint_check_iterations_total ' curl.txt
 cat pint.pid | xargs kill

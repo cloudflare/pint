@@ -4,7 +4,7 @@ pint.ok watch --listen=:6042 --pidfile=pint.pid rules
 cmp curl.txt metrics.txt
 
 -- test.sh --
-sleep 5
+sleep 3
 curl -s http://127.0.0.1:6042/metrics | grep -vE 'process_|go_info' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
 cat pint.pid | xargs kill
 
