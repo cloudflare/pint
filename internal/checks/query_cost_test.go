@@ -12,12 +12,9 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/rs/zerolog"
 )
 
 func TestCostCheck(t *testing.T) {
-	zerolog.SetGlobalLevel(zerolog.FatalLevel)
-
 	content := "- record: foo\n  expr: sum(foo)\n"
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +88,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 2\...s returning 0 result\(s\)`, srv.URL+"/empty/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 2\...s returning 0 result\(s\)`, srv.URL+"/empty/"),
 					Severity: checks.Information,
 				},
 			},
@@ -105,7 +102,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:cound't run "query/cost" checks due to "prom" on %s/empty/ connection error: Post "http://127.0.0.1:.+/empty/api/v1/query": context deadline exceeded`, srv.URL),
+					Text:     fmt.Sprintf(`RE:cound't run "query/cost" checks due to prometheus "prom" at %s/empty/ connection error: Post "http://127.0.0.1:.+/empty/api/v1/query": context deadline exceeded`, srv.URL),
 					Severity: checks.Bug,
 				},
 			},
@@ -119,7 +116,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`query using "prom" on %s/400/ failed with: bad_data: unhandled path`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/400/ failed with: bad_data: unhandled path`, srv.URL),
 					Severity: checks.Bug,
 				},
 			},
@@ -133,7 +130,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     `cound't run "query/cost" checks due to "prom" on http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
+					Text:     `cound't run "query/cost" checks due to prometheus "prom" at http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
 					Severity: checks.Warning,
 				},
 			},
@@ -147,7 +144,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 1 result\(s\) with 4\.0KiB estimated memory usage`, srv.URL+"/1/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 1 result\(s\) with 4\.0KiB estimated memory usage`, srv.URL+"/1/"),
 					Severity: checks.Information,
 				},
 			},
@@ -161,7 +158,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`, srv.URL+"/7/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`, srv.URL+"/7/"),
 					Severity: checks.Information,
 				},
 			},
@@ -175,7 +172,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 7 result\(s\) with 7\.0MiB estimated memory usage`, srv.URL+"/7/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 7\.0MiB estimated memory usage`, srv.URL+"/7/"),
 					Severity: checks.Information,
 				},
 			},
@@ -189,7 +186,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 7 result\(s\) with 7.0KiB estimated memory usage, maximum allowed series is 1`, srv.URL+"/7/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 7.0KiB estimated memory usage, maximum allowed series is 1`, srv.URL+"/7/"),
 					Severity: checks.Bug,
 				},
 			},
@@ -203,7 +200,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`, srv.URL+"/7/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`, srv.URL+"/7/"),
 					Severity: checks.Bug,
 				},
 			},
@@ -217,7 +214,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: "sum(foo)",
 					Lines:    []int{2},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`, srv.URL+"/7/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`, srv.URL+"/7/"),
 					Severity: checks.Information,
 				},
 			},
@@ -234,7 +231,7 @@ func TestCostCheck(t *testing.T) {
 					Fragment: `sum({__name__="foo"})`,
 					Lines:    []int{3},
 					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:query using "prom" on %s completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`, srv.URL+"/7/"),
+					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`, srv.URL+"/7/"),
 					Severity: checks.Information,
 				},
 			},

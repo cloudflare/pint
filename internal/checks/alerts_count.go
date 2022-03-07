@@ -107,7 +107,7 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,
 		Reporter: c.Reporter(),
-		Text:     fmt.Sprintf("query using %q on %s would trigger %d alert(s) in the last %s", c.prom.Name(), qr.URI, alerts, output.HumanizeDuration(delta)),
+		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
 		Severity: Information,
 	})
 	return

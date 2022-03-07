@@ -82,16 +82,16 @@ func (c RateCheck) checkNode(node *parser.PromQLNode, cfg *promapi.ConfigResult)
 				if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(minIntervals) {
 					p := exprProblem{
 						expr: node.Expr,
-						text: fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %q on %s is using %s scrape_interval",
-							n.Func.Name, minIntervals, c.prom.Name(), cfg.URI, output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+						text: fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval",
+							n.Func.Name, minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 						severity: Bug,
 					}
 					problems = append(problems, p)
 				} else if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(recIntervals) {
 					p := exprProblem{
 						expr: node.Expr,
-						text: fmt.Sprintf("duration for %s() is recommended to be at least %d x scrape_interval, %q on %s is using %s scrape_interval",
-							n.Func.Name, recIntervals, c.prom.Name(), cfg.URI, output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+						text: fmt.Sprintf("duration for %s() is recommended to be at least %d x scrape_interval, %s is using %s scrape_interval",
+							n.Func.Name, recIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 						severity: Warning,
 					}
 					problems = append(problems, p)
