@@ -2,315 +2,164 @@ package checks_test
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
 
+func newSeriesCheck(uri string) checks.RuleChecker {
+	return checks.NewSeriesCheck(simpleProm("prom", uri, time.Second*5, true))
+}
+
+func noMetricText(name, uri, metric, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s didn't have any series for %q metric in the last %s`, name, uri, metric, since)
+}
+
+func noFilterMatchText(name, uri, metric, filter, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s has %q metric but there are no series matching %s in the last %s`, name, uri, metric, filter, since)
+}
+
+func noLabelKeyText(name, uri, metric, label, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s has %q metric but there are no series with %q label in the last %s`, name, uri, metric, label, since)
+}
+
+func noSeriesText(name, uri, metric, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s didn't have any series for %q metric in the last %s`, name, uri, metric, since)
+}
+
+func seriesDisappearedText(name, uri, metric, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s doesn't currently have %q, it was last present %s ago`, name, uri, metric, since)
+}
+
+func filterDisappeardText(name, uri, metric, filter, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s has %q metric but doesn't currently have series matching %s, such series was last present %s ago`, name, uri, metric, filter, since)
+}
+
+func filterSometimesText(name, uri, metric, filter, since string) string {
+	return fmt.Sprintf(`metric %q with label %s is only sometimes present on prometheus %q at %s with average life span of %s`, metric, filter, name, uri, since)
+}
+
+func seriesSometimesText(name, uri, metric, since, avg string) string {
+	return fmt.Sprintf(`metric %q is only sometimes present on prometheus %q at %s with average life span of %s in the last %s`, metric, name, uri, avg, since)
+}
+
 func TestSeriesCheck(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			t.Fatal(err)
-		}
-		query := r.Form.Get("query")
-
-		switch query {
-		case `count(test_metric)`, `count(test_metric_c) by (step)`:
-			w.WriteHeader(400)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"error",
-				"errorType":"execution",
-				"error":"query failed"
-			}`))
-		case "count(notfound)",
-			`count(notfound{job="bar"}`,
-			`count(notfound{job="foo"})`,
-			`count(notfound{job!="foo"})`,
-			`count({__name__="notfound",job="bar"})`,
-			`count(ALERTS{alertname="foo"})`,
-			`count(ALERTS{notfound="foo"})`,
-			`count(test_metric{step="2"})`,
-			`count(test_metric_c{step="3"})`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			if r.URL.Path == "/api/v1/query_range" {
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-				return
-			}
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[]
-				}
-			}`))
-		case "count(found_1)", `count({__name__="notfound"})`, `count(ALERTS) by (notfound)`, `count(test_metric_c)`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			if r.URL.Path == "/api/v1/query_range" {
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{
-					"status":"success",
-					"data":{
-						"resultType":"matrix",
-						"result":[
-							{
-								"metric":{},"values":[
-									[1614859502.068,"1"]
-								]
-							},
-							{
-								"metric":{},"values":[
-									[1614869502.068,"1"]
-								]
-							}
-						]
-					}
-				}`))
-				return
-			}
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-
-		case "count(found_7)", `count(ALERTS)`, `count(ALERTS) by (alertname)`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			if r.URL.Path == "/api/v1/query_range" {
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{
-					"status":"success",
-					"data":{
-						"resultType":"matrix",
-						"result":[
-							{
-								"metric":{"alertname": "xxx"},"values":[
-									[1614859502.068,"1"]
-								]
-							},
-							{
-								"metric":{"alertname": "yyy"},"values":[
-									[1614859502.068,"1"]
-								]
-							}
-						]
-					}
-				}`))
-				return
-			}
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[
-						{"metric":{"alertname": "xxx"},"value":[1614859502.068,"7"]},
-						{"metric":{"alertname": "yyy"},"value":[1614859502.068,"7"]}
-					]
-				}
-			}`))
-		case `count(node_filesystem_readonly{mountpoint!=""})`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case `count(found{job="notfound"})`, `count(notfound{job="notfound"})`, `count(notfound{job="bar"})`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			if r.URL.Path == "/api/v1/query_range" {
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-				return
-			}
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[]
-				}
-			}`))
-		case `count(found)`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			if r.URL.Path == "/api/v1/query_range" {
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{
-					"status":"success",
-					"data":{
-						"resultType":"matrix",
-						"result":[
-							{
-								"metric":{},"values":[
-									[1614859502.068,"1"]
-								]
-							},
-							{
-								"metric":{},"values":[
-									[1614869502.068,"1"]
-								]
-							}
-						]
-					}
-				}`))
-				return
-			}
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case `count(found) by (job)`, `count({__name__="notfound"}) by (job)`:
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			if r.URL.Path == "/api/v1/query_range" {
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{
-					"status":"success",
-					"data":{
-						"resultType":"matrix",
-						"result":[
-							{
-								"metric":{"job": "xxx"},"values":[
-									[1614859502.068,"1"]
-								]
-							},
-							{
-								"metric":{"job": "yyy"},"values":[
-									[1614859502.068,"1"]
-								]
-							}
-						]
-					}
-				}`))
-				return
-			}
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[
-						{"metric":{"job": "xxx"},"value":[1614859502.068,"1"]},
-						{"metric":{"job": "yyy"},"value":[1614859502.068,"1"]}
-					]
-				}
-			}`))
-		default:
-			w.WriteHeader(400)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"error",
-				"errorType":"bad_data",
-				"error":"unhandled query"
-			}`))
-		}
-	}))
-	defer srv.Close()
-
-	testCases := []checkTest{
+	testCases := []checkTestT{
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:     newSeriesCheck,
+			problems:    noProblems,
 		},
 		{
 			description: "bad response",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
 				{
-					Fragment: "foo",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s failed with: bad_data: unhandled query`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithBadData,
 				},
 			},
 		},
 		{
 			description: "bad uri",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", "http://", time.Second*5, false)),
-			problems: []checks.Problem{
-				{
-					Fragment: "foo",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     `cound't run "promql/series" checks due to prometheus "prom" at http:// connection error: Post "http:///api/v1/query": http: no Host in request URL`,
-					Severity: checks.Warning,
-				},
+			checker: func(s string) checks.RuleChecker {
+				return checks.NewSeriesCheck(simpleProm("prom", "http://", time.Second*5, false))
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://", `Post "http:///api/v1/query": http: no Host in request URL`),
+						Severity: checks.Warning,
+					},
+				}
 			},
 		},
 		{
 			description: "simple query",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
 				{
-					Fragment: "notfound",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s didn't have any series for "notfound" metric in the last 1w`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix,
 				},
 			},
 		},
 		{
 			description: "complex query",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
-				{
-					Fragment: "notfound",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s didn't have any series for "notfound" metric in the last 1w`, srv.URL),
-					Severity: checks.Bug,
-				},
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
 			},
-		},
-		{
-			description: "complex query / bug",
-			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			mocks: []prometheusMock{
 				{
-					Fragment: "notfound",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s didn't have any series for "notfound" metric in the last 1w`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(notfound)"},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(notfound)"},
+					},
+					resp: respondWithEmptyMatrix,
+				},
+				{
+					conds: []requestCondition{requireQueryPath, formCond{key: "query", value: "count(found_7)"}},
+					resp:  respondWithSingleInstantVector,
 				},
 			},
 		},
 		{
 			description: "label_replace()",
-			content: `- alert: foo
+			content: `
+- alert: foo
   expr: |
     count(
       label_replace(
@@ -331,43 +180,883 @@ func TestSeriesCheck(t *testing.T) {
     )
   for: 5m
 `,
-			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:  newSeriesCheck,
+			problems: noProblems,
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`},
+					},
+					resp: respondWithSingleInstantVector,
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+					},
+					resp: respondWithSingleInstantVector,
+				},
+			},
 		},
 		{
 			description: "offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset 5m\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:     newSeriesCheck,
+			problems:    noProblems,
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+					},
+					resp: respondWithSingleInstantVector,
+				},
+			},
 		},
 		{
 			description: "negative offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset -15m\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:     newSeriesCheck,
+			problems:    noProblems,
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+					},
+					resp: respondWithSingleInstantVector,
+				},
+			},
+		},
+		{
+			description: "#1 series present",
+			content:     "- record: foo\n  expr: found > 0\n",
+			checker:     newSeriesCheck,
+			problems:    noProblems,
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithSingleInstantVector,
+				},
+			},
+		},
+		{
+			description: "#1 query error",
+			content:     "- record: foo\n  expr: found > 0\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithInternalError,
+				},
+			},
+		},
+		{
+			description: "#2 series never present",
+			content:     "- record: foo\n  expr: sum(notfound)\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix,
+				},
+			},
+		},
+		{
+			description: "#2 query error",
+			content:     "- record: foo\n  expr: found > 0\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithInternalError,
+				},
+			},
+		},
+		{
+			description: "#3 metric present, label missing",
+			content:     "- record: foo\n  expr: sum(found{job=\"foo\", notfound=\"xxx\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{job="foo",notfound="xxx"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noLabelKeyText("prom", uri, "found", "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{job="foo",notfound="xxx"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "xxx"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found) by (notfound)`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+			},
+		},
+		{
+			description: "#3 metric present, label query error",
+			content:     "- record: foo\n  expr: sum(found{notfound=\"xxx\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{notfound="xxx"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{notfound="xxx"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found) by (notfound)`},
+					},
+					resp: respondWithInternalError,
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared",
+			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#5 metric was present but not with label",
+			content:     "- record: foo\n  expr: sum(found{notfound=\"notfound\", instance=~\".+\", not!=\"negative\", instance!~\"bad\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noFilterMatchText("prom", uri, "found", `{notfound="notfound"}`, "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(found) by (instance)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(found) by (not)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"not": "yyy"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(found) by (notfound)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"notfound": "found"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{notfound="notfound"})`},
+					},
+					resp: respondWithEmptyMatrix,
+				},
+			},
+		},
+		{
+			description: "#5 label query error",
+			content:     "- record: foo\n  expr: sum(found{error=\"xxx\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{error="xxx"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{error="xxx"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(found) by (error)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"error": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{error="xxx"})`},
+					},
+					resp: respondWithInternalError,
+				},
+			},
+		},
+		{
+			description: "#5 high churn labels",
+			content:     "- record: foo\n  expr: sum(sometimes{churn=\"notfound\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `sometimes{churn="notfound"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noFilterMatchText("prom", uri, "sometimes", `{churn="notfound"}`, "1w") + `, "churn" looks like a high churn label`,
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sometimes{churn="notfound"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes) by (churn)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"churn": "aaa"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"churn": "bbb"},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"churn": "ccc"},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes{churn="notfound"})`},
+					},
+					resp: respondWithEmptyMatrix,
+				},
+			},
+		},
+		{
+			description: "#6 metric was always present but label disappeared",
+			content:     "- record: foo\n  expr: sum({__name__=\"found\", removed=\"xxx\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{removed="xxx"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     filterDisappeardText("prom", uri, `{__name__="found"}`, `{removed="xxx"}`, "5d16h"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__="found"})`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__="found"}) by (removed)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"removed": "xxx"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{removed="xxx"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#7 metric was always present but label only sometimes",
+			content:     "- record: foo\n  expr: sum(found{sometimes=\"xxx\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{sometimes="xxx"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{sometimes="xxx"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found) by (sometimes)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"sometimes": "aaa"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"sometimes": "bbb"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"sometimes": "xxx"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"sometimes": "xxx"},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-4),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"sometimes": "xxx"},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{sometimes="xxx"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-4),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#8 metric is sometimes present",
+			content:     "- record: foo\n  expr: sum(sometimes{foo!=\"bar\"})\n",
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `sometimes`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sometimes{foo!="bar"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes) by (foo)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"foo": "aaa"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"foo": "bbb"},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"foo": "ccc"},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
 		},
 		{
 			description: "series found, label missing",
 			content:     "- record: foo\n  expr: found{job=\"notfound\"}\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found{job="notfound"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noFilterMatchText("prom", uri, "found", `{job="notfound"}`, "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
 				{
-					Fragment: `found{job="notfound"}`,
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s has "found" metric but there are no series matching {job="notfound"} in the last 1w, "job" looks like a high churn label`, srv.URL),
-					Severity: checks.Warning,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{job="notfound"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(found)"},
+					},
+					resp: respondWithSingleRangeVector1W,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(found) by (job)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "found"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job="notfound"})`},
+					},
+					resp: respondWithEmptyMatrix,
 				},
 			},
 		},
 		{
 			description: "series missing, label missing",
 			content:     "- record: foo\n  expr: notfound{job=\"notfound\"}\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noSeriesText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
 				{
-					Fragment: "notfound",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s didn't have any series for "notfound" metric in the last 1w`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(notfound{job="notfound"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(notfound)"},
+					},
+					resp: respondWithEmptyMatrix,
 				},
 			},
 		},
@@ -377,14 +1066,32 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: '{__name__="notfound", job="bar"}'
 `,
-			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			checker: newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `{__name__="notfound"}`,
+						Lines:    []int{3},
+						Reporter: checks.SeriesCheckName,
+						Text:     noSeriesText("prom", uri, `{__name__="notfound"}`, "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
 				{
-					Fragment: `{__name__="notfound",job="bar"}`,
-					Lines:    []int{3},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s has "{__name__=\"notfound\"}" metric but there are no series matching {job="bar"} in the last 1w, "job" looks like a high churn label`, srv.URL),
-					Severity: checks.Warning,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({__name__="notfound",job="bar"})`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__="notfound"})`},
+					},
+					resp: respondWithEmptyMatrix,
 				},
 			},
 		},
@@ -395,7 +1102,8 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound) == 0
 `,
-			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:  newSeriesCheck,
+			problems: noProblems,
 		},
 		{
 			description: "series missing but check disabled, labels",
@@ -404,7 +1112,8 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound{job="foo"}) == 0
 `,
-			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:  newSeriesCheck,
+			problems: noProblems,
 		},
 		{
 			description: "series missing but check disabled, negative labels",
@@ -413,7 +1122,8 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound{job!="foo"}) == 0
 `,
-			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
+			checker:  newSeriesCheck,
+			problems: noProblems,
 		},
 		{
 			description: "series missing, disabled comment for labels",
@@ -422,73 +1132,74 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound) == 0
 `,
-			checker: checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			checker: newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `notfound`,
+						Lines:    []int{4},
+						Reporter: checks.SeriesCheckName,
+						Text:     noSeriesText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []prometheusMock{
 				{
-					Fragment: `notfound`,
-					Lines:    []int{4},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s didn't have any series for "notfound" metric in the last 1w`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(notfound)`},
+					},
+					resp: respondWithEmptyVector,
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(notfound)`},
+					},
+					resp: respondWithEmptyMatrix,
 				},
 			},
 		},
 		{
 			description: "ALERTS{notfound=...}",
 			content:     "- alert: foo\n  expr: count(ALERTS{notfound=\"foo\"}) >= 10\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
-				{
-					Fragment: `ALERTS{notfound="foo"}`,
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s has "ALERTS" metric but there are no series with "notfound" label in the last 1w`, srv.URL),
-					Severity: checks.Bug,
-				},
+			checker:     newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `ALERTS{notfound="foo"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noLabelKeyText("prom", uri, "ALERTS", "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
 			},
-		},
-		{
-			description: "ALERTS{alertname=...}",
-			content:     "- alert: foo\n  expr: count(ALERTS{alertname=\"foo\"}) >= 10\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
+			mocks: []prometheusMock{
 				{
-					Fragment: `ALERTS{alertname="foo"}`,
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s has "ALERTS" metric but there are no series matching {alertname="foo"} in the last 1w, "alertname" looks like a high churn label`, srv.URL),
-					Severity: checks.Warning,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(ALERTS{notfound="foo"})`},
+					},
+					resp: respondWithEmptyVector,
 				},
-			},
-		},
-		{
-			description: "step 2 error",
-			content:     "- alert: foo\n  expr: test_metric{step=\"2\"}\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
 				{
-					Fragment: "test_metric",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`cound't run "promql/series" checks due to prometheus "prom" at %s connection error: no more retries possible`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(ALERTS)`},
+					},
+					resp: respondWithSingleRangeVector1W,
 				},
-			},
-		},
-		{
-			description: "step 3 error",
-			content:     "- alert: foo\n  expr: test_metric_c{step=\"3\"}\n",
-			checker:     checks.NewSeriesCheck(simpleProm("prom", srv.URL, time.Second*5, true)),
-			problems: []checks.Problem{
 				{
-					Fragment: "test_metric_c",
-					Lines:    []int{2},
-					Reporter: "promql/series",
-					Text:     fmt.Sprintf(`cound't run "promql/series" checks due to prometheus "prom" at %s connection error: no more retries possible`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(ALERTS) by (notfound)`},
+					},
+					resp: respondWithSingleRangeVector1W,
 				},
 			},
 		},
 	}
-	runTests(t, testCases)
+	runTestsT(t, testCases)
 }

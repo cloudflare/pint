@@ -26,6 +26,7 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 	p := parser.NewParser()
 	ctx := context.Background()
 	for _, tc := range testCases {
+		// original test
 		t.Run(tc.description, func(t *testing.T) {
 			rules, err := p.Parse([]byte(tc.content))
 			if err != nil {
@@ -38,6 +39,8 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 				}
 			}
 		})
+
+		// broken alerting rule to test check against rules with syntax error
 		t.Run(tc.description+" (bogus alerting rule)", func(t *testing.T) {
 			rules, err := p.Parse([]byte(`
 - alert: foo
@@ -52,6 +55,8 @@ func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
 				_ = tc.checker.Check(ctx, rule)
 			}
 		})
+
+		// broken recording rule to test check against rules with syntax error
 		t.Run(tc.description+" (bogus recording rule)", func(t *testing.T) {
 			rules, err := p.Parse([]byte(`
 - record: foo
