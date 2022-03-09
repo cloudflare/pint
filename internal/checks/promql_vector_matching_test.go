@@ -10,8 +10,6 @@ import (
 )
 
 func TestVectorMatchingCheck(t *testing.T) {
-	// zerolog.SetGlobalLevel(zerolog.FatalLevel)
-
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -382,7 +380,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					Fragment: "xxx/yyy",
 					Lines:    []int{2},
 					Reporter: "promql/vector_matching",
-					Text:     `cound't run "promql/vector_matching" checks due to "prom" on http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
+					Text:     `cound't run "promql/vector_matching" checks due to prometheus "prom" at http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
 					Severity: checks.Bug,
 				},
 			},
@@ -396,7 +394,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					Fragment: "xxx/yyy",
 					Lines:    []int{2},
 					Reporter: "promql/vector_matching",
-					Text:     `cound't run "promql/vector_matching" checks due to "prom" on http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
+					Text:     `cound't run "promql/vector_matching" checks due to prometheus "prom" at http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
 					Severity: checks.Warning,
 				},
 			},

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/rs/zerolog"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
@@ -20,6 +21,8 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest, opts ...cmp.Option) {
+	zerolog.SetGlobalLevel(zerolog.FatalLevel)
+
 	p := parser.NewParser()
 	ctx := context.Background()
 	for _, tc := range testCases {

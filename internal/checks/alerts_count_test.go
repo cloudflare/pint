@@ -8,13 +8,9 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-
-	"github.com/rs/zerolog"
 )
 
 func TestAlertsCheck(t *testing.T) {
-	zerolog.SetGlobalLevel(zerolog.FatalLevel)
-
 	content := "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n"
 
 	now := time.Now()
@@ -101,7 +97,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `up{job="foo"} == 0`,
 					Lines:    []int{2},
 					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`query using "prom" on %s/400/ failed with: bad_data: unhandled path`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/400/ failed with: bad_data: unhandled path`, srv.URL),
 					Severity: checks.Bug,
 				},
 			},
@@ -115,7 +111,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `up{job="foo"} == 0`,
 					Lines:    []int{2},
 					Reporter: "alerts/count",
-					Text:     `cound't run "alerts/count" checks due to "prom" on http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query_range": dial tcp 127.0.0.1:80: connect: connection refused`,
+					Text:     `cound't run "alerts/count" checks due to prometheus "prom" at http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query_range": dial tcp 127.0.0.1:80: connect: connection refused`,
 					Severity: checks.Warning,
 				},
 			},
@@ -129,7 +125,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `up{job="foo"} == 0`,
 					Lines:    []int{2},
 					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`query using "prom" on %s/empty/ would trigger 0 alert(s) in the last 1d`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/empty/ would trigger 0 alert(s) in the last 1d`, srv.URL),
 					Severity: checks.Information,
 				},
 			},
@@ -143,7 +139,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `up{job="foo"} == 0`,
 					Lines:    []int{2},
 					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`query using "prom" on %s/alerts/ would trigger 7 alert(s) in the last 1d`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 7 alert(s) in the last 1d`, srv.URL),
 					Severity: checks.Information,
 				},
 			},
@@ -157,7 +153,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `up{job="foo"} == 0`,
 					Lines:    []int{2, 3},
 					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`query using "prom" on %s/alerts/ would trigger 1 alert(s) in the last 1d`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 1 alert(s) in the last 1d`, srv.URL),
 					Severity: checks.Information,
 				},
 			},
@@ -174,7 +170,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `{__name__="up", job="foo"} == 0`,
 					Lines:    []int{3},
 					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`query using "prom" on %s/alerts/ would trigger 3 alert(s) in the last 1d`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 3 alert(s) in the last 1d`, srv.URL),
 					Severity: checks.Information,
 				},
 			},
@@ -191,7 +187,7 @@ func TestAlertsCheck(t *testing.T) {
 					Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,
 					Lines:    []int{3},
 					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`query using "prom" on %s/alerts/ would trigger 3 alert(s) in the last 1d`, srv.URL),
+					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 3 alert(s) in the last 1d`, srv.URL),
 					Severity: checks.Information,
 				},
 			},

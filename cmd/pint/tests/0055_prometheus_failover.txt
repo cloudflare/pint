@@ -5,7 +5,7 @@ pint.error --no-color lint rules
 ! stdout .
 stderr 'level=error msg="Query failed" error="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" query=count\(foo\) uri=http://127.0.0.1:1055'
 stderr 'level=error msg="Failed to query Prometheus configuration" error="Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055'
-stderr 'rules/1.yml:2: query using "prom" on http://127.0.0.1:7055 completed without any results for foo \(promql/series\)'
+stderr 'rules/1.yml:2: prometheus "prom" at http://127.0.0.1:7055 didn''t have any series for "foo" metric in the last 1w \(promql/series\)'
 exec bash -c 'cat prometheus.pid | xargs kill'
 
 -- rules/1.yml --
@@ -40,6 +40,18 @@ func main() {
         w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
+	})
+
+	http.HandleFunc("/api/v1/query_range", func(w http.ResponseWriter, r *http.Request) {
+        w.WriteHeader(200)
+        w.Header().Set("Content-Type", "application/json")
+        _, _ = w.Write([]byte(`{
+            "status":"success",
+            "data":{
+                "resultType":"matrix",
+                "result":[]
+            }
+        }`))
 	})
 
 	http.HandleFunc("/api/v1/query", func(w http.ResponseWriter, r *http.Request) {

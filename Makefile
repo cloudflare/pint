@@ -49,7 +49,7 @@ test:
 
 .PHONY: debug-testscript
 debug-testscript:
-	for I in ./cmd/pint/tests/*.txt ; do T=`basename "$${I}" | cut -d. -f1`; echo ">>> $${T}" ; go test -count=1 -timeout=30s -v -run=TestScript/$${T} ./cmd/pint ; done
+	for I in ./cmd/pint/tests/*.txt ; do T=`basename "$${I}" | cut -d. -f1`; echo ">>> $${T}" ; go test -count=1 -timeout=30s -v -run=TestScript/$${T} ./cmd/pint || exit 1 ; done
 
 .PHONY: update-snapshots
 update-snapshots:
