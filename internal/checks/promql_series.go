@@ -104,7 +104,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 				Lines:    expr.Lines(),
 				Reporter: c.Reporter(),
 				Text: fmt.Sprintf("%s didn't have any series for %q metric in the last %s",
-					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc()),
+					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.from)),
 				Severity: Bug,
 			})
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("No historical series for base metric")
@@ -118,7 +118,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Str("label", name).Msg("Checking if base metric has historical series with required label")
 			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", bareSelector.String(), name), rangeStart, rangeStep)
 			if err != nil {
-				problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
+				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
 			}
 
@@ -130,7 +130,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 					Reporter: c.Reporter(),
 					Text: fmt.Sprintf(
 						"%s has %q metric but there are no series with %q label in the last %s",
-						promText(c.prom.Name(), trsLabelCount.uri), bareSelector.String(), name, trsLabelCount.sinceDesc()),
+						promText(c.prom.Name(), trsLabelCount.uri), bareSelector.String(), name, trsLabelCount.sinceDesc(trsLabelCount.from)),
 					Severity: Bug,
 				})
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Str("label", name).Msg("No historical series with label used for the query")
@@ -154,7 +154,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 				Reporter: c.Reporter(),
 				Text: fmt.Sprintf(
 					"%s doesn't currently have %q, it was last present %s ago",
-					promText(c.prom.Name(), trs.uri), bareSelector.String(), output.HumanizeDuration(time.Since(trs.newest()))),
+					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.newest())),
 				Severity: Bug,
 			})
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Series disappeared from prometheus ")
@@ -176,7 +176,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 
 			trsLabel, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeStart, rangeStep)
 			if err != nil {
-				problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
+				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
 			}
 
@@ -184,7 +184,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 			if len(trsLabel.ranges) == 0 {
 				text := fmt.Sprintf(
 					"%s has %q metric but there are no series matching {%s} in the last %s",
-					promText(c.prom.Name(), trsLabel.uri), bareSelector.String(), lm.String(), trsLabel.sinceDesc())
+					promText(c.prom.Name(), trsLabel.uri), bareSelector.String(), lm.String(), trsLabel.sinceDesc(trs.from))
 				var s Severity = Bug
 				for _, name := range highChurnLabels {
 					if lm.Name == name {
@@ -210,12 +210,12 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 				!trsLabel.oldest().After(rangeStart.Add(rangeStep)) &&
 				trsLabel.newest().Before(time.Now().Add(rangeStep*-1)) {
 				problems = append(problems, Problem{
-					Fragment: bareSelector.String(),
+					Fragment: labelSelector.String(),
 					Lines:    expr.Lines(),
 					Reporter: c.Reporter(),
 					Text: fmt.Sprintf(
 						"%s has %q metric but doesn't currently have series matching {%s}, such series was last present %s ago",
-						promText(c.prom.Name(), trs.uri), bareSelector.String(), lm.String(), output.HumanizeDuration(time.Since(trs.newest()))),
+						promText(c.prom.Name(), trs.uri), bareSelector.String(), lm.String(), trsLabel.sinceDesc(trsLabel.newest())),
 					Severity: Bug,
 				})
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("Series matching filter disappeared from prometheus ")
@@ -229,9 +229,9 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 					Lines:    expr.Lines(),
 					Reporter: c.Reporter(),
 					Text: fmt.Sprintf(
-						"metric %q with label %s is only sometimes present on %s with average life span of %s",
+						"metric %q with label {%s} is only sometimes present on %s with average life span of %s",
 						bareSelector.String(), lm.String(), promText(c.prom.Name(), trs.uri),
-						output.HumanizeDuration(trs.avgLife())),
+						output.HumanizeDuration(trsLabel.avgLife())),
 					Severity: Warning,
 				})
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("Series matching filter are only sometimes present")
@@ -244,12 +244,12 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 		// 8. If foo is SOMETIMES there -> WARN
 		if len(trs.ranges) > 1 {
 			problems = append(problems, Problem{
-				Fragment: selector.String(),
+				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
 				Reporter: c.Reporter(),
 				Text: fmt.Sprintf(
 					"metric %q is only sometimes present on %s with average life span of %s in the last %s",
-					bareSelector.String(), promText(c.prom.Name(), trs.uri), output.HumanizeDuration(trs.avgLife()), trs.sinceDesc()),
+					bareSelector.String(), promText(c.prom.Name(), trs.uri), output.HumanizeDuration(trs.avgLife()), trs.sinceDesc(trs.from)),
 				Severity: Warning,
 			})
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Metric only sometimes present")
@@ -427,8 +427,8 @@ func (tr timeRanges) newest() (ts time.Time) {
 	return
 }
 
-func (tr timeRanges) sinceDesc() (s string) {
-	dur := time.Since(tr.from)
+func (tr timeRanges) sinceDesc(t time.Time) (s string) {
+	dur := time.Since(t)
 	if dur > time.Hour*24 {
 		return output.HumanizeDuration(dur.Round(time.Hour))
 	}
