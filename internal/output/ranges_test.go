@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/output"
 )
@@ -38,10 +38,7 @@ func TestFormatLineRangeString(t *testing.T) {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			output := output.FormatLineRangeString(tc.lines)
 
-			if diff := cmp.Diff(tc.output, output); diff != "" {
-				t.Errorf("FormatLineRangeString() returned wrong output (-want +got):\n%s", diff)
-				return
-			}
+			require.Equal(t, tc.output, output, "FormatLineRangeString() returned wrong output")
 		})
 	}
 }

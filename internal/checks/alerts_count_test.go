@@ -2,159 +2,237 @@ package checks_test
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
 
+func newAlertsCheck(uri string) checks.RuleChecker {
+	return checks.NewAlertsCheck(simpleProm("prom", uri, time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5)
+}
+
+func alertsText(name, uri string, count int, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s would trigger %d alert(s) in the last %s`, name, uri, count, since)
+}
+
 func TestAlertsCheck(t *testing.T) {
 	content := "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n"
-
-	now := time.Now()
-
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			t.Fatal(err)
-		}
-		query := r.Form.Get("query")
-		if query != `up{job="foo"} == 0` &&
-			query != `{__name__="up", job="foo"} == 0` &&
-			query != `{__name__=~"(up|foo)", job="foo"} == 0` {
-			t.Fatalf("Prometheus got invalid query: %s", query)
-		}
-
-		switch r.URL.Path {
-		case "/empty/api/v1/query_range":
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-		case "/alerts/api/v1/query_range":
-			w.WriteHeader(200)
-			out := fmt.Sprintf(`{
-				"status":"success",
-				"data":{
-					"resultType":"matrix",
-					"result":[
-						{"metric":{"instance":"1"},"values":[
-							[%d,"0"],
-							[%d,"0"],
-							[%d,"0"],
-							[%d,"0"],
-							[%d,"0"]
-						]},
-						{"metric":{"instance":"2"},"values":[
-							[%d,"0"],
-							[%d,"0"],
-							[%d,"0"],
-							[%d,"0"],
-							[%d,"0"]
-						]}
-					]
-				}
-			}`,
-				now.AddDate(0, 0, -1).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*2).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*60).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*61).Unix(),
-
-				now.AddDate(0, 0, -1).Add(time.Minute*6).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*12).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*18).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*24).Unix(),
-				now.AddDate(0, 0, -1).Add(time.Minute*30).Unix(),
-			)
-			_, _ = w.Write([]byte(out))
-		default:
-			w.WriteHeader(400)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
-		}
-	}))
-	defer srv.Close()
 
 	testCases := []checkTest{
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: up == 0\n",
-			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     newAlertsCheck,
+			problems:    noProblems,
 		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- alert: Foo Is Down\n  expr: sum(\n",
-			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://localhost", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
+			checker:     newAlertsCheck,
+			problems:    noProblems,
 		},
 		{
 			description: "bad request",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
-			problems: []checks.Problem{
+			checker:     newAlertsCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2},
+						Reporter: "alerts/count",
+						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `up{job="foo"} == 0`,
-					Lines:    []int{2},
-					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/400/ failed with: bad_data: unhandled path`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: respondWithBadData(),
 				},
 			},
 		},
 		{
-			description: "connection refused",
+			description: "connection refused / upstream not required / warning",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", "http://127.0.0.1", time.Second*5, false), time.Hour*24, time.Minute, time.Minute*5),
-			problems: []checks.Problem{
-				{
-					Fragment: `up{job="foo"} == 0`,
-					Lines:    []int{2},
-					Reporter: "alerts/count",
-					Text:     `cound't run "alerts/count" checks due to prometheus "prom" at http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query_range": dial tcp 127.0.0.1:80: connect: connection refused`,
-					Severity: checks.Warning,
-				},
+			checker: func(s string) checks.RuleChecker {
+				return checks.NewAlertsCheck(simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false), time.Hour*24, time.Minute, time.Minute*5)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2},
+						Reporter: "alerts/count",
+						Text:     checkErrorUnableToRun(checks.AlertsCheckName, "prom", "http://127.0.0.1:1111", `Post "http://127.0.0.1:1111/api/v1/query_range": dial tcp 127.0.0.1:1111: connect: connection refused`),
+						Severity: checks.Warning,
+					},
+				}
 			},
 		},
 		{
 			description: "empty response",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
-			problems: []checks.Problem{
+			checker:     newAlertsCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 0, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `up{job="foo"} == 0`,
-					Lines:    []int{2},
-					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/empty/ would trigger 0 alert(s) in the last 1d`, srv.URL),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
 		{
 			description: "multiple alerts",
 			content:     content,
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute, time.Minute*5),
-			problems: []checks.Problem{
+			checker:     newAlertsCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 7, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `up{job="foo"} == 0`,
-					Lines:    []int{2},
-					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 7 alert(s) in the last 1d`, srv.URL),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24),
+								time.Now().Add(time.Hour*24).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*23),
+								time.Now().Add(time.Hour*23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*22),
+								time.Now().Add(time.Hour*22).Add(time.Minute),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*21),
+								time.Now().Add(time.Hour*21).Add(time.Minute*16),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*20),
+								time.Now().Add(time.Hour*20).Add(time.Minute*36),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*19),
+								time.Now().Add(time.Hour*19).Add(time.Minute*36),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*18),
+								time.Now().Add(time.Hour*18).Add(time.Hour*2),
+								time.Minute,
+							),
+						},
+					},
 				},
 			},
 		},
 		{
 			description: "for: 10m",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
-			checker:     checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute*6, time.Minute*10),
-			problems: []checks.Problem{
+			checker:     newAlertsCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2, 3},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 2, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `up{job="foo"} == 0`,
-					Lines:    []int{2, 3},
-					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 1 alert(s) in the last 1d`, srv.URL),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24),
+								time.Now().Add(time.Hour*24).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*23),
+								time.Now().Add(time.Hour*23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*22),
+								time.Now().Add(time.Hour*22).Add(time.Minute),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*21),
+								time.Now().Add(time.Hour*21).Add(time.Minute*16),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*20),
+								time.Now().Add(time.Hour*20).Add(time.Minute*9).Add(time.Second*59),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*18),
+								time.Now().Add(time.Hour*18).Add(time.Hour*2),
+								time.Minute,
+							),
+						},
+					},
 				},
 			},
 		},
@@ -164,14 +242,46 @@ func TestAlertsCheck(t *testing.T) {
 - alert: foo
   expr: '{__name__="up", job="foo"} == 0'
 `,
-			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute*6, time.Minute*10),
-			problems: []checks.Problem{
+			checker: newAlertsCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `{__name__="up", job="foo"} == 0`,
+						Lines:    []int{3},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 3, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `{__name__="up", job="foo"} == 0`,
-					Lines:    []int{3},
-					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 3 alert(s) in the last 1d`, srv.URL),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `{__name__="up", job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24),
+								time.Now().Add(time.Hour*24).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*23),
+								time.Now().Add(time.Hour*23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*22),
+								time.Now().Add(time.Hour*22).Add(time.Minute),
+								time.Minute,
+							),
+						},
+					},
 				},
 			},
 		},
@@ -181,14 +291,46 @@ func TestAlertsCheck(t *testing.T) {
 - alert: foo
   expr: '{__name__=~"(up|foo)", job="foo"} == 0'
 `,
-			checker: checks.NewAlertsCheck(simpleProm("prom", srv.URL+"/alerts/", time.Second*5, true), time.Hour*24, time.Minute*6, time.Minute*10),
-			problems: []checks.Problem{
+			checker: newAlertsCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,
+						Lines:    []int{3},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 3, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,
-					Lines:    []int{3},
-					Reporter: "alerts/count",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/alerts/ would trigger 3 alert(s) in the last 1d`, srv.URL),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `{__name__=~"(up|foo)", job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*21),
+								time.Now().Add(time.Hour*21).Add(time.Minute*16),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*20),
+								time.Now().Add(time.Hour*20).Add(time.Minute*9).Add(time.Second*59),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*18),
+								time.Now().Add(time.Hour*18).Add(time.Hour*2),
+								time.Minute,
+							),
+						},
+					},
 				},
 			},
 		},

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
 )
@@ -158,9 +158,7 @@ D       file1
 				return
 			}
 
-			if diff := cmp.Diff(tc.output, output.Results()); diff != "" {
-				t.Errorf("git.ModifiedFiles() returned wrong output (-want +got):\n%s", diff)
-			}
+			require.Equal(t, tc.output, output.Results(), "git.ModifiedFiles() returned wrong output")
 		})
 	}
 }

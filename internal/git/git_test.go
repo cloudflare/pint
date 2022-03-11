@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/cloudflare/pint/internal/git"
+	"github.com/stretchr/testify/require"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/cloudflare/pint/internal/git"
 )
 
 func blameLine(sha string, line int, filename, content string) string {
@@ -88,9 +88,7 @@ func TestGitBlame(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tc.output, output); diff != "" {
-				t.Errorf("git.Blame() returned wrong output (-want +got):\n%s", diff)
-			}
+			require.Equal(t, tc.output, output, "git.Blame() returned wrong output ")
 		})
 	}
 }
@@ -165,9 +163,7 @@ func TestCommitRange(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tc.output, output); diff != "" {
-				t.Errorf("git.CommitRange() returned wrong output (-want +got):\n%s", diff)
-			}
+			require.Equal(t, tc.output, output, "git.CommitRange() returned wrong output")
 		})
 	}
 }
@@ -218,9 +214,7 @@ func TestCurrentBranch(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tc.output, output); diff != "" {
-				t.Errorf("git.CurrentBranch() returned wrong output (-want +got):\n%s", diff)
-			}
+			require.Equal(t, tc.output, output, "git.CurrentBranch() returned wrong output")
 		})
 	}
 }

@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
@@ -54,10 +54,7 @@ func TestHasOuterBinaryExpr(t *testing.T) {
 					t.Errorf("HasOuterBinaryExpr() returned nil, expected %s", tc.output)
 				}
 			} else {
-				if diff := cmp.Diff(tc.output, bin.String()); diff != "" {
-					t.Errorf("HasOuterBinaryExpr() returned wrong result (-want +got):\n%s", diff)
-					return
-				}
+				require.Equal(t, tc.output, bin.String(), "HasOuterBinaryExpr() returned wrong output")
 			}
 		})
 	}

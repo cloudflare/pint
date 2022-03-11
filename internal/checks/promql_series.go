@@ -183,8 +183,8 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 			// 5. If foo is ALWAYS/SOMETIMES there BUT {bar OR baz} value is NEVER there -> BUG
 			if len(trsLabel.ranges) == 0 {
 				text := fmt.Sprintf(
-					"%s has %q metric but there are no series matching {%s} in the last %s",
-					promText(c.prom.Name(), trsLabel.uri), bareSelector.String(), lm.String(), trsLabel.sinceDesc(trs.from))
+					"%s has %q metric with %q label but there are no series matching {%s} in the last %s",
+					promText(c.prom.Name(), trsLabel.uri), bareSelector.String(), lm.Name, lm.String(), trsLabel.sinceDesc(trs.from))
 				var s Severity = Bug
 				for _, name := range highChurnLabels {
 					if lm.Name == name {

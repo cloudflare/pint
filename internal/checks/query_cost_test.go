@@ -2,220 +2,346 @@ package checks_test
 
 import (
 	"fmt"
-	"net/http"
-	"net/http/httptest"
-	"regexp"
-	"strings"
 	"testing"
 	"time"
 
-	"github.com/cloudflare/pint/internal/checks"
+	"github.com/prometheus/common/model"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/cloudflare/pint/internal/checks"
 )
+
+func costText(name, uri string, count int) string {
+	return fmt.Sprintf(`prometheus %q at %s returned %d result(s)`, name, uri, count)
+}
+
+func memUsageText(b string) string {
+	return fmt.Sprintf(" with %s estimated memory usage", b)
+}
+
+func maxSeriesText(m int) string {
+	return fmt.Sprintf(", maximum allowed series is %d", m)
+}
 
 func TestCostCheck(t *testing.T) {
 	content := "- record: foo\n  expr: sum(foo)\n"
-
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := r.ParseForm()
-		if err != nil {
-			t.Fatal(err)
-		}
-		query := r.Form.Get("query")
-		if query != "count(sum(foo))" && query != `count(sum({__name__="foo"}))` {
-			t.Fatalf("Prometheus got invalid query: %s", query)
-		}
-
-		switch r.URL.Path {
-		case "/empty/api/v1/query":
-			time.Sleep(time.Second * 2)
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[]
-				}
-			}`))
-		case "/1/api/v1/query":
-			time.Sleep(time.Millisecond * 550)
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
-				}
-			}`))
-		case "/7/api/v1/query":
-			time.Sleep(time.Millisecond * 100)
-			w.WriteHeader(200)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"success",
-				"data":{
-					"resultType":"vector",
-					"result":[{"metric":{},"value":[1614859502.068,"7"]}]
-				}
-			}`))
-		default:
-			w.WriteHeader(400)
-			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{
-				"status":"error",
-				"errorType":"bad_data",
-				"error":"unhandled path"
-			}`))
-		}
-	}))
-	defer srv.Close()
 
 	testCases := []checkTest{
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker:     checks.NewCostCheck(simpleProm("prom", "http://localhost", time.Second*5, true), 4096, 0, checks.Bug),
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 4096, 0, checks.Bug)
+			},
+			problems: noProblems,
 		},
 		{
 			description: "empty response",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Second*5, true), 4096, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 4096, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 0),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 2\...s returning 0 result\(s\)`, srv.URL+"/empty/"),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: respondWithEmptyVector(),
 				},
 			},
 		},
 		{
 			description: "response timeout",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/empty/", time.Millisecond*5, true), 4096, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Millisecond*50, true), 4096, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text: checkErrorUnableToRun(checks.CostCheckName, "prom", uri,
+							fmt.Sprintf(`Post "%s/api/v1/query": context deadline exceeded`, uri)),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:cound't run "query/cost" checks due to prometheus "prom" at %s/empty/ connection error: Post "http://127.0.0.1:.+/empty/api/v1/query": context deadline exceeded`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: sleepResponse{sleep: time.Millisecond * 100},
 				},
 			},
 		},
 		{
 			description: "bad request",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/400/", time.Second*5, true), 4096, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 4096, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`prometheus "prom" at %s/400/ failed with: bad_data: unhandled path`, srv.URL),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: respondWithBadData(),
 				},
 			},
 		},
 		{
-			description: "bad request",
+			description: "connection refused",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", "http://127.0.0.1", time.Second*5, false), 4096, 0, checks.Bug),
-			problems: []checks.Problem{
-				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     `cound't run "query/cost" checks due to prometheus "prom" at http://127.0.0.1 connection error: Post "http://127.0.0.1/api/v1/query": dial tcp 127.0.0.1:80: connect: connection refused`,
-					Severity: checks.Warning,
-				},
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false), 4096, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", `Post "http://127.0.0.1:1111/api/v1/query": dial tcp 127.0.0.1:1111: connect: connection refused`),
+						Severity: checks.Warning,
+					},
+				}
 			},
 		},
 		{
 			description: "1 result",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/1/", time.Second*5, true), 4096, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 4096, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 1 result\(s\) with 4\.0KiB estimated memory usage`, srv.URL+"/1/"),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: respondWithSingleInstantVector(),
 				},
 			},
 		},
 		{
 			description: "7 results",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 101, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 101, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 7) + memUsageText("707B"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`, srv.URL+"/7/"),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+					},
 				},
 			},
 		},
 		{
 			description: "7 result with MB",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 1024*1024, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 1024*1024, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 7) + memUsageText("7.0MiB"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 7\.0MiB estimated memory usage`, srv.URL+"/7/"),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+					},
 				},
 			},
 		},
 		{
 			description: "7 results with 1 series max (1KB bps)",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 1024, 1, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 1024, 1, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 7.0KiB estimated memory usage, maximum allowed series is 1`, srv.URL+"/7/"),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+					},
 				},
 			},
 		},
 		{
-			description: "7 results with 5 series max",
+			description: "6 results with 5 series max",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 0, 5, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 0, 5, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 6) + maxSeriesText(5),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`, srv.URL+"/7/"),
-					Severity: checks.Bug,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+					},
 				},
 			},
 		},
 		{
 			description: "7 results with 5 series max / infi",
 			content:     content,
-			checker:     checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 0, 5, checks.Information),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 0, 5, checks.Information)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 7) + maxSeriesText(5),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: "sum(foo)",
-					Lines:    []int{2},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\), maximum allowed series is 5`, srv.URL+"/7/"),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+					},
 				},
 			},
 		},
@@ -225,26 +351,41 @@ func TestCostCheck(t *testing.T) {
 - record: foo
   expr: 'sum({__name__="foo"})'
 `,
-			checker: checks.NewCostCheck(simpleProm("prom", srv.URL+"/7/", time.Second*5, true), 101, 0, checks.Bug),
-			problems: []checks.Problem{
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewCostCheck(simpleProm("prom", uri, time.Second*5, true), 101, 0, checks.Bug)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `sum({__name__="foo"})`,
+						Lines:    []int{3},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 7) + memUsageText("707B"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
 				{
-					Fragment: `sum({__name__="foo"})`,
-					Lines:    []int{3},
-					Reporter: "query/cost",
-					Text:     fmt.Sprintf(`RE:prometheus "prom" at %s completed in 0\...s returning 7 result\(s\) with 707B estimated memory usage`, srv.URL+"/7/"),
-					Severity: checks.Information,
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum({__name__="foo"}))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+							generateSample(map[string]string{}),
+						},
+					},
 				},
 			},
 		},
 	}
 
-	cmpText := cmp.Comparer(func(x, y string) bool {
-		if strings.HasPrefix(x, "RE:") {
-			xr := regexp.MustCompile(x[3:])
-			return xr.MatchString(y)
-		}
-		return x == y
-	})
-
-	runTests(t, testCases, cmpText)
+	runTests(t, testCases)
 }

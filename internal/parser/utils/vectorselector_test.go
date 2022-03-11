@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
@@ -59,10 +59,7 @@ func TestHasVectorSelector(t *testing.T) {
 				for _, v := range vs {
 					output = append(output, v.String())
 				}
-				if diff := cmp.Diff(tc.output, output); diff != "" {
-					t.Errorf("HasVectorSelector() returned wrong result (-want +got):\n%s", diff)
-					return
-				}
+				require.Equal(t, tc.output, output, "HasVectorSelector() returned wrong output")
 			}
 		})
 	}
