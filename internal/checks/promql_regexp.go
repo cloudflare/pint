@@ -68,7 +68,7 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule) (problems []Pr
 						Lines:    expr.Lines(),
 						Reporter: c.Reporter(),
 						Text:     text,
-						Severity: Warning,
+						Severity: Bug,
 					})
 				}
 			}
