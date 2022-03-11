@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -147,10 +147,7 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(string(tc.output), string(output)); diff != "" {
-				t.Errorf("ReadContent() returned wrong output (-want +got):\n%s", diff)
-				return
-			}
+			require.Equal(t, string(tc.output), string(output), "ReadContent() returned wrong output")
 		})
 	}
 }

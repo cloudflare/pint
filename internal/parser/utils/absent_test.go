@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
@@ -66,10 +66,7 @@ func TestHasOuterAbsent(t *testing.T) {
 				for _, a := range calls {
 					output = append(output, a.Node.String())
 				}
-				if diff := cmp.Diff(tc.output, output); diff != "" {
-					t.Errorf("HasOuterAbsent() returned wrong result (-want +got):\n%s", diff)
-					return
-				}
+				require.Equal(t, tc.output, output, "HasOuterAbsent() returned wrong output")
 			}
 		})
 	}

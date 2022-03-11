@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/stretchr/testify/require"
 
-	"github.com/google/go-cmp/cmp"
+	"github.com/cloudflare/pint/internal/discovery"
 )
 
 func TestGlobFileFinder(t *testing.T) {
@@ -105,9 +105,7 @@ func TestGlobFileFinder(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tc.output, output.Results()); diff != "" {
-				t.Errorf("GlobFileFinder.Discover() returned wrong output (-want +got):\n%s", diff)
-			}
+			require.Equal(t, tc.output, output.Results(), "GlobFileFinder.Discover() returned wrong output")
 		})
 	}
 }

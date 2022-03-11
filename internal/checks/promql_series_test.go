@@ -18,8 +18,8 @@ func noMetricText(name, uri, metric, since string) string {
 	return fmt.Sprintf(`prometheus %q at %s didn't have any series for %q metric in the last %s`, name, uri, metric, since)
 }
 
-func noFilterMatchText(name, uri, metric, filter, since string) string {
-	return fmt.Sprintf(`prometheus %q at %s has %q metric but there are no series matching %s in the last %s`, name, uri, metric, filter, since)
+func noFilterMatchText(name, uri, metric, label, filter, since string) string {
+	return fmt.Sprintf(`prometheus %q at %s has %q metric with %q label but there are no series matching %s in the last %s`, name, uri, metric, label, filter, since)
 }
 
 func noLabelKeyText(name, uri, metric, label, since string) string {
@@ -47,7 +47,7 @@ func seriesSometimesText(name, uri, metric, since, avg string) string {
 }
 
 func TestSeriesCheck(t *testing.T) {
-	testCases := []checkTestT{
+	testCases := []checkTest{
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
@@ -69,10 +69,10 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireQueryPath},
-					resp:  respondWithBadData,
+					resp:  respondWithBadData(),
 				},
 			},
 		},
@@ -109,14 +109,14 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireQueryPath},
-					resp:  respondWithEmptyVector,
+					resp:  respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{requireRangeQueryPath},
-					resp:  respondWithEmptyMatrix,
+					resp:  respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -135,24 +135,24 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: "count(notfound)"},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: "count(notfound)"},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{requireQueryPath, formCond{key: "query", value: "count(found_7)"}},
-					resp:  respondWithSingleInstantVector,
+					resp:  respondWithSingleInstantVector(),
 				},
 			},
 		},
@@ -182,20 +182,20 @@ func TestSeriesCheck(t *testing.T) {
 `,
 			checker:  newSeriesCheck,
 			problems: noProblems,
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`},
 					},
-					resp: respondWithSingleInstantVector,
+					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
 					},
-					resp: respondWithSingleInstantVector,
+					resp: respondWithSingleInstantVector(),
 				},
 			},
 		},
@@ -204,13 +204,13 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset 5m\n",
 			checker:     newSeriesCheck,
 			problems:    noProblems,
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
 					},
-					resp: respondWithSingleInstantVector,
+					resp: respondWithSingleInstantVector(),
 				},
 			},
 		},
@@ -219,13 +219,13 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset -15m\n",
 			checker:     newSeriesCheck,
 			problems:    noProblems,
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
 					},
-					resp: respondWithSingleInstantVector,
+					resp: respondWithSingleInstantVector(),
 				},
 			},
 		},
@@ -234,10 +234,10 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: found > 0\n",
 			checker:     newSeriesCheck,
 			problems:    noProblems,
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireQueryPath},
-					resp:  respondWithSingleInstantVector,
+					resp:  respondWithSingleInstantVector(),
 				},
 			},
 		},
@@ -256,10 +256,10 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireQueryPath},
-					resp:  respondWithInternalError,
+					resp:  respondWithInternalError(),
 				},
 			},
 		},
@@ -278,14 +278,14 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireQueryPath},
-					resp:  respondWithEmptyVector,
+					resp:  respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{requireRangeQueryPath},
-					resp:  respondWithEmptyMatrix,
+					resp:  respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -304,14 +304,14 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireQueryPath},
-					resp:  respondWithEmptyVector,
+					resp:  respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{requireRangeQueryPath},
-					resp:  respondWithInternalError,
+					resp:  respondWithInternalError(),
 				},
 			},
 		},
@@ -330,20 +330,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{job="foo",notfound="xxx"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -366,7 +366,7 @@ func TestSeriesCheck(t *testing.T) {
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found) by (notfound)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -385,27 +385,27 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{notfound="xxx"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found) by (notfound)`},
 					},
-					resp: respondWithInternalError,
+					resp: respondWithInternalError(),
 				},
 			},
 		},
@@ -424,13 +424,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
@@ -492,25 +492,25 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "found", `{notfound="notfound"}`, "1w"),
+						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w"),
 						Severity: checks.Bug,
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -581,7 +581,7 @@ func TestSeriesCheck(t *testing.T) {
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found{notfound="notfound"})`},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -600,20 +600,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{error="xxx"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -636,7 +636,7 @@ func TestSeriesCheck(t *testing.T) {
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found{error="xxx"})`},
 					},
-					resp: respondWithInternalError,
+					resp: respondWithInternalError(),
 				},
 			},
 		},
@@ -650,18 +650,18 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `sometimes{churn="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "sometimes", `{churn="notfound"}`, "1w") + `, "churn" looks like a high churn label`,
+						Text:     noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w") + `, "churn" looks like a high churn label`,
 						Severity: checks.Warning,
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(sometimes{churn="notfound"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
@@ -724,7 +724,7 @@ func TestSeriesCheck(t *testing.T) {
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(sometimes{churn="notfound"})`},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -743,20 +743,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count({__name__="found"})`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -807,20 +807,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{sometimes="xxx"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -907,13 +907,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(sometimes{foo!="bar"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
@@ -983,25 +983,25 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found{job="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "found", `{job="notfound"}`, "1w"),
+						Text:     noFilterMatchText("prom", uri, "found", "job", `{job="notfound"}`, "1w"),
 						Severity: checks.Bug,
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(found{job="notfound"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: "count(found)"},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -1024,7 +1024,7 @@ func TestSeriesCheck(t *testing.T) {
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found{job="notfound"})`},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -1043,20 +1043,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(notfound{job="notfound"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: "count(notfound)"},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -1078,20 +1078,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count({__name__="notfound",job="bar"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count({__name__="notfound"})`},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -1144,20 +1144,20 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(notfound)`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(notfound)`},
 					},
-					resp: respondWithEmptyMatrix,
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},
@@ -1176,30 +1176,30 @@ func TestSeriesCheck(t *testing.T) {
 					},
 				}
 			},
-			mocks: []prometheusMock{
+			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
 						requireQueryPath,
 						formCond{key: "query", value: `count(ALERTS{notfound="foo"})`},
 					},
-					resp: respondWithEmptyVector,
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(ALERTS)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(ALERTS) by (notfound)`},
 					},
-					resp: respondWithSingleRangeVector1W,
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
 	}
-	runTestsT(t, testCases)
+	runTests(t, testCases)
 }

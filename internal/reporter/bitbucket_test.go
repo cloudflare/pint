@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
@@ -474,19 +474,13 @@ func TestBitBucketReporter(t *testing.T) {
 						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
 							t.Errorf("JSON decode error: %v", err)
 						}
-						if diff := cmp.Diff(tc.report, resp); diff != "" {
-							t.Errorf("Got wrong bitbucket report body (-want +got):\n%s", diff)
-							return
-						}
+						require.Equal(t, tc.report, resp, "Got wrong bitbucket report body")
 					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations":
 						var resp reporter.BitBucketAnnotations
 						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
 							t.Errorf("JSON decode error: %s", err)
 						}
-						if diff := cmp.Diff(tc.annotations, resp); diff != "" {
-							t.Errorf("Got wrong bitbucket annotations (-want +got):\n%s", diff)
-							return
-						}
+						require.Equal(t, tc.annotations, resp, "Got wrong bitbucket annotations")
 					default:
 						w.WriteHeader(500)
 						_, _ = w.Write([]byte(fmt.Sprintf("Unhandled path: %s", r.URL.Path)))
