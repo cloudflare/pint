@@ -7,6 +7,7 @@
 - Always print the number of detected problems when running `pint lint`.
 - `promql/series` check was refactored and will now detect a range of
   problems. See [promql/series](checks/promql/series.md) for details.
+- `promql/regexp` severity is now `Bug` instead of a `Warning`.
 
 ## v0.14.0
 
