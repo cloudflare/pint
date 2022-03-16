@@ -74,6 +74,7 @@ type checkTest struct {
 	description string
 	content     string
 	checker     newCheckFn
+	entries     []discovery.Entry
 	problems    problemsFn
 	mocks       []*prometheusMock
 }
@@ -101,7 +102,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
-				problems := tc.checker(uri).Check(ctx, entry.Rule, entries)
+				problems := tc.checker(uri).Check(ctx, entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
 
@@ -124,7 +125,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(t *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker("").Check(ctx, entry.Rule, entries)
+				_ = tc.checker("").Check(ctx, entry.Rule, tc.entries)
 			}
 		})
 	}
@@ -146,6 +147,14 @@ func parseContent(content string) (entries []discovery.Entry, err error) {
 	}
 
 	return entries, nil
+}
+
+func mustParseContent(content string) (entries []discovery.Entry) {
+	entries, err := parseContent(content)
+	if err != nil {
+		panic(err)
+	}
+	return entries
 }
 
 func noProblems(uri string) []checks.Problem {
