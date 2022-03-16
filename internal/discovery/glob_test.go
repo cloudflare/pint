@@ -1,111 +1,100 @@
 package discovery_test
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/parser"
 )
 
-func TestGlobFileFinder(t *testing.T) {
+func TestGlobPathFinder(t *testing.T) {
 	type testCaseT struct {
-		files       []string
-		pattern     string
-		output      []discovery.File
-		shouldError bool
+		files   map[string]string
+		finder  discovery.GlobFinder
+		entries []discovery.Entry
+		err     error
 	}
+
+	p := parser.NewParser()
+	testRuleBody := "- record: foo\n  expr: sum(foo)\n"
+	testRules, err := p.Parse([]byte(testRuleBody))
+	require.NoError(t, err)
 
 	testCases := []testCaseT{
 		{
-			files:       []string{},
-			pattern:     "*",
-			output:      nil,
-			shouldError: false,
+			files:  map[string]string{},
+			finder: discovery.NewGlobFinder("[]"),
+			err:    filepath.ErrBadPattern,
 		},
 		{
-			files:       []string{},
-			pattern:     "xxx",
-			output:      nil,
-			shouldError: false,
+			files:  map[string]string{},
+			finder: discovery.NewGlobFinder("*"),
+			err:    fmt.Errorf("no matching files"),
 		},
 		{
-			files:       []string{"1.txt"},
-			pattern:     "*",
-			output:      []discovery.File{{Path: "1.txt"}},
-			shouldError: false,
+			files:  map[string]string{},
+			finder: discovery.NewGlobFinder("*"),
+			err:    fmt.Errorf("no matching files"),
 		},
 		{
-			files:       []string{"1.txt", "2.txt"},
-			pattern:     "*.txt",
-			output:      []discovery.File{{Path: "1.txt"}, {Path: "2.txt"}},
-			shouldError: false,
+			files:  map[string]string{},
+			finder: discovery.NewGlobFinder("foo/*"),
+			err:    fmt.Errorf("no matching files"),
 		},
 		{
-			files:       []string{"1.txt", "2/2.txt"},
-			pattern:     "*",
-			output:      []discovery.File{{Path: "1.txt"}, {Path: "2/2.txt"}},
-			shouldError: false,
+			files:  map[string]string{"bar.yml": testRuleBody},
+			finder: discovery.NewGlobFinder("foo/*"),
+			err:    fmt.Errorf("no matching files"),
 		},
 		{
-			files:       []string{"1.txt", "2/2.txt", "2/2.foo", "3/3.txt"},
-			pattern:     "2/*.txt",
-			output:      []discovery.File{{Path: "2/2.txt"}},
-			shouldError: false,
+			files:  map[string]string{"bar.yml": testRuleBody},
+			finder: discovery.NewGlobFinder("*"),
+			entries: []discovery.Entry{
+				{
+					Path: "bar.yml",
+					Rule: testRules[0],
+				},
+			},
+		},
+		{
+			files:  map[string]string{"foo/bar.yml": testRuleBody},
+			finder: discovery.NewGlobFinder("*"),
+			entries: []discovery.Entry{
+				{
+					Path: "foo/bar.yml",
+					Rule: testRules[0],
+				},
+			},
 		},
 	}
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			tmpDir, err := ioutil.TempDir("", "TestGlobFileFinder")
-			if err != nil {
-				t.Errorf("ioutil.TempDir() returned an error: %s", err)
-				return
-			}
-			defer func() {
-				err := os.RemoveAll(tmpDir)
-				if err != nil {
-					panic(err)
+			workdir := t.TempDir()
+			err := os.Chdir(workdir)
+			require.NoError(t, err)
+
+			for p, content := range tc.files {
+				if strings.Contains(p, "/") {
+					err = os.MkdirAll(path.Dir(p), 0o755)
+					require.NoError(t, err)
 				}
-			}()
-
-			for _, path := range tc.files {
-				fullpath := filepath.Join(tmpDir, path)
-				if dir := filepath.Dir(fullpath); dir != tmpDir {
-					if _, err := os.Stat(dir); os.IsNotExist(err) {
-						if err := os.Mkdir(dir, 0o755); err != nil {
-							t.Errorf("os.Mkdir(%s) returned an error: %s", dir, err)
-							return
-						}
-					}
-				}
-				if _, err := os.Create(fullpath); err != nil {
-					t.Errorf("os.Create(%s) returned an error: %s", path, err)
-					return
-				}
+				err = ioutil.WriteFile(p, []byte(content), 0o644)
+				require.NoError(t, err)
 			}
 
-			err = os.Chdir(tmpDir)
-			if err != nil {
-				t.Errorf("os.Chdir(%s) returned an error: %s", tmpDir, err)
-			}
-
-			gd := discovery.NewGlobFileFinder()
-			output, err := gd.Find(tc.pattern)
-			hadError := err != nil
-			if hadError != tc.shouldError {
-				t.Errorf("GlobFileFinder.Discover() returned err=%s, expected=%v", err, tc.shouldError)
-			}
-
-			if hadError {
-				return
-			}
-
-			require.Equal(t, tc.output, output.Results(), "GlobFileFinder.Discover() returned wrong output")
+			entries, err := tc.finder.Find()
+			require.Equal(t, tc.err, err)
+			require.Equal(t, tc.entries, entries)
 		})
 	}
 }

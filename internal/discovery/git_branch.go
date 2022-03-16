@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -9,34 +10,42 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewGitBranchFileFinder(gitCmd git.CommandRunner, include []*regexp.Regexp, baseBranch string) GitBranchFileFinder {
-	return GitBranchFileFinder{gitCmd: gitCmd, include: include, baseBranch: baseBranch}
+func NewGitBranchFinder(gitCmd git.CommandRunner, include []*regexp.Regexp, baseBranch string, maxCommits int) GitBranchFinder {
+	return GitBranchFinder{
+		gitCmd:     gitCmd,
+		include:    include,
+		baseBranch: baseBranch,
+		maxCommits: maxCommits,
+	}
 }
 
-type GitBranchFileFinder struct {
+type GitBranchFinder struct {
 	gitCmd     git.CommandRunner
 	include    []*regexp.Regexp
 	baseBranch string
+	maxCommits int
 }
 
-func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
-	cr, err := git.CommitRange(gd.gitCmd, gd.baseBranch)
+func (f GitBranchFinder) Find() (entries []Entry, err error) {
+	cr, err := git.CommitRange(f.gitCmd, f.baseBranch)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get the list of commits to scan: %w", err)
 	}
 
 	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
 
-	out, err := gd.gitCmd("log", "--reverse", "--no-merges", "--pretty=format:%H", "--name-status", cr.String())
+	if f.maxCommits > 0 && len(cr.Commits) > f.maxCommits {
+		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(cr.Commits), f.maxCommits)
+	}
+
+	out, err := f.gitCmd("log", "--reverse", "--no-merges", "--pretty=format:%H", "--name-status", cr.String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
 	}
 
-	results := FileCommits{
-		pathCommits: map[string][]string{},
-	}
-
+	pathCommits := map[string]map[string]struct{}{}
 	var commit string
+
 	for _, line := range strings.Split(string(out), "\n") {
 		parts := strings.Split(removeRedundantSpaces(line), " ")
 		if len(parts) == 1 && parts[0] != "" {
@@ -48,40 +57,69 @@ func (gd GitBranchFileFinder) Find(pattern ...string) (FileFindResults, error) {
 			log.Debug().
 				Str("path", dstPath).
 				Str("commit", commit).
-				Bool("allowed", gd.isPathAllowed(dstPath)).
+				Bool("allowed", f.isPathAllowed(dstPath)).
 				Msg("Git file change")
-			if !gd.isPathAllowed(dstPath) {
+			if !f.isPathAllowed(dstPath) {
 				continue
 			}
-			if _, ok := results.pathCommits[dstPath]; !ok {
-				results.pathCommits[dstPath] = []string{}
+			if _, ok := pathCommits[dstPath]; !ok {
+				pathCommits[dstPath] = map[string]struct{}{}
 			}
 			// check if we're dealing with a rename and if so we need to
 			// rename results in pathCommits
 			if strings.HasPrefix(op, "R") {
-				if v, ok := results.pathCommits[srcPath]; ok {
-					results.pathCommits[dstPath] = append(results.pathCommits[dstPath], v...)
-					delete(results.pathCommits, srcPath)
+				if commits, ok := pathCommits[srcPath]; ok {
+					for c := range commits {
+						pathCommits[dstPath][c] = struct{}{}
+					}
+					delete(pathCommits, srcPath)
 				}
 			}
 			// check if file is being removed, if so drop it from the results
 			if strings.HasPrefix(op, "D") {
-				delete(results.pathCommits, srcPath)
+				delete(pathCommits, srcPath)
 				continue
 			}
-			results.pathCommits[dstPath] = append(results.pathCommits[dstPath], commit)
+			pathCommits[dstPath][commit] = struct{}{}
 		}
 	}
 
-	return results, nil
+	for path, commits := range pathCommits {
+		lbs, err := git.Blame(path, f.gitCmd)
+		if err != nil {
+			return nil, fmt.Errorf("failed to run git blame for %s: %w", path, err)
+		}
+
+		alloweLines := []int{}
+		for _, lb := range lbs {
+			// skip commits that are not part of our diff
+			if _, ok := commits[lb.Commit]; !ok {
+				continue
+			}
+			alloweLines = append(alloweLines, lb.Line)
+		}
+
+		els, err := readFile(path)
+		if err != nil {
+			return nil, err
+		}
+		for _, e := range els {
+			e.ModifiedLines = alloweLines
+			if isOverlap(alloweLines, e.Rule.Lines()) {
+				entries = append(entries, e)
+			}
+		}
+	}
+
+	return entries, nil
 }
 
-func (gd GitBranchFileFinder) isPathAllowed(path string) bool {
-	if len(gd.include) == 0 {
+func (f GitBranchFinder) isPathAllowed(path string) bool {
+	if len(f.include) == 0 {
 		return true
 	}
 
-	for _, pattern := range gd.include {
+	for _, pattern := range f.include {
 		if pattern.MatchString(path) {
 			return true
 		}
@@ -91,4 +129,15 @@ func (gd GitBranchFileFinder) isPathAllowed(path string) bool {
 
 func removeRedundantSpaces(line string) string {
 	return strings.Join(strings.Fields(line), " ")
+}
+
+func isOverlap(a, b []int) bool {
+	for _, i := range a {
+		for _, j := range b {
+			if i == j {
+				return true
+			}
+		}
+	}
+	return false
 }

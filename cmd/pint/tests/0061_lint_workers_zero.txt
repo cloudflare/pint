@@ -1,0 +1,10 @@
+pint.error --workers=0 --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="--workers flag must be > 0"
+-- rules/ok.yml --
+- record: sum:missing
+  expr: sum(foo[5m)
+

@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
@@ -26,7 +27,7 @@ func (c ComparisonCheck) Reporter() string {
 	return ComparisonCheckName
 }
 
-func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return
 	}

@@ -7,6 +7,7 @@ import (
 
 	"github.com/prometheus/prometheus/model/labels"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -28,7 +29,7 @@ func (c RegexpCheck) Reporter() string {
 	return RegexpCheckName
 }
 
-func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

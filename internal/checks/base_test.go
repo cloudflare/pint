@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -78,18 +79,6 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
-	p := parser.NewParser()
-	brokenRules, err := p.Parse([]byte(`
-- alert: foo
-  expr: 'foo{}{} > 0'
-  annotations:
-    summary: '{{ $labels.job }} is incorrect'
-
-- record: foo
-  expr: 'foo{}{}'
-`))
-	require.NoError(t, err, "failed to parse broken test rules")
-
 	ctx := context.Background()
 	for _, tc := range testCases {
 		// original test
@@ -109,10 +98,10 @@ func runTests(t *testing.T, testCases []checkTest) {
 				uri = srv.URL
 			}
 
-			rules, err := p.Parse([]byte(tc.content))
+			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
-			for _, rule := range rules {
-				problems := tc.checker(uri).Check(ctx, rule)
+			for _, entry := range entries {
+				problems := tc.checker(uri).Check(ctx, entry.Rule, entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
 
@@ -123,12 +112,40 @@ func runTests(t *testing.T, testCases []checkTest) {
 		})
 
 		// broken rules to test check against rules with syntax error
+		entries, err := parseContent(`
+- alert: foo
+  expr: 'foo{}{} > 0'
+  annotations:
+    summary: '{{ $labels.job }} is incorrect'
+
+- record: foo
+  expr: 'foo{}{}'
+`)
+		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(t *testing.T) {
-			for _, rule := range brokenRules {
-				_ = tc.checker("").Check(ctx, rule)
+			for _, entry := range entries {
+				_ = tc.checker("").Check(ctx, entry.Rule, entries)
 			}
 		})
 	}
+}
+
+func parseContent(content string) (entries []discovery.Entry, err error) {
+	p := parser.NewParser()
+	rules, err := p.Parse([]byte(content))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, rule := range rules {
+		entries = append(entries, discovery.Entry{
+			Path:          "fake.yml",
+			ModifiedLines: rule.Lines(),
+			Rule:          rule,
+		})
+	}
+
+	return entries, nil
 }
 
 func noProblems(uri string) []checks.Problem {

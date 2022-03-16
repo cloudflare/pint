@@ -2,20 +2,19 @@ package reporter
 
 import (
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
 type Report struct {
-	Path    string
-	Rule    parser.Rule
-	Problem checks.Problem
+	Path          string
+	ModifiedLines []int
+	Rule          parser.Rule
+	Problem       checks.Problem
 }
 
 type Summary struct {
-	Reports     []Report
-	FileChanges discovery.FileFindResults
+	Reports []Report
 }
 
 func (s Summary) HasFatalProblems() bool {

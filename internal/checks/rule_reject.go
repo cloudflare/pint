@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -39,7 +40,7 @@ func (c Reject) Reporter() string {
 	return RejectCheckName
 }
 
-func (c Reject) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c Reject) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if c.checkLabels && rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {
 			problems = append(problems, c.reject(rule, label, "label")...)

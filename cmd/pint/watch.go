@@ -244,17 +244,13 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 }
 
 func (c *problemCollector) scan(ctx context.Context, workers int) error {
-	d := discovery.NewGlobFileFinder()
-	toScan, err := d.Find(c.paths...)
+	finder := discovery.NewGlobFinder(c.paths...)
+	entries, err := finder.Find()
 	if err != nil {
 		return err
 	}
 
-	if len(toScan.Paths()) == 0 {
-		return fmt.Errorf("no matching files")
-	}
-
-	s := scanFiles(ctx, workers, c.cfg, toScan, &discovery.NoopLineFinder{})
+	s := checkRules(ctx, workers, c.cfg, entries)
 
 	c.lock.Lock()
 	c.summary = &s

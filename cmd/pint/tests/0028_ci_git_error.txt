@@ -15,13 +15,16 @@ exec git checkout -b v2
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
-pint.error --no-color ci
+pint.error -l debug --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=fatal msg="Fatal error" error="failed to get the list of modified files: exit status 128"
+level=debug msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
+level=debug msg="Got branch information" base=notmain current=v2
+level=debug msg="Running git command" args=["log","--format=%H","--no-abbrev-commit","--reverse","notmain..HEAD"]
+level=fatal msg="Fatal error" error="failed to get the list of commits to scan: fatal: ambiguous argument 'notmain..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/common/model"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -27,7 +28,7 @@ func (c AlertsForChecksFor) Reporter() string {
 	return AlertForCheckName
 }
 
-func (c AlertsForChecksFor) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c AlertsForChecksFor) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil || rule.AlertingRule.For == nil {
 		return
 	}
