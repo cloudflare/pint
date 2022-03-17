@@ -26,6 +26,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 
 	if v, ok := p.cache.Get(expr); ok {
 		log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache hit")
+		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query").Inc()
 		r := v.(QueryResult)
 		return &r, nil
 	}

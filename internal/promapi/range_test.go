@@ -16,6 +16,7 @@ import (
 )
 
 func TestRange(t *testing.T) {
+	done := sync.Map{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -23,12 +24,36 @@ func TestRange(t *testing.T) {
 		}
 		query := r.Form.Get("query")
 
+		start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+		end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+		diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
+		t.Logf("query=%s diff=%s start=%s end=%s", query, diff, time.Unix(int64(start), 0), time.Unix(int64(end), 0))
+
+		if diffs, ok := done.Load(query); ok {
+			doneDiffs := diffs.([]string)
+			for _, doneDiff := range doneDiffs {
+				// some queries are allowed to re-run because they fail and never cache anything
+				if doneDiff == diff.String() &&
+					query != "too_many_samples1" &&
+					query != "error1" && query != "error2" &&
+					query != "vector1" && query != "vector2" &&
+					query != "slow1" {
+					t.Errorf("%q already requested diff=%s", query, diff)
+					t.FailNow()
+				}
+			}
+			doneDiffs = append(doneDiffs, diff.String())
+			done.Store(query, doneDiffs)
+		} else {
+			done.Store(query, []string{diff.String()})
+		}
+
 		switch query {
-		case "empty":
+		case "empty1", "empty2":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-		case "single_result":
+		case "single_result1", "single_result2":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[
@@ -40,7 +65,7 @@ func TestRange(t *testing.T) {
 					[1614859742.068,"11"]
 				]}
 			]}}`))
-		case "vector":
+		case "vector1", "vector2":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -50,18 +75,14 @@ func TestRange(t *testing.T) {
 					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-		case "slow":
+		case "slow1":
 			w.WriteHeader(200)
 			time.Sleep(time.Second)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
-		case "too_many_samples":
-			start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-			end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-			diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-			t.Log(diff.String())
+		case "too_many_samples1":
 			switch diff.String() {
-			case "168h0m0s", "42h0m0s", "10h30m0s", "2h37m30s", "39m23s", "9m51s":
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h38m0s", "40m0s", "10m0s":
 				w.WriteHeader(422)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{
@@ -75,11 +96,7 @@ func TestRange(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`unknown start/end`))
 			}
-		case "duplicate_series":
-			start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-			end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-			diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-			t.Log(diff.String())
+		case "duplicate_series1":
 			switch diff.String() {
 			case "168h0m0s", "84h0m0s", "42h0m0s", "21h0m0s", "10h30m0s":
 				w.WriteHeader(422)
@@ -103,13 +120,9 @@ func TestRange(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`unknown start/end`))
 			}
-		case "retry_until_success":
-			start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-			end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-			diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-			t.Log(diff.String())
+		case "retry_until_success1", "retry_until_success2":
 			switch diff.String() {
-			case "168h0m0s", "42h0m0s", "10h30m0s", "2h37m30s":
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h38m0s":
 				w.WriteHeader(422)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{
@@ -117,7 +130,7 @@ func TestRange(t *testing.T) {
 					"errorType":"execution",
 					"error":"query processing would load too many samples into memory in query execution"
 				}`))
-			case "39m23s":
+			case "40m0s":
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[
@@ -130,7 +143,7 @@ func TestRange(t *testing.T) {
 						]}
 					]}}`))
 			default:
-				t.Errorf("invalid too_many_samples diff: %s", diff)
+				t.Errorf("invalid retry_until_success diff: %s", diff)
 				w.WriteHeader(500)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`unknown start/end`))
@@ -159,7 +172,7 @@ func TestRange(t *testing.T) {
 	testCases := []testCaseT{
 		// cache hit
 		{
-			query: "empty",
+			query: "empty1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return now, now, time.Minute
 			},
@@ -169,7 +182,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "empty",
+			query: "empty2",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return time.Now(), time.Now(), time.Minute
 			},
@@ -179,7 +192,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache hit
 		{
-			query: "single_result",
+			query: "single_result1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return now, now, time.Minute
 			},
@@ -200,7 +213,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "single_result",
+			query: "single_result2",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return time.Now(), time.Now(), time.Minute
 			},
@@ -221,7 +234,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache hit
 		{
-			query: "error",
+			query: "error1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return now, now, time.Minute
 			},
@@ -231,7 +244,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "error",
+			query: "error2",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return time.Now(), time.Now(), time.Minute
 			},
@@ -241,7 +254,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache hit
 		{
-			query: "vector",
+			query: "vector1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return now, now, time.Minute
 			},
@@ -251,7 +264,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "vector",
+			query: "vector2",
 			args: func() (time.Time, time.Time, time.Duration) {
 				return time.Now(), time.Now(), time.Minute
 			},
@@ -261,7 +274,7 @@ func TestRange(t *testing.T) {
 		},
 		// give up after all the retries
 		{
-			query: "too_many_samples",
+			query: "too_many_samples1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				start := time.Unix(1577836800, 0)
 				end := time.Unix(1578441600, 0)
@@ -273,7 +286,7 @@ func TestRange(t *testing.T) {
 		},
 		// retry timeouts
 		{
-			query: "slow",
+			query: "slow1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				start := time.Unix(1577836800, 0)
 				end := time.Unix(1578441600, 0)
@@ -285,7 +298,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache hit
 		{
-			query: "retry_until_success",
+			query: "retry_until_success1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				start := time.Unix(1577836800, 0)
 				end := time.Unix(1578441600, 0)
@@ -308,7 +321,7 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "retry_until_success",
+			query: "retry_until_success2",
 			args: func() (time.Time, time.Time, time.Duration) {
 				start := time.Unix(1577836800, 0)
 				end := time.Unix(1578441600, 0)
@@ -331,7 +344,7 @@ func TestRange(t *testing.T) {
 		},
 		// duplicate series
 		{
-			query: "duplicate_series",
+			query: "duplicate_series1",
 			args: func() (time.Time, time.Time, time.Duration) {
 				start := time.Unix(1577836800, 0)
 				end := time.Unix(1578441600, 0)

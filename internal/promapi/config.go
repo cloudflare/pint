@@ -34,6 +34,7 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 
 	if v, ok := p.cache.Get(key); ok {
 		log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache hit")
+		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/status/config")
 		cfg := v.(ConfigResult)
 		return &cfg, nil
 	}
