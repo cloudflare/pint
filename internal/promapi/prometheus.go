@@ -16,6 +16,9 @@ type Prometheus struct {
 	timeout time.Duration
 	cache   *lru.Cache
 	lock    *partitionLocker
+
+	slowQueryCache *lru.Cache
+	slowQueryLock  sync.Mutex
 }
 
 func NewPrometheus(name, uri string, timeout time.Duration) *Prometheus {
@@ -27,12 +30,14 @@ func NewPrometheus(name, uri string, timeout time.Duration) *Prometheus {
 		panic(err)
 	}
 	cache, _ := lru.New(1000)
+	slowQueryCache, _ := lru.New(1000)
 	return &Prometheus{
-		name:    name,
-		uri:     uri,
-		api:     v1.NewAPI(client),
-		timeout: timeout,
-		cache:   cache,
-		lock:    newPartitionLocker((&sync.Mutex{})),
+		name:           name,
+		uri:            uri,
+		api:            v1.NewAPI(client),
+		timeout:        timeout,
+		cache:          cache,
+		lock:           newPartitionLocker((&sync.Mutex{})),
+		slowQueryCache: slowQueryCache,
 	}
 }
