@@ -16,10 +16,6 @@ func durationMustText(name, uri, fun, multi, using string) string {
 	return fmt.Sprintf(`duration for %s() must be at least %s x scrape_interval, prometheus %q at %s is using %s scrape_interval`, fun, multi, name, uri, using)
 }
 
-func durationRecommenedText(name, uri, fun, multi, using string) string {
-	return fmt.Sprintf("duration for %s() is recommended to be at least %s x scrape_interval, prometheus %q at %s is using %s scrape_interval", fun, multi, name, uri, using)
-}
-
 func TestRateCheck(t *testing.T) {
 	testCases := []checkTest{
 		{
@@ -54,17 +50,7 @@ func TestRateCheck(t *testing.T) {
 			description: "rate < 4x scrape_interval",
 			content:     "- record: foo\n  expr: rate(foo[3m])\n",
 			checker:     newRateCheck,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Fragment: "rate(foo[3m])",
-						Lines:    []int{2},
-						Reporter: "promql/rate",
-						Text:     durationRecommenedText("prom", uri, "rate", "4", "1m"),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -110,17 +96,7 @@ func TestRateCheck(t *testing.T) {
 			description: "irate < 3x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
 			checker:     newRateCheck,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Fragment: "irate(foo[2m])",
-						Lines:    []int{2},
-						Reporter: "promql/rate",
-						Text:     durationRecommenedText("prom", uri, "irate", "3", "1m"),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -164,18 +140,8 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__="foo"}[2m])
 `,
-			checker: newRateCheck,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Fragment: `irate({__name__="foo"}[2m])`,
-						Lines:    []int{3},
-						Reporter: "promql/rate",
-						Text:     durationRecommenedText("prom", uri, "irate", "3", "1m"),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			checker:  newRateCheck,
+			problems: noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -189,18 +155,8 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__=~"(foo|bar)_total"}[2m])
 `,
-			checker: newRateCheck,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Fragment: `irate({__name__=~"(foo|bar)_total"}[2m])`,
-						Lines:    []int{3},
-						Reporter: "promql/rate",
-						Text:     durationRecommenedText("prom", uri, "irate", "3", "1m"),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			checker:  newRateCheck,
+			problems: noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -238,13 +194,6 @@ func TestRateCheck(t *testing.T) {
 			checker:     newRateCheck,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
-					{
-						Fragment: "rate(foo[3m])",
-						Lines:    []int{2},
-						Reporter: "promql/rate",
-						Text:     durationRecommenedText("prom", uri, "rate", "4", "1m"),
-						Severity: checks.Warning,
-					},
 					{
 						Fragment: "rate(bar[1m])",
 						Lines:    []int{2},
@@ -351,28 +300,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
 			checker:     newRateCheck,
 			problems:    noProblems,
-			mocks: []*prometheusMock{
-				{
-					conds: []requestCondition{requireConfigPath},
-					resp:  configResponse{yaml: "global: {}\n"},
-				},
-			},
-		},
-		{
-			description: "irate < 3 x default 1m",
-			content:     "- record: foo\n  expr: irate(foo[2m])\n",
-			checker:     newRateCheck,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Fragment: "irate(foo[2m])",
-						Lines:    []int{2},
-						Reporter: "promql/rate",
-						Text:     durationRecommenedText("prom", uri, "irate", "3", "1m"),
-						Severity: checks.Warning,
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
