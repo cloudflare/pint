@@ -26,7 +26,7 @@ func CanRetryError(err error, delta time.Duration) (time.Duration, bool) {
 
 	var neterr net.Error
 	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
-		return delta / 2, true
+		return (delta / 2).Round(time.Minute), true
 	}
 
 	var apiErr *v1.Error
@@ -34,17 +34,17 @@ func CanRetryError(err error, delta time.Duration) (time.Duration, bool) {
 		switch apiErr.Type {
 		case v1.ErrBadData:
 		case v1.ErrTimeout:
-			return delta / 2, true
+			return (delta / 2).Round(time.Minute), true
 		case v1.ErrCanceled:
 		case v1.ErrExec:
 			if strings.Contains(apiErr.Msg, "query processing would load too many samples into memory in ") {
-				return (delta / 4) * 3, true
+				return (delta / 4).Round(time.Minute), true
 			}
 			return delta / 2, true
 		case v1.ErrBadResponse:
 		case v1.ErrServer:
 		case v1.ErrClient:
-			return delta / 2, true
+			return (delta / 2).Round(time.Minute), true
 		}
 	}
 

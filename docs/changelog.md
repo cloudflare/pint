@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.15.2
+
+### Fixed
+
+- Improved query cache hit rate and added `pint_prometheus_cache_hits_total` metric
+  to track the number of cache hits.
+
 ## v0.15.1
 
 ### Added

@@ -23,6 +23,9 @@ type RangeQueryResult struct {
 }
 
 func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
+	start = start.Round(time.Second)
+	end = end.Round(time.Second)
+
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
@@ -33,14 +36,24 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 
 	lockKey := "/api/v1/query/range"
 	p.lock.lock(lockKey)
+	defer p.lock.unlock(lockKey)
 
 	cacheKey := strings.Join([]string{expr, start.String(), end.String(), step.String()}, "\n")
+	return p.realRangeQuery(ctx, expr, start, end, step, cacheKey, false)
+}
+
+func (p *Prometheus) realRangeQuery(
+	ctx context.Context,
+	expr string, start, end time.Time, step time.Duration,
+	cacheKey string, isRetry bool,
+) (*RangeQueryResult, error) {
 	if v, ok := p.cache.Get(cacheKey); ok {
 		log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache hit")
+		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
 		r := v.(RangeQueryResult)
-		p.lock.unlock((lockKey))
 		return &r, nil
 	}
+	log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache miss")
 
 	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
 	r := v1.Range{
@@ -49,23 +62,31 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		Step:  step,
 	}
 
-	p.slowQueryLock.Lock()
-	if v, ok := p.slowQueryCache.Get(expr); ok {
-		log.Debug().
-			Str("query", expr).
-			Str("delta", output.HumanizeDuration(v.(time.Duration))).
-			Msg("Got cached slow query delta")
-		r.Start.Add(v.(time.Duration))
+	if !isRetry {
+		p.slowQueryLock.Lock()
+		if v, ok := p.slowQueryCache.Get(expr); ok {
+			log.Debug().
+				Str("query", expr).
+				Str("delta", output.HumanizeDuration(v.(time.Duration))).
+				Str("start", r.Start.String()).
+				Str("cached", r.End.Add(v.(time.Duration)*-1).String()).
+				Msg("Got cached slow query delta")
+			r.Start = r.End.Add(v.(time.Duration) * -1)
+		}
+		p.slowQueryLock.Unlock()
 	}
-	p.slowQueryLock.Unlock()
 
 	rctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
+	log.Debug().
+		Str("uri", p.uri).
+		Str("query", expr).
+		Bool("retry", isRetry).
+		Msg("Executing range query")
 	qstart := time.Now()
 	result, _, err := p.api.QueryRange(rctx, expr, r)
 	duration := time.Since(qstart)
-	p.lock.unlock((lockKey))
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
@@ -81,9 +102,10 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 			}
 			log.Warn().Str("delta", output.HumanizeDuration(delta)).Msg("Retrying request with smaller range")
 			p.slowQueryLock.Lock()
+			p.slowQueryCache.Remove(expr)
 			p.slowQueryCache.Add(expr, delta)
 			p.slowQueryLock.Unlock()
-			return p.RangeQuery(ctx, expr, start.Add(delta), end, step)
+			return p.realRangeQuery(ctx, expr, end.Add(delta*-1), end, step, cacheKey, true)
 		}
 		return nil, err
 	}

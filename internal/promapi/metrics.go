@@ -10,6 +10,13 @@ import (
 )
 
 var (
+	prometheusCacheHitsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "pint_prometheus_cache_hits_total",
+			Help: "Total number of all prometheus queries served from a cache",
+		},
+		[]string{"name", "endpoint"},
+	)
 	prometheusQueriesTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "pint_prometheus_queries_total",
@@ -27,6 +34,7 @@ var (
 )
 
 func RegisterMetrics() {
+	prometheus.MustRegister(prometheusCacheHitsTotal)
 	prometheus.MustRegister(prometheusQueriesTotal)
 	prometheus.MustRegister(prometheusQueryErrorsTotal)
 }
