@@ -2,8 +2,12 @@ package discovery_test
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
 	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,154 +15,322 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 )
 
-func TestModifiedFiles(t *testing.T) {
-	type testCaseT struct {
-		detector    discovery.FileFinder
-		output      []discovery.File
-		shouldError bool
+func blameLine(sha string, line int, filename string) string {
+	return fmt.Sprintf(`%s %d %d 1
+author Alice Mock
+author-mail <alice@example.com>
+author-time 1559927997
+author-tz 0000
+committer Alice Mock
+committer-mail <alice@example.com>
+committer-time 1559927997
+committer-tz 0000
+summary Mock commit title
+boundary
+filename %s
+	fake content
+`, sha, line, line, filename)
+}
+
+type blameRange struct {
+	sha   string
+	lines []int
+}
+
+func blame(v map[string][]blameRange) []byte {
+	var out string
+	for path, brs := range v {
+		for _, br := range brs {
+			for _, l := range br.lines {
+				out += blameLine(br.sha, l, path)
+			}
+		}
 	}
+	return []byte(out)
+}
+
+func TestGitBranchFinder(t *testing.T) {
+	type testCaseT struct {
+		files  map[string]string
+		finder discovery.GitBranchFinder
+		rules  map[string][]string
+		err    string
+	}
+
+	testRuleBody := `
+- record: first
+  expr: sum(foo)
+
+- alert: second
+  expr: foo > bar
+  labels:
+    cluster: dev
+
+- record: third
+  expr: count(foo)
+  labels:
+    cluster: dev
+`
 
 	testCases := []testCaseT{
 		{
-			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
-				return nil, fmt.Errorf("mock error")
-			}, nil, "main"),
-			output:      nil,
-			shouldError: true,
+			files: map[string]string{},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					return nil, fmt.Errorf("mock error")
+				},
+				nil,
+				"main",
+				0,
+			),
+			err: "failed to get the list of commits to scan: mock error",
 		},
 		{
-			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
-				if args[0] == "rev-list" {
-					return []byte("commit1\ncommit2\n"), nil
-				}
-				return nil, fmt.Errorf("mock error")
-			}, nil, "main"),
-			output:      nil,
-			shouldError: true,
+			files: map[string]string{},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					default:
+						return nil, fmt.Errorf("mock error")
+					}
+				},
+				nil,
+				"main",
+				0,
+			),
+			err: "failed to get the list of modified files from git: mock error",
 		},
 		{
-			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
-				if args[0] == "rev-list" {
-					return []byte("commit1\ncommit3\n"), nil
-				}
-				content := `commit1
-M       foo/bar/1.txt
-M       foo/bar/3.txt
-commit2
-M       5.txt
-M       foo/bar/2.txt
-commit3
-
-A       foo/bar/4.txt
-R053    src1.txt        dst1.txt
-R100    foo/bar/src2.txt        src2.txt
-M       5.txt
-C50     foo/bar/cp1.txt         foo/cp1.txt
-`
-				return []byte([]byte(content)), nil
-			}, nil, "main"),
-			output: []discovery.File{
-				{Path: "5.txt", Commits: []string{"commit2", "commit3"}},
-				{Path: "dst1.txt", Commits: []string{"commit3"}},
-				{Path: "foo/bar/1.txt", Commits: []string{"commit1"}},
-				{Path: "foo/bar/2.txt", Commits: []string{"commit2"}},
-				{Path: "foo/bar/3.txt", Commits: []string{"commit1"}},
-				{Path: "foo/bar/4.txt", Commits: []string{"commit3"}},
-				{Path: "foo/cp1.txt", Commits: []string{"commit3"}},
-				{Path: "src2.txt", Commits: []string{"commit3"}},
+			files: map[string]string{},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "blame --line-porcelain -- foo.yml":
+						return nil, fmt.Errorf("mock error")
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+			),
+			err: "failed to run git blame for foo.yml: mock error",
+		},
+		{
+			files: map[string]string{},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "blame --line-porcelain -- foo.yml":
+						return blame(map[string][]blameRange{
+							"foo.yml": {
+								{sha: "commitX", lines: []int{1, 3, 4, 5, 6, 9, 10, 11, 12}},
+								{sha: "commit1", lines: []int{2, 7, 8}},
+							},
+						}), nil
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+			),
+			err: "open foo.yml: no such file or directory",
+		},
+		{
+			files: map[string]string{
+				"foo.yml": testRuleBody,
 			},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "blame --line-porcelain -- foo.yml":
+						return blame(map[string][]blameRange{
+							"foo.yml": {
+								{sha: "commitX", lines: []int{1, 3, 4, 5, 6, 9, 10, 11, 12}},
+								{sha: "commit1", lines: []int{2, 7, 8}},
+							},
+						}), nil
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+			),
+			rules: map[string][]string{"foo.yml": {"first", "second"}},
 		},
 		{
-			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
-				if args[0] == "rev-list" {
-					return []byte("commit1\ncommit3\n"), nil
-				}
-				content := `commit1
-M       foo/1.txt
-M       3.txt
-commit2
-M       5.txt
-M       bar/2.txt
-commit3
-
-A       xxx/bar/4.txt
-R053    src1.txt        dst1.txt
-R100    foo/bar/src2.txt        src2.txt
-M       5.txt
-C50     foo/bar/cp1.txt         foo/cp1.del
-`
-				return []byte([]byte(content)), nil
-			}, []*regexp.Regexp{
-				regexp.MustCompile("^foo/.+.txt$"),
-				regexp.MustCompile("^bar/.+.txt$"),
-			}, "main"),
-			output: []discovery.File{
-				{Path: "bar/2.txt", Commits: []string{"commit2"}},
-				{Path: "foo/1.txt", Commits: []string{"commit1"}},
+			files: map[string]string{
+				"foo/i1.yml":  testRuleBody,
+				"i2.yml":      testRuleBody,
+				"foo/c1a.yml": testRuleBody,
+				"foo/c1b.yml": testRuleBody,
+				"c2a.yml":     testRuleBody,
+				"c2c.yml":     testRuleBody,
+				"foo/c2b.yml": testRuleBody,
+				"bar/c3a.yml": testRuleBody,
+				"c3b.yml":     testRuleBody,
+				"c3c.yml":     testRuleBody,
+				"c3d.yml":     testRuleBody,
+				"c3e.yml":     testRuleBody,
 			},
-		},
-		{
-			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
-				if args[0] == "rev-list" {
-					return []byte("commit1\ncommit3\n"), nil
-				}
-				content := `commit1
-M       file1
-M       file2
-
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\ncommit2\ncommit3\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit3":
+						return []byte(`commit1
+M       foo/c1a.yml
+M       foo/c1b.yml
 commit2
-M       file1
-M       file3
-
+M       c2a.yml
+M       foo/c2b.yml
+A       foo/c2c.yml
 commit3
-R100    file1  file4
-M       file2
-`
-				return []byte([]byte(content)), nil
-			}, nil, "main"),
-			output: []discovery.File{
-				{Path: "file2", Commits: []string{"commit1", "commit3"}},
-				{Path: "file3", Commits: []string{"commit2"}},
-				{Path: "file4", Commits: []string{"commit1", "commit2", "commit3"}},
-			},
-		},
-		{
-			detector: discovery.NewGitBranchFileFinder(func(args ...string) ([]byte, error) {
-				if args[0] == "rev-list" {
-					return []byte("commit1\ncommit3\n"), nil
-				}
-				content := `commit1
-A       file1
 
-commit2
-A       file2
-
-commit3
-D       file1
-`
-				return []byte([]byte(content)), nil
-			}, nil, "main"),
-			output: []discovery.File{
-				{Path: "file2", Commits: []string{"commit2"}},
+A       bar/c3a.yml
+R053    src.txt        c3b.yml
+R100    foo/c3c.txt        c3c.yml
+M       c2a.yml
+C50     foo/cp1.yml         c3d.yml
+D       foo/c2b.yml
+R090    foo/c2c.yml         c2c.yml
+`), nil
+					case "blame --line-porcelain -- foo/c1a.yml":
+						return blame(map[string][]blameRange{
+							"foo/c1a.yml": {
+								{sha: "commit1", lines: []int{2, 12}}, // 1 & 3
+								{sha: "commitX", lines: []int{1, 3, 4, 5, 6, 7, 8, 9, 10, 11}},
+							},
+						}), nil
+					case "blame --line-porcelain -- foo/c1b.yml":
+						return blame(map[string][]blameRange{
+							"foo/c1b.yml": {
+								{sha: "commit1", lines: []int{11, 12}}, // 3
+								{sha: "commitX", lines: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}},
+							},
+						}), nil
+					case "blame --line-porcelain -- c2a.yml":
+						return blame(map[string][]blameRange{
+							"c2a.yml": {
+								{sha: "commitX", lines: []int{1, 2, 3, 4, 5, 6, 9, 11, 12}},
+								{sha: "commit2", lines: []int{7, 8, 10}}, // 2 & 3
+								{sha: "commit3", lines: []int{3}},        // 1
+							},
+						}), nil
+					case "blame --line-porcelain -- c2c.yml":
+						return blame(map[string][]blameRange{
+							"c2c.yml": {
+								{sha: "commit2", lines: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}}, // 2 & 3
+								{sha: "commit3", lines: []int{3}},                                     // 1
+							},
+						}), nil
+					case "blame --line-porcelain -- c3b.yml":
+						return blame(map[string][]blameRange{
+							"c3b.yml": {
+								{sha: "commitX", lines: []int{1, 11, 12}},
+								{sha: "commit3", lines: []int{2, 3, 4, 5, 6, 7, 8, 9, 10}}, // 1 & 2 & 3
+							},
+						}), nil
+					case "blame --line-porcelain -- c3c.yml":
+						return blame(map[string][]blameRange{
+							"c3c.yml": {
+								{sha: "commit3", lines: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}}, // 1 & 2 & 3
+							},
+						}), nil
+					case "blame --line-porcelain -- c3d.yml":
+						return blame(map[string][]blameRange{
+							"c3d.yml": {
+								{sha: "commitX", lines: []int{1, 11, 12}},
+								{sha: "commit3", lines: []int{2, 3, 4, 5, 6, 7, 8, 9, 10}}, // 1 & 2 & 3
+							},
+						}), nil
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				[]*regexp.Regexp{
+					regexp.MustCompile("^foo/.*"),
+					regexp.MustCompile("^c.*.yml$"),
+				},
+				"main",
+				0,
+			),
+			rules: map[string][]string{
+				"foo/c1a.yml": {"first", "third"},
+				"foo/c1b.yml": {"third"},
+				"c2a.yml":     {"first", "second", "third"},
+				"c2c.yml":     {"first", "second", "third"},
+				"c3b.yml":     {"first", "second", "third"},
+				"c3c.yml":     {"first", "second", "third"},
+				"c3d.yml":     {"first", "second", "third"},
 			},
 		},
 	}
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			output, err := tc.detector.Find()
+			workdir := t.TempDir()
+			err := os.Chdir(workdir)
+			require.NoError(t, err)
 
-			hadError := (err != nil)
-			if hadError != tc.shouldError {
-				t.Errorf("git.ModifiedFiles() returned err=%v, expected=%v", err, tc.shouldError)
-				return
+			for p, content := range tc.files {
+				if strings.Contains(p, "/") {
+					err = os.MkdirAll(path.Dir(p), 0o755)
+					require.NoError(t, err)
+				}
+				err = ioutil.WriteFile(p, []byte(content), 0o644)
+				require.NoError(t, err)
 			}
 
-			if hadError {
-				return
-			}
+			entries, err := tc.finder.Find()
+			if tc.err != "" {
+				require.EqualError(t, err, tc.err)
+			} else {
+				require.NoError(t, err)
 
-			require.Equal(t, tc.output, output.Results(), "git.ModifiedFiles() returned wrong output")
+				m := map[string][]string{}
+				for _, e := range entries {
+					if _, ok := m[e.Path]; !ok {
+						m[e.Path] = []string{}
+					}
+					var name string
+					if e.Rule.AlertingRule != nil {
+						name = e.Rule.AlertingRule.Alert.Value.Value
+					} else {
+						name = e.Rule.RecordingRule.Record.Value.Value
+					}
+					m[e.Path] = append(m[e.Path], name)
+				}
+				require.Equal(t, tc.rules, m)
+			}
 		})
 	}
 }

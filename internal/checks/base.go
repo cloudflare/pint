@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -97,7 +98,7 @@ func (p Problem) LineRange() (int, int) {
 type RuleChecker interface {
 	String() string
 	Reporter() string
-	Check(ctx context.Context, rule parser.Rule) []Problem
+	Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) []Problem
 }
 
 type exprProblem struct {

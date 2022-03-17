@@ -1,0 +1,17 @@
+pint.ok --offline --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/ok.yml rules=1
+-- rules/ok.yml --
+- record: sum:foo
+  expr: sum(foo)
+-- .pint.hcl --
+prometheus "disabled" {
+  uri     = "http://127.0.0.1:123"
+  timeout = "5s"
+  required = true
+  paths = ["invalid/.+"]
+}

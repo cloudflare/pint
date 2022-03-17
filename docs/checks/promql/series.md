@@ -6,7 +6,7 @@ grand_parent: Documentation
 
 # promql/series
 
-This check will also query Prometheus servers, it is used to warn about queries
+This check will query Prometheus servers, it is used to warn about queries
 that are using metrics not currently present in Prometheus.
 It parses `expr` query from every rule, finds individual metric selectors and
 runs a series of checks for each of them.
@@ -25,6 +25,50 @@ to determine why, by checking if:
 
 If you see this check complaining about some metric it's might due to a number
 of different issues. Here are some usual cases.
+
+## Your query is using ALERTS or ALERTS_FOR_STATE metrics
+
+Prometheus itself exposes metrics about active alerts [see docs here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#inspecting-alerts-during-runtime.
+And it's possible to use those metrics in recording or alerting rules.
+If pint finds a query using either `ALERTS{alertname="..."}` or
+`ALERTS_FOR_STATE{alertname="..."}` selector it will check if there's
+alerting rule with matching name defined. For queries that don't pass any
+`alertname` label filters it will skip any further checks.
+
+## Your query is using recording rules
+
+If a metric isn't present in Prometheus but pint finds a recording rule
+with matching name then it will try to use that recording rule instead.
+
+This should help with CI checks where multiple rules are added at once
+and one depends on the other.
+
+Example with alert rule that depends on two recording rules:
+
+```yaml
+# count the number of targets per job
+- record: job:up:count
+  expr: count(up) by(job)
+
+# total number of targets that are healthy per job
+- record: job:up:sum
+  expr: sum(up) by(job)
+
+# alert if <50% of targets are down
+- alert: Too Many Targets Are Down
+  expr: (job:up:sum / job:up:count) < 0.5
+```
+
+If all three rules where added in a single PR and pint didn't try to match
+metrics to recording rule then `pint ci` would block such PR because metrics
+this alert is using are not present in Prometheus.
+By trying to match metrics to recording rules pint can use those rules
+as as substitute for missing metrics and better validate such PR.
+
+**NOTE**: Checking recording rules instead of real metrics present in Prometheus
+can be less accurate and might not spot some issues, like missing labels.
+For most accurate validation via `pint ci` it's best to first add recording
+rules before adding alerting rules that depend on them.
 
 ### Your query cannot return anything
 

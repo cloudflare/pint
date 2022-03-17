@@ -1,0 +1,6 @@
+pint.error --workers=1 --no-color lint
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="at least one file or directory required"

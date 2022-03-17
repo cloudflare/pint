@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -40,7 +41,7 @@ func (c CostCheck) Reporter() string {
 	return CostCheckName
 }
 
-func (c CostCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c CostCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {

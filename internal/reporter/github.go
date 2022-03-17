@@ -61,43 +61,25 @@ func (gr GithubReporter) Submit(summary Summary) error {
 		client = github.NewClient(tc)
 	}
 
-	pb, err := blameReports(summary.Reports, gr.gitCmd)
-	if err != nil {
-		return fmt.Errorf("failed to run git blame: %w", err)
-	}
-
 	comments := []*github.DraftReviewComment{}
 	for _, rep := range summary.Reports {
 		rep := rep
 
-		gitBlames, ok := pb[rep.Path]
-		if !ok {
-			continue
-		}
-
-		linesWithBlame := []int{}
-		for _, pl := range rep.Problem.Lines {
-			commit := gitBlames.GetCommit(pl)
-			if summary.FileChanges.HasCommit(commit) {
-				linesWithBlame = append(linesWithBlame, pl)
-			}
-		}
-
-		if len(linesWithBlame) == 0 {
+		if len(rep.ModifiedLines) == 0 {
 			continue
 		}
 
 		var comment *github.DraftReviewComment
 
-		if len(linesWithBlame) == 1 {
+		if len(rep.ModifiedLines) == 1 {
 			comment = &github.DraftReviewComment{
 				Path: github.String(rep.Path),
 				Body: github.String(rep.Problem.Text),
-				Line: github.Int(linesWithBlame[0]),
+				Line: github.Int(rep.ModifiedLines[0]),
 			}
-		} else if len(linesWithBlame) > 1 {
-			sort.Ints(linesWithBlame)
-			start, end := linesWithBlame[0], linesWithBlame[len(linesWithBlame)-1]
+		} else if len(rep.ModifiedLines) > 1 {
+			sort.Ints(rep.ModifiedLines)
+			start, end := rep.ModifiedLines[0], rep.ModifiedLines[len(rep.ModifiedLines)-1]
 			comment = &github.DraftReviewComment{
 				Path:      github.String(rep.Path),
 				Body:      github.String(rep.Problem.Text),

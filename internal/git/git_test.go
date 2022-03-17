@@ -1,8 +1,11 @@
 package git_test
 
 import (
+	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,6 +45,12 @@ func TestGitBlame(t *testing.T) {
 			},
 			path:   "foo.txt",
 			output: nil,
+		},
+		{
+			mock: func(args ...string) ([]byte, error) {
+				return nil, errors.New("mock error")
+			},
+			shouldError: true,
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
@@ -105,14 +114,14 @@ func TestCommitRange(t *testing.T) {
 			mock: func(args ...string) ([]byte, error) {
 				return nil, fmt.Errorf("mock error")
 			},
-			output:      git.CommitRangeResults{},
+			output:      git.CommitRangeResults{Commits: []string{}},
 			shouldError: true,
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
 				return []byte([]byte("")), nil
 			},
-			output:      git.CommitRangeResults{},
+			output:      git.CommitRangeResults{Commits: []string{}},
 			shouldError: true,
 		},
 		{
@@ -120,8 +129,9 @@ func TestCommitRange(t *testing.T) {
 				return []byte([]byte("commit1\n")), nil
 			},
 			output: git.CommitRangeResults{
-				From: "commit1",
-				To:   "commit1",
+				Commits: []string{"commit1"},
+				From:    "commit1",
+				To:      "commit1",
 			},
 		},
 		{
@@ -129,8 +139,9 @@ func TestCommitRange(t *testing.T) {
 				return []byte([]byte("commit1\ncommit2\ncommit3\n")), nil
 			},
 			output: git.CommitRangeResults{
-				From: "commit1",
-				To:   "commit3",
+				Commits: []string{"commit1", "commit2", "commit3"},
+				From:    "commit1",
+				To:      "commit3",
 			},
 		},
 		{
@@ -138,8 +149,9 @@ func TestCommitRange(t *testing.T) {
 				return []byte("commit2\ncommit1"), nil
 			},
 			output: git.CommitRangeResults{
-				From: "commit2",
-				To:   "commit1",
+				Commits: []string{"commit2", "commit1"},
+				From:    "commit2",
+				To:      "commit1",
 			},
 		},
 		{
@@ -147,8 +159,9 @@ func TestCommitRange(t *testing.T) {
 				return []byte("commit2\ncommit1\n"), nil
 			},
 			output: git.CommitRangeResults{
-				From: "commit2",
-				To:   "commit1",
+				Commits: []string{"commit2", "commit1"},
+				From:    "commit2",
+				To:      "commit1",
 			},
 		},
 	}
@@ -215,6 +228,37 @@ func TestCurrentBranch(t *testing.T) {
 			}
 
 			require.Equal(t, tc.output, output, "git.CurrentBranch() returned wrong output")
+		})
+	}
+}
+
+func TestRunGit(t *testing.T) {
+	type testCaseT struct {
+		args   []string
+		output *regexp.Regexp
+		err    string
+	}
+
+	testCases := []testCaseT{
+		{
+			args:   []string{"version"},
+			output: regexp.MustCompile("^git version"),
+		},
+		{
+			args: []string{"xxx"},
+			err:  "git: 'xxx' is not a git command. See 'git --help'.\n",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+			output, err := git.RunGit(tc.args...)
+			if tc.err != "" {
+				require.EqualError(t, err, tc.err)
+			} else {
+				require.NoError(t, err)
+				require.Regexp(t, tc.output, string(output))
+			}
 		})
 	}
 }

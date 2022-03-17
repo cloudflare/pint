@@ -10,6 +10,7 @@ import (
 	"github.com/prometheus/common/model"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -35,7 +36,7 @@ func (c VectorMatchingCheck) Reporter() string {
 	return VectorMatchingCheckName
 }
 
-func (c VectorMatchingCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c VectorMatchingCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

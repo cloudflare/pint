@@ -14,7 +14,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -100,7 +99,14 @@ func TestBitBucketReporter(t *testing.T) {
 				return nil, nil
 			},
 			summary: reporter.Summary{
-				Reports: []reporter.Report{{Path: "foo.txt", Rule: mockRules[0], Problem: checks.Problem{}}},
+				Reports: []reporter.Report{
+					{
+						Path:          "foo.txt",
+						ModifiedLines: []int{2},
+						Rule:          mockRules[0],
+						Problem:       checks.Problem{},
+					},
+				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(400)
@@ -126,7 +132,14 @@ func TestBitBucketReporter(t *testing.T) {
 				return nil, nil
 			},
 			summary: reporter.Summary{
-				Reports: []reporter.Report{{Path: "foo.txt", Rule: mockRules[0], Problem: checks.Problem{}}},
+				Reports: []reporter.Report{
+					{
+						Path:          "foo.txt",
+						ModifiedLines: []int{2},
+						Rule:          mockRules[0],
+						Problem:       checks.Problem{},
+					},
+				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				time.Sleep(time.Second * 2)
@@ -154,7 +167,14 @@ func TestBitBucketReporter(t *testing.T) {
 				return nil, nil
 			},
 			summary: reporter.Summary{
-				Reports: []reporter.Report{{Path: "foo.txt", Rule: mockRules[0], Problem: checks.Problem{}}},
+				Reports: []reporter.Report{
+					{
+						Path:          "foo.txt",
+						ModifiedLines: []int{2},
+						Rule:          mockRules[0],
+						Problem:       checks.Problem{},
+					},
+				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(400)
@@ -184,8 +204,9 @@ func TestBitBucketReporter(t *testing.T) {
 			summary: reporter.Summary{
 				Reports: []reporter.Report{
 					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
+						Path:          "foo.txt",
+						ModifiedLines: []int{2, 4},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "up",
 							Lines:    []int{1},
@@ -195,8 +216,9 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 					{
-						Path: "bar.txt",
-						Rule: mockRules[1],
+						Path:          "bar.txt",
+						ModifiedLines: []int{},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "up",
 							Lines:    []int{1},
@@ -206,8 +228,9 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
+						Path:          "foo.txt",
+						ModifiedLines: []int{2, 4},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "up",
 							Lines:    []int{2},
@@ -217,8 +240,9 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 					{
-						Path: "foo.txt",
-						Rule: mockRules[0],
+						Path:          "foo.txt",
+						ModifiedLines: []int{2, 4},
+						Rule:          mockRules[0],
 						Problem: checks.Problem{
 							Fragment: "up == 0",
 							Lines:    []int{2},
@@ -228,8 +252,9 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
+						Path:          "foo.txt",
+						ModifiedLines: []int{2, 4},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "errors",
 							Lines:    []int{4},
@@ -239,7 +264,6 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 				},
-				FileChanges: discovery.NewFileCommitsFromMap(map[string][]string{"foo.txt": {"fake-commit-id"}}),
 			},
 			report: reporter.BitBucketReport{
 				Title:  "Pint - Prometheus rules linter",
@@ -299,8 +323,9 @@ func TestBitBucketReporter(t *testing.T) {
 			summary: reporter.Summary{
 				Reports: []reporter.Report{
 					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
+						Path:          "foo.txt",
+						ModifiedLines: []int{3, 4},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "syntax error",
 							Lines:    []int{1},
@@ -310,7 +335,6 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 				},
-				FileChanges: discovery.NewFileCommitsFromMap(map[string][]string{"foo.txt": {"fake-commit-id"}}),
 			},
 			report: reporter.BitBucketReport{
 				Title:  "Pint - Prometheus rules linter",
@@ -429,7 +453,6 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					},
 				},
-				FileChanges: discovery.NewFileCommitsFromMap(map[string][]string{"foo.txt": {"fake-commit-id"}}),
 			},
 			report: reporter.BitBucketReport{
 				Title:  "Pint - Prometheus rules linter",

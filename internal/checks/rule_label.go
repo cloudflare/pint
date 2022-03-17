@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -30,7 +31,7 @@ func (c LabelCheck) Reporter() string {
 	return LabelCheckName
 }
 
-func (c LabelCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c LabelCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.RecordingRule != nil {
 		problems = append(problems, c.checkRecordingRule(rule)...)
 	}

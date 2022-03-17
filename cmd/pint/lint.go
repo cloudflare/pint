@@ -45,18 +45,14 @@ func actionLint(c *cli.Context) (err error) {
 		cfg.DisableOnlineChecks()
 	}
 
-	d := discovery.NewGlobFileFinder()
-	toScan, err := d.Find(paths...)
+	finder := discovery.NewGlobFinder(paths...)
+	entries, err := finder.Find()
 	if err != nil {
 		return err
 	}
 
-	if len(toScan.Paths()) == 0 {
-		return fmt.Errorf("no matching files")
-	}
-
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
-	summary := scanFiles(ctx, workers, cfg, toScan, &discovery.NoopLineFinder{})
+	summary := checkRules(ctx, workers, cfg, entries)
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)

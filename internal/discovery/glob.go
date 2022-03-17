@@ -1,22 +1,25 @@
 package discovery
 
 import (
+	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 )
 
-func NewGlobFileFinder() GlobFileFinder {
-	return GlobFileFinder{}
+func NewGlobFinder(patterns ...string) GlobFinder {
+	return GlobFinder{
+		patterns: patterns,
+	}
 }
 
-type GlobFileFinder struct{}
+type GlobFinder struct {
+	patterns []string
+}
 
-func (gd GlobFileFinder) Find(pattern ...string) (FileFindResults, error) {
-	results := FileCommits{
-		pathCommits: map[string][]string{},
-	}
-
-	for _, p := range pattern {
+func (f GlobFinder) Find() (entries []Entry, err error) {
+	paths := []string{}
+	for _, p := range f.patterns {
 		matches, err := filepath.Glob(p)
 		if err != nil {
 			return nil, err
@@ -28,28 +31,46 @@ func (gd GlobFileFinder) Find(pattern ...string) (FileFindResults, error) {
 				return nil, err
 			}
 			if s.IsDir() {
-				err = filepath.Walk(path,
-					func(path string, info os.FileInfo, err error) error {
-						if err != nil {
-							return err
-						}
-
-						if info.IsDir() {
-							return nil
-						}
-
-						results.pathCommits[path] = nil
-
-						return nil
-					})
+				subpaths, err := walkDir(path)
 				if err != nil {
 					return nil, err
 				}
+				paths = append(paths, subpaths...)
 			} else {
-				results.pathCommits[path] = nil
+				paths = append(paths, path)
 			}
 		}
 	}
 
-	return results, nil
+	if len(paths) == 0 {
+		return nil, fmt.Errorf("no matching files")
+	}
+
+	for _, path := range paths {
+		e, err := readFile(path)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, e...)
+	}
+
+	return entries, nil
+}
+
+func walkDir(dirname string) (paths []string, err error) {
+	err = filepath.WalkDir(dirname,
+		func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if d.IsDir() {
+				return nil
+			}
+
+			paths = append(paths, path)
+			return nil
+		})
+
+	return
 }

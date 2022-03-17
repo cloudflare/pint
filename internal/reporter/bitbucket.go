@@ -68,7 +68,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 
 	annotations := []BitBucketAnnotation{}
 	for _, report := range summary.Reports {
-		annotations = append(annotations, r.makeAnnotation(report, summary, pb)...)
+		annotations = append(annotations, r.makeAnnotation(report, pb)...)
 	}
 
 	isPassing := true
@@ -90,37 +90,19 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 	return nil
 }
 
-func (r BitBucketReporter) makeAnnotation(report Report, summary Summary, pb git.FileBlames) (annotations []BitBucketAnnotation) {
-	gitBlames, ok := pb[report.Path]
-	if !ok {
-		log.Debug().Str("path", report.Path).Msg("File not found in git blame")
-		return
-	}
-
+func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (annotations []BitBucketAnnotation) {
 	reportLine := -1
 	for _, pl := range report.Problem.Lines {
-		commit := gitBlames.GetCommit(pl)
-		log.Debug().Str("commit", commit).Str("path", report.Path).Int("line", pl).Msg("Got commit for line")
-		if summary.FileChanges.HasCommit(commit) {
-			reportLine = pl
+		for _, ml := range report.ModifiedLines {
+			if pl == ml {
+				reportLine = pl
+			}
 		}
 	}
-
 	if reportLine < 0 && report.Problem.Severity == checks.Fatal {
-		for _, fl := range summary.FileChanges.Results() {
-			if fl.Path != report.Path {
-				continue
-			}
-			for _, commit := range fl.Commits {
-				for _, lineBlame := range gitBlames {
-					if lineBlame.Commit != commit {
-						continue
-					}
-					if reportLine < 0 || lineBlame.Line < reportLine && lineBlame.Commit == commit {
-						reportLine = lineBlame.Line
-					}
-				}
-			}
+		for _, ml := range report.ModifiedLines {
+			reportLine = ml
+			break
 		}
 	}
 

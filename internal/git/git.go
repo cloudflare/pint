@@ -3,6 +3,7 @@ package git
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -19,26 +20,27 @@ type LineBlame struct {
 
 type LineBlames []LineBlame
 
-func (lbs LineBlames) GetCommit(line int) string {
-	for _, lb := range lbs {
-		if lb.Line == line {
-			return lb.Commit
-		}
-	}
-	return ""
-}
-
 type FileBlames map[string]LineBlames
 
 type CommandRunner func(args ...string) ([]byte, error)
 
 func RunGit(args ...string) (content []byte, err error) {
 	log.Debug().Strs("args", args).Msg("Running git command")
-	content, err = exec.Command("git", args...).Output()
-	return content, err
+	cmd := exec.Command("git", args...)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	if err = cmd.Run(); err != nil {
+		if stderr.Len() > 0 {
+			return nil, errors.New(stderr.String())
+		}
+		return nil, err
+	}
+	return stdout.Bytes(), nil
 }
 
 func Blame(path string, cmd CommandRunner) (lines LineBlames, err error) {
+	log.Debug().Str("path", path).Msg("Running git blame")
 	output, err := cmd("blame", "--line-porcelain", "--", path)
 	if err != nil {
 		return nil, err
@@ -95,8 +97,9 @@ func HeadCommit(cmd CommandRunner) (string, error) {
 }
 
 type CommitRangeResults struct {
-	From string
-	To   string
+	From    string
+	To      string
+	Commits []string
 }
 
 func (gcr CommitRangeResults) String() string {
@@ -104,25 +107,27 @@ func (gcr CommitRangeResults) String() string {
 }
 
 func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, err error) {
+	cr.Commits = []string{}
+
 	out, err := cmd("log", "--format=%H", "--no-abbrev-commit", "--reverse", fmt.Sprintf("%s..HEAD", baseBranch))
 	if err != nil {
 		return cr, err
 	}
 
-	lines := []string{}
 	for _, line := range strings.Split(strings.TrimSuffix(string(out), "\n"), "\n") {
 		if line != "" {
-			lines = append(lines, line)
+			cr.Commits = append(cr.Commits, line)
+			if cr.From == "" {
+				cr.From = line
+			}
+			cr.To = line
 			log.Debug().Str("commit", line).Msg("Found commit to scan")
 		}
 	}
 
-	if len(lines) == 0 {
+	if len(cr.Commits) == 0 {
 		return cr, fmt.Errorf("empty commit range")
 	}
-
-	cr.From = lines[0]
-	cr.To = lines[len(lines)-1]
 
 	return
 }

@@ -60,23 +60,14 @@ func actionCI(c *cli.Context) (err error) {
 		return nil
 	}
 
-	gitDiscovery := discovery.NewGitBranchFileFinder(git.RunGit, includeRe, cfg.CI.BaseBranch)
-	toScan, err := gitDiscovery.Find()
+	finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, cfg.CI.BaseBranch, cfg.CI.MaxCommits)
+	entries, err := finder.Find()
 	if err != nil {
-		return fmt.Errorf("failed to get the list of modified files: %w", err)
-	}
-	if len(toScan.Commits()) > cfg.CI.MaxCommits {
-		return fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(toScan.Commits()), cfg.CI.MaxCommits)
+		return err
 	}
 
-	for _, fc := range toScan.Results() {
-		log.Debug().Strs("commits", fc.Commits).Str("path", fc.Path).Msg("File to scan")
-	}
-	log.Debug().Strs("commits", toScan.Commits()).Msg("Found commits to scan")
-
-	gitBlame := discovery.NewGitBlameLineFinder(git.RunGit, toScan.Commits())
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
-	summary := scanFiles(ctx, workers, cfg, toScan, gitBlame)
+	summary := checkRules(ctx, workers, cfg, entries)
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),

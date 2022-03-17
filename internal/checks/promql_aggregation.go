@@ -6,6 +6,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
@@ -34,7 +35,7 @@ func (c AggregationCheck) Reporter() string {
 	return AggregationCheckName
 }
 
-func (c AggregationCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c AggregationCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

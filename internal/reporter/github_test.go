@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -77,8 +76,9 @@ func TestGithubReporter(t *testing.T) {
 			summary: reporter.Summary{
 				Reports: []reporter.Report{
 					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
+						Path:          "foo.txt",
+						ModifiedLines: []int{2},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "syntax error",
 							Lines:    []int{2},
@@ -88,7 +88,6 @@ func TestGithubReporter(t *testing.T) {
 						},
 					},
 				},
-				FileChanges: discovery.NewFileCommitsFromMap(map[string][]string{"foo.txt": {"fake-commit-id"}}),
 			},
 		},
 		{
@@ -114,8 +113,9 @@ func TestGithubReporter(t *testing.T) {
 			summary: reporter.Summary{
 				Reports: []reporter.Report{
 					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
+						Path:          "foo.txt",
+						ModifiedLines: []int{2},
+						Rule:          mockRules[1],
 						Problem: checks.Problem{
 							Fragment: "syntax error",
 							Lines:    []int{2},
@@ -125,7 +125,6 @@ func TestGithubReporter(t *testing.T) {
 						},
 					},
 				},
-				FileChanges: discovery.NewFileCommitsFromMap(map[string][]string{"foo.txt": {"fake-commit-id"}}),
 			},
 		},
 	} {

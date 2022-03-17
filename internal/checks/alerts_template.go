@@ -15,6 +15,7 @@ import (
 	"github.com/prometheus/prometheus/model/timestamp"
 	promTemplate "github.com/prometheus/prometheus/template"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -80,7 +81,7 @@ func (c TemplateCheck) Reporter() string {
 	return TemplateCheckName
 }
 
-func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule) (problems []Problem) {
+func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return nil
 	}
