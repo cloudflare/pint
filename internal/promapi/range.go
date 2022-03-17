@@ -42,15 +42,26 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 		return &r, nil
 	}
 
-	rctx, cancel := context.WithTimeout(ctx, p.timeout)
-	defer cancel()
-
 	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
 	r := v1.Range{
 		Start: start,
 		End:   end,
 		Step:  step,
 	}
+
+	p.slowQueryLock.Lock()
+	if v, ok := p.slowQueryCache.Get(expr); ok {
+		log.Debug().
+			Str("query", expr).
+			Str("delta", output.HumanizeDuration(v.(time.Duration))).
+			Msg("Got cached slow query delta")
+		r.Start.Add(v.(time.Duration))
+	}
+	p.slowQueryLock.Unlock()
+
+	rctx, cancel := context.WithTimeout(ctx, p.timeout)
+	defer cancel()
+
 	qstart := time.Now()
 	result, _, err := p.api.QueryRange(rctx, expr, r)
 	duration := time.Since(qstart)
@@ -69,6 +80,9 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 				return nil, errors.New("no more retries possible")
 			}
 			log.Warn().Str("delta", output.HumanizeDuration(delta)).Msg("Retrying request with smaller range")
+			p.slowQueryLock.Lock()
+			p.slowQueryCache.Add(expr, delta)
+			p.slowQueryLock.Unlock()
 			return p.RangeQuery(ctx, expr, start.Add(delta), end, step)
 		}
 		return nil, err

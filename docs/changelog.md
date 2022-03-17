@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.15.1
+
+### Added
+
+- When a range query returns `query processing would load too many samples into memory`
+  error and we retry it with smaller time range cache this information and start with
+  that smaller time range for future calls to speed up running `pint watch`.
+
 ## v0.15.0
 
 ### Changed
