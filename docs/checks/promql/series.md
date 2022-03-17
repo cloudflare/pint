@@ -28,7 +28,7 @@ of different issues. Here are some usual cases.
 
 ## Your query is using ALERTS or ALERTS_FOR_STATE metrics
 
-Prometheus itself exposes metrics about active alerts [see docs here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#inspecting-alerts-during-runtime.
+Prometheus itself exposes [metrics about active alerts](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#inspecting-alerts-during-runtime).
 And it's possible to use those metrics in recording or alerting rules.
 If pint finds a query using either `ALERTS{alertname="..."}` or
 `ALERTS_FOR_STATE{alertname="..."}` selector it will check if there's

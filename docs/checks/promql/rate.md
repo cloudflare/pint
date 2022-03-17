@@ -9,15 +9,7 @@ grand_parent: Documentation
 This check inspects `rate()` and `irate()` functions and warns if used duration
 is too low. It does so by first getting global `scrape_interval` value for selected
 Prometheus servers and comparing duration to it.
-Reported issue depends on a few factors:
-
-For `rate()` function:
-- If duration is less than 2x `scrape_interval` it will report a bug.
-- If duration is between 2x and 4x `scrape_interval` it will report a warning.
-
-For `irate()` function:
-- If duration is less than 2x `scrape_interval` it will report a bug.
-- If duration is between 2x and 3x `scrape_interval` it will report a warning.
+It will report a bug if duration is less than 2x `scrape_interval`.
 
 ## Configuration
 
