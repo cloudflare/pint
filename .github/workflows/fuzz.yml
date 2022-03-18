@@ -1,0 +1,38 @@
+name: Fuzz Go code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+
+      - name: Get Date
+        id: get-date
+        run: |
+          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
+        shell: bash
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cache/go-build/fuzz
+          key: ${{ runner.os }}-fuzz-${{ steps.get-date.outputs.date }}
+          restore-keys: |
+            ${{ runner.os }}-fuzz-
+
+      - name: Fuzz
+        run: go test -fuzz=Fuzz -fuzztime 3m ./internal/parser

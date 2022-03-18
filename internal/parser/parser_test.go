@@ -30,6 +30,17 @@ func TestParse(t *testing.T) {
 			shouldError: false,
 		},
 		{
+			content:     []byte(string("! !00 \xf6")),
+			output:      nil,
+			shouldError: true,
+		},
+		{
+			content: []byte(string("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |")),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 6}},
+			},
+		},
+		{
 			content: []byte("- record: |\n    multiline\n"),
 			output: []parser.Rule{
 				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
