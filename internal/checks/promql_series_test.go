@@ -549,7 +549,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found) by (job)`},
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -565,7 +565,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found) by (notfound)`},
+						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -604,7 +604,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found) by (notfound)`},
+						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -652,7 +652,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found) by (job)`},
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -668,7 +668,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found) by (instance)`},
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -716,7 +716,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(found) by (instance)"},
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -732,7 +732,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(found) by (not)"},
+						formCond{key: "query", value: `count(found{not=~".+"}) by (not)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -748,7 +748,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(found) by (notfound)"},
+						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -819,7 +819,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(found) by (error)"},
+						formCond{key: "query", value: `count(found{error=~".+"}) by (error)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -895,7 +895,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes) by (churn)`},
+						formCond{key: "query", value: `count(sometimes{churn=~".+"}) by (churn)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -962,7 +962,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__="found"}) by (removed)`},
+						formCond{key: "query", value: `count({__name__="found",removed=~".+"}) by (removed)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1026,7 +1026,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found) by (sometimes)`},
+						formCond{key: "query", value: `count(found{sometimes=~".+"}) by (sometimes)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1147,7 +1147,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes) by (foo)`},
+						formCond{key: "query", value: `count(sometimes{foo=~".+"}) by (foo)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -1207,7 +1207,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(found) by (job)"},
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
