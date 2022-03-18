@@ -37,7 +37,7 @@ func TestRange(t *testing.T) {
 					query != "too_many_samples1" &&
 					query != "error1" && query != "error2" &&
 					query != "vector1" && query != "vector2" &&
-					query != "slow1" {
+					query != "slow1" && query != "timeout1" {
 					t.Errorf("%q already requested diff=%s", query, diff)
 					t.FailNow()
 				}
@@ -80,6 +80,46 @@ func TestRange(t *testing.T) {
 			time.Sleep(time.Second)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
+		case "timeout1":
+			switch diff.String() {
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h38m0s", "40m0s", "10m0s":
+				w.WriteHeader(503)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{
+					"status": "error",
+					"errorType": "timeout",
+					"error": "query timed out in expression evaluation"
+				}`))
+			default:
+				t.Errorf("invalid timeout diff: %s", diff)
+				w.WriteHeader(500)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`unknown start/end`))
+			}
+		case "timeout_until_success1":
+			switch diff.String() {
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h38m0s":
+				w.WriteHeader(503)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{
+					"status": "error",
+					"errorType": "timeout",
+					"error": "query timed out in expression evaluation"
+				}`))
+			case "40m0s":
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[
+								{"metric":{"instance":"1"},"values":[
+									[1614859502.068,"0"]
+								]}
+							]}}`))
+			default:
+				t.Errorf("invalid timeout diff: %s", diff)
+				w.WriteHeader(500)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`unknown start/end`))
+			}
 		case "too_many_samples1":
 			switch diff.String() {
 			case "168h0m0s", "42h0m0s", "10h30m0s", "2h38m0s", "40m0s", "10m0s":
@@ -156,47 +196,41 @@ func TestRange(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	type argsFactory func() (time.Time, time.Time, time.Duration)
-
 	type testCaseT struct {
-		query   string
-		args    argsFactory
-		timeout time.Duration
-		samples []*model.SampleStream
-		err     string
-		runs    int
+		query    string
+		lookback time.Duration
+		step     time.Duration
+		timeout  time.Duration
+		samples  []*model.SampleStream
+		err      string
+		runs     int
 	}
-
-	now := time.Now()
 
 	testCases := []testCaseT{
 		// cache hit
 		{
-			query: "empty1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return now, now, time.Minute
-			},
-			timeout: time.Second,
-			samples: []*model.SampleStream{},
-			runs:    5,
+			query:    "empty1",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
+			samples:  []*model.SampleStream{},
+			runs:     5,
 		},
 		// cache miss
 		{
-			query: "empty2",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return time.Now(), time.Now(), time.Minute
-			},
-			timeout: time.Second,
-			samples: []*model.SampleStream{},
-			runs:    5,
+			query:    "empty2",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
+			samples:  []*model.SampleStream{},
+			runs:     5,
 		},
 		// cache hit
 		{
-			query: "single_result1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return now, now, time.Minute
-			},
-			timeout: time.Second,
+			query:    "single_result1",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
 			samples: []*model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
@@ -213,11 +247,10 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "single_result2",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return time.Now(), time.Now(), time.Minute
-			},
-			timeout: time.Second,
+			query:    "single_result2",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
 			samples: []*model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
@@ -234,77 +267,88 @@ func TestRange(t *testing.T) {
 		},
 		// cache hit
 		{
-			query: "error1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return now, now, time.Minute
-			},
-			timeout: time.Second,
-			err:     "bad_data: unhandled path",
-			runs:    5,
+			query:    "error1",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
+			err:      "bad_data: unhandled path",
+			runs:     5,
 		},
 		// cache miss
 		{
-			query: "error2",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return time.Now(), time.Now(), time.Minute
-			},
-			timeout: time.Second,
-			err:     "bad_data: unhandled path",
-			runs:    5,
+			query:    "error2",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
+			err:      "bad_data: unhandled path",
+			runs:     5,
 		},
 		// cache hit
 		{
-			query: "vector1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return now, now, time.Minute
-			},
-			timeout: time.Second,
-			err:     "unknown result type: vector",
-			runs:    5,
+			query:    "vector1",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
+			err:      "unknown result type: vector",
+			runs:     5,
 		},
 		// cache miss
 		{
-			query: "vector2",
-			args: func() (time.Time, time.Time, time.Duration) {
-				return time.Now(), time.Now(), time.Minute
-			},
-			timeout: time.Second,
-			err:     "unknown result type: vector",
-			runs:    5,
+			query:    "vector2",
+			lookback: time.Hour,
+			step:     time.Minute,
+			timeout:  time.Second,
+			err:      "unknown result type: vector",
+			runs:     5,
 		},
 		// give up after all the retries
 		{
-			query: "too_many_samples1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				start := time.Unix(1577836800, 0)
-				end := time.Unix(1578441600, 0)
-				return start, end, time.Minute * 5
-			},
-			timeout: time.Second,
-			err:     "no more retries possible",
-			runs:    5,
+			query:    "too_many_samples1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Second,
+			err:      "no more retries possible",
+			runs:     5,
 		},
 		// retry timeouts
 		{
-			query: "slow1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				start := time.Unix(1577836800, 0)
-				end := time.Unix(1578441600, 0)
-				return start, end, time.Minute * 5
+			query:    "slow1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Millisecond * 20,
+			err:      "no more retries possible",
+			runs:     5,
+		},
+		// retry query timeouts
+		{
+			query:    "timeout1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Millisecond * 20,
+			err:      "no more retries possible",
+			runs:     5,
+		},
+		{
+			query:    "timeout_until_success1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Millisecond * 20,
+			samples: []*model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: []model.SamplePair{
+						{Timestamp: 1614859502068, Value: 0},
+					},
+				},
 			},
-			timeout: time.Millisecond * 20,
-			err:     "no more retries possible",
-			runs:    5,
+			runs: 5,
 		},
 		// cache hit
 		{
-			query: "retry_until_success1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				start := time.Unix(1577836800, 0)
-				end := time.Unix(1578441600, 0)
-				return start, end, time.Minute * 5
-			},
-			timeout: time.Second,
+			query:    "retry_until_success1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Second,
 			samples: []*model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
@@ -321,13 +365,10 @@ func TestRange(t *testing.T) {
 		},
 		// cache miss
 		{
-			query: "retry_until_success2",
-			args: func() (time.Time, time.Time, time.Duration) {
-				start := time.Unix(1577836800, 0)
-				end := time.Unix(1578441600, 0)
-				return start, end, time.Minute * 5
-			},
-			timeout: time.Second,
+			query:    "retry_until_success2",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Second,
 			samples: []*model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
@@ -344,13 +385,10 @@ func TestRange(t *testing.T) {
 		},
 		// duplicate series
 		{
-			query: "duplicate_series1",
-			args: func() (time.Time, time.Time, time.Duration) {
-				start := time.Unix(1577836800, 0)
-				end := time.Unix(1578441600, 0)
-				return start, end, time.Minute * 5
-			},
-			timeout: time.Second,
+			query:    "duplicate_series1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Second,
 			samples: []*model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
@@ -358,7 +396,8 @@ func TestRange(t *testing.T) {
 						{Timestamp: 1614859502068, Value: 0},
 					},
 				},
-			}, runs: 5,
+			},
+			runs: 5,
 		},
 	}
 
@@ -372,8 +411,7 @@ func TestRange(t *testing.T) {
 			wg.Add(tc.runs)
 			for i := 1; i <= tc.runs; i++ {
 				go func() {
-					start, end, step := tc.args()
-					qr, err := prom.RangeQuery(context.Background(), tc.query, start, end, step)
+					qr, err := prom.RangeQuery(context.Background(), tc.query, tc.lookback, tc.step)
 					if tc.err != "" {
 						assert.EqualError(err, tc.err, tc)
 					} else {

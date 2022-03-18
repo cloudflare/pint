@@ -22,15 +22,11 @@ type RangeQueryResult struct {
 	DurationSeconds float64
 }
 
-func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
-	start = start.Round(time.Second)
-	end = end.Round(time.Second)
-
+func (p *Prometheus) RangeQuery(ctx context.Context, expr string, lookback, step time.Duration) (*RangeQueryResult, error) {
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
-		Time("start", start).
-		Time("end", end).
+		Str("delta", output.HumanizeDuration(lookback)).
 		Str("step", output.HumanizeDuration(step)).
 		Msg("Scheduling prometheus range query")
 
@@ -38,27 +34,38 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	p.lock.lock(lockKey)
 	defer p.lock.unlock(lockKey)
 
-	cacheKey := strings.Join([]string{expr, start.String(), end.String(), step.String()}, "\n")
-	return p.realRangeQuery(ctx, expr, start, end, step, cacheKey, false)
+	cacheKey := strings.Join([]string{expr, lookback.String(), step.String()}, "\n")
+	return p.realRangeQuery(ctx, expr, lookback, step, cacheKey, false)
 }
 
 func (p *Prometheus) realRangeQuery(
 	ctx context.Context,
-	expr string, start, end time.Time, step time.Duration,
+	expr string, lookback, step time.Duration,
 	cacheKey string, isRetry bool,
 ) (*RangeQueryResult, error) {
 	if v, ok := p.cache.Get(cacheKey); ok {
-		log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache hit")
+		log.Debug().
+			Str("uri", p.uri).
+			Str("query", expr).
+			Str("delta", output.HumanizeDuration(lookback)).
+			Str("step", output.HumanizeDuration(step)).
+			Msg("Cache hit")
 		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
 		r := v.(RangeQueryResult)
 		return &r, nil
 	}
-	log.Debug().Str("key", cacheKey).Str("uri", p.uri).Msg("Range query cache miss")
+	log.Debug().
+		Str("uri", p.uri).
+		Str("query", expr).
+		Str("delta", output.HumanizeDuration(lookback)).
+		Str("step", output.HumanizeDuration(step)).
+		Msg("Cache miss")
 
 	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
+	now := time.Now()
 	r := v1.Range{
-		Start: start,
-		End:   end,
+		Start: now.Add(lookback * -1),
+		End:   now,
 		Step:  step,
 	}
 
@@ -82,6 +89,7 @@ func (p *Prometheus) realRangeQuery(
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
+		Str("delta", output.HumanizeDuration(lookback)).
 		Bool("retry", isRetry).
 		Msg("Executing range query")
 	qstart := time.Now()
@@ -95,7 +103,7 @@ func (p *Prometheus) realRangeQuery(
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
 		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", errReason(err)).Inc()
-		if delta, retryOK := CanRetryError(err, end.Sub(start)); retryOK {
+		if delta, retryOK := CanRetryError(err, lookback); retryOK {
 			if delta < step*2 {
 				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
 				return nil, errors.New("no more retries possible")
@@ -105,7 +113,7 @@ func (p *Prometheus) realRangeQuery(
 			p.slowQueryCache.Remove(expr)
 			p.slowQueryCache.Add(expr, delta)
 			p.slowQueryLock.Unlock()
-			return p.realRangeQuery(ctx, expr, end.Add(delta*-1), end, step, cacheKey, true)
+			return p.realRangeQuery(ctx, expr, delta, step, cacheKey, true)
 		}
 		return nil, err
 	}
@@ -113,8 +121,8 @@ func (p *Prometheus) realRangeQuery(
 	qr := RangeQueryResult{
 		URI:             p.uri,
 		DurationSeconds: duration.Seconds(),
-		Start:           start,
-		End:             end,
+		Start:           r.Start,
+		End:             r.End,
 	}
 
 	switch result.Type() {
