@@ -1,0 +1,6 @@
+pint.error --no-color watch --listen=:6064
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="at least one file or directory required"

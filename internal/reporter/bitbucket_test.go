@@ -266,7 +266,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter",
+				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
 				Result: "FAIL",
 			},
 			annotations: reporter.BitBucketAnnotations{
@@ -337,7 +337,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter",
+				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
 				Result: "FAIL",
 			},
 			annotations: reporter.BitBucketAnnotations{
@@ -373,7 +373,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			summary: reporter.Summary{},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter",
+				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
 				Result: "PASS",
 			},
 			errorHandler: func(err error) error {
@@ -455,7 +455,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter",
+				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
 				Result: "PASS",
 			},
 			annotations: reporter.BitBucketAnnotations{
@@ -516,6 +516,7 @@ func TestBitBucketReporter(t *testing.T) {
 			defer srv.Close()
 
 			r := reporter.NewBitBucketReporter(
+				"v0.0.0",
 				srv.URL,
 				time.Second,
 				"token",

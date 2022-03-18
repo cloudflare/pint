@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
+
+	"github.com/cloudflare/pint/internal/config"
 )
 
 const (
@@ -72,6 +75,34 @@ func newApp() *cli.App {
 			parseCmd,
 		},
 	}
+}
+
+type actionMeta struct {
+	cfg     config.Config
+	workers int
+}
+
+func actionSetup(c *cli.Context) (meta actionMeta, err error) {
+	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
+	if err != nil {
+		return meta, fmt.Errorf("failed to set log level: %w", err)
+	}
+
+	meta.workers = c.Int(workersFlag)
+	if meta.workers < 1 {
+		return meta, fmt.Errorf("--%s flag must be > 0", workersFlag)
+	}
+
+	meta.cfg, err = config.Load(c.Path(configFlag), c.IsSet(configFlag))
+	if err != nil {
+		return meta, fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
+	}
+	meta.cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
+	if c.Bool(offlineFlag) {
+		meta.cfg.DisableOnlineChecks()
+	}
+
+	return meta, nil
 }
 
 func main() {
