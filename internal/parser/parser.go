@@ -27,6 +27,12 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		return
 	}
 
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("unable to parse YAML file: %s", r)
+		}
+	}()
+
 	var node yaml.Node
 	err = yaml.Unmarshal(content, &node)
 	if err != nil {
@@ -145,6 +151,9 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 		for {
 			start := exprPart.Value.Position.FirstLine() - 1
 			end := exprPart.Value.Position.LastLine()
+			if end > len(strings.Split(string(content), "\n")) {
+				end--
+			}
 			input := strings.Join(strings.Split(string(content), "\n")[start:end], "")
 			input = strings.ReplaceAll(input, " ", "")
 			output := strings.ReplaceAll(exprPart.Value.Value, "\n", "")
