@@ -270,7 +270,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				text := fmt.Sprintf(
 					"%s has %q metric with %q label but there are no series matching {%s} in the last %s",
 					promText(c.prom.Name(), trsLabel.uri), bareSelector.String(), lm.Name, lm.String(), trsLabel.sinceDesc(trs.from))
-				var s Severity = Bug
+				s := Bug
 				for _, name := range highChurnLabels {
 					if lm.Name == name {
 						s = Warning
