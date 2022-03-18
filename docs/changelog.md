@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.15.3
+
+### Fixed
+
+- Use more efficient queries for `promql/series` check.
+- Fixed YAML parsing panics detected by Go 1.18 fuzzing.
+
 ## v0.15.2
 
 ### Fixed

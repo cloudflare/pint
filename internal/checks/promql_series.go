@@ -198,8 +198,10 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		// 3. If foo is ALWAYS/SOMETIMES there BUT {bar OR baz} is NEVER there -> BUG
 		for _, name := range labelNames {
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", bareSelector.String(), name), rangeLookback, rangeStep)
+			l := stripLabels(selector)
+			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
+			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
+			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeLookback, rangeStep)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -216,7 +218,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 						promText(c.prom.Name(), trsLabelCount.uri), bareSelector.String(), name, trsLabelCount.sinceDesc(trsLabelCount.from)),
 					Severity: Bug,
 				})
-				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Str("label", name).Msg("No historical series with label used for the query")
+				log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("No historical series with label used for the query")
 			}
 
 			if len(trsLabelCount.labelValues(name)) == len(trsLabelCount.ranges) && trsLabelCount.avgLife() < (trsLabelCount.duration()/2) {
