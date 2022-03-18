@@ -32,8 +32,9 @@ type BitBucketAnnotations struct {
 	Annotations []BitBucketAnnotation `json:"annotations"`
 }
 
-func NewBitBucketReporter(uri string, timeout time.Duration, token, project, repo string, gitCmd git.CommandRunner) BitBucketReporter {
+func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, gitCmd git.CommandRunner) BitBucketReporter {
 	return BitBucketReporter{
+		version:   version,
 		uri:       uri,
 		timeout:   timeout,
 		authToken: token,
@@ -46,6 +47,7 @@ func NewBitBucketReporter(uri string, timeout time.Duration, token, project, rep
 // BitBucketReporter send linter results to BitBucket using
 // https://docs.atlassian.com/bitbucket-server/rest/7.8.0/bitbucket-code-insights-rest.html
 type BitBucketReporter struct {
+	version   string
 	uri       string
 	timeout   time.Duration
 	authToken string
@@ -176,7 +178,7 @@ func (r BitBucketReporter) createReport(commit string, isPassing bool) error {
 		result = "FAIL"
 	}
 	payload, _ := json.Marshal(BitBucketReport{
-		Title:  "Pint - Prometheus rules linter",
+		Title:  fmt.Sprintf("Pint - Prometheus rules linter (version: %s)", r.version),
 		Result: result,
 	})
 

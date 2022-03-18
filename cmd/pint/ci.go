@@ -25,31 +25,18 @@ var ciCmd = &cli.Command{
 	Action: actionCI,
 }
 
-func actionCI(c *cli.Context) (err error) {
-	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
+func actionCI(c *cli.Context) error {
+	meta, err := actionSetup(c)
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %w", err)
-	}
-
-	workers := c.Int(workersFlag)
-	if workers < 1 {
-		return fmt.Errorf("--%s flag must be > 0", workersFlag)
-	}
-
-	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
-	if err != nil {
-		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
-	}
-	if c.Bool(offlineFlag) {
-		cfg.DisableOnlineChecks()
+		return err
 	}
 
 	includeRe := []*regexp.Regexp{}
-	for _, pattern := range cfg.CI.Include {
+	for _, pattern := range meta.cfg.CI.Include {
 		includeRe = append(includeRe, regexp.MustCompile("^"+pattern+"$"))
 	}
 
-	baseBranch := strings.Split(cfg.CI.BaseBranch, "/")[len(strings.Split(cfg.CI.BaseBranch, "/"))-1]
+	baseBranch := strings.Split(meta.cfg.CI.BaseBranch, "/")[len(strings.Split(meta.cfg.CI.BaseBranch, "/"))-1]
 	currentBranch, err := git.CurrentBranch(git.RunGit)
 	if err != nil {
 		return fmt.Errorf("failed to get the name of current branch")
@@ -60,38 +47,39 @@ func actionCI(c *cli.Context) (err error) {
 		return nil
 	}
 
-	finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, cfg.CI.BaseBranch, cfg.CI.MaxCommits)
+	finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits)
 	entries, err := finder.Find()
 	if err != nil {
 		return err
 	}
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
-	summary := checkRules(ctx, workers, cfg, entries)
+	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),
 	}
 
-	if cfg.Repository != nil && cfg.Repository.BitBucket != nil {
+	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {
 		token, ok := os.LookupEnv("BITBUCKET_AUTH_TOKEN")
 		if !ok {
 			return fmt.Errorf("BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket")
 		}
 
-		timeout, _ := time.ParseDuration(cfg.Repository.BitBucket.Timeout)
+		timeout, _ := time.ParseDuration(meta.cfg.Repository.BitBucket.Timeout)
 		br := reporter.NewBitBucketReporter(
-			cfg.Repository.BitBucket.URI,
+			version,
+			meta.cfg.Repository.BitBucket.URI,
 			timeout,
 			token,
-			cfg.Repository.BitBucket.Project,
-			cfg.Repository.BitBucket.Repository,
+			meta.cfg.Repository.BitBucket.Project,
+			meta.cfg.Repository.BitBucket.Repository,
 			git.RunGit,
 		)
 		reps = append(reps, br)
 	}
 
-	if cfg.Repository != nil && cfg.Repository.GitHub != nil {
+	if meta.cfg.Repository != nil && meta.cfg.Repository.GitHub != nil {
 		token, ok := os.LookupEnv("GITHUB_AUTH_TOKEN")
 		if !ok {
 			return fmt.Errorf("GITHUB_AUTH_TOKEN env variable is required when reporting to GitHub")
@@ -107,14 +95,14 @@ func actionCI(c *cli.Context) (err error) {
 			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
 		}
 
-		timeout, _ := time.ParseDuration(cfg.Repository.GitHub.Timeout)
+		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
 		gr := reporter.NewGithubReporter(
-			cfg.Repository.GitHub.BaseURI,
-			cfg.Repository.GitHub.UploadURI,
+			meta.cfg.Repository.GitHub.BaseURI,
+			meta.cfg.Repository.GitHub.UploadURI,
 			timeout,
 			token,
-			cfg.Repository.GitHub.Owner,
-			cfg.Repository.GitHub.Repo,
+			meta.cfg.Repository.GitHub.Owner,
+			meta.cfg.Repository.GitHub.Repo,
 			prNum,
 			git.RunGit,
 		)

@@ -73,15 +73,10 @@ var watchCmd = &cli.Command{
 	},
 }
 
-func actionWatch(c *cli.Context) (err error) {
-	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
+func actionWatch(c *cli.Context) error {
+	meta, err := actionSetup(c)
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %w", err)
-	}
-
-	workers := c.Int(workersFlag)
-	if workers < 1 {
-		return fmt.Errorf("--%s flag must be > 0", workersFlag)
+		return err
 	}
 
 	paths := c.Args().Slice()
@@ -92,15 +87,6 @@ func actionWatch(c *cli.Context) (err error) {
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
 	if err != nil {
 		return fmt.Errorf("invalid %s value: %w", minSeverityFlag, err)
-	}
-
-	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
-	if err != nil {
-		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
-	}
-	cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
-	if c.Bool(offlineFlag) {
-		cfg.DisableOnlineChecks()
 	}
 
 	pidfile := c.String(pidfileFlag)
@@ -121,7 +107,7 @@ func actionWatch(c *cli.Context) (err error) {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(cfg, paths, minSeverity, c.Int(maxProblemsFlag))
+	collector := newProblemCollector(meta.cfg, paths, minSeverity, c.Int(maxProblemsFlag))
 	// register all metrics
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(checkDuration)
@@ -156,7 +142,7 @@ func actionWatch(c *cli.Context) (err error) {
 	// start timer to run every $interval
 	interval := c.Duration(intervalFlag)
 	ack := make(chan bool, 1)
-	stop := startTimer(mainCtx, cfg, workers, interval, ack, collector)
+	stop := startTimer(mainCtx, meta.cfg, meta.workers, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)

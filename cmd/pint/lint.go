@@ -20,29 +20,15 @@ var lintCmd = &cli.Command{
 	Action: actionLint,
 }
 
-func actionLint(c *cli.Context) (err error) {
-	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
+func actionLint(c *cli.Context) error {
+	meta, err := actionSetup(c)
 	if err != nil {
-		return fmt.Errorf("failed to set log level: %w", err)
-	}
-
-	workers := c.Int(workersFlag)
-	if workers < 1 {
-		return fmt.Errorf("--%s flag must be > 0", workersFlag)
+		return err
 	}
 
 	paths := c.Args().Slice()
 	if len(paths) == 0 {
 		return fmt.Errorf("at least one file or directory required")
-	}
-
-	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
-	if err != nil {
-		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
-	}
-	cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
-	if c.Bool(offlineFlag) {
-		cfg.DisableOnlineChecks()
 	}
 
 	finder := discovery.NewGlobFinder(paths...)
@@ -52,7 +38,7 @@ func actionLint(c *cli.Context) (err error) {
 	}
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
-	summary := checkRules(ctx, workers, cfg, entries)
+	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)
