@@ -45,7 +45,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		return
 	}
 
-	rangeStart := time.Now().Add(time.Hour * 24 * -7)
+	rangeLookback := time.Hour * 24 * 7
 	rangeStep := time.Minute * 5
 
 	done := map[string]bool{}
@@ -137,7 +137,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeStart, rangeStep)
+		trs, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeLookback, rangeStep)
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -199,7 +199,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		// 3. If foo is ALWAYS/SOMETIMES there BUT {bar OR baz} is NEVER there -> BUG
 		for _, name := range labelNames {
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", bareSelector.String(), name), rangeStart, rangeStep)
+			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", bareSelector.String(), name), rangeLookback, rangeStep)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -229,7 +229,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		// 4. If foo was ALWAYS there but it's NO LONGER there -> BUG
 		if len(trs.ranges) == 1 &&
-			!trs.oldest().After(rangeStart.Add(rangeStep)) &&
+			!trs.oldest().After(time.Now().Add(rangeLookback-1).Add(rangeStep)) &&
 			trs.newest().Before(time.Now().Add(rangeStep*-1)) {
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
@@ -257,7 +257,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeStart, rangeStep)
+			trsLabel, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeLookback, rangeStep)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
@@ -290,7 +290,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 			// 6. If foo is ALWAYS/SOMETIMES there AND {bar OR baz} used to be there ALWAYS BUT it's NO LONGER there -> BUG
 			if len(trsLabel.ranges) == 1 &&
-				!trsLabel.oldest().After(rangeStart.Add(rangeStep)) &&
+				!trsLabel.oldest().After(time.Now().Add(rangeLookback-1).Add(rangeStep)) &&
 				trsLabel.newest().Before(time.Now().Add(rangeStep*-1)) {
 				problems = append(problems, Problem{
 					Fragment: labelSelector.String(),
@@ -367,16 +367,16 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 	return series, qr.URI, nil
 }
 
-func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, from time.Time, step time.Duration) (tr *timeRanges, err error) {
+func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, lookback, step time.Duration) (tr *timeRanges, err error) {
 	now := time.Now()
-	qr, err := c.prom.RangeQuery(ctx, query, from, now, step)
+	qr, err := c.prom.RangeQuery(ctx, query, lookback, step)
 	if err != nil {
 		return nil, err
 	}
 
 	tr = &timeRanges{
 		uri:   qr.URI,
-		from:  from,
+		from:  now.Add(lookback * -1),
 		until: now,
 		step:  step,
 	}
