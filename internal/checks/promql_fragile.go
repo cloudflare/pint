@@ -48,6 +48,12 @@ func (c FragileCheck) Check(ctx context.Context, rule parser.Rule, entries []dis
 
 func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
 	if n := utils.HasOuterBinaryExpr(node); n != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
+		if _, ok := n.LHS.(*promParser.NumberLiteral); ok {
+			goto NEXT
+		}
+		if _, ok := n.RHS.(*promParser.NumberLiteral); ok {
+			goto NEXT
+		}
 		var isFragile bool
 		for _, child := range node.Children {
 			for _, agg := range utils.HasOuterAggregation(child) {

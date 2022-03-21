@@ -83,7 +83,7 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(sum(foo) without(job) + sum(bar) without(job)) > 1`,
+						Fragment: `(sum without(job) (foo) + sum without(job) (bar))`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
@@ -115,7 +115,7 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(sum without(job) (foo) + sum(bar)) > 1`,
+						Fragment: `(sum without(job) (foo) + sum(bar))`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
@@ -125,16 +125,54 @@ func TestFragileCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "ignores safe division",
+			description: "ignores safe addition",
 			content:     "- record: foo\n  expr: sum(foo) + sum(bar)\n",
 			checker:     newFragileCheck,
 			problems:    noProblems,
 		},
 		{
-			description: "ignores division if source metric is the same",
+			description: "ignores addition if source metric is the same",
 			content:     "- record: foo\n  expr: sum(foo) without(bar) + sum(foo) without(bar)\n",
 			checker:     newFragileCheck,
 			problems:    noProblems,
+		},
+		{
+			description: "handles nested aggregations correctly / LHS",
+			content: `
+- alert: foo
+  expr: |
+    count without (foo) (
+        probe_success{job="foo"} == 0 or probe_duration_seconds{job="foo"} >= 15
+    ) > 3
+`,
+			checker:  newFragileCheck,
+			problems: noProblems,
+		},
+		{
+			description: "handles nested aggregations correctly / RHS",
+			content: `
+- alert: foo
+  expr: |
+    3 <
+    count without (foo) (
+        probe_success{job="foo"} == 0 or probe_duration_seconds{job="foo"} >= 15
+    )
+`,
+			checker:  newFragileCheck,
+			problems: noProblems,
+		},
+		{
+			description: "handles nested aggregations correctly / both",
+			content: `
+- alert: foo
+  expr: |
+    3 <
+    count without (foo) (
+        probe_success{job="foo"} == 0 or probe_duration_seconds{job="foo"} >= 15
+    ) > 2
+`,
+			checker:  newFragileCheck,
+			problems: noProblems,
 		},
 	}
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.15.4
+
+### Fixed
+
+- Fixed false positive reports from `promql/fragile` when `foo OR bar` is used inside
+  aggregation.
+
 ## v0.15.3
 
 ### Fixed
