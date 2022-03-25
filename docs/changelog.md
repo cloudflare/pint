@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.15.5
+
+### Fixed
+
+- `promql/series` check was reporting both `Warning` and `Bug` problems for the
+  same metric when it was using newly added recording rule.
+
 ## v0.15.4
 
 ### Fixed
