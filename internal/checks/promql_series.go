@@ -179,7 +179,11 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				}
 
 				// if it's not there recurse checks onto it
-				problems = append(problems, c.Check(ctx, rrEntry.Rule, entries)...)
+				for _, p := range c.Check(ctx, rrEntry.Rule, entries) {
+					p.Lines = expr.Lines()
+					problems = append(problems, p)
+				}
+				continue
 			}
 
 			problems = append(problems, Problem{
@@ -528,6 +532,9 @@ func wrapLabelReplaces(q string, lms []*labels.Matcher) string {
 			out = fmt.Sprintf(`label_replace(%s, "%s", "%s", "", "")`, out, lm.Name, lm.Value)
 			onLabels = append(onLabels, lm.Name)
 		}
+	}
+	if len(onLabels) == 0 {
+		return fmt.Sprintf(`count(%s)`, q)
 	}
 	return fmt.Sprintf(`count(%s AND on(%s) %s)`, q, strings.Join(onLabels, ","), out)
 }
