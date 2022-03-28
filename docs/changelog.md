@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.15.6
+
+### Fixed
+
+- `promql/series` check was reporting that a metric stopped being exported when check
+  queries would require a few retries.
+
 ## v0.15.5
 
 ### Fixed

@@ -235,8 +235,8 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		// 4. If foo was ALWAYS there but it's NO LONGER there -> BUG
 		if len(trs.ranges) == 1 &&
-			!trs.oldest().After(time.Now().Add(rangeLookback-1).Add(rangeStep)) &&
-			trs.newest().Before(time.Now().Add(rangeStep*-1)) {
+			!trs.oldest().After(trs.until.Add(rangeLookback-1).Add(rangeStep)) &&
+			trs.newest().Before(trs.until.Add(rangeStep*-1)) {
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
@@ -296,8 +296,8 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 			// 6. If foo is ALWAYS/SOMETIMES there AND {bar OR baz} used to be there ALWAYS BUT it's NO LONGER there -> BUG
 			if len(trsLabel.ranges) == 1 &&
-				!trsLabel.oldest().After(time.Now().Add(rangeLookback-1).Add(rangeStep)) &&
-				trsLabel.newest().Before(time.Now().Add(rangeStep*-1)) {
+				!trsLabel.oldest().After(trs.until.Add(rangeLookback-1).Add(rangeStep)) &&
+				trsLabel.newest().Before(trs.until.Add(rangeStep*-1)) {
 				problems = append(problems, Problem{
 					Fragment: labelSelector.String(),
 					Lines:    expr.Lines(),
