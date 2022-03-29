@@ -3,7 +3,6 @@ package checks
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -161,28 +160,10 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					Fragment: bareSelector.String(),
 					Lines:    expr.Lines(),
 					Reporter: c.Reporter(),
-					Text: fmt.Sprintf("%s didn't have any series for %q metric in the last %s but found recording rule that generates it, "+
-						"pint will try to use source recording rule queries to validate selectors in this query but it might be less accurate",
+					Text: fmt.Sprintf("%s didn't have any series for %q metric in the last %s but found recording rule that generates it, skipping further checks",
 						promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.from)),
 					Severity: Information,
 				})
-
-				q := wrapLabelReplaces(rrEntry.Rule.RecordingRule.Expr.Value.Value, selector.LabelMatchers)
-				count, _, err := c.instantSeriesCount(ctx, q)
-				if err != nil {
-					problems = append(problems, c.queryProblem(err, selector.String(), expr))
-					continue
-				}
-				if count > 0 {
-					log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Msg("Found fallback series from recording rule, skipping further checks")
-					continue
-				}
-
-				// if it's not there recurse checks onto it
-				for _, p := range c.Check(ctx, rrEntry.Rule, entries) {
-					p.Lines = expr.Lines()
-					problems = append(problems, p)
-				}
 				continue
 			}
 
@@ -522,19 +503,4 @@ func (tr timeRanges) sinceDesc(t time.Time) (s string) {
 		return output.HumanizeDuration(dur.Round(time.Hour))
 	}
 	return output.HumanizeDuration(dur.Round(time.Minute))
-}
-
-func wrapLabelReplaces(q string, lms []*labels.Matcher) string {
-	out := "vector(1)"
-	onLabels := []string{}
-	for _, lm := range lms {
-		if lm.Name != labels.MetricName && lm.Type == labels.MatchEqual {
-			out = fmt.Sprintf(`label_replace(%s, "%s", "%s", "", "")`, out, lm.Name, lm.Value)
-			onLabels = append(onLabels, lm.Name)
-		}
-	}
-	if len(onLabels) == 0 {
-		return fmt.Sprintf(`count(%s)`, q)
-	}
-	return fmt.Sprintf(`count(%s AND on(%s) %s)`, q, strings.Join(onLabels, ","), out)
 }

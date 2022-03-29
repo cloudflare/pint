@@ -19,7 +19,7 @@ func noMetricText(name, uri, metric, since string) string {
 }
 
 func noMetricRRText(name, uri, metric, since string) string {
-	return fmt.Sprintf(`prometheus %q at %s didn't have any series for %q metric in the last %s but found recording rule that generates it, pint will try to use source recording rule queries to validate selectors in this query but it might be less accurate`, name, uri, metric, since)
+	return fmt.Sprintf(`prometheus %q at %s didn't have any series for %q metric in the last %s but found recording rule that generates it, skipping further checks`, name, uri, metric, since)
 }
 
 func noFilterMatchText(name, uri, metric, label, filter, since string) string {
@@ -332,13 +332,6 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo:bar) AND on(job) label_replace(vector(1), "job", "xxx", "", ""))`},
-					},
-					resp: respondWithSingleInstantVector(),
-				},
 			},
 		},
 		{
@@ -355,13 +348,6 @@ func TestSeriesCheck(t *testing.T) {
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
 						Severity: checks.Information,
 					},
-					{
-						Fragment: "foo",
-						Lines:    []int{2},
-						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "foo", "1w"),
-						Severity: checks.Bug,
-					},
 				}
 			},
 			mocks: []*prometheusMock{
@@ -376,27 +362,6 @@ func TestSeriesCheck(t *testing.T) {
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(foo:bar)`},
-					},
-					resp: respondWithEmptyMatrix(),
-				},
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo) AND on(job) label_replace(vector(1), "job", "xxx", "", ""))`},
-					},
-					resp: respondWithEmptyVector(),
-				},
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(foo)`},
-					},
-					resp: respondWithEmptyVector(),
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
@@ -450,13 +415,6 @@ func TestSeriesCheck(t *testing.T) {
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
 						Severity: checks.Information,
 					},
-					{
-						Fragment: `foo:bar{job="xxx"}`,
-						Lines:    []int{2},
-						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
-						Severity: checks.Bug,
-					},
 				}
 			},
 			mocks: []*prometheusMock{
@@ -473,13 +431,6 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(foo:bar)`},
 					},
 					resp: respondWithEmptyMatrix(),
-				},
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo:bar) AND on(job) label_replace(vector(1), "job", "xxx", "", ""))`},
-					},
-					resp: respondWithBadData(),
 				},
 			},
 		},
@@ -1370,25 +1321,11 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Information,
 					},
 					{
-						Fragment: `foo`,
-						Lines:    []int{2},
-						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, "foo", "1w"),
-						Severity: checks.Bug,
-					},
-					{
 						Fragment: "foo:sum",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:sum", "1w"),
 						Severity: checks.Information,
-					},
-					{
-						Fragment: `foo`,
-						Lines:    []int{2},
-						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, "foo", "1w"),
-						Severity: checks.Bug,
 					},
 				}
 			},
@@ -1419,37 +1356,6 @@ func TestSeriesCheck(t *testing.T) {
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(foo:sum)`},
-					},
-					resp: respondWithEmptyMatrix(),
-				},
-
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(sum(foo))`},
-					},
-					resp: respondWithEmptyVector(),
-				},
-
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(count(foo))`},
-					},
-					resp: respondWithEmptyVector(),
-				},
-
-				{
-					conds: []requestCondition{
-						requireQueryPath,
-						formCond{key: "query", value: `count(foo)`},
-					},
-					resp: respondWithEmptyVector(),
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo)`},
 					},
 					resp: respondWithEmptyMatrix(),
 				},

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.15.7
+
+### Fixed
+
+- `promql/series` check no longer runs duplicated checks on source metrics when
+  a query depends on a recording rule added in the same PR.
+
 ## v0.15.6
 
 ### Fixed
