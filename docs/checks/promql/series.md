@@ -38,10 +38,7 @@ alerting rule with matching name defined. For queries that don't pass any
 ## Your query is using recording rules
 
 If a metric isn't present in Prometheus but pint finds a recording rule
-with matching name then it will try to use that recording rule instead.
-
-This should help with CI checks where multiple rules are added at once
-and one depends on the other.
+with matching name then it will emit a warning and skip further checks.
 
 Example with alert rule that depends on two recording rules:
 
@@ -62,13 +59,12 @@ Example with alert rule that depends on two recording rules:
 If all three rules where added in a single PR and pint didn't try to match
 metrics to recording rule then `pint ci` would block such PR because metrics
 this alert is using are not present in Prometheus.
-By trying to match metrics to recording rules pint can use those rules
-as as substitute for missing metrics and better validate such PR.
+To avoid this pint will only emit a warning, to make it obvious that it was
+unable to run a full set of checks, but won't report any problems.
 
-**NOTE**: Checking recording rules instead of real metrics present in Prometheus
-can be less accurate and might not spot some issues, like missing labels.
-For most accurate validation via `pint ci` it's best to first add recording
-rules before adding alerting rules that depend on them.
+For best results you should split your PR and first add all recording rules
+before adding the alert that depends on it. Otherwise pint might miss some
+problems like label mismatch.
 
 ### Your query cannot return anything
 
