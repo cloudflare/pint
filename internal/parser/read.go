@@ -139,3 +139,22 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 
 	return out, nil
 }
+
+func GetComment(line, comment string) (s string, ok bool) {
+	sc := bufio.NewScanner(strings.NewReader(line))
+	for sc.Scan() {
+		elems := strings.Split(sc.Text(), "#")
+		lastComment := elems[len(elems)-1]
+		parts := strings.Split(removeRedundantSpaces(lastComment), " ")
+		if len(parts) < 2 {
+			continue
+		}
+		if parts[0] == "pint" && parts[1] == comment {
+			ok = true
+			if len(parts) > 2 {
+				s = strings.Join(parts[2:], " ")
+			}
+		}
+	}
+	return
+}

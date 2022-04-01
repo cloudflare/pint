@@ -56,9 +56,9 @@ or both:
 pint lint path/to/dir file.yml path/file.yml path/dir
 ```
 
-### Daemon
+### Watch mode
 
-Run the daemon:
+Run pint as a daemon in watch mode:
 
 ```shell
 pint watch rules.yml
@@ -91,6 +91,25 @@ Available metrics:
   `pint_problem` metrics.
 - `pint_problems` - this metric is the total number of all problems detected by pint,
   including those not exported due to the `--max-problems` flag.
+
+`pint problem` metric can include `owner` label for each rule. This is useful
+to route alerts based on metrics to the right team.
+To set a rule owner add a `# pint file/owner $owner` comment in a file, to set
+an owner for all rules in that file. You can also set an owner per rule, by adding
+`# pint rule/owner $owner` comment around given rule.
+
+Example:
+
+```yaml
+# pint file/owner bob
+
+- alert: ...
+  expr: ...
+
+# pint rule/owner alice
+- alert: ...
+  expr: ...
+```
 
 ## Release Notes
 

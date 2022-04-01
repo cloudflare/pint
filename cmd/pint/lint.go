@@ -14,10 +14,20 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var requireOwnerFlag = "require-owner"
+
 var lintCmd = &cli.Command{
 	Name:   "lint",
 	Usage:  "Lint specified files",
 	Action: actionLint,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:    requireOwnerFlag,
+			Aliases: []string{"r"},
+			Value:   false,
+			Usage:   "Require all rules to have an owner set via comment",
+		},
+	},
 }
 
 func actionLint(c *cli.Context) error {
@@ -39,6 +49,10 @@ func actionLint(c *cli.Context) error {
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
 	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
+
+	if c.Bool(requireOwnerFlag) {
+		summary.Reports = append(summary.Reports, verifyOwners(entries)...)
+	}
 
 	r := reporter.NewConsoleReporter(os.Stderr)
 	err = r.Submit(summary)
@@ -62,4 +76,32 @@ func actionLint(c *cli.Context) error {
 	}
 
 	return nil
+}
+
+func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
+	done := map[string]struct{}{}
+	for _, entry := range entries {
+		if _, ok := done[entry.Path]; ok {
+			continue
+		}
+
+		if entry.Owner == "" {
+			reports = append(reports, reporter.Report{
+				Path:          entry.Path,
+				ModifiedLines: []int{1},
+				Rule:          entry.Rule,
+				Problem: checks.Problem{
+					Lines:    []int{1},
+					Reporter: discovery.RuleOwnerComment,
+					Text: fmt.Sprintf(`%s comments are required in all files, please add a "# pint %s $owner" somewhere in this file and/or "# pint %s $owner" on top of each rule`,
+						discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
+					Severity: checks.Bug,
+				},
+			})
+		}
+
+		done[entry.Path] = struct{}{}
+	}
+
+	return
 }

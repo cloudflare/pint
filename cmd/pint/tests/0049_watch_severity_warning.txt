@@ -29,7 +29,7 @@ rule {
 }
 
 -- metrics.txt --
-pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",problem="alert query doesn't have any condition, it will always fire if the metric exists",reporter="alerts/comparison",severity="warning"} 1
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",problem="job label is required and should be preserved when aggregating \"^.+$\" rules, remove job from without()",reporter="promql/aggregate",severity="warning"} 1
-pint_problem{filename="rules/1.yml",kind="recording",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"} 1
+pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",owner="",problem="alert query doesn't have any condition, it will always fire if the metric exists",reporter="alerts/comparison",severity="warning"} 1
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="job label is required and should be preserved when aggregating \"^.+$\" rules, remove job from without()",reporter="promql/aggregate",severity="warning"} 1
+pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"} 1
 pint_problems 3

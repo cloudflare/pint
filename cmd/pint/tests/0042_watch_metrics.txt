@@ -8,15 +8,26 @@ sleep 3
 curl -s http://127.0.0.1:6042/metrics | grep -vE 'process_|go_info' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
 cat pint.pid | xargs kill
 
--- rules/1.yml --
+-- rules/unknown.yml --
 - record: broken
   expr: foo / count())
 
 - record: aggregate
   expr: sum(foo) without(job)
 
-- alert: comparison
-  expr: foo
+-- rules/bob.yml --
+# pint file/owner bob
+
+- alert: ok
+  expr: foo > 0
+
+- alert: broken
+  expr: foo / count())
+
+-- rules/alice.yml --
+- alert: broken
+  expr: foo / count())
+  # pint rule/owner alice
 
 -- .pint.hcl --
 rule {
@@ -277,7 +288,9 @@ pint_check_iterations_total
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{filename="rules/1.yml",kind="recording",name="broken",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken",owner="bob",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems

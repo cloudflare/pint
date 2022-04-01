@@ -1,0 +1,34 @@
+pint.error --no-color lint --require-owner rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="File parsed" path=rules/1.yml rules=2
+level=info msg="File parsed" path=rules/2.yml rules=1
+level=info msg="File parsed" path=rules/3.yml rules=1
+rules/1.yml:1: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+- alert: No Owner
+
+rules/3.yml:1: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+- alert: No Owner
+
+level=info msg="Problems found" Bug=2
+level=fatal msg="Fatal error" error="problems found"
+-- rules/1.yml --
+- alert: No Owner
+  expr: up > 0
+# pint rule/owner bob
+- alert: Owner Set
+  expr: up == 0
+
+-- rules/2.yml --
+- alert: Owner Set
+  expr: up{job="foo"} == 0
+
+# pint file/owner bob
+
+-- rules/3.yml --
+- alert: No Owner
+  expr: up{job="foo"} == 0
+
+# pint rule/owner bob

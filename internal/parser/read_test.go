@@ -151,3 +151,85 @@ func TestReadContent(t *testing.T) {
 		})
 	}
 }
+
+func TestGetComment(t *testing.T) {
+	type testCaseT struct {
+		input   string
+		comment string
+		output  string
+		ok      bool
+	}
+
+	testCases := []testCaseT{
+		{
+			input:   "",
+			comment: "rule/owner",
+		},
+		{
+			input:   "\n",
+			comment: "rule/owner",
+		},
+		{
+			input:   "\n \n",
+			comment: "rule/owner",
+		},
+		{
+			input:   "foo bar",
+			comment: "rule/owner",
+		},
+		{
+			input:   "foo bar\n",
+			comment: "rule/owner",
+		},
+		{
+			input:   "line1\nline2",
+			comment: "rule/owner",
+		},
+		{
+			input:   "line1\nline2\n",
+			comment: "rule/owner",
+		},
+		{
+			input:   "line1\n\nline2\n\n",
+			comment: "rule/owner",
+		},
+		{
+			input:   "# pint rule/owner",
+			comment: "rule/owner",
+			ok:      true,
+			output:  "",
+		},
+		{
+			input:   "# pint rule/owner foo",
+			comment: "rule/owner",
+			ok:      true,
+			output:  "foo",
+		},
+		{
+			input:   "# pint rule/owner foo bar bob/alice",
+			comment: "rule/owner",
+			ok:      true,
+			output:  "foo bar bob/alice",
+		},
+		{
+			input:   "line1\n  # pint rule/owner foo bar bob/alice\n line2\n\n",
+			comment: "rule/owner",
+			ok:      true,
+			output:  "foo bar bob/alice",
+		},
+		{
+			input:   "line1\n  ####    pint rule/owner    foo bar bob/alice\n line2\n\n",
+			comment: "rule/owner",
+			ok:      true,
+			output:  "foo bar bob/alice",
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
+			output, ok := parser.GetComment(string(tc.input), tc.comment)
+			require.Equal(t, tc.ok, ok)
+			require.Equal(t, tc.output, output)
+		})
+	}
+}
