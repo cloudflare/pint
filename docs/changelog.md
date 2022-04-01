@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.16.1
+
+### Fixed
+
+- Fixed false positive reports from `alerts/template` check when `absent()` function
+  is receiving labels from a binary expression.
+
 ## v0.16.0
 
 ### Added

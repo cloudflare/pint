@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/timestamp"
+	promParser "github.com/prometheus/prometheus/promql/parser"
 	promTemplate "github.com/prometheus/prometheus/template"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -140,7 +141,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 			}
 
 			for _, call := range absentCalls {
-				if len(utils.HasOuterAggregation(call)) > 0 {
+				if len(utils.HasOuterAggregation(call.Fragment)) > 0 {
 					continue
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false) {
@@ -181,7 +182,14 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 			}
 
 			for _, call := range absentCalls {
-				if len(utils.HasOuterAggregation(call)) > 0 {
+				if len(utils.HasOuterAggregation(call.Fragment)) > 0 {
+					continue
+				}
+				if call.BinExpr != nil &&
+					call.BinExpr.VectorMatching != nil &&
+					(call.BinExpr.VectorMatching.Card == promParser.CardManyToOne ||
+						call.BinExpr.VectorMatching.Card == promParser.CardOneToMany) &&
+					len(call.BinExpr.VectorMatching.Include) == 0 {
 					continue
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false) {
@@ -350,16 +358,22 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 	return
 }
 
-func absentLabels(node *parser.PromQLNode) []string {
+func absentLabels(f utils.PromQLFragment) []string {
 	labelMap := map[string]struct{}{}
 
-	for _, child := range node.Children {
+	for _, child := range f.Fragment.Children {
 		for _, v := range utils.HasVectorSelector(child) {
 			for _, lm := range v.LabelMatchers {
 				if lm.Type == labels.MatchEqual {
 					labelMap[lm.Name] = struct{}{}
 				}
 			}
+		}
+	}
+
+	if f.BinExpr != nil && f.BinExpr.VectorMatching != nil {
+		for _, name := range f.BinExpr.VectorMatching.Include {
+			labelMap[name] = struct{}{}
 		}
 	}
 
