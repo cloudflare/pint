@@ -10,9 +10,14 @@ import (
 )
 
 func TestHasOuterAbsent(t *testing.T) {
+	type callT struct {
+		call    string
+		binExpr string
+	}
+
 	type testCaseT struct {
 		expr   string
-		output []string
+		output []callT
 	}
 
 	testCases := []testCaseT{
@@ -21,31 +26,83 @@ func TestHasOuterAbsent(t *testing.T) {
 		},
 		{
 			expr:   "absent(foo)",
-			output: []string{"absent(foo)"},
+			output: []callT{{call: "absent(foo)"}},
 		},
 		{
 			expr:   `absent(foo{job="bar"})`,
-			output: []string{`absent(foo{job="bar"})`},
+			output: []callT{{call: `absent(foo{job="bar"})`}},
 		},
 		{
-			expr:   `absent(foo{job="bar"}) AND on(job) bar`,
-			output: []string{`absent(foo{job="bar"})`},
+			expr: `absent(foo{job="bar"}) AND on(job) bar`,
+			output: []callT{{
+				call: `absent(foo{job="bar"})`,
+			}},
 		},
 		{
-			expr:   `vector(1) or absent(foo{job="bar"}) AND on(job) bar`,
-			output: []string{`absent(foo{job="bar"})`},
+			expr: `vector(1) or absent(foo{job="bar"}) AND on(job) bar`,
+			output: []callT{
+				{call: `absent(foo{job="bar"})`},
+			},
 		},
 		{
-			expr:   `up == 0 or absent(foo{job="bar"}) AND on(job) bar`,
-			output: []string{`absent(foo{job="bar"})`},
+			expr: `up == 0 or absent(foo{job="bar"}) AND on(job) bar`,
+			output: []callT{{
+				call: `absent(foo{job="bar"})`,
+			}},
 		},
 		{
-			expr:   `up == 0 or absent(foo{job="bar"}) or absent(bar)`,
-			output: []string{`absent(foo{job="bar"})`, `absent(bar)`},
+			expr: `up == 0 or absent(foo{job="bar"}) or absent(bar)`,
+			output: []callT{
+				{call: `absent(foo{job="bar"})`},
+				{call: `absent(bar)`},
+			},
 		},
 		{
-			expr:   `absent(sum(nonexistent{job="myjob"}))`,
-			output: []string{`absent(sum(nonexistent{job="myjob"}))`},
+			expr: `absent(sum(nonexistent{job="myjob"}))`,
+			output: []callT{
+				{call: `absent(sum(nonexistent{job="myjob"}))`},
+			},
+		},
+		{
+			expr: `up == 0 or absent(foo{job="bar"}) * on(job) group_left(xxx) bar`,
+			output: []callT{{
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `absent(foo{job="bar"}) * on(job) group_left(xxx) bar`,
+			}},
+		},
+		{
+			expr: `bar * on() group_left(xxx) absent(foo{job="bar"})`,
+			output: []callT{{
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `bar * on() group_left(xxx) absent(foo{job="bar"})`,
+			}},
+		},
+		{
+			expr: `up == 0 or absent(foo{job="bar"}) * on(job) group_left() bar`,
+			output: []callT{{
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `absent(foo{job="bar"}) * on(job) group_left() bar`,
+			}},
+		},
+		{
+			expr: `bar * on() group_right(xxx) absent(foo{job="bar"})`,
+			output: []callT{{
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `bar * on() group_right(xxx) absent(foo{job="bar"})`,
+			}},
+		},
+		{
+			expr: `absent(foo{job="bar"}) * on(job) group_right(xxx) bar`,
+			output: []callT{{
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `absent(foo{job="bar"}) * on(job) group_right(xxx) bar`,
+			}},
+		},
+		{
+			expr: `absent(foo{job="bar"}) OR bar`,
+			output: []callT{{
+				call: `absent(foo{job="bar"})`,
+			}},
 		},
 	}
 
@@ -62,9 +119,16 @@ func TestHasOuterAbsent(t *testing.T) {
 					t.Errorf("HasOuterAbsent() returned nil, expected %s", tc.output)
 				}
 			} else {
-				output := []string{}
+				output := []callT{}
 				for _, a := range calls {
-					output = append(output, a.Node.String())
+					var c callT
+					if a.Fragment != nil {
+						c.call = a.Fragment.Node.String()
+					}
+					if a.BinExpr != nil {
+						c.binExpr = a.BinExpr.String()
+					}
+					output = append(output, c)
 				}
 				require.Equal(t, tc.output, output, "HasOuterAbsent() returned wrong output")
 			}

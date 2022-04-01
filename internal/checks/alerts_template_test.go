@@ -326,6 +326,22 @@ func TestTemplateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "label missing from metrics (without)",
+			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  labels:\n    summary: '{{ $labels.job }}'\n",
+			checker:     newTemplateCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `summary: {{ $labels.job }}`,
+						Lines:    []int{2, 4},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "job" label but the query removes it`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
 			description: "annotation label missing from metrics (or)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) by(job) or sum(bar)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
@@ -515,6 +531,50 @@ func TestTemplateCheck(t *testing.T) {
 					},
 				}
 			},
+		},
+		{
+			description: "absent() * on() group_left(...) foo",
+			content: `
+- alert: Foo
+  expr: absent(foo{job="xxx"}) * on() group_left(cluster, env) bar
+  annotations:
+    summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+`,
+			checker:  newTemplateCheck,
+			problems: noProblems,
+		},
+		{
+			description: "absent() * on() group_left() bar",
+			content: `
+- alert: Foo
+  expr: absent(foo{job="xxx"}) * on() group_left() bar
+  annotations:
+    summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+`,
+			checker:  newTemplateCheck,
+			problems: noProblems,
+		},
+		{
+			description: "bar * on() group_right(...) absent()",
+			content: `
+- alert: Foo
+  expr: bar * on() group_right(cluster, env) absent(foo{job="xxx"})
+  annotations:
+    summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+`,
+			checker:  newTemplateCheck,
+			problems: noProblems,
+		},
+		{
+			description: "bar * on() group_right() absent()",
+			content: `
+- alert: Foo
+  expr: bar * on() group_right() absent(foo{job="xxx"})
+  annotations:
+    summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+`,
+			checker:  newTemplateCheck,
+			problems: noProblems,
 		},
 	}
 	runTests(t, testCases)
