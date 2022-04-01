@@ -341,6 +341,21 @@ func (r Rule) HasComment(comment string) bool {
 	return false
 }
 
+func (r Rule) GetComment(comment string) (string, bool) {
+	var comments []string
+	if r.RecordingRule != nil {
+		comments = r.RecordingRule.Comments()
+	} else if r.AlertingRule != nil {
+		comments = r.AlertingRule.Comments()
+	}
+	for _, c := range comments {
+		if val, ok := GetComment(c, comment); ok {
+			return val, ok
+		}
+	}
+	return "", false
+}
+
 type Result struct {
 	Path    string
 	Error   error

@@ -25,7 +25,7 @@ func TestGlobPathFinder(t *testing.T) {
 	}
 
 	p := parser.NewParser()
-	testRuleBody := "- record: foo\n  expr: sum(foo)\n"
+	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
 	testRules, err := p.Parse([]byte(testRuleBody))
 	require.NoError(t, err)
 
@@ -60,18 +60,20 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder("*"),
 			entries: []discovery.Entry{
 				{
-					Path: "bar.yml",
-					Rule: testRules[0],
+					Path:  "bar.yml",
+					Rule:  testRules[0],
+					Owner: "bob",
 				},
 			},
 		},
 		{
-			files:  map[string]string{"foo/bar.yml": testRuleBody},
+			files:  map[string]string{"foo/bar.yml": testRuleBody + "\n\n# pint file/owner alice\n"},
 			finder: discovery.NewGlobFinder("*"),
 			entries: []discovery.Entry{
 				{
-					Path: "foo/bar.yml",
-					Rule: testRules[0],
+					Path:  "foo/bar.yml",
+					Rule:  testRules[0],
+					Owner: "alice",
 				},
 			},
 		},

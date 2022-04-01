@@ -8,6 +8,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	FileOwnerComment = "file/owner"
+	RuleOwnerComment = "rule/owner"
+)
+
 type RuleFinder interface {
 	Find() ([]Entry, error)
 }
@@ -17,6 +22,7 @@ type Entry struct {
 	PathError     error
 	ModifiedLines []int
 	Rule          parser.Rule
+	Owner         string
 }
 
 func readFile(path string) (entries []Entry, err error) {
@@ -33,6 +39,8 @@ func readFile(path string) (entries []Entry, err error) {
 		return nil, err
 	}
 
+	fileOwner, _ := parser.GetComment(string(content), FileOwnerComment)
+
 	rules, err := p.Parse(content)
 	if err != nil {
 		log.Error().Str("path", path).Err(err).Msg("Failed to parse file content")
@@ -44,9 +52,14 @@ func readFile(path string) (entries []Entry, err error) {
 	}
 
 	for _, rule := range rules {
+		owner, ok := rule.GetComment(RuleOwnerComment)
+		if !ok {
+			owner = fileOwner
+		}
 		entries = append(entries, Entry{
-			Path: path,
-			Rule: rule,
+			Path:  path,
+			Rule:  rule,
+			Owner: owner,
 		})
 	}
 

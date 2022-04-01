@@ -140,6 +140,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 						Text:     job.entry.Rule.Error.Err.Error(),
 						Severity: checks.Fatal,
 					},
+					Owner: job.entry.Owner,
 				}
 				continue
 			} else {
@@ -153,6 +154,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 						ModifiedLines: job.entry.ModifiedLines,
 						Rule:          job.entry.Rule,
 						Problem:       problem,
+						Owner:         job.entry.Owner,
 					}
 				}
 			}

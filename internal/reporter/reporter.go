@@ -11,6 +11,7 @@ type Report struct {
 	ModifiedLines []int
 	Rule          parser.Rule
 	Problem       checks.Problem
+	Owner         string
 }
 
 type Summary struct {

@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.16.0
+
+### Added
+
+- When running `pint watch` exported metric can include `owner` label for each rule.
+  This is useful to route alerts based on `pint_problem` metrics to the right team.
+  To set a rule owner add a `# pint file/owner $owner` comment in a file, to set
+  an owner for all rules in that file. You can also set an owner per rule, by adding
+  `# pint rule/owner $owner` comment around given rule.
+  To enforce ownership comments in all files pass `--require-owner` flag to `pint lint`.
+
 ## v0.15.7
 
 ### Fixed
