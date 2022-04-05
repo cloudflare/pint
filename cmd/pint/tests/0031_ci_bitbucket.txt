@@ -43,6 +43,9 @@ exec sh -c 'cat ../server.pid | xargs kill'
   for: 0s
 
 -- src/.pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 ci {
   baseBranch = "main"
 }
