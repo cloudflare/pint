@@ -5,16 +5,19 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
-func NewGlobFinder(patterns ...string) GlobFinder {
+func NewGlobFinder(patterns []string, relaxed []*regexp.Regexp) GlobFinder {
 	return GlobFinder{
 		patterns: patterns,
+		relaxed:  relaxed,
 	}
 }
 
 type GlobFinder struct {
 	patterns []string
+	relaxed  []*regexp.Regexp
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
@@ -47,9 +50,9 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 	}
 
 	for _, path := range paths {
-		e, err := readFile(path)
+		e, err := readFile(path, !matchesAny(f.relaxed, path))
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid file syntax: %w", err)
 		}
 		entries = append(entries, e...)
 	}

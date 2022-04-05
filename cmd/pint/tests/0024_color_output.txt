@@ -133,6 +133,9 @@ level=fatal msg="Fatal error" [36merror=[0m[31m"problems found"[0m
   expr: up == 0
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
     match {
       kind = "recording"

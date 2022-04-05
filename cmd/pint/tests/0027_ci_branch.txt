@@ -43,3 +43,6 @@ level=fatal msg="Fatal error" error="problems found"
 ci {
   baseBranch = "main"
 }
+parser {
+  relaxed = [".*"]
+}

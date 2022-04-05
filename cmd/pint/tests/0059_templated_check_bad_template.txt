@@ -10,6 +10,9 @@ level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": t
   expr: up == 0
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
   match {
     for = "> 0"

@@ -10,12 +10,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewGitBranchFinder(gitCmd git.CommandRunner, include []*regexp.Regexp, baseBranch string, maxCommits int) GitBranchFinder {
+func NewGitBranchFinder(
+	gitCmd git.CommandRunner,
+	include []*regexp.Regexp,
+	baseBranch string,
+	maxCommits int,
+	relaxed []*regexp.Regexp,
+) GitBranchFinder {
 	return GitBranchFinder{
 		gitCmd:     gitCmd,
 		include:    include,
 		baseBranch: baseBranch,
 		maxCommits: maxCommits,
+		relaxed:    relaxed,
 	}
 }
 
@@ -24,6 +31,7 @@ type GitBranchFinder struct {
 	include    []*regexp.Regexp
 	baseBranch string
 	maxCommits int
+	relaxed    []*regexp.Regexp
 }
 
 func (f GitBranchFinder) Find() (entries []Entry, err error) {
@@ -99,7 +107,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			alloweLines = append(alloweLines, lb.Line)
 		}
 
-		els, err := readFile(path)
+		els, err := readFile(path, !matchesAny(f.relaxed, path))
 		if err != nil {
 			return nil, err
 		}

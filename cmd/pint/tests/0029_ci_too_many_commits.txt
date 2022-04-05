@@ -46,3 +46,6 @@ ci {
   maxCommits = 2
   baseBranch = "main"
 }
+parser {
+  relaxed = [".*"]
+}

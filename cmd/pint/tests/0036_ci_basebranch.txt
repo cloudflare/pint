@@ -28,3 +28,6 @@ level=info msg="Running from base branch, skipping checks" branch=main
 ci {
   baseBranch = "main"
 }
+parser {
+  relaxed = [".*"]
+}

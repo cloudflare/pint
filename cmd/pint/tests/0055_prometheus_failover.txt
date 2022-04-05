@@ -19,6 +19,9 @@ prometheus "prom" {
   timeout  = "5s"
   required = true
 }
+parser {
+  relaxed = [".*"]
+}
 
 -- prometheus.go --
 package main

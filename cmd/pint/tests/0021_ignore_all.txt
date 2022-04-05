@@ -13,6 +13,9 @@ level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": i
   expr: sum(bar) without(job)
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
     ignore {}
     aggregate ".+" {

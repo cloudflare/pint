@@ -1276,6 +1276,12 @@ func TestConfigErrors(t *testing.T) {
 }`,
 			err: `not a valid duration string: "!1s"`,
 		},
+		{
+			config: `parser {
+  relaxed = ["foo", ".+", "(.+++)"]
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
 	}
 
 	dir := t.TempDir()

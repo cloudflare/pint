@@ -39,3 +39,6 @@ ci {
   baseBranch = "main"
   include = ["xxx"]
 }
+parser {
+  relaxed = [".*"]
+}

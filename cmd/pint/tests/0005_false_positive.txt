@@ -12,6 +12,9 @@ level=info msg="File parsed" path=rules/0001.yml rules=2
   expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[10m])) without (instance))
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
     aggregate ".+" {
         keep = [ "job" ]

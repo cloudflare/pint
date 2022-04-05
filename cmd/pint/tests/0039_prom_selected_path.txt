@@ -27,6 +27,9 @@ level=info msg="Problems found" Warning=1
   expr: count(foo) > 0
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 prometheus "disabled" {
   uri     = "http://127.0.0.1:123"
   timeout = "5s"

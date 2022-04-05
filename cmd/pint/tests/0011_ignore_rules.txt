@@ -58,6 +58,9 @@ level=fatal msg="Fatal error" error="problems found"
   expr: sum(errors_total) without(job)
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
     aggregate ".+" {
         keep = [ "job" ]

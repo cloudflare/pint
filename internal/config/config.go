@@ -18,6 +18,7 @@ import (
 
 type Config struct {
 	CI                *CI                `hcl:"ci,block" json:"ci,omitempty"`
+	Parser            *Parser            `hcl:"parser,block" json:"parser,omitempty"`
 	Repository        *Repository        `hcl:"repository,block" json:"repository,omitempty"`
 	Prometheus        []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Checks            *Checks            `hcl:"checks,block" json:"checks,omitempty"`
@@ -175,6 +176,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			MaxCommits: 20,
 			BaseBranch: "master",
 		},
+		Parser: &Parser{},
 		Checks: &Checks{
 			Enabled:  checks.CheckNames,
 			Disabled: []string{},
@@ -192,6 +194,12 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 
 	if cfg.CI != nil {
 		if err = cfg.CI.validate(); err != nil {
+			return cfg, err
+		}
+	}
+
+	if cfg.Parser != nil {
+		if err = cfg.Parser.validate(); err != nil {
 			return cfg, err
 		}
 	}

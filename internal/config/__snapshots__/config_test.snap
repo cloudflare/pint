@@ -5,6 +5,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -33,6 +34,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -69,6 +71,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -108,6 +111,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -147,6 +151,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -195,6 +200,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -226,6 +232,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -275,6 +282,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -324,6 +332,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -361,6 +370,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -416,6 +426,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -489,6 +500,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -559,6 +571,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -607,6 +620,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -656,6 +670,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -705,6 +720,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -754,6 +770,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -803,6 +820,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -852,6 +870,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -901,6 +920,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -950,6 +970,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1002,6 +1023,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1032,6 +1054,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1067,6 +1090,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1107,6 +1131,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1147,6 +1172,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1192,6 +1218,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -1232,6 +1259,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1275,6 +1303,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1318,6 +1347,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1361,6 +1391,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1404,6 +1435,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1447,6 +1479,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1490,6 +1523,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1518,6 +1552,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -1554,6 +1589,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -1594,6 +1630,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1639,6 +1676,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -1678,6 +1716,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -1717,6 +1756,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -1765,6 +1805,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1796,6 +1837,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1845,6 +1887,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1894,6 +1937,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -1931,6 +1975,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -1986,6 +2031,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2059,6 +2105,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -2129,6 +2176,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2177,6 +2225,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2226,6 +2275,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2275,6 +2325,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2324,6 +2375,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2373,6 +2425,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2422,6 +2475,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2471,6 +2525,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2520,6 +2575,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -2572,6 +2628,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -2602,6 +2659,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -2637,6 +2695,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -2677,6 +2736,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -2717,6 +2777,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2760,6 +2821,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2803,6 +2865,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2846,6 +2909,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2889,6 +2953,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2932,6 +2997,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -2975,6 +3041,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3003,6 +3070,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -3039,6 +3107,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -3079,6 +3148,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -3124,6 +3194,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -3163,6 +3234,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -3202,6 +3274,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -3250,6 +3323,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3281,6 +3355,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3330,6 +3405,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3379,6 +3455,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3416,6 +3493,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -3471,6 +3549,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3544,6 +3623,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -3614,6 +3694,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3662,6 +3743,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3711,6 +3793,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3760,6 +3843,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3809,6 +3893,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3858,6 +3943,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3907,6 +3993,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -3956,6 +4043,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4005,6 +4093,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4057,6 +4146,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4087,6 +4177,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4122,6 +4213,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4162,6 +4254,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4202,6 +4295,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4245,6 +4339,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4288,6 +4383,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4331,6 +4427,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4374,6 +4471,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4417,6 +4515,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4460,6 +4559,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4488,6 +4588,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -4524,6 +4625,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -4564,6 +4666,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4609,6 +4712,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -4648,6 +4752,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -4687,6 +4792,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -4735,6 +4841,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4766,6 +4873,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4815,6 +4923,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4864,6 +4973,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -4901,6 +5011,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -4956,6 +5067,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5029,6 +5141,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -5099,6 +5212,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5147,6 +5261,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5196,6 +5311,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5245,6 +5361,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5294,6 +5411,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5343,6 +5461,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5392,6 +5511,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5441,6 +5561,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5490,6 +5611,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -5542,6 +5664,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -5572,6 +5695,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -5607,6 +5731,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -5647,6 +5772,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -5687,6 +5813,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5730,6 +5857,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5773,6 +5901,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5816,6 +5945,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5859,6 +5989,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5902,6 +6033,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5945,6 +6077,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -5973,6 +6106,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -6009,6 +6143,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -6049,6 +6184,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -6094,6 +6230,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -6133,6 +6270,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -6172,6 +6310,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
@@ -6220,6 +6359,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6251,6 +6391,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6300,6 +6441,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6349,6 +6491,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6386,6 +6529,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -6441,6 +6585,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6514,6 +6659,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -6584,6 +6730,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6632,6 +6779,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6681,6 +6829,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6730,6 +6879,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6779,6 +6929,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6828,6 +6979,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6877,6 +7029,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6926,6 +7079,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -6975,6 +7129,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -7027,6 +7182,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -7057,6 +7213,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -7092,6 +7249,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -7132,6 +7290,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom1",
@@ -7172,6 +7331,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -7215,6 +7375,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -7258,6 +7419,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -7301,6 +7463,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -7344,6 +7507,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -7387,6 +7551,7 @@
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "checks": {
     "enabled": [
       "alerts/annotation",

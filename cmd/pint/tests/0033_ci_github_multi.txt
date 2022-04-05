@@ -50,6 +50,9 @@ exec sh -c 'cat ../server.pid | xargs kill'
 ci {
   baseBranch = "main"
 }
+parser {
+  relaxed = [".*"]
+}
 repository {
   github {
     baseuri   = "http://127.0.0.1:6033"

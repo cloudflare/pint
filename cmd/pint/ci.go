@@ -47,7 +47,7 @@ func actionCI(c *cli.Context) error {
 		return nil
 	}
 
-	finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits)
+	finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
 	entries, err := finder.Find()
 	if err != nil {
 		return err

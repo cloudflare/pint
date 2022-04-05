@@ -9,6 +9,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
     "maxCommits": 20,
     "baseBranch": "master"
   },
+  "parser": {},
   "prometheus": [
     {
       "name": "prom",
