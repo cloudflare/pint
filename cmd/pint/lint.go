@@ -60,7 +60,7 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	bySeverity := map[string]interface{}{}
+	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
 	var problems int
 	for s, c := range summary.CountBySeverity() {
 		bySeverity[s.String()] = c

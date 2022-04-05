@@ -110,7 +110,7 @@ func actionCI(c *cli.Context) error {
 	}
 
 	foundBugOrHigher := false
-	bySeverity := map[string]interface{}{}
+	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
 	for s, c := range summary.CountBySeverity() {
 		if s >= checks.Bug {
 			foundBugOrHigher = true

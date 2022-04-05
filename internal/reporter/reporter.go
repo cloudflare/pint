@@ -30,6 +30,9 @@ func (s Summary) HasFatalProblems() bool {
 func (s Summary) CountBySeverity() map[checks.Severity]int {
 	m := map[checks.Severity]int{}
 	for _, report := range s.Reports {
+		if !shouldReport(report) {
+			continue
+		}
 		if _, ok := m[report.Problem.Severity]; !ok {
 			m[report.Problem.Severity] = 0
 		}
@@ -53,5 +56,40 @@ func blameReports(reports []Report, gitCmd git.CommandRunner) (pb git.FileBlames
 			return
 		}
 	}
+	return
+}
+
+func shouldReport(report Report) bool {
+	if report.Problem.Severity == checks.Fatal {
+		return true
+	}
+
+	for _, pl := range report.Problem.Lines {
+		for _, ml := range report.ModifiedLines {
+			if pl == ml {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func reportedLine(report Report) (l int) {
+	l = -1
+	for _, pl := range report.Problem.Lines {
+		for _, ml := range report.ModifiedLines {
+			if pl == ml {
+				l = pl
+			}
+		}
+	}
+
+	if l < 0 && report.Problem.Severity == checks.Fatal {
+		for _, ml := range report.ModifiedLines {
+			return ml
+		}
+	}
+
 	return
 }

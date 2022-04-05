@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
+	"github.com/cloudflare/pint/internal/output"
 
 	"github.com/rs/zerolog/log"
 )
@@ -93,25 +94,15 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 }
 
 func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (annotations []BitBucketAnnotation) {
-	reportLine := -1
-	for _, pl := range report.Problem.Lines {
-		for _, ml := range report.ModifiedLines {
-			if pl == ml {
-				reportLine = pl
-			}
-		}
-	}
-	if reportLine < 0 && report.Problem.Severity == checks.Fatal {
-		for _, ml := range report.ModifiedLines {
-			reportLine = ml
-			break
-		}
-	}
-
-	if reportLine < 0 {
-		log.Debug().Str("path", report.Path).Msg("No file line found, skipping")
+	if !shouldReport(report) {
+		log.Debug().
+			Str("path", report.Path).
+			Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
+			Msg("Problem reported on unmodified line, skipping")
 		return
 	}
+
+	reportLine := reportedLine(report)
 
 	var severity, atype string
 	switch report.Problem.Severity {
