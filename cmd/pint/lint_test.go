@@ -30,7 +30,10 @@ func mockRules(dir string, filesCount, rulesPerFile int) error {
 }
 
 func mockConfig(configPath string) error {
-	content := `	
+	content := `
+parser {
+  relaxed = ["(.*)"]
+}
 rule {
   reject ".* +.*" {
     label_keys      = true

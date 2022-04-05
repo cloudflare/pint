@@ -21,5 +21,8 @@ prometheus "prom" {
   timeout  = "2m"
   required = false
 }
+parser {
+  relaxed = [".*"]
+}
 
 rule{}

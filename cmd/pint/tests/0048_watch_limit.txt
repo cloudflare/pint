@@ -19,6 +19,9 @@ cat pint.pid | xargs kill
   expr: foo
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
     match {
       kind = "recording"

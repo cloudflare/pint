@@ -30,6 +30,9 @@ cat pint.pid | xargs kill
   # pint rule/owner alice
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
     match {
       kind = "recording"

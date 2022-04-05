@@ -36,6 +36,36 @@ Rule fields are exposed as:
 
 Accessing a field that's not present in the rule will return an empty string.
 
+## Parser
+
+Configure how pint parses Prometheus rule files.
+
+Syntax:
+
+```js
+parser {
+  relaxed = [ "(.*)", ... ]
+}
+```
+
+- `relaxed` - by default pint will now parse all files in strict mode, where
+  all rule files must have the exact syntax Prometheus expects:
+
+  ```yaml
+  groups:
+  - name: example
+    rules:
+    - record: ...
+      expr: ...
+  ```
+
+  If you're using pint to lint rules that are embedded inside a different structure
+  you can set this option to allow fuzzy parsing, which will try to find rule
+  definitions anywhere in the file, without requiring `groups -> rules -> rule`
+  structure to be present.
+  This option takes a list of file patterns, all files matching those regexp rules
+  will be parsed in relaxed mode.
+
 ## CI
 
 Configure continuous integration environments.

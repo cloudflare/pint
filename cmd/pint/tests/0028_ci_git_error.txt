@@ -41,3 +41,6 @@ level=fatal msg="Fatal error" error="failed to get the list of commits to scan: 
 ci {
   baseBranch = "notmain"
 }
+parser {
+  relaxed = [".*"]
+}

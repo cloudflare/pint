@@ -18,6 +18,9 @@ level=fatal msg="Fatal error" error="problems found"
 - record: "colo:test2"
   expr: sum(foo) without(job)
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
     match {
         path = "rules/0002.yml"

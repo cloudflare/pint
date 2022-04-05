@@ -30,11 +30,13 @@ prometheus "prom1" {
   timeout = "5s"
   required = true
 }
-
 prometheus "prom2" {
   uri     = "http://127.0.0.1:1054"
   timeout = "5s"
   required = true
+}
+parser {
+  relaxed = [".*"]
 }
 
 -- metrics.txt --

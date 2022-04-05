@@ -2,6 +2,32 @@
 
 ## v0.17.0
 
+### Changed
+
+- By default pint will now parse all files in strict mode, where all rule files
+  must have the exact syntax Prometheus expects:
+
+  ```yaml
+  groups:
+  - name: example
+    rules:
+    - record: ...
+      expr: ...
+  ```
+
+  Previous releases were only looking for individual rules so `groups` object
+  wasn't required. Now pint will fail to read any file that doesn't follow
+  Prometheus syntax exactly.
+  To enable old behavior add `parser { relaxed = ["(.+)", ...]}` option in
+  the config file. See [Configuration](/docs/configuration.md) for details.
+  To enable old (relaxed) behavior for all files add:
+
+  ```yaml
+  parser {
+    relaxed = ["(.*)"]
+  }
+  ```
+
 ### Fixed
 
 - Improved `promql/vector_matching` checks to detect more issues.

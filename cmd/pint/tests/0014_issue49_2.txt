@@ -3,7 +3,13 @@ pint.ok --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/0001.yaml rules=1
 -- rules/0001.yaml --
 - record: down
   expr: up == 0
+
+-- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}

@@ -2,6 +2,10 @@ package discovery
 
 import (
 	"os"
+	"regexp"
+
+	"github.com/prometheus/prometheus/model/rulefmt"
+	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/parser"
 
@@ -25,7 +29,7 @@ type Entry struct {
 	Owner         string
 }
 
-func readFile(path string) (entries []Entry, err error) {
+func readFile(path string, isStrict bool) (entries []Entry, err error) {
 	p := parser.NewParser()
 
 	f, err := os.Open(path)
@@ -40,6 +44,19 @@ func readFile(path string) (entries []Entry, err error) {
 	}
 
 	fileOwner, _ := parser.GetComment(string(content), FileOwnerComment)
+
+	if isStrict {
+		var r rulefmt.RuleGroups
+		if err = yaml.Unmarshal(content, &r); err != nil {
+			log.Error().Str("path", path).Err(err).Msg("Failed to parse file content")
+			entries = append(entries, Entry{
+				Path:      path,
+				PathError: err,
+				Owner:     fileOwner,
+			})
+			return entries, nil
+		}
+	}
 
 	rules, err := p.Parse(content)
 	if err != nil {
@@ -65,4 +82,13 @@ func readFile(path string) (entries []Entry, err error) {
 
 	log.Info().Str("path", path).Int("rules", len(entries)).Msg("File parsed")
 	return entries, nil
+}
+
+func matchesAny(re []*regexp.Regexp, s string) bool {
+	for _, r := range re {
+		if v := r.MatchString(s); v {
+			return true
+		}
+	}
+	return false
 }

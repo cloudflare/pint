@@ -91,6 +91,9 @@ level=fatal msg="Fatal error" error="problems found"
     ignore: '$value is not a variable'
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
     annotation "url" {
         severity = "bug"

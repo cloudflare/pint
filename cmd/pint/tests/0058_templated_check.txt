@@ -30,6 +30,9 @@ level=fatal msg="Fatal error" error="problems found"
     alert_for: 4m
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
   match {
     for = "> 0"

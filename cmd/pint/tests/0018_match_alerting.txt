@@ -24,6 +24,9 @@ level=info msg="Problems found" Warning=2
   expr: sum(bar) without(job)
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
     match {
         kind = "alerting"

@@ -38,6 +38,9 @@ level=info msg="Problems found" Warning=2
     foo: bar
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
     match {
       label "foo" {

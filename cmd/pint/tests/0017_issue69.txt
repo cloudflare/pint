@@ -4273,6 +4273,9 @@ func main() {
   expr: up == 0
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
   match {
     kind = "alerting"

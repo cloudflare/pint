@@ -25,6 +25,9 @@ level=info msg="Problems found" Warning=2
   expr: sum(sum(errors_total) without(keep)) by(dropped)
 
 -- .pint.hcl --
+parser {
+  relaxed = ["rules/.*"]
+}
 rule {
     aggregate ".+" {
         keep = [ "keep" ]

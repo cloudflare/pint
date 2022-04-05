@@ -21,6 +21,9 @@ level=info msg="Problems found" Warning=1
   expr: foo
 
 -- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 rule {
     match {
       kind = "recording"

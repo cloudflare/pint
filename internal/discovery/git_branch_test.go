@@ -82,6 +82,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 				"main",
 				0,
+				nil,
 			),
 			err: "failed to get the list of commits to scan: mock error",
 		},
@@ -99,6 +100,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 				"main",
 				0,
+				nil,
 			),
 			err: "failed to get the list of modified files from git: mock error",
 		},
@@ -122,6 +124,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 				"main",
 				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
 			err: "failed to run git blame for foo.yml: mock error",
 		},
@@ -150,6 +153,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 				"main",
 				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
 			err: "open foo.yml: no such file or directory",
 		},
@@ -180,6 +184,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 				"main",
 				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
 			rules: map[string][]string{"foo.yml": {"first", "second"}},
 		},
@@ -282,6 +287,7 @@ R090    foo/c2c.yml         c2c.yml
 				},
 				"main",
 				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
 			rules: map[string][]string{
 				"foo/c1a.yml": {"first", "third"},
@@ -292,6 +298,37 @@ R090    foo/c2c.yml         c2c.yml
 				"c3c.yml":     {"first", "second", "third"},
 				"c3d.yml":     {"first", "second", "third"},
 			},
+		},
+		{
+			files: map[string]string{
+				"foo.yml": testRuleBody,
+			},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "blame --line-porcelain -- foo.yml":
+						return blame(map[string][]blameRange{
+							"foo.yml": {
+								{sha: "commitX", lines: []int{1, 3, 4, 5, 6, 9, 10, 11, 12}},
+								{sha: "commit1", lines: []int{2, 7, 8}},
+							},
+						}), nil
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+				nil,
+			),
+			rules: map[string][]string{},
 		},
 	}
 
