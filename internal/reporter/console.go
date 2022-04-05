@@ -12,6 +12,7 @@ import (
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 )
 
 func NewConsoleReporter(output io.Writer) ConsoleReporter {
@@ -49,6 +50,14 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 
 	perFile := map[string][]string{}
 	for _, report := range reps {
+		if !shouldReport(report) {
+			log.Debug().
+				Str("path", report.Path).
+				Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
+				Msg("Problem reported on unmodified line, skipping")
+			continue
+		}
+
 		if _, ok := perFile[report.Path]; !ok {
 			perFile[report.Path] = []string{}
 		}

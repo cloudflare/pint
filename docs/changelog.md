@@ -36,6 +36,7 @@
 ### Fixed
 
 - Improved `promql/vector_matching` checks to detect more issues.
+- Fixed reporting of problems detected on unmodified lines when running `pint ci`.
 
 ## v0.16.1
 

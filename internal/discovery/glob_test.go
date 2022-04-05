@@ -66,9 +66,10 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, []*regexp.Regexp{regexp.MustCompile(".*")}),
 			entries: []discovery.Entry{
 				{
-					Path:  "bar.yml",
-					Rule:  testRules[0],
-					Owner: "bob",
+					Path:          "bar.yml",
+					Rule:          testRules[0],
+					ModifiedLines: testRules[0].Lines(),
+					Owner:         "bob",
 				},
 			},
 		},
@@ -77,9 +78,10 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, []*regexp.Regexp{regexp.MustCompile(".*")}),
 			entries: []discovery.Entry{
 				{
-					Path:  "foo/bar.yml",
-					Rule:  testRules[0],
-					Owner: "alice",
+					Path:          "foo/bar.yml",
+					Rule:          testRules[0],
+					ModifiedLines: testRules[0].Lines(),
+					Owner:         "alice",
 				},
 			},
 		},
@@ -88,9 +90,10 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, nil),
 			entries: []discovery.Entry{
 				{
-					Path:      "bar.yml",
-					PathError: strictErr,
-					Owner:     "bob",
+					Path:          "bar.yml",
+					PathError:     strictErr,
+					ModifiedLines: []int{0},
+					Owner:         "bob",
 				},
 			},
 		},

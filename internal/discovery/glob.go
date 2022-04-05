@@ -50,11 +50,14 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 	}
 
 	for _, path := range paths {
-		e, err := readFile(path, !matchesAny(f.relaxed, path))
+		el, err := readFile(path, !matchesAny(f.relaxed, path))
 		if err != nil {
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
 		}
-		entries = append(entries, e...)
+		for _, e := range el {
+			e.ModifiedLines = e.Rule.Lines()
+			entries = append(entries, e)
+		}
 	}
 
 	return entries, nil
