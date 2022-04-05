@@ -139,3 +139,11 @@ func CurrentBranch(cmd CommandRunner) (string, error) {
 	}
 	return strings.Trim(string(commit), "\n"), nil
 }
+
+func CommitMessage(cmd CommandRunner, sha string) (string, error) {
+	msg, err := cmd("show", "-s", "--format=%B", sha)
+	if err != nil {
+		return "", err
+	}
+	return string(msg), err
+}

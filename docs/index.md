@@ -34,6 +34,9 @@ the issue. If you are using GitHub API then each issue will appear as a comment 
 Exit code will be one (1) if any issues were detected with severity `Bug` or higher. This permits running
 `pint` in your CI system whilst at the same you will get detailed reports on your source control system.
 
+If any commit on the PR contains `[skip ci]` or `[no ci]` somewhere in the commit message then pint will
+skip running all checks.
+
 ### Ad-hoc
 
 Lint specified files and report any found issue.

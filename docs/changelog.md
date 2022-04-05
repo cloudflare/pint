@@ -2,6 +2,11 @@
 
 ## v0.17.0
 
+### Added
+
+- When running `pint ci` all checks will be skipped if any commit contains
+  `[skip ci]` or `[no ci]` string in the commit message.
+
 ### Changed
 
 - By default pint will now parse all files in strict mode, where all rule files

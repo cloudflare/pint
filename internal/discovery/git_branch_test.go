@@ -113,6 +113,32 @@ func TestGitBranchFinder(t *testing.T) {
 						return []byte("commit1\n"), nil
 					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
 						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return nil, fmt.Errorf("mock error")
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
+			),
+			err: "failed to get commit message for commit1: mock error",
+		},
+		{
+			files: map[string]string{},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo"), nil
 					case "blame --line-porcelain -- foo.yml":
 						return nil, fmt.Errorf("mock error")
 					default:
@@ -137,6 +163,8 @@ func TestGitBranchFinder(t *testing.T) {
 						return []byte("commit1\n"), nil
 					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
 						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo"), nil
 					case "blame --line-porcelain -- foo.yml":
 						return blame(map[string][]blameRange{
 							"foo.yml": {
@@ -168,6 +196,8 @@ func TestGitBranchFinder(t *testing.T) {
 						return []byte("commit1\n"), nil
 					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
 						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo"), nil
 					case "blame --line-porcelain -- foo.yml":
 						return blame(map[string][]blameRange{
 							"foo.yml": {
@@ -226,6 +256,12 @@ C50     foo/cp1.yml         c3d.yml
 D       foo/c2b.yml
 R090    foo/c2c.yml         c2c.yml
 `), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo"), nil
+					case "show -s --format=%B commit2":
+						return []byte("bar"), nil
+					case "show -s --format=%B commit3":
+						return []byte("foo"), nil
 					case "blame --line-porcelain -- foo/c1a.yml":
 						return blame(map[string][]blameRange{
 							"foo/c1a.yml": {
@@ -310,6 +346,8 @@ R090    foo/c2c.yml         c2c.yml
 						return []byte("commit1\n"), nil
 					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
 						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo"), nil
 					case "blame --line-porcelain -- foo.yml":
 						return blame(map[string][]blameRange{
 							"foo.yml": {
@@ -327,6 +365,58 @@ R090    foo/c2c.yml         c2c.yml
 				"main",
 				0,
 				nil,
+			),
+			rules: map[string][]string{},
+		},
+		{
+			files: map[string]string{
+				"foo.yml": testRuleBody,
+			},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo [skip ci] bar"), nil
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
+			),
+			rules: map[string][]string{},
+		},
+		{
+			files: map[string]string{
+				"foo.yml": testRuleBody,
+			},
+			finder: discovery.NewGitBranchFinder(
+				func(args ...string) ([]byte, error) {
+					switch strings.Join(args, " ") {
+					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
+						return []byte("commit1\n"), nil
+					case "log --reverse --no-merges --pretty=format:%H --name-status commit1^..commit1":
+						return []byte("commit1\nM       foo.yml\n"), nil
+					case "show -s --format=%B commit1":
+						return []byte("foo [no ci] bar"), nil
+					default:
+						t.Errorf("unknown args: %v", args)
+						t.FailNow()
+						return nil, nil
+					}
+				},
+				nil,
+				"main",
+				0,
+				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
 			rules: map[string][]string{},
 		},
