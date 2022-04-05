@@ -70,6 +70,20 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			if !f.isPathAllowed(dstPath) {
 				continue
 			}
+
+			msg, err := git.CommitMessage(f.gitCmd, commit)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
+			}
+			if strings.Contains(msg, "[skip ci]") {
+				log.Info().Str("commit", commit).Msg("Found a commit with '[skip ci]', skipping all checks")
+				return []Entry{}, nil
+			}
+			if strings.Contains(msg, "[no ci]") {
+				log.Info().Str("commit", commit).Msg("Found a commit with '[no ci]', skipping all checks")
+				return []Entry{}, nil
+			}
+
 			if _, ok := pathCommits[dstPath]; !ok {
 				pathCommits[dstPath] = map[string]struct{}{}
 			}
