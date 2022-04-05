@@ -22,6 +22,10 @@ func usingMismatchText(f, l, r string) string {
 	return fmt.Sprintf(`using %s won't produce any results because both sides of the query have different labels: [%s] != [%s]`, f, l, r)
 }
 
+func differentFilters(k, lv, rv string) string {
+	return fmt.Sprintf("left hand side uses {%s=%q} while right hand side uses {%s=%q}, this will never match", k, lv, k, rv)
+}
+
 func TestVectorMatchingCheck(t *testing.T) {
 	testCases := []checkTest{
 		{
@@ -1075,6 +1079,159 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 				}
+			},
+		},
+		{
+			description: "error on topk1() left side",
+			content:     "- record: foo\n  expr: xxx/yyy\n",
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewVectorMatchingCheck(simpleProm("prom", uri, time.Second, true))
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "xxx/yyy",
+						Lines:    []int{2},
+						Reporter: checks.VectorMatchingCheckName,
+						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: server error: 500`),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(xxx / yyy)`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `topk(1, xxx)`},
+					},
+					resp: respondWithInternalError(),
+				},
+			},
+		},
+		{
+			description: "error on topk1() right side",
+			content:     "- record: foo\n  expr: xxx/yyy\n",
+			checker: func(uri string) checks.RuleChecker {
+				return checks.NewVectorMatchingCheck(simpleProm("prom", uri, time.Second, true))
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "xxx/yyy",
+						Lines:    []int{2},
+						Reporter: checks.VectorMatchingCheckName,
+						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: server error: 500`),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(xxx / yyy)`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `topk(1, xxx)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"__name__": "xxx",
+								"instance": "xx",
+								"job":      "xx",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `topk(1, yyy)`},
+					},
+					resp: respondWithInternalError(),
+				},
+			},
+		},
+		{
+			description: `up{job="a"} / up{job="b"}`,
+			content:     "- record: foo\n  expr: up{job=\"a\"} / up{job=\"b\"}\n",
+			checker:     newVectorMatchingCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="a"} / up{job="b"}`,
+						Lines:    []int{2},
+						Reporter: checks.VectorMatchingCheckName,
+						Text:     differentFilters("job", "a", "b"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(up{job="a"} / up{job="b"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+			},
+		},
+		{
+			description: `up{job="a"} / on() up{job="b"}`,
+			content:     "- record: foo\n  expr: up{job=\"a\"} / on() up{job=\"b\"}\n",
+			checker:     newVectorMatchingCheck,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(up{job="a"} / on() up{job="b"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `topk(1, up{job="a"})`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"__name__": "up",
+								"instance": "a",
+								"job":      "a",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `topk(1, up{job="b"})`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"__name__": "up",
+								"instance": "b",
+								"job":      "b",
+							}),
+						},
+					},
+				},
 			},
 		},
 	}

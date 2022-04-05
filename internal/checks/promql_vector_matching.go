@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -80,6 +81,41 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if !n.VectorMatching.On {
 			for _, name := range n.VectorMatching.MatchingLabels {
 				ignored = append(ignored, model.LabelName(name))
+			}
+		}
+
+		var lhsVec, rhsVec bool
+		lhsMatchers := map[string]string{}
+		if lhs, ok := n.LHS.(*promParser.VectorSelector); ok {
+			lhsVec = true
+			for _, lm := range lhs.LabelMatchers {
+				if lm.Name != labels.MetricName && lm.Type == labels.MatchEqual {
+					if n.VectorMatching.On != stringInSlice(n.VectorMatching.MatchingLabels, lm.Name) {
+						continue
+					}
+					lhsMatchers[lm.Name] = lm.Value
+				}
+			}
+		}
+		rhsMatchers := map[string]string{}
+		if rhs, ok := n.RHS.(*promParser.VectorSelector); ok {
+			rhsVec = true
+			for _, lm := range rhs.LabelMatchers {
+				if lm.Name != labels.MetricName && lm.Type == labels.MatchEqual {
+					rhsMatchers[lm.Name] = lm.Value
+				}
+			}
+		}
+		if lhsVec && rhsVec {
+			for k, lv := range lhsMatchers {
+				if rv, ok := rhsMatchers[k]; ok && rv != lv {
+					problems = append(problems, exprProblem{
+						expr:     node.Expr,
+						text:     fmt.Sprintf("left hand side uses {%s=%q} while right hand side uses {%s=%q}, this will never match", k, lv, k, rv),
+						severity: Bug,
+					})
+					return
+				}
 			}
 		}
 
