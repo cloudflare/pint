@@ -35,19 +35,22 @@ func TestHasOuterAbsent(t *testing.T) {
 		{
 			expr: `absent(foo{job="bar"}) AND on(job) bar`,
 			output: []callT{{
-				call: `absent(foo{job="bar"})`,
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `absent(foo{job="bar"}) and on(job) bar`,
 			}},
 		},
 		{
 			expr: `vector(1) or absent(foo{job="bar"}) AND on(job) bar`,
-			output: []callT{
-				{call: `absent(foo{job="bar"})`},
-			},
+			output: []callT{{
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `absent(foo{job="bar"}) and on(job) bar`,
+			}},
 		},
 		{
 			expr: `up == 0 or absent(foo{job="bar"}) AND on(job) bar`,
 			output: []callT{{
-				call: `absent(foo{job="bar"})`,
+				call:    `absent(foo{job="bar"})`,
+				binExpr: `absent(foo{job="bar"}) and on(job) bar`,
 			}},
 		},
 		{
@@ -71,11 +74,8 @@ func TestHasOuterAbsent(t *testing.T) {
 			}},
 		},
 		{
-			expr: `bar * on() group_left(xxx) absent(foo{job="bar"})`,
-			output: []callT{{
-				call:    `absent(foo{job="bar"})`,
-				binExpr: `bar * on() group_left(xxx) absent(foo{job="bar"})`,
-			}},
+			expr:   `bar * on() group_left(xxx) absent(foo{job="bar"})`,
+			output: []callT{},
 		},
 		{
 			expr: `up == 0 or absent(foo{job="bar"}) * on(job) group_left() bar`,
@@ -92,17 +92,30 @@ func TestHasOuterAbsent(t *testing.T) {
 			}},
 		},
 		{
-			expr: `absent(foo{job="bar"}) * on(job) group_right(xxx) bar`,
-			output: []callT{{
-				call:    `absent(foo{job="bar"})`,
-				binExpr: `absent(foo{job="bar"}) * on(job) group_right(xxx) bar`,
-			}},
+			expr:   `absent(foo{job="bar"}) * on(job) group_right(xxx) bar`,
+			output: []callT{},
 		},
 		{
 			expr: `absent(foo{job="bar"}) OR bar`,
 			output: []callT{{
 				call: `absent(foo{job="bar"})`,
 			}},
+		},
+		{
+			expr: `absent(foo{job="bar"}) OR absent(foo{job="bob"})`,
+			output: []callT{
+				{call: `absent(foo{job="bar"})`},
+				{call: `absent(foo{job="bob"})`},
+			},
+		},
+		{
+			expr: `absent(foo{job="bar"}) UNLESS absent(foo{job="bob"})`,
+			output: []callT{
+				{
+					call:    `absent(foo{job="bar"})`,
+					binExpr: `absent(foo{job="bar"}) unless absent(foo{job="bob"})`,
+				},
+			},
 		},
 	}
 

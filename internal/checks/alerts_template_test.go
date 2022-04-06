@@ -576,6 +576,17 @@ func TestTemplateCheck(t *testing.T) {
 			checker:  newTemplateCheck,
 			problems: noProblems,
 		},
+		{
+			description: "",
+			content: `
+- alert: Foo
+  expr: foo and on() absent(bar)
+  annotations:
+    summary: '{{ .Labels.job }} is missing'
+`,
+			checker:  newTemplateCheck,
+			problems: noProblems,
+		},
 	}
 	runTests(t, testCases)
 }
