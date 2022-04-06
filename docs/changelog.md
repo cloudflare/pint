@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.17.4
+
+### Fixed
+
+- Fixed false positive reports from `alerts/template` check when `absent()` is
+  used inside a binary expression.
+
 ## v0.17.3
 
 ### Fixed

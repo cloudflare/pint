@@ -24,30 +24,44 @@ func HasOuterAbsent(node *parser.PromQLNode) (calls []PromQLFragment) {
 			// bar / absent(foo)
 			// absent(foo) / bar
 			case promParser.CardOneToOne:
-			// CardManyToOne:
+
 			// absent(foo{job="bar"}) * on(job) group_left(xxx) bar
 			// bar * on() group_left(xxx) absent(foo{job="bar"})
-			// CardOneToMany
-			// bar * on() group_right(xxx) absent(foo{job="bar"})
-			// absent(foo{job="bar"}) * on(job) group_right(xxx) bar
-			case promParser.CardManyToOne, promParser.CardOneToMany:
+			case promParser.CardManyToOne:
 				if ln, ok := n.LHS.(*promParser.Call); ok && ln.Func.Name == "absent" {
 					calls = append(calls, PromQLFragment{
 						Fragment: node.Children[0],
 						BinExpr:  n,
 					})
 				}
+
+			// bar * on() group_right(xxx) absent(foo{job="bar"})
+			// absent(foo{job="bar"}) * on(job) group_right(xxx) bar
+			case promParser.CardOneToMany:
 				if rn, ok := n.RHS.(*promParser.Call); ok && rn.Func.Name == "absent" {
 					calls = append(calls, PromQLFragment{
 						Fragment: node.Children[1],
 						BinExpr:  n,
 					})
 				}
+
 			// bar AND absent(foo{job="bar"})
+			// bar OR absent(foo{job="bar"})
+			// bar UNLESS absent(foo{job="bar"})
 			case promParser.CardManyToMany:
-				for _, child := range node.Children {
-					calls = append(calls, HasOuterAbsent(child)...)
+				if n.Op == promParser.LOR {
+					for _, child := range node.Children {
+						calls = append(calls, HasOuterAbsent(child)...)
+					}
+				} else {
+					if ln, ok := n.LHS.(*promParser.Call); ok && ln.Func.Name == "absent" {
+						calls = append(calls, PromQLFragment{
+							Fragment: node.Children[0],
+							BinExpr:  n,
+						})
+					}
 				}
+
 			default:
 				log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
 			}
