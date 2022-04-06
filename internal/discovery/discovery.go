@@ -3,6 +3,7 @@ package discovery
 import (
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"gopkg.in/yaml.v3"
@@ -43,16 +44,22 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		return nil, err
 	}
 
+	contentLines := []int{}
+	for i := 1; i <= strings.Count(string(content), "\n"); i++ {
+		contentLines = append(contentLines, i)
+	}
+
 	fileOwner, _ := parser.GetComment(string(content), FileOwnerComment)
 
 	if isStrict {
 		var r rulefmt.RuleGroups
 		if err = yaml.Unmarshal(content, &r); err != nil {
-			log.Error().Str("path", path).Err(err).Msg("Failed to parse file content")
+			log.Error().Str("path", path).Err(err).Msg("Failed to unmarshal file content")
 			entries = append(entries, Entry{
-				Path:      path,
-				PathError: err,
-				Owner:     fileOwner,
+				Path:          path,
+				PathError:     err,
+				Owner:         fileOwner,
+				ModifiedLines: contentLines,
 			})
 			return entries, nil
 		}
@@ -62,8 +69,10 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 	if err != nil {
 		log.Error().Str("path", path).Err(err).Msg("Failed to parse file content")
 		entries = append(entries, Entry{
-			Path:      path,
-			PathError: err,
+			Path:          path,
+			PathError:     err,
+			Owner:         fileOwner,
+			ModifiedLines: contentLines,
 		})
 		return entries, nil
 	}
