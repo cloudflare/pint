@@ -366,7 +366,7 @@ R090    foo/c2c.yml         c2c.yml
 				0,
 				nil,
 			),
-			rules: map[string][]string{},
+			rules: map[string][]string{"foo.yml": {""}},
 		},
 		{
 			files: map[string]string{
@@ -451,7 +451,8 @@ R090    foo/c2c.yml         c2c.yml
 					var name string
 					if e.Rule.AlertingRule != nil {
 						name = e.Rule.AlertingRule.Alert.Value.Value
-					} else {
+					}
+					if e.Rule.RecordingRule != nil {
 						name = e.Rule.RecordingRule.Record.Value.Value
 					}
 					m[e.Path] = append(m[e.Path], name)

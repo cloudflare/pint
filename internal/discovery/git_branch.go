@@ -126,8 +126,12 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			return nil, err
 		}
 		for _, e := range els {
-			e.ModifiedLines = alloweLines
-			if isOverlap(alloweLines, e.Rule.Lines()) {
+			if len(e.ModifiedLines) == 0 {
+				e.ModifiedLines = alloweLines
+				if isOverlap(alloweLines, e.Rule.Lines()) {
+					entries = append(entries, e)
+				}
+			} else if isOverlap(alloweLines, e.ModifiedLines) {
 				entries = append(entries, e)
 			}
 		}
