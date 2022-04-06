@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.17.2
+
+### Fixed
+
+- File parse errors were not reported correctly when running `pint ci`.
+
 ## v0.17.1
 
 ### Fixed
