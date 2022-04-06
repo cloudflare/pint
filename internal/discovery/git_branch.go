@@ -112,13 +112,13 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			return nil, fmt.Errorf("failed to run git blame for %s: %w", path, err)
 		}
 
-		alloweLines := []int{}
+		allowedLines := []int{}
 		for _, lb := range lbs {
 			// skip commits that are not part of our diff
 			if _, ok := commits[lb.Commit]; !ok {
 				continue
 			}
-			alloweLines = append(alloweLines, lb.Line)
+			allowedLines = append(allowedLines, lb.Line)
 		}
 
 		els, err := readFile(path, !matchesAny(f.relaxed, path))
@@ -127,11 +127,11 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 		}
 		for _, e := range els {
 			if len(e.ModifiedLines) == 0 {
-				e.ModifiedLines = alloweLines
-				if isOverlap(alloweLines, e.Rule.Lines()) {
+				e.ModifiedLines = allowedLines
+				if isOverlap(allowedLines, e.Rule.Lines()) {
 					entries = append(entries, e)
 				}
-			} else if isOverlap(alloweLines, e.ModifiedLines) {
+			} else if isOverlap(allowedLines, e.ModifiedLines) {
 				entries = append(entries, e)
 			}
 		}

@@ -32,20 +32,6 @@ func tryDecodingYamlError(e string) (int, string) {
 	return 1, e
 }
 
-func scanProblem(path, owner string, err error) reporter.Report {
-	line, e := tryDecodingYamlError(err.Error())
-	return reporter.Report{
-		Path:  path,
-		Owner: owner,
-		Problem: checks.Problem{
-			Lines:    []int{line},
-			Reporter: yamlParseReporter,
-			Text:     e,
-			Severity: checks.Fatal,
-		},
-	}
-}
-
 func checkRules(ctx context.Context, workers int, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary) {
 	jobs := make(chan scanJob, workers*5)
 	results := make(chan reporter.Report, workers*5)
@@ -128,7 +114,18 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			return
 		default:
 			if job.entry.PathError != nil {
-				results <- scanProblem(job.entry.Path, job.entry.Owner, job.entry.PathError)
+				line, e := tryDecodingYamlError(job.entry.PathError.Error())
+				results <- reporter.Report{
+					Path:          job.entry.Path,
+					ModifiedLines: job.entry.ModifiedLines,
+					Problem: checks.Problem{
+						Lines:    []int{line},
+						Reporter: yamlParseReporter,
+						Text:     e,
+						Severity: checks.Fatal,
+					},
+					Owner: job.entry.Owner,
+				}
 			} else if job.entry.Rule.Error.Err != nil {
 				results <- reporter.Report{
 					Path:          job.entry.Path,

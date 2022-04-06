@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.17.3
+
+### Fixed
+
+- File parse errors didn't report correct line numbers when running `pint ci`.
+
 ## v0.17.2
 
 ### Fixed
