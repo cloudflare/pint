@@ -22,6 +22,7 @@ env BITBUCKET_AUTH_TOKEN="12345"
 pint.error -l debug --no-color ci
 ! stdout .
 stderr 'result\\":\\"FAIL\\"'
+stderr ',\\"line\\":1,'
 stderr 'level=debug msg="Sending a request to BitBucket" method=PUT'
 stderr 'level=debug msg="BitBucket request completed" status=200'
 stderr 'level=debug msg="Sending a request to BitBucket" method=DELETE'
