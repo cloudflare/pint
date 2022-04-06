@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.17.5
+
+### Fixed
+
+- Better handling of YAML unmarshal errors.
+
 ## v0.17.4
 
 ### Fixed

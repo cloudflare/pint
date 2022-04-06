@@ -5,18 +5,19 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/relaxed.yml rules=1
-level=error msg="Failed to unmarshal file content" error="yaml: unmarshal errors:\n  line 1: cannot unmarshal !!seq into rulefmt.RuleGroups" path=rules/strict.yml
-rules/strict.yml:1: yaml: unmarshal errors:
-  line 1: cannot unmarshal !!seq into rulefmt.RuleGroups (yaml/parse)
+level=error msg="Failed to unmarshal file content" error="yaml: unmarshal errors:\n  line 2: cannot unmarshal !!seq into rulefmt.RuleGroups" path=rules/strict.yml
+rules/strict.yml:2: cannot unmarshal !!seq into rulefmt.RuleGroups (yaml/parse)
 - alert: No Owner
 
 level=info msg="Problems found" Fatal=1
 level=fatal msg="Fatal error" error="problems found"
 -- rules/strict.yml --
+{%- raw %} # pint ignore/line
 - alert: No Owner
   expr: up > 0
 
 -- rules/relaxed.yml --
+{%- raw %} # pint ignore/line
 - alert: Owner Set
   expr: up{job="foo"} == 0
 -- .pint.hcl --

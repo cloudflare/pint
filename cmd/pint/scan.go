@@ -16,18 +16,23 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-var yamlErrRe = regexp.MustCompile("^yaml: line (.+): (.+)$")
+var (
+	yamlErrRe          = regexp.MustCompile("^yaml: line (.+): (.+)")
+	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
+)
 
 const yamlParseReporter = "yaml/parse"
 
 func tryDecodingYamlError(e string) (int, string) {
-	parts := yamlErrRe.FindStringSubmatch(e)
-	if len(parts) > 2 {
-		line, err := strconv.Atoi(parts[1])
-		if err != nil {
-			return 1, e
+	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe} {
+		parts := re.FindStringSubmatch(e)
+		if len(parts) > 2 {
+			line, err := strconv.Atoi(parts[1])
+			if err != nil {
+				return 1, e
+			}
+			return line, parts[2]
 		}
-		return line, parts[2]
 	}
 	return 1, e
 }
