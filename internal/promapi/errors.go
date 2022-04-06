@@ -58,6 +58,9 @@ func CanRetryError(err error, delta time.Duration) (time.Duration, bool) {
 			return delta / 2, true
 		case v1.ErrBadResponse:
 		case v1.ErrServer:
+			if apiErr.Msg == "server error: 504" {
+				return (delta / 4).Round(time.Minute), true
+			}
 		case v1.ErrClient:
 			return (delta / 2).Round(time.Minute), true
 		}

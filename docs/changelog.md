@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.17.1
+
+### Fixed
+
+- Handle `504 Gateway Timeout` HTTP responses from Prometheus same as query
+  timeouts and retry with a shorter range query.
+
 ## v0.17.0
 
 ### Added

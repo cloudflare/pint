@@ -1,6 +1,7 @@
 package discovery_test
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -92,7 +93,19 @@ func TestGlobPathFinder(t *testing.T) {
 				{
 					Path:          "bar.yml",
 					PathError:     strictErr,
-					ModifiedLines: []int{0},
+					ModifiedLines: []int{1, 2, 3, 4},
+					Owner:         "bob",
+				},
+			},
+		},
+		{
+			files:  map[string]string{"bar.yml": "record:::{}\n  expr: sum(foo)\n\n# pint file/owner bob\n"},
+			finder: discovery.NewGlobFinder([]string{"*"}, []*regexp.Regexp{regexp.MustCompile(".*")}),
+			entries: []discovery.Entry{
+				{
+					Path:          "bar.yml",
+					PathError:     errors.New("yaml: line 2: mapping values are not allowed in this context"),
+					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
 			},

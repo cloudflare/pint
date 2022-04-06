@@ -37,7 +37,7 @@ func TestRange(t *testing.T) {
 					query != "too_many_samples1" &&
 					query != "error1" && query != "error2" &&
 					query != "vector1" && query != "vector2" &&
-					query != "slow1" && query != "timeout1" {
+					query != "slow1" && query != "timeout1" && query != "gateway_timeout1" {
 					t.Errorf("%q already requested diff=%s", query, diff)
 					t.FailNow()
 				}
@@ -90,6 +90,17 @@ func TestRange(t *testing.T) {
 					"errorType": "timeout",
 					"error": "query timed out in expression evaluation"
 				}`))
+			default:
+				t.Errorf("invalid timeout diff: %s", diff)
+				w.WriteHeader(500)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`unknown start/end`))
+			}
+		case "gateway_timeout1":
+			switch diff.String() {
+			case "168h0m0s", "42h0m0s", "10h30m0s", "2h38m0s", "40m0s", "10m0s":
+				w.WriteHeader(504)
+				_, _ = w.Write([]byte(`504 Gateway Time-out`))
 			default:
 				t.Errorf("invalid timeout diff: %s", diff)
 				w.WriteHeader(500)
@@ -342,6 +353,14 @@ func TestRange(t *testing.T) {
 				},
 			},
 			runs: 5,
+		},
+		{
+			query:    "gateway_timeout1",
+			lookback: time.Hour * 24 * 7,
+			step:     time.Minute * 5,
+			timeout:  time.Second,
+			err:      "no more retries possible",
+			runs:     5,
 		},
 		// cache hit
 		{
