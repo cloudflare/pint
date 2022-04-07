@@ -2,3 +2,4 @@
 /.cover
 /memprofile.out
 /dist/
+/.vscode/
