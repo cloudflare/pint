@@ -127,6 +127,10 @@ func TestReadContent(t *testing.T) {
 			input:  []byte("foo\n# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
 			output: []byte("foo\n# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
 		},
+		{
+			input:  []byte("  {% raw %} # pint ignore/line\n"),
+			output: []byte("            # pint ignore/line\n"),
+		},
 	}
 
 	for i, tc := range testCases {
