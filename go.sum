@@ -416,8 +416,8 @@ github.com/ghodss/yaml v0.0.0-20150909031657-73d445a93680/go.mod h1:4dBDuWmgqj2H
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gkampitakis/ciinfo v0.1.0 h1:hPvgzhg7q6xlTNl4hWgEy13esbW847lWTREf0GoezRQ=
 github.com/gkampitakis/ciinfo v0.1.0/go.mod h1:PoTj49S/eZLL7PvEdBeu9D1qpd3JsEHOCyf5Y5hVYOs=
-github.com/gkampitakis/go-snaps v0.2.3 h1:4pQiQ9GbxlWps/LSR/I72CDWXVQs2lpxEHqhZi9pw4s=
-github.com/gkampitakis/go-snaps v0.2.3/go.mod h1:0HSAq6psKeEEgZJpcBcYjEwYVqCh4ZDHbSV2+SH0V84=
+github.com/gkampitakis/go-snaps v0.3.2 h1:Hm/zhPa8esP2epzP/bFhtWJjTnyTFPvCOd2mB83SNCM=
+github.com/gkampitakis/go-snaps v0.3.2/go.mod h1:q5aO5iv3BALma1z3nysRSu3vliaHDrHv9XZmvUxXXGw=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
