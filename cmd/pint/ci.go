@@ -23,6 +23,14 @@ var ciCmd = &cli.Command{
 	Name:   "ci",
 	Usage:  "Lint CI changes",
 	Action: actionCI,
+	Flags: []cli.Flag{
+		&cli.BoolFlag{
+			Name:    requireOwnerFlag,
+			Aliases: []string{"r"},
+			Value:   false,
+			Usage:   "Require all rules to have an owner set via comment",
+		},
+	},
 }
 
 func actionCI(c *cli.Context) error {
@@ -55,6 +63,10 @@ func actionCI(c *cli.Context) error {
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
 	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
+
+	if c.Bool(requireOwnerFlag) {
+		summary.Reports = append(summary.Reports, verifyOwners(entries)...)
+	}
 
 	reps := []reporter.Reporter{
 		reporter.NewConsoleReporter(os.Stderr),

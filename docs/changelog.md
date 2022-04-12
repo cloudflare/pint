@@ -5,6 +5,7 @@
 ### Added
 
 - Added `pint_last_run_duration_seconds` metric.
+- Added `--require-owner` flag support to `pint ci` command.
 
 ### Fixed
 
