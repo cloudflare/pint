@@ -38,6 +38,11 @@ func tryDecodingYamlError(e string) (int, string) {
 }
 
 func checkRules(ctx context.Context, workers int, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary) {
+	start := time.Now()
+	defer func() {
+		lastRunDuration.Set(time.Since(start).Seconds())
+	}()
+
 	jobs := make(chan scanJob, workers*5)
 	results := make(chan reporter.Report, workers*5)
 	wg := sync.WaitGroup{}

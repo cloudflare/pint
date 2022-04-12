@@ -29,6 +29,12 @@ var (
 			Help: "Last checks run completion time since unix epoch in seconds",
 		},
 	)
+	lastRunDuration = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "pint_last_run_duration_seconds",
+			Help: "Last checks run duration in seconds",
+		},
+	)
 	rulesParsedTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "pint_rules_parsed_total",

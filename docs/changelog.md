@@ -2,6 +2,10 @@
 
 ## v0.17.5
 
+### Added
+
+- Added `pint_last_run_duration_seconds` metric.
+
 ### Fixed
 
 - Better handling of YAML unmarshal errors.
