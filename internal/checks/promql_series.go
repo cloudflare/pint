@@ -216,7 +216,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		// 4. If foo was ALWAYS there but it's NO LONGER there -> BUG
 		if len(trs.ranges) == 1 &&
-			!trs.oldest().After(trs.until.Add(rangeLookback-1).Add(rangeStep)) &&
+			!trs.oldest().After(trs.from.Add(rangeStep)) &&
 			trs.newest().Before(trs.until.Add(rangeStep*-1)) {
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
@@ -355,7 +355,6 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 }
 
 func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, lookback, step time.Duration) (tr *timeRanges, err error) {
-	now := time.Now()
 	qr, err := c.prom.RangeQuery(ctx, query, lookback, step)
 	if err != nil {
 		return nil, err
@@ -363,8 +362,8 @@ func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, lookback
 
 	tr = &timeRanges{
 		uri:   qr.URI,
-		from:  now.Add(lookback * -1),
-		until: now,
+		from:  qr.Start,
+		until: qr.End,
 		step:  step,
 	}
 	var ts time.Time
