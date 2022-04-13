@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.17.6
+
+### Fixed
+
+- Fixed false positive reports from `promql/series` check when running
+  `pint watch`.
+
 ## v0.17.5
 
 ### Added
