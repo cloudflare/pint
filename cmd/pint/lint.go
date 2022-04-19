@@ -79,29 +79,22 @@ func actionLint(c *cli.Context) error {
 }
 
 func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
-	done := map[string]struct{}{}
 	for _, entry := range entries {
-		if _, ok := done[entry.Path]; ok {
+		if entry.Owner != "" {
 			continue
 		}
-
-		if entry.Owner == "" {
-			reports = append(reports, reporter.Report{
-				Path:          entry.Path,
-				ModifiedLines: []int{1},
-				Rule:          entry.Rule,
-				Problem: checks.Problem{
-					Lines:    []int{1},
-					Reporter: discovery.RuleOwnerComment,
-					Text: fmt.Sprintf(`%s comments are required in all files, please add a "# pint %s $owner" somewhere in this file and/or "# pint %s $owner" on top of each rule`,
-						discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
-					Severity: checks.Bug,
-				},
-			})
-		}
-
-		done[entry.Path] = struct{}{}
+		reports = append(reports, reporter.Report{
+			Path:          entry.Path,
+			ModifiedLines: entry.ModifiedLines,
+			Rule:          entry.Rule,
+			Problem: checks.Problem{
+				Lines:    entry.Rule.Lines(),
+				Reporter: discovery.RuleOwnerComment,
+				Text: fmt.Sprintf(`%s comments are required in all files, please add a "# pint %s $owner" somewhere in this file and/or "# pint %s $owner" on top of each rule`,
+					discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
+				Severity: checks.Bug,
+			},
+		})
 	}
-
 	return
 }
