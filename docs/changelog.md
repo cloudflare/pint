@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.17.7
+
+### Fixed
+
+- Fix problem line reporting for `rule/owner` check.
+- Add missing `rule/owner` documentation page.
+
 ## v0.17.6
 
 ### Fixed
