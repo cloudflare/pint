@@ -8,7 +8,7 @@ require (
 	github.com/google/go-cmp v0.5.7
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/golang-lru v0.5.4
-	github.com/hashicorp/hcl/v2 v2.11.1
+	github.com/hashicorp/hcl/v2 v2.12.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.34.0
