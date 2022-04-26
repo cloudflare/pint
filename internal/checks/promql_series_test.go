@@ -555,7 +555,70 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "#4 metric was present but disappeared",
+			description: "#4 metric was present but disappeared 50m ago",
+			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
+			checker:     newSeriesCheck,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Minute*-50),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Minute*-50),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Minute*-50),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared over 1h ago",
 			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
 			checker:     newSeriesCheck,
 			problems: func(uri string) []checks.Problem {
@@ -563,6 +626,378 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Fragment: `found`,
 						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared / min-age / ok",
+			content: `
+- record: foo
+  # pint rule/set promql/series min-age 5d
+  expr: sum(found{job="foo", instance="bar"})
+`,
+			checker:  newSeriesCheck,
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared / min-age / match",
+			content: `
+- record: foo
+  # pint rule/set promql/series(found) min-age 5d
+  expr: sum(found{job="foo", instance="bar"})
+`,
+			checker:  newSeriesCheck,
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared / min-age / fail",
+			content: `
+- record: foo
+  # pint rule/set promql/series min-age 3d
+  expr: sum(found{job="foo", instance="bar"})
+`,
+			checker: newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{4},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared / min-age / mismatch",
+			content: `
+- record: foo
+  # pint rule/set promql/series(bar) min-age 5d
+  expr: sum(found{job="foo", instance="bar"})
+`,
+			checker: newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{4},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"instance": "bar"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared / min-age / invalid value",
+			content: `
+- record: foo
+  # pint rule/set promql/series(found) min-age foo
+  expr: sum(found{job="foo", instance="bar"})
+`,
+			checker: newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `rule/set promql/series(found) min-age foo`,
+						Lines:    []int{2, 3, 4},
+						Reporter: checks.SeriesCheckName,
+						Text:     `failed to parse pint comment as duration: not a valid duration string: "foo"`,
+						Severity: checks.Warning,
+					},
+					{
+						Fragment: `found`,
+						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
 						Severity: checks.Bug,
@@ -874,6 +1309,48 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "#5 ignored label value",
+			content: `
+- record: foo
+  # pint rule/set promql/series ignore/label-value error
+  expr: sum(foo{error="notfound"})
+`,
+			checker:  newSeriesCheck,
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo{error=~".+"}) by (error)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"error": "yyy"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "#6 metric was always present but label disappeared",
 			content:     "- record: foo\n  expr: sum({__name__=\"found\", removed=\"xxx\"})\n",
 			checker:     newSeriesCheck,
@@ -883,7 +1360,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found{removed="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     filterDisappeardText("prom", uri, `{__name__="found"}`, `{removed="xxx"}`, "5d16h"),
+						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
 						Severity: checks.Bug,
 					},
 				}
@@ -899,14 +1376,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__="found"})`},
+						formCond{key: "query", value: `count(found)`},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__="found",removed=~".+"}) by (removed)`},
+						formCond{key: "query", value: `count(found{removed=~".+"}) by (removed)`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -930,6 +1407,139 @@ func TestSeriesCheck(t *testing.T) {
 								map[string]string{},
 								time.Now().Add(time.Hour*24*-7),
 								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#6 metric was always present but label disappeared / invalid min-age",
+			content: `
+# pint rule/set promql/series(found) min-age 1e
+- record: foo
+  expr: sum({__name__="found", removed="xxx"})
+`,
+			checker: newSeriesCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `rule/set promql/series(found) min-age 1e`,
+						Lines:    []int{3, 4},
+						Reporter: checks.SeriesCheckName,
+						Text:     `failed to parse pint comment as duration: not a valid duration string: "1e"`,
+						Severity: checks.Warning,
+					},
+					{
+						Fragment: `found{removed="xxx"}`,
+						Lines:    []int{4},
+						Reporter: checks.SeriesCheckName,
+						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{removed=~".+"}) by (removed)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"removed": "xxx"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{removed="xxx"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "#6 metric was always present but label disappeared / less than min-age",
+			content: `
+# pint rule/set promql/series(found) min-age 3h
+- record: foo
+  expr: sum({__name__="found", removed="xxx"})
+`,
+			checker:  newSeriesCheck,
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({__name__="found",removed="xxx"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{removed=~".+"}) by (removed)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"removed": "xxx"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Minute*-150),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{removed="xxx"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Minute*-150),
 								time.Minute*5,
 							),
 						},
@@ -1215,10 +1825,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `{__name__="notfound"}`,
+						Fragment: `notfound`,
 						Lines:    []int{3},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, `{__name__="notfound"}`, "1w"),
+						Text:     noSeriesText("prom", uri, "notfound", "1w"),
 						Severity: checks.Bug,
 					},
 				}
@@ -1234,7 +1844,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__="notfound"})`},
+						formCond{key: "query", value: `count(notfound)`},
 					},
 					resp: respondWithEmptyMatrix(),
 				},

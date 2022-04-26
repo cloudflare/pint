@@ -121,7 +121,77 @@ that.
 
 ## Configuration
 
-This check doesn't have any configuration options.
+This check doesn't have any configuration options but it supports a few control
+comments that can be placed around each rule.
+
+### min-age
+
+But default this check will report a problem if a metric was present
+in Prometheus but disappeared for at least two hours ago.
+You can change this duration per Prometheus rule by adding a comment around it.
+Syntax:
+
+To set `min-age` for all metrics in a query:
+
+`# pint rule/set promql/series min-age $duration`
+
+To set `min-age` for specific metric:
+
+`# pint rule/set promql/series($metric_name) min-age $duration`
+
+Example:
+
+```yaml
+- record: ...
+  # Report problems if any metric in this query is missing for at least 3 days
+  # pint rule/set promql/series min-age 3d
+  expr: sum(foo) / sum(bar)
+
+- record: ...
+  # Report problems if:
+  # - metric "foo" is missing for at least 1 hour (defaults)
+  # - metric "bar{instance=xxx}" is missing for at least 4 hours
+  # pint rule/set promql/series(bar{instance="xxx"}) min-age 4h
+  expr: sum(foo) / sum(bar{instance="xxx"})
+```
+
+# ignore/label-value
+
+By default pint will report a problem if a rule uses query with a label filter
+and the value of that filter query doesn't match anything.
+For example `rate(http_errors_total{code="500"}[2m])` will report a problem
+if there are no `http_errors_total` series with `code="500"`.
+The goal here is to catch typos in label filters or labels with values that
+got renamed, but in some cases this will report false positive problems,
+especially if label values are exported dynamically, for example after
+HTTP status code is observed.
+In the `http_errors_total{code="500"}` example if `code` label is generated
+based on HTTP responses then there won't be any series with `code="500"` until
+there's at least one HTTP response that generated this code.
+You can relax pint checks so it doesn't validate if label values for specific
+labels are present on any time series.
+Syntax
+
+`# pint rule/set promql/series ignore/label-value $labelName`
+
+Example:
+
+```yaml
+- alert: ...
+  # disable code label checks for all metrics used in this rule
+  # pint rule/set promql/series ignore/label-value code
+  expr: rate(http_errors_total{code="500"}[2m]) > 0.1
+
+- alert: ...
+  # disable code label checks for http_errors_total metric
+  # pint rule/set promql/series(http_errors_total) ignore/label-value code
+  expr: rate(http_errors_total{code="500"}[2m]) > 0.1
+
+- alert: ...
+  # disable code label checks only for http_errors_total{code="500"} queries
+  # pint rule/set promql/series(http_errors_total{code="500"}) ignore/label-value code
+  expr: rate(http_errors_total{code="500"}[2m]) > 0.1
+```
 
 ## How to enable it
 

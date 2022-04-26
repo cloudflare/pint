@@ -2,6 +2,7 @@ package parser_test
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"strings"
 	"testing"
@@ -159,79 +160,99 @@ func TestReadContent(t *testing.T) {
 func TestGetComment(t *testing.T) {
 	type testCaseT struct {
 		input   string
-		comment string
-		output  string
+		comment []string
+		output  parser.Comment
 		ok      bool
 	}
 
 	testCases := []testCaseT{
 		{
 			input:   "",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "\n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "\n \n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "foo bar",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "foo bar\n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "line1\nline2",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "line1\nline2\n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "line1\n\nline2\n\n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 		},
 		{
 			input:   "# pint rule/owner",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 			ok:      true,
-			output:  "",
+			output:  parser.Comment{Key: "rule/owner"},
 		},
 		{
 			input:   "# pint rule/owner foo",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 			ok:      true,
-			output:  "foo",
+			output:  parser.Comment{Key: "rule/owner", Value: "foo"},
 		},
 		{
 			input:   "# pint rule/owner foo bar bob/alice",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 			ok:      true,
-			output:  "foo bar bob/alice",
+			output:  parser.Comment{Key: "rule/owner", Value: "foo bar bob/alice"},
 		},
 		{
 			input:   "line1\n  # pint rule/owner foo bar bob/alice\n line2\n\n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 			ok:      true,
-			output:  "foo bar bob/alice",
+			output:  parser.Comment{Key: "rule/owner", Value: "foo bar bob/alice"},
 		},
 		{
 			input:   "line1\n  ####    pint rule/owner    foo bar bob/alice\n line2\n\n",
-			comment: "rule/owner",
+			comment: []string{"rule/owner"},
 			ok:      true,
-			output:  "foo bar bob/alice",
+			output:  parser.Comment{Key: "rule/owner", Value: "foo bar bob/alice"},
+		},
+		{
+			input:   "# pint set promql/series min-age 1w",
+			comment: []string{"set promql/series min-age"},
+		},
+		{
+			input:   "# pint set promql/series min-age 1w",
+			comment: []string{"set", "promql/series", "min-age"},
+			ok:      true,
+			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
+		},
+		{
+			input:   "# pint set",
+			comment: []string{"set", "promql/series", "min-age"},
+		},
+		{
+			input:   "# pint rule/set promql/series ignore/label-value error",
+			comment: []string{"rule/set", "promql/series", "ignore/label-value"},
+			ok:      true,
+			output:  parser.Comment{Key: "rule/set promql/series ignore/label-value", Value: "error"},
 		},
 	}
 
 	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			output, ok := parser.GetComment(string(tc.input), tc.comment)
+		t.Run(fmt.Sprintf("%d/%s", i, tc.input), func(t *testing.T) {
+			output, ok := parser.GetComment(string(tc.input), tc.comment...)
 			require.Equal(t, tc.ok, ok)
 			require.Equal(t, tc.output, output)
 		})
