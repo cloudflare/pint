@@ -8,6 +8,7 @@
   `# pint rule/set promql/series min-age ...` and
   `# pint rule/set promql/series ignore/label-value ...`
   See [promql/series](/docs/checks/promql/series.md) for details.
+- `promql/regexp` will report redundant use of regex anchors.
 
 ### Changed
 
