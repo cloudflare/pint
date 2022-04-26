@@ -214,10 +214,26 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			continue
 		}
 
-		// 4. If foo was ALWAYS there but it's NO LONGER there -> BUG
+		// 4. If foo was ALWAYS there but it's NO LONGER there (for more than min-age) -> BUG
 		if len(trs.ranges) == 1 &&
 			!trs.oldest().After(trs.from.Add(rangeStep)) &&
 			trs.newest().Before(trs.until.Add(rangeStep*-1)) {
+
+			minAge, p := c.getMinAge(rule, selector)
+			if len(p) > 0 {
+				problems = append(problems, p...)
+			}
+
+			if !trs.newest().Before(trs.until.Add(time.Duration(minAge) * -1)) {
+				log.Debug().
+					Str("check", c.Reporter()).
+					Stringer("selector", &selector).
+					Str("min-age", output.HumanizeDuration(minAge)).
+					Str("last-seen", trs.sinceDesc(trs.newest())).
+					Msg("Series disappeared from prometheus but for less then configured min-age")
+				continue
+			}
+
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
@@ -227,7 +243,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.newest())),
 				Severity: Bug,
 			})
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Series disappeared from prometheus ")
+			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Series disappeared from prometheus")
 			continue
 		}
 
@@ -236,6 +252,10 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				continue
 			}
 			if lm.Type != labels.MatchEqual && lm.Type != labels.MatchRegexp {
+				continue
+			}
+			if c.isLabelValueIgnored(rule, selector, lm.Name) {
+				log.Debug().Stringer("selector", &selector).Str("label", lm.Name).Msg("Label check disabled by comment")
 				continue
 			}
 			labelSelector := promParser.VectorSelector{
@@ -277,8 +297,24 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 			// 6. If foo is ALWAYS/SOMETIMES there AND {bar OR baz} used to be there ALWAYS BUT it's NO LONGER there -> BUG
 			if len(trsLabel.ranges) == 1 &&
-				!trsLabel.oldest().After(trs.until.Add(rangeLookback-1).Add(rangeStep)) &&
-				trsLabel.newest().Before(trs.until.Add(rangeStep*-1)) {
+				!trsLabel.oldest().After(trsLabel.until.Add(rangeLookback-1).Add(rangeStep)) &&
+				trsLabel.newest().Before(trsLabel.until.Add(rangeStep*-1)) {
+
+				minAge, p := c.getMinAge(rule, selector)
+				if len(p) > 0 {
+					problems = append(problems, p...)
+				}
+
+				if !trsLabel.newest().Before(trsLabel.until.Add(time.Duration(minAge) * -1)) {
+					log.Debug().
+						Str("check", c.Reporter()).
+						Stringer("selector", &selector).
+						Str("min-age", output.HumanizeDuration(minAge)).
+						Str("last-seen", trs.sinceDesc(trsLabel.newest())).
+						Msg("Series disappeared from prometheus but for less then configured min-age")
+					continue
+				}
+
 				problems = append(problems, Problem{
 					Fragment: labelSelector.String(),
 					Lines:    expr.Lines(),
@@ -394,6 +430,48 @@ func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, lookback
 	return tr, nil
 }
 
+func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelector) (minAge time.Duration, problems []Problem) {
+	minAge = time.Hour * 2
+
+	bareSelector := stripLabels(selector)
+	for _, s := range [][]string{
+		{"rule/set", c.Reporter(), "min-age"},
+		{"rule/set", fmt.Sprintf("%s(%s)", c.Reporter(), bareSelector.String()), "min-age"},
+		{"rule/set", fmt.Sprintf("%s(%s)", c.Reporter(), selector.String()), "min-age"},
+	} {
+		if cmt, ok := rule.GetComment(s...); ok {
+			dur, err := model.ParseDuration(cmt.Value)
+			if err != nil {
+				problems = append(problems, Problem{
+					Fragment: cmt.String(),
+					Lines:    rule.LineRange(),
+					Reporter: c.Reporter(),
+					Text:     fmt.Sprintf("failed to parse pint comment as duration: %s", err),
+					Severity: Warning,
+				})
+			} else {
+				minAge = time.Duration(dur)
+			}
+		}
+	}
+
+	return minAge, problems
+}
+
+func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.VectorSelector, labelName string) bool {
+	bareSelector := stripLabels(selector)
+	for _, s := range []string{
+		fmt.Sprintf("rule/set %s ignore/label-value %s", c.Reporter(), labelName),
+		fmt.Sprintf("rule/set %s(%s) ignore/label-value %s", c.Reporter(), bareSelector.String(), labelName),
+		fmt.Sprintf("rule/set %s(%s) ignore/label-value %s", c.Reporter(), selector.String(), labelName),
+	} {
+		if rule.HasComment(s) {
+			return true
+		}
+	}
+	return false
+}
+
 func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) {
 	if node, ok := n.Node.(*promParser.VectorSelector); ok {
 		// copy node without offset
@@ -419,6 +497,7 @@ func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
 	for _, lm := range selector.LabelMatchers {
 		if lm.Name == labels.MetricName {
 			s.LabelMatchers = append(s.LabelMatchers, lm)
+			s.Name = lm.Value
 		}
 	}
 	return s

@@ -58,7 +58,7 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 			entries = append(entries, Entry{
 				Path:          path,
 				PathError:     err,
-				Owner:         fileOwner,
+				Owner:         fileOwner.Value,
 				ModifiedLines: contentLines,
 			})
 			return entries, nil
@@ -71,7 +71,7 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		entries = append(entries, Entry{
 			Path:          path,
 			PathError:     err,
-			Owner:         fileOwner,
+			Owner:         fileOwner.Value,
 			ModifiedLines: contentLines,
 		})
 		return entries, nil
@@ -85,7 +85,7 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		entries = append(entries, Entry{
 			Path:  path,
 			Rule:  rule,
-			Owner: owner,
+			Owner: owner.Value,
 		})
 	}
 

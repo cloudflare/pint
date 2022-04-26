@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.18.0
+
+### Added
+
+- Allow fine tuning `promql/series` check with extra control comments
+  `# pint rule/set promql/series min-age ...` and
+  `# pint rule/set promql/series ignore/label-value ...`
+  See [promql/series](/docs/checks/promql/series.md) for details.
+
+### Changed
+
+- `promql/series` will now report missing metrics only if they were last seen
+  over 2 hours ago by default. This can be customized per rule with comments.
+
 ## v0.17.7
 
 ### Fixed

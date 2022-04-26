@@ -140,7 +140,16 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 	return out, nil
 }
 
-func GetComment(line, comment string) (s string, ok bool) {
+type Comment struct {
+	Key   string
+	Value string
+}
+
+func (c Comment) String() string {
+	return c.Key + " " + c.Value
+}
+
+func GetComment(line string, comment ...string) (s Comment, ok bool) {
 	sc := bufio.NewScanner(strings.NewReader(line))
 	for sc.Scan() {
 		elems := strings.Split(sc.Text(), "#")
@@ -149,12 +158,23 @@ func GetComment(line, comment string) (s string, ok bool) {
 		if len(parts) < 2 {
 			continue
 		}
-		if parts[0] == "pint" && parts[1] == comment {
-			ok = true
-			if len(parts) > 2 {
-				s = strings.Join(parts[2:], " ")
+		keys := make([]string, 0, len(parts))
+		values := make([]string, 0, len(parts))
+		if parts[0] == "pint" && len(parts) >= len(comment)+1 {
+			for i, c := range comment {
+				if parts[i+1] != c {
+					goto NEXT
+				}
+				keys = append(keys, parts[i+1])
 			}
+			for i := len(comment) + 1; i < len(parts); i++ {
+				values = append(values, parts[i])
+			}
+			ok = true
+			s.Key = strings.Join(keys, " ")
+			s.Value = strings.Join(values, " ")
 		}
+	NEXT:
 	}
 	return
 }

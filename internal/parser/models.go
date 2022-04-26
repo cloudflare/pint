@@ -326,6 +326,29 @@ func (r Rule) Lines() []int {
 	return []int{r.Error.Line}
 }
 
+func (r Rule) LineRange() []int {
+	var lmin, lmax int
+	for i, line := range r.Lines() {
+		if i == 0 {
+			lmin = line
+			lmax = line
+			continue
+		}
+		if line < lmin {
+			lmin = line
+		}
+		if line > lmax {
+			lmax = line
+		}
+	}
+
+	lines := []int{}
+	for i := lmin; i <= lmax; i++ {
+		lines = append(lines, i)
+	}
+	return lines
+}
+
 func (r Rule) HasComment(comment string) bool {
 	var comments []string
 	if r.RecordingRule != nil {
@@ -341,7 +364,7 @@ func (r Rule) HasComment(comment string) bool {
 	return false
 }
 
-func (r Rule) GetComment(comment string) (string, bool) {
+func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
 	var comments []string
 	if r.RecordingRule != nil {
 		comments = r.RecordingRule.Comments()
@@ -349,11 +372,11 @@ func (r Rule) GetComment(comment string) (string, bool) {
 		comments = r.AlertingRule.Comments()
 	}
 	for _, c := range comments {
-		if val, ok := GetComment(c, comment); ok {
+		if val, ok := GetComment(c, comment...); ok {
 			return val, ok
 		}
 	}
-	return "", false
+	return
 }
 
 type Result struct {
