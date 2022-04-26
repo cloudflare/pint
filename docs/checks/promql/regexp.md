@@ -26,6 +26,14 @@ Example of a query that wouldn't trigger this warning:
 foo{job=~"bar|baz"}
 ```
 
+Another problem this check will report on is redundant regexp anchors.
+As noted on [Querying Prometheus](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+page Prometheus fully anchors all regex matchers.
+So a query match using `foo=~"bar.*"` will be parsed as `foo=~"^bar.*$"` and
+so any anchors used in the query will be redundant.
+This means that passing `foo=~"^bar.*$"` to the query will be parsed as
+`foo=~"^^bar.*$$"`, so both `^` and `$` should be skipped to avoid it.
+
 ## Configuration
 
 This check doesn't have any configuration options.

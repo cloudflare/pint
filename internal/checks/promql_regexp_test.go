@@ -90,6 +90,38 @@ func TestRegexpCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "unnecessary regexp anchor",
+			content:     "- record: foo\n  expr: foo{job=~\"^.+$\"}\n",
+			checker:     newRegexpCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `foo{job=~"^.+$"}`,
+						Lines:    []int{2},
+						Reporter: checks.RegexpCheckName,
+						Text:     `prometheus regexp matchers are automatically fully anchored so match for job=~"^.+$" will result in job=~"^^.+$$", remove regexp anchors ^ and/or $`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "unnecessary regexp anchor",
+			content:     "- record: foo\n  expr: foo{job=~\"(foo|^.+)$\"}\n",
+			checker:     newRegexpCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `foo{job=~"(foo|^.+)$"}`,
+						Lines:    []int{2},
+						Reporter: checks.RegexpCheckName,
+						Text:     `prometheus regexp matchers are automatically fully anchored so match for job=~"(foo|^.+)$" will result in job=~"^(foo|^.+)$$", remove regexp anchors ^ and/or $`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
 	}
 	runTests(t, testCases)
 }

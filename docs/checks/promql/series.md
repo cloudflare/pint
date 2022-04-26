@@ -155,7 +155,7 @@ Example:
   expr: sum(foo) / sum(bar{instance="xxx"})
 ```
 
-# ignore/label-value
+### ignore/label-value
 
 By default pint will report a problem if a rule uses query with a label filter
 and the value of that filter query doesn't match anything.

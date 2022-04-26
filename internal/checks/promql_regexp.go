@@ -37,14 +37,17 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 	for _, selector := range getSelectors(expr.Query) {
 		for _, lm := range selector.LabelMatchers {
-			if s := lm.GetRegexString(); s != "" {
+			if re := lm.GetRegexString(); re != "" {
 				var isUseful bool
-				r, _ := syntax.Parse(s, syntax.Perl)
+				var beginText, endText int
+				r, _ := syntax.Parse(re, syntax.Perl)
 				for _, s := range r.Sub {
 					switch s.Op {
 					case syntax.OpBeginText:
+						beginText++
 						continue
 					case syntax.OpEndText:
+						endText++
 						continue
 					case syntax.OpLiteral:
 						continue
@@ -55,7 +58,6 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					}
 				}
 				if !isUseful {
-					var text string
 					var op labels.MatchType
 					switch lm.Type {
 					case labels.MatchRegexp:
@@ -63,12 +65,22 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					case labels.MatchNotRegexp:
 						op = labels.MatchNotEqual
 					}
-					text = fmt.Sprintf(`unnecessary regexp match on static string %s, use %s%s%q instead`, lm, lm.Name, op, lm.Value)
 					problems = append(problems, Problem{
 						Fragment: selector.String(),
 						Lines:    expr.Lines(),
 						Reporter: c.Reporter(),
-						Text:     text,
+						Text:     fmt.Sprintf(`unnecessary regexp match on static string %s, use %s%s%q instead`, lm, lm.Name, op, lm.Value),
+						Severity: Bug,
+					})
+				}
+				if beginText > 1 || endText > 1 {
+					problems = append(problems, Problem{
+						Fragment: selector.String(),
+						Lines:    expr.Lines(),
+						Reporter: c.Reporter(),
+						Text: fmt.Sprintf(`prometheus regexp matchers are automatically fully anchored so match for %s will result in %s%s"^%s$", remove regexp anchors ^ and/or $`,
+							lm, lm.Name, lm.Type, lm.Value,
+						),
 						Severity: Bug,
 					})
 				}
