@@ -7,7 +7,7 @@
 - Allow fine tuning `promql/series` check with extra control comments
   `# pint rule/set promql/series min-age ...` and
   `# pint rule/set promql/series ignore/label-value ...`
-  See [promql/series](/docs/checks/promql/series.md) for details.
+  See [promql/series](checks/promql/series.md) for details.
 - `promql/regexp` will report redundant use of regex anchors.
 
 ### Changed
@@ -90,7 +90,7 @@
   wasn't required. Now pint will fail to read any file that doesn't follow
   Prometheus syntax exactly.
   To enable old behavior add `parser { relaxed = ["(.+)", ...]}` option in
-  the config file. See [Configuration](/docs/configuration.md) for details.
+  the config file. See [Configuration](configuration.md) for details.
   To enable old (relaxed) behavior for all files add:
 
   ```yaml
