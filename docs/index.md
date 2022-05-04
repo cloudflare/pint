@@ -114,6 +114,23 @@ Example:
   expr: ...
 ```
 
+Here's an example alert you can use for problems detected by pint:
+
+```yaml
+- alert: Pint Problem Detected
+  # pint_problem is only present if pint detects any problems
+  # pint disable promql/series(pint_problem)
+  expr: |
+    sum without(instance, problem) (pint_problem) > 0
+  for: 1h
+  annotations:
+    summary: |
+      {{ with printf "pint_problem{filename='%s', name='%s', reporter='%s'}" .Labels.filename .Labels.name .Labels.reporter | query }}
+        {{ . | first | label "problem" }}
+      {{ end }}
+    docs: "https://cloudflare.github.io/pint/checks/{{ $labels.reporter }}.html"
+```
+
 ## Release Notes
 
 See [changelog](changelog.md) for history of changes.
