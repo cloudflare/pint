@@ -116,6 +116,7 @@ Example:
 
 Here's an example alert you can use for problems detected by pint:
 
+{% raw %}
 ```yaml
 - alert: Pint Problem Detected
   # pint_problem is only present if pint detects any problems
@@ -130,6 +131,7 @@ Here's an example alert you can use for problems detected by pint:
       {{ end }}
     docs: "https://cloudflare.github.io/pint/checks/{{ $labels.reporter }}.html"
 ```
+{% endraw %}
 
 ## Release Notes
 
