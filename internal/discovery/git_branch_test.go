@@ -49,11 +49,18 @@ func blame(v map[string][]blameRange) []byte {
 	return []byte(out)
 }
 
+type rule struct {
+	path     string
+	name     string
+	lines    []int
+	modified []int
+}
+
 func TestGitBranchFinder(t *testing.T) {
 	type testCaseT struct {
 		files  map[string]string
 		finder discovery.GitBranchFinder
-		rules  map[string][]string
+		rules  []rule
 		err    string
 	}
 
@@ -216,7 +223,10 @@ func TestGitBranchFinder(t *testing.T) {
 				0,
 				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
-			rules: map[string][]string{"foo.yml": {"first", "second"}},
+			rules: []rule{
+				{path: "foo.yml", name: "first", lines: []int{2, 3}, modified: []int{2}},
+				{path: "foo.yml", name: "second", lines: []int{5, 6, 7, 8}, modified: []int{7, 8}},
+			},
 		},
 		{
 			files: map[string]string{
@@ -325,14 +335,25 @@ R090    foo/c2c.yml         c2c.yml
 				0,
 				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
-			rules: map[string][]string{
-				"foo/c1a.yml": {"first", "third"},
-				"foo/c1b.yml": {"third"},
-				"c2a.yml":     {"first", "second", "third"},
-				"c2c.yml":     {"first", "second", "third"},
-				"c3b.yml":     {"first", "second", "third"},
-				"c3c.yml":     {"first", "second", "third"},
-				"c3d.yml":     {"first", "second", "third"},
+			rules: []rule{
+				{path: "c3b.yml", name: "first", lines: []int{2, 3}, modified: []int{2, 3}},
+				{path: "c3b.yml", name: "second", lines: []int{5, 6, 7, 8}, modified: []int{5, 6, 7, 8}},
+				{path: "c3b.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{10}},
+				{path: "c3c.yml", name: "first", lines: []int{2, 3}, modified: []int{2, 3}},
+				{path: "c3c.yml", name: "second", lines: []int{5, 6, 7, 8}, modified: []int{5, 6, 7, 8}},
+				{path: "c3c.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{10, 11, 12}},
+				{path: "c3d.yml", name: "first", lines: []int{2, 3}, modified: []int{2, 3}},
+				{path: "c3d.yml", name: "second", lines: []int{5, 6, 7, 8}, modified: []int{5, 6, 7, 8}},
+				{path: "c3d.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{10}},
+				{path: "foo/c1a.yml", name: "first", lines: []int{2, 3}, modified: []int{2}},
+				{path: "foo/c1a.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{12}},
+				{path: "foo/c1b.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{11, 12}},
+				{path: "c2a.yml", name: "first", lines: []int{2, 3}, modified: []int{3}},
+				{path: "c2a.yml", name: "second", lines: []int{5, 6, 7, 8}, modified: []int{7, 8}},
+				{path: "c2a.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{10}},
+				{path: "c2c.yml", name: "first", lines: []int{2, 3}, modified: []int{2, 3, 3}},
+				{path: "c2c.yml", name: "second", lines: []int{5, 6, 7, 8}, modified: []int{5, 6, 7, 8}},
+				{path: "c2c.yml", name: "third", lines: []int{10, 11, 12, 13}, modified: []int{10, 11, 12}},
 			},
 		},
 		{
@@ -366,7 +387,9 @@ R090    foo/c2c.yml         c2c.yml
 				0,
 				nil,
 			),
-			rules: map[string][]string{"foo.yml": {""}},
+			rules: []rule{
+				{path: "foo.yml", modified: []int{2, 7, 8}},
+			},
 		},
 		{
 			files: map[string]string{
@@ -392,7 +415,7 @@ R090    foo/c2c.yml         c2c.yml
 				0,
 				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
-			rules: map[string][]string{},
+			rules: nil,
 		},
 		{
 			files: map[string]string{
@@ -418,7 +441,7 @@ R090    foo/c2c.yml         c2c.yml
 				0,
 				[]*regexp.Regexp{regexp.MustCompile(".*")},
 			),
-			rules: map[string][]string{},
+			rules: nil,
 		},
 	}
 
@@ -443,11 +466,9 @@ R090    foo/c2c.yml         c2c.yml
 			} else {
 				require.NoError(t, err)
 
-				m := map[string][]string{}
+				rules := []rule{}
 				for _, e := range entries {
-					if _, ok := m[e.Path]; !ok {
-						m[e.Path] = []string{}
-					}
+					t.Logf("Entry: path=%s pathErr=%v lines=%v modified=%v", e.Path, e.PathError, e.Rule.Lines(), e.ModifiedLines)
 					var name string
 					if e.Rule.AlertingRule != nil {
 						name = e.Rule.AlertingRule.Alert.Value.Value
@@ -455,9 +476,14 @@ R090    foo/c2c.yml         c2c.yml
 					if e.Rule.RecordingRule != nil {
 						name = e.Rule.RecordingRule.Record.Value.Value
 					}
-					m[e.Path] = append(m[e.Path], name)
+					rules = append(rules, rule{
+						path:     e.Path,
+						name:     name,
+						lines:    e.Rule.Lines(),
+						modified: e.ModifiedLines,
+					})
 				}
-				require.Equal(t, tc.rules, m)
+				require.ElementsMatch(t, tc.rules, rules)
 			}
 		})
 	}

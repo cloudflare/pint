@@ -323,7 +323,10 @@ func (r Rule) Lines() []int {
 	if r.AlertingRule != nil {
 		return r.AlertingRule.Lines()
 	}
-	return []int{r.Error.Line}
+	if r.Error.Err != nil {
+		return []int{r.Error.Line}
+	}
+	return nil
 }
 
 func (r Rule) LineRange() []int {
