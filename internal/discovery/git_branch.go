@@ -126,12 +126,11 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			return nil, err
 		}
 		for _, e := range els {
-			if len(e.ModifiedLines) == 0 {
+			e.ModifiedLines = getOverlap(e.Rule.Lines(), allowedLines)
+			if len(e.ModifiedLines) == 0 && e.PathError != nil {
 				e.ModifiedLines = allowedLines
-				if isOverlap(allowedLines, e.Rule.Lines()) {
-					entries = append(entries, e)
-				}
-			} else if isOverlap(allowedLines, e.ModifiedLines) {
+			}
+			if isOverlap(allowedLines, e.Rule.Lines()) || isOverlap(allowedLines, e.ModifiedLines) {
 				entries = append(entries, e)
 			}
 		}
@@ -166,4 +165,15 @@ func isOverlap(a, b []int) bool {
 		}
 	}
 	return false
+}
+
+func getOverlap(a, b []int) (o []int) {
+	for _, i := range a {
+		for _, j := range b {
+			if i == j {
+				o = append(o, i)
+			}
+		}
+	}
+	return
 }

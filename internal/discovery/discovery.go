@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"gopkg.in/yaml.v3"
 
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 
 	"github.com/rs/zerolog/log"
@@ -54,7 +55,11 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 	if isStrict {
 		var r rulefmt.RuleGroups
 		if err = yaml.Unmarshal(content, &r); err != nil {
-			log.Error().Str("path", path).Err(err).Msg("Failed to unmarshal file content")
+			log.Error().
+				Err(err).
+				Str("path", path).
+				Str("lines", output.FormatLineRangeString(contentLines)).
+				Msg("Failed to unmarshal file content")
 			entries = append(entries, Entry{
 				Path:          path,
 				PathError:     err,
@@ -67,7 +72,11 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 
 	rules, err := p.Parse(content)
 	if err != nil {
-		log.Error().Str("path", path).Err(err).Msg("Failed to parse file content")
+		log.Error().
+			Err(err).
+			Str("path", path).
+			Str("lines", output.FormatLineRangeString(contentLines)).
+			Msg("Failed to parse file content")
 		entries = append(entries, Entry{
 			Path:          path,
 			PathError:     err,

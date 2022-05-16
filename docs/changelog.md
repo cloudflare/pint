@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.18.1
+
+### Fixed
+
+- Fixed incorrect line reported when pint fails to unmarshall YAML file.
+
 ## v0.18.0
 
 ### Added

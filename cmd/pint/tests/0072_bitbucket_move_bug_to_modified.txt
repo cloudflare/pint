@@ -19,8 +19,9 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-pint.error -l debug --no-color ci
+pint.error --no-color -l debug ci
 ! stdout .
+stderr 'level=info msg="Problems found" Fatal=1'
 stderr 'result\\":\\"FAIL\\"'
 stderr ',\\"line\\":3,'
 stderr 'level=debug msg="Sending a request to BitBucket" method=PUT'
@@ -28,29 +29,28 @@ stderr 'level=debug msg="BitBucket request completed" status=200'
 stderr 'level=debug msg="Sending a request to BitBucket" method=DELETE'
 stderr 'level=debug msg="BitBucket request completed" status=200'
 exec sh -c 'cat ../server.pid | xargs kill'
-
 -- src/v1.yml --
 - alert: rule1
-  expr: sum(foo) by(job)
-- alert: rule2
-  expr: sum(foo) by(job)
-  for: 0s
+  expr: sum(foo) by(job) > 0
 
 -- src/v2.yml --
 - alert: rule1
-  expr: sum(foo) by(job)
-  for: 0s
+  expr: sum(foo) by(job) > 0
 - alert: rule2
-  expr: sum(foo) by(job)
-  for: 0s
+  expr: >-
+     sum(foo)
+    by(job) > 0
 
 -- src/.pint.hcl --
+parser {
+  relaxed = [".*"]
+}
 ci {
   baseBranch = "main"
 }
 repository {
   bitbucket {
-    uri        = "http://127.0.0.1:6070"
+    uri        = "http://127.0.0.1:6072"
     timeout    = "10s"
     project    = "prometheus"
     repository = "rules"
@@ -78,13 +78,13 @@ func main() {
 		io.WriteString(w, "OK")
 	})
 
-	listener, err := net.Listen("tcp", "127.0.0.1:6070")
+	listener, err := net.Listen("tcp", "127.0.0.1:6072")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	server := &http.Server{
-		Addr: "127.0.0.1:6070",
+		Addr: "127.0.0.1:6072",
 	}
 
 	go func() {
