@@ -1,0 +1,77 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/1.yml rules=4
+rules/1.yml:22-23: summary annotation is required (alerts/annotation)
+          - alert: Example_High_Restart_Rate
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+
+rules/1.yml:22-23: priority label is required (rule/label)
+          - alert: Example_High_Restart_Rate
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+
+rules/1.yml:24-25: summary annotation is required (alerts/annotation)
+          - alert: Invalid Query
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+
+rules/1.yml:24-25: priority label is required (rule/label)
+          - alert: Invalid Query
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+
+rules/1.yml:25: syntax error: no arguments for aggregate expression provided (promql/syntax)
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+
+rules/1.yml:28: duplicated expr key (yaml/parse)
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+
+level=info msg="Problems found" Bug=4 Fatal=2
+level=fatal msg="Fatal error" error="problems found"
+-- rules/1.yml --
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: example-app-alerts
+  labels:
+  app: example-app
+data:
+  alerts: |
+    groups:
+      - name: example-app-alerts
+        rules:
+          - alert: Example_Is_Down
+            expr: kube_deployment_status_replicas_available{namespace="example-app"} < 1
+            for: 5m
+            labels:
+              priority: "2"
+              environment: production
+            annotations:
+              summary: "No replicas for Example have been running for 5 minutes"
+
+          - alert: Example_High_Restart_Rate
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+          - alert: Invalid Query
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+          - alert: Duplicated Expr
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+rule {
+  match { kind = "alerting" }
+  label "priority" {
+    severity = "bug"
+    value    = "(1|2|3|4|5)"
+    required = true
+  }
+  annotation "summary" {
+    severity = "bug"
+    required = true
+  }
+}

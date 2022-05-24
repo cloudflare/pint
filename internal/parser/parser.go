@@ -39,11 +39,11 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		return nil, err
 	}
 
-	return parseNode(content, &node)
+	return parseNode(content, &node, 0)
 }
 
-func parseNode(content []byte, node *yaml.Node) (rules []Rule, err error) {
-	ret, isEmpty, err := parseRule(content, node)
+func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err error) {
+	ret, isEmpty, err := parseRule(content, node, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -56,14 +56,14 @@ func parseNode(content []byte, node *yaml.Node) (rules []Rule, err error) {
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
-				ret, err := parseNode(content, n)
+				ret, err := parseNode(content, n, offset)
 				if err != nil {
 					return nil, err
 				}
 				rules = append(rules, ret...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty, err := parseRule(content, root)
+			rule, isEmpty, err := parseRule(content, root, offset)
 			if err != nil {
 				return nil, err
 			}
@@ -71,7 +71,20 @@ func parseNode(content []byte, node *yaml.Node) (rules []Rule, err error) {
 				rules = append(rules, rule)
 			} else {
 				for _, n := range root.Content {
-					ret, err := parseNode(content, n)
+					ret, err := parseNode(content, n, offset)
+					if err != nil {
+						return nil, err
+					}
+					rules = append(rules, ret...)
+				}
+			}
+		case yaml.ScalarNode:
+			if root.Value != string(content) {
+				c := []byte(root.Value)
+				var n yaml.Node
+				err = yaml.Unmarshal(c, &n)
+				if err == nil {
+					ret, err := parseNode(c, &n, offset+root.Line)
 					if err != nil {
 						return nil, err
 					}
@@ -83,7 +96,7 @@ func parseNode(content []byte, node *yaml.Node) (rules []Rule, err error) {
 	return rules, nil
 }
 
-func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err error) {
+func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty bool, err error) {
 	isEmpty = true
 
 	if node.Kind != yaml.MappingNode {
@@ -113,34 +126,34 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 			switch key.Value {
 			case recordKey:
 				if recordPart != nil {
-					return duplicatedKeyError(part.Line, recordKey, nil)
+					return duplicatedKeyError(part.Line+offset, recordKey, nil)
 				}
-				recordPart = newYamlKeyValue(key, part)
+				recordPart = newYamlKeyValue(key, part, offset)
 			case alertKey:
 				if alertPart != nil {
-					return duplicatedKeyError(part.Line, alertKey, nil)
+					return duplicatedKeyError(part.Line+offset, alertKey, nil)
 				}
-				alertPart = newYamlKeyValue(key, part)
+				alertPart = newYamlKeyValue(key, part, offset)
 			case exprKey:
 				if exprPart != nil {
-					return duplicatedKeyError(part.Line, exprKey, nil)
+					return duplicatedKeyError(part.Line+offset, exprKey, nil)
 				}
-				exprPart = newPromQLExpr(key, part)
+				exprPart = newPromQLExpr(key, part, offset)
 			case forKey:
 				if forPart != nil {
-					return duplicatedKeyError(part.Line, forKey, nil)
+					return duplicatedKeyError(part.Line+offset, forKey, nil)
 				}
-				forPart = newYamlKeyValue(key, part)
+				forPart = newYamlKeyValue(key, part, offset)
 			case labelsKey:
 				if labelsPart != nil {
-					return duplicatedKeyError(part.Line, labelsKey, nil)
+					return duplicatedKeyError(part.Line+offset, labelsKey, nil)
 				}
-				labelsPart = newYamlMap(key, part)
+				labelsPart = newYamlMap(key, part, offset)
 			case annotationsKey:
 				if annotationsPart != nil {
-					return duplicatedKeyError(part.Line, annotationsKey, nil)
+					return duplicatedKeyError(part.Line+offset, annotationsKey, nil)
 				}
-				annotationsPart = newYamlMap(key, part)
+				annotationsPart = newYamlMap(key, part, offset)
 			default:
 				unknownKeys = append(unknownKeys, key)
 			}
@@ -172,7 +185,7 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 		isEmpty = false
 		rule = Rule{
 			Error: ParseError{
-				Line: node.Line,
+				Line: node.Line + offset,
 				Err:  fmt.Errorf("got both %s and %s keys in a single rule", recordKey, alertKey),
 			},
 		}
@@ -216,7 +229,7 @@ func parseRule(content []byte, node *yaml.Node) (rule Rule, isEmpty bool, err er
 		}
 		rule = Rule{
 			Error: ParseError{
-				Line: unknownKeys[0].Line,
+				Line: unknownKeys[0].Line + offset,
 				Err:  fmt.Errorf("invalid key(s) found: %s", strings.Join(keys, ", ")),
 			},
 		}
