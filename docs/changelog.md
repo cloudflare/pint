@@ -1,5 +1,35 @@
 # Changelog
 
+## v0.19.0
+
+### Added
+
+- Parsing files in relaxed mode will now try to find rules inside multi-line strings #252.
+  This allows direct linting of k8s manifests like the one below:
+
+  ```yaml
+  ---
+  kind: ConfigMap
+  apiVersion: v1
+  metadata:
+    name: example-app-alerts
+    labels:
+    app: example-app
+  data:
+    alerts: |
+      groups:
+        - name: example-app-alerts
+          rules:
+            - alert: Example_Is_Down
+              expr: kube_deployment_status_replicas_available{namespace="example-app"} < 1
+              for: 5m
+              labels:
+                priority: "2"
+                environment: production
+              annotations:
+                summary: "No replicas for Example have been running for 5 minutes"
+  ```
+
 ## v0.18.1
 
 ### Fixed

@@ -730,7 +730,152 @@ data:
           - alert: Example_High_Restart_Rate
             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
 `),
-			output: nil,
+			output: []parser.Rule{
+				{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{13}},
+								Value:    "alert",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{13}},
+								Value:    "Example_Is_Down",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{14}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{14}},
+								Value:    `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
+							},
+							Query: &parser.PromQLNode{
+								Expr: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
+								Children: []*parser.PromQLNode{
+									{Expr: `kube_deployment_status_replicas_available{namespace="example-app"}`},
+									{Expr: "1"},
+								},
+							},
+						},
+						For: &parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{15}},
+								Value:    "for",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{15}},
+								Value:    "5m",
+							},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{16}},
+								Value:    "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{17}},
+										Value:    "priority",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{17}},
+										Value:    "2",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{18}},
+										Value:    "environment",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{18}},
+										Value:    "production",
+									},
+								},
+							},
+						},
+						Annotations: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{19}},
+								Value:    "annotations",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{20}},
+										Value:    "summary",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{20}},
+										Value:    "No replicas for Example have been running for 5 minutes",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{22}},
+								Value:    "alert",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{22}},
+								Value:    "Example_High_Restart_Rate",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{23}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{23}},
+								Value:    `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+							},
+							Query: &parser.PromQLNode{
+								Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+								Children: []*parser.PromQLNode{
+									{
+										Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]))`,
+										Children: []*parser.PromQLNode{
+											{
+												Expr: `rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])`,
+												Children: []*parser.PromQLNode{
+													{
+														Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}[5m]`,
+														Children: []*parser.PromQLNode{
+															{Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}`},
+														},
+													},
+												},
+											},
+										},
+									},
+									{
+										Expr: "(3 / 60)",
+										Children: []*parser.PromQLNode{
+											{
+												Expr: "3 / 60",
+												Children: []*parser.PromQLNode{
+													{Expr: "3"},
+													{Expr: "60"},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		/*
 					FIXME https://github.com/cloudflare/pint/issues/20

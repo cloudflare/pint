@@ -25,15 +25,15 @@ func appendLine(lines []int, newLines ...int) []int {
 	return lines
 }
 
-func nodeLines(node *yaml.Node) (lines []int) {
+func nodeLines(node *yaml.Node, offset int) (lines []int) {
 	lineCount := len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n"))
 
 	var firstLine int
 	switch node.Style {
 	case yaml.LiteralStyle, yaml.FoldedStyle:
-		firstLine = node.Line + 1
+		firstLine = node.Line + 1 + offset
 	default:
-		firstLine = node.Line
+		firstLine = node.Line + offset
 	}
 
 	for i := 0; i < lineCount; i++ {
@@ -88,26 +88,26 @@ type YamlNode struct {
 	Comments []string
 }
 
-func newYamlNode(node *yaml.Node) *YamlNode {
+func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	return &YamlNode{
-		Position: NewFilePosition(nodeLines(node)),
+		Position: NewFilePosition(nodeLines(node, offset)),
 		Value:    node.Value,
 		Comments: mergeComments(node),
 	}
 }
 
-func newYamlNodeWithParent(parent, node *yaml.Node) *YamlNode {
+func newYamlNodeWithParent(parent, node *yaml.Node, offset int) *YamlNode {
 	return &YamlNode{
-		Position: NewFilePosition(nodeLines(node)),
+		Position: NewFilePosition(nodeLines(node, offset)),
 		Value:    node.Value,
 		Comments: mergeComments(node),
 	}
 }
 
-func newYamlKeyValue(key, val *yaml.Node) *YamlKeyValue {
+func newYamlKeyValue(key, val *yaml.Node, offset int) *YamlKeyValue {
 	return &YamlKeyValue{
-		Key:   newYamlNode(key),
-		Value: newYamlNodeWithParent(key, val),
+		Key:   newYamlNode(key, offset),
+		Value: newYamlNodeWithParent(key, val, offset),
 	}
 }
 
@@ -144,17 +144,17 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 	return nil
 }
 
-func newYamlMap(key, value *yaml.Node) *YamlMap {
+func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
 	ym := YamlMap{
-		Key: newYamlNode(key),
+		Key: newYamlNode(key, offset),
 	}
 
 	var ckey *yaml.Node
 	for _, child := range value.Content {
 		if ckey != nil {
 			kv := YamlKeyValue{
-				Key:   newYamlNode(ckey),
-				Value: newYamlNode(child),
+				Key:   newYamlNode(ckey, offset),
+				Value: newYamlNode(child, offset),
 			}
 			ym.Items = append(ym.Items, &kv)
 			ckey = nil
@@ -202,10 +202,10 @@ func (pqle PromQLExpr) Lines() (lines []int) {
 	return
 }
 
-func newPromQLExpr(key, val *yaml.Node) *PromQLExpr {
+func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 	expr := PromQLExpr{
-		Key:   newYamlNode(key),
-		Value: newYamlNodeWithParent(key, val),
+		Key:   newYamlNode(key, offset),
+		Value: newYamlNodeWithParent(key, val, offset),
 	}
 
 	qlNode, err := DecodeExpr(val.Value)
