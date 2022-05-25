@@ -877,123 +877,337 @@ data:
 				},
 			},
 		},
-		/*
-					FIXME https://github.com/cloudflare/pint/issues/20
-					{
-						content: []byte(`groups:
-			  - name: "haproxy.api_server.rules"
-			    rules:
-			      - alert: HaproxyServerHealthcheckFailure
-			        expr: increase(haproxy_server_check_failures_total[15m]) > 100
-			        for: 5m
-			        labels:
-			          severity: 24x7
-			        annotations:
-			          summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
-			          description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
-			`),
-						output: []parser.Rule{
-							{
-								AlertingRule: &parser.AlertingRule{
-									Alert: parser.YamlKeyValue{
-										Key: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{4}},
-											Value:    "alert",
-										},
-										Value: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{4}},
-											Value:    "HaproxyServerHealthcheckFailure",
-										},
-									},
-									Expr: parser.PromQLExpr{
-										Key: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{5}},
-											Value:    "expr",
-										},
-										Value: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{5}},
-											Value:    "increase(haproxy_server_check_failures_total[15m]) > 100",
-										},
-										Query: &parser.PromQLNode{
-											Expr: "increase(haproxy_server_check_failures_total[15m]) > 100",
-											Children: []*parser.PromQLNode{
-												{
-													Expr: "increase(haproxy_server_check_failures_total[15m])",
-													Children: []*parser.PromQLNode{
-														{
-															Expr: "haproxy_server_check_failures_total[15m]",
-															Children: []*parser.PromQLNode{
-																{
-																	Expr: "haproxy_server_check_failures_total",
-																},
-															},
-														},
+		{
+			content: []byte(`groups:
+- name: "haproxy.api_server.rules"
+  rules:
+  - alert: HaproxyServerHealthcheckFailure
+    expr: increase(haproxy_server_check_failures_total[15m]) > 100
+    for: 5m
+    labels:
+      severity: 24x7
+    annotations:
+      summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
+      description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+`),
+			output: []parser.Rule{
+				{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "alert",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "HaproxyServerHealthcheckFailure",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "increase(haproxy_server_check_failures_total[15m]) > 100",
+							},
+							Query: &parser.PromQLNode{
+								Expr: "increase(haproxy_server_check_failures_total[15m]) > 100",
+								Children: []*parser.PromQLNode{
+									{
+										Expr: "increase(haproxy_server_check_failures_total[15m])",
+										Children: []*parser.PromQLNode{
+											{
+												Expr: "haproxy_server_check_failures_total[15m]",
+												Children: []*parser.PromQLNode{
+													{
+														Expr: "haproxy_server_check_failures_total",
 													},
 												},
-												{Expr: "100"},
 											},
 										},
 									},
-									For: &parser.YamlKeyValue{
-										Key: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{6}},
-											Value:    "for",
-										},
-										Value: &parser.YamlNode{Position: parser.FilePosition{Lines: []int{6}},
-											Value: "5m",
-										},
+									{Expr: "100"},
+								},
+							},
+						},
+						For: &parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "for",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "5m",
+							},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{7}},
+								Value:    "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "severity",
 									},
-									Labels: &parser.YamlMap{
-										Key: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{7}},
-											Value:    "labels",
-										},
-										Items: []*parser.YamlKeyValue{
-											{
-												Key: &parser.YamlNode{
-													Position: parser.FilePosition{Lines: []int{8}},
-													Value:    "severity",
-												},
-												Value: &parser.YamlNode{
-													Position: parser.FilePosition{Lines: []int{8}},
-													Value:    "24x7",
-												},
-											},
-										},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "24x7",
 									},
-									Annotations: &parser.YamlMap{
-										Key: &parser.YamlNode{
-											Position: parser.FilePosition{Lines: []int{9}},
-											Value:    "annotations",
-										},
-										Items: []*parser.YamlKeyValue{
-											{
-												Key: &parser.YamlNode{
-													Position: parser.FilePosition{Lines: []int{10}},
-													Value:    "summary",
-												},
-												Value: &parser.YamlNode{
-													Position: parser.FilePosition{Lines: []int{10}},
-													Value:    "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
-												},
-											},
-											{
-												Key: &parser.YamlNode{
-													Position: parser.FilePosition{Lines: []int{11}},
-													Value:    "description",
-												},
-												Value: &parser.YamlNode{
-													Position: parser.FilePosition{Lines: []int{11}},
-													Value:    `Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}`,
-												},
-											},
-										},
+								},
+							},
+						},
+						Annotations: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{9}},
+								Value:    "annotations",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{10}},
+										Value:    "summary",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{10}},
+										Value:    "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{11}},
+										Value:    "description",
+									},
+									Value: &parser.YamlNode{
+										// FIXME https://github.com/cloudflare/pint/issues/20
+										// Should be Lines: [11]
+										Position: parser.FilePosition{Lines: []int{11, 12, 13}},
+										// Should be `Some ...` since \n should be escaped
+										Value: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}",
 									},
 								},
 							},
 						},
 					},
-		*/
+				},
+			},
+		},
+		{
+			content: []byte(`groups:
+- name: certmanager
+  rules:
+  - &recordAnchor
+    record: name1
+    expr: expr1
+  - <<: *recordAnchor
+    expr: expr2
+  - <<: *recordAnchor
+`),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "name1",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "expr1",
+							},
+							Query: &parser.PromQLNode{Expr: "expr1"},
+						},
+					},
+				},
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "name1",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{8}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{8}},
+								Value:    "expr2",
+							},
+							Query: &parser.PromQLNode{Expr: "expr2"},
+						},
+					},
+				},
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "name1",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "expr1",
+							},
+							Query: &parser.PromQLNode{Expr: "expr1"},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`groups:
+- name: certmanager
+  rules:
+  - record: name1
+    expr: expr1
+    labels: &labelsAnchor
+      label1: val1
+      label2: val2
+  - record: name2
+    expr: expr2
+    labels: *labelsAnchor
+    # foot comment
+`),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "name1",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{5}},
+								Value:    "expr1",
+							},
+							Query: &parser.PromQLNode{Expr: "expr1"},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{7}},
+										Value:    "label1",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{7}},
+										Value:    "val1",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "label2",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "val2",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{9}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{9}},
+								Value:    "name2",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{10}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{10}},
+								Value:    "expr2",
+							},
+							Query: &parser.PromQLNode{Expr: "expr2"},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{11}},
+								Value:    "labels",
+								Comments: []string{"# foot comment"},
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{7}},
+										Value:    "label1",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{7}},
+										Value:    "val1",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "label2",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{8}},
+										Value:    "val2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })

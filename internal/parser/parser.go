@@ -113,7 +113,8 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
-	for i, part := range node.Content {
+
+	for i, part := range unpackNodes(node) {
 		if i == 0 && node.HeadComment != "" {
 			part.HeadComment = node.HeadComment
 		}
@@ -259,6 +260,70 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 	}
 
 	return
+}
+
+func unpackNodes(node *yaml.Node) []*yaml.Node {
+	nodes := make([]*yaml.Node, 0, len(node.Content))
+	var isMerge bool
+	for _, part := range node.Content {
+		if part.Tag == "!!merge" && part.Value == "<<" {
+			isMerge = true
+		}
+
+		if part.Alias != nil {
+			if isMerge {
+				nodes = append(nodes, resolveMapAlias(part, node).Content...)
+			} else {
+				nodes = append(nodes, resolveMapAlias(part, part))
+			}
+			isMerge = false
+			continue
+		}
+		if isMerge {
+			continue
+		}
+		nodes = append(nodes, part)
+	}
+	return nodes
+}
+
+func nodeKeys(node *yaml.Node) (keys []string) {
+	if node.Kind != yaml.MappingNode {
+		return keys
+	}
+	for i, n := range node.Content {
+		if i%2 == 0 && n.Value != "" {
+			keys = append(keys, n.Value)
+		}
+	}
+	return keys
+}
+
+func hasKey(node *yaml.Node, key string) bool {
+	for _, k := range nodeKeys(node) {
+		if k == key {
+			return true
+		}
+	}
+	return false
+}
+
+func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
+	node := yaml.Node(*part)
+	node.Content = nil
+	var ok bool
+	for i, alias := range part.Alias.Content {
+		if i%2 == 0 {
+			ok = !hasKey(parent, alias.Value)
+		}
+		if ok {
+			node.Content = append(node.Content, alias)
+		}
+		if i%2 == 1 {
+			ok = false
+		}
+	}
+	return &node
 }
 
 func duplicatedKeyError(line int, key string, err error) (Rule, bool, error) {
