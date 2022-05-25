@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.20.0
+
+### Fixed
+
+- pint will now correctly handle YAML anchors.
+
 ## v0.19.0
 
 ### Added
