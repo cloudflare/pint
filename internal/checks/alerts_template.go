@@ -53,6 +53,7 @@ var (
 		"tableLink":          dummyFuncMap,
 		"sortByLabel":        dummyFuncMap,
 		"stripPort":          dummyFuncMap,
+		"stripDomain":        dummyFuncMap,
 		"humanize":           dummyFuncMap,
 		"humanize1024":       dummyFuncMap,
 		"humanizeDuration":   dummyFuncMap,
