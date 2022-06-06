@@ -15,7 +15,7 @@ require (
 	github.com/prometheus/prometheus v0.36.0
 	github.com/rogpeppe/go-internal v1.8.1
 	github.com/rs/zerolog v1.26.1
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.2
 	github.com/urfave/cli/v2 v2.8.1
 	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401
 	gopkg.in/yaml.v3 v3.0.1
