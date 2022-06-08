@@ -10,6 +10,7 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
@@ -53,7 +54,7 @@ func (c RateCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 		return
 	}
 
-	for _, problem := range c.checkNode(expr.Query, cfg) {
+	for _, problem := range c.checkNode(ctx, expr.Query, cfg) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
@@ -66,7 +67,7 @@ func (c RateCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 	return
 }
 
-func (c RateCheck) checkNode(node *parser.PromQLNode, cfg *promapi.ConfigResult) (problems []exprProblem) {
+func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *promapi.ConfigResult) (problems []exprProblem) {
 	if n, ok := node.Node.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate") {
 		var minIntervals int
 		switch n.Func.Name {
@@ -86,12 +87,34 @@ func (c RateCheck) checkNode(node *parser.PromQLNode, cfg *promapi.ConfigResult)
 					}
 					problems = append(problems, p)
 				}
+				if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
+					metadata, err := c.prom.Metadata(ctx, s.Name)
+					if err != nil {
+						text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+						problems = append(problems, exprProblem{
+							expr:     s.Name,
+							text:     text,
+							severity: severity,
+						})
+						continue
+					}
+					for _, m := range metadata.Metadata {
+						if m.Type != v1.MetricTypeCounter {
+							problems = append(problems, exprProblem{
+								expr: s.Name,
+								text: fmt.Sprintf("%s() should only be used with counters but %q is a %s according to metrics metadata from %s",
+									n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
+								severity: Bug,
+							})
+						}
+					}
+				}
 			}
 		}
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(child, cfg)...)
+		problems = append(problems, c.checkNode(ctx, child, cfg)...)
 	}
 
 	return

@@ -224,6 +224,7 @@ var (
 	requireConfigPath     = requestPathCond{path: "/api/v1/status/config"}
 	requireQueryPath      = requestPathCond{path: "/api/v1/query"}
 	requireRangeQueryPath = requestPathCond{path: "/api/v1/query_range"}
+	requireMetadataPath   = requestPathCond{path: "/api/v1/metadata"}
 )
 
 type promError struct {
@@ -324,6 +325,28 @@ func (cr configResponse) respond(w http.ResponseWriter) {
 	}{
 		Status: "success",
 		Data:   v1.ConfigResult{YAML: cr.yaml},
+	}
+	d, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	_, _ = w.Write(d)
+}
+
+type metadataResponse struct {
+	metadata map[string][]v1.Metadata
+}
+
+func (mr metadataResponse) respond(w http.ResponseWriter) {
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+	// _, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
+	result := struct {
+		Status string                   `json:"status"`
+		Data   map[string][]v1.Metadata `json:"data"`
+	}{
+		Status: "success",
+		Data:   mr.metadata,
 	}
 	d, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

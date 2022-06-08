@@ -95,3 +95,18 @@ func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, lookback, 
 	}
 	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 }
+
+func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata *MetadataResult, err error) {
+	var uri string
+	for _, prom := range fg.servers {
+		uri = prom.uri
+		metadata, err = prom.Metadata(ctx, metric)
+		if err == nil {
+			return
+		}
+		if !IsUnavailableError(err) {
+			return metadata, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+		}
+	}
+	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+}

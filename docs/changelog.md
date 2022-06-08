@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.21.0
+
+### Added
+
+- `promql/rate` check will now report if `rate()` or `irate()` function is being
+  passed a non-counter metric.
+
 ## v0.20.0
 
 ### Fixed
