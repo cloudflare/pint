@@ -5,6 +5,8 @@ import (
 	"testing"
 	"time"
 
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+
 	"github.com/cloudflare/pint/internal/checks"
 )
 
@@ -14,6 +16,10 @@ func newRateCheck(uri string) checks.RuleChecker {
 
 func durationMustText(name, uri, fun, multi, using string) string {
 	return fmt.Sprintf(`duration for %s() must be at least %s x scrape_interval, prometheus %q at %s is using %s scrape_interval`, fun, multi, name, uri, using)
+}
+
+func notCounterText(name, uri, fun, metric, kind string) string {
+	return fmt.Sprintf(`%s() should only be used with counters but %q is a %s according to metrics metadata from prometheus %q at %s`, fun, metric, kind, name, uri)
 }
 
 func TestRateCheck(t *testing.T) {
@@ -44,6 +50,12 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
 			},
 		},
 		{
@@ -56,6 +68,12 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
 			},
 		},
 		{
@@ -67,6 +85,12 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 30s\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
 				},
 			},
 		},
@@ -90,6 +114,12 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
 			},
 		},
 		{
@@ -101,6 +131,12 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
 				},
 			},
 		},
@@ -117,6 +153,12 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
 			},
 		},
 		{
@@ -131,6 +173,12 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
 				},
 			},
 		},
@@ -147,6 +195,12 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
 			},
 		},
 		{
@@ -162,6 +216,12 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
 			},
 		},
 		{
@@ -173,6 +233,12 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
 				},
 			},
 		},
@@ -207,6 +273,12 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
 				},
 			},
 		},
@@ -304,6 +376,136 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global: {}\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
+			},
+		},
+		{
+			description: "metadata error",
+			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
+			checker:     newRateCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `rate(foo{job="xxx"}[1m])`,
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "failed to query Prometheus metric metadata: server_error: server error: 500"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp:  respondWithInternalError(),
+				},
+			},
+		},
+		{
+			description: "empty metadata response",
+			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[5m])\n",
+			checker:     newRateCheck,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp:  metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "rate(gauge) < 2x scrape interval",
+			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
+			checker:     newRateCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `rate(foo{job="xxx"}[1m])`,
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "gauge"}},
+					}},
+				},
+			},
+		},
+		{
+			description: "rate(counter)  / rate(gauge)",
+			content:     "- record: foo\n  expr: rate(foo_c[2m]) / rate(bar_g[2m])\n",
+			checker:     newRateCheck,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "bar_g",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     notCounterText("prom", uri, "rate", "bar_g", "gauge"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "foo_c"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo_c": {{Type: "counter"}},
+					}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "bar_g"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"bar_g": {{Type: "gauge"}},
+					}},
 				},
 			},
 		},

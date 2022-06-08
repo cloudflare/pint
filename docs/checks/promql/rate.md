@@ -6,10 +6,22 @@ grand_parent: Documentation
 
 # promql/rate
 
-This check inspects `rate()` and `irate()` functions and warns if used duration
-is too low. It does so by first getting global `scrape_interval` value for selected
-Prometheus servers and comparing duration to it.
-It will report a bug if duration is less than 2x `scrape_interval`.
+This check inspects `rate()` and `irate()` function calls used in queries
+to verify that:
+- [Range queries](https://prometheus.io/docs/prometheus/latest/querying/basics/#range-vector-selectors)
+  are using a valid time duration.
+  This is done by first getting global `scrape_interval` value for selected
+  Prometheus servers and comparing duration to it.
+  It will report a bug if duration is less than 2x `scrape_interval` because
+  Prometheus must have at least two samples to be able to calculate rate, so
+  the time range used in queries must be at least 2x `scrape_interval` value.
+- Metrics passed to `rate()` and `irate()` are counters.
+  Both functions only work with counters and, although any metric type can be
+  passed to it and will return calculated value, using a non-counter will cause
+  problems. This is because counters are only allowed to increase in value and any
+  value drop is interpreted as counter overflow.
+  For gauge metrics please use [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv)
+  function instead.
 
 ## Configuration
 
