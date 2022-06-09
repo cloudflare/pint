@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.21.1
+
+### Fixed
+
+- `pint_prometheus_queries_total` and `pint_prometheus_cache_hits_total` metric wasn't
+  always correctly updated.
+
 ## v0.21.0
 
 ### Added

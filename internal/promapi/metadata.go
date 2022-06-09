@@ -22,7 +22,7 @@ func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResu
 
 	if v, ok := p.cache.Get(key); ok {
 		log.Debug().Str("key", key).Str("uri", p.uri).Str("metric", metric).Msg("Metric metadata cache hit")
-		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/metadata")
+		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/metadata").Inc()
 		metadata := v.(MetadataResult)
 		return &metadata, nil
 	}
@@ -30,7 +30,7 @@ func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResu
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/metadata")
+	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/metadata").Inc()
 	resp, err := p.api.Metadata(ctx, metric, "")
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Msg("Failed to query Prometheus metric metadata")

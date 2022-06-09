@@ -42,7 +42,7 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeout)
 	defer cancel()
 
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/status/config")
+	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/status/config").Inc()
 	resp, err := p.api.Config(ctx)
 	if err != nil {
 		log.Error().Err(err).Str("uri", p.uri).Msg("Failed to query Prometheus configuration")
