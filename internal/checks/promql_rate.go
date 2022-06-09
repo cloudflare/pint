@@ -99,7 +99,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *
 						continue
 					}
 					for _, m := range metadata.Metadata {
-						if m.Type != v1.MetricTypeCounter {
+						if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
 							problems = append(problems, exprProblem{
 								expr: s.Name,
 								text: fmt.Sprintf("%s() should only be used with counters but %q is a %s according to metrics metadata from %s",

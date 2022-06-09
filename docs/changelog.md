@@ -6,6 +6,7 @@
 
 - `pint_prometheus_queries_total` and `pint_prometheus_cache_hits_total` metric wasn't
   always correctly updated.
+- Ignore `unknown` metric types in `promql/rate`.
 
 ## v0.21.0
 

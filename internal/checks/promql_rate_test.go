@@ -509,6 +509,24 @@ func TestRateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "rate(unknown)",
+			content:     "- record: foo\n  expr: rate(foo[2m])\n",
+			checker:     newRateCheck,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "unknown"}},
+					}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
