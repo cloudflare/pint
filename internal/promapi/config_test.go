@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,7 +15,6 @@ import (
 )
 
 func TestConfig(t *testing.T) {
-	done := sync.Map{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/30s/api/v1/status/config":
@@ -32,15 +30,9 @@ func TestConfig(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
 		case "/once/api/v1/status/config":
-			if _, wasDone := done.Load(r.URL.Path); wasDone {
-				w.WriteHeader(500)
-				_, _ = w.Write([]byte("path already requested\n"))
-				return
-			}
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-			done.Store(r.URL.Path, true)
 		case "/slow/api/v1/status/config":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
@@ -66,7 +58,6 @@ func TestConfig(t *testing.T) {
 		timeout time.Duration
 		cfg     promapi.ConfigResult
 		err     string
-		runs    int
 	}
 
 	defaults := promapi.PrometheusConfig{
@@ -86,7 +77,6 @@ func TestConfig(t *testing.T) {
 				URI:    srv.URL + "/default",
 				Config: defaults,
 			},
-			runs: 5,
 		},
 		{
 			prefix:  "/1m",
@@ -95,7 +85,6 @@ func TestConfig(t *testing.T) {
 				URI:    srv.URL + "/1m",
 				Config: defaults,
 			},
-			runs: 5,
 		},
 		{
 			prefix:  "/30s",
@@ -111,41 +100,21 @@ func TestConfig(t *testing.T) {
 					},
 				},
 			},
-			runs: 1,
 		},
 		{
 			prefix:  "/slow",
 			timeout: time.Millisecond * 10,
-			err:     fmt.Sprintf(`failed to query Prometheus config: Get "%s/slow/api/v1/status/config": context deadline exceeded`, srv.URL),
-			runs:    5,
+			err:     "connection timeout",
 		},
 		{
 			prefix:  "/error",
 			timeout: time.Second,
-			err:     "failed to query Prometheus config: server_error: server error: 500",
-			runs:    5,
+			err:     "server_error: server error: 500",
 		},
 		{
 			prefix:  "/badYaml",
 			timeout: time.Second,
 			err:     fmt.Sprintf("failed to decode config data in %s/badYaml response: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `invalid...` into promapi.PrometheusConfig", srv.URL),
-			runs:    5,
-		},
-		{
-			prefix:  "/once",
-			timeout: time.Second,
-			cfg: promapi.ConfigResult{
-				URI:    srv.URL + "/once",
-				Config: defaults,
-			},
-			runs: 10,
-		},
-		// make sure /once fails on second query
-		{
-			prefix:  "/once",
-			timeout: time.Second,
-			runs:    2,
-			err:     "failed to query Prometheus config: server_error: server error: 500",
 		},
 	}
 
@@ -153,25 +122,19 @@ func TestConfig(t *testing.T) {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
 			assert := assert.New(t)
 
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout)
+			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout, 1)
+			prom.StartWorkers()
+			defer prom.Close()
 
-			wg := sync.WaitGroup{}
-			wg.Add(tc.runs)
-			for i := 1; i <= tc.runs; i++ {
-				go func() {
-					cfg, err := prom.Config(context.Background())
-					if tc.err != "" {
-						assert.EqualError(err, tc.err, tc)
-					} else {
-						assert.NoError(err)
-					}
-					if cfg != nil {
-						assert.Equal(*cfg, tc.cfg)
-					}
-					wg.Done()
-				}()
+			cfg, err := prom.Config(context.Background())
+			if tc.err != "" {
+				assert.EqualError(err, tc.err, tc)
+			} else {
+				assert.NoError(err)
 			}
-			wg.Wait()
+			if cfg != nil {
+				assert.Equal(*cfg, tc.cfg)
+			}
 		})
 	}
 }

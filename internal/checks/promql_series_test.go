@@ -8,10 +8,11 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newSeriesCheck(uri string) checks.RuleChecker {
-	return checks.NewSeriesCheck(simpleProm("prom", uri, time.Second*5, true))
+func newSeriesCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
+	return checks.NewSeriesCheck(prom)
 }
 
 func noMetricText(name, uri, metric, since string) string {
@@ -64,12 +65,14 @@ func TestSeriesCheck(t *testing.T) {
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 		},
 		{
 			description: "bad response",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -91,8 +94,9 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "bad uri",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker: func(s string) checks.RuleChecker {
-				return checks.NewSeriesCheck(simpleProm("prom", "http://", time.Second*5, false))
+			checker:     newSeriesCheck,
+			prometheus: func(s string) *promapi.FailoverGroup {
+				return simpleProm("prom", "http://", time.Second*5, false)
 			},
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -110,6 +114,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "simple query",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -136,6 +141,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "complex query",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -192,8 +198,9 @@ func TestSeriesCheck(t *testing.T) {
     )
   for: 5m
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -215,6 +222,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset 5m\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -230,6 +238,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "negative offset",
 			content:     "- record: foo\n  expr: node_filesystem_readonly{mountpoint!=\"\"} offset -15m\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -245,6 +254,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#1 series present",
 			content:     "- record: foo\n  expr: found > 0\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -257,6 +267,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#1 query error",
 			content:     "- record: foo\n  expr: found > 0\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -279,6 +290,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 series never present",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -305,6 +317,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 series never present but recording rule provides it correctly",
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- record: foo:bar\n  expr: sum(foo:bar)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -338,6 +351,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 series never present but recording rule provides it without results",
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- record: foo:bar\n  expr: sum(foo)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -371,6 +385,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 {ALERTS=...} present",
 			content:     "- record: foo\n  expr: count(ALERTS{alertname=\"myalert\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- alert: myalert\n  expr: sum(foo) == 0\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -388,6 +403,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 {ALERTS=...} missing",
 			content:     "- record: foo\n  expr: count(ALERTS{alertname=\"myalert\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- alert: notmyalert\n  expr: sum(foo) == 0\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -405,6 +421,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 series never present but recording rule provides it, query error",
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- record: foo:bar\n  expr: sum(foo:bar)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -438,6 +455,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 query error",
 			content:     "- record: foo\n  expr: found > 0\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -464,6 +482,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#3 metric present, label missing",
 			content:     "- record: foo\n  expr: sum(found{job=\"foo\", notfound=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -519,6 +538,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#3 metric present, label query error",
 			content:     "- record: foo\n  expr: sum(found{notfound=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -558,6 +578,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#4 metric was present but disappeared 50m ago",
 			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -621,6 +642,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#4 metric was present but disappeared over 1h ago",
 			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -697,8 +719,9 @@ func TestSeriesCheck(t *testing.T) {
   # pint rule/set promql/series min-age 5d
   expr: sum(found{job="foo", instance="bar"})
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -764,8 +787,9 @@ func TestSeriesCheck(t *testing.T) {
   # pint rule/set promql/series(found) min-age 5d
   expr: sum(found{job="foo", instance="bar"})
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -831,7 +855,8 @@ func TestSeriesCheck(t *testing.T) {
   # pint rule/set promql/series min-age 3d
   expr: sum(found{job="foo", instance="bar"})
 `,
-			checker: newSeriesCheck,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -908,7 +933,8 @@ func TestSeriesCheck(t *testing.T) {
   # pint rule/set promql/series(bar) min-age 5d
   expr: sum(found{job="foo", instance="bar"})
 `,
-			checker: newSeriesCheck,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -985,7 +1011,8 @@ func TestSeriesCheck(t *testing.T) {
   # pint rule/set promql/series(found) min-age foo
   expr: sum(found{job="foo", instance="bar"})
 `,
-			checker: newSeriesCheck,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1066,6 +1093,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#5 metric was present but not with label",
 			content:     "- record: foo\n  expr: sum(found{notfound=\"notfound\", instance=~\".+\", not!=\"negative\", instance!~\"bad\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1169,6 +1197,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#5 label query error",
 			content:     "- record: foo\n  expr: sum(found{error=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1224,6 +1253,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#5 high churn labels",
 			content:     "- record: foo\n  expr: sum(sometimes{churn=\"notfound\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1315,8 +1345,9 @@ func TestSeriesCheck(t *testing.T) {
   # pint rule/set promql/series ignore/label-value error
   expr: sum(foo{error="notfound"})
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1354,6 +1385,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#6 metric was always present but label disappeared",
 			content:     "- record: foo\n  expr: sum({__name__=\"found\", removed=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1421,7 +1453,8 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: sum({__name__="found", removed="xxx"})
 `,
-			checker: newSeriesCheck,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1496,8 +1529,9 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: sum({__name__="found", removed="xxx"})
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1551,13 +1585,14 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#7 metric was always present but label only sometimes",
 			content:     "- record: foo\n  expr: sum(found{sometimes=\"xxx\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Fragment: `found{sometimes="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
+						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h43m20s"),
 						Severity: checks.Warning,
 					},
 				}
@@ -1632,14 +1667,14 @@ func TestSeriesCheck(t *testing.T) {
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-5),
 								time.Now().Add(time.Hour*24*-4),
+								time.Now().Add(time.Hour*24*-3),
 								time.Minute*5,
 							),
 							generateSampleStream(
 								map[string]string{},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-1),
+								time.Now().Add(time.Hour*24*-1),
 								time.Minute*5,
 							),
 						},
@@ -1651,13 +1686,14 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#8 metric is sometimes present",
 			content:     "- record: foo\n  expr: sum(sometimes{foo!=\"bar\"})\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Fragment: `sometimes`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
+						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "33m20s"),
 						Severity: checks.Warning,
 					},
 				}
@@ -1732,6 +1768,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "series found, label missing",
 			content:     "- record: foo\n  expr: found{job=\"notfound\"}\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1787,6 +1824,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "series missing, label missing",
 			content:     "- record: foo\n  expr: notfound{job=\"notfound\"}\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1821,7 +1859,8 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: '{__name__="notfound", job="bar"}'
 `,
-			checker: newSeriesCheck,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1857,8 +1896,9 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound) == 0
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 		},
 		{
 			description: "series missing but check disabled, labels",
@@ -1867,8 +1907,9 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound{job="foo"}) == 0
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 		},
 		{
 			description: "series missing but check disabled, negative labels",
@@ -1877,8 +1918,9 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound{job!="foo"}) == 0
 `,
-			checker:  newSeriesCheck,
-			problems: noProblems,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 		},
 		{
 			description: "series missing, disabled comment for labels",
@@ -1887,7 +1929,8 @@ func TestSeriesCheck(t *testing.T) {
 - record: foo
   expr: count(notfound) == 0
 `,
-			checker: newSeriesCheck,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -1920,6 +1963,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "alert rule using 2 recording rules",
 			content:     "- alert: foo\n  expr: sum(foo:count) / sum(foo:sum) > 120\n",
 			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- record: foo:count\n  expr: count(foo)\n- record: foo:sum\n  expr: sum(foo)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{

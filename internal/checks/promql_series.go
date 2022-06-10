@@ -45,6 +45,8 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 	}
 
 	rangeLookback := time.Hour * 24 * 7
+	rangeEnd := time.Now()
+	rangeStart := rangeEnd.Add(rangeLookback * -1)
 	rangeStep := time.Minute * 5
 
 	done := map[string]bool{}
@@ -136,7 +138,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeLookback, rangeStep)
+		trs, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeStart, rangeEnd, rangeStep)
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -186,7 +188,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeLookback, rangeStep)
+			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeStart, rangeEnd, rangeStep)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -264,7 +266,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeLookback, rangeStep)
+			trsLabel, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeStart, rangeEnd, rangeStep)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
@@ -390,28 +392,28 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 	return series, qr.URI, nil
 }
 
-func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, lookback, step time.Duration) (tr *timeRanges, err error) {
-	qr, err := c.prom.RangeQuery(ctx, query, lookback, step)
+func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, start, end time.Time, step time.Duration) (tr *timeRanges, err error) {
+	qr, err := c.prom.RangeQuery(ctx, query, start, end, step)
 	if err != nil {
 		return nil, err
 	}
 
 	tr = &timeRanges{
 		uri:   qr.URI,
-		from:  qr.Start,
-		until: qr.End,
+		from:  qr.Start.Round(time.Second),
+		until: qr.End.Round(time.Second),
 		step:  step,
 	}
 	var ts time.Time
 	for _, s := range qr.Samples {
 		for _, v := range s.Values {
-			ts = v.Timestamp.Time()
+			ts = v.Timestamp.Time().Round(time.Second)
 
 			var found bool
 			for i := range tr.ranges {
 				if tr.ranges[i].labels.Equal(model.LabelSet(s.Metric)) &&
 					!ts.Before(tr.ranges[i].start) &&
-					!ts.After(tr.ranges[i].end) {
+					!ts.After(tr.ranges[i].end.Add(step)) {
 					tr.ranges[i].end = ts.Add(step)
 					found = true
 					break

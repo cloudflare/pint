@@ -7,8 +7,6 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
-
-	"github.com/cloudflare/pint/internal/output"
 )
 
 type QueryResult struct {
@@ -17,61 +15,63 @@ type QueryResult struct {
 	DurationSeconds float64
 }
 
+type instantQuery struct {
+	prom *Prometheus
+	ctx  context.Context
+	expr string
+}
+
+func (q instantQuery) Run() (any, error) {
+	log.Debug().
+		Str("uri", q.prom.uri).
+		Str("query", q.expr).
+		Msg("Running prometheus query")
+
+	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
+	defer cancel()
+
+	v, _, err := q.prom.api.Query(ctx, q.expr, time.Now())
+	return v, err
+}
+
+func (q instantQuery) Endpoint() string {
+	return "/api/v1/query"
+}
+
+func (q instantQuery) String() string {
+	return q.expr
+}
+
+func (q instantQuery) CacheKey() string {
+	return hash("/api/v1/query/" + q.expr)
+}
+
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
 	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
 
-	lockKey := expr
-	p.lock.lock(lockKey)
-	defer p.lock.unlock((lockKey))
-
-	if v, ok := p.cache.Get(expr); ok {
-		log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache hit")
-		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query").Inc()
-		r := v.(QueryResult)
-		return &r, nil
+	resultChan := make(chan queryResult)
+	p.queries <- queryRequest{
+		query:  instantQuery{prom: p, ctx: ctx, expr: expr},
+		result: resultChan,
 	}
 
-	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Query started")
-
-	ctx, cancel := context.WithTimeout(ctx, p.timeout)
-	defer cancel()
-
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query").Inc()
-	start := time.Now()
-	result, _, err := p.api.Query(ctx, expr, start)
-	duration := time.Since(start)
-	log.Debug().
-		Str("uri", p.uri).
-		Str("query", expr).
-		Str("duration", output.HumanizeDuration(duration)).
-		Msg("Query completed")
-	if err != nil {
-		log.Error().Err(err).
-			Str("uri", p.uri).
-			Str("query", expr).
-			Msg("Query failed")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", errReason(err)).Inc()
-		return nil, err
+	result := <-resultChan
+	if result.err != nil {
+		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	qr := QueryResult{
-		URI:             p.uri,
-		DurationSeconds: duration.Seconds(),
-	}
+	qr := QueryResult{URI: p.uri}
 
-	switch result.Type() {
+	switch result.value.(model.Value).Type() {
 	case model.ValVector:
-		vectorVal := result.(model.Vector)
+		vectorVal := result.value.(model.Vector)
 		qr.Series = vectorVal
 	default:
-		log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result.Type())
+		log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result.value.(model.Value).Type())
 		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", "unknown result type").Inc()
-		return nil, fmt.Errorf("unknown result type: %v", result.Type())
+		return nil, fmt.Errorf("unknown result type: %v", result.value.(model.Value).Type())
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
-
-	log.Debug().Str("key", expr).Str("uri", p.uri).Msg("Query cache miss")
-	p.cache.Add(expr, qr)
 
 	return &qr, nil
 }

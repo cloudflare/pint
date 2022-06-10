@@ -3,7 +3,7 @@ exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; 
 
 exec bash -x ./test.sh &
 
-pint.ok watch --listen=:6054 --pidfile=pint.pid rules
+pint.ok watch --listen=127.0.0.1:6054 --pidfile=pint.pid rules
 cmp curl.txt metrics.txt
 
 -- test.sh --
@@ -71,18 +71,24 @@ pint_last_run_duration_seconds
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="cound't run \"promql/rate\" checks due to prometheus \"prom1\" at http://127.0.0.1:7054 connection error: failed to query Prometheus config: server_error: server error: 500",reporter="promql/rate",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="cound't run \"promql/rate\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: failed to query Prometheus config: Get \"http://127.0.0.1:1054/api/v1/status/config\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/rate",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="cound't run \"promql/series\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: Post \"http://127.0.0.1:1054/api/v1/query\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="cound't run \"promql/rate\" checks due to prometheus \"prom1\" at http://127.0.0.1:7054 connection error: server_error: server error: 500",reporter="promql/rate",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="cound't run \"promql/rate\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/rate",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="cound't run \"promql/series\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="prometheus \"prom1\" at http://127.0.0.1:7054 failed with: bad_response: Unmarshal: there are bytes left after unmarshal, error found in #10 byte of ...|y\"\n    	}Fatal error|..., bigger context ...|:\"bad_data\",\n      		\"error\":\"bogus query\"\n    	}Fatal error|...",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="cound't run \"promql/rate\" checks due to prometheus \"prom1\" at http://127.0.0.1:7054 connection error: failed to query Prometheus config: server_error: server error: 500",reporter="promql/rate",severity="bug"}
-pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="cound't run \"promql/rate\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: failed to query Prometheus config: Get \"http://127.0.0.1:1054/api/v1/status/config\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/rate",severity="bug"}
-pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="cound't run \"promql/series\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: Post \"http://127.0.0.1:1054/api/v1/query\": dial tcp 127.0.0.1:1054: connect: connection refused",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="cound't run \"promql/rate\" checks due to prometheus \"prom1\" at http://127.0.0.1:7054 connection error: server_error: server error: 500",reporter="promql/rate",severity="bug"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="cound't run \"promql/rate\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/rate",severity="bug"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="cound't run \"promql/series\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="prometheus \"prom1\" at http://127.0.0.1:7054 failed with: bad_response: Unmarshal: there are bytes left after unmarshal, error found in #10 byte of ...|y\"\n    	}Fatal error|..., bigger context ...|:\"bad_data\",\n      		\"error\":\"bogus query\"\n    	}Fatal error|...",reporter="promql/series",severity="bug"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems
+# HELP pint_prometheus_queries_running Total number of in-flight prometheus queries
+# TYPE pint_prometheus_queries_running gauge
+pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom1"}
+pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom2"}
+pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom1"}
+pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom2"}
 # HELP pint_prometheus_queries_total Total number of all prometheus queries
 # TYPE pint_prometheus_queries_total counter
 pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom1"}

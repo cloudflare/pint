@@ -154,11 +154,12 @@ Syntax:
 
 ```js
 prometheus "$name" {
-  uri      = "https://..."
-  failover = ["https://...", ...]
-  timeout  = "60s"
-  required = true|false
-  paths    = ["...", ...]
+  uri         = "https://..."
+  failover    = ["https://...", ...]
+  timeout     = "60s"
+  concurrency = 16
+  required    = true|false
+  paths       = ["...", ...]
 }
 ```
 
@@ -174,6 +175,8 @@ prometheus "$name" {
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
 - `timeout` - timeout to be used for API requests.
+- `concurrency` - how many concurrent requests can pint send to this Prometheus.
+  Optional, defaults to 16.
 - `required` - decides how pint will report errors if it's unable to get a valid response
   from this Prometheus server. If `required` is `true` and all API calls to this Prometheus
   fail pint will report those as `bug` level problem. If it's set to `false` pint will
@@ -188,8 +191,9 @@ Example:
 
 ```js
 prometheus "prod" {
-  uri     = "https://prometheus-prod.example.com"
-  timeout = "60s"
+  uri         = "https://prometheus-prod.example.com"
+  timeout     = "60s"
+  concurrency = 40
 }
 
 prometheus "dev" {

@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.22.0
+
+### Changed
+
+- The way `pint` sends API requests to Prometheus was changed to improve performance.
+  
+  First change is that each `prometheus` server definition in `pint` config file can
+  now accept optional `concurrency` field (defaults to 16) that sets a limit on how
+  many concurrent requests can that server receive. There is a new metric that
+  tracks how many queries are currently being run for each Prometheus server -
+  `pint_prometheus_queries_running`.
+
+  Second change is that range queries will now be split into smaller queries, so
+  if `pint` needs to run a range query on one week of metrics, then it will break
+  this down into multiple queries each for a two hour slot, and then merge all
+  the results. Previously it would try to run a single query for a whole week
+  and if that failed it would reduce time range until a query would succeed.
+
 ## v0.21.1
 
 ### Fixed

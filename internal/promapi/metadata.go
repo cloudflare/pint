@@ -13,35 +13,55 @@ type MetadataResult struct {
 	Metadata []v1.Metadata
 }
 
-func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
-	log.Debug().Str("uri", p.uri).Str("metric", metric).Msg("Query Prometheus metric metadata")
+type metadataQuery struct {
+	prom   *Prometheus
+	ctx    context.Context
+	metric string
+}
 
-	key := fmt.Sprintf("/api/v1/metadata/%s", metric)
-	p.lock.lock(key)
-	defer p.lock.unlock((key))
+func (q metadataQuery) Run() (any, error) {
+	log.Debug().
+		Str("uri", q.prom.uri).
+		Str("metric", q.metric).
+		Msg("Getting prometheus metrics metadata")
 
-	if v, ok := p.cache.Get(key); ok {
-		log.Debug().Str("key", key).Str("uri", p.uri).Str("metric", metric).Msg("Metric metadata cache hit")
-		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/metadata").Inc()
-		metadata := v.(MetadataResult)
-		return &metadata, nil
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, p.timeout)
+	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/metadata").Inc()
-	resp, err := p.api.Metadata(ctx, metric, "")
+	v, err := q.prom.api.Metadata(ctx, q.metric, "")
 	if err != nil {
-		log.Error().Err(err).Str("uri", p.uri).Msg("Failed to query Prometheus metric metadata")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/metadata", errReason(err)).Inc()
-		return nil, fmt.Errorf("failed to query Prometheus metric metadata: %w", err)
+		return nil, fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)
+	}
+	return v, nil
+}
+
+func (q metadataQuery) Endpoint() string {
+	return "/api/v1/metadata"
+}
+
+func (q metadataQuery) String() string {
+	return q.metric
+}
+
+func (q metadataQuery) CacheKey() string {
+	return hash("/api/v1/metadata/" + q.metric)
+}
+
+func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
+	log.Debug().Str("uri", p.uri).Str("metric", metric).Msg("Scheduling Prometheus metrics metadata query")
+
+	resultChan := make(chan queryResult)
+	p.queries <- queryRequest{
+		query:  metadataQuery{prom: p, ctx: ctx, metric: metric},
+		result: resultChan,
 	}
 
-	metadata := MetadataResult{URI: p.uri, Metadata: resp[metric]}
+	result := <-resultChan
+	if result.err != nil {
+		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
+	}
 
-	log.Debug().Str("key", key).Str("uri", p.uri).Str("metric", metric).Msg("Metric metadata cache miss")
-	p.cache.Add(key, metadata)
+	metadata := MetadataResult{URI: p.uri, Metadata: result.value.(map[string][]v1.Metadata)[metric]}
 
 	return &metadata, nil
 }

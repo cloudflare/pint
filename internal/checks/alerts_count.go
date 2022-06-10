@@ -49,7 +49,9 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		return
 	}
 
-	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, c.lookBack, c.step)
+	end := time.Now()
+	start := end.Add(c.lookBack * -1)
+	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, start, end, c.step)
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{

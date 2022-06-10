@@ -24,7 +24,8 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": null
 }
 ---
 
@@ -40,6 +41,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -61,7 +63,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -77,6 +82,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.yml"
       ],
@@ -101,7 +107,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -117,6 +126,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -141,7 +151,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -157,6 +170,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -166,6 +180,7 @@
       "name": "ignore",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.+"
       ],
@@ -190,7 +205,11 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -222,7 +241,8 @@
   },
   "rules": [
     {}
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -272,7 +292,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -322,7 +343,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -360,7 +382,8 @@
         "severity": "warning"
       }
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -376,6 +399,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -385,6 +409,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -416,6 +441,10 @@
         "bytesPerSample": 4096
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -490,7 +519,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -506,6 +536,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -515,6 +546,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -561,6 +593,10 @@
         "severity": "bug"
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -610,7 +646,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -660,7 +697,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -710,7 +748,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -760,7 +799,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -810,7 +850,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -860,7 +901,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -910,7 +952,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -960,7 +1003,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -976,6 +1020,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1013,6 +1058,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -1029,6 +1077,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1044,6 +1093,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -1060,6 +1112,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1080,6 +1133,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -1096,6 +1152,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1121,6 +1178,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -1137,6 +1197,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1162,6 +1223,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -1178,12 +1242,14 @@
       "name": "prom1",
       "uri": "http://localhost/1",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -1208,7 +1274,11 @@
     "disabled": [
       "alerts/template"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -1228,6 +1298,7 @@
         "http://localhost/2"
       ],
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -1249,7 +1320,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -1293,7 +1367,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1337,7 +1412,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1381,7 +1457,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1425,7 +1502,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1469,7 +1547,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1513,7 +1592,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1542,7 +1622,8 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": null
 }
 ---
 
@@ -1558,6 +1639,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -1579,7 +1661,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -1599,6 +1684,7 @@
         "http://localhost/2"
       ],
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -1620,7 +1706,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -1636,12 +1725,14 @@
       "name": "prom1",
       "uri": "http://localhost/1",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -1666,7 +1757,11 @@
     "disabled": [
       "alerts/template"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -1682,6 +1777,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.yml"
       ],
@@ -1706,7 +1802,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -1722,6 +1821,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1746,7 +1846,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -1762,6 +1865,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1771,6 +1875,7 @@
       "name": "ignore",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.+"
       ],
@@ -1795,7 +1900,11 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -1827,7 +1936,8 @@
   },
   "rules": [
     {}
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1877,7 +1987,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1927,7 +2038,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1965,7 +2077,8 @@
         "severity": "warning"
       }
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -1981,6 +2094,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -1990,6 +2104,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2021,6 +2136,10 @@
         "bytesPerSample": 4096
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -2095,7 +2214,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2111,6 +2231,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2120,6 +2241,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2166,6 +2288,10 @@
         "severity": "bug"
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -2215,7 +2341,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2265,7 +2392,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2315,7 +2443,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2365,7 +2494,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2415,7 +2545,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2465,7 +2596,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2515,7 +2647,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2565,7 +2698,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2581,6 +2715,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2618,6 +2753,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -2634,6 +2772,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2649,6 +2788,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -2665,6 +2807,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2685,6 +2828,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -2701,6 +2847,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2726,6 +2873,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -2742,6 +2892,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -2767,6 +2918,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -2811,7 +2965,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2855,7 +3010,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2899,7 +3055,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2943,7 +3100,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -2987,7 +3145,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3031,7 +3190,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3060,7 +3220,8 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": null
 }
 ---
 
@@ -3076,6 +3237,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -3097,7 +3259,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -3117,6 +3282,7 @@
         "http://localhost/2"
       ],
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -3138,7 +3304,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -3154,12 +3323,14 @@
       "name": "prom1",
       "uri": "http://localhost/1",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -3184,7 +3355,11 @@
     "disabled": [
       "alerts/template"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -3200,6 +3375,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.yml"
       ],
@@ -3224,7 +3400,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -3240,6 +3419,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -3264,7 +3444,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -3280,6 +3463,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -3289,6 +3473,7 @@
       "name": "ignore",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.+"
       ],
@@ -3313,7 +3498,11 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -3345,7 +3534,8 @@
   },
   "rules": [
     {}
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3395,7 +3585,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3445,7 +3636,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3483,7 +3675,8 @@
         "severity": "warning"
       }
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3499,6 +3692,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -3508,6 +3702,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -3539,6 +3734,10 @@
         "bytesPerSample": 4096
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -3613,7 +3812,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3629,6 +3829,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -3638,6 +3839,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -3684,6 +3886,10 @@
         "severity": "bug"
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -3733,7 +3939,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3783,7 +3990,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3833,7 +4041,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3883,7 +4092,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3933,7 +4143,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -3983,7 +4194,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4033,7 +4245,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4083,7 +4296,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4099,6 +4313,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4136,6 +4351,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -4152,6 +4370,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4167,6 +4386,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -4183,6 +4405,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4203,6 +4426,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -4219,6 +4445,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4244,6 +4471,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -4260,6 +4490,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4285,6 +4516,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -4329,7 +4563,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4373,7 +4608,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4417,7 +4653,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4461,7 +4698,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4505,7 +4743,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4549,7 +4788,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4578,7 +4818,8 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": null
 }
 ---
 
@@ -4594,6 +4835,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -4615,7 +4857,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -4635,6 +4880,7 @@
         "http://localhost/2"
       ],
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -4656,7 +4902,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -4672,12 +4921,14 @@
       "name": "prom1",
       "uri": "http://localhost/1",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -4702,7 +4953,11 @@
     "disabled": [
       "alerts/template"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -4718,6 +4973,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.yml"
       ],
@@ -4742,7 +4998,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -4758,6 +5017,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4782,7 +5042,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -4798,6 +5061,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -4807,6 +5071,7 @@
       "name": "ignore",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.+"
       ],
@@ -4831,7 +5096,11 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -4863,7 +5132,8 @@
   },
   "rules": [
     {}
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4913,7 +5183,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -4963,7 +5234,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5001,7 +5273,8 @@
         "severity": "warning"
       }
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5017,6 +5290,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5026,6 +5300,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5057,6 +5332,10 @@
         "bytesPerSample": 4096
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -5131,7 +5410,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5147,6 +5427,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5156,6 +5437,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5202,6 +5484,10 @@
         "severity": "bug"
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -5251,7 +5537,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5301,7 +5588,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5351,7 +5639,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5401,7 +5690,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5451,7 +5741,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5501,7 +5792,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5551,7 +5843,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5601,7 +5894,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5617,6 +5911,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5654,6 +5949,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -5670,6 +5968,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5685,6 +5984,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -5701,6 +6003,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5721,6 +6024,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -5737,6 +6043,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5762,6 +6069,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -5778,6 +6088,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -5803,6 +6114,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -5847,7 +6161,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5891,7 +6206,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5935,7 +6251,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -5979,7 +6296,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6023,7 +6341,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6067,7 +6386,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6096,7 +6416,8 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": null
 }
 ---
 
@@ -6112,6 +6433,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -6133,7 +6455,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -6153,6 +6478,7 @@
         "http://localhost/2"
       ],
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -6174,7 +6500,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -6190,12 +6519,14 @@
       "name": "prom1",
       "uri": "http://localhost/1",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     },
     {
       "name": "prom2",
       "uri": "http://localhost/2",
       "timeout": "1s",
+      "concurrency": 16,
       "required": false
     }
   ],
@@ -6220,7 +6551,11 @@
     "disabled": [
       "alerts/template"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -6236,6 +6571,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.yml"
       ],
@@ -6260,7 +6596,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -6276,6 +6615,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -6300,7 +6640,10 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {}
+  ]
 }
 ---
 
@@ -6316,6 +6659,7 @@
       "name": "prom",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -6325,6 +6669,7 @@
       "name": "ignore",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "foo.+"
       ],
@@ -6349,7 +6694,11 @@
       "rule/label",
       "rule/reject"
     ]
-  }
+  },
+  "PrometheusServers": [
+    {},
+    {}
+  ]
 }
 ---
 
@@ -6381,7 +6730,8 @@
   },
   "rules": [
     {}
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6431,7 +6781,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6481,7 +6832,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6519,7 +6871,8 @@
         "severity": "warning"
       }
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6535,6 +6888,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -6544,6 +6898,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -6575,6 +6930,10 @@
         "bytesPerSample": 4096
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -6649,7 +7008,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6665,6 +7025,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -6674,6 +7035,7 @@
       "name": "prom2",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -6720,6 +7082,10 @@
         "severity": "bug"
       }
     }
+  ],
+  "PrometheusServers": [
+    {},
+    {}
   ]
 }
 ---
@@ -6769,7 +7135,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6819,7 +7186,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6869,7 +7237,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6919,7 +7288,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -6969,7 +7339,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7019,7 +7390,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7069,7 +7441,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7119,7 +7492,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7135,6 +7509,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -7172,6 +7547,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -7188,6 +7566,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -7203,6 +7582,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -7219,6 +7601,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -7239,6 +7622,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -7255,6 +7641,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -7280,6 +7667,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -7296,6 +7686,7 @@
       "name": "prom1",
       "uri": "http://localhost",
       "timeout": "1s",
+      "concurrency": 16,
       "paths": [
         "rules.yml"
       ],
@@ -7321,6 +7712,9 @@
         "resolve": "5m"
       }
     }
+  ],
+  "PrometheusServers": [
+    {}
   ]
 }
 ---
@@ -7365,7 +7759,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7409,7 +7804,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7453,7 +7849,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7497,7 +7894,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7541,7 +7939,8 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---
 
@@ -7585,6 +7984,7 @@
         }
       ]
     }
-  ]
+  ],
+  "PrometheusServers": null
 }
 ---

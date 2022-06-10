@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newTemplateCheck(_ string) checks.RuleChecker {
+func newTemplateCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewTemplateCheck()
 }
 
@@ -16,12 +17,14 @@ func TestTemplateCheck(t *testing.T) {
 			description: "skips recording rule",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "invalid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -38,6 +41,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "invalid function in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -54,12 +58,14 @@ func TestTemplateCheck(t *testing.T) {
 			description: "valid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $labels.instance }} down'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "invalid syntax in labels",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -76,6 +82,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "invalid function in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -92,12 +99,14 @@ func TestTemplateCheck(t *testing.T) {
 			description: "valid syntax in labels",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $labels.instance }} down'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "{{ $value}} in label key",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value}}': bar\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -114,6 +123,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{ $value }} in label key",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value }}': bar\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -130,6 +140,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{$value}} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -146,6 +157,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{$value}} in multiple labels",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: '{{ .Value }}'\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -169,6 +181,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{  $value  }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{  $value | humanizePercentage }}%\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -185,6 +198,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{  $value  }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{$value|humanizePercentage}}%\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -201,6 +215,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{ .Value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: 'value {{ .Value }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -217,6 +232,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{ .Value|humanize }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ .Value|humanize }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -233,6 +249,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{ $foo := $value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := $value }}{{ $foo }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -249,6 +266,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "{{ $foo := .Value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := .Value }}{{ $foo }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -265,6 +283,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "annotation label missing from metrics (by)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -281,6 +300,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "annotation label missing from metrics (by)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -297,6 +317,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "annotation label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -313,6 +334,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "annotation label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -329,6 +351,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  labels:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -345,6 +368,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "annotation label missing from metrics (or)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) by(job) or sum(bar)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -361,6 +385,7 @@ func TestTemplateCheck(t *testing.T) {
 			description: "annotation label missing from metrics (1+)",
 			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(job) + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -382,7 +407,8 @@ func TestTemplateCheck(t *testing.T) {
     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is down'
     help: '{{ $labels.ixtance }}'
 `,
-			checker: newTemplateCheck,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -403,8 +429,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "annotation label missing from metrics (absent)",
@@ -417,7 +444,8 @@ func TestTemplateCheck(t *testing.T) {
     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
     help: '{{ $labels.xxx }}'
 `,
-			checker: newTemplateCheck,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -459,8 +487,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "annotation label missing from metrics (absent(sum))",
@@ -470,7 +499,8 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
 `,
-			checker: newTemplateCheck,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -491,7 +521,8 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} is missing'
 `,
-			checker: newTemplateCheck,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -512,7 +543,8 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} / {{$labels.job}} is missing'
 `,
-			checker: newTemplateCheck,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -540,8 +572,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "absent() * on() group_left() bar",
@@ -551,8 +584,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "bar * on() group_right(...) absent()",
@@ -562,8 +596,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "bar * on() group_right() absent()",
@@ -573,8 +608,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "",
@@ -584,8 +620,9 @@ func TestTemplateCheck(t *testing.T) {
   annotations:
     summary: '{{ .Labels.job }} is missing'
 `,
-			checker:  newTemplateCheck,
-			problems: noProblems,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 	}
 	runTests(t, testCases)

@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newSyntaxCheck(_ string) checks.RuleChecker {
+func newSyntaxCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewSyntaxCheck()
 }
 
@@ -16,18 +17,21 @@ func TestSyntaxCheck(t *testing.T) {
 			description: "valid recording rule",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker:     newSyntaxCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "valid alerting rule",
 			content:     "- alert: foo\n  expr: sum(foo)\n",
 			checker:     newSyntaxCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "no arguments for aggregate expression provided",
 			content:     "- record: foo\n  expr: sum(\n",
 			checker:     newSyntaxCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -44,6 +48,7 @@ func TestSyntaxCheck(t *testing.T) {
 			description: "unclosed left parenthesis",
 			content:     "- record: foo\n  expr: sum(foo) by(",
 			checker:     newSyntaxCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{

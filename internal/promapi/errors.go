@@ -1,12 +1,12 @@
 package promapi
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
-	"strings"
 	"syscall"
-	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 )
@@ -26,14 +26,18 @@ type APIError struct {
 	Error     string       `json:"error"`
 }
 
-func CanRetryError(err error, delta time.Duration) (time.Duration, bool) {
+func decodeError(err error) string {
+	if errors.Is(err, context.Canceled) {
+		return context.Canceled.Error()
+	}
+
 	if errors.Is(err, syscall.ECONNREFUSED) {
-		return delta, false
+		return "connection refused"
 	}
 
 	var neterr net.Error
 	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
-		return (delta / 2).Round(time.Minute), true
+		return "connection timeout"
 	}
 
 	var apiErr *v1.Error
@@ -44,27 +48,11 @@ func CanRetryError(err error, delta time.Duration) (time.Duration, bool) {
 		var v1e APIError
 		if err2 := json.Unmarshal([]byte(apiErr.Detail), &v1e); err2 == nil && v1e.ErrorType == v1.ErrTimeout {
 			apiErr.Type = v1.ErrTimeout
+			apiErr.Msg = v1e.Error
 		}
 
-		switch apiErr.Type {
-		case v1.ErrBadData:
-		case v1.ErrTimeout:
-			return (delta / 4).Round(time.Minute), true
-		case v1.ErrCanceled:
-		case v1.ErrExec:
-			if strings.Contains(apiErr.Msg, "query processing would load too many samples into memory in ") {
-				return (delta / 4).Round(time.Minute), true
-			}
-			return delta / 2, true
-		case v1.ErrBadResponse:
-		case v1.ErrServer:
-			if apiErr.Msg == "server error: 504" {
-				return (delta / 4).Round(time.Minute), true
-			}
-		case v1.ErrClient:
-			return (delta / 2).Round(time.Minute), true
-		}
+		return fmt.Sprintf("%s: %s", apiErr.Type, apiErr.Msg)
 	}
 
-	return delta, false
+	return err.Error()
 }

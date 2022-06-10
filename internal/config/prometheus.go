@@ -6,12 +6,13 @@ import (
 )
 
 type PrometheusConfig struct {
-	Name     string   `hcl:",label" json:"name"`
-	URI      string   `hcl:"uri" json:"uri"`
-	Failover []string `hcl:"failover,optional" json:"failover,omitempty"`
-	Timeout  string   `hcl:"timeout"  json:"timeout"`
-	Paths    []string `hcl:"paths,optional" json:"paths,omitempty"`
-	Required bool     `hcl:"required,optional" json:"required"`
+	Name        string   `hcl:",label" json:"name"`
+	URI         string   `hcl:"uri" json:"uri"`
+	Failover    []string `hcl:"failover,optional" json:"failover,omitempty"`
+	Timeout     string   `hcl:"timeout"  json:"timeout"`
+	Concurrency int      `hcl:"concurrency,optional" json:"concurrency"`
+	Paths       []string `hcl:"paths,optional" json:"paths,omitempty"`
+	Required    bool     `hcl:"required,optional" json:"required"`
 }
 
 func (pc PrometheusConfig) validate() error {

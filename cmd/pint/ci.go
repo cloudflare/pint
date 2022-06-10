@@ -61,6 +61,11 @@ func actionCI(c *cli.Context) error {
 		return err
 	}
 
+	for _, prom := range meta.cfg.PrometheusServers {
+		prom.StartWorkers()
+	}
+	defer meta.cleanup()
+
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
 	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
 

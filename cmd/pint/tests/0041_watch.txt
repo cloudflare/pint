@@ -1,10 +1,10 @@
 exec bash -x ./test.sh &
 
-pint.ok --no-color -l debug watch --interval=5s --listen=:6041 --pidfile=pint.pid rules
+pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6041 --pidfile=pint.pid rules
 ! stdout .
 
 stderr 'level=info msg="Pidfile created" path=pint.pid'
-stderr 'level=info msg="Started HTTP server" address=:6041'
+stderr 'level=info msg="Started HTTP server" address=127.0.0.1:6041'
 stderr 'level=info msg="Will continuously run checks until terminated" interval=5s'
 stderr 'level=debug msg="Clearing cache"'
 stderr 'level=debug msg="Running checks"'

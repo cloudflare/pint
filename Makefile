@@ -30,7 +30,7 @@ $(GOBIN)/goimports: tools/goimports/go.mod tools/goimports/go.sum
 	go install -modfile=tools/goimports/go.mod golang.org/x/tools/cmd/goimports
 .PHONY: format
 format: $(GOBIN)/gofumpt $(GOBIN)/goimports
-	$(GOBIN)/gofumpt -l -w .
+	$(GOBIN)/gofumpt -extra -l -w .
 	$(GOBIN)/goimports -local github.com/cloudflare/pint -w .
 
 
@@ -42,9 +42,8 @@ test:
 		-covermode=atomic \
 		-coverprofile=$(COVER_PROFILE) \
 		-coverpkg=./... \
-		-race \
 		-count=5 \
-		-timeout=5m \
+		-timeout=15m \
 		./...
 
 .PHONY: debug-testscript

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
@@ -25,33 +26,54 @@ type ConfigResult struct {
 	Config PrometheusConfig
 }
 
-func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
-	log.Debug().Str("uri", p.uri).Msg("Query Prometheus configuration")
+type configQuery struct {
+	prom *Prometheus
+	ctx  context.Context
+}
 
-	key := "/api/v1/status/config"
-	p.lock.lock(key)
-	defer p.lock.unlock((key))
+func (q configQuery) Run() (any, error) {
+	log.Debug().
+		Str("uri", q.prom.uri).
+		Msg("Getting prometheus configuration")
 
-	if v, ok := p.cache.Get(key); ok {
-		log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache hit")
-		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/status/config")
-		cfg := v.(ConfigResult)
-		return &cfg, nil
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, p.timeout)
+	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/status/config").Inc()
-	resp, err := p.api.Config(ctx)
+	v, err := q.prom.api.Config(ctx)
 	if err != nil {
-		log.Error().Err(err).Str("uri", p.uri).Msg("Failed to query Prometheus configuration")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
 		return nil, fmt.Errorf("failed to query Prometheus config: %w", err)
+	}
+	return v, nil
+}
+
+func (q configQuery) Endpoint() string {
+	return "/api/v1/status/config"
+}
+
+func (q configQuery) String() string {
+	return "/api/v1/status/config"
+}
+
+func (q configQuery) CacheKey() string {
+	return hash("/api/v1/status/config")
+}
+
+func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
+	log.Debug().Str("uri", p.uri).Msg("Scheduling Prometheus configuration query")
+
+	resultChan := make(chan queryResult)
+	p.queries <- queryRequest{
+		query:  configQuery{prom: p, ctx: ctx},
+		result: resultChan,
+	}
+
+	result := <-resultChan
+	if result.err != nil {
+		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
 	var cfg PrometheusConfig
-	if err = yaml.Unmarshal([]byte(resp.YAML), &cfg); err != nil {
+	if err := yaml.Unmarshal([]byte(result.value.(v1.ConfigResult).YAML), &cfg); err != nil {
 		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
 		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.uri, err)
 	}
@@ -67,9 +89,6 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	}
 
 	r := ConfigResult{URI: p.uri, Config: cfg}
-
-	log.Debug().Str("key", key).Str("uri", p.uri).Msg("Config cache miss")
-	p.cache.Add(key, r)
 
 	return &r, nil
 }
