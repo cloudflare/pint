@@ -22,6 +22,7 @@
 
 - Strict parsing mode didn't fully validate rule group files, this is now fixed
   and pint runs the same set of checks as Prometheus.
+- Fixed `promql/series` handling of rules with `{__name__=~"foo|bar"}` queries.
 
 ## v0.21.1
 

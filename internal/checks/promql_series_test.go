@@ -2015,6 +2015,39 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "__name__=~foo|bar",
+			content:     "- alert: NameRegex\n  expr: rate({__name__=~\"(foo|bar)_panics_total\", job=\"myjob\"}[2m]) > 0",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `{__name__=~"(foo|bar)_panics_total"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

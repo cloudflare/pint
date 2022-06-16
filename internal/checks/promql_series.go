@@ -499,7 +499,9 @@ func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
 	for _, lm := range selector.LabelMatchers {
 		if lm.Name == labels.MetricName {
 			s.LabelMatchers = append(s.LabelMatchers, lm)
-			s.Name = lm.Value
+			if lm.Type == labels.MatchEqual {
+				s.Name = lm.Value
+			}
 		}
 	}
 	return s
