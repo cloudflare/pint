@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
+	"sort"
+	"sync"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -22,122 +23,160 @@ type RangeQueryResult struct {
 	DurationSeconds float64
 }
 
-func (p *Prometheus) RangeQuery(ctx context.Context, expr string, lookback, step time.Duration) (*RangeQueryResult, error) {
-	log.Debug().
-		Str("uri", p.uri).
-		Str("query", expr).
-		Str("delta", output.HumanizeDuration(lookback)).
-		Str("step", output.HumanizeDuration(step)).
-		Msg("Scheduling prometheus range query")
-
-	lockKey := "/api/v1/query/range"
-	p.lock.lock(lockKey)
-	defer p.lock.unlock(lockKey)
-
-	cacheKey := strings.Join([]string{expr, lookback.String(), step.String()}, "\n")
-	return p.realRangeQuery(ctx, expr, lookback, step, cacheKey, false)
+type rangeQuery struct {
+	prom *Prometheus
+	ctx  context.Context
+	expr string
+	r    v1.Range
 }
 
-func (p *Prometheus) realRangeQuery(
-	ctx context.Context,
-	expr string, lookback, step time.Duration,
-	cacheKey string, isRetry bool,
-) (*RangeQueryResult, error) {
-	if v, ok := p.cache.Get(cacheKey); ok {
-		log.Debug().
-			Str("uri", p.uri).
-			Str("query", expr).
-			Str("delta", output.HumanizeDuration(lookback)).
-			Str("step", output.HumanizeDuration(step)).
-			Msg("Cache hit")
-		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
-		r := v.(RangeQueryResult)
-		return &r, nil
-	}
-	log.Debug().
-		Str("uri", p.uri).
-		Str("query", expr).
-		Str("delta", output.HumanizeDuration(lookback)).
-		Str("step", output.HumanizeDuration(step)).
-		Msg("Cache miss")
-
-	prometheusQueriesTotal.WithLabelValues(p.name, "/api/v1/query_range").Inc()
-	now := time.Now()
-	r := v1.Range{
-		Start: now.Add(lookback * -1),
-		End:   now,
-		Step:  step,
-	}
-
-	if !isRetry {
-		p.slowQueryLock.Lock()
-		if v, ok := p.slowQueryCache.Get(expr); ok {
-			log.Debug().
-				Str("query", expr).
-				Str("delta", output.HumanizeDuration(v.(time.Duration))).
-				Str("start", r.Start.String()).
-				Str("cached", r.End.Add(v.(time.Duration)*-1).String()).
-				Msg("Got cached slow query delta")
-			r.Start = r.End.Add(v.(time.Duration) * -1)
-		}
-		p.slowQueryLock.Unlock()
-	}
-
-	rctx, cancel := context.WithTimeout(ctx, p.timeout)
+func (q rangeQuery) Run() (any, error) {
+	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
+	v, _, err := q.prom.api.QueryRange(ctx, q.expr, q.r)
+	return v, err
+}
+
+func (q rangeQuery) Endpoint() string {
+	return "/api/v1/query/range"
+}
+
+func (q rangeQuery) String() string {
+	return q.expr
+}
+
+func (q rangeQuery) CacheKey() string {
+	return ""
+}
+
+func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
+	lookback := end.Sub(start)
+
+	queryStep := (time.Hour * 2).Round(step)
+	if queryStep > lookback {
+		queryStep = lookback
+	}
+
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
-		Str("delta", output.HumanizeDuration(lookback)).
-		Bool("retry", isRetry).
-		Msg("Executing range query")
-	qstart := time.Now()
-	result, _, err := p.api.QueryRange(rctx, expr, r)
-	duration := time.Since(qstart)
-	log.Debug().
-		Str("uri", p.uri).
-		Str("query", expr).
-		Str("duration", output.HumanizeDuration(duration)).
-		Msg("Range query completed")
-	if err != nil {
-		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msg("Range query failed")
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", errReason(err)).Inc()
-		if delta, retryOK := CanRetryError(err, lookback); retryOK {
-			if delta < step*2 {
-				log.Error().Str("uri", p.uri).Str("query", expr).Msg("No more retries possible")
-				return nil, errors.New("no more retries possible")
-			}
-			log.Warn().Str("delta", output.HumanizeDuration(delta)).Msg("Retrying request with smaller range")
-			p.slowQueryLock.Lock()
-			p.slowQueryCache.Remove(expr)
-			p.slowQueryCache.Add(expr, delta)
-			p.slowQueryLock.Unlock()
-			return p.realRangeQuery(ctx, expr, delta, step, cacheKey, true)
+		Str("start", start.Format(time.RFC3339)).
+		Str("end", end.Format(time.RFC3339)).
+		Str("step", output.HumanizeDuration(step)).
+		Str("slice", output.HumanizeDuration(queryStep)).
+		Msg("Scheduling prometheus range query")
+
+	var wg sync.WaitGroup
+	var mu sync.Mutex
+	var lastErr error
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	res := RangeQueryResult{URI: p.uri, Start: start, End: end}
+	for _, s := range sliceRange(start, end, step, queryStep) {
+		query := queryRequest{
+			query: rangeQuery{
+				prom: p,
+				ctx:  ctx,
+				expr: expr,
+				r: v1.Range{
+					Start: s.start,
+					End:   s.end,
+					Step:  step,
+				},
+			},
 		}
-		return nil, err
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			var result queryResult
+			query.result = make(chan queryResult)
+			p.queries <- query
+			result = <-query.result
+
+			mu.Lock()
+			defer mu.Unlock()
+
+			if result.err != nil {
+				if !errors.Is(result.err, context.Canceled) {
+					lastErr = result.err
+				}
+				cancel()
+				return
+			}
+
+			switch result.value.(model.Value).Type() {
+			case model.ValMatrix:
+				for _, sample := range result.value.(model.Matrix) {
+					var found bool
+					for i, rs := range res.Samples {
+						if sample.Metric.Equal(rs.Metric) {
+							found = true
+							res.Samples[i].Values = append(res.Samples[i].Values, sample.Values...)
+							break
+						}
+					}
+					if !found {
+						res.Samples = append(res.Samples, sample)
+					}
+				}
+			default:
+				log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.value.(model.Value).Type())
+				lastErr = fmt.Errorf("unknown result type: %v", result.value.(model.Value).Type())
+				return
+			}
+		}()
+	}
+	wg.Wait()
+
+	if lastErr != nil {
+		return nil, QueryError{err: lastErr, msg: decodeError(lastErr)}
 	}
 
-	qr := RangeQueryResult{
-		URI:             p.uri,
-		DurationSeconds: duration.Seconds(),
-		Start:           r.Start,
-		End:             r.End,
+	for k := range res.Samples {
+		sort.SliceStable(res.Samples[k].Values, func(i, j int) bool {
+			return res.Samples[k].Values[i].Timestamp.Before(res.Samples[k].Values[j].Timestamp)
+		})
 	}
 
-	switch result.Type() {
-	case model.ValMatrix:
-		samples := result.(model.Matrix)
-		qr.Samples = samples
-	default:
-		log.Error().Err(err).Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.Type())
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query_range", "unknown result type").Inc()
-		return nil, fmt.Errorf("unknown result type: %v", result.Type())
+	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(res.Samples)).Msg("Parsed range response")
+
+	return &res, nil
+}
+
+type timeRange struct {
+	start time.Time
+	end   time.Time
+}
+
+func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) []timeRange {
+	diff := end.Sub(start)
+	if diff <= sliceSize {
+		return []timeRange{{start: start, end: end}}
 	}
-	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(qr.Samples)).Msg("Parsed range response")
 
-	log.Debug().Str("query", expr).Str("uri", p.uri).Msg("Range query cache miss")
-	p.cache.Add(cacheKey, qr)
+	var slices []timeRange
+	for {
+		s := timeRange{start: start, end: start.Add(sliceSize)}
+		if s.end.After(end) {
+			s.end = end
+		}
+		slices = append(slices, s)
+		start = start.Add(sliceSize)
+		if !start.Before(end) {
+			break
+		}
+	}
 
-	return &qr, nil
+	for i := 0; i < len(slices); i++ {
+		if i < len(slices)-1 {
+			slices[i].end = slices[i].end.Add(resolution * -1)
+		}
+	}
+
+	return slices
 }

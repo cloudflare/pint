@@ -1,6 +1,6 @@
 exec bash -x ./test.sh &
 
-pint.ok watch --listen=:6048 --max-problems=2 --pidfile=pint.pid rules
+pint.ok watch --listen=127.0.0.1:6048 --max-problems=2 --pidfile=pint.pid rules
 cmp curl.txt metrics.txt
 
 -- test.sh --

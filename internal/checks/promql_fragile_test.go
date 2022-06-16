@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newFragileCheck(_ string) checks.RuleChecker {
+func newFragileCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewFragileCheck()
 }
 
@@ -18,36 +19,42 @@ func TestFragileCheck(t *testing.T) {
 			description: "ignores syntax errors",
 			content:     "- record: foo\n  expr: up ==\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores simple comparison",
 			content:     "- record: foo\n  expr: up == 0\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores simple division",
 			content:     "- record: foo\n  expr: foo / bar\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores unless",
 			content:     "- record: foo\n  expr: foo unless sum(bar) without(job)\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores safe division",
 			content:     "- record: foo\n  expr: foo / sum(bar)\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "warns about fragile division",
 			content:     "- record: foo\n  expr: foo / sum(bar) without(job)\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -64,6 +71,7 @@ func TestFragileCheck(t *testing.T) {
 			description: "warns about fragile sum",
 			content:     "- record: foo\n  expr: sum(foo) without(job) + sum(bar) without(job)\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -80,6 +88,7 @@ func TestFragileCheck(t *testing.T) {
 			description: "warns about fragile sum inside a condition",
 			content:     "- alert: foo\n  expr: (sum(foo) without(job) + sum(bar) without(job)) > 1\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -96,6 +105,7 @@ func TestFragileCheck(t *testing.T) {
 			description: "warns about fragile division inside a condition",
 			content:     "- alert: foo\n  expr: (foo / sum(bar) without(job)) > 1\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -112,6 +122,7 @@ func TestFragileCheck(t *testing.T) {
 			description: "warns about fragile sum inside a complex rule",
 			content:     "- alert: foo\n  expr: (sum(foo) without(job) + sum(bar)) > 1 unless sum(bob) without(job) < 10\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -128,12 +139,14 @@ func TestFragileCheck(t *testing.T) {
 			description: "ignores safe addition",
 			content:     "- record: foo\n  expr: sum(foo) + sum(bar)\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores addition if source metric is the same",
 			content:     "- record: foo\n  expr: sum(foo) without(bar) + sum(foo) without(bar)\n",
 			checker:     newFragileCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
@@ -145,8 +158,9 @@ func TestFragileCheck(t *testing.T) {
         probe_success{job="foo"} == 0 or probe_duration_seconds{job="foo"} >= 15
     ) > 3
 `,
-			checker:  newFragileCheck,
-			problems: noProblems,
+			checker:    newFragileCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "handles nested aggregations correctly / RHS",
@@ -158,8 +172,9 @@ func TestFragileCheck(t *testing.T) {
         probe_success{job="foo"} == 0 or probe_duration_seconds{job="foo"} >= 15
     )
 `,
-			checker:  newFragileCheck,
-			problems: noProblems,
+			checker:    newFragileCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "handles nested aggregations correctly / both",
@@ -171,8 +186,9 @@ func TestFragileCheck(t *testing.T) {
         probe_success{job="foo"} == 0 or probe_duration_seconds{job="foo"} >= 15
     ) > 2
 `,
-			checker:  newFragileCheck,
-			problems: noProblems,
+			checker:    newFragileCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 	}
 

@@ -3,7 +3,7 @@ exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; 
 
 exec bash -x ./test.sh &
 
-pint.ok watch --listen=:6057 --pidfile=pint.pid rules
+pint.ok watch --listen=127.0.0.1:6057 --pidfile=pint.pid rules
 cmp curl.txt metrics.txt
 
 -- test.sh --
@@ -75,6 +75,12 @@ pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",prob
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems
+# HELP pint_prometheus_queries_running Total number of in-flight prometheus queries
+# TYPE pint_prometheus_queries_running gauge
+pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom1"}
+pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom2"}
+pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom1"}
+pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom2"}
 # HELP pint_prometheus_queries_total Total number of all prometheus queries
 # TYPE pint_prometheus_queries_total counter
 pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom1"}

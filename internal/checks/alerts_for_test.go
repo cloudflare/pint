@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newAlertsForCheck(_ string) checks.RuleChecker {
+func newAlertsForCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewAlertsForCheck()
 }
 
@@ -16,18 +17,21 @@ func TestAlertsForCheck(t *testing.T) {
 			description: "ignores rules with syntax errors",
 			content:     "- alert: foo\n  expr: sum(foo) without(\n",
 			checker:     newAlertsForCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: sum(foo) without(job)\n",
 			checker:     newAlertsForCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "invalid for value",
 			content:     "- alert: foo\n  expr: foo\n  for: abc\n",
 			checker:     newAlertsForCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -44,6 +48,7 @@ func TestAlertsForCheck(t *testing.T) {
 			description: "negative for value",
 			content:     "- alert: foo\n  expr: foo\n  for: -5m\n",
 			checker:     newAlertsForCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -60,6 +65,7 @@ func TestAlertsForCheck(t *testing.T) {
 			description: "default for value",
 			content:     "- alert: foo\n  expr: foo\n  for: 0h\n",
 			checker:     newAlertsForCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{

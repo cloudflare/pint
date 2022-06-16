@@ -8,10 +8,11 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newRateCheck(uri string) checks.RuleChecker {
-	return checks.NewRateCheck(simpleProm("prom", uri, time.Second, true))
+func newRateCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
+	return checks.NewRateCheck(prom)
 }
 
 func durationMustText(name, uri, fun, multi, using string) string {
@@ -28,12 +29,14 @@ func TestRateCheck(t *testing.T) {
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 		},
 		{
 			description: "rate < 2x scrape_interval",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -62,6 +65,7 @@ func TestRateCheck(t *testing.T) {
 			description: "rate < 4x scrape_interval",
 			content:     "- record: foo\n  expr: rate(foo[3m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -80,6 +84,7 @@ func TestRateCheck(t *testing.T) {
 			description: "rate == 4x scrape interval",
 			content:     "- record: foo\n  expr: rate(foo[2m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -98,6 +103,7 @@ func TestRateCheck(t *testing.T) {
 			description: "irate < 2x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[1m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -126,6 +132,7 @@ func TestRateCheck(t *testing.T) {
 			description: "irate < 3x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -146,8 +153,9 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__="foo"}[5m])
 `,
-			checker:  newRateCheck,
-			problems: noProblems,
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -167,8 +175,9 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__=~"(foo|bar)_total"}[5m])
 `,
-			checker:  newRateCheck,
-			problems: noProblems,
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -188,8 +197,9 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__="foo"}[2m])
 `,
-			checker:  newRateCheck,
-			problems: noProblems,
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -209,8 +219,9 @@ func TestRateCheck(t *testing.T) {
 - record: foo
   expr: irate({__name__=~"(foo|bar)_total"}[2m])
 `,
-			checker:  newRateCheck,
-			problems: noProblems,
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -228,6 +239,7 @@ func TestRateCheck(t *testing.T) {
 			description: "irate == 3x scrape interval",
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -246,6 +258,7 @@ func TestRateCheck(t *testing.T) {
 			description: "valid range selector",
 			content:     "- record: foo\n  expr: foo[1m]\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -258,6 +271,7 @@ func TestRateCheck(t *testing.T) {
 			description: "nested invalid rate",
 			content:     "- record: foo\n  expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -286,13 +300,14 @@ func TestRateCheck(t *testing.T) {
 			description: "500 error from Prometheus API",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "failed to query Prometheus config: server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: server error: 500"),
 						Severity: checks.Bug,
 					},
 				}
@@ -308,13 +323,14 @@ func TestRateCheck(t *testing.T) {
 			description: "invalid status",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
-						Text:     checkErrorBadData("prom", uri, "failed to query Prometheus config: bad_data: bad input data"),
+						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
 					},
 				}
@@ -330,6 +346,7 @@ func TestRateCheck(t *testing.T) {
 			description: "invalid YAML",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -352,8 +369,9 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "connection refused",
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
-			checker: func(_ string) checks.RuleChecker {
-				return checks.NewRateCheck(simpleProm("prom", "http://127.0.0.1:1111", time.Second, true))
+			checker:     newRateCheck,
+			prometheus: func(_ string) *promapi.FailoverGroup {
+				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, true)
 			},
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -361,7 +379,7 @@ func TestRateCheck(t *testing.T) {
 						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", `failed to query Prometheus config: Get "http://127.0.0.1:1111/api/v1/status/config": dial tcp 127.0.0.1:1111: connect: connection refused`),
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Bug,
 					},
 				}
@@ -371,6 +389,7 @@ func TestRateCheck(t *testing.T) {
 			description: "irate == 3 x default 1m",
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -389,6 +408,7 @@ func TestRateCheck(t *testing.T) {
 			description: "metadata error",
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -402,7 +422,7 @@ func TestRateCheck(t *testing.T) {
 						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "failed to query Prometheus metric metadata: server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: server error: 500"),
 						Severity: checks.Bug,
 					},
 				}
@@ -422,6 +442,7 @@ func TestRateCheck(t *testing.T) {
 			description: "empty metadata response",
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[5m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
@@ -438,6 +459,7 @@ func TestRateCheck(t *testing.T) {
 			description: "rate(gauge) < 2x scrape interval",
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -473,6 +495,7 @@ func TestRateCheck(t *testing.T) {
 			description: "rate(counter)  / rate(gauge)",
 			content:     "- record: foo\n  expr: rate(foo_c[2m]) / rate(bar_g[2m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -513,6 +536,7 @@ func TestRateCheck(t *testing.T) {
 			description: "rate(unknown)",
 			content:     "- record: foo\n  expr: rate(foo[2m])\n",
 			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
 			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{

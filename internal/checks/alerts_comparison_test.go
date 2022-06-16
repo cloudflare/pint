@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newComparisonCheck(_ string) checks.RuleChecker {
+func newComparisonCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewComparisonCheck()
 }
 
@@ -16,36 +17,42 @@ func TestComparisonCheck(t *testing.T) {
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: up == 0\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- alert: Foo Is Down\n  expr: sum(\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "alert expr with > condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} > 0\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "alert expr with >= condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} >= 1\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "alert expr with == condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 1\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "alert expr without any condition",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"}\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -66,8 +73,9 @@ func TestComparisonCheck(t *testing.T) {
         AND ON (instance)
         (rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])) > 200
 `,
-			checker:  newComparisonCheck,
-			problems: noProblems,
+			checker:    newComparisonCheck,
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 		{
 			description: "deep level without comparison",
@@ -77,7 +85,8 @@ func TestComparisonCheck(t *testing.T) {
         AND ON (instance)
         rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
 `,
-			checker: newComparisonCheck,
+			checker:    newComparisonCheck,
+			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -94,12 +103,14 @@ func TestComparisonCheck(t *testing.T) {
 			description: "alert unless condition",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: foo unless bar\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "alert expr with bool",
 			content:     "- alert: Error rate is high\n  expr: rate(error_count[5m]) > bool 5\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -116,12 +127,14 @@ func TestComparisonCheck(t *testing.T) {
 			description: "alert expr with bool and condition",
 			content:     "- alert: Error rate is high\n  expr: rate(error_count[5m]) > bool 5 == 1\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "alert on absent",
 			content:     "- alert: Foo Is Missing\n  expr: absent(foo)\n",
 			checker:     newComparisonCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 	}

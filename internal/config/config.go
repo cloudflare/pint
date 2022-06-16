@@ -23,13 +23,7 @@ type Config struct {
 	Prometheus        []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Checks            *Checks            `hcl:"checks,block" json:"checks,omitempty"`
 	Rules             []Rule             `hcl:"rule,block" json:"rules,omitempty"`
-	prometheusServers []*promapi.FailoverGroup
-}
-
-func (cfg *Config) ClearCache() {
-	for _, prom := range cfg.prometheusServers {
-		prom.ClearCache()
-	}
+	PrometheusServers []*promapi.FailoverGroup
 }
 
 func (cfg *Config) DisableOnlineChecks() {
@@ -110,7 +104,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 		if !prom.isEnabledForPath(path) {
 			continue
 		}
-		for _, p := range cfg.prometheusServers {
+		for _, p := range cfg.PrometheusServers {
 			if p.Name() == prom.Name {
 				proms = append(proms, p)
 				break
@@ -222,18 +216,23 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		}
 	}
 
-	for _, prom := range cfg.Prometheus {
+	for i, prom := range cfg.Prometheus {
 		if err = prom.validate(); err != nil {
 			return cfg, err
 		}
 		timeout, _ := parseDuration(prom.Timeout)
+		concurrency := prom.Concurrency
+		if concurrency <= 0 {
+			concurrency = 16
+			cfg.Prometheus[i].Concurrency = concurrency
+		}
 		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, timeout),
+			promapi.NewPrometheus(prom.Name, prom.URI, timeout, concurrency),
 		}
 		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout))
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout, concurrency))
 		}
-		cfg.prometheusServers = append(cfg.prometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
+		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
 	}
 
 	for _, rule := range cfg.Rules {

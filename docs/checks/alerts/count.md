@@ -11,10 +11,6 @@ It will run `expr` query from every alert rule against selected Prometheus
 servers and report how many unique alerts it would generate.
 If `for` is set on alerts it will be used to adjust results.
 
-In some cases queries might fail due to timeout or loading too many samples.
-This check will try to retry such queries with a shorter `range` until it
-gets a response.
-
 ## Configuration
 
 Syntax:
@@ -28,8 +24,7 @@ alerts {
 ```
 
 - `range` - query range, how far to look back, `1h` would mean that pint will
-  query last 1h of metrics. If a query results in a timeout pint will retry it
-  with 50% smaller range until it succeeds.
+  query last 1h of metrics.
   Defaults to `1d`.
 - `step` - query resolution, for most accurate result use step equal
   to `scrape_interval`, try to reduce it if that would load too many samples.

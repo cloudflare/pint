@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -60,19 +62,30 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 	return promapi.NewFailoverGroup(
 		name,
 		[]*promapi.Prometheus{
-			promapi.NewPrometheus(name, uri, timeout),
+			promapi.NewPrometheus(name, uri, timeout, 16),
 		},
 		required,
 	)
 }
 
-type newCheckFn func(string) checks.RuleChecker
+func newSimpleProm(uri string) *promapi.FailoverGroup {
+	return simpleProm("prom", uri, time.Second*5, true)
+}
+
+func noProm(uri string) *promapi.FailoverGroup {
+	return nil
+}
+
+type newCheckFn func(*promapi.FailoverGroup) checks.RuleChecker
 
 type problemsFn func(string) []checks.Problem
+
+type newPrometheusFn func(string) *promapi.FailoverGroup
 
 type checkTest struct {
 	description string
 	content     string
+	prometheus  newPrometheusFn
 	checker     newCheckFn
 	entries     []discovery.Entry
 	problems    problemsFn
@@ -80,7 +93,7 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
-	ctx := context.Background()
+	zerolog.SetGlobalLevel(zerolog.FatalLevel)
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
@@ -99,10 +112,16 @@ func runTests(t *testing.T, testCases []checkTest) {
 				uri = srv.URL
 			}
 
+			prom := tc.prometheus(uri)
+			if prom != nil {
+				prom.StartWorkers()
+				defer prom.Close()
+			}
+
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
-				problems := tc.checker(uri).Check(ctx, entry.Rule, tc.entries)
+				problems := tc.checker(prom).Check(context.Background(), entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
 
@@ -125,7 +144,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(t *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker("").Check(ctx, entry.Rule, tc.entries)
+				_ = tc.checker(nil).Check(context.Background(), entry.Rule, tc.entries)
 			}
 		})
 	}
@@ -166,7 +185,7 @@ type requestCondition interface {
 }
 
 type responseWriter interface {
-	respond(w http.ResponseWriter)
+	respond(w http.ResponseWriter, r *http.Request)
 }
 
 type prometheusMock struct {
@@ -183,7 +202,7 @@ func (pm *prometheusMock) maybeApply(w http.ResponseWriter, r *http.Request) boo
 		}
 	}
 	pm.markUsed()
-	pm.resp.respond(w)
+	pm.resp.respond(w, r)
 	return true
 }
 
@@ -233,7 +252,7 @@ type promError struct {
 	err       string
 }
 
-func (pe promError) respond(w http.ResponseWriter) {
+func (pe promError) respond(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(pe.code)
 	w.Header().Set("Content-Type", "application/json")
 	perr := struct {
@@ -256,7 +275,7 @@ type vectorResponse struct {
 	samples model.Vector
 }
 
-func (vr vectorResponse) respond(w http.ResponseWriter) {
+func (vr vectorResponse) respond(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
@@ -286,7 +305,27 @@ type matrixResponse struct {
 	samples []*model.SampleStream
 }
 
-func (mr matrixResponse) respond(w http.ResponseWriter) {
+func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
+	start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+	end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+	step, _ := strconv.Atoi(r.Form.Get("step"))
+	samples := []*model.SampleStream{}
+	for _, s := range mr.samples {
+		var values []model.SamplePair
+		for _, v := range s.Values {
+			ts := float64(v.Timestamp.Time().Unix())
+			if ts >= start && ts <= end+float64(step) {
+				values = append(values, v)
+			}
+		}
+		if len(values) > 0 {
+			samples = append(samples, &model.SampleStream{
+				Metric: s.Metric,
+				Values: values,
+			})
+		}
+	}
+
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
@@ -302,7 +341,7 @@ func (mr matrixResponse) respond(w http.ResponseWriter) {
 			Result     []*model.SampleStream `json:"result"`
 		}{
 			ResultType: "matrix",
-			Result:     mr.samples,
+			Result:     samples,
 		},
 	}
 	d, err := json.MarshalIndent(result, "", "  ")
@@ -316,7 +355,7 @@ type configResponse struct {
 	yaml string
 }
 
-func (cr configResponse) respond(w http.ResponseWriter) {
+func (cr configResponse) respond(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
@@ -337,7 +376,7 @@ type metadataResponse struct {
 	metadata map[string][]v1.Metadata
 }
 
-func (mr metadataResponse) respond(w http.ResponseWriter) {
+func (mr metadataResponse) respond(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	// _, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
@@ -359,7 +398,7 @@ type sleepResponse struct {
 	sleep time.Duration
 }
 
-func (sr sleepResponse) respond(w http.ResponseWriter) {
+func (sr sleepResponse) respond(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(sr.sleep)
 }
 
@@ -415,7 +454,7 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 	s = &model.SampleStream{
 		Metric: metric,
 	}
-	for from.Before(until) {
+	for !from.After(until) {
 		s.Values = append(s.Values, model.SamplePair{
 			Timestamp: model.TimeFromUnix(from.Unix()),
 			Value:     1,

@@ -138,11 +138,14 @@ func actionWatch(c *cli.Context) error {
 	}()
 	log.Info().Str("address", listen).Msg("Started HTTP server")
 
-	mainCtx, cancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
+	for _, prom := range meta.cfg.PrometheusServers {
+		prom.StartWorkers()
+	}
 
 	// start timer to run every $interval
 	interval := c.Duration(intervalFlag)
 	ack := make(chan bool, 1)
+	mainCtx, mainCancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
 	stop := startTimer(mainCtx, meta.cfg, meta.workers, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
@@ -150,17 +153,21 @@ func actionWatch(c *cli.Context) error {
 	<-quit
 
 	log.Info().Msg("Shutting down")
-	cancel()
+	mainCancel()
+
+	stop <- true
+	log.Info().Msg("Waiting for all background tasks to finish")
+	<-ack
+
+	for _, prom := range meta.cfg.PrometheusServers {
+		prom.Close()
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	if err = server.Shutdown(ctx); err != nil {
 		log.Error().Err(err).Msg("HTTP server returned an error while shutting down")
 	}
-
-	stop <- true
-	log.Info().Msg("Waiting for all background tasks to finish")
-	<-ack
 
 	return nil
 }
@@ -175,7 +182,9 @@ func startTimer(ctx context.Context, cfg config.Config, workers int, interval ti
 			select {
 			case <-ticker.C:
 				log.Debug().Msg("Clearing cache")
-				cfg.ClearCache()
+				for _, prom := range cfg.PrometheusServers {
+					prom.ClearCache()
+				}
 				log.Debug().Msg("Running checks")
 				if !wasBootstrapped {
 					ticker.Reset(interval)

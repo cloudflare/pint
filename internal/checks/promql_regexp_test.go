@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func newRegexpCheck(_ string) checks.RuleChecker {
+func newRegexpCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewRegexpCheck()
 }
 
@@ -16,36 +17,42 @@ func TestRegexpCheck(t *testing.T) {
 			description: "ignores rules with syntax errors",
 			content:     "- alert: foo\n  expr: sum(foo) without(\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "static match",
 			content:     "- record: foo\n  expr: foo{job=\"bar\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "valid regexp",
 			content:     "- record: foo\n  expr: foo{job=~\"bar.+\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "valid regexp",
 			content:     "- record: foo\n  expr: foo{job!~\"(.*)\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "valid regexp",
 			content:     "- record: foo\n  expr: foo{job=~\"a|b|c\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems:    noProblems,
 		},
 		{
 			description: "unnecessary regexp",
 			content:     "- record: foo\n  expr: foo{job=~\"bar\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -62,6 +69,7 @@ func TestRegexpCheck(t *testing.T) {
 			description: "unnecessary negative regexp",
 			content:     "- record: foo\n  expr: foo{job!~\"bar\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -78,6 +86,7 @@ func TestRegexpCheck(t *testing.T) {
 			description: "empty regexp",
 			content:     "- record: foo\n  expr: foo{job=~\"\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -94,6 +103,7 @@ func TestRegexpCheck(t *testing.T) {
 			description: "unnecessary regexp anchor",
 			content:     "- record: foo\n  expr: foo{job=~\"^.+$\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -110,6 +120,7 @@ func TestRegexpCheck(t *testing.T) {
 			description: "unnecessary regexp anchor",
 			content:     "- record: foo\n  expr: foo{job=~\"(foo|^.+)$\"}\n",
 			checker:     newRegexpCheck,
+			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{

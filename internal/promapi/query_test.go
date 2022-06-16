@@ -2,10 +2,8 @@ package promapi_test
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"sync"
 	"testing"
 	"time"
 
@@ -16,7 +14,6 @@ import (
 )
 
 func TestQuery(t *testing.T) {
-	done := sync.Map{}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -60,11 +57,6 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "once":
-			if _, wasDone := done.Load(r.URL.Path); wasDone {
-				w.WriteHeader(500)
-				_, _ = w.Write([]byte("query already requested\n"))
-				return
-			}
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
@@ -74,7 +66,6 @@ func TestQuery(t *testing.T) {
 					"result":[{"metric":{},"value":[1614859502.068,"1"]}]
 				}
 			}`))
-			done.Store(r.URL.Path, true)
 		case "matrix":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
@@ -113,7 +104,6 @@ func TestQuery(t *testing.T) {
 		timeout time.Duration
 		result  promapi.QueryResult
 		err     string
-		runs    int
 	}
 
 	testCases := []testCaseT{
@@ -124,7 +114,6 @@ func TestQuery(t *testing.T) {
 				URI:    srv.URL,
 				Series: model.Vector{},
 			},
-			runs: 5,
 		},
 		{
 			query:   "single_result",
@@ -139,7 +128,6 @@ func TestQuery(t *testing.T) {
 					},
 				},
 			},
-			runs: 5,
 		},
 		{
 			query:   "three_results",
@@ -164,25 +152,21 @@ func TestQuery(t *testing.T) {
 					},
 				},
 			},
-			runs: 5,
 		},
 		{
 			query:   "error",
 			timeout: time.Second,
 			err:     "bad_data: unhandled query",
-			runs:    5,
 		},
 		{
 			query:   "matrix",
 			timeout: time.Second,
 			err:     "unknown result type: matrix",
-			runs:    5,
 		},
 		{
 			query:   "timeout",
 			timeout: time.Millisecond * 20,
-			err:     fmt.Sprintf(`Post "%s/api/v1/query": context deadline exceeded`, srv.URL),
-			runs:    5,
+			err:     "connection timeout",
 		},
 		{
 			query:   "once",
@@ -197,14 +181,6 @@ func TestQuery(t *testing.T) {
 					},
 				},
 			},
-			runs: 5,
-		},
-		// repeat once to ensure it errors
-		{
-			query:   "once",
-			timeout: time.Second,
-			err:     "server_error: server error: 500",
-			runs:    5,
 		},
 	}
 
@@ -212,26 +188,20 @@ func TestQuery(t *testing.T) {
 		t.Run(tc.query, func(t *testing.T) {
 			assert := assert.New(t)
 
-			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout)
+			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1)
+			prom.StartWorkers()
+			defer prom.Close()
 
-			wg := sync.WaitGroup{}
-			wg.Add(tc.runs)
-			for i := 1; i <= tc.runs; i++ {
-				go func() {
-					qr, err := prom.Query(context.Background(), tc.query)
-					if tc.err != "" {
-						assert.EqualError(err, tc.err, tc)
-					} else {
-						assert.NoError(err)
-					}
-					if qr != nil {
-						assert.Equal(tc.result.URI, qr.URI)
-						assert.Equal(tc.result.Series, qr.Series)
-					}
-					wg.Done()
-				}()
+			qr, err := prom.Query(context.Background(), tc.query)
+			if tc.err != "" {
+				assert.EqualError(err, tc.err, tc)
+			} else {
+				assert.NoError(err)
 			}
-			wg.Wait()
+			if qr != nil {
+				assert.Equal(tc.result.URI, qr.URI)
+				assert.Equal(tc.result.Series, qr.Series)
+			}
 		})
 	}
 }

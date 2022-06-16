@@ -2,10 +2,8 @@ package promapi_test
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"sync"
 	"testing"
 	"time"
 
@@ -15,8 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func TestMedatata(t *testing.T) {
-	done := sync.Map{}
+func TestMetadata(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm()
 		if err != nil {
@@ -38,15 +35,9 @@ func TestMedatata(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
 		case "once":
-			if _, wasDone := done.Load(r.URL.Path); wasDone {
-				w.WriteHeader(500)
-				_, _ = w.Write([]byte("path already requested\n"))
-				return
-			}
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
-			done.Store(r.URL.Path, true)
 		case "slow":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
@@ -68,7 +59,6 @@ func TestMedatata(t *testing.T) {
 		timeout  time.Duration
 		metadata promapi.MetadataResult
 		err      string
-		runs     int
 	}
 
 	testCases := []testCaseT{
@@ -79,7 +69,6 @@ func TestMedatata(t *testing.T) {
 				URI:      srv.URL,
 				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
-			runs: 5,
 		},
 		{
 			metric:  "counter",
@@ -88,19 +77,16 @@ func TestMedatata(t *testing.T) {
 				URI:      srv.URL,
 				Metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
 			},
-			runs: 5,
 		},
 		{
 			metric:  "slow",
 			timeout: time.Millisecond * 10,
-			err:     fmt.Sprintf(`failed to query Prometheus metric metadata: Get "%s/api/v1/metadata?limit=&metric=slow": context deadline exceeded`, srv.URL),
-			runs:    5,
+			err:     "connection timeout",
 		},
 		{
 			metric:  "error",
 			timeout: time.Second,
-			err:     "failed to query Prometheus metric metadata: server_error: server error: 500",
-			runs:    5,
+			err:     "server_error: server error: 500",
 		},
 		{
 			metric:  "once",
@@ -109,14 +95,6 @@ func TestMedatata(t *testing.T) {
 				URI:      srv.URL,
 				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
-			runs: 10,
-		},
-		// make sure /once fails on second query
-		{
-			metric:  "once",
-			timeout: time.Second,
-			runs:    2,
-			err:     "failed to query Prometheus metric metadata: server_error: server error: 500",
 		},
 	}
 
@@ -124,25 +102,19 @@ func TestMedatata(t *testing.T) {
 		t.Run(tc.metric, func(t *testing.T) {
 			assert := assert.New(t)
 
-			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout)
+			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1)
+			prom.StartWorkers()
+			defer prom.Close()
 
-			wg := sync.WaitGroup{}
-			wg.Add(tc.runs)
-			for i := 1; i <= tc.runs; i++ {
-				go func() {
-					metadata, err := prom.Metadata(context.Background(), tc.metric)
-					if tc.err != "" {
-						assert.EqualError(err, tc.err, tc)
-					} else {
-						assert.NoError(err)
-					}
-					if metadata != nil {
-						assert.Equal(*metadata, tc.metadata)
-					}
-					wg.Done()
-				}()
+			metadata, err := prom.Metadata(context.Background(), tc.metric)
+			if tc.err != "" {
+				assert.EqualError(err, tc.err, tc)
+			} else {
+				assert.NoError(err)
 			}
-			wg.Wait()
+			if metadata != nil {
+				assert.Equal(*metadata, tc.metadata)
+			}
 		})
 	}
 }
