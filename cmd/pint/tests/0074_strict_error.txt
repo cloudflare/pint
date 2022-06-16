@@ -1,0 +1,21 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=error msg="Failed to unmarshal file content" error="yaml: unmarshal errors:\n  line 2: field alert not found in type rulefmt.RuleGroup\n  line 3: field expr not found in type rulefmt.RuleGroup\n  line 4: field for not found in type rulefmt.RuleGroup\n  line 5: field labels not found in type rulefmt.RuleGroup\n  line 8: field annotations not found in type rulefmt.RuleGroup" lines=1-9 path=rules/strict.yml
+rules/strict.yml:2: field alert not found in type rulefmt.RuleGroup (yaml/parse)
+- alert: Conntrack_Table_Almost_Full
+
+level=info msg="Problems found" Fatal=1
+level=fatal msg="Fatal error" error="problems found"
+-- rules/strict.yml --
+groups:
+- alert: Conntrack_Table_Almost_Full
+  expr: ((node_nf_conntrack_entries / node_nf_conntrack_entries_limit) * 100) > 75
+  for: 5m
+  labels:
+    component: conntrack
+    priority: "3"
+  annotations:
+    summary: Conntrack table is at {{ $value|humanize }}%

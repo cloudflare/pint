@@ -14,7 +14,6 @@ import (
 
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -33,8 +32,7 @@ func TestGlobPathFinder(t *testing.T) {
 	testRules, err := p.Parse([]byte(testRuleBody))
 	require.NoError(t, err)
 
-	var r rulefmt.RuleGroups
-	strictErr := yaml.Unmarshal([]byte(testRuleBody), &r)
+	_, strictErrs := rulefmt.Parse([]byte(testRuleBody))
 
 	testCases := []testCaseT{
 		{
@@ -92,7 +90,7 @@ func TestGlobPathFinder(t *testing.T) {
 			entries: []discovery.Entry{
 				{
 					Path:          "bar.yml",
-					PathError:     strictErr,
+					PathError:     strictErrs[0],
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
