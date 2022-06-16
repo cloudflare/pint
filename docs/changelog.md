@@ -18,6 +18,11 @@
   the results. Previously it would try to run a single query for a whole week
   and if that failed it would reduce time range until a query would succeed.
 
+### Fixed
+
+- Strict parsing mode didn't fully validate rule group files, this is now fixed
+  and pint runs the same set of checks as Prometheus.
+
 ## v0.21.1
 
 ### Fixed

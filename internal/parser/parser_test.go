@@ -35,7 +35,7 @@ func TestParse(t *testing.T) {
 			shouldError: true,
 		},
 		{
-			content: []byte(string("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |")),
+			content: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
 			output: []parser.Rule{
 				{Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 6}},
 			},
