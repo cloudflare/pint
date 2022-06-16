@@ -105,7 +105,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 							return
 						}
 					}
-					t.Errorf("no matching response for %s request", r.URL.Path)
+					t.Errorf("no matching response for %s request with payload: %s", r.URL.Path, r.Form.Encode())
 					t.FailNow()
 				}))
 				defer srv.Close()
