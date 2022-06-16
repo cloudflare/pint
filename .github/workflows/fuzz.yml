@@ -36,3 +36,9 @@ jobs:
 
       - name: Fuzz
         run: go test -fuzz=Fuzz -fuzztime 3m ./internal/parser
+
+      - name: Get failed inputs
+        if: failure()
+        run: |
+          git add .
+          git diff --cached --exit-code
