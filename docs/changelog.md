@@ -23,6 +23,10 @@
 - Strict parsing mode didn't fully validate rule group files, this is now fixed
   and pint runs the same set of checks as Prometheus.
 - Fixed `promql/series` handling of rules with `{__name__=~"foo|bar"}` queries.
+- If Prometheus was stopped or restarted `promql/series` would occasionally
+  report metrics as "sometimes present". This check will now try to find time
+  ranges with no metrics in Prometheus and ignore these when checking if
+  metrics are present.
 
 ## v0.21.1
 

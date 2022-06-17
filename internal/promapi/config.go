@@ -2,7 +2,9 @@ package promapi
 
 import (
 	"context"
+	"crypto/sha1"
 	"fmt"
+	"io"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -55,7 +57,9 @@ func (q configQuery) String() string {
 }
 
 func (q configQuery) CacheKey() string {
-	return hash("/api/v1/status/config")
+	h := sha1.New()
+	_, _ = io.WriteString(h, q.Endpoint())
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {

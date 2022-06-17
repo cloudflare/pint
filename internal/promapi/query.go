@@ -2,7 +2,9 @@ package promapi
 
 import (
 	"context"
+	"crypto/sha1"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/prometheus/common/model"
@@ -43,7 +45,11 @@ func (q instantQuery) String() string {
 }
 
 func (q instantQuery) CacheKey() string {
-	return hash("/api/v1/query/" + q.expr)
+	h := sha1.New()
+	_, _ = io.WriteString(h, q.Endpoint())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.expr)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {

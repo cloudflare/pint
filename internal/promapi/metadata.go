@@ -2,7 +2,9 @@ package promapi
 
 import (
 	"context"
+	"crypto/sha1"
 	"fmt"
+	"io"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/rs/zerolog/log"
@@ -44,7 +46,11 @@ func (q metadataQuery) String() string {
 }
 
 func (q metadataQuery) CacheKey() string {
-	return hash("/api/v1/metadata/" + q.metric)
+	h := sha1.New()
+	_, _ = io.WriteString(h, q.Endpoint())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.metric)
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
