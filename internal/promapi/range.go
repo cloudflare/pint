@@ -2,8 +2,10 @@ package promapi
 
 import (
 	"context"
+	"crypto/sha1"
 	"errors"
 	"fmt"
+	"io"
 	"sort"
 	"sync"
 	"time"
@@ -31,6 +33,17 @@ type rangeQuery struct {
 }
 
 func (q rangeQuery) Run() (any, error) {
+	/*
+		Too noisy
+			log.Debug().
+				Str("uri", q.prom.uri).
+				Str("query", q.expr).
+				Str("start", q.r.Start.Format(time.RFC3339)).
+				Str("end", q.r.End.Format(time.RFC3339)).
+				Str("step", output.HumanizeDuration(q.r.Step)).
+				Msg("Running prometheus range query slice")
+	*/
+
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
@@ -47,7 +60,17 @@ func (q rangeQuery) String() string {
 }
 
 func (q rangeQuery) CacheKey() string {
-	return ""
+	h := sha1.New()
+	_, _ = io.WriteString(h, q.Endpoint())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.expr)
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.r.Start.Round(q.r.Step).String())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.r.End.Round(q.r.Step).String())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.r.Step.String())
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {

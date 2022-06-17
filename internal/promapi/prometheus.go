@@ -1,9 +1,6 @@
 package promapi
 
 import (
-	"crypto/sha1"
-	"fmt"
-	"io"
 	"sync"
 	"time"
 
@@ -11,6 +8,8 @@ import (
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/rs/zerolog/log"
+
+	"github.com/cloudflare/pint/internal/output"
 )
 
 type QueryError struct {
@@ -49,7 +48,7 @@ type Prometheus struct {
 	api         v1.API
 	timeout     time.Duration
 	concurrency int
-	cache       *lru.Cache
+	cache       *lru.ARCCache
 
 	wg      sync.WaitGroup
 	queries chan queryRequest
@@ -63,7 +62,7 @@ func NewPrometheus(name, uri string, timeout time.Duration, concurrency int) *Pr
 		// use this code in tests
 		panic(err)
 	}
-	cache, _ := lru.New(1000)
+	cache, _ := lru.NewARC(1000)
 
 	prom := Prometheus{
 		name:        name,
@@ -77,11 +76,18 @@ func NewPrometheus(name, uri string, timeout time.Duration, concurrency int) *Pr
 }
 
 func (prom *Prometheus) Close() {
+	log.Debug().Str("name", prom.name).Str("uri", prom.uri).Msg("Stopping query workers")
 	close(prom.queries)
 	prom.wg.Wait()
 }
 
 func (prom *Prometheus) StartWorkers() {
+	log.Debug().
+		Str("name", prom.name).
+		Str("uri", prom.uri).
+		Int("workers", prom.concurrency).
+		Msg("Starting query workers")
+
 	prom.queries = make(chan queryRequest, prom.concurrency*10)
 
 	for w := 1; w <= prom.concurrency; w++ {
@@ -112,7 +118,15 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 
 		prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 		prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
+		start := time.Now()
 		result, err := job.query.Run()
+		dur := time.Since(start)
+		log.Debug().
+			Str("uri", prom.uri).
+			Str("query", job.query.String()).
+			Str("endpoint", job.query.Endpoint()).
+			Str("duration", output.HumanizeDuration(dur)).
+			Msg("Query completed")
 		prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Dec()
 		if err != nil {
 			prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(err)).Inc()
@@ -126,19 +140,9 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 		}
 
 		if cacheKey != "" {
-			log.Debug().
-				Str("uri", prom.uri).
-				Str("query", job.query.String()).
-				Msg("Adding result to cache")
 			prom.cache.Add(cacheKey, result)
 		}
 
 		job.result <- queryResult{value: result}
 	}
-}
-
-func hash(s string) string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, s)
-	return fmt.Sprintf("%x", h.Sum(nil))
 }

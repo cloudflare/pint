@@ -136,9 +136,14 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			continue
 		}
 
+		promUptime, err := c.seriesTimeRanges(ctx, "count(up)", rangeStart, rangeEnd, rangeStep, nil)
+		if err != nil {
+			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
+		}
+
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeStart, rangeEnd, rangeStep)
+		trs, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeStart, rangeEnd, rangeStep, promUptime)
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -188,7 +193,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeStart, rangeEnd, rangeStep)
+			trsLabelCount, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeStart, rangeEnd, rangeStep, promUptime)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -208,7 +213,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("No historical series with label used for the query")
 			}
 
-			if len(trsLabelCount.labelValues(name)) == len(trsLabelCount.ranges) && trsLabelCount.avgLife() < (trsLabelCount.duration()/2) {
+			if len(trsLabelCount.gaps) > 0 && len(trsLabelCount.labelValues(name)) == len(trsLabelCount.ranges) && trsLabelCount.avgLife() < (trsLabelCount.duration()/2) {
 				highChurnLabels = append(highChurnLabels, name)
 			}
 		}
@@ -266,7 +271,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.serieTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeStart, rangeEnd, rangeStep)
+			trsLabel, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeStart, rangeEnd, rangeStep, promUptime)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
@@ -331,7 +336,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			}
 
 			// 7. if foo is ALWAYS/SOMETIMES there BUT {bar OR baz} value is SOMETIMES there -> WARN
-			if len(trsLabel.ranges) > 1 {
+			if len(trsLabel.ranges) > 1 && len(trsLabel.gaps) > 0 {
 				problems = append(problems, Problem{
 					Fragment: selector.String(),
 					Lines:    expr.Lines(),
@@ -350,7 +355,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		}
 
 		// 8. If foo is SOMETIMES there -> WARN
-		if len(trs.ranges) > 1 {
+		if len(trs.ranges) > 1 && len(trs.gaps) > 0 {
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
@@ -392,7 +397,7 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 	return series, qr.URI, nil
 }
 
-func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, start, end time.Time, step time.Duration) (tr *timeRanges, err error) {
+func (c SeriesCheck) seriesTimeRanges(ctx context.Context, query string, start, end time.Time, step time.Duration, promUptime *timeRanges) (tr *timeRanges, err error) {
 	qr, err := c.prom.RangeQuery(ctx, query, start, end, step)
 	if err != nil {
 		return nil, err
@@ -404,6 +409,7 @@ func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, start, e
 		until: qr.End.Round(time.Second),
 		step:  step,
 	}
+
 	var ts time.Time
 	for _, s := range qr.Samples {
 		for _, v := range s.Values {
@@ -426,6 +432,34 @@ func (c SeriesCheck) serieTimeRanges(ctx context.Context, query string, start, e
 					end:    ts.Add(step),
 				})
 			}
+		}
+	}
+
+	if promUptime != nil {
+		ts = tr.from
+		for !ts.After(tr.until) {
+			if tr.covers(ts) || !promUptime.covers(ts) {
+				ts = ts.Add(tr.step)
+				continue
+			}
+
+			var found bool
+			for i := range tr.gaps {
+				if !ts.Before(tr.gaps[i].start) &&
+					!ts.After(tr.gaps[i].end.Add(tr.step)) {
+					tr.gaps[i].end = ts.Add(tr.step)
+					found = true
+					break
+				}
+			}
+			if !found {
+				tr.gaps = append(tr.gaps, rangeGap{
+					start: ts,
+					end:   ts.Add(tr.step),
+				})
+			}
+
+			ts = ts.Add(tr.step)
 		}
 	}
 
@@ -513,12 +547,18 @@ type timeRange struct {
 	end    time.Time
 }
 
+type rangeGap struct {
+	start time.Time
+	end   time.Time
+}
+
 type timeRanges struct {
 	uri    string
 	from   time.Time
 	until  time.Time
 	step   time.Duration
 	ranges []timeRange
+	gaps   []rangeGap
 }
 
 func (tr timeRanges) withLabelName(name string) (r []timeRange) {
@@ -585,4 +625,13 @@ func (tr timeRanges) sinceDesc(t time.Time) (s string) {
 		return output.HumanizeDuration(dur.Round(time.Hour))
 	}
 	return output.HumanizeDuration(dur.Round(time.Minute))
+}
+
+func (tr timeRanges) covers(ts time.Time) bool {
+	for _, r := range tr.ranges {
+		if !r.start.After(ts) && !r.end.Before(ts) {
+			return true
+		}
+	}
+	return false
 }

@@ -172,6 +172,13 @@ func TestSeriesCheck(t *testing.T) {
 					conds: []requestCondition{requireQueryPath, formCond{key: "query", value: "count(found_7)"}},
 					resp:  respondWithSingleInstantVector(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -345,6 +352,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -378,6 +392,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(foo:bar)`},
 					},
 					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -448,6 +469,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(foo:bar)`},
 					},
 					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -532,6 +560,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -571,6 +606,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
 					},
 					resp: respondWithInternalError(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -635,6 +677,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -710,6 +759,13 @@ func TestSeriesCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -778,6 +834,13 @@ func TestSeriesCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -845,6 +908,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -924,6 +994,13 @@ func TestSeriesCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -1001,6 +1078,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1086,6 +1170,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1191,6 +1282,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -1246,6 +1344,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(found{error="xxx"})`},
 					},
 					resp: respondWithInternalError(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1336,6 +1441,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -1378,6 +1490,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1443,6 +1562,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1520,6 +1646,13 @@ func TestSeriesCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -1578,6 +1711,13 @@ func TestSeriesCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1680,6 +1820,13 @@ func TestSeriesCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -1762,6 +1909,101 @@ func TestSeriesCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#8 metric is sometimes present due to prometheus downtime",
+			content:     "- record: foo\n  expr: sum(sometimes{foo!=\"bar\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sometimes{foo!="bar"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-3).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-3).Add(time.Hour),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(sometimes{foo=~".+"}) by (foo)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"foo": "aaa"},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"foo": "bbb"},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{"foo": "ccc"},
+								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-3).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-3).Add(time.Hour),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
 			},
 		},
 		{
@@ -1818,6 +2060,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -1850,6 +2099,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: "count(notfound)"},
 					},
 					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1886,6 +2142,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(notfound)`},
 					},
 					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
@@ -1957,6 +2220,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -2013,6 +2283,13 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					resp: respondWithEmptyMatrix(),
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 			},
 		},
 		{
@@ -2045,6 +2322,13 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
 					},
 					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 			},
 		},
