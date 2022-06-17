@@ -20,8 +20,9 @@ to verify that:
   passed to it and will return calculated value, using a non-counter will cause
   problems. This is because counters are only allowed to increase in value and any
   value drop is interpreted as counter overflow.
-  For gauge metrics please use [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv)
-  function instead.
+  For gauge metrics use [`delta()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#delta)
+  or [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv) 
+  functions instead.
 
 ## Configuration
 
