@@ -45,8 +45,6 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 	}
 
 	rangeLookback := time.Hour * 24 * 7
-	rangeEnd := time.Now()
-	rangeStart := rangeEnd.Add(rangeLookback * -1)
 	rangeStep := time.Minute * 5
 
 	done := map[string]bool{}
@@ -136,14 +134,14 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			continue
 		}
 
-		promUptime, err := c.seriesTimeRanges(ctx, "count(up)", rangeStart, rangeEnd, rangeStep, nil)
+		promUptime, err := c.seriesTimeRanges(ctx, "count(up)", rangeLookback, rangeStep, nil)
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		}
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeStart, rangeEnd, rangeStep, promUptime)
+		trs, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), rangeLookback, rangeStep, promUptime)
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -193,7 +191,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeStart, rangeEnd, rangeStep, promUptime)
+			trsLabelCount, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), rangeLookback, rangeStep, promUptime)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -271,7 +269,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeStart, rangeEnd, rangeStep, promUptime)
+			trsLabel, err := c.seriesTimeRanges(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), rangeLookback, rangeStep, promUptime)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
@@ -397,8 +395,8 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 	return series, qr.URI, nil
 }
 
-func (c SeriesCheck) seriesTimeRanges(ctx context.Context, query string, start, end time.Time, step time.Duration, promUptime *timeRanges) (tr *timeRanges, err error) {
-	qr, err := c.prom.RangeQuery(ctx, query, start, end, step)
+func (c SeriesCheck) seriesTimeRanges(ctx context.Context, query string, lookback, step time.Duration, promUptime *timeRanges) (tr *timeRanges, err error) {
+	qr, err := c.prom.RangeQuery(ctx, query, promapi.NewRelativeRange(lookback, step))
 	if err != nil {
 		return nil, err
 	}
