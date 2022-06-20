@@ -308,7 +308,7 @@ func TestRange(t *testing.T) {
 			prom.StartWorkers()
 			defer prom.Close()
 
-			qr, err := prom.RangeQuery(context.Background(), tc.query, tc.start, tc.end, tc.step)
+			qr, err := prom.RangeQuery(context.Background(), tc.query, promapi.NewAbsoluteRange(tc.start, tc.end, tc.step))
 			if tc.err != "" {
 				assert.EqualError(err, tc.err, tc)
 			} else {

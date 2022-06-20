@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.22.1
+
+### Fixed
+
+- Fixed high memory usage when running range queries against Prometheus servers.
+
 ## v0.22.0
 
 ### Changed

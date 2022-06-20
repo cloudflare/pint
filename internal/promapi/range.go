@@ -60,21 +60,22 @@ func (q rangeQuery) String() string {
 }
 
 func (q rangeQuery) CacheKey() string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, q.Endpoint())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.expr)
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.r.Start.Round(q.r.Step).String())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.r.End.Round(q.r.Step).String())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.r.Step.String())
-	return fmt.Sprintf("%x", h.Sum(nil))
+	return ""
 }
 
-func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (*RangeQueryResult, error) {
-	lookback := end.Sub(start)
+type RangeQueryTimes interface {
+	Start() time.Time
+	End() time.Time
+	Dur() time.Duration
+	Step() time.Duration
+	String() string
+}
+
+func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (*RangeQueryResult, error) {
+	start := params.Start()
+	end := params.End()
+	lookback := params.Dur()
+	step := params.Step()
 
 	queryStep := (time.Hour * 2).Round(step)
 	if queryStep > lookback {
@@ -84,11 +85,26 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 	log.Debug().
 		Str("uri", p.uri).
 		Str("query", expr).
-		Str("start", start.Format(time.RFC3339)).
-		Str("end", end.Format(time.RFC3339)).
+		Str("lookback", output.HumanizeDuration(lookback)).
 		Str("step", output.HumanizeDuration(step)).
 		Str("slice", output.HumanizeDuration(queryStep)).
 		Msg("Scheduling prometheus range query")
+
+	h := sha1.New()
+	_, _ = io.WriteString(h, expr)
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, params.String())
+	cacheKey := fmt.Sprintf("%x", h.Sum(nil))
+
+	if cached, ok := p.cache.Get(cacheKey); ok {
+		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query/range").Inc()
+		log.Debug().
+			Str("uri", p.uri).
+			Str("query", expr).
+			Msg("Cache hit")
+		res := cached.(RangeQueryResult)
+		return &res, nil
+	}
 
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -168,6 +184,8 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, start, end tim
 
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(res.Samples)).Msg("Parsed range response")
 
+	p.cache.Add(cacheKey, res)
+
 	return &res, nil
 }
 
@@ -202,4 +220,67 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) []tim
 	}
 
 	return slices
+}
+
+func NewRelativeRange(lookback, step time.Duration) RelativeRange {
+	return RelativeRange{lookback: lookback, step: step}
+}
+
+type RelativeRange struct {
+	lookback time.Duration
+	step     time.Duration
+}
+
+func (rr RelativeRange) Start() time.Time {
+	return time.Now().Add(rr.lookback * -1)
+}
+
+func (rr RelativeRange) End() time.Time {
+	return time.Now()
+}
+
+func (rr RelativeRange) Dur() time.Duration {
+	return rr.lookback
+}
+
+func (rr RelativeRange) Step() time.Duration {
+	return rr.step
+}
+
+func (rr RelativeRange) String() string {
+	return fmt.Sprintf("%s/%s", output.HumanizeDuration(rr.lookback), output.HumanizeDuration(rr.step))
+}
+
+func NewAbsoluteRange(start, end time.Time, step time.Duration) AbsoluteRange {
+	return AbsoluteRange{start: start, end: end, step: step}
+}
+
+type AbsoluteRange struct {
+	start time.Time
+	end   time.Time
+	step  time.Duration
+}
+
+func (ar AbsoluteRange) Start() time.Time {
+	return ar.start
+}
+
+func (ar AbsoluteRange) End() time.Time {
+	return ar.end
+}
+
+func (ar AbsoluteRange) Dur() time.Duration {
+	return ar.end.Sub(ar.start)
+}
+
+func (ar AbsoluteRange) Step() time.Duration {
+	return ar.step
+}
+
+func (ar AbsoluteRange) String() string {
+	return fmt.Sprintf(
+		"%s-%s/%s",
+		ar.start.Format(time.RFC3339),
+		ar.end.Format(time.RFC3339),
+		output.HumanizeDuration(ar.step))
 }

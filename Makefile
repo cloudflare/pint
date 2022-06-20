@@ -42,6 +42,7 @@ test:
 		-covermode=atomic \
 		-coverprofile=$(COVER_PROFILE) \
 		-coverpkg=./... \
+		-race \
 		-count=5 \
 		-timeout=15m \
 		./...

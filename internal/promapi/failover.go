@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"time"
 )
 
 type FailoverGroupError struct {
@@ -93,11 +92,11 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 }
 
-func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, start, end time.Time, step time.Duration) (rqr *RangeQueryResult, err error) {
+func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (rqr *RangeQueryResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
 		uri = prom.uri
-		rqr, err = prom.RangeQuery(ctx, expr, start, end, step)
+		rqr, err = prom.RangeQuery(ctx, expr, params)
 		if err == nil {
 			return
 		}
