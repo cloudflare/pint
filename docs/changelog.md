@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.22.2
+
+### Fixed
+
+- Improved error reporting when strict mode is enabled.
+
 ## v0.22.1
 
 ### Fixed
