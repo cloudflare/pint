@@ -18,6 +18,21 @@ const (
 	RuleOwnerComment = "rule/owner"
 )
 
+var ignoredErrors = []string{
+	"one of 'record' or 'alert' must be set",
+	": could not parse expression: ",
+	"cannot unmarshal !!seq into rulefmt.ruleGroups",
+}
+
+func isStrictIgnored(err error) bool {
+	for _, ign := range ignoredErrors {
+		if strings.Contains(err.Error(), ign) {
+			return true
+		}
+	}
+	return false
+}
+
 type RuleFinder interface {
 	Find() ([]Entry, error)
 }
@@ -54,6 +69,9 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 	if isStrict {
 		if _, errs := rulefmt.Parse(content); len(errs) > 0 {
 			for _, err := range errs {
+				if isStrictIgnored(err) {
+					continue
+				}
 				log.Error().
 					Err(err).
 					Str("path", path).
@@ -65,6 +83,8 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 					Owner:         fileOwner.Value,
 					ModifiedLines: contentLines,
 				})
+			}
+			if len(entries) > 0 {
 				return entries, nil
 			}
 		}

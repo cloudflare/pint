@@ -4,9 +4,9 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=error msg="Failed to unmarshal file content" error="0:0: group \"foo\", rule 2, \"\": one of 'record' or 'alert' must be set" lines=1-10 path=rules/0001.yml
-rules/0001.yml:1: 0:0: group "foo", rule 2, "": one of 'record' or 'alert' must be set (yaml/parse)
-groups:
+level=info msg="File parsed" path=rules/0001.yml rules=2
+rules/0001.yml:8: incomplete rule, no alert or record key (yaml/parse)
+  - expr: sum(foo)
 
 level=info msg="Problems found" Fatal=1
 level=fatal msg="Fatal error" error="problems found"

@@ -19,12 +19,14 @@ import (
 var (
 	yamlErrRe          = regexp.MustCompile("^yaml: line (.+): (.+)")
 	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
+	rulefmtGroupRe     = regexp.MustCompile("^([0-9]+):[0-9]+: group \".+\", rule [0-9]+, (.+)")
+	rulefmtGroupnameRe = regexp.MustCompile("^([0-9]+):[0-9]+: (groupname: .+)")
 )
 
 const yamlParseReporter = "yaml/parse"
 
 func tryDecodingYamlError(e string) (int, string) {
-	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe} {
+	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe, rulefmtGroupRe, rulefmtGroupnameRe} {
 		parts := re.FindStringSubmatch(e)
 		if len(parts) > 2 {
 			line, err := strconv.Atoi(parts[1])

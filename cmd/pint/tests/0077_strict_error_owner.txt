@@ -1,0 +1,23 @@
+pint.error --no-color lint --require-owner rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=error msg="Failed to unmarshal file content" error="4:13: group \"foo\", rule 1, \"foo bar\": invalid field 'annotations' in recording rule" lines=1-7 path=rules/strict.yml
+level=error msg="Failed to unmarshal file content" error="4:13: group \"foo\", rule 1, \"foo bar\": invalid recording rule name: foo bar" lines=1-7 path=rules/strict.yml
+rules/strict.yml:4: "foo bar": invalid field 'annotations' in recording rule (yaml/parse)
+  - record: foo bar
+
+rules/strict.yml:4: "foo bar": invalid recording rule name: foo bar (yaml/parse)
+  - record: foo bar
+
+level=info msg="Problems found" Fatal=2
+level=fatal msg="Fatal error" error="problems found"
+-- rules/strict.yml --
+groups:
+- name: foo
+  rules:
+  - record: foo bar
+    expr: 0
+    annotations:
+      foo: bar

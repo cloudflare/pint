@@ -85,6 +85,9 @@ func actionLint(c *cli.Context) error {
 
 func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
 	for _, entry := range entries {
+		if entry.PathError != nil {
+			continue
+		}
 		if entry.Owner != "" {
 			continue
 		}
