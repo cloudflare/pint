@@ -18,7 +18,7 @@ nav_order: 2
 All regexp patterns use [Go regexp](https://pkg.go.dev/regexp) module and are fully anchored.
 This means that when you pass `.*` regexp expression internally it will be represented as
 `^.*$`, where `^` indicates beginning of a string and `$` is the end of string.
-This follow [PromQL behavior](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+This follows [PromQL behavior](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 for consistency with Prometheus.
 If you have a string `alice bob john` and you want to match a substring `bob`, then be sure to use
 `.*bob.*`.
