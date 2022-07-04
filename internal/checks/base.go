@@ -83,6 +83,8 @@ const (
 	Fatal
 )
 
+type SettingsKey string
+
 type Problem struct {
 	Fragment string
 	Lines    []int

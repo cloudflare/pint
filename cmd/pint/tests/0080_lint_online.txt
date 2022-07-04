@@ -1,0 +1,122 @@
+exec bash -x ./prometheus.sh &
+exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+
+pint.ok --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+exec bash -c 'cat prometheus.pid | xargs kill'
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/1.yml rules=1
+rules/1.yml:2: prometheus "prom1" at http://127.0.0.1:7080 didn't have any series for "http_errors_total" metric in the last 1w. Metric name "http_errors_total" matches "promql/series" check ignore regexp "^.+_errors_.+$" (promql/series)
+  expr: rate(http_errors_total[2m]) > 0
+
+level=info msg="Problems found" Warning=1
+-- rules/1.yml --
+- alert: http errors
+  expr: rate(http_errors_total[2m]) > 0
+
+-- .pint.hcl --
+prometheus "prom1" {
+  uri     = "http://127.0.0.1:7080"
+  timeout = "5s"
+  required = true
+}
+parser {
+  relaxed = [".*"]
+}
+check "promql/series" {
+    ignoreMetrics = [
+        ".+_error",
+        ".+_error_.+",
+        ".+_errors",
+        ".+_errors_.+",
+    ]
+}
+
+-- prometheus.go --
+package main
+
+import (
+	"context"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/api/v1/metadata", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
+	})
+
+	http.HandleFunc("/api/v1/status/config", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
+	})
+
+	http.HandleFunc("/api/v1/query_range", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+            "status":"success",
+            "data":{
+                "resultType":"matrix",
+                "result":[]
+            }
+        }`))
+	})
+
+	http.HandleFunc("/api/v1/query", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{
+            "status":"success",
+            "data":{
+                "resultType":"vector",
+                "result":[]
+            }
+        }`))
+	})
+
+	listener, err := net.Listen("tcp", "127.0.0.1:7080")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server := &http.Server{
+		Addr: "127.0.0.1:7080",
+	}
+
+	go func() {
+		_ = server.Serve(listener)
+	}()
+
+	pid := os.Getpid()
+	err = os.WriteFile("prometheus.pid", []byte(strconv.Itoa(pid)), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		time.Sleep(time.Minute * 2)
+		stop <- syscall.SIGTERM
+	}()
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+}
+
+-- prometheus.sh --
+env GOCACHE=$TMPDIR go run prometheus.go

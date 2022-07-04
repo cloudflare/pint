@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.23.0
+
+### Added
+
+- Added extra global configuration for `promql/series` check.
+  See check [documentation](checks/promql/series.md) for details.
+
 ## v0.22.2
 
 ### Fixed

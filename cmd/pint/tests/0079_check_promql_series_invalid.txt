@@ -1,0 +1,22 @@
+pint.error --no-color config
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": .pint.hcl:8,3-6: Unsupported argument; An argument named \"bob\" is not expected here."
+-- .pint.hcl --
+prometheus "prom" {
+  uri     = "https://"
+  timeout = "2m"
+  required = true
+}
+
+check "promql/series" {
+  bob = [
+    ".*_error",
+    ".*_error_.*",
+    ".*_errors",
+    ".*_errors_.*",
+  ]
+}

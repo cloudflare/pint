@@ -82,10 +82,13 @@ type problemsFn func(string) []checks.Problem
 
 type newPrometheusFn func(string) *promapi.FailoverGroup
 
+type newCtxFn func() context.Context
+
 type checkTest struct {
 	description string
 	content     string
 	prometheus  newPrometheusFn
+	ctx         newCtxFn
 	checker     newCheckFn
 	entries     []discovery.Entry
 	problems    problemsFn
@@ -121,7 +124,11 @@ func runTests(t *testing.T, testCases []checkTest) {
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
-				problems := tc.checker(prom).Check(context.Background(), entry.Rule, tc.entries)
+				ctx := context.Background()
+				if tc.ctx != nil {
+					ctx = tc.ctx()
+				}
+				problems := tc.checker(prom).Check(ctx, entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
 

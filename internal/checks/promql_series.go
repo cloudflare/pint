@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -16,6 +17,23 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
+
+type PromqlSeriesSettings struct {
+	IgnoreMetrics   []string `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
+	ignoreMetricsRe []*regexp.Regexp
+}
+
+func (c *PromqlSeriesSettings) Validate() error {
+	for _, re := range c.IgnoreMetrics {
+		re, err := regexp.Compile("^" + re + "$")
+		if err != nil {
+			return err
+		}
+		c.ignoreMetricsRe = append(c.ignoreMetricsRe, re)
+	}
+
+	return nil
+}
 
 const (
 	SeriesCheckName = "promql/series"
@@ -38,6 +56,11 @@ func (c SeriesCheck) Reporter() string {
 }
 
 func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+	var settings *PromqlSeriesSettings
+	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
+		settings = s.(*PromqlSeriesSettings)
+	}
+
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -172,13 +195,19 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				continue
 			}
 
+			text, severity := c.textAndSeverity(
+				settings,
+				bareSelector.String(),
+				fmt.Sprintf("%s didn't have any series for %q metric in the last %s",
+					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.from)),
+				Bug,
+			)
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
 				Reporter: c.Reporter(),
-				Text: fmt.Sprintf("%s didn't have any series for %q metric in the last %s",
-					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.from)),
-				Severity: Bug,
+				Text:     text,
+				Severity: severity,
 			})
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("No historical series for base metric")
 			continue
@@ -239,14 +268,20 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				continue
 			}
 
+			text, severity := c.textAndSeverity(
+				settings,
+				bareSelector.String(),
+				fmt.Sprintf(
+					"%s doesn't currently have %q, it was last present %s ago",
+					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.newest())),
+				Bug,
+			)
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
 				Reporter: c.Reporter(),
-				Text: fmt.Sprintf(
-					"%s doesn't currently have %q, it was last present %s ago",
-					promText(c.prom.Name(), trs.uri), bareSelector.String(), trs.sinceDesc(trs.newest())),
-				Severity: Bug,
+				Text:     text,
+				Severity: severity,
 			})
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Series disappeared from prometheus")
 			continue
@@ -289,6 +324,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					}
 				}
 
+				text, s = c.textAndSeverity(settings, bareSelector.String(), text, s)
 				problems = append(problems, Problem{
 					Fragment: selector.String(),
 					Lines:    expr.Lines(),
@@ -320,14 +356,20 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					continue
 				}
 
+				text, severity := c.textAndSeverity(
+					settings,
+					bareSelector.String(),
+					fmt.Sprintf(
+						"%s has %q metric but doesn't currently have series matching {%s}, such series was last present %s ago",
+						promText(c.prom.Name(), trs.uri), bareSelector.String(), lm.String(), trsLabel.sinceDesc(trsLabel.newest())),
+					Bug,
+				)
 				problems = append(problems, Problem{
 					Fragment: labelSelector.String(),
 					Lines:    expr.Lines(),
 					Reporter: c.Reporter(),
-					Text: fmt.Sprintf(
-						"%s has %q metric but doesn't currently have series matching {%s}, such series was last present %s ago",
-						promText(c.prom.Name(), trs.uri), bareSelector.String(), lm.String(), trsLabel.sinceDesc(trsLabel.newest())),
-					Severity: Bug,
+					Text:     text,
+					Severity: severity,
 				})
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("Series matching filter disappeared from prometheus ")
 				continue
@@ -504,6 +546,18 @@ func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.V
 		}
 	}
 	return false
+}
+
+func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text string, s Severity) (string, Severity) {
+	if settings != nil {
+		for _, re := range settings.ignoreMetricsRe {
+			if name != "" && re.MatchString(name) {
+				log.Debug().Str("check", c.Reporter()).Str("metric", name).Stringer("regexp", re).Msg("Metric matches check ignore rules")
+				return fmt.Sprintf("%s. Metric name %q matches %q check ignore regexp %q", text, name, c.Reporter(), re), Warning
+			}
+		}
+	}
+	return text, s
 }
 
 func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) {
