@@ -36,8 +36,21 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "promql/series",
       "rule/label",
       "rule/reject"
+    ],
+    "disabled": [
+      "promql/fragile"
     ]
   },
+  "check": [
+    {
+      "ignoreMetrics": [
+        ".*_error",
+        ".*_error_.*",
+        ".*_errors",
+        ".*_errors_.*"
+      ]
+    }
+  ],
   "rules": [
     {},
     {
@@ -111,9 +124,6 @@ level=info msg="Loading configuration file" path=.pint.hcl
         "bytesPerSample": 4036
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 -- .pint.hcl --
@@ -121,6 +131,19 @@ prometheus "prom" {
   uri     = "https://"
   timeout = "2m"
   required = true
+}
+
+checks {
+  disabled = ["promql/fragile"]
+}
+
+check "promql/series" {
+  ignoreMetrics = [
+    ".*_error",
+    ".*_error_.*",
+    ".*_errors",
+    ".*_errors_.*",
+  ]
 }
 
 rule{  }

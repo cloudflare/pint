@@ -1282,6 +1282,18 @@ func TestConfigErrors(t *testing.T) {
 }`,
 			err: "error parsing regexp: invalid nested repetition operator: `++`",
 		},
+		{
+			config: `check "bob" {}`,
+			err:    `unknown check "bob"`,
+		},
+		{
+			config: `check "promql/series " {}`,
+			err:    `unknown check "promql/series "`,
+		},
+		{
+			config: `check "promql/series" { ignoreMetrics = [".+++"] }`,
+			err:    "error parsing regexp: invalid nested repetition operator: `++`",
+		},
 	}
 
 	dir := t.TempDir()

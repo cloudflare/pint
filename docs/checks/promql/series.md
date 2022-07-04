@@ -121,8 +121,32 @@ that.
 
 ## Configuration
 
-This check doesn't have any configuration options but it supports a few control
-comments that can be placed around each rule.
+This check supports setting extra configuration option to fine tune its behavior.
+
+Syntax:
+
+```js
+check "promql/series" {
+  ignoreMetrics = [ "(.*)", ... ]
+}
+```
+
+- `ignoreMetrics` - list of regexp matchers, if a metric is missing from Prometheus
+  but the name matches any of provided regexp matchers then pint will only report a
+  warning, instead of a bug level report.
+
+Example:
+
+```js
+check "promql/series" {
+  ignoreMetrics = [
+    ".*_error",
+    ".*_error_.*",
+    ".*_errors",
+    ".*_errors_.*",
+  ]
+}
+```
 
 ### min-age
 

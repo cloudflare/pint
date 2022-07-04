@@ -24,8 +24,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": null
+  }
 }
 ---
 
@@ -63,10 +62,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -107,10 +103,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -151,10 +144,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -205,11 +195,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -241,8 +227,7 @@
   },
   "rules": [
     {}
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -292,8 +277,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -343,8 +327,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -382,8 +365,7 @@
         "severity": "warning"
       }
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -441,10 +423,6 @@
         "bytesPerSample": 4096
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -519,8 +497,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -593,10 +570,6 @@
         "severity": "bug"
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -646,8 +619,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -697,8 +669,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -748,8 +719,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -799,8 +769,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -850,8 +819,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -901,8 +869,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -952,8 +919,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1003,8 +969,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1058,9 +1023,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -1093,9 +1055,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -1133,9 +1092,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -1178,9 +1134,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -1223,9 +1176,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -1274,11 +1224,7 @@
     "disabled": [
       "alerts/template"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -1320,10 +1266,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -1367,8 +1310,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1412,8 +1354,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1457,8 +1398,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1502,8 +1442,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1547,8 +1486,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1592,8 +1530,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1622,8 +1559,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": null
+  }
 }
 ---
 
@@ -1661,10 +1597,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -1706,10 +1639,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -1757,11 +1687,7 @@
     "disabled": [
       "alerts/template"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -1802,10 +1728,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -1846,10 +1769,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -1900,11 +1820,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -1936,8 +1852,7 @@
   },
   "rules": [
     {}
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -1987,8 +1902,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2038,8 +1952,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2077,8 +1990,7 @@
         "severity": "warning"
       }
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2136,10 +2048,6 @@
         "bytesPerSample": 4096
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -2214,8 +2122,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2288,10 +2195,6 @@
         "severity": "bug"
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -2341,8 +2244,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2392,8 +2294,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2443,8 +2344,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2494,8 +2394,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2545,8 +2444,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2596,8 +2494,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2647,8 +2544,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2698,8 +2594,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -2753,9 +2648,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -2788,9 +2680,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -2828,9 +2717,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -2873,9 +2759,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -2918,9 +2801,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -2965,8 +2845,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3010,8 +2889,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3055,8 +2933,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3100,8 +2977,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3145,8 +3021,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3190,8 +3065,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3220,8 +3094,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": null
+  }
 }
 ---
 
@@ -3259,10 +3132,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -3304,10 +3174,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -3355,11 +3222,7 @@
     "disabled": [
       "alerts/template"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -3400,10 +3263,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -3444,10 +3304,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -3498,11 +3355,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -3534,8 +3387,7 @@
   },
   "rules": [
     {}
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3585,8 +3437,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3636,8 +3487,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3675,8 +3525,7 @@
         "severity": "warning"
       }
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3734,10 +3583,6 @@
         "bytesPerSample": 4096
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -3812,8 +3657,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3886,10 +3730,6 @@
         "severity": "bug"
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -3939,8 +3779,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -3990,8 +3829,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4041,8 +3879,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4092,8 +3929,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4143,8 +3979,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4194,8 +4029,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4245,8 +4079,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4296,8 +4129,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4351,9 +4183,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -4386,9 +4215,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -4426,9 +4252,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -4471,9 +4294,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -4516,9 +4336,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -4563,8 +4380,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4608,8 +4424,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4653,8 +4468,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4698,8 +4512,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4743,8 +4556,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4788,8 +4600,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -4818,8 +4629,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": null
+  }
 }
 ---
 
@@ -4857,10 +4667,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -4902,10 +4709,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -4953,11 +4757,7 @@
     "disabled": [
       "alerts/template"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -4998,10 +4798,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -5042,10 +4839,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -5096,11 +4890,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -5132,8 +4922,7 @@
   },
   "rules": [
     {}
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5183,8 +4972,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5234,8 +5022,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5273,8 +5060,7 @@
         "severity": "warning"
       }
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5332,10 +5118,6 @@
         "bytesPerSample": 4096
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -5410,8 +5192,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5484,10 +5265,6 @@
         "severity": "bug"
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -5537,8 +5314,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5588,8 +5364,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5639,8 +5414,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5690,8 +5464,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5741,8 +5514,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5792,8 +5564,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5843,8 +5614,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5894,8 +5664,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -5949,9 +5718,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -5984,9 +5750,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -6024,9 +5787,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -6069,9 +5829,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -6114,9 +5871,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -6161,8 +5915,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6206,8 +5959,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6251,8 +6003,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6296,8 +6047,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6341,8 +6091,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6386,8 +6135,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6416,8 +6164,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": null
+  }
 }
 ---
 
@@ -6455,10 +6202,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -6500,10 +6244,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -6551,11 +6292,7 @@
     "disabled": [
       "alerts/template"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -6596,10 +6333,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -6640,10 +6374,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {}
-  ]
+  }
 }
 ---
 
@@ -6694,11 +6425,7 @@
       "rule/label",
       "rule/reject"
     ]
-  },
-  "PrometheusServers": [
-    {},
-    {}
-  ]
+  }
 }
 ---
 
@@ -6730,8 +6457,7 @@
   },
   "rules": [
     {}
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6781,8 +6507,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6832,8 +6557,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6871,8 +6595,7 @@
         "severity": "warning"
       }
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -6930,10 +6653,6 @@
         "bytesPerSample": 4096
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -7008,8 +6727,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7082,10 +6800,6 @@
         "severity": "bug"
       }
     }
-  ],
-  "PrometheusServers": [
-    {},
-    {}
   ]
 }
 ---
@@ -7135,8 +6849,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7186,8 +6899,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7237,8 +6949,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7288,8 +6999,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7339,8 +7049,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7390,8 +7099,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7441,8 +7149,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7492,8 +7199,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7547,9 +7253,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -7582,9 +7285,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -7622,9 +7322,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -7667,9 +7364,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -7712,9 +7406,6 @@
         "resolve": "5m"
       }
     }
-  ],
-  "PrometheusServers": [
-    {}
   ]
 }
 ---
@@ -7759,8 +7450,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7804,8 +7494,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7849,8 +7538,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7894,8 +7582,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7939,8 +7626,7 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---
 
@@ -7984,7 +7670,6 @@
         }
       ]
     }
-  ],
-  "PrometheusServers": null
+  ]
 }
 ---

@@ -17,13 +17,14 @@ import (
 )
 
 type Config struct {
-	CI                *CI                `hcl:"ci,block" json:"ci,omitempty"`
-	Parser            *Parser            `hcl:"parser,block" json:"parser,omitempty"`
-	Repository        *Repository        `hcl:"repository,block" json:"repository,omitempty"`
-	Prometheus        []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
-	Checks            *Checks            `hcl:"checks,block" json:"checks,omitempty"`
-	Rules             []Rule             `hcl:"rule,block" json:"rules,omitempty"`
-	PrometheusServers []*promapi.FailoverGroup
+	CI                *CI                      `hcl:"ci,block" json:"ci,omitempty"`
+	Parser            *Parser                  `hcl:"parser,block" json:"parser,omitempty"`
+	Repository        *Repository              `hcl:"repository,block" json:"repository,omitempty"`
+	Prometheus        []PrometheusConfig       `hcl:"prometheus,block" json:"prometheus,omitempty"`
+	Checks            *Checks                  `hcl:"checks,block" json:"checks,omitempty"`
+	Check             []Check                  `hcl:"check,block" json:"check,omitempty"`
+	Rules             []Rule                   `hcl:"rule,block" json:"rules,omitempty"`
+	PrometheusServers []*promapi.FailoverGroup `json:"-"`
 }
 
 func (cfg *Config) DisableOnlineChecks() {
@@ -212,6 +213,12 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 
 	if cfg.Checks != nil {
 		if err = cfg.Checks.validate(); err != nil {
+			return cfg, err
+		}
+	}
+
+	for _, chk := range cfg.Check {
+		if err = chk.validate(); err != nil {
 			return cfg, err
 		}
 	}

@@ -49,6 +49,12 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 	results := make(chan reporter.Report, workers*5)
 	wg := sync.WaitGroup{}
 
+	for _, s := range cfg.Check {
+		settings, _ := s.Decode()
+		key := checks.SettingsKey(s.Name)
+		ctx = context.WithValue(ctx, key, settings)
+	}
+
 	for w := 1; w <= workers; w++ {
 		wg.Add(1)
 		go func() {
