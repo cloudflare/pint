@@ -158,6 +158,7 @@ prometheus "$name" {
   failover    = ["https://...", ...]
   timeout     = "60s"
   concurrency = 16
+  rateLimit   = 100
   cache       = 10000
   required    = true|false
   paths       = ["...", ...]
@@ -176,8 +177,11 @@ prometheus "$name" {
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
 - `timeout` - timeout to be used for API requests.
-- `concurrency` - how many concurrent requests can pint send to this Prometheus.
+- `concurrency` - how many concurrent requests can pint send to this Prometheus server.
   Optional, defaults to 16.
+- `rateLimit` - per second rate limit for all API requests send to this Prometheus server.
+  Setting it to `1000` would allow for up to 1000 requests per each wall clock second.
+  Optional, default to 100 requests per second.
 - `cache` - size of the query cache, defaults to 10000.
 - `required` - decides how pint will report errors if it's unable to get a valid response
   from this Prometheus server. If `required` is `true` and all API calls to this Prometheus

@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.24.0
+
+### Added
+
+- Added rate limit for Prometheus API requests with a default value of 100
+  requests per second. To customize it set `rateLimit` field inside selected
+  `prometheus` server definition.
+
 ## v0.23.0
 
 ### Fixed

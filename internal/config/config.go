@@ -241,11 +241,17 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			cfg.Prometheus[i].Cache = cacheSize
 		}
 
+		rateLimit := prom.RateLimit
+		if rateLimit <= 0 {
+			rateLimit = 100
+			cfg.Prometheus[i].RateLimit = rateLimit
+		}
+
 		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, timeout, concurrency, cacheSize),
+			promapi.NewPrometheus(prom.Name, prom.URI, timeout, concurrency, cacheSize, rateLimit),
 		}
 		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout, concurrency, cacheSize))
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout, concurrency, cacheSize, rateLimit))
 		}
 		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
 	}
