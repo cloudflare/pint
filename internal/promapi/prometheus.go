@@ -12,6 +12,8 @@ import (
 	"github.com/cloudflare/pint/internal/output"
 )
 
+var cacheExpiry = time.Minute * 5
+
 type QueryError struct {
 	err error
 	msg string
@@ -49,12 +51,12 @@ type Prometheus struct {
 	timeout     time.Duration
 	concurrency int
 	cache       *lru.ARCCache
-
-	wg      sync.WaitGroup
-	queries chan queryRequest
+	locker      *partitionLocker
+	wg          sync.WaitGroup
+	queries     chan queryRequest
 }
 
-func NewPrometheus(name, uri string, timeout time.Duration, concurrency int) *Prometheus {
+func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSize int) *Prometheus {
 	client, err := api.NewClient(api.Config{Address: uri})
 	if err != nil {
 		// config validation should prevent this from ever happening
@@ -62,7 +64,7 @@ func NewPrometheus(name, uri string, timeout time.Duration, concurrency int) *Pr
 		// use this code in tests
 		panic(err)
 	}
-	cache, _ := lru.NewARC(1000)
+	cache, _ := lru.NewARC(cacheSize)
 
 	prom := Prometheus{
 		name:        name,
@@ -70,6 +72,7 @@ func NewPrometheus(name, uri string, timeout time.Duration, concurrency int) *Pr
 		api:         v1.NewAPI(client),
 		timeout:     timeout,
 		cache:       cache,
+		locker:      newPartitionLocker((&sync.Mutex{})),
 		concurrency: concurrency,
 	}
 	return &prom
@@ -111,6 +114,7 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 				log.Debug().
 					Str("uri", prom.uri).
 					Str("query", job.query.String()).
+					Str("key", cacheKey).
 					Msg("Cache hit")
 				continue
 			}
@@ -142,6 +146,7 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 		if cacheKey != "" {
 			prom.cache.Add(cacheKey, result)
 		}
+		prometheusCacheSize.WithLabelValues(prom.name, job.query.Endpoint()).Set(float64(prom.cache.Len()))
 
 		job.result <- queryResult{value: result}
 	}

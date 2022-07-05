@@ -50,12 +50,6 @@ func (fg *FailoverGroup) StartWorkers() {
 	}
 }
 
-func (fg *FailoverGroup) ClearCache() {
-	for _, prom := range fg.servers {
-		prom.cache.Purge()
-	}
-}
-
 func (fg *FailoverGroup) Close() {
 	for _, prom := range fg.servers {
 		prom.Close()
@@ -71,7 +65,7 @@ func (fg *FailoverGroup) Config(ctx context.Context) (cfg *ConfigResult, err err
 			return
 		}
 		if !IsUnavailableError(err) {
-			return cfg, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
+			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 		}
 	}
 	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}

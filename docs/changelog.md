@@ -2,10 +2,19 @@
 
 ## v0.23.0
 
+### Fixed
+
+- Improved range query cache efficiency.
+
 ### Added
 
 - Added extra global configuration for `promql/series` check.
   See check [documentation](checks/promql/series.md) for details.
+- `prometheus` server definition in `pint` config file can now accept optional
+  `cache` field (defaults to 10000) to allow fine tuning of built-in Prometheus
+  API query caching.
+- Added `pint_prometheus_cache_size` metric that exposes the number of entries
+  currently in the query cache.
 
 ## v0.22.2
 

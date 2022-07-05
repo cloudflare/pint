@@ -18,11 +18,10 @@ import (
 )
 
 type RangeQueryResult struct {
-	URI             string
-	Samples         []*model.SampleStream
-	Start           time.Time
-	End             time.Time
-	DurationSeconds float64
+	URI     string
+	Samples []*model.SampleStream
+	Start   time.Time
+	End     time.Time
 }
 
 type rangeQuery struct {
@@ -33,16 +32,14 @@ type rangeQuery struct {
 }
 
 func (q rangeQuery) Run() (any, error) {
-	/*
-		Too noisy
-			log.Debug().
-				Str("uri", q.prom.uri).
-				Str("query", q.expr).
-				Str("start", q.r.Start.Format(time.RFC3339)).
-				Str("end", q.r.End.Format(time.RFC3339)).
-				Str("step", output.HumanizeDuration(q.r.Step)).
-				Msg("Running prometheus range query slice")
-	*/
+	log.Debug().
+		Str("uri", q.prom.uri).
+		Str("query", q.expr).
+		Str("start", q.r.Start.Format(time.RFC3339)).
+		Str("end", q.r.End.Format(time.RFC3339)).
+		Str("range", output.HumanizeDuration(q.r.End.Sub(q.r.Start))).
+		Str("step", output.HumanizeDuration(q.r.Step)).
+		Msg("Running prometheus range query slice")
 
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
@@ -60,7 +57,17 @@ func (q rangeQuery) String() string {
 }
 
 func (q rangeQuery) CacheKey() string {
-	return ""
+	h := sha1.New()
+	_, _ = io.WriteString(h, q.Endpoint())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.expr)
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.r.Start.Format(time.RFC3339))
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.r.End.Format(time.RFC3339))
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, output.HumanizeDuration(q.r.Step))
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 type RangeQueryTimes interface {
@@ -90,31 +97,19 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		Str("slice", output.HumanizeDuration(queryStep)).
 		Msg("Scheduling prometheus range query")
 
-	h := sha1.New()
-	_, _ = io.WriteString(h, expr)
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, params.String())
-	cacheKey := fmt.Sprintf("%x", h.Sum(nil))
-
-	if cached, ok := p.cache.Get(cacheKey); ok {
-		prometheusCacheHitsTotal.WithLabelValues(p.name, "/api/v1/query/range").Inc()
-		log.Debug().
-			Str("uri", p.uri).
-			Str("query", expr).
-			Msg("Cache hit")
-		res := cached.(RangeQueryResult)
-		return &res, nil
-	}
+	key := fmt.Sprintf("/api/v1/query/range/%s/%s", expr, params.String())
+	p.locker.lock(key)
+	defer p.locker.unlock(key)
 
 	var wg sync.WaitGroup
-	var mu sync.Mutex
 	var lastErr error
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	res := RangeQueryResult{URI: p.uri, Start: start, End: end}
-	for _, s := range sliceRange(start, end, step, queryStep) {
+	slices := sliceRange(start, end, step, queryStep)
+	results := make(chan queryResult, len(slices))
+	for _, s := range slices {
 		query := queryRequest{
 			query: rangeQuery{
 				prom: p,
@@ -130,63 +125,85 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 
 		wg.Add(1)
 		go func() {
-			defer wg.Done()
-
 			var result queryResult
 			query.result = make(chan queryResult)
 			p.queries <- query
 			result = <-query.result
 
-			mu.Lock()
-			defer mu.Unlock()
-
 			if result.err != nil {
-				if !errors.Is(result.err, context.Canceled) {
-					lastErr = result.err
-				}
 				cancel()
-				return
 			}
 
-			switch result.value.(model.Value).Type() {
-			case model.ValMatrix:
-				for _, sample := range result.value.(model.Matrix) {
-					var found bool
-					for i, rs := range res.Samples {
-						if sample.Metric.Equal(rs.Metric) {
-							found = true
-							res.Samples[i].Values = append(res.Samples[i].Values, sample.Values...)
-							break
-						}
-					}
-					if !found {
-						res.Samples = append(res.Samples, sample)
-					}
-				}
-			default:
-				log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.value.(model.Value).Type())
-				lastErr = fmt.Errorf("unknown result type: %v", result.value.(model.Value).Type())
-				return
-			}
+			results <- result
 		}()
 	}
-	wg.Wait()
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	merged := RangeQueryResult{URI: p.uri, Start: start, End: end}
+	for result := range results {
+		if result.err != nil {
+			if !errors.Is(result.err, context.Canceled) {
+				lastErr = result.err
+			}
+			wg.Done()
+			continue
+		}
+
+		switch result.value.(model.Value).Type() {
+		case model.ValMatrix:
+			for _, sample := range result.value.(model.Matrix) {
+				var found bool
+				var ts time.Time
+				for i, rs := range merged.Samples {
+					if sample.Metric.Equal(rs.Metric) {
+						found = true
+						for _, v := range sample.Values {
+							ts = v.Timestamp.Time()
+							if !ts.Before(start) && !ts.After(end) {
+								merged.Samples[i].Values = append(merged.Samples[i].Values, v)
+							}
+						}
+						break
+					}
+				}
+				if !found {
+					s := model.SampleStream{
+						Metric: sample.Metric.Clone(),
+						Values: make([]model.SamplePair, 0, len(sample.Values)),
+					}
+					for _, v := range sample.Values {
+						ts = v.Timestamp.Time()
+						if !ts.Before(start) && !ts.After(end) {
+							s.Values = append(s.Values, v)
+						}
+					}
+					merged.Samples = append(merged.Samples, &s)
+				}
+			}
+		default:
+			log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.value.(model.Value).Type())
+			lastErr = fmt.Errorf("unknown result type: %v", result.value.(model.Value).Type())
+		}
+		wg.Done()
+	}
 
 	if lastErr != nil {
 		return nil, QueryError{err: lastErr, msg: decodeError(lastErr)}
 	}
 
-	for k := range res.Samples {
-		sort.SliceStable(res.Samples[k].Values, func(i, j int) bool {
-			return res.Samples[k].Values[i].Timestamp.Before(res.Samples[k].Values[j].Timestamp)
+	for k := range merged.Samples {
+		sort.SliceStable(merged.Samples[k].Values, func(i, j int) bool {
+			return merged.Samples[k].Values[i].Timestamp.Before(merged.Samples[k].Values[j].Timestamp)
 		})
 	}
 
-	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(res.Samples)).Msg("Parsed range response")
+	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(merged.Samples)).Msg("Parsed range response")
 
-	p.cache.Add(cacheKey, res)
-
-	return &res, nil
+	return &merged, nil
 }
 
 type timeRange struct {
@@ -194,28 +211,38 @@ type timeRange struct {
 	end   time.Time
 }
 
-func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) []timeRange {
-	diff := end.Sub(start)
-	if diff <= sliceSize {
+func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slices []timeRange) {
+	if end.Sub(start) <= resolution {
 		return []timeRange{{start: start, end: end}}
 	}
 
-	var slices []timeRange
-	for {
-		s := timeRange{start: start, end: start.Add(sliceSize)}
+	rstart := start.Round(sliceSize)
+
+	if rstart.After(start) {
+		s := timeRange{start: rstart.Add(sliceSize * -1), end: rstart}
 		if s.end.After(end) {
 			s.end = end
 		}
 		slices = append(slices, s)
-		start = start.Add(sliceSize)
-		if !start.Before(end) {
+	}
+
+	for {
+		if !rstart.Before(end) {
 			break
 		}
+
+		s := timeRange{start: rstart, end: rstart.Add(sliceSize)}
+		if s.end.After(end) {
+			s.end = end
+		}
+		slices = append(slices, s)
+
+		rstart = rstart.Add(sliceSize)
 	}
 
 	for i := 0; i < len(slices); i++ {
 		if i < len(slices)-1 {
-			slices[i].end = slices[i].end.Add(resolution * -1)
+			slices[i].end = slices[i].end.Add(time.Second * -1)
 		}
 	}
 

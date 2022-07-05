@@ -181,10 +181,6 @@ func startTimer(ctx context.Context, cfg config.Config, workers int, interval ti
 		for {
 			select {
 			case <-ticker.C:
-				log.Debug().Msg("Clearing cache")
-				for _, prom := range cfg.PrometheusServers {
-					prom.ClearCache()
-				}
 				log.Debug().Msg("Running checks")
 				if !wasBootstrapped {
 					ticker.Reset(interval)

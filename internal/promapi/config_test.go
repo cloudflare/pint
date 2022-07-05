@@ -122,7 +122,7 @@ func TestConfig(t *testing.T) {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
 			assert := assert.New(t)
 
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout, 1)
+			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout, 1, 1000)
 			prom.StartWorkers()
 			defer prom.Close()
 
@@ -131,8 +131,6 @@ func TestConfig(t *testing.T) {
 				assert.EqualError(err, tc.err, tc)
 			} else {
 				assert.NoError(err)
-			}
-			if cfg != nil {
 				assert.Equal(*cfg, tc.cfg)
 			}
 		})
