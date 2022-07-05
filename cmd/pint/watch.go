@@ -112,6 +112,8 @@ func actionWatch(c *cli.Context) error {
 	prometheus.MustRegister(collector)
 	prometheus.MustRegister(checkDuration)
 	prometheus.MustRegister(checkIterationsTotal)
+	prometheus.MustRegister(checkIterationChecks)
+	prometheus.MustRegister(checkIterationChecksDone)
 	prometheus.MustRegister(pintVersion)
 	prometheus.MustRegister(lastRunTime)
 	prometheus.MustRegister(lastRunDuration)

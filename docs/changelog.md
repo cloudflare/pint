@@ -7,6 +7,8 @@
 - Added rate limit for Prometheus API requests with a default value of 100
   requests per second. To customize it set `rateLimit` field inside selected
   `prometheus` server definition.
+- Added `pint_last_run_checks` and `pint_last_run_checks_done` metrics to track
+  progress when running `pint watch`.
 
 ## v0.23.0
 

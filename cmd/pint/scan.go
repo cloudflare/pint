@@ -40,6 +40,9 @@ func tryDecodingYamlError(e string) (int, string) {
 }
 
 func checkRules(ctx context.Context, workers int, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary) {
+	checkIterationChecks.Set(float64(len(entries)))
+	checkIterationChecksDone.Set(0)
+
 	start := time.Now()
 	defer func() {
 		lastRunDuration.Set(time.Since(start).Seconds())
@@ -104,6 +107,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 
 				jobs <- scanJob{entry: entry, allEntries: entries, check: nil}
 			}
+			checkIterationChecksDone.Inc()
 		}
 		defer close(jobs)
 	}()
