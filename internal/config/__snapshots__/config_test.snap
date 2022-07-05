@@ -41,6 +41,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -79,6 +80,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.yml"
       ],
@@ -120,6 +122,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -161,6 +164,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -171,6 +175,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.+"
       ],
@@ -382,6 +387,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -392,6 +398,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -514,6 +521,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -524,6 +532,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -986,6 +995,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1040,6 +1050,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1072,6 +1083,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1109,6 +1121,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1151,6 +1164,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1193,6 +1207,7 @@
       "uri": "http://localhost/1",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     },
     {
@@ -1200,6 +1215,7 @@
       "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -1245,6 +1261,7 @@
       ],
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -1576,6 +1593,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -1618,6 +1636,7 @@
       ],
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -1656,6 +1675,7 @@
       "uri": "http://localhost/1",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     },
     {
@@ -1663,6 +1683,7 @@
       "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -1704,6 +1725,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.yml"
       ],
@@ -1745,6 +1767,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1786,6 +1809,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -1796,6 +1820,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.+"
       ],
@@ -2007,6 +2032,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2017,6 +2043,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2139,6 +2166,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2149,6 +2177,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2611,6 +2640,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2665,6 +2695,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2697,6 +2728,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2734,6 +2766,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -2776,6 +2809,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -3111,6 +3145,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -3153,6 +3188,7 @@
       ],
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -3191,6 +3227,7 @@
       "uri": "http://localhost/1",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     },
     {
@@ -3198,6 +3235,7 @@
       "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -3239,6 +3277,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.yml"
       ],
@@ -3280,6 +3319,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -3321,6 +3361,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -3331,6 +3372,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.+"
       ],
@@ -3542,6 +3584,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -3552,6 +3595,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -3674,6 +3718,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -3684,6 +3729,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4146,6 +4192,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4200,6 +4247,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4232,6 +4280,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4269,6 +4318,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4311,6 +4361,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4646,6 +4697,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -4688,6 +4740,7 @@
       ],
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -4726,6 +4779,7 @@
       "uri": "http://localhost/1",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     },
     {
@@ -4733,6 +4787,7 @@
       "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -4774,6 +4829,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.yml"
       ],
@@ -4815,6 +4871,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4856,6 +4913,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -4866,6 +4924,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.+"
       ],
@@ -5077,6 +5136,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5087,6 +5147,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5209,6 +5270,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5219,6 +5281,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5681,6 +5744,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5735,6 +5799,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5767,6 +5832,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5804,6 +5870,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -5846,6 +5913,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -6181,6 +6249,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -6223,6 +6292,7 @@
       ],
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -6261,6 +6331,7 @@
       "uri": "http://localhost/1",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     },
     {
@@ -6268,6 +6339,7 @@
       "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -6309,6 +6381,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.yml"
       ],
@@ -6350,6 +6423,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -6391,6 +6465,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -6401,6 +6476,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "foo.+"
       ],
@@ -6612,6 +6688,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -6622,6 +6699,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -6744,6 +6822,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -6754,6 +6833,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -7216,6 +7296,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -7270,6 +7351,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -7302,6 +7384,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -7339,6 +7422,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],
@@ -7381,6 +7465,7 @@
       "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
+      "cache": 10000,
       "paths": [
         "rules.yml"
       ],

@@ -12,15 +12,15 @@ import (
 )
 
 type QueryResult struct {
-	URI             string
-	Series          model.Vector
-	DurationSeconds float64
+	URI    string
+	Series model.Vector
 }
 
 type instantQuery struct {
-	prom *Prometheus
-	ctx  context.Context
-	expr string
+	prom      *Prometheus
+	ctx       context.Context
+	expr      string
+	timestamp time.Time
 }
 
 func (q instantQuery) Run() (any, error) {
@@ -49,15 +49,21 @@ func (q instantQuery) CacheKey() string {
 	_, _ = io.WriteString(h, q.Endpoint())
 	_, _ = io.WriteString(h, "\n")
 	_, _ = io.WriteString(h, q.expr)
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
 	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
 
+	key := fmt.Sprintf("/api/v1/query/%s", expr)
+	p.locker.lock(key)
+	defer p.locker.unlock(key)
+
 	resultChan := make(chan queryResult)
 	p.queries <- queryRequest{
-		query:  instantQuery{prom: p, ctx: ctx, expr: expr},
+		query:  instantQuery{prom: p, ctx: ctx, expr: expr, timestamp: time.Now()},
 		result: resultChan,
 	}
 

@@ -158,6 +158,7 @@ prometheus "$name" {
   failover    = ["https://...", ...]
   timeout     = "60s"
   concurrency = 16
+  cache       = 10000
   required    = true|false
   paths       = ["...", ...]
 }
@@ -177,6 +178,7 @@ prometheus "$name" {
 - `timeout` - timeout to be used for API requests.
 - `concurrency` - how many concurrent requests can pint send to this Prometheus.
   Optional, defaults to 16.
+- `cache` - size of the query cache, defaults to 10000.
 - `required` - decides how pint will report errors if it's unable to get a valid response
   from this Prometheus server. If `required` is `true` and all API calls to this Prometheus
   fail pint will report those as `bug` level problem. If it's set to `false` pint will

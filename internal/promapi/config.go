@@ -29,8 +29,9 @@ type ConfigResult struct {
 }
 
 type configQuery struct {
-	prom *Prometheus
-	ctx  context.Context
+	prom      *Prometheus
+	ctx       context.Context
+	timestamp time.Time
 }
 
 func (q configQuery) Run() (any, error) {
@@ -59,15 +60,21 @@ func (q configQuery) String() string {
 func (q configQuery) CacheKey() string {
 	h := sha1.New()
 	_, _ = io.WriteString(h, q.Endpoint())
+	_, _ = io.WriteString(h, "\n")
+	_, _ = io.WriteString(h, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	log.Debug().Str("uri", p.uri).Msg("Scheduling Prometheus configuration query")
 
+	key := "/api/v1/status/config"
+	p.locker.lock(key)
+	defer p.locker.unlock(key)
+
 	resultChan := make(chan queryResult)
 	p.queries <- queryRequest{
-		query:  configQuery{prom: p, ctx: ctx},
+		query:  configQuery{prom: p, ctx: ctx, timestamp: time.Now()},
 		result: resultChan,
 	}
 

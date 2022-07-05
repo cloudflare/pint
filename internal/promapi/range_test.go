@@ -150,7 +150,7 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:55:00Z").Unix()), end, "invalid end for #0")
+					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
 					require.Equal(t, float64(timeParse("2022-06-14T03:00:00Z").Unix()), end, "invalid end for #1")
 
@@ -192,11 +192,11 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:59:00Z").Unix()), end, "invalid end for #0")
+					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T03:59:00Z").Unix()), end, "invalid end for #1")
+					require.Equal(t, float64(timeParse("2022-06-14T03:59:59Z").Unix()), end, "invalid end for #1")
 				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T05:59:00Z").Unix()), end, "invalid end for #2")
+					require.Equal(t, float64(timeParse("2022-06-14T05:59:59Z").Unix()), end, "invalid end for #2")
 				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
 					require.Equal(t, float64(timeParse("2022-06-14T07:00:00Z").Unix()), end, "invalid end for #3")
 				default:
@@ -234,7 +234,7 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:55:00Z").Unix()), end, "invalid end for #0")
+					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
 					w.WriteHeader(200)
 					w.Header().Set("Content-Type", "application/json")
 					var values []string
@@ -304,7 +304,7 @@ func TestRange(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1)
+			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 
@@ -313,8 +313,6 @@ func TestRange(t *testing.T) {
 				assert.EqualError(err, tc.err, tc)
 			} else {
 				assert.NoError(err)
-			}
-			if qr != nil {
 				assert.Equal(qr.Samples, tc.samples, tc)
 			}
 		})

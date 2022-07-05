@@ -16,7 +16,24 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "uri": "https://",
       "timeout": "2m",
       "concurrency": 16,
+      "cache": 10000,
       "required": true
+    },
+    {
+      "name": "custom-concurrency",
+      "uri": "https://",
+      "timeout": "2m",
+      "concurrency": 32,
+      "cache": 10000,
+      "required": false
+    },
+    {
+      "name": "custom-cache",
+      "uri": "https://",
+      "timeout": "10s",
+      "concurrency": 16,
+      "cache": 32,
+      "required": false
     }
   ],
   "checks": {
@@ -131,6 +148,19 @@ prometheus "prom" {
   uri     = "https://"
   timeout = "2m"
   required = true
+}
+
+prometheus "custom-concurrency" {
+  uri         = "https://"
+  timeout     = "2m"
+  required    = false
+  concurrency = 32
+}
+
+prometheus "custom-cache" {
+  uri      = "https://"
+  timeout  = "10s"
+  cache    = 32
 }
 
 checks {

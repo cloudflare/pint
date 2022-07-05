@@ -228,16 +228,24 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			return cfg, err
 		}
 		timeout, _ := parseDuration(prom.Timeout)
+
 		concurrency := prom.Concurrency
 		if concurrency <= 0 {
 			concurrency = 16
 			cfg.Prometheus[i].Concurrency = concurrency
 		}
+
+		cacheSize := prom.Cache
+		if cacheSize <= 0 {
+			cacheSize = 10000
+			cfg.Prometheus[i].Cache = cacheSize
+		}
+
 		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, timeout, concurrency),
+			promapi.NewPrometheus(prom.Name, prom.URI, timeout, concurrency, cacheSize),
 		}
 		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout, concurrency))
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout, concurrency, cacheSize))
 		}
 		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
 	}

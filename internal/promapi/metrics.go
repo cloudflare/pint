@@ -17,6 +17,13 @@ var (
 		},
 		[]string{"name", "endpoint"},
 	)
+	prometheusCacheSize = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "pint_prometheus_cache_size",
+			Help: "Total number of entries currently stored in Prometheus query cache",
+		},
+		[]string{"name", "endpoint"},
+	)
 	prometheusCacheHitsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "pint_prometheus_cache_hits_total",
@@ -42,6 +49,7 @@ var (
 
 func RegisterMetrics() {
 	prometheus.MustRegister(prometheusQueriesRunning)
+	prometheus.MustRegister(prometheusCacheSize)
 	prometheus.MustRegister(prometheusCacheHitsTotal)
 	prometheus.MustRegister(prometheusQueriesTotal)
 	prometheus.MustRegister(prometheusQueryErrorsTotal)
