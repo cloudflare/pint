@@ -146,6 +146,12 @@ pint_check_duration_seconds_count{check="promql/syntax"}
 # HELP pint_check_iterations_total Total number of completed check iterations since pint start
 # TYPE pint_check_iterations_total counter
 pint_check_iterations_total
+# HELP pint_last_run_checks The number of checks to run in the current iteration
+# TYPE pint_last_run_checks gauge
+pint_last_run_checks
+# HELP pint_last_run_checks_done The number of checks completed in the current iteration
+# TYPE pint_last_run_checks_done gauge
+pint_last_run_checks_done
 # HELP pint_last_run_duration_seconds Last checks run duration in seconds
 # TYPE pint_last_run_duration_seconds gauge
 pint_last_run_duration_seconds

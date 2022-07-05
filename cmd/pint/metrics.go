@@ -16,6 +16,18 @@ var (
 			Help: "Total number of completed check iterations since pint start",
 		},
 	)
+	checkIterationChecks = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "pint_last_run_checks",
+			Help: "The number of checks to run in the current iteration",
+		},
+	)
+	checkIterationChecksDone = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "pint_last_run_checks_done",
+			Help: "The number of checks completed in the current iteration",
+		},
+	)
 	checkDuration = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
 			Name: "pint_check_duration_seconds",
