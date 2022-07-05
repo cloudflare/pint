@@ -22,7 +22,7 @@ var (
 			Name: "pint_prometheus_cache_size",
 			Help: "Total number of entries currently stored in Prometheus query cache",
 		},
-		[]string{"name", "endpoint"},
+		[]string{"name"},
 	)
 	prometheusCacheHitsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
