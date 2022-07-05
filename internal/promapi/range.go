@@ -64,7 +64,7 @@ func (q rangeQuery) CacheKey() string {
 	_, _ = io.WriteString(h, "\n")
 	_, _ = io.WriteString(h, q.r.Start.Format(time.RFC3339))
 	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.r.End.Format(time.RFC3339))
+	_, _ = io.WriteString(h, q.r.End.Round(q.r.Step).Format(time.RFC3339))
 	_, _ = io.WriteString(h, "\n")
 	_, _ = io.WriteString(h, output.HumanizeDuration(q.r.Step))
 	return fmt.Sprintf("%x", h.Sum(nil))
