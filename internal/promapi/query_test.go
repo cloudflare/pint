@@ -188,7 +188,7 @@ func TestQuery(t *testing.T) {
 		t.Run(tc.query, func(t *testing.T) {
 			assert := assert.New(t)
 
-			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 100)
+			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 100, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 

@@ -62,7 +62,7 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 	return promapi.NewFailoverGroup(
 		name,
 		[]*promapi.Prometheus{
-			promapi.NewPrometheus(name, uri, timeout, 16, 1000),
+			promapi.NewPrometheus(name, uri, timeout, 16, 1000, 1000),
 		},
 		required,
 	)

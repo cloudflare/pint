@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/client_golang/api"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/rs/zerolog/log"
+	"go.uber.org/ratelimit"
 
 	"github.com/cloudflare/pint/internal/output"
 )
@@ -52,11 +53,12 @@ type Prometheus struct {
 	concurrency int
 	cache       *lru.ARCCache
 	locker      *partitionLocker
+	rateLimiter ratelimit.Limiter
 	wg          sync.WaitGroup
 	queries     chan queryRequest
 }
 
-func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSize int) *Prometheus {
+func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSize, rl int) *Prometheus {
 	client, err := api.NewClient(api.Config{Address: uri})
 	if err != nil {
 		// config validation should prevent this from ever happening
@@ -73,6 +75,7 @@ func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSi
 		timeout:     timeout,
 		cache:       cache,
 		locker:      newPartitionLocker((&sync.Mutex{})),
+		rateLimiter: ratelimit.New(rl),
 		concurrency: concurrency,
 	}
 	return &prom
@@ -122,6 +125,7 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 
 		prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 		prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
+		prom.rateLimiter.Take()
 		start := time.Now()
 		result, err := job.query.Run()
 		dur := time.Since(start)

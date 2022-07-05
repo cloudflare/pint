@@ -16,6 +16,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "uri": "https://",
       "timeout": "2m",
       "concurrency": 16,
+      "rateLimit": 100,
       "cache": 10000,
       "required": true
     },
@@ -24,6 +25,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "uri": "https://",
       "timeout": "2m",
       "concurrency": 32,
+      "rateLimit": 100,
       "cache": 10000,
       "required": false
     },
@@ -32,7 +34,17 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "uri": "https://",
       "timeout": "10s",
       "concurrency": 16,
+      "rateLimit": 100,
       "cache": 32,
+      "required": false
+    },
+    {
+      "name": "custom-rateLimit",
+      "uri": "https://",
+      "timeout": "15s",
+      "concurrency": 16,
+      "rateLimit": 1,
+      "cache": 10000,
       "required": false
     }
   ],
@@ -161,6 +173,12 @@ prometheus "custom-cache" {
   uri      = "https://"
   timeout  = "10s"
   cache    = 32
+}
+
+prometheus "custom-rateLimit" {
+  uri       = "https://"
+  timeout   = "15s"
+  rateLimit = 1
 }
 
 checks {
