@@ -146,7 +146,7 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 		if cacheKey != "" {
 			prom.cache.Add(cacheKey, result)
 		}
-		prometheusCacheSize.WithLabelValues(prom.name, job.query.Endpoint()).Set(float64(prom.cache.Len()))
+		prometheusCacheSize.WithLabelValues(prom.name).Set(float64(prom.cache.Len()))
 
 		job.result <- queryResult{value: result}
 	}
