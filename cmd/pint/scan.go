@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
 
+	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -25,18 +27,27 @@ var (
 
 const yamlParseReporter = "yaml/parse"
 
-func tryDecodingYamlError(e string) (int, string) {
+func tryDecodingYamlError(err error) (l int, s string) {
+	s = err.Error()
+
+	werr := &rulefmt.WrappedError{}
+	if errors.As(err, &werr) {
+		if uerr := werr.Unwrap(); uerr != nil {
+			s = uerr.Error()
+		}
+	}
+
 	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe, rulefmtGroupRe, rulefmtGroupnameRe} {
-		parts := re.FindStringSubmatch(e)
+		parts := re.FindStringSubmatch(err.Error())
 		if len(parts) > 2 {
-			line, err := strconv.Atoi(parts[1])
-			if err != nil {
-				return 1, e
+			line, err2 := strconv.Atoi(parts[1])
+			if err2 != nil || line <= 0 {
+				return 1, s
 			}
 			return line, parts[2]
 		}
 	}
-	return 1, e
+	return 1, s
 }
 
 func checkRules(ctx context.Context, workers int, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary) {
@@ -136,7 +147,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			return
 		default:
 			if job.entry.PathError != nil {
-				line, e := tryDecodingYamlError(job.entry.PathError.Error())
+				line, e := tryDecodingYamlError(job.entry.PathError)
 				results <- reporter.Report{
 					Path:          job.entry.Path,
 					ModifiedLines: job.entry.ModifiedLines,
