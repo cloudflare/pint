@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -186,21 +186,19 @@ func TestQuery(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.query, func(t *testing.T) {
-			assert := assert.New(t)
-
 			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 100, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 
 			qr, err := prom.Query(context.Background(), tc.query)
 			if tc.err != "" {
-				assert.EqualError(err, tc.err, tc)
+				require.EqualError(t, err, tc.err, tc)
 			} else {
-				assert.NoError(err)
+				require.NoError(t, err)
 			}
 			if qr != nil {
-				assert.Equal(tc.result.URI, qr.URI)
-				assert.Equal(tc.result.Series, qr.Series)
+				require.Equal(t, tc.result.URI, qr.URI)
+				require.Equal(t, tc.result.Series, qr.Series)
 			}
 		})
 	}

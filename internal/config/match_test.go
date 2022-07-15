@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDurationMatch(t *testing.T) {
@@ -37,14 +37,14 @@ func TestDurationMatch(t *testing.T) {
 			input: "5m",
 			output: durationMatch{
 				op:  opEqual,
-				dur: time.Duration(time.Minute * 5),
+				dur: time.Minute * 5,
 			},
 		},
 		{
 			input: "= 1w",
 			output: durationMatch{
 				op:  opEqual,
-				dur: time.Duration(time.Hour * 24 * 7),
+				dur: time.Hour * 24 * 7,
 			},
 		},
 		{
@@ -58,21 +58,21 @@ func TestDurationMatch(t *testing.T) {
 			input: "!= 10w",
 			output: durationMatch{
 				op:  opNotEqual,
-				dur: time.Duration(time.Hour * 24 * 7 * 10),
+				dur: time.Hour * 24 * 7 * 10,
 			},
 		},
 		{
 			input: "> 5m",
 			output: durationMatch{
 				op:  opMore,
-				dur: time.Duration(time.Minute * 5),
+				dur: time.Minute * 5,
 			},
 		},
 		{
 			input: "< 1s",
 			output: durationMatch{
 				op:  opLess,
-				dur: time.Duration(time.Second),
+				dur: time.Second,
 			},
 		},
 		{
@@ -86,20 +86,19 @@ func TestDurationMatch(t *testing.T) {
 			input: ">= 25h",
 			output: durationMatch{
 				op:  opMoreEqual,
-				dur: time.Duration(time.Hour * 25),
+				dur: time.Hour * 25,
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			assert := assert.New(t)
 			output, err := parseDurationMatch(tc.input)
 			if tc.err == "" {
-				assert.NoError(err)
-				assert.Equal(tc.output, output)
+				require.NoError(t, err)
+				require.Equal(t, tc.output, output)
 			} else {
-				assert.EqualError(err, tc.err)
+				require.EqualError(t, err, tc.err)
 			}
 		})
 	}
@@ -115,12 +114,12 @@ func TestDurationMatchIsMatch(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			input:    "240s",
-			duration: time.Duration(time.Minute * 4),
+			duration: time.Minute * 4,
 			isMatch:  true,
 		},
 		{
 			input:    "3m59s",
-			duration: time.Duration(time.Minute * 4),
+			duration: time.Minute * 4,
 			isMatch:  false,
 		},
 		{
@@ -130,78 +129,77 @@ func TestDurationMatchIsMatch(t *testing.T) {
 		},
 		{
 			input:    "= 30s",
-			duration: time.Duration(time.Second),
+			duration: time.Second,
 			isMatch:  false,
 		},
 		{
 			input:    "!= 4m",
-			duration: time.Duration(time.Minute * 5),
+			duration: time.Minute * 5,
 			isMatch:  true,
 		},
 		{
 			input:    "!= 1s",
-			duration: time.Duration(time.Second),
+			duration: time.Second,
 			isMatch:  false,
 		},
 		{
 			input:    "< 4m",
-			duration: time.Duration(time.Minute * 3),
+			duration: time.Minute * 3,
 			isMatch:  true,
 		},
 		{
 			input:    "< 59s",
-			duration: time.Duration(time.Minute),
+			duration: time.Minute,
 			isMatch:  false,
 		},
 		{
 			input:    "<= 4m",
-			duration: time.Duration(time.Minute * 4),
+			duration: time.Minute * 4,
 			isMatch:  true,
 		},
 		{
 			input:    "<= 4m1s",
-			duration: time.Duration(time.Minute * 4),
+			duration: time.Minute * 4,
 			isMatch:  true,
 		},
 		{
 			input:    "<= 59s",
-			duration: time.Duration(time.Minute),
+			duration: time.Minute,
 			isMatch:  false,
 		},
 		{
 			input:    ">= 4m",
-			duration: time.Duration(time.Minute * 4),
+			duration: time.Minute * 4,
 			isMatch:  true,
 		},
 		{
 			input:    ">= 3m59s",
-			duration: time.Duration(time.Minute * 4),
+			duration: time.Minute * 4,
 			isMatch:  true,
 		},
 		{
 			input:    ">= 61s",
-			duration: time.Duration(time.Minute),
+			duration: time.Minute,
 			isMatch:  false,
 		},
 		{
 			input:    "> 0s",
-			duration: time.Duration(time.Microsecond),
+			duration: time.Microsecond,
 			isMatch:  true,
 		},
 		{
 			input:    "> 1ms",
-			duration: time.Duration(time.Nanosecond),
+			duration: time.Nanosecond,
 			isMatch:  false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			assert := assert.New(t)
 			d, err := parseDurationMatch(tc.input)
-			assert.NoError(err)
+			require.NoError(t, err)
 			isMatch := d.isMatch(tc.duration)
-			assert.Equal(tc.isMatch, isMatch, "input=%q duration=%s", tc.input, tc.duration)
+			require.Equal(t, tc.isMatch, isMatch, "input=%q duration=%s", tc.input, tc.duration)
 		})
 	}
 }

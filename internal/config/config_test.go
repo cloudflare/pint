@@ -3,13 +3,12 @@ package config_test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
@@ -23,105 +22,93 @@ func TestMain(t *testing.M) {
 }
 
 func TestConfigLoadMissingFile(t *testing.T) {
-	assert := assert.New(t)
-
 	_, err := config.Load("/foo/bar/pint.hcl", true)
-	assert.EqualError(err, "<nil>: Configuration file not found; The configuration file /foo/bar/pint.hcl does not exist.")
+	require.EqualError(t, err, "<nil>: Configuration file not found; The configuration file /foo/bar/pint.hcl does not exist.")
 }
 
 func TestConfigLoadMissingFileOk(t *testing.T) {
-	assert := assert.New(t)
-
 	_, err := config.Load("/foo/bar/pint.hcl", false)
-	assert.Nil(err)
+	require.NoError(t, err)
 }
 
 func TestDisableOnlineChecksWithPrometheus(t *testing.T) {
-	assert := assert.New(t)
-
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
-	err := ioutil.WriteFile(path, []byte(`
+	err := os.WriteFile(path, []byte(`
 prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
 }
 `), 0o644)
-	assert.NoError(err)
+	require.NoError(t, err)
 
 	cfg, err := config.Load(path, true)
-	assert.NoError(err)
-	assert.Empty(cfg.Checks.Disabled)
+	require.NoError(t, err)
+	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.DisableOnlineChecks()
 	for _, c := range checks.OnlineChecks {
-		assert.Contains(cfg.Checks.Disabled, c)
+		require.Contains(t, cfg.Checks.Disabled, c)
 	}
 }
 
 func TestDisableOnlineChecksWithoutPrometheus(t *testing.T) {
-	assert := assert.New(t)
-
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
-	err := ioutil.WriteFile(path, []byte(``), 0o644)
-	assert.NoError(err)
+	err := os.WriteFile(path, []byte(``), 0o644)
+	require.NoError(t, err)
 
 	cfg, err := config.Load(path, true)
-	assert.NoError(err)
-	assert.Empty(cfg.Checks.Disabled)
+	require.NoError(t, err)
+	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.DisableOnlineChecks()
 	for _, c := range checks.OnlineChecks {
-		assert.Contains(cfg.Checks.Disabled, c)
+		require.Contains(t, cfg.Checks.Disabled, c)
 	}
 }
 
 func TestDisableOnlineChecksAfterSetDisabledChecks(t *testing.T) {
-	assert := assert.New(t)
-
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
-	err := ioutil.WriteFile(path, []byte(`
+	err := os.WriteFile(path, []byte(`
 prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
 }
 `), 0o644)
-	assert.NoError(err)
+	require.NoError(t, err)
 
 	cfg, err := config.Load(path, true)
-	assert.NoError(err)
-	assert.Empty(cfg.Checks.Disabled)
+	require.NoError(t, err)
+	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
-	assert.Contains(cfg.Checks.Disabled, checks.SyntaxCheckName)
+	require.Contains(t, cfg.Checks.Disabled, checks.SyntaxCheckName)
 
 	cfg.SetDisabledChecks([]string{checks.RateCheckName})
-	assert.Contains(cfg.Checks.Disabled, checks.RateCheckName)
+	require.Contains(t, cfg.Checks.Disabled, checks.RateCheckName)
 
 	cfg.DisableOnlineChecks()
 	for _, c := range checks.OnlineChecks {
-		assert.Contains(cfg.Checks.Disabled, c)
+		require.Contains(t, cfg.Checks.Disabled, c)
 	}
 }
 
 func TestSetDisabledChecks(t *testing.T) {
-	assert := assert.New(t)
-
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
-	err := ioutil.WriteFile(path, []byte(``), 0o644)
-	assert.NoError(err)
+	err := os.WriteFile(path, []byte(``), 0o644)
+	require.NoError(t, err)
 
 	cfg, err := config.Load(path, true)
-	assert.NoError(err)
-	assert.Empty(cfg.Checks.Disabled)
+	require.NoError(t, err)
+	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
 	cfg.SetDisabledChecks([]string{checks.RateCheckName})
-	assert.Equal([]string{checks.SyntaxCheckName, checks.RateCheckName}, cfg.Checks.Disabled)
+	require.Equal(t, []string{checks.SyntaxCheckName, checks.RateCheckName}, cfg.Checks.Disabled)
 }
 
 func newRule(t *testing.T, content string) parser.Rule {
@@ -1086,23 +1073,21 @@ rule {
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
 	for i, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
-			assert := assert.New(t)
-
 			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
 			if tc.config != "" {
-				err := ioutil.WriteFile(path, []byte(tc.config), 0o644)
-				assert.NoError(err)
+				err := os.WriteFile(path, []byte(tc.config), 0o644)
+				require.NoError(t, err)
 			}
 
 			cfg, err := config.Load(path, false)
-			assert.NoError(err)
+			require.NoError(t, err)
 
 			checks := cfg.GetChecksForRule(ctx, tc.path, tc.rule)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())
 			}
-			assert.Equal(tc.checks, checkNames)
+			require.Equal(t, tc.checks, checkNames)
 			snaps.MatchSnapshot(t, cfg.String())
 		})
 	}
@@ -1299,16 +1284,14 @@ func TestConfigErrors(t *testing.T) {
 	dir := t.TempDir()
 	for i, tc := range testCases {
 		t.Run(tc.err, func(t *testing.T) {
-			assert := assert.New(t)
-
 			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
 			if tc.config != "" {
-				err := ioutil.WriteFile(path, []byte(tc.config), 0o644)
-				assert.NoError(err)
+				err := os.WriteFile(path, []byte(tc.config), 0o644)
+				require.NoError(t, err)
 			}
 
 			_, err := config.Load(path, false)
-			assert.EqualError(err, tc.err, tc.config)
+			require.EqualError(t, err, tc.err, tc.config)
 		})
 	}
 }

@@ -42,6 +42,7 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				var beginText, endText int
 				r, _ := syntax.Parse(re, syntax.Perl)
 				for _, s := range r.Sub {
+					// nolint: exhaustive
 					switch s.Op {
 					case syntax.OpBeginText:
 						beginText++
@@ -59,6 +60,7 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				}
 				if !isUseful {
 					var op labels.MatchType
+					// nolint: exhaustive
 					switch lm.Type {
 					case labels.MatchRegexp:
 						op = labels.MatchEqual

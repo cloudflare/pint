@@ -3,7 +3,7 @@ package utils_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -55,9 +55,8 @@ func TestRemoveConditions(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			assert := assert.New(t)
 			output := utils.RemoveConditions(tc.input)
-			assert.Equalf(tc.output, output.String(), "input: %q", tc.input)
+			require.Equalf(t, tc.output, output.String(), "input: %q", tc.input)
 		})
 	}
 }

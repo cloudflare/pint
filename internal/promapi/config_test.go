@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -120,18 +120,16 @@ func TestConfig(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			assert := assert.New(t)
-
 			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout, 1, 1000, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 
 			cfg, err := prom.Config(context.Background())
 			if tc.err != "" {
-				assert.EqualError(err, tc.err, tc)
+				require.EqualError(t, err, tc.err, tc)
 			} else {
-				assert.NoError(err)
-				assert.Equal(*cfg, tc.cfg)
+				require.NoError(t, err)
+				require.Equal(t, *cfg, tc.cfg)
 			}
 		})
 	}

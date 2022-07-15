@@ -56,18 +56,20 @@ func hasComment(line, comment string) bool {
 }
 
 func parseSkipComment(line string) (skipMode, bool) {
-	if hasComment(line, "ignore/file") {
+	switch {
+	case hasComment(line, "ignore/file"):
 		return skipFile, true
-	} else if hasComment(line, "ignore/line") {
+	case hasComment(line, "ignore/line"):
 		return skipCurrentLine, true
-	} else if hasComment(line, "ignore/next-line") {
+	case hasComment(line, "ignore/next-line"):
 		return skipNextLine, true
-	} else if hasComment(line, "ignore/begin") {
+	case hasComment(line, "ignore/begin"):
 		return skipBegin, true
-	} else if hasComment(line, "ignore/end") {
+	case hasComment(line, "ignore/end"):
 		return skipEnd, true
+	default:
+		return skipNone, false
 	}
-	return skipNone, false
 }
 
 func ReadContent(r io.Reader) (out []byte, err error) {
@@ -90,8 +92,11 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 			out = append(out, []byte(emptyLine(line))...)
 		} else {
 			skip, found = parseSkipComment(line)
-			if found {
+			switch {
+			case found:
 				switch skip {
+				case skipNone:
+					// no-op
 				case skipFile:
 					out = append(out, []byte(emptyLine(line))...)
 					skipNext = true
@@ -118,12 +123,12 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 					autoReset = true
 					inBegin = false
 				}
-			} else if skipNext {
+			case skipNext:
 				out = append(out, []byte(emptyLine(line))...)
 				if autoReset {
 					skipNext = false
 				}
-			} else {
+			default:
 				out = append(out, []byte(line)...)
 			}
 		}

@@ -53,6 +53,7 @@ func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err e
 	}
 
 	for _, root := range node.Content {
+		// nolint: exhaustive
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
@@ -309,7 +310,7 @@ func hasKey(node *yaml.Node, key string) bool {
 }
 
 func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
-	node := yaml.Node(*part)
+	node := *part
 	node.Content = nil
 	var ok bool
 	for i, alias := range part.Alias.Content {

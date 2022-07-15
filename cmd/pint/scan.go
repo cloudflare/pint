@@ -146,7 +146,8 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 		case <-ctx.Done():
 			return
 		default:
-			if job.entry.PathError != nil {
+			switch {
+			case job.entry.PathError != nil:
 				line, e := tryDecodingYamlError(job.entry.PathError)
 				results <- reporter.Report{
 					Path:          job.entry.Path,
@@ -159,7 +160,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					},
 					Owner: job.entry.Owner,
 				}
-			} else if job.entry.Rule.Error.Err != nil {
+			case job.entry.Rule.Error.Err != nil:
 				results <- reporter.Report{
 					Path:          job.entry.Path,
 					ModifiedLines: job.entry.ModifiedLines,
@@ -173,7 +174,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					},
 					Owner: job.entry.Owner,
 				}
-			} else {
+			default:
 				start := time.Now()
 				problems := job.check.Check(ctx, job.entry.Rule, job.allEntries)
 				duration := time.Since(start)

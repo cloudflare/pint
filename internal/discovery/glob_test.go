@@ -3,7 +3,6 @@ package discovery_test
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -121,7 +120,7 @@ func TestGlobPathFinder(t *testing.T) {
 					err = os.MkdirAll(path.Dir(p), 0o755)
 					require.NoError(t, err)
 				}
-				err = ioutil.WriteFile(p, []byte(content), 0o644)
+				err = os.WriteFile(p, []byte(content), 0o644)
 				require.NoError(t, err)
 			}
 

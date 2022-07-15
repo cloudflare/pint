@@ -22,7 +22,7 @@ $(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
 	go install -modfile=tools/golangci-lint/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint
 .PHONY: lint
 lint: $(GOBIN)/golangci-lint
-	$(GOBIN)/golangci-lint run -E staticcheck,misspell,promlinter,revive,tenv,errorlint,exportloopref,predeclared,bodyclose
+	$(GOBIN)/golangci-lint run
 
 $(GOBIN)/gofumpt: tools/gofumpt/go.mod tools/gofumpt/go.sum
 	go install -modfile=tools/gofumpt/go.mod mvdan.cc/gofumpt

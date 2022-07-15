@@ -2,7 +2,6 @@ package discovery_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"regexp"
@@ -456,7 +455,7 @@ R090    foo/c2c.yml         c2c.yml
 					err = os.MkdirAll(path.Dir(p), 0o755)
 					require.NoError(t, err)
 				}
-				err = ioutil.WriteFile(p, []byte(content), 0o644)
+				err = os.WriteFile(p, []byte(content), 0o644)
 				require.NoError(t, err)
 			}
 

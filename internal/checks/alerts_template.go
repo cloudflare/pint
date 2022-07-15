@@ -203,7 +203,6 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 					})
 				}
 			}
-
 		}
 	}
 
@@ -275,8 +274,7 @@ func (am aliasMap) varAliases(k string) (vals []string) {
 }
 
 func getAliases(node parse.Node, aliases *aliasMap) {
-	switch n := node.(type) {
-	case *parse.ActionNode:
+	if n, ok := node.(*parse.ActionNode); ok {
 		if len(n.Pipe.Decl) == 1 && !n.Pipe.IsAssign && len(n.Pipe.Cmds) == 1 {
 			for _, cmd := range n.Pipe.Cmds {
 				for _, arg := range cmd.Args {
@@ -386,8 +384,10 @@ func absentLabels(f utils.PromQLFragment) []string {
 	return names
 }
 
-func mergeLines(a, b []int) (l []int) {
-	l = append(a, b...)
+func mergeLines(a, b []int) []int {
+	l := make([]int, 0, len(a)+len(b))
+	l = append(l, a...)
+	l = append(l, b...)
 	sort.Ints(l)
-	return
+	return l
 }

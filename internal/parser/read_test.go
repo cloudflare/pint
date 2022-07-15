@@ -252,7 +252,7 @@ func TestGetComment(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%s", i, tc.input), func(t *testing.T) {
-			output, ok := parser.GetComment(string(tc.input), tc.comment...)
+			output, ok := parser.GetComment(tc.input, tc.comment...)
 			require.Equal(t, tc.ok, ok)
 			require.Equal(t, tc.output, output)
 		})

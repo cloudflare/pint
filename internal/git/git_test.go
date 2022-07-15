@@ -119,14 +119,14 @@ func TestCommitRange(t *testing.T) {
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("")), nil
+				return []byte(""), nil
 			},
 			output:      git.CommitRangeResults{Commits: []string{}},
 			shouldError: true,
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("commit1\n")), nil
+				return []byte("commit1\n"), nil
 			},
 			output: git.CommitRangeResults{
 				Commits: []string{"commit1"},
@@ -136,7 +136,7 @@ func TestCommitRange(t *testing.T) {
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("commit1\ncommit2\ncommit3\n")), nil
+				return []byte("commit1\ncommit2\ncommit3\n"), nil
 			},
 			output: git.CommitRangeResults{
 				Commits: []string{"commit1", "commit2", "commit3"},
@@ -198,20 +198,20 @@ func TestCurrentBranch(t *testing.T) {
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("")), nil
+				return []byte(""), nil
 			},
 			output:      "",
 			shouldError: false,
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("foo")), nil
+				return []byte("foo"), nil
 			},
 			output: "foo",
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("foo bar\n")), nil
+				return []byte("foo bar\n"), nil
 			},
 			output: "foo bar",
 		},
@@ -280,20 +280,20 @@ func TestCommitMessage(t *testing.T) {
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("")), nil
+				return []byte(""), nil
 			},
 			output:      "",
 			shouldError: false,
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("foo")), nil
+				return []byte("foo"), nil
 			},
 			output: "foo",
 		},
 		{
 			mock: func(args ...string) ([]byte, error) {
-				return []byte([]byte("foo bar\n")), nil
+				return []byte("foo bar\n"), nil
 			},
 			output: "foo bar\n",
 		},

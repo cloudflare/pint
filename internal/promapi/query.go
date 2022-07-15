@@ -74,6 +74,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 
 	qr := QueryResult{URI: p.uri}
 
+	// nolint: exhaustive
 	switch result.value.(model.Value).Type() {
 	case model.ValVector:
 		vectorVal := result.value.(model.Vector)

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCostSettings(t *testing.T) {
@@ -42,12 +42,11 @@ func TestCostSettings(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
-			assert := assert.New(t)
 			err := tc.conf.validate()
 			if err == nil || tc.err == nil {
-				assert.Equal(err, tc.err)
+				require.Equal(t, err, tc.err)
 			} else {
-				assert.EqualError(err, tc.err.Error())
+				require.EqualError(t, err, tc.err.Error())
 			}
 		})
 	}
