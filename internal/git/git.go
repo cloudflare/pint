@@ -53,23 +53,24 @@ func Blame(path string, cmd CommandRunner) (lines LineBlames, err error) {
 	for scanner.Scan() {
 		line = scanner.Text()
 
-		if strings.HasPrefix(line, "author") {
+		switch {
+		case strings.HasPrefix(line, "author"):
 			continue
-		} else if strings.HasPrefix(line, "committer") {
+		case strings.HasPrefix(line, "committer"):
 			continue
-		} else if strings.HasPrefix(line, "summary") {
+		case strings.HasPrefix(line, "summary"):
 			continue
-		} else if strings.HasPrefix(line, "filename") {
+		case strings.HasPrefix(line, "filename"):
 			cl.Filename = strings.Split(line, " ")[1]
-		} else if strings.HasPrefix(line, "previous") {
+		case strings.HasPrefix(line, "previous"):
 			continue
-		} else if strings.HasPrefix(line, "boundary") {
+		case strings.HasPrefix(line, "boundary"):
 			continue
-		} else if strings.HasPrefix(line, "\t") {
+		case strings.HasPrefix(line, "\t"):
 			if cl.Filename == path {
 				lines = append(lines, cl)
 			}
-		} else {
+		default:
 			parts := strings.Split(line, " ")
 			if len(parts) < 3 {
 				return nil, fmt.Errorf("failed to parse line number from line: %q", line)

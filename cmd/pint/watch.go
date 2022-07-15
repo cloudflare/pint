@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -92,7 +91,7 @@ func actionWatch(c *cli.Context) error {
 	pidfile := c.String(pidfileFlag)
 	if pidfile != "" {
 		pid := os.Getpid()
-		err := ioutil.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0o644)
+		err := os.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0o644)
 		if err != nil {
 			return err
 		}

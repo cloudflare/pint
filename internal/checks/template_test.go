@@ -3,10 +3,10 @@ package checks_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestTemplatedRegexpExpand(t *testing.T) {
@@ -87,21 +87,19 @@ func TestTemplatedRegexpExpand(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			assert := assert.New(t)
-
 			tr, err := checks.NewTemplatedRegexp(tc.input)
 			if err != nil {
-				assert.EqualError(err, tc.err)
+				require.EqualError(t, err, tc.err)
 				return
 			}
 
 			re, err := tr.Expand(tc.rule)
 			if err != nil {
-				assert.EqualError(err, tc.err)
+				require.EqualError(t, err, tc.err)
 				return
 			}
-			assert.Empty(tc.err)
-			assert.Equal(tc.output, re.String())
+			require.Empty(t, tc.err)
+			require.Equal(t, tc.output, re.String())
 		})
 	}
 }

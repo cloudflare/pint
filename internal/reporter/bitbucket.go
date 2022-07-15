@@ -112,7 +112,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 	case checks.Bug:
 		severity = "MEDIUM"
 		atype = "BUG"
-	default:
+	case checks.Warning, checks.Information:
 		severity = "LOW"
 		atype = "CODE_SMELL"
 	}

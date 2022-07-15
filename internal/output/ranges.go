@@ -16,12 +16,13 @@ func FormatLineRangeString(lines []int) string {
 	start := -1
 	end := -1
 	for _, l := range ls {
-		if start < 0 {
+		switch {
+		case start < 0:
 			start = l
 			end = l
-		} else if l == end+1 {
+		case l == end+1:
 			end = l
-		} else {
+		default:
 			if start > 0 && end > 0 {
 				ranges = append(ranges, printRange(start, end))
 			}

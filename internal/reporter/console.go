@@ -25,8 +25,7 @@ type ConsoleReporter struct {
 
 func (cr ConsoleReporter) Submit(summary Summary) error {
 	reports := summary.Reports
-	reps := reports[:]
-	sort.Slice(reps, func(i, j int) bool {
+	sort.Slice(reports, func(i, j int) bool {
 		if reports[i].Path < reports[j].Path {
 			return true
 		}
@@ -49,7 +48,7 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 	})
 
 	perFile := map[string][]string{}
-	for _, report := range reps {
+	for _, report := range reports {
 		if !shouldReport(report) {
 			log.Debug().
 				Str("path", report.Path).
@@ -75,7 +74,7 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 			msg = append(msg, color.RedString(report.Problem.Text))
 		case checks.Warning:
 			msg = append(msg, color.YellowString(report.Problem.Text))
-		default:
+		case checks.Information:
 			msg = append(msg, color.HiBlackString(report.Problem.Text))
 		}
 		msg = append(msg, color.MagentaString(" (%s)\n", report.Problem.Reporter))

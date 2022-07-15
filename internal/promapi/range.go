@@ -153,6 +153,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 			continue
 		}
 
+		// nolint: exhaustive
 		switch result.value.(model.Value).Type() {
 		case model.ValMatrix:
 			for _, sample := range result.value.(model.Matrix) {

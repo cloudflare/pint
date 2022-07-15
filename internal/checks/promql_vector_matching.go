@@ -171,21 +171,19 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 					})
 				}
 			}
-		} else {
-			if !areStringSlicesEqual(leftLabels, rightLabels) {
-				if len(n.VectorMatching.MatchingLabels) == 0 {
-					problems = append(problems, exprProblem{
-						expr:     node.Expr,
-						text:     fmt.Sprintf("both sides of the query have different labels: %s != %s", leftLabels, rightLabels),
-						severity: Bug,
-					})
-				} else {
-					problems = append(problems, exprProblem{
-						expr:     node.Expr,
-						text:     fmt.Sprintf("using ignoring(%q) won't produce any results because both sides of the query have different labels: %s != %s", strings.Join(n.VectorMatching.MatchingLabels, ","), leftLabels, rightLabels),
-						severity: Bug,
-					})
-				}
+		} else if !areStringSlicesEqual(leftLabels, rightLabels) {
+			if len(n.VectorMatching.MatchingLabels) == 0 {
+				problems = append(problems, exprProblem{
+					expr:     node.Expr,
+					text:     fmt.Sprintf("both sides of the query have different labels: %s != %s", leftLabels, rightLabels),
+					severity: Bug,
+				})
+			} else {
+				problems = append(problems, exprProblem{
+					expr:     node.Expr,
+					text:     fmt.Sprintf("using ignoring(%q) won't produce any results because both sides of the query have different labels: %s != %s", strings.Join(n.VectorMatching.MatchingLabels, ","), leftLabels, rightLabels),
+					severity: Bug,
+				})
 			}
 		}
 	}

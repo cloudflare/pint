@@ -8,7 +8,7 @@ import (
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -100,20 +100,18 @@ func TestMetadata(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.metric, func(t *testing.T) {
-			assert := assert.New(t)
-
 			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 100, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 
 			metadata, err := prom.Metadata(context.Background(), tc.metric)
 			if tc.err != "" {
-				assert.EqualError(err, tc.err, tc)
+				require.EqualError(t, err, tc.err, tc)
 			} else {
-				assert.NoError(err)
+				require.NoError(t, err)
 			}
 			if metadata != nil {
-				assert.Equal(*metadata, tc.metadata)
+				require.Equal(t, *metadata, tc.metadata)
 			}
 		})
 	}

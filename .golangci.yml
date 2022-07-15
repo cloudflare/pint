@@ -1,0 +1,42 @@
+run:
+  deadline: 5m
+
+output:
+  sort-results: true
+
+linters:
+  enable:
+    - depguard
+    - gofumpt
+    - goimports
+    - revive
+    - misspell
+    - promlinter
+    - tenv
+    - errorlint
+    - exportloopref
+    - predeclared
+    - contextcheck
+    - exhaustive
+    - exportloopref
+    - gocritic
+    - importas
+    - maligned
+    - prealloc
+    - promlinter
+    - unconvert
+
+issues:
+  max-same-issues: 0
+
+linters-settings:
+  depguard:
+    list-type: blacklist
+    include-go-root: true
+    packages-with-error-message:
+      - github.com/stretchr/testify/assert: "Use github.com/stretchr/testify/require instead of github.com/stretchr/testify/assert"
+      - io/ioutil: "Use corresponding 'os' or 'io' functions instead."
+  goimports:
+    local-prefixes: github.com/cloudflare/pint
+  gofumpt:
+    extra-rules: true

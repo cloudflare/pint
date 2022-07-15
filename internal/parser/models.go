@@ -29,6 +29,7 @@ func nodeLines(node *yaml.Node, offset int) (lines []int) {
 	lineCount := len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n"))
 
 	var firstLine int
+	// nolint: exhaustive
 	switch node.Style {
 	case yaml.LiteralStyle, yaml.FoldedStyle:
 		firstLine = node.Line + 1 + offset

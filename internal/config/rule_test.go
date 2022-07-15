@@ -8,7 +8,7 @@ import (
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/parser"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMatch(t *testing.T) {
@@ -434,10 +434,9 @@ func TestMatch(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			assert := assert.New(t)
 			ctx := context.WithValue(context.Background(), config.CommandKey, tc.cmd)
 			isMatch := tc.match.IsMatch(ctx, tc.path, tc.rule)
-			assert.Equal(tc.isMatch, isMatch)
+			require.Equal(t, tc.isMatch, isMatch)
 		})
 	}
 }

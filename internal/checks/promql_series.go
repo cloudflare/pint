@@ -258,7 +258,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 				problems = append(problems, p...)
 			}
 
-			if !trs.newest().Before(trs.until.Add(time.Duration(minAge) * -1)) {
+			if !trs.newest().Before(trs.until.Add(minAge * -1)) {
 				log.Debug().
 					Str("check", c.Reporter()).
 					Stringer("selector", &selector).
@@ -346,7 +346,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					problems = append(problems, p...)
 				}
 
-				if !trsLabel.newest().Before(trsLabel.until.Add(time.Duration(minAge) * -1)) {
+				if !trsLabel.newest().Before(trsLabel.until.Add(minAge * -1)) {
 					log.Debug().
 						Str("check", c.Reporter()).
 						Stringer("selector", &selector).

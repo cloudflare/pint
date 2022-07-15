@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/output"
 )
@@ -61,9 +61,8 @@ func TestHumanizeDuration(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.input.String(), func(t *testing.T) {
-			assert := assert.New(t)
 			output := output.HumanizeDuration(tc.input)
-			assert.Equal(tc.output, output)
+			require.Equal(t, tc.output, output)
 		})
 	}
 }
@@ -111,9 +110,8 @@ func TestHumanizeBytes(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strconv.Itoa(tc.input), func(t *testing.T) {
-			assert := assert.New(t)
 			output := output.HumanizeBytes(tc.input)
-			assert.Equal(tc.output, output)
+			require.Equal(t, tc.output, output)
 		})
 	}
 }

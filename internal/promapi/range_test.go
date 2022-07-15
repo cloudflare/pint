@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
@@ -297,8 +296,6 @@ func TestRange(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.query, func(t *testing.T) {
-			assert := assert.New(t)
-
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				tc.handler(t, w, r)
 			}))
@@ -310,10 +307,10 @@ func TestRange(t *testing.T) {
 
 			qr, err := prom.RangeQuery(context.Background(), tc.query, promapi.NewAbsoluteRange(tc.start, tc.end, tc.step))
 			if tc.err != "" {
-				assert.EqualError(err, tc.err, tc)
+				require.EqualError(t, err, tc.err, tc)
 			} else {
-				assert.NoError(err)
-				assert.Equal(qr.Samples, tc.samples, tc)
+				require.NoError(t, err)
+				require.Equal(t, qr.Samples, tc.samples, tc)
 			}
 		})
 	}

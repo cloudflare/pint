@@ -81,12 +81,10 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					alerts++
 				}
 				firstTime = value.Timestamp.Time()
-			} else {
-				if !isAlerting && rule.AlertingRule.For != nil {
-					if !value.Timestamp.Time().Before(firstTime.Add(forDur)) {
-						isAlerting = true
-						alerts++
-					}
+			} else if !isAlerting && rule.AlertingRule.For != nil {
+				if !value.Timestamp.Time().Before(firstTime.Add(forDur)) {
+					isAlerting = true
+					alerts++
 				}
 			}
 			lastTime = value.Timestamp.Time()
