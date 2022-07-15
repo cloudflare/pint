@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.24.1
+
+### Fixed
+
+- Fixed line reporting on some strict parser errors.
+
 ## v0.24.0
 
 ### Added

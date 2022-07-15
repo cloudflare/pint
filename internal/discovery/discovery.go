@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"errors"
 	"os"
 	"regexp"
 	"strings"
@@ -20,13 +21,21 @@ const (
 
 var ignoredErrors = []string{
 	"one of 'record' or 'alert' must be set",
-	": could not parse expression: ",
+	"could not parse expression: ",
 	"cannot unmarshal !!seq into rulefmt.ruleGroups",
 }
 
 func isStrictIgnored(err error) bool {
+	s := err.Error()
+
+	werr := &rulefmt.WrappedError{}
+	if errors.As(err, &werr) {
+		if uerr := werr.Unwrap(); uerr != nil {
+			s = uerr.Error()
+		}
+	}
 	for _, ign := range ignoredErrors {
-		if strings.Contains(err.Error(), ign) {
+		if strings.Contains(s, ign) {
 			return true
 		}
 	}
