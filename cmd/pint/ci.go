@@ -19,6 +19,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var baseBranchFlag = "base-branch"
+
 var ciCmd = &cli.Command{
 	Name:   "ci",
 	Usage:  "Lint CI changes",
@@ -29,6 +31,12 @@ var ciCmd = &cli.Command{
 			Aliases: []string{"r"},
 			Value:   false,
 			Usage:   "Require all rules to have an owner set via comment",
+		},
+		&cli.StringFlag{
+			Name:    baseBranchFlag,
+			Aliases: []string{"b"},
+			Value:   "",
+			Usage:   "Set base branch to use for PR checks (main, master, ...)",
 		},
 	},
 }
@@ -45,6 +53,9 @@ func actionCI(c *cli.Context) error {
 	}
 
 	baseBranch := strings.Split(meta.cfg.CI.BaseBranch, "/")[len(strings.Split(meta.cfg.CI.BaseBranch, "/"))-1]
+	if c.String(baseBranchFlag) != "" {
+		baseBranch = c.String(baseBranchFlag)
+	}
 	currentBranch, err := git.CurrentBranch(git.RunGit)
 	if err != nil {
 		return fmt.Errorf("failed to get the name of current branch")

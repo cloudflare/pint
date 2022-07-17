@@ -6,6 +6,10 @@
 
 - Fixed line reporting on some strict parser errors.
 
+### Added
+
+- Added `--base-branch` flag to `pint ci` command.
+
 ## v0.24.0
 
 ### Added
