@@ -37,6 +37,54 @@ Exit code will be one (1) if any issues were detected with severity `Bug` or hig
 If any commit on the PR contains `[skip ci]` or `[no ci]` somewhere in the commit message then pint will
 skip running all checks.
 
+#### GitHub Actions
+
+The easiest way of using `pint` with GitHub Actions is by using
+[prymitive/pint-action](https://github.com/prymitive/pint-action).
+Here's an example workflow:
+
+```yaml
+name: pint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  pint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run pint
+        uses: prymitive/pint-action@v1
+        with:
+          token: ${{ github.token }}
+          workdir: 'rules'
+```
+
+To customize pint checks create a `.pint.hcl` file in the root of your repository.
+See [Configuration](configuration.md) for a description of all options.
+
+If your repository contains other files, not only Prometheus rules, then tell pint
+to only check selected paths when running checks on a pull request:
+
+```js
+ci {
+  include    = [ "rules/dev/.*.yml", "rules/prod/.*" ]
+}
+```
+
+When pint runs checks after a push to a branch (for example after a merge), then
+it will pass `workdir` option to `pint lint`, which means that all files inside
+`rules` directory will be checked.
+
 ### Ad-hoc
 
 Lint specified files and report any found issue.
