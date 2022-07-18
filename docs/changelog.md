@@ -8,6 +8,10 @@
   * `prometheus { timeout = ... }`
   * `repository { bitbucket { timeout = ... } }`
   * `repository { github { timeout = ... } }`
+- `pint` will now try to discover all repository settings from environment variables
+  when run as part of GitHub Actions workflow and so it doesn't need any
+  `repository { github { ... } }` configuration block for that anymore.
+  Setting `GITHUB_AUTH_TOKEN` is the only requirement for GitHub Actions now.
 
 ## v0.24.1
 

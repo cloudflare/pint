@@ -13,10 +13,8 @@ type BitBucket struct {
 }
 
 func (bb BitBucket) validate() error {
-	if bb.Timeout != "" {
-		if _, err := parseDuration(bb.Timeout); err != nil {
-			return err
-		}
+	if _, err := parseDuration(bb.Timeout); err != nil {
+		return err
 	}
 	if bb.Project == "" {
 		return fmt.Errorf("project cannot be empty")
@@ -39,10 +37,8 @@ type GitHub struct {
 }
 
 func (gh GitHub) validate() error {
-	if gh.Timeout != "" {
-		if _, err := parseDuration(gh.Timeout); err != nil {
-			return err
-		}
+	if _, err := parseDuration(gh.Timeout); err != nil {
+		return err
 	}
 	if gh.Repo == "" {
 		return fmt.Errorf("repo cannot be empty")
