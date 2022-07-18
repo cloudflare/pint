@@ -34,7 +34,6 @@ func TestPrometheusConfig(t *testing.T) {
 		},
 		{
 			conf: PrometheusConfig{URI: "http://localhost"},
-			err:  errors.New("empty duration string"),
 		},
 		{
 			conf: PrometheusConfig{},

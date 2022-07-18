@@ -25,7 +25,7 @@ func TestBitBucketSettings(t *testing.T) {
 		},
 		{
 			conf: BitBucket{},
-			err:  errors.New(`empty duration string`),
+			err:  errors.New(`project cannot be empty`),
 		},
 		{
 			conf: BitBucket{
@@ -73,7 +73,7 @@ func TestBitBucketSettings(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
 			err := tc.conf.validate()
 			if err == nil || tc.err == nil {
-				require.Equal(t, err, tc.err)
+				require.Equal(t, tc.err, err)
 			} else {
 				require.EqualError(t, err, tc.err.Error())
 			}
@@ -100,7 +100,6 @@ func TestGitHubSettings(t *testing.T) {
 				Repo:  "foo",
 				Owner: "bar",
 			},
-			err: errors.New(`empty duration string`),
 		},
 		{
 			conf: GitHub{
@@ -148,7 +147,7 @@ func TestGitHubSettings(t *testing.T) {
 		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
 			err := tc.conf.validate()
 			if err == nil || tc.err == nil {
-				require.Equal(t, err, tc.err)
+				require.Equal(t, tc.err, err)
 			} else {
 				require.EqualError(t, err, tc.err.Error())
 			}

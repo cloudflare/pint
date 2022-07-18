@@ -4,11 +4,10 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": .pint.hcl:8,3-6: Unsupported argument; An argument named \"bob\" is not expected here."
+level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": .pint.hcl:7,3-6: Unsupported argument; An argument named \"bob\" is not expected here."
 -- .pint.hcl --
 prometheus "prom" {
   uri     = "https://"
-  timeout = "2m"
   required = true
 }
 

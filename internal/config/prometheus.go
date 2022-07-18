@@ -9,7 +9,7 @@ type PrometheusConfig struct {
 	Name        string   `hcl:",label" json:"name"`
 	URI         string   `hcl:"uri" json:"uri"`
 	Failover    []string `hcl:"failover,optional" json:"failover,omitempty"`
-	Timeout     string   `hcl:"timeout"  json:"timeout"`
+	Timeout     string   `hcl:"timeout,optional"  json:"timeout"`
 	Concurrency int      `hcl:"concurrency,optional" json:"concurrency"`
 	RateLimit   int      `hcl:"rateLimit,optional" json:"rateLimit"`
 	Cache       int      `hcl:"cache,optional" json:"cache"`
@@ -22,8 +22,10 @@ func (pc PrometheusConfig) validate() error {
 		return errors.New("prometheus URI cannot be empty")
 	}
 
-	if _, err := parseDuration(pc.Timeout); err != nil {
-		return err
+	if pc.Timeout != "" {
+		if _, err := parseDuration(pc.Timeout); err != nil {
+			return err
+		}
 	}
 
 	for _, path := range pc.Paths {

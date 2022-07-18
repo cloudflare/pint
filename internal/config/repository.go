@@ -7,14 +7,16 @@ import (
 
 type BitBucket struct {
 	URI        string `hcl:"uri"`
-	Timeout    string `hcl:"timeout"`
+	Timeout    string `hcl:"timeout,optional"`
 	Project    string `hcl:"project"`
 	Repository string `hcl:"repository"`
 }
 
 func (bb BitBucket) validate() error {
-	if _, err := parseDuration(bb.Timeout); err != nil {
-		return err
+	if bb.Timeout != "" {
+		if _, err := parseDuration(bb.Timeout); err != nil {
+			return err
+		}
 	}
 	if bb.Project == "" {
 		return fmt.Errorf("project cannot be empty")
@@ -31,14 +33,16 @@ func (bb BitBucket) validate() error {
 type GitHub struct {
 	BaseURI   string `hcl:"baseuri,optional"`
 	UploadURI string `hcl:"uploaduri,optional"`
-	Timeout   string `hcl:"timeout"`
+	Timeout   string `hcl:"timeout,optional"`
 	Owner     string `hcl:"owner"`
 	Repo      string `hcl:"repo"`
 }
 
 func (gh GitHub) validate() error {
-	if _, err := parseDuration(gh.Timeout); err != nil {
-		return err
+	if gh.Timeout != "" {
+		if _, err := parseDuration(gh.Timeout); err != nil {
+			return err
+		}
 	}
 	if gh.Repo == "" {
 		return fmt.Errorf("repo cannot be empty")

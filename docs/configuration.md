@@ -110,7 +110,7 @@ Syntax:
 repository {
   bitbucket {
     uri        = "https://..."
-    timeout    = "30s"
+    timeout    = "1m"
     project    = "..."
     repository = "..."
   }
@@ -119,7 +119,7 @@ repository {
 
 - `bitbucket:uri` - base URI of this repository, will be used for HTTP
   requests to the BitBucket API.
-- `bitbucket:timeout` - timeout to be used for API requests.
+- `bitbucket:timeout` - timeout to be used for API requests, defaults to 1 minute.
 - `bitbucket:project` - name of the BitBucket project for this repository.
 - `bitbucket:repository` - name of the BitBucket repository.
 
@@ -128,7 +128,7 @@ repository {
   github {
     baseuri    = "https://..."
     uploaduri  = "https://..."
-    timeout    = "30s"
+    timeout    = "1m"
     owner      = "..."
     repo       = "..."
   }
@@ -140,8 +140,8 @@ repository {
 
 If `github:baseuri` _or_ `github:uploaduri` are not specified then [GitHub](https://github.com) will be used.
 
-- `github:timeout` - timeout to be used for API requests;
-- `github:owner` - name of the GitHub owner i.e. the first part that comes before the repository's name in the URI;
+- `github:timeout` - timeout to be used for API requests, defaults to 1 minute.
+- `github:owner` - name of the GitHub owner i.e. the first part that comes before the repository's name in the URI.
 - `github:repo` - name of the GitHub repository (e.g. `monitoring`).
 
 ## Prometheus servers
@@ -156,7 +156,7 @@ Syntax:
 prometheus "$name" {
   uri         = "https://..."
   failover    = ["https://...", ...]
-  timeout     = "60s"
+  timeout     = "2m"
   concurrency = 16
   rateLimit   = 100
   cache       = 10000
@@ -176,7 +176,7 @@ prometheus "$name" {
   It's highly recommended that all URIs point to Prometheus servers with identical
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
-- `timeout` - timeout to be used for API requests.
+- `timeout` - timeout to be used for API requests. Defaults to 2 minutes.
 - `concurrency` - how many concurrent requests can pint send to this Prometheus server.
   Optional, defaults to 16.
 - `rateLimit` - per second rate limit for all API requests send to this Prometheus server.
@@ -198,7 +198,6 @@ Example:
 ```js
 prometheus "prod" {
   uri         = "https://prometheus-prod.example.com"
-  timeout     = "60s"
   concurrency = 40
 }
 

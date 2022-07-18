@@ -52,7 +52,6 @@ repository {
   github {
     baseuri   = "http://127.0.0.1:6032"
 	uploaduri = "http://127.0.0.1:6032"
-    timeout   = "10s"
     owner     = "cloudflare"
     repo      = "pint"
   }
