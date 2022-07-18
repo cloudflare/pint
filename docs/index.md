@@ -43,6 +43,7 @@ The easiest way of using `pint` with GitHub Actions is by using
 [prymitive/pint-action](https://github.com/prymitive/pint-action).
 Here's an example workflow:
 
+{% raw %}
 ```yaml
 name: pint
 
@@ -66,8 +67,10 @@ jobs:
         uses: prymitive/pint-action@v1
         with:
           token: ${{ github.token }}
+          # directory containing Prometheus rules
           workdir: 'rules'
 ```
+{% endraw %}
 
 To customize pint checks create a `.pint.hcl` file in the root of your repository.
 See [Configuration](configuration.md) for a description of all options.
