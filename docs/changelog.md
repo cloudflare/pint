@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.25.0
+
+### Changed
+
+- All timeout options are now optional. This includes following config blocks:
+  * `prometheus { timeout = ... }`
+  * `repository { bitbucket { timeout = ... } }`
+  * `repository { github { timeout = ... } }`
+
 ## v0.24.1
 
 ### Fixed

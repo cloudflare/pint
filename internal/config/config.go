@@ -203,11 +203,17 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		if err = cfg.Repository.BitBucket.validate(); err != nil {
 			return cfg, err
 		}
+		if cfg.Repository.BitBucket.Timeout == "" {
+			cfg.Repository.BitBucket.Timeout = time.Minute.String()
+		}
 	}
 
 	if cfg.Repository != nil && cfg.Repository.GitHub != nil {
 		if err = cfg.Repository.GitHub.validate(); err != nil {
 			return cfg, err
+		}
+		if cfg.Repository.GitHub.Timeout == "" {
+			cfg.Repository.GitHub.Timeout = time.Minute.String()
 		}
 	}
 
@@ -227,7 +233,14 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		if err = prom.validate(); err != nil {
 			return cfg, err
 		}
-		timeout, _ := parseDuration(prom.Timeout)
+
+		var timeout time.Duration
+		if prom.Timeout != "" {
+			timeout, _ = parseDuration(prom.Timeout)
+		} else {
+			timeout = time.Minute * 2
+			cfg.Prometheus[i].Timeout = timeout.String()
+		}
 
 		concurrency := prom.Concurrency
 		if concurrency <= 0 {

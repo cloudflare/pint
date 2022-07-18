@@ -52,7 +52,6 @@ ci {
 repository {
   bitbucket {
     uri        = "http://127.0.0.1:6031"
-    timeout    = "10s"
     project    = "prometheus"
     repository = "rules"
   }

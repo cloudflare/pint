@@ -18,7 +18,6 @@ stderr 'level=info msg="Problems found" Warning=8'
 -- .pint.hcl --
 prometheus "prom" {
   uri      = "https://"
-  timeout  = "2m"
   required = false
 }
 parser {

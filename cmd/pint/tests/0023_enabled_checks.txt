@@ -22,7 +22,6 @@ parser {
 }
 prometheus "prom" {
   uri      = "https://"
-  timeout  = "2m"
   required = true
 }
 

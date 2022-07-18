@@ -1117,7 +1117,7 @@ func TestConfigErrors(t *testing.T) {
 	uri        = ""
   }
 }`,
-			err: "empty duration string",
+			err: "project cannot be empty",
 		},
 		{
 			config: `repository {
@@ -1128,7 +1128,7 @@ func TestConfigErrors(t *testing.T) {
     repo    = ""
   }
 }`,
-			err: "empty duration string",
+			err: "repo cannot be empty",
 		},
 		{
 			config: `checks { enabled = ["foo"] }`,
