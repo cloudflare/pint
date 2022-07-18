@@ -25,7 +25,7 @@ func TestBitBucketSettings(t *testing.T) {
 		},
 		{
 			conf: BitBucket{},
-			err:  errors.New(`project cannot be empty`),
+			err:  errors.New(`empty duration string`),
 		},
 		{
 			conf: BitBucket{
@@ -100,6 +100,7 @@ func TestGitHubSettings(t *testing.T) {
 				Repo:  "foo",
 				Owner: "bar",
 			},
+			err: errors.New(`empty duration string`),
 		},
 		{
 			conf: GitHub{

@@ -200,20 +200,20 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 	}
 
 	if cfg.Repository != nil && cfg.Repository.BitBucket != nil {
-		if err = cfg.Repository.BitBucket.validate(); err != nil {
-			return cfg, err
-		}
 		if cfg.Repository.BitBucket.Timeout == "" {
 			cfg.Repository.BitBucket.Timeout = time.Minute.String()
+		}
+		if err = cfg.Repository.BitBucket.validate(); err != nil {
+			return cfg, err
 		}
 	}
 
 	if cfg.Repository != nil && cfg.Repository.GitHub != nil {
-		if err = cfg.Repository.GitHub.validate(); err != nil {
-			return cfg, err
-		}
 		if cfg.Repository.GitHub.Timeout == "" {
 			cfg.Repository.GitHub.Timeout = time.Minute.String()
+		}
+		if err = cfg.Repository.GitHub.validate(); err != nil {
+			return cfg, err
 		}
 	}
 

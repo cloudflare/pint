@@ -52,6 +52,7 @@ func actionCI(c *cli.Context) error {
 		includeRe = append(includeRe, regexp.MustCompile("^"+pattern+"$"))
 	}
 
+	meta.cfg.CI = detectCI(meta.cfg.CI)
 	baseBranch := strings.Split(meta.cfg.CI.BaseBranch, "/")[len(strings.Split(meta.cfg.CI.BaseBranch, "/"))-1]
 	if c.String(baseBranchFlag) != "" {
 		baseBranch = c.String(baseBranchFlag)
@@ -107,6 +108,7 @@ func actionCI(c *cli.Context) error {
 		reps = append(reps, br)
 	}
 
+	meta.cfg.Repository = detectRepository(meta.cfg.Repository)
 	if meta.cfg.Repository != nil && meta.cfg.Repository.GitHub != nil {
 		token, ok := os.LookupEnv("GITHUB_AUTH_TOKEN")
 		if !ok {
@@ -158,4 +160,93 @@ func actionCI(c *cli.Context) error {
 	}
 
 	return nil
+}
+
+func detectCI(cfg *config.CI) *config.CI {
+	var isNil, isDirty bool
+
+	if cfg == nil {
+		isNil = true
+		cfg = &config.CI{}
+	}
+
+	if bb := os.Getenv("GITHUB_BASE_REF"); bb != "" {
+		isDirty = true
+		cfg.BaseBranch = bb
+	}
+
+	if isNil && !isDirty {
+		return nil
+	}
+	return cfg
+}
+
+func detectRepository(cfg *config.Repository) *config.Repository {
+	var isNil, isDirty bool
+
+	if cfg == nil {
+		isNil = true
+		cfg = &config.Repository{}
+	}
+
+	if os.Getenv("GITHUB_ACTION") != "" {
+		isDirty = true
+		cfg.GitHub = detectGithubActions(cfg.GitHub)
+	}
+
+	if isNil && !isDirty {
+		return nil
+	}
+	return cfg
+}
+
+func detectGithubActions(gh *config.GitHub) *config.GitHub {
+	if os.Getenv("GITHUB_PULL_REQUEST_NUMBER") == "" &&
+		os.Getenv("GITHUB_EVENT_NAME") == "pull_request" &&
+		os.Getenv("GITHUB_REF") != "" {
+		parts := strings.Split(os.Getenv("GITHUB_REF"), "/")
+		if len(parts) >= 4 {
+			log.Info().Str("pr", parts[2]).Msg("Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable")
+			os.Setenv("GITHUB_PULL_REQUEST_NUMBER", parts[2])
+		}
+	}
+
+	var isDirty, isNil bool
+
+	if gh == nil {
+		isNil = true
+		gh = &config.GitHub{Timeout: time.Minute.String()}
+	}
+
+	if repo := os.Getenv("GITHUB_REPOSITORY"); repo != "" {
+		parts := strings.SplitN(repo, "/", 2)
+		if len(parts) == 2 {
+			if gh.Owner == "" {
+				log.Info().Str("owner", parts[0]).Msg("Setting repository owner from GITHUB_REPOSITORY env variable")
+				gh.Owner = parts[0]
+				isDirty = true
+			}
+			if gh.Repo == "" {
+				log.Info().Str("repo", parts[1]).Msg("Setting repository name from GITHUB_REPOSITORY env variable")
+				gh.Repo = parts[1]
+				isDirty = true
+			}
+		}
+	}
+
+	if api := os.Getenv("GITHUB_API_URL"); api != "" {
+		if gh.BaseURI == "" {
+			log.Info().Str("baseuri", api).Msg("Setting repository base URI from GITHUB_API_URL env variable")
+			gh.BaseURI = api
+		}
+		if gh.UploadURI == "" {
+			log.Info().Str("uploaduri", api).Msg("Setting repository upload URI from GITHUB_API_URL env variable")
+			gh.UploadURI = api
+		}
+	}
+
+	if isNil && !isDirty {
+		return nil
+	}
+	return gh
 }

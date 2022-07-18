@@ -1,0 +1,119 @@
+exec bash -x ./webserver.sh &
+exec bash -c 'I=0 ; while [ ! -f server.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+
+mkdir testrepo
+cd testrepo
+exec git init --initial-branch=main .
+
+cp ../src/v1.yml rules.yml
+cp ../src/.pint.hcl .
+env GIT_AUTHOR_NAME=pint
+env GIT_AUTHOR_EMAIL=pint@example.com
+env GIT_COMMITTER_NAME=pint
+env GIT_COMMITTER_EMAIL=pint@example.com
+exec git add .
+exec git commit -am 'import rules and config'
+
+exec git checkout -b v2
+cp ../src/v2.yml rules.yml
+exec git commit -am 'v2'
+
+env GITHUB_AUTH_TOKEN=12345
+env GITHUB_ACTION=YES
+env GITHUB_EVENT_NAME=pull_request
+env GITHUB_REF=refs/pull/123/merge
+env GITHUB_BASE_REF=main
+env GITHUB_REPOSITORY=foo/bar
+env GITHUB_API_URL=http://127.0.0.1:6084
+pint.ok -l debug --offline --no-color ci
+! stdout .
+stderr 'level=info msg="Report submitted" status="200 OK"'
+stderr 'level=info msg="Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable" pr=123'
+stderr 'level=info msg="Setting repository base URI from GITHUB_API_URL env variable" baseuri=http://127.0.0.1:6084'
+
+exec sh -c 'cat ../server.pid | xargs kill'
+
+-- src/v1.yml --
+groups:
+- name: foo
+  rules:
+  - alert: rule1
+    expr: sum(foo) by(job)
+  - alert: rule2
+    expr: sum(foo) by(job)
+    for: 0s
+
+-- src/v2.yml --
+groups:
+- name: foo
+  rules:
+  - alert: rule1
+    expr: sum(foo) by(job)
+    for: 0s
+  - alert: rule2
+    expr: sum(foo) by(job)
+    for: 0s
+
+-- src/.pint.hcl --
+repository {
+  github {
+	uploaduri = "http://127.0.0.1:6084"
+    owner     = "cloudflare"
+    repo      = "pint"
+  }
+}
+
+-- webserver.go --
+package main
+
+import (
+	"context"
+	"io"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, "{}")
+	})
+
+	listener, err := net.Listen("tcp", "127.0.0.1:6084")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server := &http.Server{
+		Addr: "127.0.0.1:6084",
+	}
+
+	go func() {
+		_ = server.Serve(listener)
+	}()
+
+	pid := os.Getpid()
+	err = os.WriteFile("server.pid", []byte(strconv.Itoa(pid)), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		time.Sleep(time.Minute*2)
+		stop <- syscall.SIGTERM
+	}()
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+}
+
+-- webserver.sh --
+env GOCACHE=$TMPDIR go run webserver.go
