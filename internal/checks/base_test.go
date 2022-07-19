@@ -248,6 +248,7 @@ func (fc formCond) isMatch(r *http.Request) bool {
 
 var (
 	requireConfigPath     = requestPathCond{path: "/api/v1/status/config"}
+	requireFlagsPath      = requestPathCond{path: "/api/v1/status/flags"}
 	requireQueryPath      = requestPathCond{path: "/api/v1/query"}
 	requireRangeQueryPath = requestPathCond{path: "/api/v1/query_range"}
 	requireMetadataPath   = requestPathCond{path: "/api/v1/metadata"}
@@ -371,6 +372,27 @@ func (cr configResponse) respond(w http.ResponseWriter, r *http.Request) {
 	}{
 		Status: "success",
 		Data:   v1.ConfigResult{YAML: cr.yaml},
+	}
+	d, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	_, _ = w.Write(d)
+}
+
+type flagsResponse struct {
+	flags map[string]string
+}
+
+func (fg flagsResponse) respond(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+	w.Header().Set("Content-Type", "application/json")
+	result := struct {
+		Status string         `json:"status"`
+		Data   v1.FlagsResult `json:"data"`
+	}{
+		Status: "success",
+		Data:   fg.flags,
 	}
 	d, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {

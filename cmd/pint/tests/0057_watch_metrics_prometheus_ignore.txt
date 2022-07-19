@@ -48,6 +48,8 @@ pint_check_duration_seconds_sum{check="alerts/template"}
 pint_check_duration_seconds_count{check="alerts/template"}
 pint_check_duration_seconds_sum{check="promql/fragile"}
 pint_check_duration_seconds_count{check="promql/fragile"}
+pint_check_duration_seconds_sum{check="promql/range_query"}
+pint_check_duration_seconds_count{check="promql/range_query"}
 pint_check_duration_seconds_sum{check="promql/rate"}
 pint_check_duration_seconds_count{check="promql/rate"}
 pint_check_duration_seconds_sum{check="promql/regexp"}
@@ -87,18 +89,24 @@ pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom2"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom2"}
+pint_prometheus_queries_running{endpoint="/api/v1/status/flags",name="prom1"}
+pint_prometheus_queries_running{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_queries_total Total number of all prometheus queries
 # TYPE pint_prometheus_queries_total counter
 pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom2"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom2"}
+pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom1"}
+pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_query_errors_total Total number of failed prometheus queries
 # TYPE pint_prometheus_query_errors_total counter
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason="api/bad_response"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/client_error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom2",reason="connection/error"}
 # HELP pint_rules_parsed_total Total number of rules parsed since startup
 # TYPE pint_rules_parsed_total counter
 pint_rules_parsed_total{kind="alerting"}

@@ -15,46 +15,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/single_prometheus_server - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -98,104 +59,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/single_prometheus_server_/_path_match - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/multiple_prometheus_servers - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "ignore",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "foo.+"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -225,6 +89,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -257,6 +122,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -307,6 +173,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -357,6 +224,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -379,68 +247,6 @@
 }
 ---
 
-[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {
-        "bytesPerSample": 4096
-      }
-    }
-  ]
-}
----
-
 [TestGetChecksForRule/duplicated_rules - 1]
 {
   "ci": {
@@ -457,6 +263,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -515,83 +322,6 @@
 }
 ---
 
-[TestGetChecksForRule/multiple_cost_checks - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {
-        "bytesPerSample": 4096,
-        "severity": "info"
-      }
-    },
-    {
-      "cost": {
-        "bytesPerSample": 4096,
-        "maxSeries": 10000,
-        "severity": "warning"
-      }
-    },
-    {
-      "cost": {
-        "bytesPerSample": 4096,
-        "maxSeries": 20000,
-        "severity": "bug"
-      }
-    }
-  ]
-}
----
-
 [TestGetChecksForRule/reject_rules - 1]
 {
   "ci": {
@@ -608,6 +338,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -657,6 +388,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -707,6 +439,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -757,6 +490,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -807,6 +541,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -857,6 +592,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -907,6 +643,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -957,6 +694,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -986,96 +724,6 @@
           "severity": "bug"
         }
       ]
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/checks_disabled_via_config - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ],
-    "disabled": [
-      "promql/rate",
-      "promql/vector_matching"
-    ]
-  },
-  "rules": [
-    {
-      "alerts": {
-        "range": "1h",
-        "step": "1m",
-        "resolve": "5m"
-      }
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/single_check_enabled_via_config - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "paths": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {},
-  "rules": [
-    {
-      "alerts": {
-        "range": "1h",
-        "step": "1m",
-        "resolve": "5m"
-      }
     }
   ]
 }
@@ -1208,102 +856,6 @@
 }
 ---
 
-[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/multiple_URIs - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "failover": [
-        "http://localhost/1",
-        "http://localhost/2"
-      ],
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/reject"
-    ]
-  }
-}
----
-
 [TestGetChecksForRule/for_match_/_passing - 1]
 {
   "ci": {
@@ -1320,6 +872,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1364,6 +917,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1408,6 +962,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1452,6 +1007,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1496,6 +1052,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1540,6 +1097,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1568,6 +1126,478 @@
 }
 ---
 
+[TestGetChecksForRule/single_prometheus_server - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/multiple_URIs - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "failover": [
+        "http://localhost/1",
+        "http://localhost/2"
+      ],
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server_/_path_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/multiple_prometheus_servers - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "ignore",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "foo.+"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {
+        "bytesPerSample": 4096
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/multiple_cost_checks - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {
+        "bytesPerSample": 4096,
+        "severity": "info"
+      }
+    },
+    {
+      "cost": {
+        "bytesPerSample": 4096,
+        "maxSeries": 10000,
+        "severity": "warning"
+      }
+    },
+    {
+      "cost": {
+        "bytesPerSample": 4096,
+        "maxSeries": 20000,
+        "severity": "bug"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 10000,
+      "paths": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching",
+      "promql/range_query"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
 [TestGetChecksForRule/defaults - 2]
 {
   "ci": {
@@ -1584,6 +1614,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1624,6 +1655,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1668,6 +1700,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1717,6 +1750,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1763,6 +1797,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1806,6 +1841,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1861,6 +1897,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1890,6 +1927,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1922,6 +1960,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -1972,6 +2011,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2022,6 +2062,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2086,6 +2127,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2122,6 +2164,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2222,6 +2265,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2273,6 +2317,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2322,6 +2367,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2372,6 +2418,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2422,6 +2469,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2472,6 +2520,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2522,6 +2571,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2572,6 +2622,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2622,6 +2673,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2686,6 +2738,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2697,7 +2750,8 @@
     ],
     "disabled": [
       "promql/rate",
-      "promql/vector_matching"
+      "promql/vector_matching",
+      "promql/range_query"
     ]
   },
   "rules": [
@@ -2889,6 +2943,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2933,6 +2988,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -2977,6 +3033,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3021,6 +3078,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3065,6 +3123,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3109,6 +3168,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3153,6 +3213,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3193,6 +3254,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3237,6 +3299,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3286,6 +3349,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3332,6 +3396,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3375,6 +3440,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3430,6 +3496,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3459,6 +3526,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3491,6 +3559,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3541,6 +3610,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3591,6 +3661,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3655,6 +3726,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3691,6 +3763,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3791,6 +3864,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3842,6 +3916,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3891,6 +3966,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3941,6 +4017,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -3991,6 +4068,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4041,6 +4119,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4091,6 +4170,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4141,6 +4221,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4191,6 +4272,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4255,6 +4337,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4266,7 +4349,8 @@
     ],
     "disabled": [
       "promql/rate",
-      "promql/vector_matching"
+      "promql/vector_matching",
+      "promql/range_query"
     ]
   },
   "rules": [
@@ -4458,6 +4542,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4502,6 +4587,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4546,6 +4632,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4590,6 +4677,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4634,6 +4722,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4678,6 +4767,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4722,6 +4812,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4762,6 +4853,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4806,6 +4898,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4855,6 +4948,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4901,6 +4995,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4944,6 +5039,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -4999,6 +5095,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5028,6 +5125,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5060,6 +5158,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5110,6 +5209,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5160,6 +5260,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5224,6 +5325,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5260,6 +5362,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5360,6 +5463,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5411,6 +5515,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5460,6 +5565,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5510,6 +5616,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5560,6 +5667,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5610,6 +5718,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5660,6 +5769,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5710,6 +5820,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5760,6 +5871,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5824,6 +5936,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -5835,7 +5948,8 @@
     ],
     "disabled": [
       "promql/rate",
-      "promql/vector_matching"
+      "promql/vector_matching",
+      "promql/range_query"
     ]
   },
   "rules": [
@@ -6027,6 +6141,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6071,6 +6186,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6115,6 +6231,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6159,6 +6276,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6203,6 +6321,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6247,6 +6366,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6291,6 +6411,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6331,6 +6452,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6375,6 +6497,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6424,6 +6547,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6470,6 +6594,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6513,6 +6638,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6568,6 +6694,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6597,6 +6724,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6629,6 +6757,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6679,6 +6808,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6729,6 +6859,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6793,6 +6924,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6829,6 +6961,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6929,6 +7062,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -6980,6 +7114,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7029,6 +7164,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7079,6 +7215,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7129,6 +7266,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7179,6 +7317,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7229,6 +7368,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7279,6 +7419,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7329,6 +7470,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7393,6 +7535,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7404,7 +7547,8 @@
     ],
     "disabled": [
       "promql/rate",
-      "promql/vector_matching"
+      "promql/vector_matching",
+      "promql/range_query"
     ]
   },
   "rules": [
@@ -7596,6 +7740,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7640,6 +7785,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7684,6 +7830,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7728,6 +7875,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7772,6 +7920,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",
@@ -7816,6 +7965,7 @@
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
+      "promql/range_query",
       "promql/rate",
       "promql/regexp",
       "promql/syntax",

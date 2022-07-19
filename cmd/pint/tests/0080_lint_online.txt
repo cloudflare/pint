@@ -9,13 +9,16 @@ exec bash -c 'cat prometheus.pid | xargs kill'
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/1.yml rules=1
-rules/1.yml:2: prometheus "prom1" at http://127.0.0.1:7080 didn't have any series for "http_errors_total" metric in the last 1w. Metric name "http_errors_total" matches "promql/series" check ignore regexp "^.+_errors_.+$" (promql/series)
-  expr: rate(http_errors_total[2m]) > 0
+rules/1.yml:2: http_errors_total[2d] selector is trying to query Prometheus for 2d worth of metrics, but prometheus "prom1" at http://127.0.0.1:7080 is configured to only keep 1d of metrics history (promql/range_query)
+  expr: rate(http_errors_total[2d]) > 0
 
-level=info msg="Problems found" Warning=1
+rules/1.yml:2: prometheus "prom1" at http://127.0.0.1:7080 didn't have any series for "http_errors_total" metric in the last 1w. Metric name "http_errors_total" matches "promql/series" check ignore regexp "^.+_errors_.+$" (promql/series)
+  expr: rate(http_errors_total[2d]) > 0
+
+level=info msg="Problems found" Warning=2
 -- rules/1.yml --
 - alert: http errors
-  expr: rate(http_errors_total[2m]) > 0
+  expr: rate(http_errors_total[2d]) > 0
 
 -- .pint.hcl --
 prometheus "prom1" {
@@ -61,6 +64,12 @@ func main() {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
 		_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
+	})
+
+	http.HandleFunc("/api/v1/status/flags", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"status":"success","data":{"--storage.tsdb.retention.time": "1d"}}`))
 	})
 
 	http.HandleFunc("/api/v1/query_range", func(w http.ResponseWriter, r *http.Request) {
