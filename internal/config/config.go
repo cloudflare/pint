@@ -126,6 +126,10 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 			name:  checks.VectorMatchingCheckName,
 			check: checks.NewVectorMatchingCheck(p),
 		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.RangeQueryCheckName,
+			check: checks.NewRangeQueryCheck(p),
+		})
 	}
 
 	for _, rule := range cfg.Rules {

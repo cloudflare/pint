@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.26.0
+
+### Added
+
+- [promql/range_query](checks/promql/range_query.md) check.
+
 ## v0.25.0
 
 ### Changed
