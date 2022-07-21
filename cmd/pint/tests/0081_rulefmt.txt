@@ -3,9 +3,9 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=error msg="Failed to unmarshal file content" error="0:0: group \"foo\", rule 1, \"foo\": field 'expr' must be set in rule" lines=1-4 path=rules/strict.yml
-rules/strict.yml:1: field 'expr' must be set in rule (yaml/parse)
-groups:
+level=info msg="File parsed" path=rules/strict.yml rules=1
+rules/strict.yml:4: missing expr key (yaml/parse)
+  - record: foo
 
 level=info msg="Problems found" Fatal=1
 level=fatal msg="Fatal error" error="problems found"

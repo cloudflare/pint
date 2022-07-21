@@ -21,8 +21,10 @@ const (
 
 var ignoredErrors = []string{
 	"one of 'record' or 'alert' must be set",
+	"field 'expr' must be set in rule",
 	"could not parse expression: ",
 	"cannot unmarshal !!seq into rulefmt.ruleGroups",
+	": template: __",
 }
 
 func isStrictIgnored(err error) bool {

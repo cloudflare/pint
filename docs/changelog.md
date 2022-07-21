@@ -2,6 +2,11 @@
 
 ## v0.26.0
 
+### Fixed
+
+- Strict parsing mode shouldn't fail on template errors, those will be later
+  reported by `alerts/template` check.
+
 ### Added
 
 - [promql/range_query](checks/promql/range_query.md) check.
