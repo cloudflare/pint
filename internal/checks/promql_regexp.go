@@ -21,6 +21,10 @@ func NewRegexpCheck() RegexpCheck {
 
 type RegexpCheck struct{}
 
+func (c RegexpCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c RegexpCheck) String() string {
 	return RegexpCheckName
 }

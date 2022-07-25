@@ -25,6 +25,10 @@ type Reject struct {
 	severity         Severity
 }
 
+func (c Reject) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c Reject) String() string {
 	r := []string{}
 	if c.keyRe != nil {

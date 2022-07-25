@@ -25,6 +25,10 @@ type RangeQueryCheck struct {
 	prom *promapi.FailoverGroup
 }
 
+func (c RangeQueryCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: true}
+}
+
 func (c RangeQueryCheck) String() string {
 	return fmt.Sprintf("%s(%s)", RangeQueryCheckName, c.prom.Name())
 }

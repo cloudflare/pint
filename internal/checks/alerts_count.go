@@ -32,6 +32,10 @@ type AlertsCheck struct {
 	resolve  time.Duration
 }
 
+func (c AlertsCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: true}
+}
+
 func (c AlertsCheck) String() string {
 	return fmt.Sprintf("%s(%s)", AlertsCheckName, c.prom.Name())
 }

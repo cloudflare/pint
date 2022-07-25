@@ -43,6 +43,10 @@ func NewSeriesCheck(prom *promapi.FailoverGroup) SeriesCheck {
 	return SeriesCheck{prom: prom}
 }
 
+func (c SeriesCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: true}
+}
+
 type SeriesCheck struct {
 	prom *promapi.FailoverGroup
 }

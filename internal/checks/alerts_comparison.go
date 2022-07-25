@@ -19,6 +19,10 @@ func NewComparisonCheck() ComparisonCheck {
 
 type ComparisonCheck struct{}
 
+func (c ComparisonCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c ComparisonCheck) String() string {
 	return ComparisonCheckName
 }

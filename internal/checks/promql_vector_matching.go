@@ -29,6 +29,10 @@ type VectorMatchingCheck struct {
 	prom *promapi.FailoverGroup
 }
 
+func (c VectorMatchingCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: true}
+}
+
 func (c VectorMatchingCheck) String() string {
 	return fmt.Sprintf("%s(%s)", VectorMatchingCheckName, c.prom.Name())
 }

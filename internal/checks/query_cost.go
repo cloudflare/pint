@@ -30,6 +30,10 @@ type CostCheck struct {
 	severity       Severity
 }
 
+func (c CostCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: true}
+}
+
 func (c CostCheck) String() string {
 	if c.maxSeries > 0 {
 		return fmt.Sprintf("%s(%s:%d)", CostCheckName, c.prom.Name(), c.maxSeries)

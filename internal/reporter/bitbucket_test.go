@@ -266,8 +266,18 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
-				Result: "FAIL",
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "FAIL",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
 			},
 			annotations: reporter.BitBucketAnnotations{
 				Annotations: []reporter.BitBucketAnnotation{
@@ -337,8 +347,18 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
-				Result: "FAIL",
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "FAIL",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
 			},
 			annotations: reporter.BitBucketAnnotations{
 				Annotations: []reporter.BitBucketAnnotation{
@@ -373,8 +393,18 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			summary: reporter.Summary{},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
-				Result: "PASS",
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "PASS",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
 			},
 			errorHandler: func(err error) error {
 				if err != nil {
@@ -455,8 +485,18 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			report: reporter.BitBucketReport{
-				Title:  "Pint - Prometheus rules linter (version: v0.0.0)",
-				Result: "PASS",
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "PASS",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
 			},
 			annotations: reporter.BitBucketAnnotations{
 				Annotations: []reporter.BitBucketAnnotation{

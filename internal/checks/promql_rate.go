@@ -26,6 +26,10 @@ type RateCheck struct {
 	prom *promapi.FailoverGroup
 }
 
+func (c RateCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: true}
+}
+
 func (c RateCheck) String() string {
 	return fmt.Sprintf("%s(%s)", RateCheckName, c.prom.Name())
 }

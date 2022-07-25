@@ -27,6 +27,10 @@ type AggregationCheck struct {
 	severity  Severity
 }
 
+func (c AggregationCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c AggregationCheck) String() string {
 	return fmt.Sprintf("%s(%s:%v)", AggregationCheckName, c.label, c.keep)
 }
