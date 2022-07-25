@@ -20,6 +20,10 @@ func NewAlertsForCheck() AlertsForChecksFor {
 
 type AlertsForChecksFor struct{}
 
+func (c AlertsForChecksFor) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c AlertsForChecksFor) String() string {
 	return AlertForCheckName
 }

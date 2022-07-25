@@ -17,6 +17,7 @@ require (
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.11.1
+	go.uber.org/atomic v1.9.0
 	go.uber.org/ratelimit v0.2.0
 	golang.org/x/oauth2 v0.0.0-20220628200809-02e64fa58f26
 	gopkg.in/yaml.v3 v3.0.1
@@ -68,7 +69,6 @@ require (
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	go.opentelemetry.io/otel v1.7.0 // indirect
 	go.opentelemetry.io/otel/trace v1.7.0 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/goleak v1.1.12 // indirect
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect

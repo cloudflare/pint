@@ -99,9 +99,14 @@ func (p Problem) LineRange() (int, int) {
 	return p.Lines[0], p.Lines[len(p.Lines)-1]
 }
 
+type CheckMeta struct {
+	IsOnline bool
+}
+
 type RuleChecker interface {
 	String() string
 	Reporter() string
+	Meta() CheckMeta
 	Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) []Problem
 }
 

@@ -20,6 +20,10 @@ func NewFragileCheck() FragileCheck {
 
 type FragileCheck struct{}
 
+func (c FragileCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c FragileCheck) String() string {
 	return FragileCheckName
 }

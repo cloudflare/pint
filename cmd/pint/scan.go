@@ -10,6 +10,7 @@ import (
 
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/rs/zerolog/log"
+	"go.uber.org/atomic"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
@@ -82,9 +83,11 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 		wg.Wait()
 	}()
 
+	var onlineChecksCount, offlineChecksCount atomic.Int64
 	go func() {
 		for _, entry := range entries {
-			if entry.PathError == nil && entry.Rule.Error.Err == nil {
+			switch {
+			case entry.PathError == nil && entry.Rule.Error.Err == nil:
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
 					log.Debug().
@@ -105,9 +108,15 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 				checkList := cfg.GetChecksForRule(ctx, entry.Path, entry.Rule)
 				for _, check := range checkList {
 					check := check
+					if check.Meta().IsOnline {
+						onlineChecksCount.Inc()
+					} else {
+						offlineChecksCount.Inc()
+					}
 					jobs <- scanJob{entry: entry, allEntries: entries, check: check}
+					checkIterationChecksDone.Inc()
 				}
-			} else {
+			default:
 				if entry.Rule.Error.Err != nil {
 					log.Debug().
 						Str("path", entry.Path).
@@ -115,10 +124,8 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 						Msg("Found invalid rule")
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
 				}
-
 				jobs <- scanJob{entry: entry, allEntries: entries, check: nil}
 			}
-			checkIterationChecksDone.Inc()
 		}
 		defer close(jobs)
 	}()
@@ -126,10 +133,14 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 	for result := range results {
 		summary.Reports = append(summary.Reports, result)
 	}
+	summary.Duration = time.Since(start)
+	summary.Entries = len(entries)
+	summary.OnlineChecks = onlineChecksCount.Load()
+	summary.OfflineChecks = offlineChecksCount.Load()
 
 	lastRunTime.SetToCurrentTime()
 
-	return
+	return summary
 }
 
 type scanJob struct {

@@ -1,6 +1,8 @@
 package reporter
 
 import (
+	"time"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -15,7 +17,11 @@ type Report struct {
 }
 
 type Summary struct {
-	Reports []Report
+	OfflineChecks int64
+	OnlineChecks  int64
+	Duration      time.Duration
+	Entries       int
+	Reports       []Report
 }
 
 func (s Summary) HasFatalProblems() bool {

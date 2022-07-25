@@ -75,6 +75,10 @@ func NewTemplateCheck() TemplateCheck {
 
 type TemplateCheck struct{}
 
+func (c TemplateCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c TemplateCheck) String() string {
 	return TemplateCheckName
 }

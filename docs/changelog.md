@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.27.0
+
+### Changed
+
+- Add more details to BitBucket CI reports.
+
 ## v0.26.0
 
 ### Fixed

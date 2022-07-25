@@ -18,6 +18,10 @@ func NewSyntaxCheck() SyntaxCheck {
 
 type SyntaxCheck struct{}
 
+func (c SyntaxCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c SyntaxCheck) String() string {
 	return SyntaxCheckName
 }

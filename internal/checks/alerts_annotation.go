@@ -23,6 +23,10 @@ type AnnotationCheck struct {
 	severity   Severity
 }
 
+func (c AnnotationCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c AnnotationCheck) String() string {
 	if c.valueRe != nil {
 		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.key, c.valueRe.anchored, c.isReguired)

@@ -15,9 +15,37 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+const (
+	BitBucketDescription = "pint is a Prometheus rule linter/validator.\n" +
+		"It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.\n" +
+		"Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server)."
+)
+
 type BitBucketReport struct {
-	Title  string `json:"title"`
-	Result string `json:"result"`
+	Reporter string                `json:"reporter"`
+	Title    string                `json:"title"`
+	Result   string                `json:"result"`
+	Details  string                `json:"details"`
+	Link     string                `json:"link"`
+	Data     []BitBucketReportData `json:"data"`
+}
+
+type DataType string
+
+const (
+	BooleanType    DataType = "BOOLEAN"
+	DateType       DataType = "DATA"
+	DurationType   DataType = "DURATION"
+	LinkType       DataType = "LINK"
+	NumberType     DataType = "NUMBER"
+	PercentageType DataType = "PERCENTAGE"
+	TextType       DataType = "TEXT"
+)
+
+type BitBucketReportData struct {
+	Title string   `json:"title"`
+	Type  DataType `json:"type"`
+	Value any      `json:"value"`
 }
 
 type BitBucketAnnotation struct {
@@ -82,7 +110,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 		}
 	}
 
-	if err = r.postReport(headCommit, isPassing, annotations); err != nil {
+	if err = r.postReport(headCommit, isPassing, annotations, summary); err != nil {
 		return err
 	}
 
@@ -163,21 +191,6 @@ func (r BitBucketReporter) bitBucketRequest(method, url string, body []byte) err
 	return nil
 }
 
-func (r BitBucketReporter) createReport(commit string, isPassing bool) error {
-	result := "PASS"
-	if !isPassing {
-		result = "FAIL"
-	}
-	payload, _ := json.Marshal(BitBucketReport{
-		Title:  fmt.Sprintf("Pint - Prometheus rules linter (version: %s)", r.version),
-		Result: result,
-	})
-
-	url := fmt.Sprintf("%s/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint",
-		r.uri, r.project, r.repo, commit)
-	return r.bitBucketRequest(http.MethodPut, url, payload)
-}
-
 func (r BitBucketReporter) createAnnotations(commit string, annotations []BitBucketAnnotation) error {
 	payload, _ := json.Marshal(BitBucketAnnotations{Annotations: annotations})
 	url := fmt.Sprintf("%s/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations",
@@ -191,16 +204,35 @@ func (r BitBucketReporter) deleteAnnotations(commit string) error {
 	return r.bitBucketRequest(http.MethodDelete, url, nil)
 }
 
-func (r BitBucketReporter) postReport(commit string, isPassing bool, annotations []BitBucketAnnotation) error {
-	err := r.createReport(commit, isPassing)
-	if err != nil {
+func (r BitBucketReporter) postReport(commit string, isPassing bool, annotations []BitBucketAnnotation, summary Summary) error {
+	result := "PASS"
+	if !isPassing {
+		result = "FAIL"
+	}
+	payload, _ := json.Marshal(BitBucketReport{
+		Title:    fmt.Sprintf("pint %s", r.version),
+		Result:   result,
+		Reporter: "Prometheus rule linter",
+		Details:  BitBucketDescription,
+		Link:     "https://cloudflare.github.io/pint/",
+		Data: []BitBucketReportData{
+			{Title: "Number of rules checked", Type: NumberType, Value: summary.Entries},
+			{Title: "Number of problems found", Type: NumberType, Value: len(annotations)},
+			{Title: "Number of offline checks", Type: NumberType, Value: summary.OfflineChecks},
+			{Title: "Number of online checks", Type: NumberType, Value: summary.OnlineChecks},
+			{Title: "Checks duration", Type: DurationType, Value: summary.Duration.Milliseconds()},
+		},
+	})
+
+	url := fmt.Sprintf("%s/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint",
+		r.uri, r.project, r.repo, commit)
+	if err := r.bitBucketRequest(http.MethodPut, url, payload); err != nil {
 		return fmt.Errorf("failed to create BitBucket report: %w", err)
 	}
 
 	// Try to delete annotations when that happens so we don't end up with stale data if we run
 	// pint twice, first with problems found, and second without any.
-	err = r.deleteAnnotations(commit)
-	if err != nil {
+	if err := r.deleteAnnotations(commit); err != nil {
 		return err
 	}
 

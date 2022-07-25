@@ -23,6 +23,10 @@ type LabelCheck struct {
 	severity   Severity
 }
 
+func (c LabelCheck) Meta() CheckMeta {
+	return CheckMeta{IsOnline: false}
+}
+
 func (c LabelCheck) String() string {
 	return fmt.Sprintf("%s(%s:%v)", LabelCheckName, c.key, c.isReguired)
 }
