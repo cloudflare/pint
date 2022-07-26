@@ -2,20 +2,25 @@
 
 ## v0.27.0
 
+### Added
+
+- Deduplicate reports where possible to avoid showing same issue twice.
+
 ### Changed
 
 - Add more details to BitBucket CI reports.
+- More compact console output when running `pint lint`.
 
 ## v0.26.0
+
+### Added
+
+- [promql/range_query](checks/promql/range_query.md) check.
 
 ### Fixed
 
 - Strict parsing mode shouldn't fail on template errors, those will be later
   reported by `alerts/template` check.
-
-### Added
-
-- [promql/range_query](checks/promql/range_query.md) check.
 
 ## v0.25.0
 

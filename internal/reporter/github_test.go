@@ -22,7 +22,7 @@ func TestGithubReporter(t *testing.T) {
 
 	type testCaseT struct {
 		description  string
-		summary      reporter.Summary
+		reports      []reporter.Report
 		httpHandler  http.Handler
 		errorHandler errorCheck
 		gitCmd       git.CommandRunner
@@ -42,7 +42,7 @@ func TestGithubReporter(t *testing.T) {
   expr: sum(errors) by (job)
 `))
 
-	for _, tcase := range []testCaseT{
+	for _, tc := range []testCaseT{
 		{
 			description: "timeout errors out",
 			owner:       "foo",
@@ -73,19 +73,17 @@ func TestGithubReporter(t *testing.T) {
 				}
 				return nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "syntax error",
-							Lines:    []int{2},
-							Reporter: "mock",
-							Text:     "syntax error",
-							Severity: checks.Fatal,
-						},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "syntax error",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Severity: checks.Fatal,
 					},
 				},
 			},
@@ -110,28 +108,26 @@ func TestGithubReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "syntax error",
-							Lines:    []int{2},
-							Reporter: "mock",
-							Text:     "syntax error",
-							Severity: checks.Fatal,
-						},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "syntax error",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Severity: checks.Fatal,
 					},
 				},
 			},
 		},
 	} {
-		t.Run(tcase.description, func(t *testing.T) {
+		t.Run(tc.description, func(t *testing.T) {
 			var handler http.Handler
-			if tcase.httpHandler != nil {
-				handler = tcase.httpHandler
+			if tc.httpHandler != nil {
+				handler = tc.httpHandler
 			} else {
 				// Handler that checks for token.
 				handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +139,7 @@ func TestGithubReporter(t *testing.T) {
 						return
 					}
 					token := auth[0]
-					if token != fmt.Sprintf("Bearer %s", tcase.token) {
+					if token != fmt.Sprintf("Bearer %s", tc.token) {
 						w.WriteHeader(500)
 						_, _ = w.Write([]byte("Invalid token"))
 						t.Fatalf("got a request with invalid token (got %s)", token)
@@ -152,19 +148,19 @@ func TestGithubReporter(t *testing.T) {
 			}
 			srv := httptest.NewServer(handler)
 			defer srv.Close()
-			reporter := reporter.NewGithubReporter(
+			r := reporter.NewGithubReporter(
 				srv.URL,
 				srv.URL,
-				tcase.timeout,
-				tcase.token,
-				tcase.owner,
-				tcase.repo,
-				tcase.prNum,
-				tcase.gitCmd,
+				tc.timeout,
+				tc.token,
+				tc.owner,
+				tc.repo,
+				tc.prNum,
+				tc.gitCmd,
 			)
 
-			err := reporter.Submit(tcase.summary)
-			if e := tcase.errorHandler(t, err); e != nil {
+			err := r.Submit(reporter.NewSummary(tc.reports))
+			if e := tc.errorHandler(t, err); e != nil {
 				t.Errorf("error check failure: %s", e)
 				return
 			}

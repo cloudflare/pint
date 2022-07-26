@@ -8,69 +8,57 @@ level=info msg="File parsed" path=rules/0001.yml rules=3
 level=info msg="File parsed" path=rules/0002.yaml rules=2
 level=info msg="File parsed" path=rules/0003.yaml rules=10
 rules/0001.yml:2: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
-  expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+ 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
 
 rules/0001.yml:6: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/aggregate)
-  expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+ 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
 
 rules/0002.yaml:2: unnecessary regexp match on static string job=~"foo", use job="foo" instead (promql/regexp)
-  expr: up{job=~"foo"} == 0
+ 2 |   expr: up{job=~"foo"} == 0
 
 rules/0002.yaml:5: unnecessary regexp match on static string job!~"foo", use job!="foo" instead (promql/regexp)
-  expr: up{job!~"foo"} == 0
+ 5 |   expr: up{job!~"foo"} == 0
 
 rules/0003.yaml:11: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/aggregate)
-  expr: sum(foo) without(job)
+ 11 |   expr: sum(foo) without(job)
 
 rules/0003.yaml:11: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
-  expr: sum(foo) without(job)
+ 11 |   expr: sum(foo) without(job)
 
 rules/0003.yaml:14: syntax error: unexpected right parenthesis ')' (promql/syntax)
-  expr: sum(foo) by ())
+ 14 |   expr: sum(foo) by ())
 
 rules/0003.yaml:22-25: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
-  expr: |
-    sum(
-      multiline
-    ) without(job, instance)
+ 22 |   expr: |
+ 23 |     sum(
+ 24 |       multiline
+ 25 |     ) without(job, instance)
 
 rules/0003.yaml:28-31: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/aggregate)
-  expr: |
-    sum(sum) without(job)
-    +
-    sum(sum) without(job)
-
-rules/0003.yaml:28-31: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, use without(instance, ...) (promql/aggregate)
-  expr: |
-    sum(sum) without(job)
-    +
-    sum(sum) without(job)
+ 28 |   expr: |
+ 29 |     sum(sum) without(job)
+ 30 |     +
+ 31 |     sum(sum) without(job)
 
 rules/0003.yaml:28-31: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
-  expr: |
-    sum(sum) without(job)
-    +
-    sum(sum) without(job)
-
-rules/0003.yaml:28-31: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
-  expr: |
-    sum(sum) without(job)
-    +
-    sum(sum) without(job)
+ 28 |   expr: |
+ 29 |     sum(sum) without(job)
+ 30 |     +
+ 31 |     sum(sum) without(job)
 
 rules/0003.yaml:34-37: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
-  expr: >-
-    sum(
-      multiline2
-    ) without(job, instance)
+ 34 |   expr: >-
+ 35 |     sum(
+ 36 |       multiline2
+ 37 |     ) without(job, instance)
 
 rules/0003.yaml:40: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/aggregate)
-  expr: sum(byinstance) by(instance)
+ 40 |   expr: sum(byinstance) by(instance)
 
 rules/0003.yaml:40: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
-  expr: sum(byinstance) by(instance)
+ 40 |   expr: sum(byinstance) by(instance)
 
-level=info msg="Problems found" Bug=2 Fatal=1 Warning=12
+level=info msg="Problems found" Bug=2 Fatal=1 Warning=10
 level=fatal msg="Fatal error" error="problems found"
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m

@@ -10,6 +10,7 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
@@ -24,7 +25,7 @@ type ConsoleReporter struct {
 }
 
 func (cr ConsoleReporter) Submit(summary Summary) error {
-	reports := summary.Reports
+	reports := summary.Reports()
 	sort.Slice(reports, func(i, j int) bool {
 		if reports[i].Path < reports[j].Path {
 			return true
@@ -84,8 +85,20 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 			lastLine = len(lines) - 1
 			log.Warn().Str("path", report.Path).Msgf("Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details")
 		}
-		for _, c := range lines[firstLine-1 : lastLine] {
-			msg = append(msg, color.WhiteString("%s\n", c))
+
+		nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
+		var inPlaceholder bool
+		for i := firstLine; i <= lastLine; i++ {
+			switch {
+			case slices.Contains(report.Problem.Lines, i):
+				msg = append(msg, color.WhiteString(nrFmt+" | %s\n", i, lines[i-1]))
+				inPlaceholder = false
+			case inPlaceholder:
+				//
+			default:
+				msg = append(msg, color.WhiteString(" %s\n", strings.Repeat(".", countDigits(lastLine))))
+				inPlaceholder = true
+			}
 		}
 		perFile[report.Path] = append(perFile[report.Path], strings.Join(msg, ""))
 	}
@@ -126,4 +139,12 @@ func printLineRange(s, e int) string {
 		return strconv.Itoa(s)
 	}
 	return fmt.Sprintf("%d-%d", s, e)
+}
+
+func countDigits(n int) (c int) {
+	for n > 0 {
+		n /= 10
+		c++
+	}
+	return c
 }

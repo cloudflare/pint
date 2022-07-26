@@ -8,16 +8,16 @@ level=info msg="File parsed" path=rules/1.yml rules=3
 level=info msg="File parsed" path=rules/2.yml rules=1
 level=info msg="File parsed" path=rules/3.yml rules=1
 rules/1.yml:4-5: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
-  - alert: No Owner
-    expr: up > 0
+ 4 |   - alert: No Owner
+ 5 |     expr: up > 0
 
 rules/1.yml:9-10: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
-  - alert: No Owner
-    expr: up > 0
+  9 |   - alert: No Owner
+ 10 |     expr: up > 0
 
 rules/3.yml:1-2: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
-- alert: No Owner
-  expr: up{job="foo"} == 0
+ 1 | - alert: No Owner
+ 2 |   expr: up{job="foo"} == 0
 
 level=info msg="Problems found" Bug=3
 level=fatal msg="Fatal error" error="problems found"

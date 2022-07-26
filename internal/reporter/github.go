@@ -62,7 +62,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 	}
 
 	comments := []*github.DraftReviewComment{}
-	for _, rep := range summary.Reports {
+	for _, rep := range summary.Reports() {
 		rep := rep
 
 		if len(rep.ModifiedLines) == 0 {

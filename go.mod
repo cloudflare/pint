@@ -19,6 +19,7 @@ require (
 	github.com/urfave/cli/v2 v2.11.1
 	go.uber.org/atomic v1.9.0
 	go.uber.org/ratelimit v0.2.0
+	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
 	golang.org/x/oauth2 v0.0.0-20220628200809-02e64fa58f26
 	gopkg.in/yaml.v3 v3.0.1
 )

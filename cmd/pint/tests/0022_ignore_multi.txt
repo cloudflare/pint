@@ -6,10 +6,10 @@ cmp stderr stderr.txt
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/1.yaml rules=3
 rules/1.yaml:2: dropped label should be removed when aggregating "^.+$" rules, remove dropped from by() (promql/aggregate)
-  expr: sum(errors_total) by(keep,dropped)
+ 2 |   expr: sum(errors_total) by(keep,dropped)
 
 rules/1.yaml:5: keep label is required and should be preserved when aggregating "^.+$" rules, remove keep from without() (promql/aggregate)
-  expr: sum(errors_total) without(keep,dropped)
+ 5 |   expr: sum(errors_total) without(keep,dropped)
 
 level=info msg="Problems found" Warning=2
 -- rules/1.yaml --

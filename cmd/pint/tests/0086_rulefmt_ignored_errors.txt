@@ -5,19 +5,19 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=info msg="File parsed" path=rules/strict.yml rules=5
 rules/strict.yml:4: incomplete rule, no alert or record key (yaml/parse)
-  - expr: MissingAlertOrRecord
+ 4 |   - expr: MissingAlertOrRecord
 
 rules/strict.yml:7: syntax error: no expression found in input (promql/syntax)
-    expr: 
+ 7 |     expr: 
 
 rules/strict.yml:10: syntax error: unknown function with name "sumz" (promql/syntax)
-    expr: sumz(0)
+ 10 |     expr: sumz(0)
 
 rules/strict.yml:15: template parse error: function "bogus" not defined (alerts/template)
-      dashboard: '{{ bogus }}'
+ 15 |       dashboard: '{{ bogus }}'
 
 rules/strict.yml:20: template parse error: function "bogus" not defined (alerts/template)
-      dashboard: '{{ bogus }}'
+ 20 |       dashboard: '{{ bogus }}'
 
 level=info msg="Problems found" Fatal=5
 level=fatal msg="Fatal error" error="problems found"

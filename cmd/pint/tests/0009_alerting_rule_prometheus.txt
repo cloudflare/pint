@@ -6,17 +6,17 @@ cmp stderr stderr.txt
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/0001.yml rules=2
 rules/0001.yml:11-13: link annotation is required (alerts/annotation)
-    annotations:
-      summary: "Instance {{ $labels.instance }} down"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+ 11 |     annotations:
+ 12 |       summary: "Instance {{ $labels.instance }} down"
+ 13 |       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
 
 rules/0001.yml:17: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
-    expr: sum by (instance) (http_inprogress_requests) > 0
+ 17 |     expr: sum by (instance) (http_inprogress_requests) > 0
 
 rules/0001.yml:19-21: link annotation is required (alerts/annotation)
-    annotations:
-      summary: "High request latency on {{ $labels.instance }}"
-      description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
+ 19 |     annotations:
+ 20 |       summary: "High request latency on {{ $labels.instance }}"
+ 21 |       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 
 level=info msg="Problems found" Bug=2 Warning=1
 level=fatal msg="Fatal error" error="problems found"
