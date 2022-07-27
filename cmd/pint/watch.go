@@ -267,7 +267,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 	done := map[string]prometheus.Metric{}
 	keys := []string{}
 
-	for _, report := range c.summary.Reports {
+	for _, report := range c.summary.Reports() {
 		if report.Problem.Severity < c.minSeverity {
 			log.Debug().Stringer("severity", report.Problem.Severity).Msg("Skipping report")
 			continue

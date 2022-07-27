@@ -7,47 +7,47 @@ level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="File parsed" path=rules/0001.yml rules=5
 level=info msg="File parsed" path=rules/0002.yml rules=1
 rules/0001.yml:1-2: url annotation is required (alerts/annotation)
-- alert: Always
-  expr: up
+ 1 | - alert: Always
+ 2 |   expr: up
 
 rules/0001.yml:1-2: severity label is required (rule/label)
-- alert: Always
-  expr: up
+ 1 | - alert: Always
+ 2 |   expr: up
 
 rules/0001.yml:2: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
-  expr: up
+ 2 |   expr: up
 
 rules/0001.yml:9-10: url annotation is required (alerts/annotation)
-- alert: ServiceIsDown
-  expr: up == 0
+  9 | - alert: ServiceIsDown
+ 10 |   expr: up == 0
 
 rules/0001.yml:9-10: severity label is required (rule/label)
-- alert: ServiceIsDown
-  expr: up == 0
+  9 | - alert: ServiceIsDown
+ 10 |   expr: up == 0
 
 rules/0001.yml:14: severity label value must match "^critical|warning|info$" (rule/label)
-    severity: bad
+ 14 |     severity: bad
 
 rules/0001.yml:16: url annotation value must match "^https://wiki.example.com/page/(.+).html$" (alerts/annotation)
-    url: bad
+ 16 |     url: bad
 
 rules/0002.yml:5: template parse error: undefined variable "$label" (alerts/template)
-    summary: 'Instance {{ $label.instance }} down'
+ 5 |     summary: 'Instance {{ $label.instance }} down'
 
 rules/0002.yml:6: template parse error: undefined variable "$valuexx" (alerts/template)
-    func: '{{ $valuexx | xxx }}'
+ 6 |     func: '{{ $valuexx | xxx }}'
 
 rules/0002.yml:9: template parse error: undefined variable "$label" (alerts/template)
-    summary: 'Instance {{ $label.instance }} down'
+ 9 |     summary: 'Instance {{ $label.instance }} down'
 
 rules/0002.yml:10: template parse error: function "xxx" not defined (alerts/template)
-    func: '{{ $value | xxx }}'
+ 10 |     func: '{{ $value | xxx }}'
 
 rules/0002.yml:11: using $value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
-    bar: 'Some {{$value}} value'
+ 11 |     bar: 'Some {{$value}} value'
 
 rules/0002.yml:12: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
-    val: '{{ .Value|humanizeDuration }}'
+ 12 |     val: '{{ .Value|humanizeDuration }}'
 
 level=info msg="Problems found" Bug=5 Fatal=4 Warning=4
 level=fatal msg="Fatal error" error="problems found"

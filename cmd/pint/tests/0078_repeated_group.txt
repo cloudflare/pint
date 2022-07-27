@@ -5,7 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=error msg="Failed to unmarshal file content" error="4:3: groupname: \"foo\" is repeated in the same file" lines=1-5 path=rules/strict.yml
 rules/strict.yml:4: groupname: "foo" is repeated in the same file (yaml/parse)
-- name: foo
+ 4 | - name: foo
 
 level=info msg="Problems found" Fatal=1
 level=fatal msg="Fatal error" error="problems found"

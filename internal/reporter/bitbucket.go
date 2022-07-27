@@ -92,13 +92,13 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 	}
 	log.Info().Str("commit", headCommit).Msg("Got HEAD commit from git")
 
-	pb, err := blameReports(summary.Reports, r.gitCmd)
+	pb, err := blameReports(summary.Reports(), r.gitCmd)
 	if err != nil {
 		return fmt.Errorf("failed to run git blame: %w", err)
 	}
 
 	annotations := []BitBucketAnnotation{}
-	for _, report := range summary.Reports {
+	for _, report := range summary.Reports() {
 		annotations = append(annotations, r.makeAnnotation(report, pb)...)
 	}
 

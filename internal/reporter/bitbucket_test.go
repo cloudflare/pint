@@ -34,7 +34,7 @@ func TestBitBucketReporter(t *testing.T) {
 	type testCaseT struct {
 		description  string
 		gitCmd       git.CommandRunner
-		summary      reporter.Summary
+		reports      []reporter.Report
 		httpHandler  http.Handler
 		report       reporter.BitBucketReport
 		annotations  reporter.BitBucketAnnotations
@@ -76,9 +76,7 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{{Path: "foo.txt", Rule: mockRules[0], Problem: checks.Problem{}}},
-			},
+			reports: []reporter.Report{{Path: "foo.txt", Rule: mockRules[0], Problem: checks.Problem{}}},
 			errorHandler: func(err error) error {
 				if err != nil && err.Error() == "failed to run git blame: git blame error" {
 					return nil
@@ -98,14 +96,12 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2},
-						Rule:          mockRules[0],
-						Problem:       checks.Problem{},
-					},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[0],
+					Problem:       checks.Problem{},
 				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -131,14 +127,12 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2},
-						Rule:          mockRules[0],
-						Problem:       checks.Problem{},
-					},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[0],
+					Problem:       checks.Problem{},
 				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -166,14 +160,12 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2},
-						Rule:          mockRules[0],
-						Problem:       checks.Problem{},
-					},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[0],
+					Problem:       checks.Problem{},
 				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -201,67 +193,65 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2, 4},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "up",
-							Lines:    []int{1},
-							Reporter: "mock",
-							Text:     "this should be ignored, line is not part of the diff",
-							Severity: checks.Bug,
-						},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{1},
+						Reporter: "mock",
+						Text:     "this should be ignored, line is not part of the diff",
+						Severity: checks.Bug,
 					},
-					{
-						Path:          "bar.txt",
-						ModifiedLines: []int{},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "up",
-							Lines:    []int{1},
-							Reporter: "mock",
-							Text:     "this should be ignored, file is not part of the diff",
-							Severity: checks.Bug,
-						},
+				},
+				{
+					Path:          "bar.txt",
+					ModifiedLines: []int{},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{1},
+						Reporter: "mock",
+						Text:     "this should be ignored, file is not part of the diff",
+						Severity: checks.Bug,
 					},
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2, 4},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "up",
-							Lines:    []int{2},
-							Reporter: "mock",
-							Text:     "bad name",
-							Severity: checks.Fatal,
-						},
+				},
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "bad name",
+						Severity: checks.Fatal,
 					},
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2, 4},
-						Rule:          mockRules[0],
-						Problem: checks.Problem{
-							Fragment: "up == 0",
-							Lines:    []int{2},
-							Reporter: "mock",
-							Text:     "mock text",
-							Severity: checks.Bug,
-						},
+				},
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Fragment: "up == 0",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "mock text",
+						Severity: checks.Bug,
 					},
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{2, 4},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "errors",
-							Lines:    []int{4},
-							Reporter: "mock",
-							Text:     "mock text 2",
-							Severity: checks.Warning,
-						},
+				},
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "errors",
+						Lines:    []int{4},
+						Reporter: "mock",
+						Text:     "mock text 2",
+						Severity: checks.Warning,
 					},
 				},
 			},
@@ -330,19 +320,17 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path:          "foo.txt",
-						ModifiedLines: []int{3, 4},
-						Rule:          mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "syntax error",
-							Lines:    []int{1},
-							Reporter: "test/mock",
-							Text:     "syntax error",
-							Severity: checks.Fatal,
-						},
+			reports: []reporter.Report{
+				{
+					Path:          "foo.txt",
+					ModifiedLines: []int{3, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "syntax error",
+						Lines:    []int{1},
+						Reporter: "test/mock",
+						Text:     "syntax error",
+						Severity: checks.Fatal,
 					},
 				},
 			},
@@ -391,7 +379,6 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{},
 			report: reporter.BitBucketReport{
 				Reporter: "Prometheus rule linter",
 				Title:    "pint v0.0.0",
@@ -425,62 +412,60 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			summary: reporter.Summary{
-				Reports: []reporter.Report{
-					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "up",
-							Lines:    []int{1},
-							Reporter: "mock",
-							Text:     "this should be ignored, line is not part of the diff",
-							Severity: checks.Bug,
-						},
+			reports: []reporter.Report{
+				{
+					Path: "foo.txt",
+					Rule: mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{1},
+						Reporter: "mock",
+						Text:     "this should be ignored, line is not part of the diff",
+						Severity: checks.Bug,
 					},
-					{
-						Path: "bar.txt",
-						Rule: mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "up",
-							Lines:    []int{1},
-							Reporter: "mock",
-							Text:     "this should be ignored, file is not part of the diff",
-							Severity: checks.Bug,
-						},
+				},
+				{
+					Path: "bar.txt",
+					Rule: mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{1},
+						Reporter: "mock",
+						Text:     "this should be ignored, file is not part of the diff",
+						Severity: checks.Bug,
 					},
-					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "up",
-							Lines:    []int{2},
-							Reporter: "mock",
-							Text:     "bad name",
-							Severity: checks.Bug,
-						},
+				},
+				{
+					Path: "foo.txt",
+					Rule: mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "bad name",
+						Severity: checks.Bug,
 					},
-					{
-						Path: "foo.txt",
-						Rule: mockRules[0],
-						Problem: checks.Problem{
-							Fragment: "up == 0",
-							Lines:    []int{2},
-							Reporter: "mock",
-							Text:     "mock text",
-							Severity: checks.Bug,
-						},
+				},
+				{
+					Path: "foo.txt",
+					Rule: mockRules[0],
+					Problem: checks.Problem{
+						Fragment: "up == 0",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "mock text",
+						Severity: checks.Bug,
 					},
-					{
-						Path: "foo.txt",
-						Rule: mockRules[1],
-						Problem: checks.Problem{
-							Fragment: "errors",
-							Lines:    []int{4},
-							Reporter: "mock",
-							Text:     "mock text 2",
-							Severity: checks.Warning,
-						},
+				},
+				{
+					Path: "foo.txt",
+					Rule: mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "errors",
+						Lines:    []int{4},
+						Reporter: "mock",
+						Text:     "mock text 2",
+						Severity: checks.Warning,
 					},
 				},
 			},
@@ -563,7 +548,8 @@ func TestBitBucketReporter(t *testing.T) {
 				"proj",
 				"repo",
 				tc.gitCmd)
-			err := r.Submit(tc.summary)
+			summary := reporter.NewSummary(tc.reports)
+			err := r.Submit(summary)
 
 			if e := tc.errorHandler(err); e != nil {
 				t.Errorf("error check failure: %s", e)

@@ -82,7 +82,7 @@ func actionCI(c *cli.Context) error {
 	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
 
 	if c.Bool(requireOwnerFlag) {
-		summary.Reports = append(summary.Reports, verifyOwners(entries)...)
+		summary.Report(verifyOwners(entries)...)
 	}
 
 	reps := []reporter.Reporter{

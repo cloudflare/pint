@@ -1,0 +1,40 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="File parsed" path=rules/01.yml rules=1
+rules/01.yml:5: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
+ 5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+
+rules/01.yml:5-12: template is using "cluster" label but the query removes it (alerts/template)
+  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+ ..
+ 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+
+rules/01.yml:5-13: template is using "cluster" label but the query removes it (alerts/template)
+  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+ ..
+ 13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
+
+rules/01.yml:5-12: template is using "instance" label but the query removes it (alerts/template)
+  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+ ..
+ 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+
+level=info msg="Problems found" Bug=3 Warning=1
+level=fatal msg="Fatal error" error="problems found"
+-- rules/01.yml --
+groups:
+- name: foo
+  rules:
+  - alert: foo
+    expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+    for: 5m
+    labels:
+        priority: "2"
+        component: bob
+    annotations:
+        link: https://example.com/link
+        summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+        dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"

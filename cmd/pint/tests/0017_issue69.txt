@@ -7,4228 +7,4228 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 rules/1.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/1.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/1.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/1.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/10.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/10.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/10.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/10.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/100.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/100.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/100.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/100.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/101.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/101.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/101.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/101.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/102.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/102.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/102.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/102.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/103.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/103.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/103.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/103.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/104.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/104.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/104.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/104.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/105.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/105.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/105.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/105.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/106.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/106.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/106.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/106.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/107.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/107.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/107.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/107.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/108.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/108.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/108.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/108.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/109.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/109.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/109.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/109.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/11.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/11.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/11.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/11.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/110.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/110.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/110.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/110.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/111.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/111.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/111.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/111.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/112.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/112.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/112.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/112.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/113.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/113.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/113.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/113.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/114.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/114.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/114.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/114.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/115.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/115.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/115.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/115.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/116.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/116.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/116.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/116.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/117.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/117.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/117.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/117.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/118.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/118.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/118.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/118.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/119.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/119.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/119.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/119.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/12.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/12.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/12.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/12.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/120.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/120.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/120.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/120.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/121.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/121.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/121.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/121.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/122.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/122.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/122.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/122.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/123.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/123.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/123.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/123.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/124.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/124.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/124.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/124.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/125.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/125.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/125.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/125.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/126.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/126.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/126.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/126.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/127.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/127.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/127.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/127.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/128.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/128.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/128.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/128.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/129.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/129.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/129.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/129.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/13.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/13.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/13.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/13.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/130.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/130.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/130.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/130.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/131.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/131.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/131.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/131.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/132.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/132.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/132.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/132.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/133.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/133.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/133.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/133.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/134.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/134.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/134.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/134.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/135.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/135.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/135.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/135.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/136.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/136.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/136.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/136.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/137.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/137.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/137.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/137.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/138.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/138.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/138.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/138.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/139.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/139.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/139.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/139.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/14.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/14.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/14.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/14.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/140.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/140.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/140.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/140.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/141.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/141.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/141.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/141.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/142.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/142.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/142.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/142.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/143.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/143.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/143.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/143.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/144.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/144.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/144.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/144.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/145.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/145.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/145.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/145.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/146.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/146.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/146.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/146.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/147.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/147.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/147.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/147.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/148.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/148.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/148.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/148.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/149.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/149.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/149.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/149.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/15.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/15.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/15.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/15.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/150.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/150.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/150.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/150.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/151.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/151.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/151.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/151.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/152.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/152.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/152.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/152.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/153.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/153.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/153.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/153.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/154.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/154.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/154.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/154.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/155.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/155.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/155.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/155.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/156.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/156.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/156.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/156.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/157.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/157.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/157.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/157.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/158.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/158.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/158.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/158.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/159.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/159.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/159.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/159.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/16.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/16.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/16.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/16.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/160.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/160.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/160.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/160.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/161.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/161.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/161.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/161.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/162.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/162.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/162.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/162.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/163.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/163.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/163.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/163.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/164.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/164.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/164.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/164.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/165.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/165.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/165.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/165.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/166.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/166.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/166.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/166.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/167.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/167.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/167.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/167.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/168.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/168.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/168.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/168.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/169.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/169.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/169.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/169.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/17.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/17.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/17.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/17.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/170.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/170.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/170.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/170.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/171.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/171.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/171.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/171.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/172.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/172.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/172.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/172.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/173.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/173.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/173.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/173.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/174.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/174.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/174.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/174.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/175.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/175.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/175.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/175.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/176.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/176.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/176.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/176.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/177.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/177.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/177.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/177.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/178.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/178.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/178.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/178.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/179.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/179.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/179.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/179.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/18.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/18.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/18.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/18.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/180.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/180.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/180.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/180.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/181.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/181.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/181.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/181.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/182.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/182.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/182.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/182.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/183.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/183.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/183.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/183.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/184.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/184.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/184.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/184.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/185.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/185.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/185.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/185.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/186.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/186.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/186.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/186.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/187.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/187.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/187.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/187.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/188.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/188.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/188.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/188.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/189.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/189.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/189.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/189.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/19.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/19.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/19.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/19.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/190.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/190.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/190.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/190.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/191.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/191.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/191.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/191.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/192.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/192.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/192.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/192.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/193.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/193.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/193.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/193.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/194.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/194.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/194.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/194.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/195.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/195.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/195.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/195.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/196.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/196.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/196.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/196.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/197.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/197.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/197.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/197.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/198.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/198.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/198.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/198.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/199.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/199.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/199.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/199.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/2.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/2.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/2.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/2.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/20.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/20.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/20.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/20.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/200.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/200.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/200.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/200.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/201.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/201.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/201.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/201.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/202.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/202.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/202.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/202.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/203.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/203.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/203.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/203.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/204.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/204.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/204.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/204.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/205.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/205.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/205.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/205.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/206.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/206.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/206.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/206.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/207.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/207.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/207.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/207.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/208.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/208.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/208.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/208.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/209.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/209.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/209.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/209.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/21.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/21.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/21.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/21.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/210.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/210.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/210.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/210.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/211.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/211.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/211.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/211.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/212.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/212.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/212.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/212.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/213.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/213.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/213.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/213.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/214.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/214.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/214.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/214.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/215.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/215.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/215.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/215.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/216.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/216.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/216.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/216.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/217.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/217.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/217.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/217.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/218.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/218.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/218.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/218.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/219.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/219.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/219.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/219.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/22.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/22.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/22.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/22.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/220.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/220.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/220.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/220.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/221.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/221.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/221.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/221.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/222.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/222.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/222.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/222.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/223.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/223.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/223.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/223.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/224.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/224.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/224.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/224.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/225.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/225.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/225.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/225.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/226.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/226.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/226.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/226.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/227.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/227.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/227.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/227.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/228.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/228.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/228.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/228.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/229.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/229.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/229.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/229.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/23.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/23.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/23.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/23.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/230.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/230.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/230.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/230.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/231.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/231.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/231.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/231.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/232.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/232.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/232.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/232.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/233.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/233.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/233.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/233.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/234.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/234.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/234.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/234.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/235.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/235.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/235.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/235.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/236.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/236.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/236.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/236.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/237.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/237.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/237.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/237.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/238.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/238.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/238.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/238.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/239.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/239.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/239.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/239.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/24.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/24.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/24.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/24.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/240.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/240.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/240.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/240.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/241.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/241.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/241.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/241.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/242.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/242.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/242.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/242.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/243.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/243.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/243.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/243.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/244.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/244.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/244.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/244.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/245.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/245.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/245.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/245.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/246.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/246.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/246.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/246.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/247.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/247.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/247.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/247.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/248.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/248.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/248.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/248.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/249.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/249.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/249.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/249.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/25.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/25.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/25.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/25.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/250.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/250.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/250.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/250.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/251.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/251.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/251.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/251.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/252.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/252.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/252.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/252.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/253.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/253.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/253.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/253.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/254.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/254.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/254.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/254.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/255.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/255.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/255.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/255.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/256.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/256.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/256.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/256.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/257.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/257.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/257.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/257.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/258.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/258.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/258.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/258.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/259.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/259.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/259.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/259.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/26.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/26.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/26.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/26.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/260.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/260.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/260.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/260.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/261.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/261.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/261.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/261.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/262.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/262.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/262.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/262.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/263.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/263.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/263.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/263.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/27.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/27.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/27.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/27.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/28.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/28.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/28.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/28.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/29.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/29.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/29.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/29.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/3.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/3.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/3.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/3.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/30.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/30.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/30.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/30.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/31.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/31.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/31.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/31.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/32.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/32.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/32.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/32.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/33.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/33.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/33.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/33.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/34.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/34.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/34.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/34.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/35.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/35.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/35.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/35.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/36.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/36.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/36.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/36.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/37.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/37.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/37.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/37.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/38.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/38.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/38.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/38.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/39.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/39.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/39.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/39.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/4.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/4.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/4.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/4.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/40.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/40.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/40.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/40.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/41.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/41.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/41.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/41.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/42.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/42.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/42.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/42.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/43.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/43.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/43.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/43.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/44.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/44.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/44.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/44.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/45.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/45.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/45.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/45.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/46.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/46.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/46.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/46.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/47.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/47.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/47.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/47.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/48.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/48.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/48.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/48.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/49.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/49.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/49.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/49.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/5.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/5.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/5.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/5.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/50.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/50.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/50.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/50.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/51.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/51.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/51.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/51.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/52.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/52.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/52.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/52.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/53.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/53.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/53.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/53.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/54.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/54.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/54.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/54.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/55.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/55.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/55.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/55.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/56.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/56.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/56.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/56.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/57.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/57.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/57.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/57.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/58.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/58.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/58.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/58.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/59.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/59.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/59.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/59.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/6.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/6.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/6.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/6.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/60.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/60.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/60.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/60.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/61.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/61.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/61.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/61.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/62.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/62.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/62.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/62.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/63.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/63.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/63.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/63.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/64.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/64.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/64.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/64.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/65.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/65.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/65.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/65.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/66.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/66.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/66.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/66.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/67.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/67.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/67.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/67.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/68.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/68.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/68.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/68.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/69.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/69.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/69.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/69.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/7.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/7.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/7.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/7.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/70.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/70.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/70.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/70.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/71.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/71.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/71.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/71.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/72.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/72.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/72.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/72.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/73.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/73.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/73.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/73.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/74.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/74.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/74.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/74.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/75.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/75.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/75.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/75.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/76.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/76.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/76.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/76.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/77.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/77.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/77.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/77.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/78.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/78.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/78.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/78.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/79.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/79.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/79.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/79.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/8.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/8.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/8.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/8.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/80.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/80.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/80.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/80.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/81.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/81.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/81.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/81.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/82.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/82.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/82.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/82.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/83.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/83.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/83.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/83.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/84.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/84.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/84.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/84.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/85.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/85.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/85.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/85.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/86.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/86.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/86.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/86.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/87.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/87.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/87.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/87.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/88.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/88.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/88.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/88.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/89.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/89.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/89.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/89.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/9.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/9.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/9.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/9.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/90.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/90.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/90.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/90.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/91.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/91.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/91.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/91.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/92.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/92.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/92.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/92.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/93.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/93.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/93.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/93.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/94.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/94.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/94.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/94.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/95.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/95.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/95.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/95.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/96.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/96.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/96.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/96.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/97.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/97.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/97.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/97.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/98.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/98.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/98.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/98.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/99.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/99.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/99.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/99.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/template.yml:1-2: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/template.yml:1-2: severity label is required (rule/label)
-- alert: Test Alert 1
-  expr: up == 0
+ 1 | - alert: Test Alert 1
+ 2 |   expr: up == 0
 
 rules/template.yml:4-5: runbook_url annotation is required (alerts/annotation)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 rules/template.yml:4-5: severity label is required (rule/label)
-- alert: Test Alert 2
-  expr: up == 0
+ 4 | - alert: Test Alert 2
+ 5 |   expr: up == 0
 
 level=fatal msg="Fatal error" error="problems found"
 -- copy.sh --

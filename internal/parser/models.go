@@ -3,6 +3,7 @@ package parser
 import (
 	"strings"
 
+	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 
 	promparser "github.com/prometheus/prometheus/promql/parser"
@@ -239,6 +240,7 @@ func (ar AlertingRule) Lines() (lines []int) {
 	if ar.Annotations != nil {
 		lines = appendLine(lines, ar.Annotations.Lines()...)
 	}
+	slices.Sort(lines)
 	return
 }
 
@@ -280,6 +282,7 @@ func (rr RecordingRule) Lines() (lines []int) {
 	if rr.Labels != nil {
 		lines = appendLine(lines, rr.Labels.Lines()...)
 	}
+	slices.Sort(lines)
 	return
 }
 
@@ -308,6 +311,22 @@ type Rule struct {
 	AlertingRule  *AlertingRule
 	RecordingRule *RecordingRule
 	Error         ParseError
+}
+
+func (r Rule) IsSame(nr Rule) bool {
+	if (r.AlertingRule != nil) != (nr.AlertingRule != nil) {
+		return false
+	}
+	if (r.RecordingRule != nil) != (nr.RecordingRule != nil) {
+		return false
+	}
+	if r.Error != nr.Error {
+		return false
+	}
+	if !slices.Equal(r.Lines(), nr.Lines()) {
+		return false
+	}
+	return true
 }
 
 func (r Rule) Expr() PromQLExpr {

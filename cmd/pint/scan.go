@@ -131,7 +131,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 	}()
 
 	for result := range results {
-		summary.Reports = append(summary.Reports, result)
+		summary.Report(result)
 	}
 	summary.Duration = time.Since(start)
 	summary.Entries = len(entries)
