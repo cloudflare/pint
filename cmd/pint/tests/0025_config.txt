@@ -65,6 +65,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
