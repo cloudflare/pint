@@ -5,6 +5,7 @@
 ### Added
 
 - Deduplicate reports where possible to avoid showing same issue twice.
+- [rule/link](checks/rule/link.md) check for validating URIs found in alerting rule annotations.
 
 ### Changed
 

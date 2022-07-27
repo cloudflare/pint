@@ -22,6 +22,7 @@ type Rule struct {
 	Cost       *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
 	Alerts     *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
 	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
+	RuleLink   []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
 }
 
 func (rule Rule) validate() (err error) {
@@ -69,6 +70,12 @@ func (rule Rule) validate() (err error) {
 
 	for _, reject := range rule.Reject {
 		if err = reject.validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, link := range rule.RuleLink {
+		if err = link.validate(); err != nil {
 			return err
 		}
 	}
@@ -208,6 +215,21 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 				})
 			}
 		}
+	}
+
+	for _, link := range rule.RuleLink {
+		severity := link.getSeverity(checks.Bug)
+		re := checks.MustTemplatedRegexp(link.Regex)
+		var timeout time.Duration
+		if link.Timeout != "" {
+			timeout, _ = parseDuration(link.Timeout)
+		} else {
+			timeout = time.Minute
+		}
+		enabled = append(enabled, checkMeta{
+			name:  checks.RuleLinkCheckName,
+			check: checks.NewRuleLinkCheck(re, link.URI, timeout, link.Headers, severity),
+		})
 	}
 
 	return enabled

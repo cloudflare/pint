@@ -1,0 +1,123 @@
+exec bash -x ./webserver.sh &
+exec bash -c 'I=0 ; while [ ! -f webserver.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+
+pint.ok --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+exec bash -c 'cat webserver.pid | xargs kill'
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=info msg="File parsed" path=rules/1.yml rules=1
+rules/1.yml:10: GET request for http://127.0.0.1:7088/404 returned invalid status code: 404 Not Found (rule/link)
+ 10 |       r404: http://127.0.0.1:7088/404
+
+rules/1.yml:11: GET request for http://127.0.0.1:7088/500 returned invalid status code: 500 Internal Server Error (rule/link)
+ 11 |       r500: http://127.0.0.1:7088/500
+
+rules/1.yml:13: GET request for http://127.0.0.1:7088/redirect/404 returned invalid status code: 404 Not Found (rule/link)
+ 13 |       rewrite: https://xxxx.example.com/redirect/404
+
+level=info msg="Problems found" Information=2 Warning=1
+-- rules/1.yml --
+groups:
+- name: foo
+  rules:
+  - alert: down
+    expr: up == 0
+    labels:
+      foo: bar
+    annotations:
+      r200: http://127.0.0.1:7088/200
+      r404: http://127.0.0.1:7088/404
+      r500: http://127.0.0.1:7088/500
+      r302t200: http://127.0.0.1:7088/redirect/200
+      rewrite: https://xxxx.example.com/redirect/404
+
+-- .pint.hcl --
+rule {
+  link "http://.*" {
+    severity = "info"
+  }
+  link "https://xxxx.example.com/(.+)" {
+    uri = "http://127.0.0.1:7088/$1"
+    severity = "warning"
+	timeout  = "10s"
+  }
+}
+
+-- webserver.go --
+package main
+
+import (
+	"context"
+	"log"
+	"net"
+	"net/http"
+	"os"
+	"os/signal"
+	"strconv"
+	"syscall"
+	"time"
+)
+
+func main() {
+	http.HandleFunc("/200", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		_, _ = w.Write([]byte(`Ok`))
+	})
+
+	http.HandleFunc("/404", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(404)
+		_, _ = w.Write([]byte(`Ok`))
+	})
+
+	http.HandleFunc("/500", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(500)
+		_, _ = w.Write([]byte(`Error`))
+	})
+
+	http.HandleFunc("/redirect/200", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Location", "/200")
+		w.WriteHeader(302)
+	})
+
+	http.HandleFunc("/redirect/404", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Location", "/404")
+		w.WriteHeader(302)
+	})
+
+	listener, err := net.Listen("tcp", "127.0.0.1:7088")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server := &http.Server{
+		Addr: "127.0.0.1:7088",
+	}
+
+	go func() {
+		_ = server.Serve(listener)
+	}()
+
+	pid := os.Getpid()
+	err = os.WriteFile("webserver.pid", []byte(strconv.Itoa(pid)), 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		time.Sleep(time.Minute * 2)
+		stop <- syscall.SIGTERM
+	}()
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	server.Shutdown(ctx)
+}
+
+-- webserver.sh --
+env GOCACHE=$TMPDIR go run webserver.go
+

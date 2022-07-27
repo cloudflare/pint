@@ -23,6 +23,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -67,6 +68,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -97,6 +99,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -130,6 +133,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -181,6 +185,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -232,6 +237,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -271,6 +277,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -346,6 +353,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -396,6 +404,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -447,6 +456,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -498,6 +508,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -549,6 +560,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -600,6 +612,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -651,6 +664,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -702,6 +716,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -880,6 +895,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -925,6 +941,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -970,6 +987,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1015,6 +1033,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1060,6 +1079,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1105,6 +1125,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1161,6 +1182,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1206,6 +1228,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1250,6 +1273,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1306,6 +1330,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1390,6 +1415,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -1449,6 +1475,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1512,6 +1539,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1578,6 +1606,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -1593,6 +1622,52 @@
         "step": "1m",
         "resolve": "5m"
       }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/link - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "link": [
+        {
+          "key": "https?://(.+)",
+          "uri": "http://localhost/$1",
+          "timeout": "10s",
+          "headers": {
+            "X-Auth": "xxx"
+          },
+          "severity": "bug"
+        }
+      ]
     }
   ]
 }
@@ -1622,6 +1697,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1663,6 +1739,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1708,6 +1785,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1758,6 +1836,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -1805,6 +1884,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1849,6 +1929,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1905,6 +1986,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -1935,6 +2017,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -1968,6 +2051,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2019,6 +2103,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2070,6 +2155,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2135,6 +2221,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2172,6 +2259,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2273,6 +2361,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2325,6 +2414,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2375,6 +2465,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2426,6 +2517,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2477,6 +2569,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2528,6 +2621,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2579,6 +2673,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2630,6 +2725,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2681,6 +2777,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2746,6 +2843,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -2951,6 +3049,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -2996,6 +3095,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3041,6 +3141,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3086,6 +3187,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3131,6 +3233,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3176,6 +3279,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3190,6 +3294,52 @@
         {
           "key": "summary",
           "required": true
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/link - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "link": [
+        {
+          "key": "https?://(.+)",
+          "uri": "http://localhost/$1",
+          "timeout": "10s",
+          "headers": {
+            "X-Auth": "xxx"
+          },
+          "severity": "bug"
         }
       ]
     }
@@ -3221,6 +3371,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -3262,6 +3413,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -3307,6 +3459,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -3357,6 +3510,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -3404,6 +3558,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -3448,6 +3603,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -3504,6 +3660,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -3534,6 +3691,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3567,6 +3725,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3618,6 +3777,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3669,6 +3829,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3734,6 +3895,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3771,6 +3933,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3872,6 +4035,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3924,6 +4088,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -3974,6 +4139,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4025,6 +4191,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4076,6 +4243,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4127,6 +4295,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4178,6 +4347,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4229,6 +4399,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4280,6 +4451,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4345,6 +4517,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -4550,6 +4723,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4595,6 +4769,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4640,6 +4815,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4685,6 +4861,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4730,6 +4907,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4775,6 +4953,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -4789,6 +4968,52 @@
         {
           "key": "summary",
           "required": true
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/link - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "link": [
+        {
+          "key": "https?://(.+)",
+          "uri": "http://localhost/$1",
+          "timeout": "10s",
+          "headers": {
+            "X-Auth": "xxx"
+          },
+          "severity": "bug"
         }
       ]
     }
@@ -4820,6 +5045,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -4861,6 +5087,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -4906,6 +5133,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -4956,6 +5184,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -5003,6 +5232,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -5047,6 +5277,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -5103,6 +5334,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -5133,6 +5365,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5166,6 +5399,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5217,6 +5451,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5268,6 +5503,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5333,6 +5569,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5370,6 +5607,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5471,6 +5709,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5523,6 +5762,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5573,6 +5813,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5624,6 +5865,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5675,6 +5917,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5726,6 +5969,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5777,6 +6021,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5828,6 +6073,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5879,6 +6125,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -5944,6 +6191,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -6149,6 +6397,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6194,6 +6443,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6239,6 +6489,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6284,6 +6535,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6329,6 +6581,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6374,6 +6627,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6388,6 +6642,52 @@
         {
           "key": "summary",
           "required": true
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/link - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "link": [
+        {
+          "key": "https?://(.+)",
+          "uri": "http://localhost/$1",
+          "timeout": "10s",
+          "headers": {
+            "X-Auth": "xxx"
+          },
+          "severity": "bug"
         }
       ]
     }
@@ -6419,6 +6719,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -6460,6 +6761,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -6505,6 +6807,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -6555,6 +6858,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -6602,6 +6906,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -6646,6 +6951,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -6702,6 +7008,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   }
@@ -6732,6 +7039,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6765,6 +7073,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6816,6 +7125,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6867,6 +7177,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6932,6 +7243,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -6969,6 +7281,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7070,6 +7383,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7122,6 +7436,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7172,6 +7487,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7223,6 +7539,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7274,6 +7591,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7325,6 +7643,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7376,6 +7695,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7427,6 +7747,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7478,6 +7799,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7543,6 +7865,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ],
     "disabled": [
@@ -7748,6 +8071,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7793,6 +8117,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7838,6 +8163,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7883,6 +8209,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7928,6 +8255,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7973,6 +8301,7 @@
       "query/cost",
       "promql/series",
       "rule/label",
+      "rule/link",
       "rule/reject"
     ]
   },
@@ -7987,6 +8316,52 @@
         {
           "key": "summary",
           "required": true
+        }
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/link - 5]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "link": [
+        {
+          "key": "https?://(.+)",
+          "uri": "http://localhost/$1",
+          "timeout": "10s",
+          "headers": {
+            "X-Auth": "xxx"
+          },
+          "severity": "bug"
         }
       ]
     }

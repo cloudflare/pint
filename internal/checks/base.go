@@ -27,6 +27,7 @@ var (
 		CostCheckName,
 		SeriesCheckName,
 		LabelCheckName,
+		RuleLinkCheckName,
 		RejectCheckName,
 	}
 	OnlineChecks = []string{
@@ -36,6 +37,7 @@ var (
 		VectorMatchingCheckName,
 		CostCheckName,
 		SeriesCheckName,
+		RuleLinkCheckName,
 	}
 )
 

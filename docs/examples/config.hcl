@@ -61,6 +61,16 @@ rule {
     step    = "1m"
     resolve = "5m"
   }
+
+  # Validate all links to ensure they point to pages that do exist.
+  link "https?://(.+)" {
+    severity = "warning"
+    timeout = "30s"
+    # Pass custom headers to all requests
+    headers = {
+      X-Auth = "secret key"
+    }
+  }
 }
 
 rule {

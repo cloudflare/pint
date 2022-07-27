@@ -96,14 +96,6 @@ checks {
 }
 ```
 
-You can disable this check globally by adding this config block:
-
-```js
-checks {
-  disabled = ["rule/reject"]
-}
-```
-
 Or you can disable it per rule by adding a comment to it.
 
 `# pint disable rule/reject`
@@ -121,7 +113,7 @@ Example:
 
 ### If `label_values` or `annotation_values` is set
 
-`# pint disable promql/aggregate($label:false)`
+`# pint disable promql/reject(val=~'$pattern')`
 
 Example:
 

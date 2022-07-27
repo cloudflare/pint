@@ -1079,6 +1079,32 @@ rule {
 				checks.AnnotationCheckName + "(summary:true)",
 			},
 		},
+		{
+			title: "link",
+			config: `
+rule {
+  link "https?://(.+)" {
+    uri = "http://localhost/$1"
+	timeout = "10s"
+	headers = {
+		X-Auth = "xxx"
+	}
+	severity = "bug"
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.RuleLinkCheckName + "(^https?://(.+)$)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -1290,6 +1316,20 @@ func TestConfigErrors(t *testing.T) {
 		{
 			config: `check "promql/series" { ignoreMetrics = [".+++"] }`,
 			err:    "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  link ".+++" {}
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `rule {
+  link ".*" {
+	timeout = "abc"
+  }
+}`,
+			err: `not a valid duration string: "abc"`,
 		},
 	}
 
