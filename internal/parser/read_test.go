@@ -239,6 +239,12 @@ func TestGetComment(t *testing.T) {
 			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
 		},
 		{
+			input:   "# pint set promql/series min-age 1w       ",
+			comment: []string{"set", "promql/series", "min-age"},
+			ok:      true,
+			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
+		},
+		{
 			input:   "# pint set",
 			comment: []string{"set", "promql/series", "min-age"},
 		},

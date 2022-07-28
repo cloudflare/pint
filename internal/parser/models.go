@@ -402,6 +402,21 @@ func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
 	return
 }
 
+func (r Rule) GetComments(key string) (cs []Comment) {
+	var comments []string
+	if r.RecordingRule != nil {
+		comments = r.RecordingRule.Comments()
+	} else if r.AlertingRule != nil {
+		comments = r.AlertingRule.Comments()
+	}
+	for _, c := range comments {
+		if val, ok := GetComment(c, key); ok {
+			cs = append(cs, val)
+		}
+	}
+	return cs
+}
+
 type Result struct {
 	Path    string
 	Error   error
