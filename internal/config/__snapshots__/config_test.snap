@@ -244,7 +244,6 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
@@ -1481,9 +1480,7 @@
   },
   "rules": [
     {
-      "cost": {
-        "bytesPerSample": 4096
-      }
+      "cost": {}
     }
   ]
 }
@@ -1546,20 +1543,17 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "severity": "info"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 20000,
         "severity": "bug"
       }
@@ -2162,7 +2156,6 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
@@ -2227,9 +2220,7 @@
   },
   "rules": [
     {
-      "cost": {
-        "bytesPerSample": 4096
-      }
+      "cost": {}
     }
   ]
 }
@@ -2368,20 +2359,17 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "severity": "info"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 20000,
         "severity": "bug"
       }
@@ -3836,7 +3824,6 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
@@ -3901,9 +3888,7 @@
   },
   "rules": [
     {
-      "cost": {
-        "bytesPerSample": 4096
-      }
+      "cost": {}
     }
   ]
 }
@@ -4042,20 +4027,17 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "severity": "info"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 20000,
         "severity": "bug"
       }
@@ -5510,7 +5492,6 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
@@ -5575,9 +5556,7 @@
   },
   "rules": [
     {
-      "cost": {
-        "bytesPerSample": 4096
-      }
+      "cost": {}
     }
   ]
 }
@@ -5716,20 +5695,17 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "severity": "info"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 20000,
         "severity": "bug"
       }
@@ -7184,7 +7160,6 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
@@ -7249,9 +7224,7 @@
   },
   "rules": [
     {
-      "cost": {
-        "bytesPerSample": 4096
-      }
+      "cost": {}
     }
   ]
 }
@@ -7390,20 +7363,17 @@
   "rules": [
     {
       "cost": {
-        "bytesPerSample": 4096,
         "severity": "info"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 10000,
         "severity": "warning"
       }
     },
     {
       "cost": {
-        "bytesPerSample": 4096,
         "maxSeries": 20000,
         "severity": "bug"
       }

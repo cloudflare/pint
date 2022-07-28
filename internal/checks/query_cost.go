@@ -11,23 +11,22 @@ import (
 )
 
 const (
-	CostCheckName = "query/cost"
+	CostCheckName       = "query/cost"
+	BytesPerSampleQuery = "avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))"
 )
 
-func NewCostCheck(prom *promapi.FailoverGroup, bps, maxSeries int, severity Severity) CostCheck {
+func NewCostCheck(prom *promapi.FailoverGroup, maxSeries int, severity Severity) CostCheck {
 	return CostCheck{
-		prom:           prom,
-		bytesPerSample: bps,
-		maxSeries:      maxSeries,
-		severity:       severity,
+		prom:      prom,
+		maxSeries: maxSeries,
+		severity:  severity,
 	}
 }
 
 type CostCheck struct {
-	prom           *promapi.FailoverGroup
-	bytesPerSample int
-	maxSeries      int
-	severity       Severity
+	prom      *promapi.FailoverGroup
+	maxSeries int
+	severity  Severity
 }
 
 func (c CostCheck) Meta() CheckMeta {
@@ -72,8 +71,14 @@ func (c CostCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 	}
 
 	var estimate string
-	if c.bytesPerSample > 0 && series > 0 {
-		estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(c.bytesPerSample*series))
+	if series > 0 {
+		result, err := c.prom.Query(ctx, BytesPerSampleQuery)
+		if err == nil {
+			for _, s := range result.Series {
+				estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(int(float64(s.Value)*float64(series))))
+				break
+			}
+		}
 	}
 
 	var above string
