@@ -52,7 +52,7 @@ func tryDecodingYamlError(err error) (l int, s string) {
 }
 
 func checkRules(ctx context.Context, workers int, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary) {
-	checkIterationChecks.Set(float64(len(entries)))
+	checkIterationChecks.Set(0)
 	checkIterationChecksDone.Set(0)
 
 	start := time.Now()
@@ -107,6 +107,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 
 				checkList := cfg.GetChecksForRule(ctx, entry.Path, entry.Rule)
 				for _, check := range checkList {
+					checkIterationChecks.Inc()
 					check := check
 					if check.Meta().IsOnline {
 						onlineChecksCount.Inc()
@@ -114,7 +115,6 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 						offlineChecksCount.Inc()
 					}
 					jobs <- scanJob{entry: entry, allEntries: entries, check: check}
-					checkIterationChecksDone.Inc()
 				}
 			default:
 				if entry.Rule.Error.Err != nil {
@@ -201,6 +201,8 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 				}
 			}
 		}
+
+		checkIterationChecksDone.Inc()
 	}
 }
 
