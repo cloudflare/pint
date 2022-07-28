@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.28.0
+
+### Changed
+
+- [promql/series](promql/../checks/promql/series.md) check now supports more flexible
+  `# pint disable promql/series(...)` comments.
+  Adding a comment `# pint disable promql/series({cluster="dev"})` will disable this check
+  for any metric selector with `cluster="dev"` matcher.
+
 ## v0.27.0
 
 ### Added

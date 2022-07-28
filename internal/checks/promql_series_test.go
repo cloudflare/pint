@@ -2418,6 +2418,156 @@ func TestSeriesCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
+			description: "series missing, selector disabled",
+			content: `
+# pint disable promql/series(notfound{job="foo"})
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, multi-label selector disabled",
+			content: `
+# pint disable promql/series(notfound{job="foo", instance="xxx"})
+- record: foo
+  expr: count(notfound{job="foo", instance="xxx"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, multi-label selector disabled with different order",
+			content: `
+# pint disable promql/series(notfound{job="foo", instance="xxx"})
+- record: foo
+  expr: count(notfound{instance="xxx",job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, multi-label selector disabled with subset of labels",
+			content: `
+# pint disable promql/series(notfound{job="foo"})    
+- record: foo
+  expr: count(notfound{instance="xxx",job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, series disabled",
+			content: `
+# pint disable promql/series(notfound)
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, labels disabled",
+			content: `
+# pint disable promql/series({job="foo"})
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, multi-label selector disabled with __name__",
+			content: `
+# pint disable promql/series({job="foo", __name__="notfound", instance="xxx"})    
+- record: foo
+  expr: count(notfound{instance="xxx",cluster="dev", job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, labels disabled, regexp",
+			content: `
+# pint disable promql/series({job=~"foo"})
+- record: foo
+  expr: count(notfound{job=~"foo", instance!="bob"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "series missing, disable comment with labels, regexp selector",
+			content: `
+# pint disable promql/series({job="foo"})
+- record: foo
+  expr: count(notfound{job=~"foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{4},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
+		{
+			description: "series missing, disable comment with labels, invalid selector",
+			content: `
+# pint disable promql/series(notfound{job=foo})
+- record: foo
+  expr: count(notfound{job=~"foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{4},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
+		{
 			description: "series missing but check disabled, labels",
 			content: `
 # pint disable promql/series(notfound)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -82,10 +83,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		done[selector.String()] = true
 
-		bareSelector := stripLabels(selector)
-		c1 := fmt.Sprintf("disable %s(%s)", SeriesCheckName, selector.String())
-		c2 := fmt.Sprintf("disable %s(%s)", SeriesCheckName, bareSelector.String())
-		if rule.HasComment(c1) || rule.HasComment(c2) {
+		if isDisabled(rule, selector) {
 			done[selector.String()] = true
 			continue
 		}
@@ -165,6 +163,8 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		}
+
+		bareSelector := stripLabels(selector)
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
@@ -689,5 +689,33 @@ func (tr timeRanges) covers(ts time.Time) bool {
 			return true
 		}
 	}
+	return false
+}
+
+func isDisabled(rule parser.Rule, selector promParser.VectorSelector) bool {
+	for _, c := range rule.GetComments("disable") {
+		if strings.HasPrefix(c.Value, SeriesCheckName+"(") && strings.HasSuffix(c.Value, ")") {
+			cs := strings.TrimSuffix(strings.TrimPrefix(c.Value, SeriesCheckName+"("), ")")
+			m, err := promParser.ParseMetricSelector(cs)
+			if err != nil {
+				continue
+			}
+			for _, l := range m {
+				var isMatch bool
+				for _, s := range selector.LabelMatchers {
+					if s.Type == l.Type && s.Name == l.Name && s.Value == l.Value {
+						isMatch = true
+						break
+					}
+				}
+				if !isMatch {
+					goto NEXT
+				}
+			}
+			return true
+		}
+	NEXT:
+	}
+
 	return false
 }

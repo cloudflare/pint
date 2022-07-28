@@ -271,18 +271,33 @@ Example:
 You can also disable `promql/series` for specific metric using
 `# pint disable promql/series($selector)` comment.
 
-Just like with PromQL if a selector doesn't have any labels then it will match all instances,
-if you pass any labels it will only pass time series with those labels.
-
-Disable warnings about missing `my_metric_name`:
+Just like with PromQL if a selector doesn't have any matchers then it will match all instances,
+Example:
 
 ```YAML
-# pint disable promql/series(my_metric_name)
+- alert: foo
+  # Disable promql/series for any instance of my_metric_name metric selector
+  # pint disable promql/series(my_metric_name)
+  expr: my_metric_name{instance="a"} / my_metric_name{instance="b"}
 ```
 
-Disable it only for `my_metric_name{cluster="dev"}` but still warn about
-`my_metric_name{cluster="prod"}`:
+To disable individual selectors you can pass matchers.
+Example:
 
 ```YAML
-# pint disable promql/series(my_metric_name{cluster="dev"})
+- alert: foo
+  # Disable promql/series only for my_metric_name{instance="a"} metric selector
+  # pint disable promql/series(my_metric_name{instance="a"})
+  expr: my_metric_name{instance="a"} / my_metric_name{instance="b"}
+```
+
+Matching is done the same way PromQL matchers work - if the selector from
+the query has more matchers than the comment the it will be still matched.
+Example:
+
+```YAML
+- alert: foo
+  # Disable promql/series for any selector at least partially matching {job="dev"}
+  # pint disable promql/series({job="dev"})
+  expr: my_metric_name{job="dev", instance="a"} / other_metric_name{job="dev", instance="b"}
 ```
