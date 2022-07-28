@@ -110,9 +110,7 @@ rule {
     keep     = ["job"]
   }
 
-  cost {
-    bytesPerSample = 4036
-  }
+  cost {}
 }
 
 rule {

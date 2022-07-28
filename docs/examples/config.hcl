@@ -104,10 +104,8 @@ rule {
   }
 
   # Enable cost checks that will print the number of returned time series and try
-  # to estimate total memory usage assuming that each series require 4KB of memory.
-  cost {
-    bytesPerSample = 4096
-  }
+  # to estimate total memory usage.
+  cost {}
 }
 
 rule {

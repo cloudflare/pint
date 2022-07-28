@@ -151,9 +151,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
           "kind": "recording"
         }
       ],
-      "cost": {
-        "bytesPerSample": 4036
-      }
+      "cost": {}
     }
   ]
 }
@@ -248,7 +246,5 @@ rule {
   match {
     kind = "recording"
   }
-  cost {
-    bytesPerSample = 4036
-  }
+  cost {}
 }

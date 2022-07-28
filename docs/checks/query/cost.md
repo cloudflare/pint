@@ -12,6 +12,20 @@ selected Prometheus servers and report results.
 This check can be used for both recording and alerting rules, but is most
 useful for recording rules.
 
+`pint` will try to estimate the number of bytes needed per single time series
+and use that to estimate the amount of memory needed for all time series
+returned by given query.
+The `bytes per time series` number is calculated using this query:
+
+```
+avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))
+```
+
+Since Go uses garbage collector total Prometheus process memory will be more than the
+sum of all memory allocations, depending on many factors like memory pressure,
+Go version, GOGC settings etc. The estimate `pint` gives you should be considered
+`best case` scenario.
+
 ## Configuration
 
 Syntax:
@@ -19,7 +33,6 @@ Syntax:
 ```js
 cost {
   severity       = "bug|warning|info"
-  bytesPerSample = 1024
   maxSeries      = 5000
 }
 ```
@@ -28,8 +41,6 @@ cost {
   This is only used when query result series exceed `maxSeries` value (if set).
   If `maxSeries` is not set or when results count is below it pint will still
   report it as information.
-- `bytesPerSample` - if set results will use this to calculate estimated memory
-  required to store returned series in Prometheus.
 - `maxSeries` - if set and number of results for given query exceeds this value
   it will be reported as a bug (or custom severity if `severity` is set).
 
@@ -54,25 +65,6 @@ prometheus "dev" {
 
 rule {
   cost {}
-}
-```
-
-To add memory usage estimate we first need to get average bytes per sample.
-This can be be estimated using two different queries:
-
-- for RSS usage: `process_resident_memory_bytes / prometheus_tsdb_head_series`
-- for Go allocations: `go_memstats_alloc_bytes / prometheus_tsdb_head_series`
-
-Since Go uses garbage collector RSS memory will be more than the sum of all
-memory allocations. RSS usage will be "worst case" while "Go alloc" best case,
-while real memory usage will be somewhere in between, depending on many factors
-like memory pressure, Go version, GOGC settings etc.
-
-```js
-...
-  cost {
-    bytesPerSample = 4096
-  }
 }
 ```
 

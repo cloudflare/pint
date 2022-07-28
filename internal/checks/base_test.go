@@ -475,6 +475,18 @@ func generateSample(labels map[string]string) *model.Sample {
 	}
 }
 
+func generateSampleWithValue(labels map[string]string, val float64) *model.Sample {
+	metric := model.Metric{}
+	for k, v := range labels {
+		metric[model.LabelName(k)] = model.LabelValue(v)
+	}
+	return &model.Sample{
+		Metric:    metric,
+		Value:     model.SampleValue(val),
+		Timestamp: model.TimeFromUnix(time.Now().Unix()),
+	}
+}
+
 func generateSampleStream(labels map[string]string, from, until time.Time, step time.Duration) (s *model.SampleStream) {
 	metric := model.Metric{}
 	for k, v := range labels {

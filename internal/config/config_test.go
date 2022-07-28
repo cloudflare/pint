@@ -367,7 +367,6 @@ rule {
 			config: `
 rule {
   cost {
-    bytesPerSample = 4096
 	maxSeries = 10000
 	severity  = "warning"
   }
@@ -388,9 +387,7 @@ rule {
 			title: "prometheus check with prometheus servers and disable comment",
 			config: `
 rule {
-  cost {
-    bytesPerSample = 4096
-  }
+  cost {}
 }
 prometheus "prom1" {
   uri     = "http://localhost"
@@ -489,20 +486,17 @@ prometheus "prom2" {
 }
 rule {
   cost {
-    bytesPerSample = 4096
     severity  = "info"
   }
 }
 rule {
   cost {
-    bytesPerSample = 4096
 	maxSeries = 10000
 	severity  = "warning"
   }
 }
 rule {
   cost {
-    bytesPerSample = 4096
     maxSeries = 20000
     severity  = "bug"
   }
@@ -1202,14 +1196,6 @@ func TestConfigErrors(t *testing.T) {
   reject ".+++" {}
 }`,
 			err: "error parsing regexp: invalid nested repetition operator: `++`",
-		},
-		{
-			config: `rule {
-  cost {
-    bytesPerSample = -34343
-  }
-}`,
-			err: "bytesPerSample value must be >= 0",
 		},
 		{
 			config: `rule {

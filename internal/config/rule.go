@@ -132,7 +132,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		for _, prom := range prometheusServers {
 			enabled = append(enabled, checkMeta{
 				name:  checks.CostCheckName,
-				check: checks.NewCostCheck(prom, rule.Cost.BytesPerSample, rule.Cost.MaxSeries, severity),
+				check: checks.NewCostCheck(prom, rule.Cost.MaxSeries, severity),
 			})
 		}
 	}
