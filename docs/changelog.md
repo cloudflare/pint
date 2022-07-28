@@ -12,6 +12,10 @@
   will be needed for storing results of given query.
   `bytesPerSample` option that was previously used to calculate this was removed.
 
+### Fixed
+
+- `pint_last_run_checks` and `pint_last_run_checks_done` were not updated properly.
+
 ## v0.27.0
 
 ### Added
