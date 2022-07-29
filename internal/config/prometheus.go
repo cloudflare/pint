@@ -13,7 +13,8 @@ type PrometheusConfig struct {
 	Concurrency int      `hcl:"concurrency,optional" json:"concurrency"`
 	RateLimit   int      `hcl:"rateLimit,optional" json:"rateLimit"`
 	Cache       int      `hcl:"cache,optional" json:"cache"`
-	Paths       []string `hcl:"paths,optional" json:"paths,omitempty"`
+	Include     []string `hcl:"include,optional" json:"include,omitempty"`
+	Exclude     []string `hcl:"exclude,optional" json:"exclude,omitempty"`
 	Required    bool     `hcl:"required,optional" json:"required"`
 }
 
@@ -28,7 +29,13 @@ func (pc PrometheusConfig) validate() error {
 		}
 	}
 
-	for _, path := range pc.Paths {
+	for _, path := range pc.Include {
+		if _, err := regexp.Compile(path); err != nil {
+			return err
+		}
+	}
+
+	for _, path := range pc.Exclude {
 		if _, err := regexp.Compile(path); err != nil {
 			return err
 		}
@@ -38,10 +45,16 @@ func (pc PrometheusConfig) validate() error {
 }
 
 func (pc PrometheusConfig) isEnabledForPath(path string) bool {
-	if len(pc.Paths) == 0 {
+	if len(pc.Include) == 0 && len(pc.Exclude) == 0 {
 		return true
 	}
-	for _, pattern := range pc.Paths {
+	for _, pattern := range pc.Exclude {
+		re := strictRegex(pattern)
+		if re.MatchString(path) {
+			return false
+		}
+	}
+	for _, pattern := range pc.Include {
 		re := strictRegex(pattern)
 		if re.MatchString(path) {
 			return true

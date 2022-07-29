@@ -19,11 +19,12 @@ const (
 )
 
 func NewRateCheck(prom *promapi.FailoverGroup) RateCheck {
-	return RateCheck{prom: prom}
+	return RateCheck{prom: prom, minIntervals: 2}
 }
 
 type RateCheck struct {
-	prom *promapi.FailoverGroup
+	prom         *promapi.FailoverGroup
+	minIntervals int
 }
 
 func (c RateCheck) Meta() CheckMeta {
@@ -72,45 +73,43 @@ func (c RateCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 }
 
 func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *promapi.ConfigResult) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate") {
-		var minIntervals int
-		switch n.Func.Name {
-		case "rate":
-			minIntervals = 2
-		case "irate":
-			minIntervals = 2
-		}
+	if n, ok := node.Node.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
-			if m, ok := arg.(*promParser.MatrixSelector); ok {
-				if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(minIntervals) {
-					p := exprProblem{
-						expr: node.Expr,
-						text: fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval",
-							n.Func.Name, minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
-						severity: Bug,
-					}
-					problems = append(problems, p)
+			m, ok := arg.(*promParser.MatrixSelector)
+			if !ok {
+				continue
+			}
+			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
+				p := exprProblem{
+					expr: node.Expr,
+					text: fmt.Sprintf("duration for %s() must be at least %d x scrape_interval, %s is using %s scrape_interval",
+						n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+					severity: Bug,
 				}
-				if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
-					metadata, err := c.prom.Metadata(ctx, s.Name)
-					if err != nil {
-						text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+				problems = append(problems, p)
+			}
+			if n.Func.Name == "deriv" {
+				continue
+			}
+			if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
+				metadata, err := c.prom.Metadata(ctx, s.Name)
+				if err != nil {
+					text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+					problems = append(problems, exprProblem{
+						expr:     s.Name,
+						text:     text,
+						severity: severity,
+					})
+					continue
+				}
+				for _, m := range metadata.Metadata {
+					if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
 						problems = append(problems, exprProblem{
-							expr:     s.Name,
-							text:     text,
-							severity: severity,
+							expr: s.Name,
+							text: fmt.Sprintf("%s() should only be used with counters but %q is a %s according to metrics metadata from %s",
+								n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
+							severity: Bug,
 						})
-						continue
-					}
-					for _, m := range metadata.Metadata {
-						if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
-							problems = append(problems, exprProblem{
-								expr: s.Name,
-								text: fmt.Sprintf("%s() should only be used with counters but %q is a %s according to metrics metadata from %s",
-									n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
-								severity: Bug,
-							})
-						}
 					}
 				}
 			}

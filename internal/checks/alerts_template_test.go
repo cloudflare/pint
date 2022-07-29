@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -9,6 +10,10 @@ import (
 
 func newTemplateCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewTemplateCheck()
+}
+
+func humanizeText(call string) string {
+	return fmt.Sprintf("using the value of %s inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly", call)
 }
 
 func TestTemplateCheck(t *testing.T) {
@@ -613,12 +618,172 @@ func TestTemplateCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
-			description: "",
+			description: "foo and on() absent(bar)",
 			content: `
 - alert: Foo
   expr: foo and on() absent(bar)
   annotations:
     summary: '{{ .Labels.job }} is missing'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "no humanize on rate()",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "Seeing {{ $value | first }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "rate(errors[2m])",
+						Lines:    []int{3, 5},
+						Reporter: checks.TemplateCheckName,
+						Text:     humanizeText("rate(errors[2m])"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "no humanize on rate() / alias",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar | first }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "rate(errors[2m])",
+						Lines:    []int{3, 5},
+						Reporter: checks.TemplateCheckName,
+						Text:     humanizeText("rate(errors[2m])"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "no humanize on irate()",
+			content: `
+- alert: Foo
+  expr: irate(errors[2m]) > 0
+  annotations:
+    summary: "Seeing {{ .Value }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "irate(errors[2m])",
+						Lines:    []int{3, 5},
+						Reporter: checks.TemplateCheckName,
+						Text:     humanizeText("irate(errors[2m])"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "no humanize on irate()",
+			content: `
+- alert: Foo
+  expr: deriv(errors[2m]) > 0
+  annotations:
+    summary: "Seeing {{ .Value }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "deriv(errors[2m])",
+						Lines:    []int{3, 5},
+						Reporter: checks.TemplateCheckName,
+						Text:     humanizeText("deriv(errors[2m])"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "rate() but no $value",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "Seeing errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanize passed to value",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "Seeing {{ $value | first | humanize }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanizePercentage passed to value",
+			content: `
+- alert: Foo
+  expr: (sum(rate(errors[2m])) / sum(rate(requests[2m]))) > 0.1
+  annotations:
+    summary: "Seeing {{ $value | humanizePercentage }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanizeDuration passed to value",
+			content: `
+- alert: Foo
+  expr: (sum(rate(errors[2m])) / sum(rate(requests[2m]))) > 0.1
+  annotations:
+    summary: "Seeing {{ $value | humanizeDuration }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanize not needed on count()",
+			content: `
+- alert: Foo
+  expr: count(rate(errors[2m]) > 0) > 0
+  annotations:
+    summary: "Seeing {{ $value }} instances with errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanize not needed on rate() used in RHS",
+			content: `
+- alert: Foo
+  expr: foo > on() sum(rate(errors[2m])
+  annotations:
+    summary: "Seeing {{ $value }} instances with errors"
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,

@@ -129,6 +129,42 @@ func TestRateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "deriv < 2x scrape_interval",
+			content:     "- record: foo\n  expr: deriv(foo[1m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "deriv(foo[1m])",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     durationMustText("prom", uri, "deriv", "2", "1m"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+			},
+		},
+		{
+			description: "deriv == 2x scrape_interval",
+			content:     "- record: foo\n  expr: deriv(foo[2m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+			},
+		},
+		{
 			description: "irate < 3x scrape_interval",
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
 			checker:     newRateCheck,

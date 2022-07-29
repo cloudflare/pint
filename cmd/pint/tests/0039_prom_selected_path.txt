@@ -28,6 +28,10 @@ level=debug msg="Stopping query workers" name=disabled uri=http://127.0.0.1:123
 - alert: third
   expr: count(foo) > 0
 
+-- invalid/rules/0001.yml --
+- alert: first
+  expr: foo > 1
+  for: 1m
 -- .pint.hcl --
 parser {
   relaxed = [".*"]
@@ -36,7 +40,8 @@ prometheus "disabled" {
   uri     = "http://127.0.0.1:123"
   timeout = "5s"
   required = true
-  paths = ["invalid/.+"]
+  include  = ["invalid/.+"]
+  exclude  = ["invalid/rules/.+"]
 }
 rule {
     match {

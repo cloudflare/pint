@@ -2,6 +2,13 @@
 
 ## v0.28.0
 
+### Added
+
+- [promql/rate](checks/promql/rate.md) check will now also validate `deriv` function usage.
+- [alerts/annotation](checks/alerts/annotation.md) check will now recommend using one of
+  humanize functions if alert query is returning results based on `rate()` and the value
+  is used in annotations.
+
 ### Changed
 
 - [promql/series](checks/promql/series.md) check now supports more flexible
@@ -11,6 +18,26 @@
 - [query/cost](checks/query/cost.md) check will now calculate how much Prometheus memory
   will be needed for storing results of given query.
   `bytesPerSample` option that was previously used to calculate this was removed.
+- `prometheus {}` config block now allows to pass a list of paths to explicitly ignore
+  by setting `exclude` option. Existing `paths` option was renamed to `include` for
+  consistency. Example migration:
+
+  ```javascript
+  prometheus "foo" {
+    [...]
+    paths = [ "rules/.*" ]
+  }
+  ```
+
+  becomes
+
+  ```javascript
+  prometheus "foo" {
+    [...]
+    include = [ "rules/.*" ]
+  }
+  ```
+
 
 ### Fixed
 

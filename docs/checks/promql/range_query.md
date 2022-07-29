@@ -47,7 +47,7 @@ Example:
 prometheus "prod" {
   uri     = "https://prometheus-prod.example.com"
   timeout = "60s"
-  paths = [
+  include = [
     "rules/prod/.*",
     "rules/common/.*",
   ]
@@ -56,7 +56,7 @@ prometheus "prod" {
 prometheus "dev" {
   uri     = "https://prometheus-dev.example.com"
   timeout = "30s"
-  paths = [
+  include = [
     "rules/dev/.*",
     "rules/common/.*",
   ]
