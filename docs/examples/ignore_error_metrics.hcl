@@ -3,8 +3,7 @@
 prometheus "prod" {
   uri     = "https://prod.example.com"
   timeout = "30s"
-
-  paths = [
+  include = [
     "alerting/prod/.+",
     "recording/prod/.+",
   ]

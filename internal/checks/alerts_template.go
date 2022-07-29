@@ -207,9 +207,32 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 					})
 				}
 			}
+
+			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
+				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr.Query) {
+					problems = append(problems, Problem{
+						Fragment: problem.expr,
+						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Reporter: c.Reporter(),
+						Text:     problem.text,
+						Severity: problem.severity,
+					})
+				}
+			}
 		}
 	}
 
+	return problems
+}
+
+func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems []exprProblem) {
+	for _, call := range utils.HasOuterRate(node) {
+		problems = append(problems, exprProblem{
+			expr:     call.String(),
+			text:     fmt.Sprintf("using the value of %s inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly", call),
+			severity: Warning,
+		})
+	}
 	return problems
 }
 
@@ -244,23 +267,86 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 		// no need to double report errors
 		return nil
 	}
-
-	aliases := aliasMap{aliases: map[string]map[string]struct{}{}}
-	vars := [][]string{}
+	aliases := aliasesForTemplate(t)
 	for _, node := range t.Root.Nodes {
-		getAliases(node, &aliases)
-		vars = append(vars, getVariables(node)...)
-	}
-	valAliases := aliases.varAliases(".Value")
-	for _, v := range vars {
-		for _, a := range valAliases {
-			if v[0] == a {
-				msg := fmt.Sprintf("using %s in labels will generate a new alert on every value change, move it to annotations", v[0])
-				msgs = append(msgs, msg)
-			}
+		if v, ok := containsAliasedNode(aliases, node, ".Value"); ok {
+			msg := fmt.Sprintf("using %s in labels will generate a new alert on every value change, move it to annotations", v)
+			msgs = append(msgs, msg)
 		}
 	}
 	return msgs
+}
+
+func containsAliasedNode(am aliasMap, node parse.Node, alias string) (string, bool) {
+	valAliases := am.varAliases(alias)
+	for _, vars := range getVariables(node) {
+		for _, v := range vars {
+			for _, a := range valAliases {
+				if v == a {
+					return v, true
+				}
+			}
+		}
+	}
+	return "", false
+}
+
+func hasValue(name, text string) bool {
+	t, err := textTemplate.
+		New(name).
+		Funcs(templateFuncMap).
+		Option("missingkey=zero").
+		Parse(strings.Join(append(templateDefs, text), ""))
+	if err != nil {
+		// no need to double report errors
+		return false
+	}
+	aliases := aliasesForTemplate(t)
+	for _, node := range t.Root.Nodes {
+		if _, ok := containsAliasedNode(aliases, node, ".Value"); ok {
+			return true
+		}
+	}
+	return false
+}
+
+func hasHumanize(name, text string) bool {
+	t, err := textTemplate.
+		New(name).
+		Funcs(templateFuncMap).
+		Option("missingkey=zero").
+		Parse(strings.Join(append(templateDefs, text), ""))
+	if err != nil {
+		// no need to double report errors
+		return false
+	}
+	aliases := aliasesForTemplate(t)
+
+	for _, node := range t.Root.Nodes {
+		if _, ok := containsAliasedNode(aliases, node, ".Value"); !ok {
+			continue
+		}
+		if n, ok := node.(*parse.ActionNode); ok {
+			if len(n.Pipe.Cmds) <= 1 {
+				continue
+			}
+			for _, cmd := range n.Pipe.Cmds {
+				for _, arg := range cmd.Args {
+					if m, ok := arg.(*parse.IdentifierNode); ok {
+						for _, f := range []string{"humanize", "humanize1024", "humanizePercentage", "humanizeDuration"} {
+							for _, a := range aliases.varAliases(f) {
+								if m.Ident == a {
+									return true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 type aliasMap struct {
@@ -275,6 +361,14 @@ func (am aliasMap) varAliases(k string) (vals []string) {
 		}
 	}
 	return vals
+}
+
+func aliasesForTemplate(t *textTemplate.Template) aliasMap {
+	aliases := aliasMap{aliases: map[string]map[string]struct{}{}}
+	for _, n := range t.Root.Nodes {
+		getAliases(n, &aliases)
+	}
+	return aliases
 }
 
 func getAliases(node parse.Node, aliases *aliasMap) {

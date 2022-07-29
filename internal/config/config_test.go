@@ -228,7 +228,48 @@ checks {
 prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "foo.yml" ]
+  include = [ "foo.yml" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "single prometheus server / include & exclude",
+			config: `
+prometheus "prom" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  include = [ ".*" ]
+  exclude = [ "rules.yml" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "single prometheus server / excluded",
+			config: `
+prometheus "prom" {
+  uri     = "http://localhost"
+  timeout = "1s"
+  exclude = [ "rules.yml" ]
 }
 `,
 			path: "rules.yml",
@@ -248,7 +289,7 @@ prometheus "prom" {
 prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include = [ "rules.yml" ]
 }
 `,
 			path: "rules.yml",
@@ -271,12 +312,12 @@ prometheus "prom" {
 prometheus "prom" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include = [ "rules.yml" ]
 }
 prometheus "ignore" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "foo.+" ]
+  include =[ "foo.+" ]
 }
 `,
 			path: "rules.yml",
@@ -392,12 +433,12 @@ rule {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 prometheus "prom2" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }  
 `,
 			path: "rules.yml",
@@ -477,12 +518,12 @@ rule {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 prometheus "prom2" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 rule {
   cost {
@@ -775,7 +816,7 @@ checks {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 `,
 			path: "rules.yml",
@@ -810,7 +851,7 @@ checks {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 `,
 			path: "rules.yml",
@@ -850,7 +891,7 @@ checks {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 `,
 			path: "rules.yml",
@@ -879,7 +920,7 @@ rule {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 checks {
   enabled = [
@@ -914,7 +955,7 @@ rule {
 prometheus "prom1" {
   uri     = "http://localhost"
   timeout = "1s"
-  paths   = [ "rules.yml" ]
+  include =[ "rules.yml" ]
 }
 checks {
   enabled = [

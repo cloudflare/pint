@@ -13,7 +13,7 @@ prometheus "disabled" {
   uri     = "http://127.0.0.1:123"
   timeout = "5s"
   required = true
-  paths = ["invalid/.+"]
+  include  = ["invalid/.+"]
 }
 parser {
   relaxed = [".*"]

@@ -172,7 +172,8 @@ prometheus "$name" {
   rateLimit   = 100
   cache       = 10000
   required    = true|false
-  paths       = ["...", ...]
+  include     = ["...", ...]
+  exclude     = ["...", ...]
 }
 ```
 
@@ -201,8 +202,11 @@ prometheus "$name" {
   Default value for `required` is `false`. Set it to `true` if you want to hard fail
   in case of remote Prometheus issues. Note that setting it to `true` might block
   PRs when running `pint ci` until pint is able to talk to Prometheus again.
-- `paths` - optional path filter, if specified only paths matching one of listed regexp
+- `include` - optional path filter, if specified only paths matching one of listed regexp
   patterns will use this Prometheus server for checks.
+- `exclude` - optional path filter, if specified any path matching one of listed regexp
+  patterns will never use this Prometheus server for checks.
+  `exclude` takes precedence over `include.
 
 Example:
 
@@ -215,7 +219,8 @@ prometheus "prod" {
 prometheus "dev" {
   uri     = "https://prometheus-dev.example.com"
   timeout = "30s"
-  paths   = [ "alerts/test/.*" ]
+  include = [ "alerts/test/.*" ]
+  exclude = [ "alerts/test/docs/.*" ]
 }
 ```
 

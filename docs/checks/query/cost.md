@@ -60,7 +60,7 @@ All rules from files matching `rules/dev/.+` pattern will be tested against
 prometheus "dev" {
   uri     = "https://prometheus-dev.example.com"
   timeout = "30s"
-  paths   = ["rules/dev/.+"]
+  include = ["rules/dev/.+"]
 }
 
 rule {

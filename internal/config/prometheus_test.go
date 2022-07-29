@@ -20,7 +20,7 @@ func TestPrometheusConfig(t *testing.T) {
 				Name:    "prom",
 				URI:     "http://localhost",
 				Timeout: "5m",
-				Paths:   []string{"foo", "bar"},
+				Include: []string{"foo", "bar"},
 			},
 		},
 		{
@@ -29,7 +29,7 @@ func TestPrometheusConfig(t *testing.T) {
 				URI:      "http://localhost",
 				Failover: []string{"http://localhost", "http://localhost"},
 				Timeout:  "5m",
-				Paths:    []string{"foo", "bar"},
+				Include:  []string{"foo", "bar"},
 			},
 		},
 		{
@@ -51,7 +51,16 @@ func TestPrometheusConfig(t *testing.T) {
 				Name:    "prom",
 				URI:     "http://localhost",
 				Timeout: "5m",
-				Paths:   []string{"foo.++", "bar"},
+				Include: []string{"foo.++", "bar"},
+			},
+			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
+		},
+		{
+			conf: PrometheusConfig{
+				Name:    "prom",
+				URI:     "http://localhost",
+				Timeout: "5m",
+				Exclude: []string{"foo.++", "bar"},
 			},
 			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
 		},
