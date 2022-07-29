@@ -63,7 +63,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -79,7 +79,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -110,7 +110,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, xxx)"},
+						formCond{key: "query", value: "xxx"},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -133,7 +133,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -148,7 +148,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, xxx)"},
+						formCond{key: "query", value: "xxx"},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -195,7 +195,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -210,7 +210,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, app_registry)"},
+						formCond{key: "query", value: "app_registry"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -250,7 +250,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -265,7 +265,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -296,7 +296,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -327,7 +327,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -359,7 +359,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -374,7 +374,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -406,7 +406,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -422,7 +422,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -453,7 +453,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -469,7 +469,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -510,7 +510,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -525,7 +525,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar_with_notfound)"},
+						formCond{key: "query", value: "bar_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -567,7 +567,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -583,7 +583,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -624,7 +624,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, (memory_bytes / ignoring(job) memory_limit))"},
+						formCond{key: "query", value: "(memory_bytes / ignoring(job) memory_limit)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -640,7 +640,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, app_registry)"},
+						formCond{key: "query", value: "app_registry"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -687,7 +687,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -700,7 +700,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -729,7 +729,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -742,7 +742,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -778,7 +778,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, up)"},
+						formCond{key: "query", value: "up"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -791,7 +791,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -830,7 +830,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, min_over_time(foo_with_notfound[30m:1m]))"},
+						formCond{key: "query", value: "min_over_time(foo_with_notfound[30m:1m])"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -846,7 +846,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, bar)"},
+						formCond{key: "query", value: "bar"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -884,7 +884,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, (foo / ignoring(notfound) foo_with_notfound))"},
+						formCond{key: "query", value: "(foo / ignoring(notfound) foo_with_notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -907,7 +907,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -922,7 +922,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -964,7 +964,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, (foo / ignoring(notfound) foo_with_notfound))"},
+						formCond{key: "query", value: "(foo / ignoring(notfound) foo_with_notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -979,7 +979,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo)"},
+						formCond{key: "query", value: "foo"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -994,7 +994,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, foo_with_notfound)"},
+						formCond{key: "query", value: "foo_with_notfound"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1010,7 +1010,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, (memory_bytes / ignoring(job) memory_limit))"},
+						formCond{key: "query", value: "(memory_bytes / ignoring(job) memory_limit)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1040,7 +1040,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, memory_bytes)"},
+						formCond{key: "query", value: "memory_bytes"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1056,7 +1056,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "topk(1, memory_limit)"},
+						formCond{key: "query", value: "memory_limit"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1138,7 +1138,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `topk(1, xxx)`},
+						formCond{key: "query", value: `xxx`},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -1173,7 +1173,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `topk(1, xxx)`},
+						formCond{key: "query", value: `xxx`},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1188,7 +1188,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `topk(1, yyy)`},
+						formCond{key: "query", value: `yyy`},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -1237,7 +1237,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `topk(1, up{job="a"})`},
+						formCond{key: "query", value: `up{job="a"}`},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
@@ -1252,7 +1252,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `topk(1, up{job="b"})`},
+						formCond{key: "query", value: `up{job="b"}`},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
