@@ -86,7 +86,7 @@ func actionCI(c *cli.Context) error {
 	}
 
 	reps := []reporter.Reporter{
-		reporter.NewConsoleReporter(os.Stderr),
+		reporter.NewConsoleReporter(os.Stderr, checks.Information),
 	}
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {

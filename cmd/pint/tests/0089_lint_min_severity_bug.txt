@@ -1,0 +1,14 @@
+pint.ok --no-color lint --min-severity=bug rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="File parsed" path=rules/0001.yml rules=1
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - alert: foo
+    expr: rate(errors[2m]) > 0
+    annotations:
+      summary: 'error rate: {{ $value }}'
