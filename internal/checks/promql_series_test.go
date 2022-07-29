@@ -2473,6 +2473,17 @@ func TestSeriesCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
+			description: "series missing, series disabled",
+			content: `
+# pint disable promql/series(notfound)
+- record: foo
+  expr: notfound == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
 			description: "series missing, labels disabled",
 			content: `
 # pint disable promql/series({job="foo"})

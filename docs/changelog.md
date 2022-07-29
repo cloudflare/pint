@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.28.2
+
+- Fix a regression in [promql/vector_matching](checks/promql/vector_matching.md) introduced
+  in previous release.
+
 ## v0.28.1
 
 ### Fixed
