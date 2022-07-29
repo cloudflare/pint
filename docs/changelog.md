@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.28.1
+
+### Fixed
+
+- Don't use `topk` in [promql/vector_matching](checks/promql/vector_matching.md) check to
+  avoid false positives.
+
 ## v0.28.0
 
 ### Added

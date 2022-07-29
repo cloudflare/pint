@@ -123,7 +123,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			}
 		}
 
-		leftLabels, err := c.seriesLabels(ctx, fmt.Sprintf("topk(1, %s)", n.LHS.String()), ignored...)
+		leftLabels, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
@@ -137,7 +137,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			goto NEXT
 		}
 
-		rightLabels, err := c.seriesLabels(ctx, fmt.Sprintf("topk(1, %s)", n.RHS.String()), ignored...)
+		rightLabels, err := c.seriesLabels(ctx, n.RHS.String(), ignored...)
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
