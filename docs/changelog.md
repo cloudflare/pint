@@ -2,6 +2,10 @@
 
 ## v0.28.2
 
+### Added
+
+- Added `--min-severity` flag to the `pint lint` command. Default value is set to `warning`.
+
 ### Fixed
 
 - Fix a regression in [promql/vector_matching](checks/promql/vector_matching.md) introduced

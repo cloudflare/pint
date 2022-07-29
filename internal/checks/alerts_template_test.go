@@ -646,7 +646,7 @@ func TestTemplateCheck(t *testing.T) {
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
-						Severity: checks.Warning,
+						Severity: checks.Information,
 					},
 				}
 			},
@@ -668,7 +668,7 @@ func TestTemplateCheck(t *testing.T) {
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
-						Severity: checks.Warning,
+						Severity: checks.Information,
 					},
 				}
 			},
@@ -690,7 +690,7 @@ func TestTemplateCheck(t *testing.T) {
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("irate(errors[2m])"),
-						Severity: checks.Warning,
+						Severity: checks.Information,
 					},
 				}
 			},
@@ -712,7 +712,7 @@ func TestTemplateCheck(t *testing.T) {
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("deriv(errors[2m])"),
-						Severity: checks.Warning,
+						Severity: checks.Information,
 					},
 				}
 			},

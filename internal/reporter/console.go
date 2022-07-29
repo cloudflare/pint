@@ -16,12 +16,13 @@ import (
 	"github.com/cloudflare/pint/internal/output"
 )
 
-func NewConsoleReporter(output io.Writer) ConsoleReporter {
-	return ConsoleReporter{output: output}
+func NewConsoleReporter(output io.Writer, minSeverity checks.Severity) ConsoleReporter {
+	return ConsoleReporter{output: output, minSeverity: minSeverity}
 }
 
 type ConsoleReporter struct {
-	output io.Writer
+	output      io.Writer
+	minSeverity checks.Severity
 }
 
 func (cr ConsoleReporter) Submit(summary Summary) error {
@@ -50,6 +51,10 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 
 	perFile := map[string][]string{}
 	for _, report := range reports {
+		if report.Problem.Severity < cr.minSeverity {
+			continue
+		}
+
 		if !shouldReport(report) {
 			log.Debug().
 				Str("path", report.Path).

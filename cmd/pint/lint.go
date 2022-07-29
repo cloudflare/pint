@@ -27,6 +27,12 @@ var lintCmd = &cli.Command{
 			Value:   false,
 			Usage:   "Require all rules to have an owner set via comment",
 		},
+		&cli.StringFlag{
+			Name:    minSeverityFlag,
+			Aliases: []string{"n"},
+			Value:   "warning",
+			Usage:   "Set minimum severity for reported problems",
+		},
 	},
 }
 
@@ -59,7 +65,12 @@ func actionLint(c *cli.Context) error {
 		summary.Report(verifyOwners(entries)...)
 	}
 
-	r := reporter.NewConsoleReporter(os.Stderr)
+	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
+	if err != nil {
+		return fmt.Errorf("invalid %s value: %w", minSeverityFlag, err)
+	}
+
+	r := reporter.NewConsoleReporter(os.Stderr, minSeverity)
 	err = r.Submit(summary)
 	if err != nil {
 		return err
@@ -68,6 +79,9 @@ func actionLint(c *cli.Context) error {
 	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
 	var problems int
 	for s, c := range summary.CountBySeverity() {
+		if s < minSeverity {
+			continue
+		}
 		bySeverity[s.String()] = c
 		if s >= checks.Bug {
 			problems += c

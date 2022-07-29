@@ -230,7 +230,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems 
 		problems = append(problems, exprProblem{
 			expr:     call.String(),
 			text:     fmt.Sprintf("using the value of %s inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly", call),
-			severity: Warning,
+			severity: Information,
 		})
 	}
 	return problems
