@@ -47,7 +47,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "foo_with_notfound / bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     differentLabelsText("instance job notfound", "instance job"),
+						Text:     differentLabelsText("instance, job, notfound", "instance, job"),
 						Severity: checks.Bug,
 					},
 				}
@@ -73,6 +73,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 								"job":      "bbb",
 								"notfound": "xxx",
 							}),
+							generateSample(map[string]string{
+								"__name__": "foo",
+								"instance": "bbb",
+								"job":      "bbb",
+								"notfound": "xxx",
+							}),
 						},
 					},
 				},
@@ -86,6 +92,16 @@ func TestVectorMatchingCheck(t *testing.T) {
 							generateSample(map[string]string{
 								"__name__": "bar",
 								"instance": "aaa",
+								"job":      "bbb",
+							}),
+							generateSample(map[string]string{
+								"__name__": "bar",
+								"instance": "bbb",
+								"job":      "bbb",
+							}),
+							generateSample(map[string]string{
+								"__name__": "bar",
+								"instance": "ccc",
 								"job":      "bbb",
 							}),
 						},
@@ -179,7 +195,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "foo / ignoring(xxx) app_registry",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingMismatchText(`ignoring("xxx")`, "instance job", "app_name"),
+						Text:     usingMismatchText(`ignoring("xxx")`, "instance, job", "app_name"),
 						Severity: checks.Bug,
 					},
 				}
@@ -217,6 +233,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 							generateSample(map[string]string{
 								"__name__": "app_registry",
 								"app_name": "aaa",
+							}),
+							generateSample(map[string]string{
+								"__name__": "app_registry",
+								"app_name": "aaa",
+								"cluster":  "dev",
 							}),
 						},
 					},
@@ -814,7 +835,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     `both sides of the query have different labels: [instance job notfound] != [instance job]`,
+						Text:     `both sides of the query have different labels: [instance, job, notfound] != [instance, job]`,
 						Severity: checks.Bug,
 					},
 				}
@@ -948,7 +969,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "(foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "both sides of the query have different labels: [instance job] != [dev instance job]",
+						Text:     "both sides of the query have different labels: [instance, job] != [dev, instance, job]",
 						Severity: checks.Bug,
 					},
 				}
