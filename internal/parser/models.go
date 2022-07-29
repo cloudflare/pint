@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"bufio"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -410,8 +411,11 @@ func (r Rule) GetComments(key string) (cs []Comment) {
 		comments = r.AlertingRule.Comments()
 	}
 	for _, c := range comments {
-		if val, ok := GetComment(c, key); ok {
-			cs = append(cs, val)
+		sc := bufio.NewScanner(strings.NewReader(c))
+		for sc.Scan() {
+			if val, ok := GetComment(sc.Text(), key); ok {
+				cs = append(cs, val)
+			}
 		}
 	}
 	return cs
