@@ -40,11 +40,9 @@ func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule, entries []
 		return
 	}
 
-	if isAbsent(rule.Expr().Query) {
-		return
-	}
+	expr := rule.Expr().Query
 
-	if expr := hasComparision(rule.Expr().Query); expr != nil {
+	if expr := hasComparision(expr); expr != nil {
 		if expr.ReturnBool {
 			problems = append(problems, Problem{
 				Fragment: rule.AlertingRule.Expr.Value.Value,
@@ -54,6 +52,10 @@ func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule, entries []
 				Severity: Bug,
 			})
 		}
+		return
+	}
+
+	if hasAbsent(expr) {
 		return
 	}
 
@@ -87,9 +89,14 @@ func hasComparision(n *parser.PromQLNode) *promParser.BinaryExpr {
 	return nil
 }
 
-func isAbsent(n *parser.PromQLNode) bool {
+func hasAbsent(n *parser.PromQLNode) bool {
 	if node, ok := n.Node.(*promParser.Call); ok && (node.Func.Name == "absent") {
 		return true
+	}
+	for _, child := range n.Children {
+		if hasAbsent(child) {
+			return true
+		}
 	}
 	return false
 }
