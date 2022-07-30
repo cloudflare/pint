@@ -137,6 +137,20 @@ func TestComparisonCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    noProblems,
 		},
+		{
+			description: "absent or absent",
+			content:     "- alert: Foo Is Missing\n  expr: absent(foo) or absent(bar)\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
+		{
+			description: "absent or absent or absent",
+			content:     "- alert: Foo Is Missing\n  expr: absent(foo) or absent(bar) or absent(bob{job=\"xx\"})\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
 	}
 
 	runTests(t, testCases)

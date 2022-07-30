@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.28.3
+
+### Fixed
+
+- Fix `absent()` handling in [alerts/comparison](checks/alerts/comparison.md) #330.
+
 ## v0.28.2
 
 ### Added
