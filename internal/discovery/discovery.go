@@ -129,7 +129,7 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		})
 	}
 
-	log.Info().Str("path", path).Int("rules", len(entries)).Msg("File parsed")
+	log.Debug().Str("path", path).Int("rules", len(entries)).Msg("File parsed")
 	return entries, nil
 }
 

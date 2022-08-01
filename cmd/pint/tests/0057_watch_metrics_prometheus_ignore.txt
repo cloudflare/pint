@@ -83,6 +83,14 @@ pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",prob
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems
+# HELP pint_prometheus_cache_miss_total Total number of all prometheus queries resulting in a cache miss
+# TYPE pint_prometheus_cache_miss_total counter
+pint_prometheus_cache_miss_total{endpoint="/api/v1/query",name="prom1"}
+pint_prometheus_cache_miss_total{endpoint="/api/v1/query",name="prom2"}
+pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom1"}
+pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom2"}
+pint_prometheus_cache_miss_total{endpoint="/api/v1/status/flags",name="prom1"}
+pint_prometheus_cache_miss_total{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_queries_running Total number of in-flight prometheus queries
 # TYPE pint_prometheus_queries_running gauge
 pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom1"}

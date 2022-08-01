@@ -8,7 +8,6 @@ exec bash -c 'cat webserver.pid | xargs kill'
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/1.yml rules=1
 rules/1.yml:10: GET request for http://127.0.0.1:7088/404 returned invalid status code: 404 Not Found (rule/link)
  10 |       r404: http://127.0.0.1:7088/404
 

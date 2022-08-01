@@ -4,9 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/1.yml rules=3
-level=info msg="File parsed" path=rules/2.yml rules=1
-level=info msg="File parsed" path=rules/3.yml rules=1
 rules/1.yml:4-5: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  4 |   - alert: No Owner
  5 |     expr: up > 0

@@ -4,7 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/relaxed.yml rules=1
 level=error msg="Failed to unmarshal file content" error="yaml: unmarshal errors:\n  line 2: cannot unmarshal !!seq into rulefmt.RuleGroups" lines=1-4 path=rules/strict.yml
 rules/strict.yml:2: cannot unmarshal !!seq into rulefmt.RuleGroups (yaml/parse)
  2 | - alert: No Owner

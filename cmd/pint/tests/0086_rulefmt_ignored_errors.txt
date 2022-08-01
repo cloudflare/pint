@@ -3,7 +3,6 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="File parsed" path=rules/strict.yml rules=5
 rules/strict.yml:4: incomplete rule, no alert or record key (yaml/parse)
  4 |   - expr: MissingAlertOrRecord
 

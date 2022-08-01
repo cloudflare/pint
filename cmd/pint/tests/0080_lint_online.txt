@@ -8,7 +8,6 @@ exec bash -c 'cat prometheus.pid | xargs kill'
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/1.yml rules=1
 rules/1.yml:2: http_errors_total[2d] selector is trying to query Prometheus for 2d worth of metrics, but prometheus "prom1" at http://127.0.0.1:7080 is configured to only keep 1d of metrics history (promql/range_query)
  2 |   expr: rate(http_errors_total[2d]) > 0
 

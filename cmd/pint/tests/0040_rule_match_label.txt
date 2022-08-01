@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/rules.yml rules=4
+level=debug msg="File parsed" path=rules/rules.yml rules=4
 level=debug msg="Found recording rule" lines=1-2 path=rules/rules.yml record=ignore
 level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
 level=debug msg="Found recording rule" lines=4-7 path=rules/rules.yml record=match

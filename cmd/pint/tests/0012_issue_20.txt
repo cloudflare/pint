@@ -4,7 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/1.yaml rules=1
 level=warn msg="Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details" path=rules/1.yaml
 rules/1.yaml:9-13: runbook_url annotation is required (alerts/annotation)
   9 |         annotations:

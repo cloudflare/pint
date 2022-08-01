@@ -5,7 +5,6 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
 level=error msg="Failed to parse file content" error="yaml: line 4: did not find expected key" lines=1-7 path=rules/bad.yaml
-level=info msg="File parsed" path=rules/ok.yml rules=1
 rules/bad.yaml:4: did not find expected key (yaml/parse)
  4 | 
 
