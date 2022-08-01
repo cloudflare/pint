@@ -22,7 +22,7 @@ type flagsQuery struct {
 	timestamp time.Time
 }
 
-func (q flagsQuery) Run() (any, error) {
+func (q flagsQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.uri).
 		Msg("Getting prometheus flags")
@@ -32,9 +32,9 @@ func (q flagsQuery) Run() (any, error) {
 
 	v, err := q.prom.api.Flags(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query Prometheus flags: %w", err)
+		return queryResult{err: fmt.Errorf("failed to query Prometheus flags: %w", err)}
 	}
-	return v, nil
+	return queryResult{value: v, expires: q.timestamp.Add(cacheExpiry * 2)}
 }
 
 func (q flagsQuery) Endpoint() string {

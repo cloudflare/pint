@@ -21,7 +21,6 @@ cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules.yml rules=2
 level=info msg="Problems found" Fatal=1
 rules.yml:2: syntax error: unexpected identifier "bi" (promql/syntax)
  2 |   expr: sum(foo) bi(job)

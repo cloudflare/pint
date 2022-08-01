@@ -34,7 +34,7 @@ type configQuery struct {
 	timestamp time.Time
 }
 
-func (q configQuery) Run() (any, error) {
+func (q configQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.uri).
 		Msg("Getting prometheus configuration")
@@ -44,9 +44,9 @@ func (q configQuery) Run() (any, error) {
 
 	v, err := q.prom.api.Config(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query Prometheus config: %w", err)
+		return queryResult{err: fmt.Errorf("failed to query Prometheus config: %w", err)}
 	}
-	return v, nil
+	return queryResult{value: v, expires: q.timestamp.Add(cacheExpiry * 2)}
 }
 
 func (q configQuery) Endpoint() string {

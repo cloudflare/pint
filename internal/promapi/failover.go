@@ -56,6 +56,12 @@ func (fg *FailoverGroup) Close() {
 	}
 }
 
+func (fg *FailoverGroup) CleanCache() {
+	for _, prom := range fg.servers {
+		prom.purgeExpiredCache()
+	}
+}
+
 func (fg *FailoverGroup) Config(ctx context.Context) (cfg *ConfigResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {

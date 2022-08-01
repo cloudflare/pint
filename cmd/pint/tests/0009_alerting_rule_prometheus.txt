@@ -4,7 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/0001.yml rules=2
 rules/0001.yml:11-13: link annotation is required (alerts/annotation)
  11 |     annotations:
  12 |       summary: "Instance {{ $labels.instance }} down"

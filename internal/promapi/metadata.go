@@ -23,7 +23,7 @@ type metadataQuery struct {
 	timestamp time.Time
 }
 
-func (q metadataQuery) Run() (any, error) {
+func (q metadataQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.uri).
 		Str("metric", q.metric).
@@ -34,9 +34,9 @@ func (q metadataQuery) Run() (any, error) {
 
 	v, err := q.prom.api.Metadata(ctx, q.metric, "")
 	if err != nil {
-		return nil, fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)
+		return queryResult{err: fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)}
 	}
-	return v, nil
+	return queryResult{value: v, expires: q.timestamp.Add(cacheExpiry * 2)}
 }
 
 func (q metadataQuery) Endpoint() string {

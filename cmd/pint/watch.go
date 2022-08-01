@@ -191,6 +191,9 @@ func startTimer(ctx context.Context, cfg config.Config, workers int, interval ti
 					log.Error().Err(err).Msg("Got an error when running checks")
 				}
 				checkIterationsTotal.Inc()
+				for _, prom := range cfg.PrometheusServers {
+					prom.CleanCache()
+				}
 			case <-stop:
 				ticker.Stop()
 				log.Info().Msg("Background worker finished")

@@ -4,7 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/1.yml rules=4
 rules/1.yml:22-23: summary annotation is required (alerts/annotation)
  22 |           - alert: Example_High_Restart_Rate
  23 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )

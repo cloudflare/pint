@@ -32,7 +32,7 @@ type querier interface {
 	Endpoint() string
 	String() string
 	CacheKey() string
-	Run() (any, error)
+	Run() queryResult
 }
 
 type queryRequest struct {
@@ -41,8 +41,9 @@ type queryRequest struct {
 }
 
 type queryResult struct {
-	value any
-	err   error
+	value   any
+	err     error
+	expires time.Time
 }
 
 type Prometheus struct {
@@ -81,6 +82,20 @@ func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSi
 	return &prom
 }
 
+func (prom *Prometheus) purgeExpiredCache() {
+	now := time.Now()
+	for _, key := range prom.cache.Keys() {
+		if val, found := prom.cache.Peek(key); found {
+			if c, ok := val.(queryResult); ok {
+				if !c.expires.IsZero() && c.expires.Before(now) {
+					log.Info().Interface("key", key).Str("uri", prom.uri).Str("expired", c.expires.Format(time.RFC3339)).Msg("Purging expired cache key")
+					prom.cache.Remove(key)
+				}
+			}
+		}
+	}
+}
+
 func (prom *Prometheus) Close() {
 	log.Debug().Str("name", prom.name).Str("uri", prom.uri).Msg("Stopping query workers")
 	close(prom.queries)
@@ -112,7 +127,7 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 		cacheKey := job.query.CacheKey()
 		if cacheKey != "" {
 			if cached, ok := prom.cache.Get(cacheKey); ok {
-				job.result <- queryResult{value: cached}
+				job.result <- cached.(queryResult)
 				prometheusCacheHitsTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 				log.Debug().
 					Str("uri", prom.uri).
@@ -122,12 +137,18 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 				continue
 			}
 		}
+		prometheusCacheMissTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
+		log.Debug().
+			Str("uri", prom.uri).
+			Str("query", job.query.String()).
+			Str("key", cacheKey).
+			Msg("Cache miss")
 
 		prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 		prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 		prom.rateLimiter.Take()
 		start := time.Now()
-		result, err := job.query.Run()
+		result := job.query.Run()
 		dur := time.Since(start)
 		log.Debug().
 			Str("uri", prom.uri).
@@ -136,14 +157,14 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 			Str("duration", output.HumanizeDuration(dur)).
 			Msg("Query completed")
 		prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Dec()
-		if err != nil {
-			prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(err)).Inc()
+		if result.err != nil {
+			prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
 			log.Error().
-				Err(err).
+				Err(result.err).
 				Str("uri", prom.uri).
 				Str("query", job.query.String()).
 				Msg("Query returned an error")
-			job.result <- queryResult{err: err}
+			job.result <- result
 			continue
 		}
 
@@ -152,6 +173,6 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 		}
 		prometheusCacheSize.WithLabelValues(prom.name).Set(float64(prom.cache.Len()))
 
-		job.result <- queryResult{value: result}
+		job.result <- result
 	}
 }

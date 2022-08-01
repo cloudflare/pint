@@ -31,7 +31,7 @@ type rangeQuery struct {
 	r    v1.Range
 }
 
-func (q rangeQuery) Run() (any, error) {
+func (q rangeQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.uri).
 		Str("query", q.expr).
@@ -45,7 +45,7 @@ func (q rangeQuery) Run() (any, error) {
 	defer cancel()
 
 	v, _, err := q.prom.api.QueryRange(ctx, q.expr, q.r)
-	return v, err
+	return queryResult{value: v, err: err}
 }
 
 func (q rangeQuery) Endpoint() string {

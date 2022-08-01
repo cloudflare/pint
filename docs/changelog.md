@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.28.4
+
+### Added
+
+- Added `pint_prometheus_cache_miss_total` metric.
+
+### Changed
+
+- Reduce log level for `File parsed` messages.
+
+### Fixed
+
+- Purge expired cache entries faster to reduce memory usage.
+
 ## v0.28.3
 
 ### Fixed

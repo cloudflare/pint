@@ -23,7 +23,7 @@ type instantQuery struct {
 	timestamp time.Time
 }
 
-func (q instantQuery) Run() (any, error) {
+func (q instantQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.uri).
 		Str("query", q.expr).
@@ -33,7 +33,7 @@ func (q instantQuery) Run() (any, error) {
 	defer cancel()
 
 	v, _, err := q.prom.api.Query(ctx, q.expr, time.Now())
-	return v, err
+	return queryResult{value: v, err: err, expires: q.timestamp.Add(cacheExpiry * 2)}
 }
 
 func (q instantQuery) Endpoint() string {

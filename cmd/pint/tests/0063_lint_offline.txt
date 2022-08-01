@@ -4,7 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/ok.yml rules=1
 -- rules/ok.yml --
 - record: sum:foo
   expr: sum(foo)

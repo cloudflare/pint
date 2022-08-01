@@ -4,8 +4,6 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="File parsed" path=rules/0001.yml rules=5
-level=info msg="File parsed" path=rules/0002.yml rules=1
 rules/0001.yml:1-2: url annotation is required (alerts/annotation)
  1 | - alert: Always
  2 |   expr: up
