@@ -88,7 +88,6 @@ func (prom *Prometheus) purgeExpiredCache() {
 		if val, found := prom.cache.Peek(key); found {
 			if c, ok := val.(queryResult); ok {
 				if !c.expires.IsZero() && c.expires.Before(now) {
-					log.Info().Interface("key", key).Str("uri", prom.uri).Str("expired", c.expires.Format(time.RFC3339)).Msg("Purging expired cache key")
 					prom.cache.Remove(key)
 				}
 			}

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.28.5
+
+### Fixed
+
+- Remove noisy debug logs.
+
 ## v0.28.4
 
 ### Added
