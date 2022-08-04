@@ -1,5 +1,5 @@
-exec bash -x ./webserver.sh &
-exec bash -c 'I=0 ; while [ ! -f server.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http response bitbucket / 200 OK
+http start bitbucket 127.0.0.1:6070
 
 mkdir testrepo
 cd testrepo
@@ -27,7 +27,6 @@ stderr 'level=debug msg="Sending a request to BitBucket" method=PUT'
 stderr 'level=debug msg="BitBucket request completed" status=200'
 stderr 'level=debug msg="Sending a request to BitBucket" method=DELETE'
 stderr 'level=debug msg="BitBucket request completed" status=200'
-exec sh -c 'cat ../server.pid | xargs kill'
 
 -- src/v1.yml --
 - alert: rule1
@@ -56,58 +55,3 @@ repository {
     repository = "rules"
   }
 }
-
--- webserver.go --
-package main
-
-import (
-	"context"
-	"io"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "OK")
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:6070")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:6070",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("server.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute*2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- webserver.sh --
-env GOCACHE=$TMPDIR go run webserver.go

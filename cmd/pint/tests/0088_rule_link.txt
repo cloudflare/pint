@@ -1,10 +1,13 @@
-exec bash -x ./webserver.sh &
-exec bash -c 'I=0 ; while [ ! -f webserver.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http response mock /200 200 OK
+http response mock /404 404 Not found
+http response mock /500 500 Error
+http redirect mock /redirect/200 /200
+http redirect mock /redirect/404 /404
+http start mock 127.0.0.1:7088
 
 pint.ok --no-color lint --min-severity=info rules
 ! stdout .
 cmp stderr stderr.txt
-exec bash -c 'cat webserver.pid | xargs kill'
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
@@ -44,79 +47,3 @@ rule {
 	timeout  = "10s"
   }
 }
-
--- webserver.go --
-package main
-
-import (
-	"context"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/200", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-		_, _ = w.Write([]byte(`Ok`))
-	})
-
-	http.HandleFunc("/404", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(404)
-		_, _ = w.Write([]byte(`Ok`))
-	})
-
-	http.HandleFunc("/500", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(500)
-		_, _ = w.Write([]byte(`Error`))
-	})
-
-	http.HandleFunc("/redirect/200", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Location", "/200")
-		w.WriteHeader(302)
-	})
-
-	http.HandleFunc("/redirect/404", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Location", "/404")
-		w.WriteHeader(302)
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:7088")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:7088",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("webserver.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute * 2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- webserver.sh --
-env GOCACHE=$TMPDIR go run webserver.go
-
