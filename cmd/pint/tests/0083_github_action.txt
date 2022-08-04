@@ -1,5 +1,5 @@
-exec bash -x ./webserver.sh &
-exec bash -c 'I=0 ; while [ ! -f server.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http response github / 200 {}
+http start github 127.0.0.1:6083
 
 mkdir testrepo
 cd testrepo
@@ -34,8 +34,6 @@ stderr 'level=info msg="Setting repository name from GITHUB_REPOSITORY env varia
 stderr 'level=info msg="Setting repository base URI from GITHUB_API_URL env variable" baseuri=http://127.0.0.1:6083'
 stderr 'level=info msg="Setting repository upload URI from GITHUB_API_URL env variable" uploaduri=http://127.0.0.1:6083'
 
-exec sh -c 'cat ../server.pid | xargs kill'
-
 -- src/v1.yml --
 groups:
 - name: foo
@@ -59,58 +57,3 @@ groups:
 
 -- src/.pint.hcl --
 repository {}
-
--- webserver.go --
-package main
-
-import (
-	"context"
-	"io"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "{}")
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:6083")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:6083",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("server.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute*2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- webserver.sh --
-env GOCACHE=$TMPDIR go run webserver.go

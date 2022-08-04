@@ -1,5 +1,5 @@
-exec bash -x ./webserver.sh &
-exec bash -c 'I=0 ; while [ ! -f server.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http response github / 200 {}
+http start github 127.0.0.1:6085
 
 mkdir testrepo
 cd testrepo
@@ -24,8 +24,6 @@ env GITHUB_PULL_REQUEST_NUMBER=123
 pint.ok -l debug --offline --no-color ci
 ! stdout .
 stderr 'level=info msg="Report submitted" status="200 OK"'
-
-exec sh -c 'cat ../server.pid | xargs kill'
 
 -- src/v1.yml --
 groups:
@@ -57,58 +55,3 @@ repository {
     repo      = "pint"
   }
 }
-
--- webserver.go --
-package main
-
-import (
-	"context"
-	"io"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "{}")
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:6085")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:6085",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("server.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute*2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- webserver.sh --
-env GOCACHE=$TMPDIR go run webserver.go

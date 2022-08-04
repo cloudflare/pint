@@ -1,5 +1,5 @@
-exec bash -x ./prometheus.sh &
-exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http slow-response github / 30s 200 {}
+http start github 127.0.0.1:7043
 
 exec bash -x ./test.sh &
 
@@ -15,7 +15,6 @@ stderr 'level=info msg="Background worker finished"'
 -- test.sh --
 sleep 3
 cat pint.pid | xargs kill
-cat prometheus.pid | xargs kill
 
 -- rules/1.yml --
 - record: aggregate
@@ -30,60 +29,3 @@ prometheus "slow" {
   timeout = "2m"
   required = true
 }
-
--- prometheus.go --
-package main
-
-import (
-	"context"
-	"io"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(500)
-        time.Sleep(time.Second*30)
-		io.WriteString(w, "Fatal error")
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:7043")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:7043",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("prometheus.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute*2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- prometheus.sh --
-env GOCACHE=$TMPDIR go run prometheus.go

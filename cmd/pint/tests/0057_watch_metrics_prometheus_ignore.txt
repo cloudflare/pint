@@ -1,5 +1,6 @@
-exec bash -x ./prometheus.sh &
-exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http slow-response prometheus /api/v1/status/config 100ms 500 Fatal error
+http slow-response prometheus /api/v1/query 200ms 400 {"status":"error","errorType":"bad_data","error":"bogus query"}
+http start prometheus 127.0.0.1:7057
 
 exec bash -x ./test.sh &
 
@@ -10,7 +11,6 @@ cmp curl.txt metrics.txt
 sleep 3
 curl -s http://127.0.0.1:6057/metrics | grep 'pint_' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
 cat pint.pid | xargs kill
-cat prometheus.pid | xargs kill
 
 -- rules/1.yml --
 - record: broken
@@ -77,8 +77,8 @@ pint_last_run_duration_seconds
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",owner="",problem="prometheus \"prom1\" at http://127.0.0.1:7057 failed with: bad_response: Unmarshal: there are bytes left after unmarshal, error found in #10 byte of ...|y\"\n    	}Fatal error|..., bigger context ...|:\"bad_data\",\n      		\"error\":\"bogus query\"\n    	}Fatal error|...",reporter="promql/series",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="prometheus \"prom1\" at http://127.0.0.1:7057 failed with: bad_response: Unmarshal: there are bytes left after unmarshal, error found in #10 byte of ...|y\"\n    	}Fatal error|..., bigger context ...|:\"bad_data\",\n      		\"error\":\"bogus query\"\n    	}Fatal error|...",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",owner="",problem="prometheus \"prom1\" at http://127.0.0.1:7057 failed with: bad_data: bogus query",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="prometheus \"prom1\" at http://127.0.0.1:7057 failed with: bad_data: bogus query",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
@@ -109,7 +109,7 @@ pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_query_errors_total Total number of failed prometheus queries
 # TYPE pint_prometheus_query_errors_total counter
-pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason="api/bad_response"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason="api/bad_data"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
@@ -123,71 +123,3 @@ pint_rules_parsed_total{kind="recording"}
 # HELP pint_version Version information
 # TYPE pint_version gauge
 pint_version{version="unknown"}
--- prometheus.go --
-package main
-
-import (
-	"context"
-	"io"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/api/v1/status/config", func(w http.ResponseWriter, r *http.Request) {
-    	w.WriteHeader(500)
-		time.Sleep(time.Millisecond * 100)
-		io.WriteString(w, "Fatal error")
-	})
-
-	http.HandleFunc("/api/v1/query", func(w http.ResponseWriter, r *http.Request) {
-    	w.WriteHeader(400)
-		time.Sleep(time.Millisecond * 200)
-    	w.Header().Set("Content-Type", "application/json")
-    	_, _ = w.Write([]byte(`{
-      		"status":"error",
-      		"errorType":"bad_data",
-      		"error":"bogus query"
-    	}`))
-		io.WriteString(w, "Fatal error")
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:7057")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:7057",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("prometheus.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute*2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- prometheus.sh --
-env GOCACHE=$TMPDIR go run prometheus.go

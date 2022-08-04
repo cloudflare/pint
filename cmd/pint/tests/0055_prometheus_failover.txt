@@ -1,5 +1,7 @@
-exec bash -x ./prometheus.sh &
-exec bash -c 'I=0 ; while [ ! -f prometheus.pid ] && [ $I -lt 30 ]; do sleep 1; I=$((I+1)); done'
+http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http response prometheus /api/v1/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
+http start prometheus 127.0.0.1:7055
 
 pint.error --no-color lint rules
 ! stdout .
@@ -7,7 +9,6 @@ stderr 'level=error msg="Query returned an error" error="Post \\"http://127.0.0.
 stderr 'level=error msg="Query returned an error" error="failed to query Prometheus config: Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:1055'
 ! stderr 'query="count\(foo offset '
 stderr 'rules/1.yml:2: prometheus "prom" at http://127.0.0.1:7055 didn''t have any series for "foo" metric in the last 1w \(promql/series\)'
-exec bash -c 'cat prometheus.pid | xargs kill'
 
 -- rules/1.yml --
 - record: aggregate
@@ -23,83 +24,3 @@ prometheus "prom" {
 parser {
   relaxed = [".*"]
 }
-
--- prometheus.go --
-package main
-
-import (
-	"context"
-	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/signal"
-	"strconv"
-	"syscall"
-	"time"
-)
-
-func main() {
-	http.HandleFunc("/api/v1/status/config", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(200)
-		w.Header().Set("Content-Type", "application/json")
-		_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
-	})
-
-	http.HandleFunc("/api/v1/query_range", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(200)
-        w.Header().Set("Content-Type", "application/json")
-        _, _ = w.Write([]byte(`{
-            "status":"success",
-            "data":{
-                "resultType":"matrix",
-                "result":[]
-            }
-        }`))
-	})
-
-	http.HandleFunc("/api/v1/query", func(w http.ResponseWriter, r *http.Request) {
-        w.WriteHeader(200)
-        w.Header().Set("Content-Type", "application/json")
-        _, _ = w.Write([]byte(`{
-            "status":"success",
-            "data":{
-                "resultType":"vector",
-                "result":[]
-            }
-        }`))
-	})
-
-	listener, err := net.Listen("tcp", "127.0.0.1:7055")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	server := &http.Server{
-		Addr: "127.0.0.1:7055",
-	}
-
-	go func() {
-		_ = server.Serve(listener)
-	}()
-
-	pid := os.Getpid()
-	err = os.WriteFile("prometheus.pid", []byte(strconv.Itoa(pid)), 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	go func() {
-		time.Sleep(time.Minute*2)
-		stop <- syscall.SIGTERM
-	}()
-	<-stop
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	server.Shutdown(ctx)
-}
-
--- prometheus.sh --
-env GOCACHE=$TMPDIR go run prometheus.go
