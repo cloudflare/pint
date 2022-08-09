@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.28.6
+
+### Fixed
+
+- Fixed symlink handling when running `pint lint`.
+
 ## v0.28.5
 
 ### Fixed

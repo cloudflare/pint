@@ -1,0 +1,19 @@
+mkdir rules
+mkdir rules/src
+exec ln -s src rules/dst
+exec ln -s rules linked
+
+pint.ok -l debug --no-color lint rules linked rules/src/rule.yaml
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=debug msg="File parsed" path=rules/src/rule.yaml rules=1
+level=debug msg="Found recording rule" lines=4-5 path=rules/src/rule.yaml record=down
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/src/rule.yaml rule=down
+-- rules/src/rule.yaml --
+groups:
+- name: foo
+  rules:
+  - record: down
+    expr: up == 0
