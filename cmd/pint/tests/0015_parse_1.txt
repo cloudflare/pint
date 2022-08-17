@@ -3,19 +3,19 @@ cmp stdout stdout.txt
 ! stderr .
 
 -- stdout.txt --
-++ node: sum without(job) (rate(foo[5m])) + (sum without(job) (rate(bar[5m])) > 0)
+++ node: sum without (job) (rate(foo[5m])) + (sum without (job) (rate(bar[5m])) > 0)
   BinaryExpr:
     * Type: vector
     * Op: +
-    * LHS: sum without(job) (rate(foo[5m]))
-    * RHS: (sum without(job) (rate(bar[5m])) > 0)
+    * LHS: sum without (job) (rate(foo[5m]))
+    * RHS: (sum without (job) (rate(bar[5m])) > 0)
     * VectorMatching:
       * Card: one-to-one
       * MatchingLabels: []
       * On: false
       * Include: []
     * ReturnBool: false
-      ++ node: sum without(job) (rate(foo[5m]))
+      ++ node: sum without (job) (rate(foo[5m]))
         AggregateExpr:
           * Type: vector
           * Op: sum
@@ -35,19 +35,19 @@ cmp stdout stdout.txt
                           * Type: matrix
                           * VectorSelector: foo
                           * Range: 5m0s
-      ++ node: (sum without(job) (rate(bar[5m])) > 0)
+      ++ node: (sum without (job) (rate(bar[5m])) > 0)
         ParenExpr:
           * Type: vector
-          * Expr: sum without(job) (rate(bar[5m])) > 0
-            ++ node: sum without(job) (rate(bar[5m])) > 0
+          * Expr: sum without (job) (rate(bar[5m])) > 0
+            ++ node: sum without (job) (rate(bar[5m])) > 0
               BinaryExpr:
                 * Type: vector
                 * Op: >
-                * LHS: sum without(job) (rate(bar[5m]))
+                * LHS: sum without (job) (rate(bar[5m]))
                 * RHS: 0
                 * VectorMatching:
                 * ReturnBool: false
-                  ++ node: sum without(job) (rate(bar[5m]))
+                  ++ node: sum without (job) (rate(bar[5m]))
                     AggregateExpr:
                       * Type: vector
                       * Op: sum

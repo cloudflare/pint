@@ -3,19 +3,19 @@ cmp stdout stdout.txt
 ! stderr .
 
 -- stdout.txt --
-++ node: sum without(job) (rate(foo[5m:1m])) / on(instance) group_left() sum without(job) (rate(bar[5m]))
+++ node: sum without (job) (rate(foo[5m:1m])) / on (instance) group_left () sum without (job) (rate(bar[5m]))
   BinaryExpr:
     * Type: vector
     * Op: /
-    * LHS: sum without(job) (rate(foo[5m:1m]))
-    * RHS: sum without(job) (rate(bar[5m]))
+    * LHS: sum without (job) (rate(foo[5m:1m]))
+    * RHS: sum without (job) (rate(bar[5m]))
     * VectorMatching:
       * Card: many-to-one
       * MatchingLabels: [instance]
       * On: true
       * Include: []
     * ReturnBool: false
-      ++ node: sum without(job) (rate(foo[5m:1m]))
+      ++ node: sum without (job) (rate(foo[5m:1m]))
         AggregateExpr:
           * Type: vector
           * Op: sum
@@ -43,7 +43,7 @@ cmp stdout stdout.txt
                                 * Name: foo
                                 * Offset: 0s
                                 * LabelMatchers: [__name__="foo"]
-      ++ node: sum without(job) (rate(bar[5m]))
+      ++ node: sum without (job) (rate(bar[5m]))
         AggregateExpr:
           * Type: vector
           * Op: sum

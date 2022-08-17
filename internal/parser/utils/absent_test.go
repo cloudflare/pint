@@ -36,21 +36,21 @@ func TestHasOuterAbsent(t *testing.T) {
 			expr: `absent(foo{job="bar"}) AND on(job) bar`,
 			output: []callT{{
 				call:    `absent(foo{job="bar"})`,
-				binExpr: `absent(foo{job="bar"}) and on(job) bar`,
+				binExpr: `absent(foo{job="bar"}) and on (job) bar`,
 			}},
 		},
 		{
 			expr: `vector(1) or absent(foo{job="bar"}) AND on(job) bar`,
 			output: []callT{{
 				call:    `absent(foo{job="bar"})`,
-				binExpr: `absent(foo{job="bar"}) and on(job) bar`,
+				binExpr: `absent(foo{job="bar"}) and on (job) bar`,
 			}},
 		},
 		{
 			expr: `up == 0 or absent(foo{job="bar"}) AND on(job) bar`,
 			output: []callT{{
 				call:    `absent(foo{job="bar"})`,
-				binExpr: `absent(foo{job="bar"}) and on(job) bar`,
+				binExpr: `absent(foo{job="bar"}) and on (job) bar`,
 			}},
 		},
 		{
@@ -70,7 +70,7 @@ func TestHasOuterAbsent(t *testing.T) {
 			expr: `up == 0 or absent(foo{job="bar"}) * on(job) group_left(xxx) bar`,
 			output: []callT{{
 				call:    `absent(foo{job="bar"})`,
-				binExpr: `absent(foo{job="bar"}) * on(job) group_left(xxx) bar`,
+				binExpr: `absent(foo{job="bar"}) * on (job) group_left (xxx) bar`,
 			}},
 		},
 		{
@@ -81,14 +81,14 @@ func TestHasOuterAbsent(t *testing.T) {
 			expr: `up == 0 or absent(foo{job="bar"}) * on(job) group_left() bar`,
 			output: []callT{{
 				call:    `absent(foo{job="bar"})`,
-				binExpr: `absent(foo{job="bar"}) * on(job) group_left() bar`,
+				binExpr: `absent(foo{job="bar"}) * on (job) group_left () bar`,
 			}},
 		},
 		{
 			expr: `bar * on() group_right(xxx) absent(foo{job="bar"})`,
 			output: []callT{{
 				call:    `absent(foo{job="bar"})`,
-				binExpr: `bar * on() group_right(xxx) absent(foo{job="bar"})`,
+				binExpr: `bar * on () group_right (xxx) absent(foo{job="bar"})`,
 			}},
 		},
 		{
