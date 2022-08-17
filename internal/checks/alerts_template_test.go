@@ -789,6 +789,18 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   noProblems,
 		},
+		{
+			description: "toTime",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: "{{ $value | toTime }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
 	}
 	runTests(t, testCases)
 }

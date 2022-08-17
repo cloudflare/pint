@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.28.7
+
+### Changed
+
+- Updated Prometheus modules to [v2.38.0](https://github.com/prometheus/prometheus/releases/tag/v2.38.0).
+  This adds support for `toTime` template function.
+
 ## v0.28.6
 
 ### Fixed

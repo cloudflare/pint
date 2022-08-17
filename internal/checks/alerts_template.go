@@ -62,6 +62,7 @@ var (
 		"pathPrefix":         dummyFuncMap,
 		"externalURL":        dummyFuncMap,
 		"parseDuration":      dummyFuncMap,
+		"toTime":             dummyFuncMap,
 	}
 )
 

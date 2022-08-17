@@ -45,11 +45,11 @@ func TestRemoveConditions(t *testing.T) {
 		},
 		{
 			input:  "(memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry",
-			output: "(memory_bytes / ignoring(job) memory_limit) * on(app_name) group_left(a, b, c) app_registry",
+			output: "(memory_bytes / ignoring (job) memory_limit) * on (app_name) group_left (a, b, c) app_registry",
 		},
 		{
 			input:  `(quantile_over_time(0.9, (rate(container_cpu_system_seconds_total{app_name="foo"}[5m]) + rate(container_cpu_user_seconds_total{app_name="foo"}[5m]))[5m:]) / on(instance) bar) > 0.65`,
-			output: `(quantile_over_time(0.9, (rate(container_cpu_system_seconds_total{app_name="foo"}[5m]) + rate(container_cpu_user_seconds_total{app_name="foo"}[5m]))[5m:]) / on(instance) bar)`,
+			output: `(quantile_over_time(0.9, (rate(container_cpu_system_seconds_total{app_name="foo"}[5m]) + rate(container_cpu_user_seconds_total{app_name="foo"}[5m]))[5m:]) / on (instance) bar)`,
 		},
 	}
 
