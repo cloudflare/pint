@@ -139,6 +139,33 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "simple query / duplicated metric",
+			content:     "- record: foo\n  expr: count(notfound) / sum(notfound)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
+		{
 			description: "complex query",
 			content:     "- record: foo\n  expr: sum(found_7 * on (job) sum(sum(notfound))) / found_7\n",
 			checker:     newSeriesCheck,

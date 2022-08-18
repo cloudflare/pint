@@ -587,6 +587,38 @@ func TestRateCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "rate(foo) / rate(foo) / sum(rate(foo))",
+			content:     "- record: foo\n  expr: rate(foo[2m]) / rate(foo[2m]) / sum(rate(foo[2m]))\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "foo"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "gauge"}},
+					}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

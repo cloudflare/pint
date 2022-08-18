@@ -39,7 +39,12 @@ func (c RegexpCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		return nil
 	}
 
+	done := map[string]struct{}{}
 	for _, selector := range getSelectors(expr.Query) {
+		if _, ok := done[selector.String()]; ok {
+			continue
+		}
+		done[selector.String()] = struct{}{}
 		for _, lm := range selector.LabelMatchers {
 			if re := lm.GetRegexString(); re != "" {
 				var isUseful bool

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.29.0
+
+### Fixed
+
+- Avoid reporting same issue multiple times in `promql/rate` and `promql/regexp` checks.
+
 ## v0.28.7
 
 ### Changed
