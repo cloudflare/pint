@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -59,7 +61,8 @@ func (c RateCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 		return
 	}
 
-	for _, problem := range c.checkNode(ctx, expr.Query, cfg) {
+	done := &completedList{}
+	for _, problem := range c.checkNode(ctx, expr.Query, cfg, done) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
@@ -72,7 +75,7 @@ func (c RateCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 	return
 }
 
-func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *promapi.ConfigResult) (problems []exprProblem) {
+func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *promapi.ConfigResult, done *completedList) (problems []exprProblem) {
 	if n, ok := node.Node.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
@@ -92,6 +95,10 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *
 				continue
 			}
 			if s, ok := m.VectorSelector.(*promParser.VectorSelector); ok {
+				if slices.Contains(done.values, s.Name) {
+					continue
+				}
+				done.values = append(done.values, s.Name)
 				metadata, err := c.prom.Metadata(ctx, s.Name)
 				if err != nil {
 					text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
@@ -117,8 +124,12 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, child, cfg)...)
+		problems = append(problems, c.checkNode(ctx, child, cfg, done)...)
 	}
 
 	return
+}
+
+type completedList struct {
+	values []string
 }

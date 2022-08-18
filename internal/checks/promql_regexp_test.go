@@ -133,6 +133,47 @@ func TestRegexpCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "duplicated unnecessary regexp",
+			content:     "- record: foo\n  expr: foo{job=~\"bar\"} / foo{job=~\"bar\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `foo{job=~"bar"}`,
+						Lines:    []int{2},
+						Reporter: checks.RegexpCheckName,
+						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "duplicated unnecessary regexp",
+			content:     "- record: foo\n  expr: foo{job=~\"bar\"} / foo{job=~\"bar\", level=\"total\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `foo{job=~"bar"}`,
+						Lines:    []int{2},
+						Reporter: checks.RegexpCheckName,
+						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: `foo{job=~"bar",level="total"}`,
+						Lines:    []int{2},
+						Reporter: checks.RegexpCheckName,
+						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
 	}
 	runTests(t, testCases)
 }
