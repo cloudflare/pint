@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.37.0
 	github.com/prometheus/prometheus v0.38.0
-	github.com/rogpeppe/go-internal v1.8.1
+	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.8.0
 	github.com/urfave/cli/v2 v2.11.2
@@ -77,7 +77,6 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
-	gopkg.in/errgo.v2 v2.1.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
