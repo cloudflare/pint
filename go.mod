@@ -9,10 +9,12 @@ require (
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/hcl/v2 v2.13.0
+	github.com/klauspost/compress v1.15.9
 	github.com/prometheus/client_golang v1.13.0
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.37.0
 	github.com/prometheus/prometheus v0.38.0
+	github.com/prymitive/current v0.0.0-20220824101118-443c8cff6d1a
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.8.0

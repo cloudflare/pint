@@ -37,7 +37,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Fragment: "rate(foo[30d])",
 						Lines:    []int{2},
 						Reporter: "promql/range_query",
-						Text:     checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}

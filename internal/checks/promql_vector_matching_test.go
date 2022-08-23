@@ -1143,7 +1143,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "xxx/yyy",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: server error: 500`),
+						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
 						Severity: checks.Bug,
 					},
 				}
@@ -1178,7 +1178,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "xxx/yyy",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: server error: 500`),
+						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
 						Severity: checks.Bug,
 					},
 				}

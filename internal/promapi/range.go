@@ -3,15 +3,20 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/output"
@@ -44,12 +49,31 @@ func (q rangeQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	v, _, err := q.prom.api.QueryRange(ctx, q.expr, q.r)
-	return queryResult{value: v, err: err}
+	qr := queryResult{}
+
+	args := url.Values{}
+	args.Set("query", q.expr)
+	args.Set("start", formatTime(q.r.Start))
+	args.Set("end", formatTime(q.r.End))
+	args.Set("step", strconv.FormatFloat(q.r.Step.Seconds(), 'f', -1, 64))
+	resp, err := q.prom.doRequest(ctx, http.MethodPost, "/api/v1/query_range", args)
+	if err != nil {
+		qr.err = err
+		return qr
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		qr.err = tryDecodingAPIError(resp)
+		return qr
+	}
+
+	qr.value, qr.err = streamSampleStream(resp.Body)
+	return qr
 }
 
 func (q rangeQuery) Endpoint() string {
-	return "/api/v1/query/range"
+	return "/api/v1/query_range"
 }
 
 func (q rangeQuery) String() string {
@@ -97,7 +121,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		Str("slice", output.HumanizeDuration(queryStep)).
 		Msg("Scheduling prometheus range query")
 
-	key := fmt.Sprintf("/api/v1/query/range/%s/%s", expr, params.String())
+	key := fmt.Sprintf("/api/v1/query_range/%s/%s", expr, params.String())
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 
@@ -153,41 +177,34 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 			continue
 		}
 
-		// nolint: exhaustive
-		switch result.value.(model.Value).Type() {
-		case model.ValMatrix:
-			for _, sample := range result.value.(model.Matrix) {
-				var found bool
-				var ts time.Time
-				for i, rs := range merged.Samples {
-					if sample.Metric.Equal(rs.Metric) {
-						found = true
-						for _, v := range sample.Values {
-							ts = v.Timestamp.Time()
-							if !ts.Before(start) && !ts.After(end) {
-								merged.Samples[i].Values = append(merged.Samples[i].Values, v)
-							}
-						}
-						break
-					}
-				}
-				if !found {
-					s := model.SampleStream{
-						Metric: sample.Metric.Clone(),
-						Values: make([]model.SamplePair, 0, len(sample.Values)),
-					}
+		for _, sample := range result.value.([]model.SampleStream) {
+			var found bool
+			var ts time.Time
+			for i, rs := range merged.Samples {
+				if sample.Metric.Equal(rs.Metric) {
+					found = true
 					for _, v := range sample.Values {
 						ts = v.Timestamp.Time()
 						if !ts.Before(start) && !ts.After(end) {
-							s.Values = append(s.Values, v)
+							merged.Samples[i].Values = append(merged.Samples[i].Values, v)
 						}
 					}
-					merged.Samples = append(merged.Samples, &s)
+					break
 				}
 			}
-		default:
-			log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Range query returned unknown result type: %v", result.value.(model.Value).Type())
-			lastErr = fmt.Errorf("unknown result type: %v", result.value.(model.Value).Type())
+			if !found {
+				s := model.SampleStream{
+					Metric: sample.Metric.Clone(),
+					Values: make([]model.SamplePair, 0, len(sample.Values)),
+				}
+				for _, v := range sample.Values {
+					ts = v.Timestamp.Time()
+					if !ts.Before(start) && !ts.After(end) {
+						s.Values = append(s.Values, v)
+					}
+				}
+				merged.Samples = append(merged.Samples, &s)
+			}
 		}
 		wg.Done()
 	}
@@ -311,4 +328,50 @@ func (ar AbsoluteRange) String() string {
 		ar.start.Format(time.RFC3339),
 		ar.end.Format(time.RFC3339),
 		output.HumanizeDuration(ar.step))
+}
+
+func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
+	defer dummyReadAll(r)
+
+	var status, errType, errText, resultType string
+
+	samples = []model.SampleStream{}
+	decoder := current.Object(
+		func() {},
+		current.Key("status", current.Text(func(s string) {
+			status = s
+		})),
+		current.Key("error", current.Text(func(s string) {
+			errText = s
+		})),
+		current.Key("errorType", current.Text(func(s string) {
+			errType = s
+		})),
+		current.Key("data", current.Object(
+			func() {},
+			current.Key("resultType", current.Text(func(s string) {
+				resultType = s
+			})),
+			current.Key("result", current.Array(func(sample *model.SampleStream) {
+				samples = append(samples, *sample)
+				sample.Metric = model.Metric{}
+				sample.Values = make([]model.SamplePair, 0, len(sample.Values))
+			})),
+		)),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = current.Stream(dec, decoder); err != nil {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	if resultType != "matrix" {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
+	}
+
+	return samples, nil
 }

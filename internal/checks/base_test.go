@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strconv"
 	"sync"
 	"testing"
@@ -103,12 +105,15 @@ func runTests(t *testing.T, testCases []checkTest) {
 			var uri string
 			if len(tc.mocks) > 0 {
 				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					defer r.Body.Close()
 					for i := range tc.mocks {
 						if tc.mocks[i].maybeApply(w, r) {
 							return
 						}
 					}
-					t.Errorf("no matching response for %s request with payload: %s", r.URL.Path, r.Form.Encode())
+					b, _ := io.ReadAll(r.Body)
+					payload, _ := url.QueryUnescape(string(b))
+					t.Errorf("no matching response for %s %s request with payload: %s", r.Method, r.URL, payload)
 					t.FailNow()
 				}))
 				defer srv.Close()

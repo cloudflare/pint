@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 
-	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -69,9 +68,9 @@ func errReason(err error) string {
 		return "connection/timeout"
 	}
 
-	var v1err *v1.Error
-	if ok := errors.As(err, &v1err); ok {
-		return fmt.Sprintf("api/%s", v1err.Type)
+	var e1 APIError
+	if ok := errors.As(err, &e1); ok {
+		return fmt.Sprintf("api/%s", e1.ErrorType)
 	}
 
 	return "connection/error"

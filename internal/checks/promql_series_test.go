@@ -309,7 +309,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}
@@ -508,7 +508,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}
@@ -635,7 +635,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found{notfound="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}
@@ -1569,7 +1569,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found{error="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}

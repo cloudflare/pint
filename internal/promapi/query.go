@@ -3,17 +3,22 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"time"
 
+	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 )
 
 type QueryResult struct {
 	URI    string
-	Series model.Vector
+	Series []model.Sample
 }
 
 type instantQuery struct {
@@ -32,8 +37,24 @@ func (q instantQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	v, _, err := q.prom.api.Query(ctx, q.expr, time.Now())
-	return queryResult{value: v, err: err, expires: q.timestamp.Add(cacheExpiry * 2)}
+	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+
+	args := url.Values{}
+	args.Set("query", q.expr)
+	resp, err := q.prom.doRequest(ctx, http.MethodPost, "/api/v1/query", args)
+	if err != nil {
+		qr.err = err
+		return qr
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		qr.err = tryDecodingAPIError(resp)
+		return qr
+	}
+
+	qr.value, qr.err = streamSamples(resp.Body)
+	return qr
 }
 
 func (q instantQuery) Endpoint() string {
@@ -72,19 +93,55 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	qr := QueryResult{URI: p.uri}
-
-	// nolint: exhaustive
-	switch result.value.(model.Value).Type() {
-	case model.ValVector:
-		vectorVal := result.value.(model.Vector)
-		qr.Series = vectorVal
-	default:
-		log.Error().Str("uri", p.uri).Str("query", expr).Msgf("Query returned unknown result type: %v", result.value.(model.Value).Type())
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/query", "unknown result type").Inc()
-		return nil, fmt.Errorf("unknown result type: %v", result.value.(model.Value).Type())
+	qr := QueryResult{
+		URI:    p.uri,
+		Series: result.value.([]model.Sample),
 	}
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 
 	return &qr, nil
+}
+
+func streamSamples(r io.Reader) (samples []model.Sample, err error) {
+	defer dummyReadAll(r)
+
+	var status, resultType, errType, errText string
+	samples = []model.Sample{}
+	decoder := current.Object(
+		func() {},
+		current.Key("status", current.Text(func(s string) {
+			status = s
+		})),
+		current.Key("error", current.Text(func(s string) {
+			errText = s
+		})),
+		current.Key("errorType", current.Text(func(s string) {
+			errType = s
+		})),
+		current.Key("data", current.Object(
+			func() {},
+			current.Key("resultType", current.Text(func(s string) {
+				resultType = s
+			})),
+			current.Key("result", current.Array(func(sample *model.Sample) {
+				samples = append(samples, *sample)
+				sample.Metric = model.Metric{}
+			})),
+		)),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = current.Stream(dec, decoder); err != nil {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	if resultType != "vector" {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected vector, got %s", resultType)}
+	}
+
+	return samples, nil
 }

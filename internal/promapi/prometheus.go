@@ -1,12 +1,17 @@
 package promapi
 
 import (
+	"context"
+	"io"
+	"net/http"
+	"net/url"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/prometheus/client_golang/api"
-	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/klauspost/compress/gzhttp"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/ratelimit"
 
@@ -49,9 +54,9 @@ type queryResult struct {
 type Prometheus struct {
 	name        string
 	uri         string
-	api         v1.API
 	timeout     time.Duration
 	concurrency int
+	client      http.Client
 	cache       *lru.ARCCache
 	locker      *partitionLocker
 	rateLimiter ratelimit.Limiter
@@ -60,20 +65,13 @@ type Prometheus struct {
 }
 
 func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSize, rl int) *Prometheus {
-	client, err := api.NewClient(api.Config{Address: uri})
-	if err != nil {
-		// config validation should prevent this from ever happening
-		// panic so we don't need to return an error and it's easier to
-		// use this code in tests
-		panic(err)
-	}
 	cache, _ := lru.NewARC(cacheSize)
 
 	prom := Prometheus{
 		name:        name,
 		uri:         uri,
-		api:         v1.NewAPI(client),
 		timeout:     timeout,
+		client:      http.Client{Transport: gzhttp.Transport(http.DefaultTransport)},
 		cache:       cache,
 		locker:      newPartitionLocker((&sync.Mutex{})),
 		rateLimiter: ratelimit.New(rl),
@@ -117,6 +115,30 @@ func (prom *Prometheus) StartWorkers() {
 			queryWorker(prom, prom.queries)
 		}()
 	}
+}
+
+func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args url.Values) (*http.Response, error) {
+	u, _ := url.Parse(prom.uri)
+	u.Path = strings.TrimSuffix(u.Path, "/")
+
+	uri, err := url.JoinPath(u.String(), path)
+	if err != nil {
+		return nil, err
+	}
+
+	if prom.timeout > 0 {
+		args.Set("timeout", prom.timeout.String())
+	}
+
+	req, err := http.NewRequestWithContext(ctx, method, uri, strings.NewReader(args.Encode()))
+	if err != nil {
+		return nil, err
+	}
+	if method == http.MethodPost {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+
+	return prom.client.Do(req)
 }
 
 func queryWorker(prom *Prometheus, queries chan queryRequest) {
@@ -174,4 +196,12 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 
 		job.result <- result
 	}
+}
+
+func formatTime(t time.Time) string {
+	return strconv.FormatFloat(float64(t.Unix())+float64(t.Nanosecond())/1e9, 'f', -1, 64)
+}
+
+func dummyReadAll(r io.Reader) {
+	_, _ = io.Copy(io.Discard, r)
 }

@@ -3,11 +3,15 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,11 +36,24 @@ func (q metadataQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	v, err := q.prom.api.Metadata(ctx, q.metric, "")
+	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+
+	args := url.Values{}
+	args.Set("metric", q.metric)
+	resp, err := q.prom.doRequest(ctx, http.MethodPost, "/api/v1/metadata", args)
 	if err != nil {
-		return queryResult{err: fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)}
+		qr.err = fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)
+		return qr
 	}
-	return queryResult{value: v, expires: q.timestamp.Add(cacheExpiry * 2)}
+	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		qr.err = tryDecodingAPIError(resp)
+		return qr
+	}
+
+	qr.value, qr.err = streamMetadata(resp.Body)
+	return qr
 }
 
 func (q metadataQuery) Endpoint() string {
@@ -78,4 +95,37 @@ func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResu
 	metadata := MetadataResult{URI: p.uri, Metadata: result.value.(map[string][]v1.Metadata)[metric]}
 
 	return &metadata, nil
+}
+
+func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
+	defer dummyReadAll(r)
+
+	var status, errType, errText string
+	meta = map[string][]v1.Metadata{}
+	decoder := current.Object(
+		func() {},
+		current.Key("status", current.Text(func(s string) {
+			status = s
+		})),
+		current.Key("error", current.Text(func(s string) {
+			errText = s
+		})),
+		current.Key("errorType", current.Text(func(s string) {
+			errType = s
+		})),
+		current.Key("data", current.Map(func(k string, v []v1.Metadata) {
+			meta[k] = v
+		})),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = current.Stream(dec, decoder); err != nil {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	return meta, nil
 }
