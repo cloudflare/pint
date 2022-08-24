@@ -2,6 +2,11 @@
 
 ## v0.29.0
 
+### Changed
+
+- Switched from using [prometheus/client_golang](https://github.com/prometheus/client_golang)
+  API client to streaming JSON library [prymitive/current](https://github.com/prymitive/current)
+
 ### Fixed
 
 - Avoid reporting same issue multiple times in `promql/rate` and `promql/regexp` checks.
