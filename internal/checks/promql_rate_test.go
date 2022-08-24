@@ -343,7 +343,7 @@ func TestRateCheck(t *testing.T) {
 						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}
@@ -458,7 +458,7 @@ func TestRateCheck(t *testing.T) {
 						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: server error: 500"),
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}

@@ -30,6 +30,10 @@ func TestMetadata(t *testing.T) {
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"counter":[{"type":"counter","help":"Text","unit":""}]}}`))
+		case "mixed":
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"success","data":{"mixed":[{"type":"gauge","help":"Text1","unit":"abc"},{"type":"counter","help":"Text2","unit":""}]}}`))
 		case "notfound":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
@@ -76,6 +80,17 @@ func TestMetadata(t *testing.T) {
 			metadata: promapi.MetadataResult{
 				URI:      srv.URL,
 				Metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
+			},
+		},
+		{
+			metric:  "mixed",
+			timeout: time.Second,
+			metadata: promapi.MetadataResult{
+				URI: srv.URL,
+				Metadata: []v1.Metadata{
+					{Type: "gauge", Help: "Text1", Unit: "abc"},
+					{Type: "counter", Help: "Text2", Unit: ""},
+				},
 			},
 		},
 		{

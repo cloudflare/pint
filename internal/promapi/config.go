@@ -3,11 +3,15 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io"
+	"net/http"
+	"net/url"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
@@ -42,11 +46,23 @@ func (q configQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	v, err := q.prom.api.Config(ctx)
+	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+
+	args := url.Values{}
+	resp, err := q.prom.doRequest(ctx, http.MethodGet, "/api/v1/status/config", args)
 	if err != nil {
-		return queryResult{err: fmt.Errorf("failed to query Prometheus config: %w", err)}
+		qr.err = fmt.Errorf("failed to query Prometheus config: %w", err)
+		return qr
 	}
-	return queryResult{value: v, expires: q.timestamp.Add(cacheExpiry * 2)}
+	defer resp.Body.Close()
+
+	if resp.StatusCode/100 != 2 {
+		qr.err = tryDecodingAPIError(resp)
+		return qr
+	}
+
+	qr.value, qr.err = streamConfig(resp.Body)
+	return qr
 }
 
 func (q configQuery) Endpoint() string {
@@ -84,7 +100,7 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	}
 
 	var cfg PrometheusConfig
-	if err := yaml.Unmarshal([]byte(result.value.(v1.ConfigResult).YAML), &cfg); err != nil {
+	if err := yaml.Unmarshal([]byte(result.value.(string)), &cfg); err != nil {
 		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
 		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.uri, err)
 	}
@@ -102,4 +118,39 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	r := ConfigResult{URI: p.uri, Config: cfg}
 
 	return &r, nil
+}
+
+func streamConfig(r io.Reader) (cfg string, err error) {
+	defer dummyReadAll(r)
+
+	var status, errType, errText string
+	decoder := current.Object(
+		func() {},
+		current.Key("status", current.Text(func(s string) {
+			status = s
+		})),
+		current.Key("error", current.Text(func(s string) {
+			errText = s
+		})),
+		current.Key("errorType", current.Text(func(s string) {
+			errType = s
+		})),
+		current.Key("data", current.Object(
+			func() {},
+			current.Key("yaml", current.Text(func(s string) {
+				cfg = s
+			})),
+		)),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = current.Stream(dec, decoder); err != nil {
+		return cfg, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return cfg, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	return cfg, nil
 }

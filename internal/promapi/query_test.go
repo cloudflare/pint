@@ -112,16 +112,16 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			result: promapi.QueryResult{
 				URI:    srv.URL,
-				Series: model.Vector{},
+				Series: []model.Sample{},
 			},
 		},
 		{
 			query:   "single_result",
-			timeout: time.Second,
+			timeout: time.Second * 5,
 			result: promapi.QueryResult{
 				URI: srv.URL,
-				Series: model.Vector{
-					&model.Sample{
+				Series: []model.Sample{
+					{
 						Metric:    model.Metric{},
 						Value:     model.SampleValue(1),
 						Timestamp: model.Time(1614859502068),
@@ -134,18 +134,18 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			result: promapi.QueryResult{
 				URI: srv.URL,
-				Series: model.Vector{
-					&model.Sample{
+				Series: []model.Sample{
+					{
 						Metric:    model.Metric{"instance": "1"},
 						Value:     model.SampleValue(1),
 						Timestamp: model.Time(1614859502068),
 					},
-					&model.Sample{
+					{
 						Metric:    model.Metric{"instance": "2"},
 						Value:     model.SampleValue(2),
 						Timestamp: model.Time(1614859502168),
 					},
-					&model.Sample{
+					{
 						Metric:    model.Metric{"instance": "3"},
 						Value:     model.SampleValue(3),
 						Timestamp: model.Time(1614859503000),
@@ -161,7 +161,7 @@ func TestQuery(t *testing.T) {
 		{
 			query:   "matrix",
 			timeout: time.Second,
-			err:     "unknown result type: matrix",
+			err:     "bad_response: invalid result type, expected vector, got matrix",
 		},
 		{
 			query:   "timeout",
@@ -173,8 +173,8 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			result: promapi.QueryResult{
 				URI: srv.URL,
-				Series: model.Vector{
-					&model.Sample{
+				Series: []model.Sample{
+					{
 						Metric:    model.Metric{},
 						Value:     model.SampleValue(1),
 						Timestamp: model.Time(1614859502068),

@@ -21,6 +21,10 @@ func TestFlags(t *testing.T) {
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
+		case "/foo/api/v1/status/flags":
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{"status":"success","data":{"foo":"bar"}}`))
 		case "/once/api/v1/status/flags":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
@@ -62,6 +66,14 @@ func TestFlags(t *testing.T) {
 			},
 		},
 		{
+			prefix:  "/foo",
+			timeout: time.Second,
+			flags: promapi.FlagsResult{
+				URI:   srv.URL + "/foo",
+				Flags: v1.FlagsResult{"foo": "bar"},
+			},
+		},
+		{
 			prefix:  "/slow",
 			timeout: time.Millisecond * 10,
 			err:     "connection timeout",
@@ -74,7 +86,7 @@ func TestFlags(t *testing.T) {
 		{
 			prefix:  "/badYaml",
 			timeout: time.Second,
-			err:     `bad_response: v1.apiResponse.Data: ReadObject: expect : after object field, but found }, error found in #10 byte of ...|a":{"xxx"}}|..., bigger context ...|{"status":"success","data":{"xxx"}}|...`,
+			err:     `bad_response: JSON parse error: expected colon after object key`,
 		},
 	}
 

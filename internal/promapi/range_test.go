@@ -132,10 +132,20 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T03:00:00Z"),
 			step:    time.Minute * 5,
 			timeout: time.Second,
-			samples: []*model.SampleStream{{
-				Metric: model.Metric{"instance": "1"},
-				Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T03:00:00Z"), time.Minute*5),
-			}},
+			samples: []*model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T03:00:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "2"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T03:00:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "3"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T03:00:00Z"), time.Minute*5),
+				},
+			},
 			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
 				err := r.ParseForm()
 				if err != nil {
@@ -164,8 +174,8 @@ func TestRange(t *testing.T) {
 					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 				}
 				_, _ = w.Write([]byte(fmt.Sprintf(
-					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-					strings.Join(values, ","))))
+					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]},{"metric":{"instance":"2"}, "values":[%s]},{"metric":{"instance":"3"}, "values":[%s]}]}}`,
+					strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","))))
 			},
 		},
 		{
@@ -263,7 +273,7 @@ func TestRange(t *testing.T) {
 			end:     timeParse("2022-06-14T00:05:00Z"),
 			step:    time.Second,
 			timeout: time.Second,
-			err:     "unknown result type: vector",
+			err:     "bad_response: invalid result type, expected matrix, got vector",
 			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
 				err := r.ParseForm()
 				if err != nil {
@@ -310,7 +320,7 @@ func TestRange(t *testing.T) {
 				require.EqualError(t, err, tc.err, tc)
 			} else {
 				require.NoError(t, err)
-				require.Equal(t, qr.Samples, tc.samples, tc)
+				require.Equal(t, tc.samples, qr.Samples, tc)
 			}
 		})
 	}
