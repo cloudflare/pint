@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.29.1
+
+### Fixed
+
+- Fixed wrong request formatting for Prometheus metric metadata queries.
+
 ## v0.29.0
 
 ### Changed

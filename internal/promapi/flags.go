@@ -37,7 +37,7 @@ func (q flagsQuery) Run() queryResult {
 	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
 
 	args := url.Values{}
-	resp, err := q.prom.doRequest(ctx, http.MethodGet, "/api/v1/status/flags", args)
+	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus flags: %w", err)
 		return qr

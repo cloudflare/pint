@@ -56,7 +56,8 @@ func (q rangeQuery) Run() queryResult {
 	args.Set("start", formatTime(q.r.Start))
 	args.Set("end", formatTime(q.r.End))
 	args.Set("step", strconv.FormatFloat(q.r.Step.Seconds(), 'f', -1, 64))
-	resp, err := q.prom.doRequest(ctx, http.MethodPost, "/api/v1/query_range", args)
+	args.Set("timeout", q.prom.timeout.String())
+	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
 		return qr
