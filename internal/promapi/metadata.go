@@ -40,7 +40,7 @@ func (q metadataQuery) Run() queryResult {
 
 	args := url.Values{}
 	args.Set("metric", q.metric)
-	resp, err := q.prom.doRequest(ctx, http.MethodPost, "/api/v1/metadata", args)
+	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)
 		return qr

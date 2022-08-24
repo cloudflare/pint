@@ -41,7 +41,8 @@ func (q instantQuery) Run() queryResult {
 
 	args := url.Values{}
 	args.Set("query", q.expr)
-	resp, err := q.prom.doRequest(ctx, http.MethodPost, "/api/v1/query", args)
+	args.Set("timeout", q.prom.timeout.String())
+	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
 		return qr

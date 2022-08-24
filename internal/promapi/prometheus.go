@@ -126,11 +126,14 @@ func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args
 		return nil, err
 	}
 
-	if prom.timeout > 0 {
-		args.Set("timeout", prom.timeout.String())
+	var body io.Reader
+	if method == http.MethodPost {
+		body = strings.NewReader(args.Encode())
+	} else if eargs := args.Encode(); eargs != "" {
+		uri += "?" + eargs
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, uri, strings.NewReader(args.Encode()))
+	req, err := http.NewRequestWithContext(ctx, method, uri, body)
 	if err != nil {
 		return nil, err
 	}
