@@ -14,7 +14,7 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.37.0
 	github.com/prometheus/prometheus v0.38.0
-	github.com/prymitive/current v0.0.0-20220824101118-443c8cff6d1a
+	github.com/prymitive/current v0.0.0-20220825134203-0bab7d8d57fc
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.8.0

@@ -356,7 +356,7 @@ func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
 			current.Key("result", current.Array(func(sample *model.SampleStream) {
 				samples = append(samples, *sample)
 				sample.Metric = model.Metric{}
-				sample.Values = make([]model.SamplePair, 0, len(sample.Values))
+				sample.Values = []model.SamplePair{}
 			})),
 		)),
 	)

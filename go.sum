@@ -389,8 +389,8 @@ github.com/prometheus/procfs v0.8.0 h1:ODq8ZFEaYeCaZOJlZZdJA2AbQR98dSHSM1KW/You5
 github.com/prometheus/procfs v0.8.0/go.mod h1:z7EfXMXOkbkqb9IINtpCn86r/to3BnA0uaxHdg830/4=
 github.com/prometheus/prometheus v0.38.0 h1:YSiJ5gDZmXnOntPRyHn1wb/6I1Frasj9dw57XowIqeA=
 github.com/prometheus/prometheus v0.38.0/go.mod h1:2zHO5FtRhM+iu995gwKIb99EXxjeZEuXpKUTIRq4YI0=
-github.com/prymitive/current v0.0.0-20220824101118-443c8cff6d1a h1:H440xi5oZoOX6e7qwPxQcsToVr1upubrxK2JWwEM7F4=
-github.com/prymitive/current v0.0.0-20220824101118-443c8cff6d1a/go.mod h1:ZKbTBHjDMGAM3YPcnkA2I4L5U/vYfbXyVTKZJWhTCoc=
+github.com/prymitive/current v0.0.0-20220825134203-0bab7d8d57fc h1:ZbDWHY5AScgVzxB0Gt2SpT6Maoi2xHjyQ25AzDmA3K8=
+github.com/prymitive/current v0.0.0-20220825134203-0bab7d8d57fc/go.mod h1:ZKbTBHjDMGAM3YPcnkA2I4L5U/vYfbXyVTKZJWhTCoc=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
