@@ -96,7 +96,7 @@ func tryDecodingAPIError(resp *http.Response) error {
 	)
 
 	dec := json.NewDecoder(resp.Body)
-	if err := current.Stream(dec, decoder); err != nil {
+	if err := decoder.Stream(dec); err != nil {
 		switch resp.StatusCode / 100 {
 		case 4:
 			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: fmt.Sprintf("client error: %d", resp.StatusCode)}
