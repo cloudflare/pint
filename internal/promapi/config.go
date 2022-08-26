@@ -144,7 +144,7 @@ func streamConfig(r io.Reader) (cfg string, err error) {
 	)
 
 	dec := json.NewDecoder(r)
-	if err = current.Stream(dec, decoder); err != nil {
+	if err = decoder.Stream(dec); err != nil {
 		return cfg, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
 	}
 

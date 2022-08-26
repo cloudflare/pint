@@ -335,7 +335,7 @@ func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
 	defer dummyReadAll(r)
 
 	var status, errType, errText, resultType string
-
+	var sample model.SampleStream
 	samples = []model.SampleStream{}
 	decoder := current.Object(
 		func() {},
@@ -353,16 +353,19 @@ func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
 			current.Key("resultType", current.Text(func(s string) {
 				resultType = s
 			})),
-			current.Key("result", current.Array(func(sample *model.SampleStream) {
-				samples = append(samples, *sample)
-				sample.Metric = model.Metric{}
-				sample.Values = []model.SamplePair{}
-			})),
+			current.Key("result", current.Array(
+				&sample,
+				func() {
+					samples = append(samples, sample)
+					sample.Metric = model.Metric{}
+					sample.Values = []model.SamplePair{}
+				},
+			)),
 		)),
 	)
 
 	dec := json.NewDecoder(r)
-	if err = current.Stream(dec, decoder); err != nil {
+	if err = decoder.Stream(dec); err != nil {
 		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
 	}
 
