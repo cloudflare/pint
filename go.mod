@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/gkampitakis/go-snaps v0.3.4
+	github.com/gkampitakis/go-snaps v0.3.5
 	github.com/google/go-cmp v0.5.8
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/golang-lru v0.5.4
