@@ -103,7 +103,6 @@ func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 	var status, errType, errText string
 	meta = map[string][]v1.Metadata{}
 	decoder := current.Object(
-		func() {},
 		current.Key("status", current.Value(func(s string, isNil bool) {
 			status = s
 		})),

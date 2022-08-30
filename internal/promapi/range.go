@@ -338,7 +338,6 @@ func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
 	var sample model.SampleStream
 	samples = []model.SampleStream{}
 	decoder := current.Object(
-		func() {},
 		current.Key("status", current.Value(func(s string, isNil bool) {
 			status = s
 		})),
@@ -349,7 +348,6 @@ func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
 			errType = s
 		})),
 		current.Key("data", current.Object(
-			func() {},
 			current.Key("resultType", current.Value(func(s string, isNil bool) {
 				resultType = s
 			})),

@@ -98,7 +98,6 @@ func streamFlags(r io.Reader) (flags v1.FlagsResult, err error) {
 	var status, errType, errText string
 	flags = v1.FlagsResult{}
 	decoder := current.Object(
-		func() {},
 		current.Key("status", current.Value(func(s string, isNil bool) {
 			status = s
 		})),
