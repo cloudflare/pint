@@ -241,6 +241,7 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 
 func (c *problemCollector) scan(ctx context.Context, workers int) error {
 	finder := discovery.NewGlobFinder(c.paths, c.cfg.Parser.CompileRelaxed())
+	// nolint: contextcheck
 	entries, err := finder.Find()
 	if err != nil {
 		return err
