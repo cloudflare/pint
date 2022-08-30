@@ -126,18 +126,18 @@ func streamConfig(r io.Reader) (cfg string, err error) {
 	var status, errType, errText string
 	decoder := current.Object(
 		func() {},
-		current.Key("status", current.Text(func(s string) {
+		current.Key("status", current.Value(func(s string, isNil bool) {
 			status = s
 		})),
-		current.Key("error", current.Text(func(s string) {
+		current.Key("error", current.Value(func(s string, isNil bool) {
 			errText = s
 		})),
-		current.Key("errorType", current.Text(func(s string) {
+		current.Key("errorType", current.Value(func(s string, isNil bool) {
 			errType = s
 		})),
 		current.Key("data", current.Object(
 			func() {},
-			current.Key("yaml", current.Text(func(s string) {
+			current.Key("yaml", current.Value(func(s string, isNil bool) {
 				cfg = s
 			})),
 		)),

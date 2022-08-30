@@ -104,7 +104,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 
 	if rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {
-			if err := checkTemplateSyntax(label.Key.Value, label.Value.Value, data); err != nil {
+			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
 					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
@@ -165,7 +165,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 
 	if rule.AlertingRule.Annotations != nil {
 		for _, annotation := range rule.AlertingRule.Annotations.Items {
-			if err := checkTemplateSyntax(annotation.Key.Value, annotation.Value.Value, data); err != nil {
+			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
 					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 					Lines:    annotation.Lines(),
@@ -237,9 +237,9 @@ func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems 
 	return problems
 }
 
-func checkTemplateSyntax(name, text string, data interface{}) error {
+func checkTemplateSyntax(ctx context.Context, name, text string, data interface{}) error {
 	tmpl := promTemplate.NewTemplateExpander(
-		context.TODO(),
+		ctx,
 		strings.Join(append(templateDefs, text), ""),
 		name,
 		data,
