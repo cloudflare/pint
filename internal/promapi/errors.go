@@ -83,7 +83,6 @@ func decodeError(err error) string {
 func tryDecodingAPIError(resp *http.Response) error {
 	var status, errType, errText string
 	decoder := current.Object(
-		func() {},
 		current.Key("status", current.Value(func(s string, isNil bool) {
 			status = s
 		})),
