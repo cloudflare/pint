@@ -24,6 +24,24 @@ to verify that:
   or [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv) 
   functions instead.
 
+## Common problems
+
+### Metadata mismatch
+
+Metric type checks are using
+[metadata API](https://prometheus.io/docs/prometheus/latest/querying/api/#querying-metric-metadata).
+Metadata is aggregated from all scraped metrics.
+
+This can cause a few potential problems:
+
+- You might have the same metric reported with multiple different types and Prometheus or pint won't know
+  which time series is which type, because all we have to match a metric to a type is its name.
+  Best solution here is to never export same name as multiple metrics with different types.
+- If you change the typo of some exported metric then the old type will still show up in metadata,
+  plus the new one, as long as there's at least one target still exporting old metric type.
+  If you accidentally exported some metric with wrong type, then fixed it, but pint is still complaining,
+  then it's very likely that you didn't release your fix to all targets yet.
+
 ## Configuration
 
 This check doesn't have any configuration options.
