@@ -26,7 +26,7 @@ to determine why, by checking if:
 If you see this check complaining about some metric it's might due to a number
 of different issues. Here are some usual cases.
 
-## Your query is using ALERTS or ALERTS_FOR_STATE metrics
+### Your query is using ALERTS or ALERTS_FOR_STATE metrics
 
 Prometheus itself exposes [metrics about active alerts](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#inspecting-alerts-during-runtime).
 And it's possible to use those metrics in recording or alerting rules.
@@ -35,7 +35,7 @@ If pint finds a query using either `ALERTS{alertname="..."}` or
 alerting rule with matching name defined. For queries that don't pass any
 `alertname` label filters it will skip any further checks.
 
-## Your query is using recording rules
+### Your query is using recording rules
 
 If a metric isn't present in Prometheus but pint finds a recording rule
 with matching name then it will emit a warning and skip further checks.
