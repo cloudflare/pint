@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.29.3
+
+### Fixed
+
+- Revert 'Use smaller buffers when decoding Prometheus API responses' change.
+
 ## v0.29.2
 
 ### Fixed
