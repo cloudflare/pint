@@ -4,6 +4,8 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
+// RemoveConditions takes a *valid* PromQL expression and removes
+// any condition from it.
 func RemoveConditions(source string) promParser.Node {
 	node, _ := promParser.ParseExpr(source)
 	switch n := node.(type) {
@@ -34,9 +36,16 @@ func RemoveConditions(source string) promParser.Node {
 		n.RHS = rhs.(promParser.Expr)
 		return n
 	case *promParser.Call:
+		fn := promParser.Functions[n.Func.Name]
 		ret := promParser.Expressions{}
-		for _, e := range n.Args {
-			ret = append(ret, RemoveConditions(e.String()).(promParser.Expr))
+		for i, e := range n.Args {
+			// nolint: exhaustive
+			switch fn.ArgTypes[i] {
+			case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
+				ret = append(ret, RemoveConditions(e.String()).(promParser.Expr))
+			default:
+				ret = append(ret, e)
+			}
 		}
 		n.Args = ret
 		return n

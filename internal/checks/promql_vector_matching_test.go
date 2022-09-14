@@ -37,6 +37,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems:    noProblems,
 		},
 		{
+			description: "ignores rules with bogus calls",
+			content:     "- record: foo\n  expr: sum(foo, 5) without(\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+		},
+		{
 			description: "one to one matching",
 			content:     "- record: foo\n  expr: foo_with_notfound / bar\n",
 			checker:     newVectorMatchingCheck,
