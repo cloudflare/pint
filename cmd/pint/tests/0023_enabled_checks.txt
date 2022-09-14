@@ -21,7 +21,7 @@ parser {
   relaxed = ["rules/.*"]
 }
 prometheus "prom" {
-  uri      = "https://"
+  uri      = "http://127.0.0.1"
   required = true
 }
 
