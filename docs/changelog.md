@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.29.4
+
+### Fixed
+
+- [promql/vector_matching](checks/promql/vector_matching.md) was incorrectly handling
+  queries containing function calls with multiple arguments.
+
 ## v0.29.3
 
 ### Fixed

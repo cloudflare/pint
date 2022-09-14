@@ -40,6 +40,10 @@ func TestRemoveConditions(t *testing.T) {
 			output: "min_over_time(foo_with_notfound[30m:1m]) / bar",
 		},
 		{
+			input:  "min_over_time((foo_with_notfound > 0)[30m:1m]) / 2",
+			output: "min_over_time(foo_with_notfound[30m:1m])",
+		},
+		{
 			input:  "min_over_time(rate(http_requests_total[5m])[30m:1m])",
 			output: "min_over_time(rate(http_requests_total[5m])[30m:1m])",
 		},
@@ -50,6 +54,14 @@ func TestRemoveConditions(t *testing.T) {
 		{
 			input:  `(quantile_over_time(0.9, (rate(container_cpu_system_seconds_total{app_name="foo"}[5m]) + rate(container_cpu_user_seconds_total{app_name="foo"}[5m]))[5m:]) / on(instance) bar) > 0.65`,
 			output: `(quantile_over_time(0.9, (rate(container_cpu_system_seconds_total{app_name="foo"}[5m]) + rate(container_cpu_user_seconds_total{app_name="foo"}[5m]))[5m:]) / on (instance) bar)`,
+		},
+		{
+			input:  "sum(foo > 5)",
+			output: "sum(foo)",
+		},
+		{
+			input:  `predict_linear(ceph_pool_max_avail[2d], 3600 * 24 * 5) * on(pool_id) group_left(name) ceph_pool_metadata < 0`,
+			output: `predict_linear(ceph_pool_max_avail[2d], 3600 * 24 * 5) * on (pool_id) group_left (name) ceph_pool_metadata`,
 		},
 	}
 
