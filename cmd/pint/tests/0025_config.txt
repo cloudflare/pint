@@ -13,7 +13,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
   "prometheus": [
     {
       "name": "prom",
-      "uri": "https://",
+      "uri": "http://127.0.0.1",
       "timeout": "2m",
       "concurrency": 16,
       "rateLimit": 100,
@@ -22,7 +22,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
     },
     {
       "name": "custom-concurrency",
-      "uri": "https://",
+      "uri": "http://127.0.0.1",
       "timeout": "2m0s",
       "concurrency": 32,
       "rateLimit": 100,
@@ -31,7 +31,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
     },
     {
       "name": "custom-cache",
-      "uri": "https://",
+      "uri": "http://127.0.0.1",
       "timeout": "10s",
       "concurrency": 16,
       "rateLimit": 100,
@@ -40,7 +40,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
     },
     {
       "name": "custom-rateLimit",
-      "uri": "https://",
+      "uri": "http://127.0.0.1",
       "timeout": "15s",
       "concurrency": 16,
       "rateLimit": 1,
@@ -157,25 +157,25 @@ level=info msg="Loading configuration file" path=.pint.hcl
 }
 -- .pint.hcl --
 prometheus "prom" {
-  uri     = "https://"
+  uri     = "http://127.0.0.1"
   timeout = "2m"
   required = true
 }
 
 prometheus "custom-concurrency" {
-  uri         = "https://"
+  uri         = "http://127.0.0.1"
   required    = false
   concurrency = 32
 }
 
 prometheus "custom-cache" {
-  uri      = "https://"
+  uri      = "http://127.0.0.1"
   timeout  = "10s"
   cache    = 32
 }
 
 prometheus "custom-rateLimit" {
-  uri       = "https://"
+  uri       = "http://127.0.0.1"
   timeout   = "15s"
   rateLimit = 1
 }
