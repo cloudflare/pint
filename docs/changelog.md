@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.29.5
+## v0.30.0
 
 ### Added
 
@@ -9,6 +9,20 @@
   so it's still visible in BitBucket.
   Now pint will also add a note to that annotation to make it clear that the problem is really
   on a different line.
+- [alerts/template](checks/alerts/template.md) will now run extra checks to validate syntax
+  of queries executed from within alerting rule templates.
+
+  Example template using `sum(xxx` query that's missing closing `)`:
+
+  ```yaml
+  - alert: ...
+    expr: ...
+    annotations:
+      summary: |
+        {{ with query "sum(xxx" }}
+        {{ . | first | value | humanize }}
+        {{ end }}
+  ```
 
 ## v0.29.4
 

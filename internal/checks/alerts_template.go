@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/timestamp"
+	"github.com/prometheus/prometheus/promql"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	promTemplate "github.com/prometheus/prometheus/template"
 
@@ -237,6 +238,29 @@ func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems 
 	return problems
 }
 
+func queryFunc(ctx context.Context, expr string, ts time.Time) (promql.Vector, error) {
+	if _, err := promParser.ParseExpr(expr); err != nil {
+		return nil, err
+	}
+	// return a single sample so template using `... | first` don't fail
+	return promql.Vector{{}}, nil
+}
+
+func normalizeTemplateError(name string, err error) error {
+	e := strings.TrimPrefix(err.Error(), fmt.Sprintf("template: %s:", name))
+	if v := strings.SplitN(e, ":", 2); len(v) > 1 {
+		e = strings.TrimPrefix(v[1], " ")
+	}
+	return errors.New(e)
+}
+
+func maybeExpandError(err error) error {
+	if e := errors.Unwrap(err); e != nil {
+		return e
+	}
+	return err
+}
+
 func checkTemplateSyntax(ctx context.Context, name, text string, data interface{}) error {
 	tmpl := promTemplate.NewTemplateExpander(
 		ctx,
@@ -244,17 +268,20 @@ func checkTemplateSyntax(ctx context.Context, name, text string, data interface{
 		name,
 		data,
 		model.Time(timestamp.FromTime(time.Now())),
-		nil,
+		queryFunc,
 		nil,
 		nil,
 	)
+
 	if err := tmpl.ParseTest(); err != nil {
-		e := strings.TrimPrefix(err.Error(), fmt.Sprintf("template: %s:", name))
-		if v := strings.SplitN(e, ":", 2); len(v) > 1 {
-			e = strings.TrimPrefix(v[1], " ")
-		}
-		return errors.New(e)
+		return normalizeTemplateError(name, maybeExpandError(err))
 	}
+
+	_, err := tmpl.Expand()
+	if err != nil {
+		return normalizeTemplateError(name, maybeExpandError(err))
+	}
+
 	return nil
 }
 
