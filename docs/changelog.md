@@ -14,6 +14,7 @@
 
   Example template using `sum(xxx` query that's missing closing `)`:
 
+  {% raw %}
   ```yaml
   - alert: ...
     expr: ...
@@ -23,6 +24,7 @@
         {{ . | first | value | humanize }}
         {{ end }}
   ```
+  {% endraw }
 
 ## v0.29.4
 
