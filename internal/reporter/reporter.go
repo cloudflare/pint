@@ -132,22 +132,3 @@ func shouldReport(report Report) bool {
 
 	return false
 }
-
-func reportedLine(report Report) (l int) {
-	l = -1
-	for _, pl := range report.Problem.Lines {
-		for _, ml := range report.ModifiedLines {
-			if pl == ml {
-				l = pl
-			}
-		}
-	}
-
-	if l < 0 && report.Problem.Severity == checks.Fatal {
-		for _, ml := range report.ModifiedLines {
-			return ml
-		}
-	}
-
-	return
-}

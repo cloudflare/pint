@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.29.5
+
+### Added
+
+- BitBucket only allows for annotations on modified lines, so when a high severity problem
+  is reported on unmodified line pint will move that annotation to the first modified line,
+  so it's still visible in BitBucket.
+  Now pint will also add a note to that annotation to make it clear that the problem is really
+  on a different line.
+
 ## v0.29.4
 
 ### Fixed
