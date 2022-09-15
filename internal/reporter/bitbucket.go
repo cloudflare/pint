@@ -130,7 +130,11 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 		return
 	}
 
-	reportLine := reportedLine(report)
+	var msgPrefix string
+	reportLine, srcLine := moveReportedLine(report)
+	if reportLine != srcLine {
+		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
+	}
 
 	var severity, atype string
 	switch report.Problem.Severity {
@@ -148,7 +152,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 	a := BitBucketAnnotation{
 		Path:     report.Path,
 		Line:     reportLine,
-		Message:  fmt.Sprintf("%s: %s", report.Problem.Reporter, report.Problem.Text),
+		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Text),
 		Severity: severity,
 		Type:     atype,
 		Link:     fmt.Sprintf("https://cloudflare.github.io/pint/checks/%s.html", report.Problem.Reporter),
@@ -242,4 +246,30 @@ func (r BitBucketReporter) postReport(commit string, isPassing bool, annotations
 	}
 
 	return r.createAnnotations(commit, annotations)
+}
+
+// BitBucket only allows us to report annotations for modified lines.
+// If a high severity problem is detected on a non-modified line we move that annotation
+// to the first modified line.
+// Without this we could have a report that is marked as failed, but with no annotations
+// at all, which would make it more difficult to fix.
+func moveReportedLine(report Report) (reported, original int) {
+	reported = -1
+	for _, pl := range report.Problem.Lines {
+		original = pl
+		for _, ml := range report.ModifiedLines {
+			if pl == ml {
+				reported = pl
+			}
+		}
+	}
+
+	if reported < 0 && report.Problem.Severity == checks.Fatal {
+		for _, ml := range report.ModifiedLines {
+			reported = ml
+			break
+		}
+	}
+
+	return reported, original
 }

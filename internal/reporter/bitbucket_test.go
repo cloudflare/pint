@@ -353,7 +353,7 @@ func TestBitBucketReporter(t *testing.T) {
 					{
 						Path:     "foo.txt",
 						Line:     3,
-						Message:  "test/mock: syntax error",
+						Message:  "Problem reported on unmodified line 1, annotation moved here: test/mock: syntax error",
 						Severity: "HIGH",
 						Type:     "BUG",
 						Link:     "https://cloudflare.github.io/pint/checks/test/mock.html",
