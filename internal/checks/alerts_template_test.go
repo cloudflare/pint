@@ -635,7 +635,7 @@ func TestTemplateCheck(t *testing.T) {
 - alert: Foo
   expr: rate(errors[2m]) > 0
   annotations:
-    summary: "Seeing {{ $value | first }} errors"
+    summary: "Seeing {{ $value }} errors"
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
@@ -657,7 +657,7 @@ func TestTemplateCheck(t *testing.T) {
 - alert: Foo
   expr: rate(errors[2m]) > 0
   annotations:
-    summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar | first }} errors"
+    summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
@@ -735,7 +735,7 @@ func TestTemplateCheck(t *testing.T) {
 - alert: Foo
   expr: rate(errors[2m]) > 0
   annotations:
-    summary: "Seeing {{ $value | first | humanize }} errors"
+    summary: "Seeing {{ $value | humanize }} errors"
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
@@ -801,6 +801,152 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   noProblems,
 		},
+		{
+			description: "template query with syntax error",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ with printf "sum({job='%s'}) by(" .Labels.job | query }}
+      {{ . | first | label "instance" }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "summary: {{ with printf \"sum({job='%s'}) by(\" .Labels.job | query }}\n{{ . | first | label \"instance\" }}\n{{ end }}\n",
+						Lines:    []int{5, 6, 7, 8},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template parse error: 163: executing "summary" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`,
+						Severity: checks.Fatal,
+					},
+				}
+			},
+		},
+		{
+			description: "template query with bogus function",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ with printf "suz({job='%s'})" .Labels.job | query }}
+      {{ . | first | label "instance" }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "summary: {{ with printf \"suz({job='%s'})\" .Labels.job | query }}\n{{ . | first | label \"instance\" }}\n{{ end }}\n",
+						Lines:    []int{5, 6, 7, 8},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template parse error: 159: executing "summary" at <query>: error calling query: 1:1: parse error: unknown function with name "suz"`,
+						Severity: checks.Fatal,
+					},
+				}
+			},
+		},
+		{
+			description: "$value | first",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m])
+  annotations:
+    summary: "{{ $value | first }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "summary: {{ $value | first }} errors",
+						Lines:    []int{5},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template parse error: 124: executing "summary" at <first>: wrong type for value; expected template.queryResult; got float64`,
+						Severity: checks.Fatal,
+					},
+					{
+						Fragment: "rate(errors[2m])",
+						Lines:    []int{3, 5},
+						Reporter: checks.TemplateCheckName,
+						Text:     humanizeText("rate(errors[2m])"),
+						Severity: checks.Information,
+					},
+				}
+			},
+		},
+		{
+			description: "template query with with bogus range",
+			content: `
+- alert: Foo
+  expr: up == 0
+  annotations:
+    summary: |
+      {{ range query "up xxx" }}
+      {{ .Labels.instance }} {{ .Value }}
+      {{ end }}
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "summary: {{ range query \"up xxx\" }}\n{{ .Labels.instance }} {{ .Value }}\n{{ end }}\n",
+						Lines:    []int{5, 6, 7, 8},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template parse error: 121: executing "summary" at <query "up xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`,
+						Severity: checks.Fatal,
+					},
+				}
+			},
+		},
+		{
+			description: "template query with valid expr",
+			content: `
+- alert: Foo
+  expr: up{job="bar"} == 0
+  annotations:
+    summary: Instance {{ printf "up{job='bar', instance='%s'}" $labels.instance | query | first | value }} is down'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		/*
+					TODO
+					{
+						description: "template query removes instance",
+						content: `
+			- alert: Foo
+			  expr: up == 0
+			  annotations:
+			    summary: |
+			      {{ with printf "sum({job='%s'})" .Labels.job | query }}
+			      {{ . | first | label "instance" }}
+			      {{ end }}
+			`,
+						checker:    newTemplateCheck,
+						prometheus: noProm,
+						problems: func(uri string) []checks.Problem {
+							return []checks.Problem{
+								{
+									Fragment: `summary: |
+			    {{ with printf "sum({job='%s'})" .Labels.job | query }}
+			    {{ . | first | label "instance" }}`,
+									Lines:    []int{5, 6, 7, 8},
+									Reporter: checks.TemplateCheckName,
+									Text:     `"summary" annotation template sends a query that is using "instance" label but that query removes it`,
+									Severity: checks.Bug,
+								},
+							}
+						},
+					},
+		*/
 	}
 	runTests(t, testCases)
 }
