@@ -26,6 +26,10 @@
   ```
   {% endraw }
 
+- If a file is ignored pint will now note that using `Information` level annotation.
+  This will make it more obvious that a CI check passed because pint didn't run any
+  checks due to file being excluded.
+
 ## v0.29.4
 
 ### Fixed
