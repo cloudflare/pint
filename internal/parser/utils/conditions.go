@@ -36,11 +36,16 @@ func RemoveConditions(source string) promParser.Node {
 		n.RHS = rhs.(promParser.Expr)
 		return n
 	case *promParser.Call:
-		fn := promParser.Functions[n.Func.Name]
 		ret := promParser.Expressions{}
 		for i, e := range n.Args {
+			var vt promParser.ValueType
+			if i >= len(n.Func.ArgTypes) {
+				vt = n.Func.ArgTypes[len(n.Func.ArgTypes)-1]
+			} else {
+				vt = n.Func.ArgTypes[i]
+			}
 			// nolint: exhaustive
-			switch fn.ArgTypes[i] {
+			switch vt {
 			case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
 				ret = append(ret, RemoveConditions(e.String()).(promParser.Expr))
 			default:

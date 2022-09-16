@@ -291,7 +291,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			c.problem,
 			prometheus.GaugeValue,
 			1,
-			report.Path,
+			report.SourcePath,
 			kind,
 			name,
 			strings.ToLower(report.Problem.Severity.String()),

@@ -73,7 +73,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 
 		if len(rep.ModifiedLines) == 1 {
 			comment = &github.DraftReviewComment{
-				Path: github.String(rep.Path),
+				Path: github.String(rep.ReportedPath),
 				Body: github.String(rep.Problem.Text),
 				Line: github.Int(rep.ModifiedLines[0]),
 			}
@@ -81,7 +81,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 			sort.Ints(rep.ModifiedLines)
 			start, end := rep.ModifiedLines[0], rep.ModifiedLines[len(rep.ModifiedLines)-1]
 			comment = &github.DraftReviewComment{
-				Path:      github.String(rep.Path),
+				Path:      github.String(rep.ReportedPath),
 				Body:      github.String(rep.Problem.Text),
 				Line:      github.Int(end),
 				StartLine: github.Int(start),

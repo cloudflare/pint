@@ -63,6 +63,18 @@ func TestRemoveConditions(t *testing.T) {
 			input:  `predict_linear(ceph_pool_max_avail[2d], 3600 * 24 * 5) * on(pool_id) group_left(name) ceph_pool_metadata < 0`,
 			output: `predict_linear(ceph_pool_max_avail[2d], 3600 * 24 * 5) * on (pool_id) group_left (name) ceph_pool_metadata`,
 		},
+		{
+			input:  `label_join(sum by (job, cluster, id) (rate(errors_total[5m])), "_tmp", "/", "cluster", "id")`,
+			output: `label_join(sum by (job, cluster, id) (rate(errors_total[5m])), "_tmp", "/", "cluster", "id")`,
+		},
+		{
+			input:  `round((foo > 0))`,
+			output: `round(foo)`,
+		},
+		{
+			input:  `round((foo > 0), 10)`,
+			output: `round(foo, 10)`,
+		},
 	}
 
 	for _, tc := range testCases {

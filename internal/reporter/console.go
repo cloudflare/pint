@@ -28,10 +28,10 @@ type ConsoleReporter struct {
 func (cr ConsoleReporter) Submit(summary Summary) error {
 	reports := summary.Reports()
 	sort.Slice(reports, func(i, j int) bool {
-		if reports[i].Path < reports[j].Path {
+		if reports[i].SourcePath < reports[j].SourcePath {
 			return true
 		}
-		if reports[i].Path > reports[j].Path {
+		if reports[i].SourcePath > reports[j].SourcePath {
 			return false
 		}
 		if reports[i].Problem.Lines[0] < reports[j].Problem.Lines[0] {
@@ -57,24 +57,31 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 
 		if !shouldReport(report) {
 			log.Debug().
-				Str("path", report.Path).
+				Str("path", report.SourcePath).
 				Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
 				Msg("Problem reported on unmodified line, skipping")
 			continue
 		}
 
-		if _, ok := perFile[report.Path]; !ok {
-			perFile[report.Path] = []string{}
+		if _, ok := perFile[report.SourcePath]; !ok {
+			perFile[report.SourcePath] = []string{}
 		}
 
-		content, err := readFile(report.Path)
+		content, err := readFile(report.SourcePath)
 		if err != nil {
 			return err
 		}
 
 		msg := []string{}
+
 		firstLine, lastLine := report.Problem.LineRange()
-		msg = append(msg, color.CyanString("%s:%s: ", report.Path, printLineRange(firstLine, lastLine)))
+
+		path := report.SourcePath
+		if report.SourcePath != report.ReportedPath {
+			path = fmt.Sprintf("%s ~> %s", report.SourcePath, report.ReportedPath)
+		}
+
+		msg = append(msg, color.CyanString("%s:%s: ", path, printLineRange(firstLine, lastLine)))
 		switch report.Problem.Severity {
 		case checks.Bug, checks.Fatal:
 			msg = append(msg, color.RedString(report.Problem.Text))
@@ -88,7 +95,7 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 		lines := strings.Split(content, "\n")
 		if lastLine > len(lines)-1 {
 			lastLine = len(lines) - 1
-			log.Warn().Str("path", report.Path).Msgf("Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details")
+			log.Warn().Str("path", report.SourcePath).Msgf("Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details")
 		}
 
 		nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
@@ -105,7 +112,7 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 				inPlaceholder = true
 			}
 		}
-		perFile[report.Path] = append(perFile[report.Path], strings.Join(msg, ""))
+		perFile[report.SourcePath] = append(perFile[report.SourcePath], strings.Join(msg, ""))
 	}
 
 	paths := []string{}

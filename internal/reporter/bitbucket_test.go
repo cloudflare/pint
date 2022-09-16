@@ -76,7 +76,14 @@ func TestBitBucketReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			reports: []reporter.Report{{Path: "foo.txt", Rule: mockRules[0], Problem: checks.Problem{}}},
+			reports: []reporter.Report{
+				{
+					ReportedPath: "foo.txt",
+					SourcePath:   "foo.txt",
+					Rule:         mockRules[0],
+					Problem:      checks.Problem{},
+				},
+			},
 			errorHandler: func(err error) error {
 				if err != nil && err.Error() == "failed to run git blame: git blame error" {
 					return nil
@@ -98,7 +105,8 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2},
 					Rule:          mockRules[0],
 					Problem:       checks.Problem{},
@@ -129,7 +137,8 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2},
 					Rule:          mockRules[0],
 					Problem:       checks.Problem{},
@@ -162,7 +171,8 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2},
 					Rule:          mockRules[0],
 					Problem:       checks.Problem{},
@@ -195,7 +205,8 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -207,7 +218,8 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path:          "bar.txt",
+					ReportedPath:  "bar.txt",
+					SourcePath:    "bar.txt",
 					ModifiedLines: []int{},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -219,7 +231,8 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -231,7 +244,8 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -243,7 +257,8 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -322,7 +337,8 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{3, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -414,8 +430,9 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path: "foo.txt",
-					Rule: mockRules[1],
+					ReportedPath: "foo.txt",
+					SourcePath:   "foo.txt",
+					Rule:         mockRules[1],
 					Problem: checks.Problem{
 						Fragment: "up",
 						Lines:    []int{1},
@@ -425,8 +442,9 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path: "bar.txt",
-					Rule: mockRules[1],
+					ReportedPath: "bar.txt",
+					SourcePath:   "bar.txt",
+					Rule:         mockRules[1],
 					Problem: checks.Problem{
 						Fragment: "up",
 						Lines:    []int{1},
@@ -436,8 +454,9 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path: "foo.txt",
-					Rule: mockRules[1],
+					ReportedPath: "foo.txt",
+					SourcePath:   "foo.txt",
+					Rule:         mockRules[1],
 					Problem: checks.Problem{
 						Fragment: "up",
 						Lines:    []int{2},
@@ -447,8 +466,9 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path: "foo.txt",
-					Rule: mockRules[0],
+					ReportedPath: "foo.txt",
+					SourcePath:   "foo.txt",
+					Rule:         mockRules[0],
 					Problem: checks.Problem{
 						Fragment: "up == 0",
 						Lines:    []int{2},
@@ -458,8 +478,9 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Path: "foo.txt",
-					Rule: mockRules[1],
+					ReportedPath: "foo.txt",
+					SourcePath:   "foo.txt",
+					Rule:         mockRules[1],
 					Problem: checks.Problem{
 						Fragment: "errors",
 						Lines:    []int{4},

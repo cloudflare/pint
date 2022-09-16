@@ -94,7 +94,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
 					log.Debug().
-						Str("path", entry.Path).
+						Str("path", entry.SourcePath).
 						Str("record", entry.Rule.RecordingRule.Record.Value.Value).
 						Str("lines", output.FormatLineRangeString(entry.Rule.Lines())).
 						Msg("Found recording rule")
@@ -102,13 +102,13 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 				if entry.Rule.AlertingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
 					log.Debug().
-						Str("path", entry.Path).
+						Str("path", entry.SourcePath).
 						Str("alert", entry.Rule.AlertingRule.Alert.Value.Value).
 						Str("lines", output.FormatLineRangeString(entry.Rule.Lines())).
 						Msg("Found alerting rule")
 				}
 
-				checkList := cfg.GetChecksForRule(ctx, entry.Path, entry.Rule)
+				checkList := cfg.GetChecksForRule(ctx, entry.SourcePath, entry.Rule)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
 					check := check
@@ -122,7 +122,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 			default:
 				if entry.Rule.Error.Err != nil {
 					log.Debug().
-						Str("path", entry.Path).
+						Str("path", entry.SourcePath).
 						Str("lines", output.FormatLineRangeString(entry.Rule.Lines())).
 						Msg("Found invalid rule")
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
@@ -163,7 +163,8 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			switch {
 			case errors.Is(job.entry.PathError, discovery.ErrFileIsIgnored):
 				results <- reporter.Report{
-					Path:          job.entry.Path,
+					ReportedPath:  job.entry.ReportedPath,
+					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
 						Lines:    job.entry.ModifiedLines,
@@ -176,7 +177,8 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			case job.entry.PathError != nil:
 				line, e := tryDecodingYamlError(job.entry.PathError)
 				results <- reporter.Report{
-					Path:          job.entry.Path,
+					ReportedPath:  job.entry.ReportedPath,
+					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
 						Lines:    []int{line},
@@ -188,7 +190,8 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 				}
 			case job.entry.Rule.Error.Err != nil:
 				results <- reporter.Report{
-					Path:          job.entry.Path,
+					ReportedPath:  job.entry.ReportedPath,
+					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Rule:          job.entry.Rule,
 					Problem: checks.Problem{
@@ -203,11 +206,11 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			default:
 				start := time.Now()
 				problems := job.check.Check(ctx, job.entry.Rule, job.allEntries)
-				duration := time.Since(start)
-				checkDuration.WithLabelValues(job.check.Reporter()).Observe(duration.Seconds())
+				checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
 				for _, problem := range problems {
 					results <- reporter.Report{
-						Path:          job.entry.Path,
+						ReportedPath:  job.entry.ReportedPath,
+						SourcePath:    job.entry.SourcePath,
 						ModifiedLines: job.entry.ModifiedLines,
 						Rule:          job.entry.Rule,
 						Problem:       problem,

@@ -30,6 +30,25 @@
   This will make it more obvious that a CI check passed because pint didn't run any
   checks due to file being excluded.
 
+### Changed
+
+- Prometheus rule files can be symlinked between directories.
+  If the symlink source and target files are in a different directory they can
+  end up querying different Prometheus server when running ping checks.
+  This means that when modifying symlink target file checks must be executed against
+  both symlink source and target.
+  Until now pint was ignoring symlinks but starting with this release it will try to
+  follow them. This means that if you modify a file that has symlinks pointint to them
+  pint will try run checks against those symlinks too.
+
+  **NOTE**: pint can only detect and check symlinks if they are located in the current
+  working directory (as seen by running pint process) or its subdirectories.
+
+### Fixed
+
+- Fixed a regression in [promql/vector_matching](checks/promql/vector_matching.md) that
+  would cause a panic when parsing function calls with optional arguments.
+
 ## v0.29.4
 
 ### Fixed

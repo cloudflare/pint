@@ -467,7 +467,7 @@ R090    foo/c2c.yml         c2c.yml
 
 				rules := []rule{}
 				for _, e := range entries {
-					t.Logf("Entry: path=%s pathErr=%v lines=%v modified=%v", e.Path, e.PathError, e.Rule.Lines(), e.ModifiedLines)
+					t.Logf("Entry: path=%s pathErr=%v lines=%v modified=%v", e.SourcePath, e.PathError, e.Rule.Lines(), e.ModifiedLines)
 					var name string
 					if e.Rule.AlertingRule != nil {
 						name = e.Rule.AlertingRule.Alert.Value.Value
@@ -476,7 +476,7 @@ R090    foo/c2c.yml         c2c.yml
 						name = e.Rule.RecordingRule.Record.Value.Value
 					}
 					rules = append(rules, rule{
-						path:     e.Path,
+						path:     e.SourcePath,
 						name:     name,
 						lines:    e.Rule.Lines(),
 						modified: e.ModifiedLines,

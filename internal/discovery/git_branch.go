@@ -136,7 +136,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 		}
 	}
 
-	return entries, nil
+	return addSymlinkedEntries(entries)
 }
 
 func (f GitBranchFinder) isPathAllowed(path string) bool {
