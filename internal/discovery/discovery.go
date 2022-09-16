@@ -27,6 +27,8 @@ var ignoredErrors = []string{
 	": template: __",
 }
 
+var ErrFileIsIgnored = errors.New("file was ignored")
+
 func isStrictIgnored(err error) bool {
 	s := err.Error()
 
@@ -65,20 +67,30 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 	}
 
 	content, err := parser.ReadContent(f)
-	f.Close()
+	_ = f.Close()
 	if err != nil {
 		return nil, err
 	}
 
 	contentLines := []int{}
-	for i := 1; i <= strings.Count(string(content), "\n"); i++ {
+	for i := 1; i <= strings.Count(string(content.Body), "\n"); i++ {
 		contentLines = append(contentLines, i)
 	}
 
-	fileOwner, _ := parser.GetComment(string(content), FileOwnerComment)
+	fileOwner, _ := parser.GetComment(string(content.Body), FileOwnerComment)
+
+	if content.Ignored {
+		entries = append(entries, Entry{
+			Path:          path,
+			PathError:     ErrFileIsIgnored,
+			Owner:         fileOwner.Value,
+			ModifiedLines: contentLines,
+		})
+		return entries, nil
+	}
 
 	if isStrict {
-		if _, errs := rulefmt.Parse(content); len(errs) > 0 {
+		if _, errs := rulefmt.Parse(content.Body); len(errs) > 0 {
 			for _, err := range errs {
 				if isStrictIgnored(err) {
 					continue
@@ -101,7 +113,7 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		}
 	}
 
-	rules, err := p.Parse(content)
+	rules, err := p.Parse(content.Body)
 	if err != nil {
 		log.Error().
 			Err(err).

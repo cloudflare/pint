@@ -72,7 +72,12 @@ func parseSkipComment(line string) (skipMode, bool) {
 	}
 }
 
-func ReadContent(r io.Reader) (out []byte, err error) {
+type Content struct {
+	Body    []byte
+	Ignored bool
+}
+
+func ReadContent(r io.Reader) (out Content, err error) {
 	reader := bufio.NewReader(r)
 	var line string
 	var found bool
@@ -89,7 +94,7 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 		}
 
 		if skipAll {
-			out = append(out, []byte(emptyLine(line))...)
+			out.Body = append(out.Body, []byte(emptyLine(line))...)
 		} else {
 			skip, found = parseSkipComment(line)
 			switch {
@@ -98,38 +103,39 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 				case skipNone:
 					// no-op
 				case skipFile:
-					out = append(out, []byte(emptyLine(line))...)
+					out.Ignored = true
+					out.Body = append(out.Body, []byte(emptyLine(line))...)
 					skipNext = true
 					autoReset = false
 					skipAll = true
 				case skipCurrentLine:
-					out = append(out, []byte(emptyLine(line))...)
+					out.Body = append(out.Body, []byte(emptyLine(line))...)
 					if !inBegin {
 						skipNext = false
 						autoReset = true
 					}
 				case skipNextLine:
-					out = append(out, []byte(line)...)
+					out.Body = append(out.Body, []byte(line)...)
 					skipNext = true
 					autoReset = true
 				case skipBegin:
-					out = append(out, []byte(line)...)
+					out.Body = append(out.Body, []byte(line)...)
 					skipNext = true
 					autoReset = false
 					inBegin = true
 				case skipEnd:
-					out = append(out, []byte(line)...)
+					out.Body = append(out.Body, []byte(line)...)
 					skipNext = false
 					autoReset = true
 					inBegin = false
 				}
 			case skipNext:
-				out = append(out, []byte(emptyLine(line))...)
+				out.Body = append(out.Body, []byte(emptyLine(line))...)
 				if autoReset {
 					skipNext = false
 				}
 			default:
-				out = append(out, []byte(line)...)
+				out.Body = append(out.Body, []byte(line)...)
 			}
 		}
 
@@ -139,7 +145,7 @@ func ReadContent(r io.Reader) (out []byte, err error) {
 	}
 
 	if !errors.Is(err, io.EOF) {
-		return nil, err
+		return out, err
 	}
 
 	return out, nil

@@ -26,7 +26,10 @@ var (
 	rulefmtGroupnameRe = regexp.MustCompile("^([0-9]+):[0-9]+: (groupname: .+)")
 )
 
-const yamlParseReporter = "yaml/parse"
+const (
+	yamlParseReporter  = "yaml/parse"
+	ignoreFileReporter = "ignore/file"
+)
 
 func tryDecodingYamlError(err error) (l int, s string) {
 	s = err.Error()
@@ -158,6 +161,18 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			return
 		default:
 			switch {
+			case errors.Is(job.entry.PathError, discovery.ErrFileIsIgnored):
+				results <- reporter.Report{
+					Path:          job.entry.Path,
+					ModifiedLines: job.entry.ModifiedLines,
+					Problem: checks.Problem{
+						Lines:    job.entry.ModifiedLines,
+						Reporter: ignoreFileReporter,
+						Text:     "This file was excluded from pint checks",
+						Severity: checks.Information,
+					},
+					Owner: job.entry.Owner,
+				}
 			case job.entry.PathError != nil:
 				line, e := tryDecodingYamlError(job.entry.PathError)
 				results <- reporter.Report{

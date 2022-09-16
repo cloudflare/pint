@@ -16,6 +16,7 @@ func TestReadContent(t *testing.T) {
 	type testCaseT struct {
 		input       []byte
 		output      []byte
+		ignored     bool
 		shouldError bool
 	}
 
@@ -121,12 +122,14 @@ func TestReadContent(t *testing.T) {
 			output: []byte(" #- comment #} # pint ignore/line\n"),
 		},
 		{
-			input:  []byte("# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
-			output: []byte("# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
+			input:   []byte("# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
+			output:  []byte("# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
+			ignored: true,
 		},
 		{
-			input:  []byte("foo\n# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
-			output: []byte("foo\n# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
+			input:   []byte("foo\n# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
+			output:  []byte("foo\n# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
+			ignored: true,
 		},
 		{
 			input:  []byte("  {% raw %} # pint ignore/line\n"),
@@ -145,14 +148,15 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
-			outputLines := strings.Count(string(output), "\n")
+			outputLines := strings.Count(string(output.Body), "\n")
 			inputLines := strings.Count(string(tc.input), "\n")
 			if outputLines != inputLines {
 				t.Errorf("ReadContent() returned %d line(s) while input had %d", outputLines, inputLines)
 				return
 			}
 
-			require.Equal(t, string(tc.output), string(output), "ReadContent() returned wrong output")
+			require.Equal(t, string(tc.output), string(output.Body), "ReadContent() returned wrong output")
+			require.Equal(t, tc.ignored, output.Ignored, "ReadContent() returned wrong Ignored value")
 		})
 	}
 }
