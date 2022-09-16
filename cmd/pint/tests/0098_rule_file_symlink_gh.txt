@@ -1,0 +1,57 @@
+http response github / 200 {}
+http start github 127.0.0.1:6098
+
+mkdir testrepo
+cd testrepo
+exec git init --initial-branch=main .
+
+cp ../src/v1.yml rules.yml
+exec ln -s rules.yml symlink.yml
+cp ../src/.pint.hcl .
+env GIT_AUTHOR_NAME=pint
+env GIT_AUTHOR_EMAIL=pint@example.com
+env GIT_COMMITTER_NAME=pint
+env GIT_COMMITTER_EMAIL=pint@example.com
+exec git add .
+exec git commit -am 'import rules and config'
+
+exec git checkout -b v2
+cp ../src/v2.yml rules.yml
+exec git commit -am 'v2'
+
+env GITHUB_AUTH_TOKEN=12345
+env GITHUB_PULL_REQUEST_NUMBER=1
+pint.ok -l debug -d promql/series --no-color ci
+! stdout .
+stderr 'level=info msg="Report submitted" status="200 OK"'
+
+-- src/v1.yml --
+groups:
+- name: foo
+  rules:
+  - alert: rule1
+    expr: rate(errors_total[5m]) > 0
+  - alert: rule2
+    expr: rate(errors_total[5m]) > 0
+
+-- src/v2.yml --
+groups:
+- name: foo
+  rules:
+  - alert: rule1
+    expr: rate(errors_total[2m]) > 0
+  - alert: rule2
+    expr: rate(errors_total[2m])
+
+-- src/.pint.hcl --
+ci {
+  baseBranch = "main"
+}
+repository {
+  github {
+    baseuri   = "http://127.0.0.1:6098"
+	uploaduri = "http://127.0.0.1:6098"
+    owner     = "cloudflare"
+    repo      = "pint"
+  }
+}

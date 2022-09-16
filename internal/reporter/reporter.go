@@ -11,7 +11,8 @@ import (
 )
 
 type Report struct {
-	Path          string
+	ReportedPath  string
+	SourcePath    string
 	ModifiedLines []int
 	Rule          parser.Rule
 	Problem       checks.Problem
@@ -19,7 +20,10 @@ type Report struct {
 }
 
 func (r Report) isEqual(nr Report) bool {
-	if nr.Path != r.Path {
+	if nr.ReportedPath != r.ReportedPath {
+		return false
+	}
+	if nr.SourcePath != r.SourcePath {
 		return false
 	}
 	if nr.Owner != r.Owner {
@@ -106,10 +110,10 @@ type Reporter interface {
 func blameReports(reports []Report, gitCmd git.CommandRunner) (pb git.FileBlames, err error) {
 	pb = make(git.FileBlames)
 	for _, report := range reports {
-		if _, ok := pb[report.Path]; ok {
+		if _, ok := pb[report.SourcePath]; ok {
 			continue
 		}
-		pb[report.Path], err = git.Blame(report.Path, gitCmd)
+		pb[report.SourcePath], err = git.Blame(report.SourcePath, gitCmd)
 		if err != nil {
 			return
 		}

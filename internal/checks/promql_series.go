@@ -118,7 +118,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					}
 				}
 				if arEntry != nil {
-					log.Debug().Stringer("selector", &selector).Str("path", arEntry.Path).Msg("Metric is provided by alerting rule")
+					log.Debug().Stringer("selector", &selector).Str("path", arEntry.SourcePath).Msg("Metric is provided by alerting rule")
 				} else {
 					problems = append(problems, Problem{
 						Fragment: selector.String(),
@@ -180,7 +180,7 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			}
 			if rrEntry != nil {
 				// Validate recording rule instead
-				log.Debug().Stringer("selector", &bareSelector).Str("path", rrEntry.Path).Msg("Metric is provided by recording rule")
+				log.Debug().Stringer("selector", &bareSelector).Str("path", rrEntry.SourcePath).Msg("Metric is provided by recording rule")
 				problems = append(problems, Problem{
 					Fragment: bareSelector.String(),
 					Lines:    expr.Lines(),

@@ -1,0 +1,9 @@
+mkdir rules
+exec ln -s ../bad.yml rules/symlink.yml
+
+pint.error -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="lstat rules/../bad.yml: no such file or directory"

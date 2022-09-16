@@ -51,7 +51,8 @@ type RuleFinder interface {
 }
 
 type Entry struct {
-	Path          string
+	ReportedPath  string
+	SourcePath    string
 	PathError     error
 	ModifiedLines []int
 	Rule          parser.Rule
@@ -81,7 +82,8 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 
 	if content.Ignored {
 		entries = append(entries, Entry{
-			Path:          path,
+			ReportedPath:  path,
+			SourcePath:    path,
 			PathError:     ErrFileIsIgnored,
 			Owner:         fileOwner.Value,
 			ModifiedLines: contentLines,
@@ -101,7 +103,8 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 					Str("lines", output.FormatLineRangeString(contentLines)).
 					Msg("Failed to unmarshal file content")
 				entries = append(entries, Entry{
-					Path:          path,
+					ReportedPath:  path,
+					SourcePath:    path,
 					PathError:     err,
 					Owner:         fileOwner.Value,
 					ModifiedLines: contentLines,
@@ -121,7 +124,8 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 			Str("lines", output.FormatLineRangeString(contentLines)).
 			Msg("Failed to parse file content")
 		entries = append(entries, Entry{
-			Path:          path,
+			ReportedPath:  path,
+			SourcePath:    path,
 			PathError:     err,
 			Owner:         fileOwner.Value,
 			ModifiedLines: contentLines,
@@ -135,9 +139,10 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 			owner = fileOwner
 		}
 		entries = append(entries, Entry{
-			Path:  path,
-			Rule:  rule,
-			Owner: owner.Value,
+			ReportedPath: path,
+			SourcePath:   path,
+			Rule:         rule,
+			Owner:        owner.Value,
 		})
 	}
 

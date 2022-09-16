@@ -171,7 +171,7 @@ func parseContent(content string) (entries []discovery.Entry, err error) {
 
 	for _, rule := range rules {
 		entries = append(entries, discovery.Entry{
-			Path:          "fake.yml",
+			SourcePath:    "fake.yml",
 			ModifiedLines: rule.Lines(),
 			Rule:          rule,
 		})

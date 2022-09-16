@@ -1,0 +1,21 @@
+mkdir rules/strict
+exec ln -s ../relaxed/1.yml rules/strict/symlink.yml
+
+pint.ok -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=debug msg="File parsed" path=rules/relaxed/1.yml rules=1
+level=debug msg="Found recording rule" lines=1-2 path=rules/relaxed/1.yml record=foo
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/relaxed/1.yml rule=foo
+level=debug msg="Found recording rule" lines=1-2 path=rules/strict/symlink.yml record=foo
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/strict/symlink.yml rule=foo
+-- rules/relaxed/1.yml --
+- record: foo
+  expr: up == 0
+-- .pint.hcl --
+parser {
+  relaxed = ["rules/relaxed/.*"]
+}

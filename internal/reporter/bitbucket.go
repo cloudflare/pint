@@ -124,7 +124,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (annotations []BitBucketAnnotation) {
 	if !shouldReport(report) {
 		log.Debug().
-			Str("path", report.Path).
+			Str("path", report.SourcePath).
 			Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
 			Msg("Problem reported on unmodified line, skipping")
 		return
@@ -134,6 +134,13 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 	reportLine, srcLine := moveReportedLine(report)
 	if reportLine != srcLine {
 		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
+	}
+	if report.ReportedPath != report.SourcePath {
+		if msgPrefix == "" {
+			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s: ", report.SourcePath)
+		} else {
+			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s. %s", report.SourcePath, msgPrefix)
+		}
 	}
 
 	var severity, atype string
@@ -150,7 +157,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 	}
 
 	a := BitBucketAnnotation{
-		Path:     report.Path,
+		Path:     report.ReportedPath,
 		Line:     reportLine,
 		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Text),
 		Severity: severity,

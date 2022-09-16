@@ -106,7 +106,8 @@ func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
 			continue
 		}
 		reports = append(reports, reporter.Report{
-			Path:          entry.Path,
+			ReportedPath:  entry.ReportedPath,
+			SourcePath:    entry.SourcePath,
 			ModifiedLines: entry.ModifiedLines,
 			Rule:          entry.Rule,
 			Problem: checks.Problem{

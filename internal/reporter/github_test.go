@@ -75,7 +75,7 @@ func TestGithubReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -110,7 +110,7 @@ func TestGithubReporter(t *testing.T) {
 			},
 			reports: []reporter.Report{
 				{
-					Path:          "foo.txt",
+					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{

@@ -64,7 +64,8 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, []*regexp.Regexp{regexp.MustCompile(".*")}),
 			entries: []discovery.Entry{
 				{
-					Path:          "bar.yml",
+					ReportedPath:  "bar.yml",
+					SourcePath:    "bar.yml",
 					Rule:          testRules[0],
 					ModifiedLines: testRules[0].Lines(),
 					Owner:         "bob",
@@ -76,7 +77,8 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, []*regexp.Regexp{regexp.MustCompile(".*")}),
 			entries: []discovery.Entry{
 				{
-					Path:          "foo/bar.yml",
+					ReportedPath:  "foo/bar.yml",
+					SourcePath:    "foo/bar.yml",
 					Rule:          testRules[0],
 					ModifiedLines: testRules[0].Lines(),
 					Owner:         "alice",
@@ -88,7 +90,8 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, nil),
 			entries: []discovery.Entry{
 				{
-					Path:          "bar.yml",
+					ReportedPath:  "bar.yml",
+					SourcePath:    "bar.yml",
 					PathError:     strictErrs[0],
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
@@ -100,7 +103,8 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, []*regexp.Regexp{regexp.MustCompile(".*")}),
 			entries: []discovery.Entry{
 				{
-					Path:          "bar.yml",
+					ReportedPath:  "bar.yml",
+					SourcePath:    "bar.yml",
 					PathError:     errors.New("yaml: line 2: mapping values are not allowed in this context"),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
