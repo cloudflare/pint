@@ -60,7 +60,13 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		}
 	}
 
-	return addSymlinkedEntries(entries)
+	symlinks, err := addSymlinkedEntries(entries)
+	if err != nil {
+		return nil, err
+	}
+	entries = append(entries, symlinks...)
+
+	return entries, nil
 }
 
 func findFiles(path string) (paths []string, err error) {

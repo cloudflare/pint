@@ -22,6 +22,7 @@ exec git init --initial-branch=main .
 cp ../src/v1.yml rules.yml
 exec ln -s rules.yml symlink.yml
 exec ln -s symlink.yml double.yml
+exec ln -s rules.yml ../ignored.yml
 cp ../src/.pint.hcl .
 env GIT_AUTHOR_NAME=pint
 env GIT_AUTHOR_EMAIL=pint@example.com
@@ -44,6 +45,7 @@ stderr 'path=symlink.yml rule=rule1'
 stderr 'path=symlink.yml rule=rule2'
 stderr 'path=double.yml rule=rule1'
 stderr 'path=double.yml rule=rule2'
+! stderr 'path=ignored.yml'
 
 stderr 'level=info msg="Problems found" Bug=4'
 stderr 'result\\":\\"FAIL\\"'
