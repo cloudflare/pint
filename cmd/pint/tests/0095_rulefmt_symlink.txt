@@ -8,6 +8,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
 level=debug msg="File parsed" path=rules/relaxed/1.yml rules=1
+level=debug msg="Found a symlink" from=rules/strict/symlink.yml to=rules/relaxed/1.yml
 level=debug msg="Found recording rule" lines=1-2 path=rules/relaxed/1.yml record=foo
 level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/relaxed/1.yml rule=foo
 level=debug msg="Found recording rule" lines=1-2 path=rules/strict/symlink.yml record=foo

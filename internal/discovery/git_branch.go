@@ -136,7 +136,18 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 		}
 	}
 
-	return addSymlinkedEntries(entries)
+	symlinks, err := addSymlinkedEntries(entries)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range symlinks {
+		if f.isPathAllowed(entry.SourcePath) {
+			entries = append(entries, entry)
+		}
+	}
+
+	return entries, nil
 }
 
 func (f GitBranchFinder) isPathAllowed(path string) bool {

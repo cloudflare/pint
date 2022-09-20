@@ -5,6 +5,8 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+
+	"github.com/rs/zerolog/log"
 )
 
 type symlink struct {
@@ -49,10 +51,8 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 		return nil, err
 	}
 
-	nentries := make([]Entry, 0, len(entries))
+	nentries := []Entry{}
 	for _, entry := range entries {
-		nentries = append(nentries, entry)
-
 		if entry.PathError != nil {
 			continue
 		}
@@ -65,14 +65,14 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 
 		for _, sl := range slinks {
 			if sl.to == entry.SourcePath {
-				ne := Entry{
+				log.Debug().Str("to", sl.to).Str("from", sl.from).Msg("Found a symlink")
+				nentries = append(nentries, Entry{
 					ReportedPath:  sl.to,
 					SourcePath:    sl.from,
 					ModifiedLines: entry.ModifiedLines,
 					Rule:          entry.Rule,
 					Owner:         entry.Owner,
-				}
-				nentries = append(nentries, ne)
+				})
 			}
 		}
 	}
