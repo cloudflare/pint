@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.30.1
+
+### Fixed
+
+- Fixed handling of symlinks when running `pint lint` and `pint watch` commands.
+
 ## v0.30.0
 
 ### Added

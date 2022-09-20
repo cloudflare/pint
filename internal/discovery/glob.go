@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-
-	"golang.org/x/exp/slices"
 )
 
 func NewGlobFinder(patterns []string, relaxed []*regexp.Regexp) GlobFinder {
@@ -23,7 +21,7 @@ type GlobFinder struct {
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
-	paths := []string{}
+	paths := filePaths{}
 	for _, p := range f.patterns {
 		matches, err := filepath.Glob(p)
 		if err != nil {
@@ -36,7 +34,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 				return nil, err
 			}
 			for _, subpath := range subpaths {
-				if !slices.Contains(paths, subpath) {
+				if !paths.hasPath(subpath.path) {
 					paths = append(paths, subpath)
 				}
 			}
@@ -47,8 +45,8 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		return nil, fmt.Errorf("no matching files")
 	}
 
-	for _, path := range paths {
-		el, err := readFile(path, !matchesAny(f.relaxed, path))
+	for _, fp := range paths {
+		el, err := readFile(fp.path, !matchesAny(f.relaxed, fp.target))
 		if err != nil {
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
 		}
@@ -56,20 +54,32 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 			if len(e.ModifiedLines) == 0 {
 				e.ModifiedLines = e.Rule.Lines()
 			}
+			e.SourcePath = fp.path
+			e.ReportedPath = fp.target
 			entries = append(entries, e)
 		}
 	}
 
-	symlinks, err := addSymlinkedEntries(entries)
-	if err != nil {
-		return nil, err
-	}
-	entries = append(entries, symlinks...)
-
 	return entries, nil
 }
 
-func findFiles(path string) (paths []string, err error) {
+type filePath struct {
+	path   string
+	target string
+}
+
+type filePaths []filePath
+
+func (fps filePaths) hasPath(p string) bool {
+	for _, fp := range fps {
+		if fp.path == p {
+			return true
+		}
+	}
+	return false
+}
+
+func findFiles(path string) (paths filePaths, err error) {
 	s, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -82,13 +92,13 @@ func findFiles(path string) (paths []string, err error) {
 		}
 		paths = append(paths, subpaths...)
 	} else {
-		paths = append(paths, path)
+		paths = append(paths, filePath{path: path, target: path})
 	}
 
 	return paths, nil
 }
 
-func walkDir(dirname string) (paths []string, err error) {
+func walkDir(dirname string) (paths filePaths, err error) {
 	err = filepath.WalkDir(dirname,
 		func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
@@ -104,13 +114,22 @@ func walkDir(dirname string) (paths []string, err error) {
 				if err != nil {
 					return err
 				}
-				subpaths, err := findFiles(dest)
+
+				s, err := os.Stat(dest)
 				if err != nil {
 					return err
 				}
-				paths = append(paths, subpaths...)
+				if s.IsDir() {
+					subpaths, err := findFiles(dest)
+					if err != nil {
+						return err
+					}
+					paths = append(paths, subpaths...)
+				} else {
+					paths = append(paths, filePath{path: path, target: dest})
+				}
 			default:
-				paths = append(paths, path)
+				paths = append(paths, filePath{path: path, target: path})
 			}
 
 			return nil
