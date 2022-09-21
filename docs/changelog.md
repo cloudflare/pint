@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.30.2
+
+### Fixed
+
+- Fixed incorrect line number reporting on BitBucket annotations.
+
 ## v0.30.1
 
 ### Fixed
