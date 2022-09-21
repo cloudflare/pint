@@ -262,10 +262,14 @@ func (r BitBucketReporter) postReport(commit string, isPassing bool, annotations
 // at all, which would make it more difficult to fix.
 func moveReportedLine(report Report) (reported, original int) {
 	reported = -1
+	original = -1
 	for _, pl := range report.Problem.Lines {
-		original = pl
+		if original < 0 {
+			original = pl
+		}
 		for _, ml := range report.ModifiedLines {
 			if pl == ml {
+				original = pl
 				reported = pl
 			}
 		}
