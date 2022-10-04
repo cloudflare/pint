@@ -145,8 +145,10 @@ github.com/fsnotify/fsnotify v1.5.4 h1:jRbGcIw6P2Meqdwuo0H1p6JVLbL5DHKAKlYndzMwV
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gkampitakis/ciinfo v0.1.1 h1:dz1LCkOd+zmZ3YYlFNpr0hRDqGY7Ox2mcaltHzdahqk=
 github.com/gkampitakis/ciinfo v0.1.1/go.mod h1:bVaOGziPqf8PoeYZxatq1HmCsJUmv191hLnFboYxd9Y=
-github.com/gkampitakis/go-snaps v0.3.8 h1:6hXzH8OJlvLqpPYvJkF9lgKAPer1NwwJc3sB6GQFt4o=
-github.com/gkampitakis/go-snaps v0.3.8/go.mod h1:K7ZOtJfx+Apn1RB6XxSeQzQurmgr6fJx6SsJg0SUdGc=
+github.com/gkampitakis/go-diff v1.3.0 h1:Szdbo5w73LSQ9sQ02h+NSSf2ZlW/E8naJCI1ZzQtWgE=
+github.com/gkampitakis/go-diff v1.3.0/go.mod h1:QUJDQRA0JkEX0d7tgDaBHzJv9IH6k6e91TByC+9/RFk=
+github.com/gkampitakis/go-snaps v0.4.0 h1:yTMQ4RaGrQvsr70XZRoxZeJiMkmdLbZ9fWpW/vypdVk=
+github.com/gkampitakis/go-snaps v0.4.0/go.mod h1:xYclGIA7Al0CoYwehW0dd/NEr6oJge+1Dl4OWWxQUWY=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
