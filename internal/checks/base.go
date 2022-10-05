@@ -120,11 +120,11 @@ type exprProblem struct {
 
 func textAndSeverityFromError(err error, reporter, prom string, s Severity) (text string, severity Severity) {
 	if promapi.IsUnavailableError(err) {
-		text = fmt.Sprintf("cound't run %q checks due to %q connection error: %s", reporter, prom, err)
+		text = fmt.Sprintf("couldn't run %q checks due to %q connection error: %s", reporter, prom, err)
 		var perr *promapi.FailoverGroupError
 		if errors.As(err, &perr) {
 			if uri := perr.URI(); uri != "" {
-				text = fmt.Sprintf("cound't run %q checks due to %s connection error: %s", reporter, promText(prom, uri), err)
+				text = fmt.Sprintf("couldn't run %q checks due to %s connection error: %s", reporter, promText(prom, uri), err)
 			}
 			if perr.IsStrict() {
 				severity = Bug
