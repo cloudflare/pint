@@ -515,5 +515,5 @@ func checkErrorBadData(name, uri, err string) string {
 }
 
 func checkErrorUnableToRun(c, name, uri, err string) string {
-	return fmt.Sprintf(`cound't run %q checks due to prometheus %q at %s connection error: %s`, c, name, uri, err)
+	return fmt.Sprintf(`couldn't run %q checks due to prometheus %q at %s connection error: %s`, c, name, uri, err)
 }
