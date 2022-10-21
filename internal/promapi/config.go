@@ -3,18 +3,27 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
-	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
-	"github.com/prymitive/current"
+	"github.com/go-json-experiment/json"
 	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
+
+const promAPIStatusSuccess = "success"
+
+type ConfigResponse struct {
+	Status    string `json:"status"`
+	Error     string `json:"error"`
+	ErrorType string `json:"errorType"`
+	Data      struct {
+		YAML string `json:"yaml"`
+	} `json:"data"`
+}
 
 type ConfigSectionGlobal struct {
 	ScrapeInterval     time.Duration     `yaml:"scrape_interval"`
@@ -61,7 +70,19 @@ func (q configQuery) Run() queryResult {
 		return qr
 	}
 
-	qr.value, qr.err = streamConfig(resp.Body)
+	var decoded ConfigResponse
+	err = json.UnmarshalFull(resp.Body, &decoded)
+	if err != nil {
+		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
+		return qr
+	}
+
+	if decoded.Status != promAPIStatusSuccess {
+		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
+		return qr
+	}
+
+	qr.value = decoded.Data.YAML
 	return qr
 }
 
@@ -118,37 +139,4 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	r := ConfigResult{URI: p.uri, Config: cfg}
 
 	return &r, nil
-}
-
-func streamConfig(r io.Reader) (cfg string, err error) {
-	defer dummyReadAll(r)
-
-	var status, errType, errText string
-	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, isNil bool) {
-			status = s
-		})),
-		current.Key("error", current.Value(func(s string, isNil bool) {
-			errText = s
-		})),
-		current.Key("errorType", current.Value(func(s string, isNil bool) {
-			errType = s
-		})),
-		current.Key("data", current.Object(
-			current.Key("yaml", current.Value(func(s string, isNil bool) {
-				cfg = s
-			})),
-		)),
-	)
-
-	dec := json.NewDecoder(r)
-	if err = decoder.Stream(dec); err != nil {
-		return cfg, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
-	}
-
-	if status != "success" {
-		return cfg, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
-	}
-
-	return cfg, nil
 }

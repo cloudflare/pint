@@ -86,7 +86,7 @@ func TestFlags(t *testing.T) {
 		{
 			prefix:  "/badYaml",
 			timeout: time.Second,
-			err:     `bad_response: JSON parse error: expected colon after object key`,
+			err:     `bad_response: JSON parse error: json: missing character ':' after object name`,
 		},
 	}
 
