@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/fatih/color v1.13.0
 	github.com/gkampitakis/go-snaps v0.4.0
+	github.com/go-json-experiment/json v0.0.0-20221017203807-c5ed296b8c92
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/golang-lru v0.5.4
@@ -14,7 +15,6 @@ require (
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.37.0
 	github.com/prometheus/prometheus v0.39.1
-	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.28.0
 	github.com/stretchr/testify v1.8.0
