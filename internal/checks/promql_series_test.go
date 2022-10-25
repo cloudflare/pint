@@ -1999,7 +1999,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `found{sometimes="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h43m20s"),
+						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
 						Severity: checks.Warning,
 					},
 				}
@@ -2107,7 +2107,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `sometimes`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "33m20s"),
+						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
 						Severity: checks.Warning,
 					},
 				}

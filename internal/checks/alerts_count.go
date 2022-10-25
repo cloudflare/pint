@@ -6,6 +6,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -66,32 +68,24 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		return
 	}
 
+	if len(qr.Series.Ranges) > 0 {
+		promUptime, err := c.prom.RangeQuery(ctx, "count(up)", promapi.NewRelativeRange(c.lookBack, c.step))
+		if err != nil {
+			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
+		} else {
+			qr.Series.FindGaps(promUptime.Series, qr.Series.From, qr.Series.Until)
+		}
+	}
+
 	var forDur time.Duration
 	if rule.AlertingRule.For != nil {
 		forDur, _ = time.ParseDuration(rule.AlertingRule.For.Value.Value)
 	}
 
 	var alerts int
-	for _, sample := range qr.Samples {
-		var isAlerting, isNew bool
-		var firstTime, lastTime time.Time
-		for _, value := range sample.Values {
-			isNew = value.Timestamp.Time().After(lastTime.Add(c.step))
-			if isNew {
-				if rule.AlertingRule.For != nil {
-					isAlerting = false
-				} else {
-					isAlerting = true
-					alerts++
-				}
-				firstTime = value.Timestamp.Time()
-			} else if !isAlerting && rule.AlertingRule.For != nil {
-				if !value.Timestamp.Time().Before(firstTime.Add(forDur)) {
-					isAlerting = true
-					alerts++
-				}
-			}
-			lastTime = value.Timestamp.Time()
+	for _, r := range qr.Series.Ranges {
+		if r.End.Sub(r.Start) > forDur {
+			alerts++
 		}
 	}
 
@@ -102,7 +96,7 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 	}
 	sort.Ints(lines)
 
-	delta := qr.End.Sub(qr.Start)
+	delta := qr.Series.Until.Sub(qr.Series.From)
 	problems = append(problems, Problem{
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,

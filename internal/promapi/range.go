@@ -32,10 +32,8 @@ type RangeQueryResponse struct {
 }
 
 type RangeQueryResult struct {
-	URI     string
-	Samples []*model.SampleStream
-	Start   time.Time
-	End     time.Time
+	URI    string
+	Series SeriesTimeRanges
 }
 
 type rangeQuery struct {
@@ -167,8 +165,8 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 				ctx:  ctx,
 				expr: expr,
 				r: v1.Range{
-					Start: s.start,
-					End:   s.end,
+					Start: s.Start,
+					End:   s.End,
 					Step:  step,
 				},
 			},
@@ -194,7 +192,14 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		close(results)
 	}()
 
-	merged := RangeQueryResult{URI: p.uri, Start: start, End: end}
+	merged := RangeQueryResult{
+		URI: p.uri,
+		Series: SeriesTimeRanges{
+			From:  start,
+			Until: end,
+			Step:  step,
+		},
+	}
 	for result := range results {
 		if result.err != nil {
 			if !errors.Is(result.err, context.Canceled) {
@@ -204,35 +209,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 			continue
 		}
 
-		for _, sample := range result.value.([]model.SampleStream) {
-			var found bool
-			var ts time.Time
-			for i, rs := range merged.Samples {
-				if sample.Metric.Equal(rs.Metric) {
-					found = true
-					for _, v := range sample.Values {
-						ts = v.Timestamp.Time()
-						if !ts.Before(start) && !ts.After(end) {
-							merged.Samples[i].Values = append(merged.Samples[i].Values, v)
-						}
-					}
-					break
-				}
-			}
-			if !found {
-				s := model.SampleStream{
-					Metric: sample.Metric.Clone(),
-					Values: make([]model.SamplePair, 0, len(sample.Values)),
-				}
-				for _, v := range sample.Values {
-					ts = v.Timestamp.Time()
-					if !ts.Before(start) && !ts.After(end) {
-						s.Values = append(s.Values, v)
-					}
-				}
-				merged.Samples = append(merged.Samples, &s)
-			}
-		}
+		merged.Series.Ranges = AppendSamplesToRanges(merged.Series.Ranges, result.value.([]model.SampleStream), step)
 		wg.Done()
 	}
 
@@ -240,33 +217,24 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		return nil, QueryError{err: lastErr, msg: decodeError(lastErr)}
 	}
 
-	for k := range merged.Samples {
-		sort.SliceStable(merged.Samples[k].Values, func(i, j int) bool {
-			return merged.Samples[k].Values[i].Timestamp.Before(merged.Samples[k].Values[j].Timestamp)
-		})
-	}
+	sort.Stable(merged.Series.Ranges)
 
-	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(merged.Samples)).Msg("Parsed range response")
+	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(merged.Series.Ranges)).Msg("Parsed range response")
 
 	return &merged, nil
 }
 
-type timeRange struct {
-	start time.Time
-	end   time.Time
-}
-
-func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slices []timeRange) {
+func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slices []TimeRange) {
 	if end.Sub(start) <= resolution {
-		return []timeRange{{start: start, end: end}}
+		return []TimeRange{{Start: start, End: end}}
 	}
 
 	rstart := start.Round(sliceSize)
 
 	if rstart.After(start) {
-		s := timeRange{start: rstart.Add(sliceSize * -1), end: rstart}
-		if s.end.After(end) {
-			s.end = end
+		s := TimeRange{Start: rstart.Add(sliceSize * -1), End: rstart}
+		if s.End.After(end) {
+			s.End = end
 		}
 		slices = append(slices, s)
 	}
@@ -276,9 +244,9 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 			break
 		}
 
-		s := timeRange{start: rstart, end: rstart.Add(sliceSize)}
-		if s.end.After(end) {
-			s.end = end
+		s := TimeRange{Start: rstart, End: rstart.Add(sliceSize)}
+		if s.End.After(end) {
+			s.End = end
 		}
 		slices = append(slices, s)
 
@@ -287,7 +255,7 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 
 	for i := 0; i < len(slices); i++ {
 		if i < len(slices)-1 {
-			slices[i].end = slices[i].end.Add(time.Second * -1)
+			slices[i].End = slices[i].End.Add(time.Second * -1)
 		}
 	}
 

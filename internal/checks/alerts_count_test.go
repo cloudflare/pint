@@ -177,6 +177,13 @@ func TestAlertsCountCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
+				},
 			},
 		},
 		{
@@ -242,6 +249,13 @@ func TestAlertsCountCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
+				},
 			},
 		},
 		{
@@ -292,6 +306,13 @@ func TestAlertsCountCheck(t *testing.T) {
 						},
 					},
 				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
+				},
 			},
 		},
 		{
@@ -341,6 +362,13 @@ func TestAlertsCountCheck(t *testing.T) {
 							),
 						},
 					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
 				},
 			},
 		},
