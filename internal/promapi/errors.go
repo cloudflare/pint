@@ -2,14 +2,15 @@ package promapi
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"syscall"
 
-	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prymitive/current"
 )
 
 func IsUnavailableError(err error) bool {
@@ -79,23 +80,30 @@ func decodeError(err error) string {
 	return err.Error()
 }
 
-type FailedResponse struct {
-	Status    string `json:"status"`
-	Error     string `json:"error"`
-	ErrorType string `json:"errorType"`
-}
-
 func tryDecodingAPIError(resp *http.Response) error {
-	var decoded FailedResponse
-	if json.UnmarshalFull(resp.Body, &decoded) == nil {
-		return APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
+	var status, errType, errText string
+	decoder := current.Object(
+		current.Key("status", current.Value(func(s string, isNil bool) {
+			status = s
+		})),
+		current.Key("error", current.Value(func(s string, isNil bool) {
+			errText = s
+		})),
+		current.Key("errorType", current.Value(func(s string, isNil bool) {
+			errType = s
+		})),
+	)
+
+	dec := json.NewDecoder(resp.Body)
+	if err := decoder.Stream(dec); err != nil {
+		switch resp.StatusCode / 100 {
+		case 4:
+			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: fmt.Sprintf("client error: %d", resp.StatusCode)}
+		case 5:
+			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: fmt.Sprintf("server error: %d", resp.StatusCode)}
+		}
+		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("bad response code: %d", resp.StatusCode)}
 	}
 
-	switch resp.StatusCode / 100 {
-	case 4:
-		return APIError{Status: "error", ErrorType: v1.ErrClient, Err: fmt.Sprintf("client error: %d", resp.StatusCode)}
-	case 5:
-		return APIError{Status: "error", ErrorType: v1.ErrServer, Err: fmt.Sprintf("server error: %d", resp.StatusCode)}
-	}
-	return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("bad response code: %d", resp.StatusCode)}
+	return APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
 }

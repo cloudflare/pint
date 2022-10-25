@@ -3,6 +3,7 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,23 +14,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/output"
 )
-
-type RangeQueryResponse struct {
-	Status    string `json:"status"`
-	Error     string `json:"error"`
-	ErrorType string `json:"errorType"`
-	Data      struct {
-		ResultType string               `json:"resultType"`
-		Result     []model.SampleStream `json:"result"`
-	} `json:"data"`
-}
 
 type RangeQueryResult struct {
 	URI    string
@@ -76,24 +67,7 @@ func (q rangeQuery) Run() queryResult {
 		return qr
 	}
 
-	var decoded RangeQueryResponse
-	err = json.UnmarshalFull(resp.Body, &decoded)
-	if err != nil {
-		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
-		return qr
-	}
-
-	if decoded.Status != promAPIStatusSuccess {
-		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
-		return qr
-	}
-
-	if decoded.Data.ResultType != "matrix" {
-		qr.err = APIError{Status: decoded.Status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", decoded.Data.ResultType)}
-		return qr
-	}
-
-	qr.value = decoded.Data.Result
+	qr.value, qr.err = streamSampleStream(resp.Body)
 	return qr
 }
 
@@ -323,4 +297,51 @@ func (ar AbsoluteRange) String() string {
 		ar.start.Format(time.RFC3339),
 		ar.end.Format(time.RFC3339),
 		output.HumanizeDuration(ar.step))
+}
+
+func streamSampleStream(r io.Reader) (samples []model.SampleStream, err error) {
+	defer dummyReadAll(r)
+
+	var status, errType, errText, resultType string
+	var sample model.SampleStream
+	samples = []model.SampleStream{}
+	decoder := current.Object(
+		current.Key("status", current.Value(func(s string, isNil bool) {
+			status = s
+		})),
+		current.Key("error", current.Value(func(s string, isNil bool) {
+			errText = s
+		})),
+		current.Key("errorType", current.Value(func(s string, isNil bool) {
+			errType = s
+		})),
+		current.Key("data", current.Object(
+			current.Key("resultType", current.Value(func(s string, isNil bool) {
+				resultType = s
+			})),
+			current.Key("result", current.Array(
+				&sample,
+				func() {
+					samples = append(samples, sample)
+					sample.Metric = model.Metric{}
+					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
+				},
+			)),
+		)),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = decoder.Stream(dec); err != nil {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	if resultType != "matrix" {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
+	}
+
+	return samples, nil
 }
