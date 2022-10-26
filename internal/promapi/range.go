@@ -32,7 +32,6 @@ type rangeQuery struct {
 	ctx  context.Context
 	expr string
 	r    v1.Range
-	dest chan model.SampleStream
 }
 
 func (q rangeQuery) Run() queryResult {
@@ -68,7 +67,7 @@ func (q rangeQuery) Run() queryResult {
 		return qr
 	}
 
-	qr.err = streamSampleStream(resp.Body, q.dest)
+	qr.value, qr.err = streamSampleStream(resp.Body, q.r.Step)
 	return qr
 }
 
@@ -132,8 +131,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	defer cancel()
 
 	slices := sliceRange(start, end, step, queryStep)
-	errs := make(chan error, len(slices))
-	samples := make(chan model.SampleStream, len(slices)*10)
+	results := make(chan queryResult, len(slices))
 	for _, s := range slices {
 		query := queryRequest{
 			query: rangeQuery{
@@ -145,7 +143,6 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 					End:   s.End,
 					Step:  step,
 				},
-				dest: samples,
 			},
 		}
 
@@ -155,20 +152,17 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 			query.result = make(chan queryResult)
 			p.queries <- query
 			result = <-query.result
-			errs <- result.err
+			results <- result
 
 			if result.err != nil {
 				cancel()
 			}
-
-			wg.Done()
 		}()
 	}
 
 	go func() {
 		wg.Wait()
-		close(samples)
-		close(errs)
+		close(results)
 	}()
 
 	merged := RangeQueryResult{
@@ -180,17 +174,19 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		},
 	}
 
-	for sample := range samples {
-		merged.Series.Ranges = AppendSampleToRanges(merged.Series.Ranges, sample, step)
+	for result := range results {
+		if result.err != nil {
+			if !errors.Is(result.err, context.Canceled) {
+				lastErr = result.err
+			}
+			wg.Done()
+			continue
+		}
+		merged.Series.Ranges = append(merged.Series.Ranges, result.value.(MetricTimeRanges)...)
+		wg.Done()
 	}
 	if len(merged.Series.Ranges) > 1 {
 		merged.Series.Ranges = MergeRanges(merged.Series.Ranges)
-	}
-
-	for err := range errs {
-		if err != nil && !errors.Is(err, context.Canceled) {
-			lastErr = err
-		}
 	}
 
 	if lastErr != nil {
@@ -305,7 +301,7 @@ func (ar AbsoluteRange) String() string {
 		output.HumanizeDuration(ar.step))
 }
 
-func streamSampleStream(r io.Reader, dest chan model.SampleStream) (err error) {
+func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, err error) {
 	defer dummyReadAll(r)
 
 	var status, errType, errText, resultType string
@@ -327,7 +323,7 @@ func streamSampleStream(r io.Reader, dest chan model.SampleStream) (err error) {
 			current.Key("result", current.Array(
 				&sample,
 				func() {
-					dest <- sample
+					dst = AppendSampleToRanges(dst, sample, step)
 					sample.Metric = model.Metric{}
 					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
 				},
@@ -337,16 +333,16 @@ func streamSampleStream(r io.Reader, dest chan model.SampleStream) (err error) {
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
 	}
 
 	if status != "success" {
-		return APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
 	}
 
 	if resultType != "matrix" {
-		return APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
 	}
 
-	return nil
+	return dst, nil
 }
