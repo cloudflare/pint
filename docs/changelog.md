@@ -8,6 +8,15 @@
   caused by queries returing huge number of results.
   As a result pint should use up to 5x less memory.
 
+### Fixed
+
+- Fixed a false positive in [promql/vector_matching](checks/promql/vector_matching.md)
+  for rules using `on(...)`. Example:
+
+  ```
+  sum(foo) without(instance) * on(app_name) group_left() bar
+  ```
+
 ## v0.30.2
 
 ### Fixed
