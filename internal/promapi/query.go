@@ -3,27 +3,18 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
 
-	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 )
-
-type QueryResponse struct {
-	Status    string `json:"status"`
-	Error     string `json:"error"`
-	ErrorType string `json:"errorType"`
-	Data      struct {
-		ResultType string         `json:"resultType"`
-		Result     []model.Sample `json:"result"`
-	} `json:"data"`
-}
 
 type QueryResult struct {
 	URI    string
@@ -63,24 +54,7 @@ func (q instantQuery) Run() queryResult {
 		return qr
 	}
 
-	var decoded QueryResponse
-	err = json.UnmarshalFull(resp.Body, &decoded)
-	if err != nil {
-		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
-		return qr
-	}
-
-	if decoded.Status != promAPIStatusSuccess {
-		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
-		return qr
-	}
-
-	if decoded.Data.ResultType != "vector" {
-		qr.err = APIError{Status: decoded.Status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected vector, got %s", decoded.Data.ResultType)}
-		return qr
-	}
-
-	qr.value = decoded.Data.Result
+	qr.value, qr.err = streamSamples(resp.Body)
 	return qr
 }
 
@@ -127,4 +101,50 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 
 	return &qr, nil
+}
+
+func streamSamples(r io.Reader) (samples []model.Sample, err error) {
+	defer dummyReadAll(r)
+
+	var status, resultType, errType, errText string
+	samples = []model.Sample{}
+	var sample model.Sample
+	decoder := current.Object(
+		current.Key("status", current.Value(func(s string, isNil bool) {
+			status = s
+		})),
+		current.Key("error", current.Value(func(s string, isNil bool) {
+			errText = s
+		})),
+		current.Key("errorType", current.Value(func(s string, isNil bool) {
+			errType = s
+		})),
+		current.Key("data", current.Object(
+			current.Key("resultType", current.Value(func(s string, isNil bool) {
+				resultType = s
+			})),
+			current.Key("result", current.Array(
+				&sample,
+				func() {
+					samples = append(samples, sample)
+					sample.Metric = model.Metric{}
+				},
+			)),
+		)),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = decoder.Stream(dec); err != nil {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	if resultType != "vector" {
+		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected vector, got %s", resultType)}
+	}
+
+	return samples, nil
 }

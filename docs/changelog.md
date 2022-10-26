@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.31.0
+
+### Changed
+
+- Prometheus range query handling was rewritten to improve memory usage
+  caused by queries returing huge number of results.
+  As a result pint should use up to 5x less memory.
+
 ## v0.30.2
 
 ### Fixed

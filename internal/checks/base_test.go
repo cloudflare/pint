@@ -4,10 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"strconv"
 	"sync"
 	"testing"
@@ -111,9 +109,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 							return
 						}
 					}
-					b, _ := io.ReadAll(r.Body)
-					payload, _ := url.QueryUnescape(string(b))
-					t.Errorf("no matching response for %s %s request with payload: %s", r.Method, r.URL, payload)
+					t.Errorf("no matching response for %s %s request: %s", r.Method, r.URL, r.URL.Query())
 					t.FailNow()
 				}))
 				defer srv.Close()
@@ -321,13 +317,12 @@ type matrixResponse struct {
 func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
 	start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 	end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-	step, _ := strconv.Atoi(r.Form.Get("step"))
 	samples := []*model.SampleStream{}
 	for _, s := range mr.samples {
 		var values []model.SamplePair
 		for _, v := range s.Values {
 			ts := float64(v.Timestamp.Time().Unix())
-			if ts >= start && ts <= end+float64(step) {
+			if ts >= start && ts < end {
 				values = append(values, v)
 			}
 		}
@@ -452,6 +447,18 @@ var (
 	respondWithSingleInstantVector = func() responseWriter {
 		return vectorResponse{
 			samples: []*model.Sample{generateSample(map[string]string{})},
+		}
+	}
+	respondWithSingleRangeVector1D = func() responseWriter {
+		return matrixResponse{
+			samples: []*model.SampleStream{
+				generateSampleStream(
+					map[string]string{},
+					time.Now().Add(time.Hour*24),
+					time.Now(),
+					time.Minute*5,
+				),
+			},
 		}
 	}
 	respondWithSingleRangeVector1W = func() responseWriter {

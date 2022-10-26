@@ -16,7 +16,7 @@ func TestSliceRange(t *testing.T) {
 		end        time.Time
 		resolution time.Duration
 		sliceSize  time.Duration
-		output     []timeRange
+		output     []TimeRange
 	}
 
 	timeParse := func(s string) time.Time {
@@ -27,10 +27,10 @@ func TestSliceRange(t *testing.T) {
 		return v
 	}
 
-	printRange := func(tr []timeRange) string {
+	printRange := func(tr []TimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s - %s\n", r.start.Format(time.RFC3339), r.end.Format(time.RFC3339)))
+			buf.WriteString(fmt.Sprintf("%s - %s\n", r.Start.Format(time.RFC3339), r.End.Format(time.RFC3339)))
 		}
 		return buf.String()
 	}
@@ -41,14 +41,14 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-02T01:00:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T22:00:00Z"),
-					end:   timeParse("2022-01-01T23:59:59Z"),
+					Start: timeParse("2022-01-01T22:00:00Z"),
+					End:   timeParse("2022-01-01T23:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-02T00:00:00Z"),
-					end:   timeParse("2022-01-02T01:00:00Z"),
+					Start: timeParse("2022-01-02T00:00:00Z"),
+					End:   timeParse("2022-01-02T01:00:00Z"),
 				},
 			},
 		},
@@ -57,10 +57,10 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T02:00:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T00:00:00Z"),
-					end:   timeParse("2022-01-01T02:00:00Z"),
+					Start: timeParse("2022-01-01T00:00:00Z"),
+					End:   timeParse("2022-01-01T02:00:00Z"),
 				},
 			},
 		},
@@ -69,10 +69,10 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T01:30:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T01:00:00Z"),
-					end:   timeParse("2022-01-01T01:30:00Z"),
+					Start: timeParse("2022-01-01T01:00:00Z"),
+					End:   timeParse("2022-01-01T01:30:00Z"),
 				},
 			},
 		},
@@ -81,10 +81,10 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T01:30:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T00:00:00Z"),
-					end:   timeParse("2022-01-01T01:30:00Z"),
+					Start: timeParse("2022-01-01T00:00:00Z"),
+					End:   timeParse("2022-01-01T01:30:00Z"),
 				},
 			},
 		},
@@ -93,30 +93,30 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T11:00:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T00:00:00Z"),
-					end:   timeParse("2022-01-01T01:59:59Z"),
+					Start: timeParse("2022-01-01T00:00:00Z"),
+					End:   timeParse("2022-01-01T01:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T02:00:00Z"),
-					end:   timeParse("2022-01-01T03:59:59Z"),
+					Start: timeParse("2022-01-01T02:00:00Z"),
+					End:   timeParse("2022-01-01T03:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T04:00:00Z"),
-					end:   timeParse("2022-01-01T05:59:59Z"),
+					Start: timeParse("2022-01-01T04:00:00Z"),
+					End:   timeParse("2022-01-01T05:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T06:00:00Z"),
-					end:   timeParse("2022-01-01T07:59:59Z"),
+					Start: timeParse("2022-01-01T06:00:00Z"),
+					End:   timeParse("2022-01-01T07:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T08:00:00Z"),
-					end:   timeParse("2022-01-01T09:59:59Z"),
+					Start: timeParse("2022-01-01T08:00:00Z"),
+					End:   timeParse("2022-01-01T09:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T10:00:00Z"),
-					end:   timeParse("2022-01-01T11:00:00Z"),
+					Start: timeParse("2022-01-01T10:00:00Z"),
+					End:   timeParse("2022-01-01T11:00:00Z"),
 				},
 			},
 		},
@@ -125,10 +125,10 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T00:59:59Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T00:59:00Z"),
-					end:   timeParse("2022-01-01T00:59:59Z"),
+					Start: timeParse("2022-01-01T00:59:00Z"),
+					End:   timeParse("2022-01-01T00:59:59Z"),
 				},
 			},
 		},
@@ -137,14 +137,14 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T03:30:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T00:00:00Z"),
-					end:   timeParse("2022-01-01T01:59:59Z"),
+					Start: timeParse("2022-01-01T00:00:00Z"),
+					End:   timeParse("2022-01-01T01:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T02:00:00Z"),
-					end:   timeParse("2022-01-01T03:30:00Z"),
+					Start: timeParse("2022-01-01T02:00:00Z"),
+					End:   timeParse("2022-01-01T03:30:00Z"),
 				},
 			},
 		},
@@ -153,14 +153,14 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-02T00:30:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T22:00:00Z"),
-					end:   timeParse("2022-01-01T23:59:59Z"),
+					Start: timeParse("2022-01-01T22:00:00Z"),
+					End:   timeParse("2022-01-01T23:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-02T00:00:00Z"),
-					end:   timeParse("2022-01-02T00:30:00Z"),
+					Start: timeParse("2022-01-02T00:00:00Z"),
+					End:   timeParse("2022-01-02T00:30:00Z"),
 				},
 			},
 		},
@@ -169,18 +169,18 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-02T02:30:00Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T22:00:00Z"),
-					end:   timeParse("2022-01-01T23:59:59Z"),
+					Start: timeParse("2022-01-01T22:00:00Z"),
+					End:   timeParse("2022-01-01T23:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-02T00:00:00Z"),
-					end:   timeParse("2022-01-02T01:59:59Z"),
+					Start: timeParse("2022-01-02T00:00:00Z"),
+					End:   timeParse("2022-01-02T01:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-02T02:00:00Z"),
-					end:   timeParse("2022-01-02T02:30:00Z"),
+					Start: timeParse("2022-01-02T02:00:00Z"),
+					End:   timeParse("2022-01-02T02:30:00Z"),
 				},
 			},
 		},
@@ -189,14 +189,14 @@ func TestSliceRange(t *testing.T) {
 			end:        timeParse("2022-01-01T13:11:11Z"),
 			resolution: time.Minute * 5,
 			sliceSize:  time.Hour * 2,
-			output: []timeRange{
+			output: []TimeRange{
 				{
-					start: timeParse("2022-01-01T10:00:00Z"),
-					end:   timeParse("2022-01-01T11:59:59Z"),
+					Start: timeParse("2022-01-01T10:00:00Z"),
+					End:   timeParse("2022-01-01T11:59:59Z"),
 				},
 				{
-					start: timeParse("2022-01-01T12:00:00Z"),
-					end:   timeParse("2022-01-01T13:11:11Z"),
+					Start: timeParse("2022-01-01T12:00:00Z"),
+					End:   timeParse("2022-01-01T13:11:11Z"),
 				},
 			},
 		},

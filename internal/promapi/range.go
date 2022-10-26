@@ -3,6 +3,7 @@ package promapi
 import (
 	"context"
 	"crypto/sha1"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,29 +14,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/go-json-experiment/json"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/output"
 )
 
-type RangeQueryResponse struct {
-	Status    string `json:"status"`
-	Error     string `json:"error"`
-	ErrorType string `json:"errorType"`
-	Data      struct {
-		ResultType string               `json:"resultType"`
-		Result     []model.SampleStream `json:"result"`
-	} `json:"data"`
-}
-
 type RangeQueryResult struct {
-	URI     string
-	Samples []*model.SampleStream
-	Start   time.Time
-	End     time.Time
+	URI    string
+	Series SeriesTimeRanges
 }
 
 type rangeQuery struct {
@@ -43,6 +32,7 @@ type rangeQuery struct {
 	ctx  context.Context
 	expr string
 	r    v1.Range
+	dest chan model.SampleStream
 }
 
 func (q rangeQuery) Run() queryResult {
@@ -78,24 +68,7 @@ func (q rangeQuery) Run() queryResult {
 		return qr
 	}
 
-	var decoded RangeQueryResponse
-	err = json.UnmarshalFull(resp.Body, &decoded)
-	if err != nil {
-		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
-		return qr
-	}
-
-	if decoded.Status != promAPIStatusSuccess {
-		qr.err = APIError{Status: decoded.Status, ErrorType: decodeErrorType(decoded.ErrorType), Err: decoded.Error}
-		return qr
-	}
-
-	if decoded.Data.ResultType != "matrix" {
-		qr.err = APIError{Status: decoded.Status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", decoded.Data.ResultType)}
-		return qr
-	}
-
-	qr.value = decoded.Data.Result
+	qr.err = streamSampleStream(resp.Body, q.dest)
 	return qr
 }
 
@@ -159,7 +132,8 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	defer cancel()
 
 	slices := sliceRange(start, end, step, queryStep)
-	results := make(chan queryResult, len(slices))
+	errs := make(chan error, len(slices))
+	samples := make(chan model.SampleStream, len(slices)*10)
 	for _, s := range slices {
 		query := queryRequest{
 			query: rangeQuery{
@@ -167,10 +141,11 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 				ctx:  ctx,
 				expr: expr,
 				r: v1.Range{
-					Start: s.start,
-					End:   s.end,
+					Start: s.Start,
+					End:   s.End,
 					Step:  step,
 				},
+				dest: samples,
 			},
 		}
 
@@ -180,93 +155,66 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 			query.result = make(chan queryResult)
 			p.queries <- query
 			result = <-query.result
+			errs <- result.err
 
 			if result.err != nil {
 				cancel()
 			}
 
-			results <- result
+			wg.Done()
 		}()
 	}
 
 	go func() {
 		wg.Wait()
-		close(results)
+		close(samples)
+		close(errs)
 	}()
 
-	merged := RangeQueryResult{URI: p.uri, Start: start, End: end}
-	for result := range results {
-		if result.err != nil {
-			if !errors.Is(result.err, context.Canceled) {
-				lastErr = result.err
-			}
-			wg.Done()
-			continue
-		}
+	merged := RangeQueryResult{
+		URI: p.uri,
+		Series: SeriesTimeRanges{
+			From:  start,
+			Until: end,
+			Step:  step,
+		},
+	}
 
-		for _, sample := range result.value.([]model.SampleStream) {
-			var found bool
-			var ts time.Time
-			for i, rs := range merged.Samples {
-				if sample.Metric.Equal(rs.Metric) {
-					found = true
-					for _, v := range sample.Values {
-						ts = v.Timestamp.Time()
-						if !ts.Before(start) && !ts.After(end) {
-							merged.Samples[i].Values = append(merged.Samples[i].Values, v)
-						}
-					}
-					break
-				}
-			}
-			if !found {
-				s := model.SampleStream{
-					Metric: sample.Metric.Clone(),
-					Values: make([]model.SamplePair, 0, len(sample.Values)),
-				}
-				for _, v := range sample.Values {
-					ts = v.Timestamp.Time()
-					if !ts.Before(start) && !ts.After(end) {
-						s.Values = append(s.Values, v)
-					}
-				}
-				merged.Samples = append(merged.Samples, &s)
-			}
+	for sample := range samples {
+		merged.Series.Ranges = AppendSampleToRanges(merged.Series.Ranges, sample, step)
+	}
+	if len(merged.Series.Ranges) > 1 {
+		merged.Series.Ranges = MergeRanges(merged.Series.Ranges)
+	}
+
+	for err := range errs {
+		if err != nil && !errors.Is(err, context.Canceled) {
+			lastErr = err
 		}
-		wg.Done()
 	}
 
 	if lastErr != nil {
 		return nil, QueryError{err: lastErr, msg: decodeError(lastErr)}
 	}
 
-	for k := range merged.Samples {
-		sort.SliceStable(merged.Samples[k].Values, func(i, j int) bool {
-			return merged.Samples[k].Values[i].Timestamp.Before(merged.Samples[k].Values[j].Timestamp)
-		})
-	}
+	sort.Stable(merged.Series.Ranges)
 
-	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(merged.Samples)).Msg("Parsed range response")
+	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(merged.Series.Ranges)).Msg("Parsed range response")
 
 	return &merged, nil
 }
 
-type timeRange struct {
-	start time.Time
-	end   time.Time
-}
-
-func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slices []timeRange) {
+func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slices []TimeRange) {
 	if end.Sub(start) <= resolution {
-		return []timeRange{{start: start, end: end}}
+		return []TimeRange{{Start: start, End: end}}
 	}
 
 	rstart := start.Round(sliceSize)
 
 	if rstart.After(start) {
-		s := timeRange{start: rstart.Add(sliceSize * -1), end: rstart}
-		if s.end.After(end) {
-			s.end = end
+		s := TimeRange{Start: rstart.Add(sliceSize * -1), End: rstart}
+		if s.End.After(end) {
+			s.End = end
 		}
 		slices = append(slices, s)
 	}
@@ -276,9 +224,9 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 			break
 		}
 
-		s := timeRange{start: rstart, end: rstart.Add(sliceSize)}
-		if s.end.After(end) {
-			s.end = end
+		s := TimeRange{Start: rstart, End: rstart.Add(sliceSize)}
+		if s.End.After(end) {
+			s.End = end
 		}
 		slices = append(slices, s)
 
@@ -287,7 +235,7 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 
 	for i := 0; i < len(slices); i++ {
 		if i < len(slices)-1 {
-			slices[i].end = slices[i].end.Add(time.Second * -1)
+			slices[i].End = slices[i].End.Add(time.Second * -1)
 		}
 	}
 
@@ -355,4 +303,50 @@ func (ar AbsoluteRange) String() string {
 		ar.start.Format(time.RFC3339),
 		ar.end.Format(time.RFC3339),
 		output.HumanizeDuration(ar.step))
+}
+
+func streamSampleStream(r io.Reader, dest chan model.SampleStream) (err error) {
+	defer dummyReadAll(r)
+
+	var status, errType, errText, resultType string
+	var sample model.SampleStream
+	decoder := current.Object(
+		current.Key("status", current.Value(func(s string, isNil bool) {
+			status = s
+		})),
+		current.Key("error", current.Value(func(s string, isNil bool) {
+			errText = s
+		})),
+		current.Key("errorType", current.Value(func(s string, isNil bool) {
+			errType = s
+		})),
+		current.Key("data", current.Object(
+			current.Key("resultType", current.Value(func(s string, isNil bool) {
+				resultType = s
+			})),
+			current.Key("result", current.Array(
+				&sample,
+				func() {
+					dest <- sample
+					sample.Metric = model.Metric{}
+					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
+				},
+			)),
+		)),
+	)
+
+	dec := json.NewDecoder(r)
+	if err = decoder.Stream(dec); err != nil {
+		return APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+	}
+
+	if status != "success" {
+		return APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	if resultType != "matrix" {
+		return APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
+	}
+
+	return nil
 }
