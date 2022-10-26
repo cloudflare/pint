@@ -190,6 +190,21 @@ func TestFragileCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   noProblems,
 		},
+		{
+			description: "(...) without(instance) on(app_name) is ok",
+			content: `
+- alert: foo
+  expr: |
+    quantile(0.95,
+      container_memory_working_set_bytes{app_name!="foo.service"}
+      / (container_spec_memory_limit_bytes > 0)
+    ) without(instance)
+    * on(app_name) group_left(product, team, notify) job:ownership
+`,
+			checker:    newFragileCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
 	}
 
 	runTests(t, testCases)
