@@ -1386,22 +1386,6 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{not=~".+"}) by (not)`},
-					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"not": "yyy"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
 					},
 					resp: matrixResponse{
@@ -1487,22 +1471,6 @@ func TestSeriesCheck(t *testing.T) {
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{not=~".+"}) by (not)`},
-					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"not": "yyy"},
 								time.Now().Add(time.Hour*24*-7),
 								time.Now(),
 								time.Minute*5,
@@ -2151,34 +2119,6 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes{foo=~".+"}) by (foo)`},
-					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"foo": "aaa"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{"foo": "bbb"},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{"foo": "ccc"},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
-								time.Minute*5,
-							),
-						},
-					},
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
 						formCond{key: "query", value: "count(up)"},
 					},
 					resp: respondWithSingleRangeVector1W(),
@@ -2216,34 +2156,6 @@ func TestSeriesCheck(t *testing.T) {
 								map[string]string{},
 								time.Now().Add(time.Hour*24*-3).Add(time.Hour),
 								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
-				},
-				{
-					conds: []requestCondition{
-						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes{foo=~".+"}) by (foo)`},
-					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"foo": "aaa"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{"foo": "bbb"},
-								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{"foo": "ccc"},
-								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
 								time.Minute*5,
 							),
 						},

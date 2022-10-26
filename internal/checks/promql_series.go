@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -135,9 +136,16 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 		labelNames := []string{}
 		for _, lm := range selector.LabelMatchers {
-			if lm.Name != labels.MetricName {
-				labelNames = append(labelNames, lm.Name)
+			if lm.Name == labels.MetricName {
+				continue
 			}
+			if lm.Type == labels.MatchNotEqual || lm.Type == labels.MatchNotRegexp {
+				continue
+			}
+			if slices.Contains(labelNames, lm.Name) {
+				continue
+			}
+			labelNames = append(labelNames, lm.Name)
 		}
 
 		// 1. If foo{bar, baz} is there -> GOOD

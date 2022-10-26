@@ -1,9 +1,11 @@
 package promapi
 
 import (
+	"sort"
 	"time"
 
 	"github.com/prometheus/common/model"
+	"golang.org/x/exp/slices"
 )
 
 type TimeRange struct {
@@ -77,7 +79,9 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 }
 
 // merge [t1:t2] [t2:t3] together
-func mergeRanges(dst MetricTimeRanges) MetricTimeRanges {
+func MergeRanges(dst MetricTimeRanges) MetricTimeRanges {
+	sort.Stable(dst)
+
 	var toPurge []int
 	for i := range dst {
 		for j := range dst {
@@ -87,8 +91,11 @@ func mergeRanges(dst MetricTimeRanges) MetricTimeRanges {
 			if dst[i].Fingerprint != dst[j].Fingerprint {
 				continue
 			}
+			if slices.Contains(toPurge, j) {
+				continue
+			}
 			if dst[i].Start.Before(dst[j].Start) && !dst[i].End.Before(dst[j].Start) && !dst[i].End.After(dst[j].End) {
-				dst[i].End = dst[j].End.Add(0)
+				dst[i].End = dst[j].End
 				toPurge = append(toPurge, j)
 			}
 		}
@@ -108,37 +115,32 @@ func mergeRanges(dst MetricTimeRanges) MetricTimeRanges {
 	return merged
 }
 
-func AppendSamplesToRanges(dst MetricTimeRanges, samples []model.SampleStream, step time.Duration) MetricTimeRanges {
+func AppendSampleToRanges(dst MetricTimeRanges, s model.SampleStream, step time.Duration) MetricTimeRanges {
 	var ts time.Time
 	var fp model.Fingerprint
-	for _, s := range samples {
-		for _, v := range s.Values {
-			ts = v.Timestamp.Time()
-			ls := model.LabelSet(s.Metric)
-			fp = ls.Fingerprint()
+	for _, v := range s.Values {
+		ts = v.Timestamp.Time()
+		ls := model.LabelSet(s.Metric)
+		fp = ls.Fingerprint()
 
-			var found bool
-			for i := range dst {
-				if dst[i].Fingerprint == fp &&
-					!ts.Before(dst[i].Start) &&
-					!ts.After(dst[i].End.Add(step)) {
-					dst[i].End = ts.Add(step)
-					found = true
-					break
-				}
-			}
-			if !found {
-				dst = append(dst, MetricTimeRange{
-					Fingerprint: fp,
-					Labels:      ls,
-					Start:       ts,
-					End:         ts.Add(step),
-				})
+		var found bool
+		for i := range dst {
+			if dst[i].Fingerprint == fp &&
+				!ts.Before(dst[i].Start) &&
+				!ts.After(dst[i].End.Add(step)) {
+				dst[i].End = ts.Add(step)
+				found = true
+				break
 			}
 		}
+		if !found {
+			dst = append(dst, MetricTimeRange{
+				Fingerprint: fp,
+				Labels:      ls,
+				Start:       ts,
+				End:         ts.Add(step),
+			})
+		}
 	}
-
-	dst = mergeRanges(dst)
-
 	return dst
 }
