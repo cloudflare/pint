@@ -6,16 +6,17 @@ import (
 )
 
 type PrometheusConfig struct {
-	Name        string   `hcl:",label" json:"name"`
-	URI         string   `hcl:"uri" json:"uri"`
-	Failover    []string `hcl:"failover,optional" json:"failover,omitempty"`
-	Timeout     string   `hcl:"timeout,optional"  json:"timeout"`
-	Concurrency int      `hcl:"concurrency,optional" json:"concurrency"`
-	RateLimit   int      `hcl:"rateLimit,optional" json:"rateLimit"`
-	Cache       int      `hcl:"cache,optional" json:"cache"`
-	Include     []string `hcl:"include,optional" json:"include,omitempty"`
-	Exclude     []string `hcl:"exclude,optional" json:"exclude,omitempty"`
-	Required    bool     `hcl:"required,optional" json:"required"`
+	Name        string            `hcl:",label" json:"name"`
+	URI         string            `hcl:"uri" json:"uri"`
+	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
+	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
+	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
+	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
+	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
+	Cache       int               `hcl:"cache,optional" json:"cache"`
+	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
+	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
+	Required    bool              `hcl:"required,optional" json:"required"`
 }
 
 func (pc PrometheusConfig) validate() error {

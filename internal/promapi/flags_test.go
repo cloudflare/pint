@@ -92,7 +92,7 @@ func TestFlags(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout, 1, 1000, 100)
+			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 1000, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 

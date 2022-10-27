@@ -28,7 +28,7 @@ type flagsQuery struct {
 
 func (q flagsQuery) Run() queryResult {
 	log.Debug().
-		Str("uri", q.prom.uri).
+		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus flags")
 
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
@@ -70,7 +70,7 @@ func (q flagsQuery) CacheKey() string {
 }
 
 func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
-	log.Debug().Str("uri", p.uri).Msg("Scheduling Prometheus flags query")
+	log.Debug().Str("uri", p.safeURI).Msg("Scheduling Prometheus flags query")
 
 	key := "/api/v1/status/flags"
 	p.locker.lock(key)
@@ -87,7 +87,7 @@ func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	r := FlagsResult{URI: p.uri, Flags: result.value.(v1.FlagsResult)}
+	r := FlagsResult{URI: p.safeURI, Flags: result.value.(v1.FlagsResult)}
 
 	return &r, nil
 }

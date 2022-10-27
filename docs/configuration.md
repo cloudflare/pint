@@ -167,6 +167,7 @@ Syntax:
 prometheus "$name" {
   uri         = "https://..."
   failover    = ["https://...", ...]
+  headers     = { "...": "..." }
   timeout     = "2m"
   concurrency = 16
   rateLimit   = 100
@@ -188,6 +189,8 @@ prometheus "$name" {
   It's highly recommended that all URIs point to Prometheus servers with identical
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
+- `headers` - a list of HTTP headers that will be set on all requests for this Prometheus
+  server.
 - `timeout` - timeout to be used for API requests. Defaults to 2 minutes.
 - `concurrency` - how many concurrent requests can pint send to this Prometheus server.
   Optional, defaults to 16.
@@ -213,6 +216,9 @@ Example:
 ```js
 prometheus "prod" {
   uri         = "https://prometheus-prod.example.com"
+  headers     = {
+    "X-Auth": "secret"
+  }
   concurrency = 40
 }
 

@@ -40,7 +40,7 @@ type configQuery struct {
 
 func (q configQuery) Run() queryResult {
 	log.Debug().
-		Str("uri", q.prom.uri).
+		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus configuration")
 
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
@@ -82,7 +82,7 @@ func (q configQuery) CacheKey() string {
 }
 
 func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
-	log.Debug().Str("uri", p.uri).Msg("Scheduling Prometheus configuration query")
+	log.Debug().Str("uri", p.safeURI).Msg("Scheduling Prometheus configuration query")
 
 	key := "/api/v1/status/config"
 	p.locker.lock(key)
@@ -102,7 +102,7 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 	var cfg PrometheusConfig
 	if err := yaml.Unmarshal([]byte(result.value.(string)), &cfg); err != nil {
 		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
-		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.uri, err)
+		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.safeURI, err)
 	}
 
 	if cfg.Global.ScrapeInterval == 0 {
@@ -115,7 +115,7 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 		cfg.Global.EvaluationInterval = time.Minute
 	}
 
-	r := ConfigResult{URI: p.uri, Config: cfg}
+	r := ConfigResult{URI: p.safeURI, Config: cfg}
 
 	return &r, nil
 }

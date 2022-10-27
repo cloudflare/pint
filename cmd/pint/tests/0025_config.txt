@@ -32,6 +32,9 @@ level=info msg="Loading configuration file" path=.pint.hcl
     {
       "name": "custom-cache",
       "uri": "http://127.0.0.1",
+      "headers": {
+        "X-Foo": "bar"
+      },
       "timeout": "10s",
       "concurrency": 16,
       "rateLimit": 100,
@@ -40,7 +43,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
     },
     {
       "name": "custom-rateLimit",
-      "uri": "http://127.0.0.1",
+      "uri": "http://user:pass@127.0.0.1",
       "timeout": "15s",
       "concurrency": 16,
       "rateLimit": 1,
@@ -172,10 +175,13 @@ prometheus "custom-cache" {
   uri      = "http://127.0.0.1"
   timeout  = "10s"
   cache    = 32
+  headers  = {
+    "X-Foo": "bar"
+  }
 }
 
 prometheus "custom-rateLimit" {
-  uri       = "http://127.0.0.1"
+  uri       = "http://user:pass@127.0.0.1"
   timeout   = "15s"
   rateLimit = 1
 }
