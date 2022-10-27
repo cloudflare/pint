@@ -959,6 +959,25 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 		*/
+		{
+			description: "sub aggregation",
+			content: `
+- alert: Foo
+  expr: |
+    (
+      sum(foo:sum > 0) without(notify)
+      * on(job) group_left(notify)
+      job:notify
+    )
+    and on(job)
+    sum(foo:count) by(job) > 20
+  labels:
+    notify: "{{ $labels.notify }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
 	}
 	runTests(t, testCases)
 }
