@@ -42,6 +42,8 @@
   alert: Foo
   expr: (foo > 1) > bool 1
   ```
+- Fixed false positive reports in [alerts/template](checks/alerts/template.md)
+  warning about labels removed in a query despite being re-added by a join.
 
 ## v0.30.2
 

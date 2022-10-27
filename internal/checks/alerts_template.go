@@ -16,6 +16,7 @@ import (
 	"github.com/prometheus/prometheus/promql"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	promTemplate "github.com/prometheus/prometheus/template"
+	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -101,6 +102,13 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
 	absentCalls := utils.HasOuterAbsent(rule.AlertingRule.Expr.Query)
 
+	var safeLabels []string
+	for _, be := range binaryExprs(rule.AlertingRule.Expr.Query) {
+		if be.VectorMatching != nil {
+			safeLabels = append(safeLabels, be.VectorMatching.Include...)
+		}
+	}
+
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
 
 	if rule.AlertingRule.Labels != nil {
@@ -136,7 +144,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 			}
 
 			for _, aggr := range aggrs {
-				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without) {
+				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
@@ -151,7 +159,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 				if len(utils.HasOuterAggregation(call.Fragment)) > 0 {
 					continue
 				}
-				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false) {
+				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false, safeLabels) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
@@ -177,7 +185,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 			}
 
 			for _, aggr := range aggrs {
-				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without) {
+				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
@@ -199,7 +207,7 @@ func (c TemplateCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 					len(call.BinExpr.VectorMatching.Include) == 0 {
 					continue
 				}
-				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false) {
+				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false, safeLabels) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
@@ -440,7 +448,7 @@ func getVariables(node parse.Node) (vars [][]string) {
 	return vars
 }
 
-func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLabels bool) (msgs []string) {
+func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLabels bool, safeLabels []string) (msgs []string) {
 	t, err := textTemplate.
 		New(name).
 		Funcs(templateFuncMap).
@@ -468,6 +476,9 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 					if len(v) > 1 && v[1] == l {
 						found = true
 					}
+				}
+				if found && slices.Contains(safeLabels, v[1]) {
+					found = !excludeLabels
 				}
 				if found == excludeLabels {
 					if _, ok := done[v[1]]; !ok {
@@ -516,4 +527,16 @@ func mergeLines(a, b []int) []int {
 	l = append(l, b...)
 	sort.Ints(l)
 	return l
+}
+
+func binaryExprs(node *parser.PromQLNode) (be []*promParser.BinaryExpr) {
+	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+		be = append(be, n)
+	}
+
+	for _, child := range node.Children {
+		be = append(be, binaryExprs(child)...)
+	}
+
+	return be
 }
