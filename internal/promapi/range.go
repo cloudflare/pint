@@ -323,7 +323,8 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 			current.Key("result", current.Array(
 				&sample,
 				func() {
-					dst = AppendSampleToRanges(dst, sample, step)
+					lset := MetricToLabels(sample.Metric)
+					dst = AppendSampleToRanges(dst, lset, sample.Values, step)
 					sample.Metric = model.Metric{}
 					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
 				},

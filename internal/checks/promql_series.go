@@ -604,8 +604,8 @@ func newest(ranges []promapi.MetricTimeRange) (ts time.Time) {
 
 func withLabelName(ranges []promapi.MetricTimeRange, name string) (r []promapi.MetricTimeRange) {
 	for _, s := range ranges {
-		for k := range s.Labels {
-			if k == model.LabelName(name) {
+		for _, l := range s.Labels {
+			if l.Name == name {
 				r = append(r, s)
 			}
 		}
@@ -616,9 +616,9 @@ func withLabelName(ranges []promapi.MetricTimeRange, name string) (r []promapi.M
 func labelValues(ranges []promapi.MetricTimeRange, name string) (vals []string) {
 	vm := map[string]struct{}{}
 	for _, s := range ranges {
-		for k, v := range s.Labels {
-			if k == model.LabelName(name) {
-				vm[string(v)] = struct{}{}
+		for _, l := range s.Labels {
+			if l.Name == name {
+				vm[l.Value] = struct{}{}
 			}
 		}
 	}

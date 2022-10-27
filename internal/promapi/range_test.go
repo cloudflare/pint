@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
@@ -143,17 +144,17 @@ func TestRange(t *testing.T) {
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
-						Labels: model.LabelSet{"instance": "1"},
+						Labels: labels.FromStrings("instance", "1"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
 						End:    timeParse("2022-06-14T03:00:00Z"),
 					},
 					{
-						Labels: model.LabelSet{"instance": "2"},
+						Labels: labels.FromStrings("instance", "2"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
 						End:    timeParse("2022-06-14T03:00:00Z"),
 					},
 					{
-						Labels: model.LabelSet{"instance": "3"},
+						Labels: labels.FromStrings("instance", "3"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
 						End:    timeParse("2022-06-14T03:00:00Z"),
 					},
@@ -200,7 +201,7 @@ func TestRange(t *testing.T) {
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
-						Labels: model.LabelSet{"instance": "1"},
+						Labels: labels.FromStrings("instance", "1"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
 						End:    timeParse("2022-06-14T07:00:00Z"),
 					},
@@ -250,7 +251,7 @@ func TestRange(t *testing.T) {
 			out: promapi.SeriesTimeRanges{
 				Ranges: promapi.MetricTimeRanges{
 					{
-						Labels: model.LabelSet{"instance": "1"},
+						Labels: labels.FromStrings("instance", "1"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
 						End:    timeParse("2022-06-14T07:30:00Z"),
 					},
