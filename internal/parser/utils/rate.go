@@ -13,7 +13,7 @@ func HasOuterRate(node *parser.PromQLNode) (calls []*promParser.Call) {
 		case "rate", "irate", "deriv":
 			calls = append(calls, n)
 			return calls
-		case "ceil", "floor":
+		case "ceil", "floor", "round":
 			return nil
 		}
 	}

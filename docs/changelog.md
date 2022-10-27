@@ -32,6 +32,8 @@
   sum(foo) without(instance) * on(app_name) group_left() bar
   ```
 - Don't log passwords when Prometheus URI is using basic authentication.
+- Fixed a false positive reports in [alerts/template](checks/alerts/template.md)
+  suggeting to use `humanize` on queries that already use `round()`.
 
 ## v0.30.2
 

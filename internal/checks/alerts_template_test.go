@@ -790,6 +790,18 @@ func TestTemplateCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
+			description: "humanize not needed on round(rate())",
+			content: `
+- alert: Foo
+  expr: round(rate(errors_total[5m]), 1) > 0
+  annotations:
+    summary: "Seeing {{ $value }} instances with errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
 			description: "toTime",
 			content: `
 - alert: Foo
