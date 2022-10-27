@@ -30,7 +30,7 @@ type instantQuery struct {
 
 func (q instantQuery) Run() queryResult {
 	log.Debug().
-		Str("uri", q.prom.uri).
+		Str("uri", q.prom.safeURI).
 		Str("query", q.expr).
 		Msg("Running prometheus query")
 
@@ -77,7 +77,7 @@ func (q instantQuery) CacheKey() string {
 }
 
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
-	log.Debug().Str("uri", p.uri).Str("query", expr).Msg("Scheduling prometheus query")
+	log.Debug().Str("uri", p.safeURI).Str("query", expr).Msg("Scheduling prometheus query")
 
 	key := fmt.Sprintf("/api/v1/query/%s", expr)
 	p.locker.lock(key)
@@ -95,10 +95,10 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	}
 
 	qr := QueryResult{
-		URI:    p.uri,
+		URI:    p.safeURI,
 		Series: result.value.([]model.Sample),
 	}
-	log.Debug().Str("uri", p.uri).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
+	log.Debug().Str("uri", p.safeURI).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 
 	return &qr, nil
 }

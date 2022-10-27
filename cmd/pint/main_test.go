@@ -84,7 +84,29 @@ func httpServer(ts *testscript.TestScript, neg bool, args []string) {
 			_, err := w.Write([]byte(body))
 			ts.Check(err)
 		}})
-		// http response name /200 200 OK
+	// http auth-response name /200 user password 200 OK
+	case "auth-response":
+		if len(args) < 7 {
+			ts.Fatalf("! http response command requires '$NAME $PATH $USER $PASS $CODE $BODY' args, got [%s]", strings.Join(args, " "))
+		}
+		name := args[1]
+		path := args[2]
+		user := args[3]
+		pass := args[4]
+		code, err := strconv.Atoi(args[5])
+		ts.Check(err)
+		body := strings.Join(args[6:], " ")
+		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
+			username, password, ok := r.BasicAuth()
+			if ok && username == user && password == pass {
+				w.WriteHeader(code)
+				_, err := w.Write([]byte(body))
+				ts.Check(err)
+				return
+			}
+			w.WriteHeader(http.StatusUnauthorized)
+		}})
+	// http response name /200 200 OK
 	case "slow-response":
 		if len(args) < 6 {
 			ts.Fatalf("! http response command requires '$NAME $PATH $DELAY $CODE $BODY' args, got [%s]", strings.Join(args, " "))

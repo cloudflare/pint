@@ -65,7 +65,7 @@ func (fg *FailoverGroup) CleanCache() {
 func (fg *FailoverGroup) Config(ctx context.Context) (cfg *ConfigResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
-		uri = prom.uri
+		uri = prom.safeURI
 		cfg, err = prom.Config(ctx)
 		if err == nil {
 			return
@@ -80,7 +80,7 @@ func (fg *FailoverGroup) Config(ctx context.Context) (cfg *ConfigResult, err err
 func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
-		uri = prom.uri
+		uri = prom.safeURI
 		qr, err = prom.Query(ctx, expr)
 		if err == nil {
 			return
@@ -95,7 +95,7 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (rqr *RangeQueryResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
-		uri = prom.uri
+		uri = prom.safeURI
 		rqr, err = prom.RangeQuery(ctx, expr, params)
 		if err == nil {
 			return
@@ -110,7 +110,7 @@ func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params Ran
 func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata *MetadataResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
-		uri = prom.uri
+		uri = prom.safeURI
 		metadata, err = prom.Metadata(ctx, metric)
 		if err == nil {
 			return
@@ -125,7 +125,7 @@ func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata 
 func (fg *FailoverGroup) Flags(ctx context.Context) (flags *FlagsResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
-		uri = prom.uri
+		uri = prom.safeURI
 		flags, err = prom.Flags(ctx)
 		if err == nil {
 			return

@@ -380,7 +380,7 @@ func TestRange(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 1000, 100)
+			prom := promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 1000, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 

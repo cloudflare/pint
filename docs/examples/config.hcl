@@ -1,7 +1,12 @@
 # Define "prod" Prometheus instance that will only be used for
 # rules defined in file matching "alerting/prod/.+" or "recording/prod/.+".
 prometheus "prod" {
-  uri     = "https://prod.example.com"
+  uri      = "https://prod.example.com"
+  failover = [ "https://prod-backup.example.com" ]
+  headers  = {
+    "X-Auth": "secret",
+    "X-User": "bob"
+  }
   timeout = "30s"
   include = [
     "alerting/prod/.+",

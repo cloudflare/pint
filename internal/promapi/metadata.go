@@ -29,7 +29,7 @@ type metadataQuery struct {
 
 func (q metadataQuery) Run() queryResult {
 	log.Debug().
-		Str("uri", q.prom.uri).
+		Str("uri", q.prom.safeURI).
 		Str("metric", q.metric).
 		Msg("Getting prometheus metrics metadata")
 
@@ -75,7 +75,7 @@ func (q metadataQuery) CacheKey() string {
 }
 
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
-	log.Debug().Str("uri", p.uri).Str("metric", metric).Msg("Scheduling Prometheus metrics metadata query")
+	log.Debug().Str("uri", p.safeURI).Str("metric", metric).Msg("Scheduling Prometheus metrics metadata query")
 
 	key := fmt.Sprintf("/api/v1/metadata/%s", metric)
 	p.locker.lock(key)
@@ -92,7 +92,7 @@ func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResu
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	metadata := MetadataResult{URI: p.uri, Metadata: result.value.(map[string][]v1.Metadata)[metric]}
+	metadata := MetadataResult{URI: p.safeURI, Metadata: result.value.(map[string][]v1.Metadata)[metric]}
 
 	return &metadata, nil
 }

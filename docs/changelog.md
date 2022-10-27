@@ -2,6 +2,21 @@
 
 ## v0.31.0
 
+### Added
+
+- `prometheus` configuration block now accepts optional `headers` field, for setting
+  request headers that will be attached to any request made to given Prometheus server.
+  Example:
+
+  ```javascript
+  prometheus "protected" {
+  uri      = "https://prod.example.com"
+  headers  = {
+    "X-Auth": "secret",
+    "X-User": "bob"
+  }
+  ```
+
 ### Changed
 
 - Prometheus range query handling was rewritten to improve memory usage
@@ -16,6 +31,7 @@
   ```
   sum(foo) without(instance) * on(app_name) group_left() bar
   ```
+- Don't log passwords when Prometheus URI is using basic authentication.
 
 ## v0.30.2
 

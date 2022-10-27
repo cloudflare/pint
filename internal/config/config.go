@@ -265,10 +265,10 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		}
 
 		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, timeout, concurrency, cacheSize, rateLimit),
+			promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, concurrency, cacheSize, rateLimit),
 		}
 		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, timeout, concurrency, cacheSize, rateLimit))
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, cacheSize, rateLimit))
 		}
 		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
 	}

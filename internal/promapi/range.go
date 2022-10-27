@@ -36,7 +36,7 @@ type rangeQuery struct {
 
 func (q rangeQuery) Run() queryResult {
 	log.Debug().
-		Str("uri", q.prom.uri).
+		Str("uri", q.prom.safeURI).
 		Str("query", q.expr).
 		Str("start", q.r.Start.Format(time.RFC3339)).
 		Str("end", q.r.End.Format(time.RFC3339)).
@@ -113,7 +113,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	}
 
 	log.Debug().
-		Str("uri", p.uri).
+		Str("uri", p.safeURI).
 		Str("query", expr).
 		Str("lookback", output.HumanizeDuration(lookback)).
 		Str("step", output.HumanizeDuration(step)).
@@ -166,7 +166,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	}()
 
 	merged := RangeQueryResult{
-		URI: p.uri,
+		URI: p.safeURI,
 		Series: SeriesTimeRanges{
 			From:  start,
 			Until: end,
@@ -195,7 +195,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 
 	sort.Stable(merged.Series.Ranges)
 
-	log.Debug().Str("uri", p.uri).Str("query", expr).Int("samples", len(merged.Series.Ranges)).Msg("Parsed range response")
+	log.Debug().Str("uri", p.safeURI).Str("query", expr).Int("samples", len(merged.Series.Ranges)).Msg("Parsed range response")
 
 	return &merged, nil
 }

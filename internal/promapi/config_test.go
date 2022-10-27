@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -120,7 +121,7 @@ func TestConfig(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, tc.timeout, 1, 1000, 100)
+			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 1000, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 
@@ -131,6 +132,55 @@ func TestConfig(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, *cfg, tc.cfg)
 			}
+		})
+	}
+}
+
+func TestConfigHeaders(t *testing.T) {
+	type testCaseT struct {
+		config     map[string]string
+		request    map[string]string
+		shouldFail bool
+	}
+
+	testCases := []testCaseT{
+		{
+			config:  nil,
+			request: nil,
+		},
+		{
+			config:     nil,
+			request:    map[string]string{"X-Foo": "bar"},
+			shouldFail: true,
+		},
+		{
+			config:  map[string]string{"X-Foo": "bar", "X-Bar": "foo"},
+			request: map[string]string{"X-Foo": "bar", "X-Bar": "foo"},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				for k, v := range tc.request {
+					if tc.shouldFail {
+						require.NotEqual(t, r.Header.Get(k), v)
+					} else {
+						require.Equal(t, r.Header.Get(k), v)
+					}
+				}
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
+			}))
+			defer srv.Close()
+
+			prom := promapi.NewPrometheus("test", srv.URL, tc.config, time.Second, 1, 1000, 100)
+			prom.StartWorkers()
+			defer prom.Close()
+
+			_, err := prom.Config(context.Background())
+			require.NoError(t, err)
 		})
 	}
 }

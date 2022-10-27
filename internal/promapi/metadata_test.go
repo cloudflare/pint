@@ -115,7 +115,7 @@ func TestMetadata(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.metric, func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL, tc.timeout, 1, 100, 100)
+			prom := promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 

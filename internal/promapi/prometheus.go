@@ -51,9 +51,25 @@ type queryResult struct {
 	expires time.Time
 }
 
+func sanitizeURI(s string) string {
+	u, err := url.Parse(s)
+	if err != nil {
+		return s
+	}
+	if u.User != nil {
+		if _, pwdSet := u.User.Password(); pwdSet {
+			u.User = url.UserPassword(u.User.Username(), "xxx")
+		}
+		return u.String()
+	}
+	return s
+}
+
 type Prometheus struct {
 	name        string
-	uri         string
+	unsafeURI   string
+	safeURI     string
+	headers     map[string]string
 	timeout     time.Duration
 	concurrency int
 	client      http.Client
@@ -64,12 +80,14 @@ type Prometheus struct {
 	queries     chan queryRequest
 }
 
-func NewPrometheus(name, uri string, timeout time.Duration, concurrency, cacheSize, rl int) *Prometheus {
+func NewPrometheus(name, uri string, headers map[string]string, timeout time.Duration, concurrency, cacheSize, rl int) *Prometheus {
 	cache, _ := lru.NewARC(cacheSize)
 
 	prom := Prometheus{
 		name:        name,
-		uri:         uri,
+		unsafeURI:   uri,
+		safeURI:     sanitizeURI(uri),
+		headers:     headers,
 		timeout:     timeout,
 		client:      http.Client{Transport: gzhttp.Transport(http.DefaultTransport)},
 		cache:       cache,
@@ -94,7 +112,7 @@ func (prom *Prometheus) purgeExpiredCache() {
 }
 
 func (prom *Prometheus) Close() {
-	log.Debug().Str("name", prom.name).Str("uri", prom.uri).Msg("Stopping query workers")
+	log.Debug().Str("name", prom.name).Str("uri", prom.safeURI).Msg("Stopping query workers")
 	close(prom.queries)
 	prom.wg.Wait()
 }
@@ -102,7 +120,7 @@ func (prom *Prometheus) Close() {
 func (prom *Prometheus) StartWorkers() {
 	log.Debug().
 		Str("name", prom.name).
-		Str("uri", prom.uri).
+		Str("uri", prom.safeURI).
 		Int("workers", prom.concurrency).
 		Msg("Starting query workers")
 
@@ -118,7 +136,7 @@ func (prom *Prometheus) StartWorkers() {
 }
 
 func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args url.Values) (*http.Response, error) {
-	u, _ := url.Parse(prom.uri)
+	u, _ := url.Parse(prom.unsafeURI)
 	u.Path = strings.TrimSuffix(u.Path, "/")
 
 	uri, err := url.JoinPath(u.String(), path)
@@ -141,6 +159,10 @@ func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
 
+	for k, v := range prom.headers {
+		req.Header.Set(k, v)
+	}
+
 	return prom.client.Do(req)
 }
 
@@ -156,7 +178,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 		if cached, ok := prom.cache.Get(cacheKey); ok {
 			prometheusCacheHitsTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 			log.Debug().
-				Str("uri", prom.uri).
+				Str("uri", prom.safeURI).
 				Str("query", job.query.String()).
 				Str("key", cacheKey).
 				Msg("Cache hit")
@@ -166,7 +188,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 
 	prometheusCacheMissTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 	log.Debug().
-		Str("uri", prom.uri).
+		Str("uri", prom.safeURI).
 		Str("query", job.query.String()).
 		Str("key", cacheKey).
 		Msg("Cache miss")
@@ -179,7 +201,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	result := job.query.Run()
 	dur := time.Since(start)
 	log.Debug().
-		Str("uri", prom.uri).
+		Str("uri", prom.safeURI).
 		Str("query", job.query.String()).
 		Str("endpoint", job.query.Endpoint()).
 		Str("duration", output.HumanizeDuration(dur)).
@@ -190,7 +212,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
 		log.Error().
 			Err(result.err).
-			Str("uri", prom.uri).
+			Str("uri", prom.safeURI).
 			Str("query", job.query.String()).
 			Msg("Query returned an error")
 		return result
