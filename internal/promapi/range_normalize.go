@@ -5,8 +5,52 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"golang.org/x/exp/slices"
+	"github.com/prometheus/prometheus/model/labels"
 )
+
+func labelValue(ls labels.Labels, name string) (string, bool) {
+	for _, l := range ls {
+		if l.Name == name {
+			return l.Value, true
+		}
+	}
+	return "", false
+}
+
+func labelsBefore(ls, o labels.Labels) bool {
+	if len(ls) < len(o) {
+		return true
+	}
+	if len(ls) > len(o) {
+		return false
+	}
+
+	lns := make([]string, 0, len(ls)+len(o))
+	for _, ln := range ls {
+		lns = append(lns, ln.Name)
+	}
+	for _, ln := range o {
+		lns = append(lns, ln.Name)
+	}
+	sort.Strings(lns)
+	for _, ln := range lns {
+		mlv, ok := labelValue(ls, ln)
+		if !ok {
+			return true
+		}
+		olv, ok := labelValue(o, ln)
+		if !ok {
+			return false
+		}
+		if mlv < olv {
+			return true
+		}
+		if mlv > olv {
+			return false
+		}
+	}
+	return false
+}
 
 type TimeRange struct {
 	Start time.Time
@@ -14,8 +58,8 @@ type TimeRange struct {
 }
 
 type MetricTimeRange struct {
-	Fingerprint model.Fingerprint
-	Labels      model.LabelSet
+	Fingerprint uint64
+	Labels      labels.Labels
 	Start       time.Time
 	End         time.Time
 }
@@ -32,7 +76,7 @@ func (mtr MetricTimeRanges) Swap(i, j int) {
 
 func (mtr MetricTimeRanges) Less(i, j int) bool {
 	if mtr[i].Fingerprint != mtr[j].Fingerprint {
-		return mtr[i].Labels.Before(mtr[j].Labels)
+		return labelsBefore(mtr[i].Labels, mtr[j].Labels)
 	}
 	return mtr[i].Start.Before(mtr[j].Start)
 }
@@ -82,7 +126,8 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 func MergeRanges(dst MetricTimeRanges) MetricTimeRanges {
 	sort.Stable(dst)
 
-	var toPurge []int
+	toPurge := map[int]struct{}{}
+	var ok bool
 	for i := range dst {
 		for j := range dst {
 			if i == j {
@@ -91,22 +136,20 @@ func MergeRanges(dst MetricTimeRanges) MetricTimeRanges {
 			if dst[i].Fingerprint != dst[j].Fingerprint {
 				continue
 			}
-			if slices.Contains(toPurge, j) {
+			if _, ok = toPurge[j]; ok {
 				continue
 			}
 			if dst[i].Start.Before(dst[j].Start) && !dst[i].End.Before(dst[j].Start) && !dst[i].End.After(dst[j].End) {
 				dst[i].End = dst[j].End
-				toPurge = append(toPurge, j)
+				toPurge[j] = struct{}{}
 			}
 		}
 	}
 
 	merged := make(MetricTimeRanges, 0, len(dst)-len(toPurge))
 	for i, tr := range dst {
-		for _, j := range toPurge {
-			if i == j {
-				goto NEXT
-			}
+		if _, ok = toPurge[i]; ok {
+			goto NEXT
 		}
 		merged = append(merged, tr)
 	NEXT:
@@ -115,15 +158,14 @@ func MergeRanges(dst MetricTimeRanges) MetricTimeRanges {
 	return merged
 }
 
-func AppendSampleToRanges(dst MetricTimeRanges, s model.SampleStream, step time.Duration) MetricTimeRanges {
-	var ts time.Time
-	var fp model.Fingerprint
-	for _, v := range s.Values {
-		ts = v.Timestamp.Time()
-		ls := model.LabelSet(s.Metric)
-		fp = ls.Fingerprint()
+func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.SamplePair, step time.Duration) MetricTimeRanges {
+	fp := ls.Hash()
 
-		var found bool
+	var ts time.Time
+	var found bool
+	for _, v := range vals {
+		ts = v.Timestamp.Time()
+		found = false
 		for i := range dst {
 			if dst[i].Fingerprint == fp &&
 				!ts.Before(dst[i].Start) &&
@@ -143,4 +185,12 @@ func AppendSampleToRanges(dst MetricTimeRanges, s model.SampleStream, step time.
 		}
 	}
 	return dst
+}
+
+func MetricToLabels(m model.Metric) labels.Labels {
+	lset := make([]string, 0, len(m)*2)
+	for k, v := range m {
+		lset = append(lset, string(k), string(v))
+	}
+	return labels.FromStrings(lset...)
 }

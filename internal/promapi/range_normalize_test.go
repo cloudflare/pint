@@ -11,6 +11,7 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 )
 
@@ -58,20 +59,68 @@ func TestAppendSampleToRanges(t *testing.T) {
 			step: time.Minute * 5,
 			out: []promapi.MetricTimeRange{
 				{
-					Fingerprint: model.LabelSet{"instance": "1"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "1"},
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "2"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "2"},
+					Fingerprint: labels.FromStrings("instance", "2").Hash(),
+					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "3"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "3"},
+					Fingerprint: labels.FromStrings("instance", "3").Hash(),
+					Labels:      labels.FromStrings("instance", "3"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T03:00:00Z"),
+				},
+			},
+		},
+		{
+			in: nil,
+			samples: []model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "1", "job": "foo"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"job": "bar"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+				},
+			},
+			step: time.Minute * 5,
+			out: []promapi.MetricTimeRange{
+				{
+					Fingerprint: labels.FromStrings().Hash(),
+					Labels:      labels.FromStrings(),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T03:00:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("job", "bar").Hash(),
+					Labels:      labels.FromStrings("job", "bar"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T03:00:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T03:00:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1", "job", "foo").Hash(),
+					Labels:      labels.FromStrings("instance", "1", "job", "foo"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
@@ -80,20 +129,20 @@ func TestAppendSampleToRanges(t *testing.T) {
 		{
 			in: []promapi.MetricTimeRange{
 				{
-					Fingerprint: model.LabelSet{"instance": "1"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "1"},
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "3"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "3"},
+					Fingerprint: labels.FromStrings("instance", "3").Hash(),
+					Labels:      labels.FromStrings("instance", "3"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "2"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "2"},
+					Fingerprint: labels.FromStrings("instance", "2").Hash(),
+					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
@@ -119,32 +168,32 @@ func TestAppendSampleToRanges(t *testing.T) {
 			step: time.Minute * 5,
 			out: []promapi.MetricTimeRange{
 				{
-					Fingerprint: model.LabelSet{"instance": "1"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "1"},
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-13T10:00:00Z"),
 					End:         timeParse("2022-06-13T13:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "1"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "1"},
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-13T23:00:00Z"),
 					End:         timeParse("2022-06-14T04:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "2"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "2"},
+					Fingerprint: labels.FromStrings("instance", "2").Hash(),
+					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "2"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "2"},
+					Fingerprint: labels.FromStrings("instance", "2").Hash(),
+					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-15T10:00:00Z"),
 					End:         timeParse("2022-06-15T13:00:00Z"),
 				},
 				{
-					Fingerprint: model.LabelSet{"instance": "3"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "3"},
+					Fingerprint: labels.FromStrings("instance", "3").Hash(),
+					Labels:      labels.FromStrings("instance", "3"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T03:00:00Z"),
 				},
@@ -169,8 +218,8 @@ func TestAppendSampleToRanges(t *testing.T) {
 			step: time.Minute * 5,
 			out: []promapi.MetricTimeRange{
 				{
-					Fingerprint: model.LabelSet{"instance": "1"}.Fingerprint(),
-					Labels:      model.LabelSet{"instance": "1"},
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
 					End:         timeParse("2022-06-14T08:00:00Z"),
 				},
@@ -181,7 +230,8 @@ func TestAppendSampleToRanges(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			for _, s := range tc.samples {
-				tc.in = promapi.AppendSampleToRanges(tc.in, s, tc.step)
+				lset := promapi.MetricToLabels(s.Metric)
+				tc.in = promapi.AppendSampleToRanges(tc.in, lset, s.Values, tc.step)
 			}
 			tc.in = promapi.MergeRanges(tc.in)
 			sort.Stable(tc.in)
@@ -223,31 +273,31 @@ func TestMergeRanges(t *testing.T) {
 		},
 		{
 			in: promapi.MetricTimeRanges{
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T16:00:44Z"), End: timeParse("2022-10-19T20:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T14:00:44Z"), End: timeParse("2022-10-19T16:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-24T18:00:44Z"), End: timeParse("2022-10-25T22:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T22:00:44Z"), End: timeParse("2022-10-20T00:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-23T06:00:44Z"), End: timeParse("2022-10-23T14:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-22T14:00:44Z"), End: timeParse("2022-10-23T06:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T20:00:44Z"), End: timeParse("2022-10-19T22:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T12:00:44Z"), End: timeParse("2022-10-19T14:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-24T02:00:44Z"), End: timeParse("2022-10-24T10:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-22T12:00:44Z"), End: timeParse("2022-10-22T14:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-24T00:00:44Z"), End: timeParse("2022-10-24T02:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-19T12:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-24T10:00:44Z"), End: timeParse("2022-10-24T18:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-23T14:00:44Z"), End: timeParse("2022-10-23T22:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-25T22:00:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-20T14:00:44Z"), End: timeParse("2022-10-21T02:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-21T06:00:44Z"), End: timeParse("2022-10-21T20:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-21T20:00:44Z"), End: timeParse("2022-10-22T06:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-21T02:00:44Z"), End: timeParse("2022-10-21T06:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-23T22:00:44Z"), End: timeParse("2022-10-24T00:00:44Z")},
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-22T06:00:44Z"), End: timeParse("2022-10-22T12:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T16:00:44Z"), End: timeParse("2022-10-19T20:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T14:00:44Z"), End: timeParse("2022-10-19T16:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T18:00:44Z"), End: timeParse("2022-10-25T22:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T22:00:44Z"), End: timeParse("2022-10-20T00:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-23T06:00:44Z"), End: timeParse("2022-10-23T14:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T14:00:44Z"), End: timeParse("2022-10-23T06:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T20:00:44Z"), End: timeParse("2022-10-19T22:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T12:00:44Z"), End: timeParse("2022-10-19T14:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T02:00:44Z"), End: timeParse("2022-10-24T10:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T12:00:44Z"), End: timeParse("2022-10-22T14:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T00:00:44Z"), End: timeParse("2022-10-24T02:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-19T12:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T10:00:44Z"), End: timeParse("2022-10-24T18:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-23T14:00:44Z"), End: timeParse("2022-10-23T22:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-25T22:00:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T14:00:44Z"), End: timeParse("2022-10-21T02:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-21T06:00:44Z"), End: timeParse("2022-10-21T20:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-21T20:00:44Z"), End: timeParse("2022-10-22T06:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-21T02:00:44Z"), End: timeParse("2022-10-21T06:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-23T22:00:44Z"), End: timeParse("2022-10-24T00:00:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T06:00:44Z"), End: timeParse("2022-10-22T12:00:44Z")},
 			},
 			out: promapi.MetricTimeRanges{
-				{Fingerprint: model.LabelSet{}.Fingerprint(), Labels: model.LabelSet{}, Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
 			},
 		},
 	}
