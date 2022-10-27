@@ -25,15 +25,23 @@
 
 ### Fixed
 
-- Fixed a false positive in [promql/vector_matching](checks/promql/vector_matching.md)
+- Fixed false positive reports in [promql/vector_matching](checks/promql/vector_matching.md)
   for rules using `on(...)`. Example:
 
   ```
   sum(foo) without(instance) * on(app_name) group_left() bar
   ```
 - Don't log passwords when Prometheus URI is using basic authentication.
-- Fixed a false positive reports in [alerts/template](checks/alerts/template.md)
+- Fixed false positive reports in [alerts/template](checks/alerts/template.md)
   suggeting to use `humanize` on queries that already use `round()`.
+- Fixed false positive reports in [alerts/comparison](checks/alerts/comparison.md)
+  when `bool` modifier is used on a condtion that is guarded by another conditon.
+  Example:
+
+  ```yaml
+  alert: Foo
+  expr: (foo > 1) > bool 1
+  ```
 
 ## v0.30.2
 

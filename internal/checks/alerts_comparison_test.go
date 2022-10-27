@@ -151,6 +151,13 @@ func TestComparisonCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    noProblems,
 		},
+		{
+			description: "(foo > 1) > bool 1",
+			content:     "- alert: Foo Is Missing\n  expr: (foo > 1) > bool 1\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
 	}
 
 	runTests(t, testCases)

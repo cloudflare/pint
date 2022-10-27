@@ -42,8 +42,8 @@ func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule, entries []
 
 	expr := rule.Expr().Query
 
-	if expr := hasComparision(expr); expr != nil {
-		if expr.ReturnBool {
+	if n := hasComparision(expr.Node); n != nil {
+		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
 			problems = append(problems, Problem{
 				Fragment: rule.AlertingRule.Expr.Value.Value,
 				Lines:    rule.AlertingRule.Expr.Lines(),
@@ -70,8 +70,8 @@ func (c ComparisonCheck) Check(ctx context.Context, rule parser.Rule, entries []
 	return
 }
 
-func hasComparision(n *parser.PromQLNode) *promParser.BinaryExpr {
-	if node, ok := n.Node.(*promParser.BinaryExpr); ok {
+func hasComparision(n promParser.Node) *promParser.BinaryExpr {
+	if node, ok := n.(*promParser.BinaryExpr); ok {
 		if node.Op.IsComparisonOperator() {
 			return node
 		}
@@ -80,7 +80,7 @@ func hasComparision(n *parser.PromQLNode) *promParser.BinaryExpr {
 		}
 	}
 
-	for _, child := range n.Children {
+	for _, child := range promParser.Children(n) {
 		if node := hasComparision(child); node != nil {
 			return node
 		}
