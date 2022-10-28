@@ -123,7 +123,7 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 }
 
 // merge [t1:t2] [t2:t3] together
-func MergeRanges(dst MetricTimeRanges) MetricTimeRanges {
+func MergeRanges(dst MetricTimeRanges, step time.Duration) MetricTimeRanges {
 	sort.Stable(dst)
 
 	toPurge := map[int]struct{}{}
@@ -139,7 +139,13 @@ func MergeRanges(dst MetricTimeRanges) MetricTimeRanges {
 			if _, ok = toPurge[j]; ok {
 				continue
 			}
-			if dst[i].Start.Before(dst[j].Start) && !dst[i].End.Before(dst[j].Start) && !dst[i].End.After(dst[j].End) {
+			// 1. Merge two ranges next to each other
+			// [s1 ~ e1]
+			//          [s2 - e2]
+			// 2. Merge two overlapping ranges
+			// [s1 ~ e1]
+			//       [s2 ~ e2]
+			if dst[i].Start.Before(dst[j].Start) && !dst[i].End.Before(dst[j].Start.Add(step*-1)) {
 				dst[i].End = dst[j].End
 				toPurge[j] = struct{}{}
 			}

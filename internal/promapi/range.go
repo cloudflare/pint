@@ -186,7 +186,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		wg.Done()
 	}
 	if len(merged.Series.Ranges) > 1 {
-		merged.Series.Ranges = MergeRanges(merged.Series.Ranges)
+		merged.Series.Ranges = MergeRanges(merged.Series.Ranges, step)
 	}
 
 	if lastErr != nil {
