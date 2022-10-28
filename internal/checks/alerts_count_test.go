@@ -132,42 +132,49 @@ func TestAlertsCountCheck(t *testing.T) {
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
+							// 7m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-24),
 								time.Now().Add(time.Hour*-24).Add(time.Minute*6),
 								time.Minute,
 							),
+							// 7m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-23),
 								time.Now().Add(time.Hour*-23).Add(time.Minute*6),
 								time.Minute,
 							),
+							// 2m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-22),
 								time.Now().Add(time.Hour*-22).Add(time.Minute),
 								time.Minute,
 							),
+							// 17m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-21),
 								time.Now().Add(time.Hour*-21).Add(time.Minute*16),
 								time.Minute,
 							),
+							// 37m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
 								time.Now().Add(time.Hour*-20).Add(time.Minute*36),
 								time.Minute,
 							),
+							// 37m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-19),
 								time.Now().Add(time.Hour*-19).Add(time.Minute*36),
 								time.Minute,
 							),
+							// 2h1m
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-10),

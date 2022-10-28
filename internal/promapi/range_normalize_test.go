@@ -225,6 +225,84 @@ func TestAppendSampleToRanges(t *testing.T) {
 				},
 			},
 		},
+		{
+			in: nil,
+			samples: []model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T09:14:59Z"), timeParse("2022-10-27T09:20:59Z"), time.Minute),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T10:14:59Z"), timeParse("2022-10-27T10:20:59Z"), time.Minute),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T11:14:59Z"), timeParse("2022-10-27T11:15:59Z"), time.Minute),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T12:14:59Z"), timeParse("2022-10-27T12:30:59Z"), time.Minute),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T13:14:59Z"), timeParse("2022-10-27T13:50:59Z"), time.Minute),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T14:14:59Z"), timeParse("2022-10-27T14:50:59Z"), time.Minute),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-10-27T23:14:59Z"), timeParse("2022-10-28T01:14:59Z"), time.Minute),
+				},
+			},
+			step: time.Minute,
+			out: []promapi.MetricTimeRange{
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T09:14:59Z"),
+					End:         timeParse("2022-10-27T09:21:59Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T10:14:59Z"),
+					End:         timeParse("2022-10-27T10:21:59Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T11:14:59Z"),
+					End:         timeParse("2022-10-27T11:16:59Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T12:14:59Z"),
+					End:         timeParse("2022-10-27T12:31:59Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T13:14:59Z"),
+					End:         timeParse("2022-10-27T13:51:59Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T14:14:59Z"),
+					End:         timeParse("2022-10-27T14:51:59Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-10-27T23:14:59Z"),
+					End:         timeParse("2022-10-28T01:15:59Z"),
+				},
+			},
+		},
 	}
 
 	for i, tc := range testCases {
@@ -233,7 +311,7 @@ func TestAppendSampleToRanges(t *testing.T) {
 				lset := promapi.MetricToLabels(s.Metric)
 				tc.in = promapi.AppendSampleToRanges(tc.in, lset, s.Values, tc.step)
 			}
-			tc.in = promapi.MergeRanges(tc.in)
+			tc.in = promapi.MergeRanges(tc.in, tc.step)
 			sort.Stable(tc.in)
 			require.Equal(t, printRange(tc.out), printRange(tc.in))
 		})
@@ -242,8 +320,9 @@ func TestAppendSampleToRanges(t *testing.T) {
 
 func TestMergeRanges(t *testing.T) {
 	type testCaseT struct {
-		in  promapi.MetricTimeRanges
-		out promapi.MetricTimeRanges
+		in   promapi.MetricTimeRanges
+		out  promapi.MetricTimeRanges
+		step time.Duration
 	}
 
 	timeParse := func(s string) time.Time {
@@ -264,12 +343,14 @@ func TestMergeRanges(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			in:  nil,
-			out: nil,
+			in:   nil,
+			out:  nil,
+			step: time.Minute,
 		},
 		{
-			in:  promapi.MetricTimeRanges{},
-			out: promapi.MetricTimeRanges{},
+			in:   promapi.MetricTimeRanges{},
+			out:  promapi.MetricTimeRanges{},
+			step: time.Minute,
 		},
 		{
 			in: promapi.MetricTimeRanges{
@@ -299,12 +380,13 @@ func TestMergeRanges(t *testing.T) {
 			out: promapi.MetricTimeRanges{
 				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
 			},
+			step: time.Minute,
 		},
 	}
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			out := promapi.MergeRanges(tc.in)
+			out := promapi.MergeRanges(tc.in, tc.step)
 			sort.Stable(out)
 			require.Equal(t, printRange(tc.out), printRange(out))
 		})

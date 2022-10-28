@@ -73,6 +73,7 @@ func (c AlertsCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		} else {
+			// FIXME: gaps are not used
 			qr.Series.FindGaps(promUptime.Series, qr.Series.From, qr.Series.Until)
 		}
 	}

@@ -454,7 +454,7 @@ var (
 			samples: []*model.SampleStream{
 				generateSampleStream(
 					map[string]string{},
-					time.Now().Add(time.Hour*24),
+					time.Now().Add(time.Hour*-24),
 					time.Now(),
 					time.Minute*5,
 				),
@@ -500,6 +500,9 @@ func generateSampleWithValue(labels map[string]string, val float64) *model.Sampl
 }
 
 func generateSampleStream(labels map[string]string, from, until time.Time, step time.Duration) (s *model.SampleStream) {
+	if from.After(until) {
+		panic(fmt.Sprintf("generateSampleStream() got from > until: %s ~ %s", from.UTC().Format(time.RFC3339), until.UTC().Format(time.RFC3339)))
+	}
 	metric := model.Metric{}
 	for k, v := range labels {
 		metric[model.LabelName(k)] = model.LabelValue(v)
