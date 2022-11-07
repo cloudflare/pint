@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_golang v1.13.1
 	github.com/prometheus/client_model v0.3.0
 	github.com/prometheus/common v0.37.0
-	github.com/prometheus/prometheus v0.39.1
+	github.com/prometheus/prometheus v0.40.0
 	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.28.0
@@ -21,8 +21,8 @@ require (
 	github.com/urfave/cli/v2 v2.23.4
 	go.uber.org/atomic v1.10.0
 	go.uber.org/ratelimit v0.2.0
-	golang.org/x/exp v0.0.0-20220827204233-334a2380cb91
-	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
+	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326
+	golang.org/x/oauth2 v0.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -31,7 +31,7 @@ require (
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/aws/aws-sdk-go v1.44.102 // indirect
+	github.com/aws/aws-sdk-go v1.44.128 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -44,10 +44,11 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
-	github.com/grafana/regexp v0.0.0-20220304095617-2e8d9baf4ac2 // indirect
+	github.com/grafana/regexp v0.0.0-20221005093135-b4c2bcb0a4b6 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -74,14 +75,14 @@ require (
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/zclconf/go-cty v1.11.0 // indirect
-	go.opentelemetry.io/otel v1.10.0 // indirect
-	go.opentelemetry.io/otel/trace v1.10.0 // indirect
+	go.opentelemetry.io/otel v1.11.1 // indirect
+	go.opentelemetry.io/otel/trace v1.11.1 // indirect
 	go.uber.org/goleak v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
-	golang.org/x/net v0.0.0-20220920203100-d0c6ba3f52d9 // indirect
-	golang.org/x/sync v0.0.0-20220907140024-f12130a52804 // indirect
-	golang.org/x/sys v0.0.0-20220919091848-fb04ddd9f9c8 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/net v0.1.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
