@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/fatih/color v1.13.0
-	github.com/gkampitakis/go-snaps v0.4.1
+	github.com/gkampitakis/go-snaps v0.4.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v37 v37.0.0
 	github.com/hashicorp/golang-lru v0.5.4
@@ -71,6 +71,7 @@ require (
 	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
+	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/zclconf/go-cty v1.11.0 // indirect
 	go.opentelemetry.io/otel v1.10.0 // indirect
