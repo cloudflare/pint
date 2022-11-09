@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.31.1
+
+### Fixed
+
+- Fixed performance regression slowing down `pint watch` over time.
+
 ## v0.31.0
 
 ### Added
