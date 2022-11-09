@@ -64,6 +64,112 @@ type MetricTimeRange struct {
 	End         time.Time
 }
 
+func Overlaps(a, b MetricTimeRange, step time.Duration) (c TimeRange, ok bool) {
+	// 0. Different labels
+	if a.Fingerprint != b.Fingerprint {
+		return c, false
+	}
+
+	// 1. Equal (within step)
+	//    [s1 e1]
+	//    [s2 e2]
+	if a.Start.Sub(b.Start).Abs() <= step && a.End.Sub(b.End).Abs() <= step {
+		if a.Start.Before(b.Start) {
+			c.Start = a.Start
+		} else {
+			c.Start = b.Start
+		}
+		if a.End.After(b.End) {
+			c.End = a.End
+		} else {
+			c.End = b.End
+		}
+		return c, true
+	}
+
+	// 2. Overlap e1 and s2
+	//    [s1 e1]
+	//      [s2 es2]
+	if a.Start.Before(b.Start) && a.End.After(b.Start) && a.End.Before(b.End) {
+		c.Start = a.Start
+		c.End = b.End
+		return c, true
+	}
+
+	// 3. Overlap e2 and s1
+	//      [s1 e2]
+	//    [s2 e2]
+	if a.Start.After(b.Start) && a.Start.Before(b.End) && a.End.After(b.End) {
+		c.Start = b.Start
+		c.End = a.End
+		return c, true
+	}
+
+	// 4. s2 continues e1
+	//    [s1 e1]
+	//           [s2 e2]
+	if a.Start.Before(b.Start) && a.End.Before(b.End) && a.End.Sub(b.Start).Abs() <= step {
+		c.Start = a.Start
+		c.End = b.End
+		return c, true
+	}
+
+	// 5. s1 continues e2
+	//           [s1 e1]
+	//    [s2 e2]
+	if a.Start.After(b.Start) && a.End.After(b.End) && a.Start.Sub(b.End).Abs() <= step {
+		c.Start = b.Start
+		c.End = a.End
+		return c, true
+	}
+
+	// 6. Second range fully included in first range
+	//    [s1     e1]
+	//      [s2 e2]
+	if a.Start.Before(b.Start) && a.End.After(b.End) {
+		c.Start = a.Start
+		c.End = a.End
+		return c, true
+	}
+
+	// 7. Second range included in first range (start aligned)
+	//    [s1   e1]
+	//    [s2 e2]
+	if a.Start.Sub(b.Start).Abs() <= step && a.End.After(b.End) {
+		if a.Start.Before(b.Start) {
+			c.Start = a.Start
+		} else {
+			c.Start = b.Start
+		}
+		c.End = a.End
+		return c, true
+	}
+
+	// 8. Second range included in first range (end aligned)
+	//    [s1   e1]
+	//      [s2 e2]
+	if a.Start.Before(b.Start) && a.End.Sub(b.End).Abs() <= step {
+		c.Start = a.Start
+		if a.End.After(b.End) {
+			c.End = a.End
+		} else {
+			c.End = b.End
+		}
+		return c, true
+	}
+
+	// 9. First range fully included in second range
+	//      [s1 e1]
+	//    [s2     e2]
+	if a.Start.After(b.Start) && a.End.Before(b.End) {
+		c.Start = b.Start
+		c.End = b.End
+		return c, true
+	}
+
+	return c, false
+}
+
 type MetricTimeRanges []MetricTimeRange
 
 func (mtr MetricTimeRanges) Len() int {
@@ -123,45 +229,51 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 }
 
 // merge [t1:t2] [t2:t3] together
-func MergeRanges(dst MetricTimeRanges, step time.Duration) MetricTimeRanges {
-	sort.Stable(dst)
+func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges, bool) {
+	merged := map[uint64]MetricTimeRanges{}
+	var ok, found, hadMerged bool
+	var tr TimeRange
+	for _, src := range source {
+		if _, ok = merged[src.Fingerprint]; !ok {
+			merged[src.Fingerprint] = MetricTimeRanges{}
+		}
 
-	toPurge := map[int]struct{}{}
-	var ok bool
-	for i := range dst {
-		for j := range dst {
-			if i == j {
-				continue
+		found = false
+		for i := 0; i < len(merged[src.Fingerprint]); i++ {
+			if tr, ok = Overlaps(merged[src.Fingerprint][i], src, step); ok { // 1. [s e]
+				//    [ts]
+				merged[src.Fingerprint][i].Start = tr.Start
+				merged[src.Fingerprint][i].End = tr.End
+				found = true
+				hadMerged = true
 			}
-			if dst[i].Fingerprint != dst[j].Fingerprint {
-				continue
-			}
-			if _, ok = toPurge[j]; ok {
-				continue
-			}
-			// 1. Merge two ranges next to each other
-			// [s1 ~ e1]
-			//          [s2 - e2]
-			// 2. Merge two overlapping ranges
-			// [s1 ~ e1]
-			//       [s2 ~ e2]
-			if dst[i].Start.Before(dst[j].Start) && !dst[i].End.Before(dst[j].Start.Add(step*-1)) {
-				dst[i].End = dst[j].End
-				toPurge[j] = struct{}{}
-			}
+		}
+		if !found {
+			merged[src.Fingerprint] = append(merged[src.Fingerprint], src)
 		}
 	}
 
-	merged := make(MetricTimeRanges, 0, len(dst)-len(toPurge))
-	for i, tr := range dst {
-		if _, ok = toPurge[i]; ok {
-			goto NEXT
-		}
-		merged = append(merged, tr)
-	NEXT:
+	if !hadMerged {
+		return source, false
 	}
 
-	return merged
+	for fp := range merged {
+		ok = true
+		for ok {
+			merged[fp], ok = MergeRanges(merged[fp], step)
+		}
+	}
+
+	var total int
+	for _, ranges := range merged {
+		total += len(ranges)
+	}
+	all := make(MetricTimeRanges, 0, total)
+	for _, ranges := range merged {
+		all = append(all, ranges...)
+	}
+	sort.Stable(all)
+	return all, hadMerged
 }
 
 func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.SamplePair, step time.Duration) MetricTimeRanges {
@@ -173,10 +285,15 @@ func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.S
 		ts = v.Timestamp.Time()
 		found = false
 		for i := range dst {
-			if dst[i].Fingerprint == fp &&
-				!ts.Before(dst[i].Start) &&
+			if dst[i].Fingerprint != fp {
+				continue
+			}
+
+			if !ts.Before(dst[i].Start) &&
 				!ts.After(dst[i].End.Add(step)) {
-				dst[i].End = ts.Add(step)
+				if ts.Add(step).After(dst[i].End) {
+					dst[i].End = ts.Add(step)
+				}
 				found = true
 				break
 			}
