@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -233,10 +235,16 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		}
 	}
 
+	promNames := make([]string, 0, len(cfg.Prometheus))
 	for i, prom := range cfg.Prometheus {
 		if err = prom.validate(); err != nil {
 			return cfg, err
 		}
+
+		if slices.Contains(promNames, prom.Name) {
+			return cfg, fmt.Errorf("prometheus server name must be unique, found two or more config blocks using %q name", prom.Name)
+		}
+		promNames = append(promNames, prom.Name)
 
 		var timeout time.Duration
 		if prom.Timeout != "" {
@@ -265,12 +273,12 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		}
 
 		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, concurrency, cacheSize, rateLimit),
+			promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, concurrency, rateLimit),
 		}
 		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, cacheSize, rateLimit))
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, rateLimit))
 		}
-		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required))
+		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, cacheSize, prom.Required))
 	}
 
 	for _, rule := range cfg.Rules {

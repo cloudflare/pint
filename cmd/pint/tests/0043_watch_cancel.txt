@@ -6,9 +6,6 @@ exec bash -x ./test.sh &
 pint.ok --no-color watch --interval=1h --listen=127.0.0.1:6043 --pidfile=pint.pid rules
 ! stdout .
 stderr 'level=info msg="Shutting down"'
-stderr 'level=error msg="Query returned an error" error="failed to query Prometheus config: Get \\"http://127.0.0.1:7043/api/v1/status/config\\": context canceled" query=/api/v1/status/config uri=http://127.0.0.1:7043'
-stderr 'level=error msg="Query returned an error" error="failed to query Prometheus flags: Get \\"http://127.0.0.1:7043/api/v1/status/flags\\": context canceled" query=/api/v1/status/flags uri=http://127.0.0.1:7043'
-stderr 'level=error msg="Query returned an error" error="Post \\"http://127.0.0.1:7043/api/v1/query\\": context canceled" query=count\(foo\) uri=http://127.0.0.1:7043'
 stderr 'level=info msg="Waiting for all background tasks to finish"'
 stderr 'level=info msg="Background worker finished"'
 

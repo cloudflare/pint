@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -10,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	lru "github.com/hashicorp/golang-lru"
+	"github.com/cespare/xxhash/v2"
 	"github.com/klauspost/compress/gzhttp"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/ratelimit"
@@ -36,7 +37,8 @@ func (qe QueryError) Unwrap() error {
 type querier interface {
 	Endpoint() string
 	String() string
-	CacheKey() string
+	CacheKey() uint64
+	CacheAfter() int
 	Run() queryResult
 }
 
@@ -73,16 +75,14 @@ type Prometheus struct {
 	timeout     time.Duration
 	concurrency int
 	client      http.Client
-	cache       *lru.ARCCache
+	cache       *queryCache
 	locker      *partitionLocker
 	rateLimiter ratelimit.Limiter
 	wg          sync.WaitGroup
 	queries     chan queryRequest
 }
 
-func NewPrometheus(name, uri string, headers map[string]string, timeout time.Duration, concurrency, cacheSize, rl int) *Prometheus {
-	cache, _ := lru.NewARC(cacheSize)
-
+func NewPrometheus(name, uri string, headers map[string]string, timeout time.Duration, concurrency, rl int) *Prometheus {
 	prom := Prometheus{
 		name:        name,
 		unsafeURI:   uri,
@@ -90,25 +90,11 @@ func NewPrometheus(name, uri string, headers map[string]string, timeout time.Dur
 		headers:     headers,
 		timeout:     timeout,
 		client:      http.Client{Transport: gzhttp.Transport(http.DefaultTransport)},
-		cache:       cache,
 		locker:      newPartitionLocker((&sync.Mutex{})),
 		rateLimiter: ratelimit.New(rl),
 		concurrency: concurrency,
 	}
 	return &prom
-}
-
-func (prom *Prometheus) purgeExpiredCache() {
-	now := time.Now()
-	for _, key := range prom.cache.Keys() {
-		if val, found := prom.cache.Peek(key); found {
-			if c, ok := val.(queryResult); ok {
-				if !c.expires.IsZero() && c.expires.Before(now) {
-					prom.cache.Remove(key)
-				}
-			}
-		}
-	}
 }
 
 func (prom *Prometheus) Close() {
@@ -174,23 +160,21 @@ func queryWorker(prom *Prometheus, queries chan queryRequest) {
 
 func processJob(prom *Prometheus, job queryRequest) queryResult {
 	cacheKey := job.query.CacheKey()
-	if cacheKey != "" {
-		if cached, ok := prom.cache.Get(cacheKey); ok {
-			prometheusCacheHitsTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
+	if prom.cache != nil {
+		if cached, ok := prom.cache.get(cacheKey, job.query.Endpoint()); ok {
 			log.Debug().
 				Str("uri", prom.safeURI).
 				Str("query", job.query.String()).
-				Str("key", cacheKey).
+				Uint64("key", cacheKey).
 				Msg("Cache hit")
-			return cached.(queryResult)
+			return cached
 		}
 	}
 
-	prometheusCacheMissTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 	log.Debug().
 		Str("uri", prom.safeURI).
 		Str("query", job.query.String()).
-		Str("key", cacheKey).
+		Uint64("key", cacheKey).
 		Msg("Cache miss")
 
 	prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
@@ -209,6 +193,9 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Dec()
 
 	if result.err != nil {
+		if errors.Is(result.err, context.Canceled) {
+			return result
+		}
 		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
 		log.Error().
 			Err(result.err).
@@ -218,11 +205,9 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 		return result
 	}
 
-	if cacheKey != "" {
-		prom.cache.Add(cacheKey, result)
+	if prom.cache != nil {
+		prom.cache.set(cacheKey, result, job.query.CacheAfter())
 	}
-
-	prometheusCacheSize.WithLabelValues(prom.name).Set(float64(prom.cache.Len()))
 
 	return result
 }
@@ -233,4 +218,13 @@ func formatTime(t time.Time) string {
 
 func dummyReadAll(r io.Reader) {
 	_, _ = io.Copy(io.Discard, r)
+}
+
+func hash(s ...string) uint64 {
+	h := xxhash.New()
+	for _, v := range s {
+		_, _ = h.WriteString(v)
+		_, _ = h.WriteString("\n")
+	}
+	return h.Sum64()
 }

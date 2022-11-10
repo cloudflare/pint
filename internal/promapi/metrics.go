@@ -16,27 +16,6 @@ var (
 		},
 		[]string{"name", "endpoint"},
 	)
-	prometheusCacheSize = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "pint_prometheus_cache_size",
-			Help: "Total number of entries currently stored in Prometheus query cache",
-		},
-		[]string{"name"},
-	)
-	prometheusCacheHitsTotal = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "pint_prometheus_cache_hits_total",
-			Help: "Total number of all prometheus queries served from a cache",
-		},
-		[]string{"name", "endpoint"},
-	)
-	prometheusCacheMissTotal = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: "pint_prometheus_cache_miss_total",
-			Help: "Total number of all prometheus queries resulting in a cache miss",
-		},
-		[]string{"name", "endpoint"},
-	)
 	prometheusQueriesTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "pint_prometheus_queries_total",
@@ -55,9 +34,6 @@ var (
 
 func RegisterMetrics() {
 	prometheus.MustRegister(prometheusQueriesRunning)
-	prometheus.MustRegister(prometheusCacheSize)
-	prometheus.MustRegister(prometheusCacheHitsTotal)
-	prometheus.MustRegister(prometheusCacheMissTotal)
 	prometheus.MustRegister(prometheusQueriesTotal)
 	prometheus.MustRegister(prometheusQueryErrorsTotal)
 }

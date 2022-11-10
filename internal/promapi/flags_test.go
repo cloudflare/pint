@@ -92,11 +92,14 @@ func TestFlags(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 1000, 100)
-			prom.StartWorkers()
-			defer prom.Close()
+			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 100),
+			}, 1000, true)
 
-			flags, err := prom.Flags(context.Background())
+			fg.StartWorkers(time.Minute)
+			defer fg.Close()
+
+			flags, err := fg.Flags(context.Background())
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {

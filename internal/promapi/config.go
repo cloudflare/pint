@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -73,12 +72,12 @@ func (q configQuery) String() string {
 	return "/api/v1/status/config"
 }
 
-func (q configQuery) CacheKey() string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, q.Endpoint())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func (q configQuery) CacheAfter() int {
+	return 0
+}
+
+func (q configQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
 }
 
 func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {

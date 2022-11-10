@@ -3,11 +3,11 @@ module github.com/cloudflare/pint
 go 1.19
 
 require (
+	github.com/cespare/xxhash/v2 v2.1.2
 	github.com/fatih/color v1.13.0
 	github.com/gkampitakis/go-snaps v0.4.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v37 v37.0.0
-	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/hcl/v2 v2.15.0
 	github.com/klauspost/compress v1.15.12
 	github.com/prometheus/client_golang v1.14.0
@@ -33,7 +33,6 @@ require (
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.128 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dennwc/varint v1.0.0 // indirect

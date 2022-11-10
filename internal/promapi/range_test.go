@@ -380,13 +380,15 @@ func TestRange(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			prom := promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 1000, 100)
-			prom.StartWorkers()
-			defer prom.Close()
+			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100),
+			}, 1000, true)
+			fg.StartWorkers(time.Minute)
+			defer fg.Close()
 
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := prom.RangeQuery(context.Background(), tc.query, promapi.NewAbsoluteRange(tc.start, tc.end, tc.step))
+					qr, err := fg.RangeQuery(context.Background(), tc.query, promapi.NewAbsoluteRange(tc.start, tc.end, tc.step))
 					if tc.err != "" {
 						require.EqualError(t, err, tc.err, tc)
 					} else {

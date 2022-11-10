@@ -139,12 +139,13 @@ func actionWatch(c *cli.Context) error {
 	}()
 	log.Info().Str("address", listen).Msg("Started HTTP server")
 
+	interval := c.Duration(intervalFlag)
+
 	for _, prom := range meta.cfg.PrometheusServers {
-		prom.StartWorkers()
+		prom.StartWorkers(interval * 3)
 	}
 
 	// start timer to run every $interval
-	interval := c.Duration(intervalFlag)
 	ack := make(chan bool, 1)
 	mainCtx, mainCancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
 	stop := startTimer(mainCtx, meta.cfg, meta.workers, interval, ack, collector)

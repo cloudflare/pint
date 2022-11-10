@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -61,12 +60,12 @@ func (q flagsQuery) String() string {
 	return "/api/v1/status/flags"
 }
 
-func (q flagsQuery) CacheKey() string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, q.Endpoint())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func (q flagsQuery) CacheAfter() int {
+	return 0
+}
+
+func (q flagsQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
 }
 
 func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
