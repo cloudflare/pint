@@ -1,4 +1,4 @@
-remote_theme: pdmosses/just-the-docs@combination
+remote_theme: pdmosses/just-the-docs@v0.4.0.rc3
 aux_links:
   "cloudflare/pint on GitHub":
     - "//github.com/cloudflare/pint"
