@@ -396,7 +396,7 @@ func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
 		comments = r.AlertingRule.Comments()
 	}
 	for _, c := range comments {
-		if val, ok := GetComment(c, comment...); ok {
+		if val, ok := GetLastComment(c, comment...); ok {
 			return val, ok
 		}
 	}
@@ -413,7 +413,7 @@ func (r Rule) GetComments(key string) (cs []Comment) {
 	for _, c := range comments {
 		sc := bufio.NewScanner(strings.NewReader(c))
 		for sc.Scan() {
-			if val, ok := GetComment(sc.Text(), key); ok {
+			if val, ok := GetLastComment(sc.Text(), key); ok {
 				cs = append(cs, val)
 			}
 		}

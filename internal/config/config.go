@@ -72,7 +72,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.Rule) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.Rule, disabledChecks []string) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	allChecks := []checkMeta{
@@ -139,6 +139,11 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 	}
 
 	for _, cm := range allChecks {
+		// check if check is disabled for specific rule
+		if !isEnabled(cfg.Checks.Enabled, disabledChecks, r, cm.name, cm.check) {
+			continue
+		}
+
 		// check if rule was disabled
 		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, r, cm.name, cm.check) {
 			continue

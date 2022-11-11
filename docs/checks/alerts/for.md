@@ -27,6 +27,11 @@ checks {
 }
 ```
 
-Or you can disable it per rule by adding a comment to it.
+You can also disable it for all rules inside given file by adding
+a comment anywhere in that file. Example:
+
+`# pint file/disable alerts/for`
+
+Or you can disable it per rule by adding a comment to it. Example:
 
 `# pint disable alerts/for`

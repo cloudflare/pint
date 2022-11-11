@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/prometheus/prometheus/model/rulefmt"
+	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -15,8 +16,9 @@ import (
 )
 
 const (
-	FileOwnerComment = "file/owner"
-	RuleOwnerComment = "rule/owner"
+	FileOwnerComment         = "file/owner"
+	FileDisabledCheckComment = "file/disable"
+	RuleOwnerComment         = "rule/owner"
 )
 
 var ignoredErrors = []string{
@@ -51,12 +53,13 @@ type RuleFinder interface {
 }
 
 type Entry struct {
-	ReportedPath  string
-	SourcePath    string
-	PathError     error
-	ModifiedLines []int
-	Rule          parser.Rule
-	Owner         string
+	ReportedPath   string
+	SourcePath     string
+	PathError      error
+	ModifiedLines  []int
+	Rule           parser.Rule
+	Owner          string
+	DisabledChecks []string
 }
 
 func readFile(path string, isStrict bool) (entries []Entry, err error) {
@@ -78,7 +81,15 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		contentLines = append(contentLines, i)
 	}
 
-	fileOwner, _ := parser.GetComment(string(content.Body), FileOwnerComment)
+	body := string(content.Body)
+	fileOwner, _ := parser.GetLastComment(body, FileOwnerComment)
+
+	var disabledChecks []string
+	for _, comment := range parser.GetComments(body, FileDisabledCheckComment) {
+		if !slices.Contains(disabledChecks, comment.Value) {
+			disabledChecks = append(disabledChecks, comment.Value)
+		}
+	}
 
 	if content.Ignored {
 		entries = append(entries, Entry{
@@ -139,10 +150,11 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 			owner = fileOwner
 		}
 		entries = append(entries, Entry{
-			ReportedPath: path,
-			SourcePath:   path,
-			Rule:         rule,
-			Owner:        owner.Value,
+			ReportedPath:   path,
+			SourcePath:     path,
+			Rule:           rule,
+			Owner:          owner.Value,
+			DisabledChecks: disabledChecks,
 		})
 	}
 

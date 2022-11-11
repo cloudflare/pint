@@ -161,7 +161,7 @@ func TestReadContent(t *testing.T) {
 	}
 }
 
-func TestGetComment(t *testing.T) {
+func TestGetLastComment(t *testing.T) {
 	type testCaseT struct {
 		input   string
 		comment []string
@@ -243,6 +243,18 @@ func TestGetComment(t *testing.T) {
 			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
 		},
 		{
+			input:   "# pint set promql/series min-age 1d\n# pint set promql/series min-age 1w\n",
+			comment: []string{"set", "promql/series", "min-age"},
+			ok:      true,
+			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
+		},
+		{
+			input:   "# pint set promql/series min-age 2d\n# pint set promql/series min-age 1w\n# pint set promql/series min-age 1s\n",
+			comment: []string{"set", "promql/series", "min-age"},
+			ok:      true,
+			output:  parser.Comment{Key: "set promql/series min-age", Value: "1s"},
+		},
+		{
 			input:   "# pint set promql/series min-age 1w       ",
 			comment: []string{"set", "promql/series", "min-age"},
 			ok:      true,
@@ -262,7 +274,7 @@ func TestGetComment(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%s", i, tc.input), func(t *testing.T) {
-			output, ok := parser.GetComment(tc.input, tc.comment...)
+			output, ok := parser.GetLastComment(tc.input, tc.comment...)
 			require.Equal(t, tc.ok, ok)
 			require.Equal(t, tc.output, output)
 		})

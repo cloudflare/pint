@@ -1,0 +1,35 @@
+http response prometheus / 502 Bad Gateway
+http start prometheus 127.0.0.1:7104
+
+pint.error --no-color lint rules
+! stdout .
+stderr 'level=error msg="Query returned an error" error="server error: 502" query=/api/v1/status/config uri=http://127.0.0.1:7104'
+stderr 'level=error msg="Query returned an error" error="server error: 502" query=/api/v1/status/flags uri=http://127.0.0.1:7104'
+stderr 'level=error msg="Query returned an error" error="server error: 502" query=count\(foo\) uri=http://127.0.0.1:7104'
+stderr 'level=info msg="Problems found" Bug=3'
+-- rules/0001.yml --
+# This should skip all online checks
+# pint file/disable promql/series
+#  pint  file/disable  promql/rate
+#
+# pint file/disable alerts/count
+#   pint   file/disable   promql/range_query
+#
+
+- record: "colo:test1"
+  expr: sum(foo) without(job)
+
+-- rules/0002.yml --
+- record: "colo:test2"
+  expr: sum(foo) without(job)
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7104"
+  failover = []
+  timeout  = "5s"
+  required = true
+}
+parser {
+  relaxed = [".*"]
+}

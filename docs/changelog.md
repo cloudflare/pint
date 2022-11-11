@@ -6,6 +6,8 @@
 
 - Added `pint_prometheus_cache_evictions_total` metric tracking the number of times
   cache results were evicted from query cache.
+- Allow disabling individual checks for the entire file using
+  `# pint file/disable ...` comments.
 
 ### Changed
 

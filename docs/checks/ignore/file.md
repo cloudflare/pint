@@ -7,7 +7,7 @@ grand_parent: Documentation
 # ignore/file
 
 You will see this check reports for files that are excludes from pint using a
-`file/ignore` comment.
+`ignore/file` comment.
 See this [page](../../ignoring.md) for details on how such comments work.
 
 Those reports are informational to make it obvious that pint didn't run any
