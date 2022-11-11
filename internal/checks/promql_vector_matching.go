@@ -202,7 +202,18 @@ NEXT:
 }
 
 func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, error) {
-	qr, err := c.prom.Query(ctx, query)
+	var expr strings.Builder
+	expr.WriteString("count(")
+	expr.WriteString(query)
+	expr.WriteString(") without(")
+	for i, ln := range ignored {
+		expr.WriteString(string(ln))
+		if i < (len(ignored) - 1) {
+			expr.WriteString(",")
+		}
+	}
+	expr.WriteString(")")
+	qr, err := c.prom.Query(ctx, expr.String())
 	if err != nil {
 		return nil, err
 	}
@@ -215,15 +226,7 @@ func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ign
 	for _, s := range qr.Series {
 		var ls labelSet
 		for k := range s.Metric {
-			var isIgnored bool
-			for _, i := range ignored {
-				if k == i {
-					isIgnored = true
-				}
-			}
-			if !isIgnored {
-				ls.add(string(k))
-			}
+			ls.add(string(k))
 		}
 		if len(ls.names) > 1 {
 			sort.Strings(ls.names)

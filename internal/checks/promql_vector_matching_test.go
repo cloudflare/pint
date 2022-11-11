@@ -70,18 +70,16 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 								"notfound": "xxx",
 							}),
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "bbb",
 								"job":      "bbb",
 								"notfound": "xxx",
@@ -92,22 +90,19 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "bbb",
 								"job":      "bbb",
 							}),
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "ccc",
 								"job":      "bbb",
 							}),
@@ -133,7 +128,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "xxx"},
+						formCond{key: "query", value: "count(xxx) without(__name__)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -156,12 +151,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -171,7 +165,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "xxx"},
+						formCond{key: "query", value: "count(xxx) without(__name__)"},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -218,12 +212,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__,xxx)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -233,16 +226,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "app_registry"},
+						formCond{key: "query", value: "count(app_registry) without(__name__,xxx)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "app_registry",
 								"app_name": "aaa",
 							}),
 							generateSample(map[string]string{
-								"__name__": "app_registry",
 								"app_name": "aaa",
 								"cluster":  "dev",
 							}),
@@ -278,12 +269,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -293,12 +283,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -324,12 +313,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -355,15 +343,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
-								"notfound": "ccc",
 							}),
 						},
 					},
@@ -387,12 +373,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -402,15 +387,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
-								"notfound": "ccc",
 							}),
 						},
 					},
@@ -434,15 +417,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
-								"notfound": "ccc",
 							}),
 						},
 					},
@@ -450,12 +431,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -481,15 +461,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
-								"notfound": "ccc",
 							}),
 						},
 					},
@@ -497,12 +475,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -538,12 +515,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -553,12 +529,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar_with_notfound"},
+						formCond{key: "query", value: "count(bar_with_notfound) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "bar_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
 								"notfound": "ccc",
@@ -595,12 +570,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 								"notfound": "ccc",
@@ -611,12 +585,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -652,28 +625,22 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "(memory_bytes / ignoring (job) memory_limit)"},
+						formCond{key: "query", value: "count(memory_bytes / ignoring (job) memory_limit)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "memory_bytes",
-								"instance": "instance1",
-								"job":      "foo_job",
-								"dev":      "mem",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "app_registry"},
+						formCond{key: "query", value: "count(app_registry) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "app_registry",
 								"app_name": "foo",
 							}),
 						},
@@ -682,7 +649,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "count(memory_bytes / ignoring (job) memory_limit)"},
+						formCond{key: "query", value: "count((memory_bytes / ignoring (job) memory_limit)) without(__name__)"},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -715,26 +682,22 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "foo",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "bar",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
@@ -757,26 +720,22 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "foo",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "bar",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
@@ -806,26 +765,22 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "up"},
+						formCond{key: "query", value: "count(up) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "up",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
-							generateSample(map[string]string{
-								"__name__": "foo",
-							}),
+							generateSample(map[string]string{}),
 						},
 					},
 				},
@@ -858,12 +813,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "min_over_time(foo_with_notfound[30m:1m])"},
+						formCond{key: "query", value: "count(min_over_time(foo_with_notfound[30m:1m])) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
 								"notfound": "ccc",
@@ -874,12 +828,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "bar"},
+						formCond{key: "query", value: "count(bar) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "bar",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -912,12 +865,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "(foo / ignoring (notfound) foo_with_notfound)"},
+						formCond{key: "query", value: "count((foo / ignoring (notfound) foo_with_notfound)) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 								"notfound": "ccc",
@@ -935,12 +887,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -950,15 +901,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
-								"notfound": "ccc",
 							}),
 						},
 					},
@@ -992,12 +941,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "(foo / ignoring (notfound) foo_with_notfound)"},
+						formCond{key: "query", value: "count((foo / ignoring (notfound) foo_with_notfound)) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -1007,12 +955,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo"},
+						formCond{key: "query", value: "count(foo) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo",
 								"instance": "aaa",
 								"job":      "bbb",
 							}),
@@ -1022,15 +969,13 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "foo_with_notfound"},
+						formCond{key: "query", value: "count(foo_with_notfound) without(__name__,notfound)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "foo_with_notfound",
 								"instance": "aaa",
 								"job":      "bbb",
-								"notfound": "ccc",
 							}),
 						},
 					},
@@ -1038,12 +983,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "(memory_bytes / ignoring (job) memory_limit)"},
+						formCond{key: "query", value: "count((memory_bytes / ignoring (job) memory_limit)) without(__name__)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "memory_bytes",
 								"instance": "aaa",
 								"job":      "bbb",
 								"dev":      "ccc",
@@ -1068,14 +1012,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "memory_bytes"},
+						formCond{key: "query", value: "count(memory_bytes) without(__name__,job)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "memory_bytes",
 								"instance": "aaa",
-								"job":      "bbb",
 								"dev":      "ccc",
 							}),
 						},
@@ -1084,14 +1026,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: "memory_limit"},
+						formCond{key: "query", value: "count(memory_limit) without(__name__,job)"},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "memory_limit",
 								"instance": "aaa",
-								"job":      "xxx",
 								"dev":      "ccc",
 							}),
 						},
@@ -1166,7 +1106,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `xxx`},
+						formCond{key: "query", value: `count(xxx) without(__name__)`},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -1201,12 +1141,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `xxx`},
+						formCond{key: "query", value: `count(xxx) without(__name__)`},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "xxx",
 								"instance": "xx",
 								"job":      "xx",
 							}),
@@ -1216,7 +1155,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `yyy`},
+						formCond{key: "query", value: `count(yyy) without(__name__)`},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -1265,12 +1204,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `up{job="a"}`},
+						formCond{key: "query", value: `count(up{job="a"}) without(__name__)`},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "up",
 								"instance": "a",
 								"job":      "a",
 							}),
@@ -1280,12 +1218,11 @@ func TestVectorMatchingCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `up{job="b"}`},
+						formCond{key: "query", value: `count(up{job="b"}) without(__name__)`},
 					},
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSample(map[string]string{
-								"__name__": "up",
 								"instance": "b",
 								"job":      "b",
 							}),

@@ -1,9 +1,11 @@
 package checks_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -110,7 +112,8 @@ func runTests(t *testing.T, testCases []checkTest) {
 							return
 						}
 					}
-					t.Errorf("no matching response for %s %s request: %s", r.Method, r.URL, r.URL.Query())
+					buf, _ := io.ReadAll(r.Body)
+					t.Errorf("no matching response for %s %s request: %s, body: %s", r.Method, r.URL, r.URL.Query(), string(buf))
 					t.FailNow()
 				}))
 				defer srv.Close()
@@ -241,6 +244,12 @@ type formCond struct {
 }
 
 func (fc formCond) isMatch(r *http.Request) bool {
+	buf, _ := io.ReadAll(r.Body)
+	defer func() {
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
+	}()
+
+	r.Body = io.NopCloser(bytes.NewBuffer(buf))
 	err := r.ParseForm()
 	if err != nil {
 		return false

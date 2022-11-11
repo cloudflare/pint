@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.32.1
+
+### Fixed
+
+- [promql/vector_matching](checks/promql/vector_matching.md) was sending expensive
+  queries resulting in high memory usage, this is now fixed.
+
 ## v0.32.0
 
 ### Added
