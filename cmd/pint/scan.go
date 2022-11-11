@@ -108,7 +108,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 						Msg("Found alerting rule")
 				}
 
-				checkList := cfg.GetChecksForRule(ctx, entry.SourcePath, entry.Rule)
+				checkList := cfg.GetChecksForRule(ctx, entry.SourcePath, entry.Rule, entry.DisabledChecks)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
 					check := check

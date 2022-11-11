@@ -123,11 +123,12 @@ func newRule(t *testing.T, content string) parser.Rule {
 
 func TestGetChecksForRule(t *testing.T) {
 	type testCaseT struct {
-		title  string
-		config string
-		path   string
-		rule   parser.Rule
-		checks []string
+		title          string
+		config         string
+		path           string
+		rule           parser.Rule
+		checks         []string
+		disabledChecks []string
 	}
 
 	testCases := []testCaseT{
@@ -1140,6 +1141,39 @@ rule {
 				checks.RuleLinkCheckName + "(^https?://(.+)$)",
 			},
 		},
+		{
+			title: "two prometheus servers / disable checks via file/disable comment",
+			config: `
+prometheus "prom1" {
+  uri     = "http://localhost/1"
+  timeout = "1s"
+}
+prometheus "prom2" {
+  uri     = "http://localhost/2"
+  timeout = "1s"
+}
+checks {
+  disabled = [ "alerts/template" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# Some extra comment
+# pint disable promql/series
+# Some extra comment
+# pint disable promql/range_query
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+			disabledChecks: []string{"promql/rate", "promql/vector_matching"},
+		},
 	}
 
 	dir := t.TempDir()
@@ -1155,7 +1189,7 @@ rule {
 			cfg, err := config.Load(path, false)
 			require.NoError(t, err)
 
-			checks := cfg.GetChecksForRule(ctx, tc.path, tc.rule)
+			checks := cfg.GetChecksForRule(ctx, tc.path, tc.rule, tc.disabledChecks)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())

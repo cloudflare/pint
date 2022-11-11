@@ -1,0 +1,34 @@
+pint.ok -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=debug msg="File parsed" path=rules/0001.yml rules=1
+level=debug msg="Starting query workers" name=prom uri=http://127.0.0.1:7103 workers=16
+level=debug msg="Found recording rule" lines=9-10 path=rules/0001.yml record=colo:test1
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/vector_matching(prom)"] path=rules/0001.yml rule=colo:test1
+level=debug msg="Stopping query workers" name=prom uri=http://127.0.0.1:7103
+-- rules/0001.yml --
+# This should skip all online checks
+# pint file/disable promql/series
+#  pint  file/disable  promql/rate
+#
+# pint file/disable alerts/count
+#   pint   file/disable   promql/range_query
+#
+
+- record: "colo:test1"
+  expr: sum(foo) without(job)
+
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7103"
+  failover = []
+  timeout  = "5s"
+  required = true
+}
+parser {
+  relaxed = [".*"]
+}

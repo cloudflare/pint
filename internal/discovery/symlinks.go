@@ -67,11 +67,12 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 			if sl.to == entry.SourcePath {
 				log.Debug().Str("to", sl.to).Str("from", sl.from).Msg("Found a symlink")
 				nentries = append(nentries, Entry{
-					ReportedPath:  sl.to,
-					SourcePath:    sl.from,
-					ModifiedLines: entry.ModifiedLines,
-					Rule:          entry.Rule,
-					Owner:         entry.Owner,
+					ReportedPath:   sl.to,
+					SourcePath:     sl.from,
+					ModifiedLines:  entry.ModifiedLines,
+					Rule:           entry.Rule,
+					Owner:          entry.Owner,
+					DisabledChecks: entry.DisabledChecks,
 				})
 			}
 		}

@@ -160,8 +160,8 @@ func (c Comment) String() string {
 	return c.Key + " " + c.Value
 }
 
-func GetComment(line string, comment ...string) (s Comment, ok bool) {
-	sc := bufio.NewScanner(strings.NewReader(line))
+func GetComments(text string, comment ...string) (comments []Comment) {
+	sc := bufio.NewScanner(strings.NewReader(text))
 	for sc.Scan() {
 		elems := strings.Split(sc.Text(), "#")
 		lastComment := elems[len(elems)-1]
@@ -181,11 +181,21 @@ func GetComment(line string, comment ...string) (s Comment, ok bool) {
 			for i := len(comment) + 1; i < len(parts); i++ {
 				values = append(values, parts[i])
 			}
-			ok = true
-			s.Key = strings.Join(keys, " ")
-			s.Value = strings.Join(values, " ")
+			comments = append(comments, Comment{
+				Key:   strings.Join(keys, " "),
+				Value: strings.Join(values, " "),
+			})
 		}
 	NEXT:
 	}
-	return
+
+	return comments
+}
+
+func GetLastComment(text string, comment ...string) (Comment, bool) {
+	comments := GetComments(text, comment...)
+	if len(comments) == 0 {
+		return Comment{}, false
+	}
+	return comments[len(comments)-1], true
 }

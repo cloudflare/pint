@@ -91,6 +91,13 @@ checks {
 }
 ```
 
+## Disabling invididual checks for specific files
+
+To disable individual check for a specific rule use `# pint file/disable ...` comments
+anywhere in the file. This will disable given check for all rules in that file.
+
+See each individual [check](checks/index.md) documentation for details.
+
 ## Disabling individual checks for specific rules
 
 To disable individual check for a specific rule use `# pint disable ...` comments.
