@@ -93,7 +93,11 @@ pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems
-# HELP pint_prometheus_cache_miss_total Total number of all prometheus queries resulting in a cache miss
+# HELP pint_prometheus_cache_evictions_total Total number of times an entry was evicted from query cache due to size limit or TTL
+# TYPE pint_prometheus_cache_evictions_total counter
+pint_prometheus_cache_evictions_total{name="prom1"}
+pint_prometheus_cache_evictions_total{name="prom2"}
+# HELP pint_prometheus_cache_miss_total Total number of query cache misses
 # TYPE pint_prometheus_cache_miss_total counter
 pint_prometheus_cache_miss_total{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/query",name="prom2"}
@@ -101,6 +105,10 @@ pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom2"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/flags",name="prom2"}
+# HELP pint_prometheus_cache_size Total number of entries currently stored in Prometheus query cache
+# TYPE pint_prometheus_cache_size gauge
+pint_prometheus_cache_size{name="prom1"}
+pint_prometheus_cache_size{name="prom2"}
 # HELP pint_prometheus_queries_running Total number of in-flight prometheus queries
 # TYPE pint_prometheus_queries_running gauge
 pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom1"}

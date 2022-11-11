@@ -2,6 +2,9 @@ package promapi
 
 import (
 	"context"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type FailoverGroupError struct {
@@ -27,15 +30,18 @@ func (e *FailoverGroupError) IsStrict() bool {
 }
 
 type FailoverGroup struct {
-	name         string
-	servers      []*Prometheus
-	strictErrors bool
+	name           string
+	servers        []*Prometheus
+	cacheSize      int
+	strictErrors   bool
+	cacheCollector *cacheCollector
 }
 
-func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool) *FailoverGroup {
+func NewFailoverGroup(name string, servers []*Prometheus, cacheSize int, strictErrors bool) *FailoverGroup {
 	return &FailoverGroup{
 		name:         name,
 		servers:      servers,
+		cacheSize:    cacheSize,
 		strictErrors: strictErrors,
 	}
 }
@@ -44,8 +50,12 @@ func (fg *FailoverGroup) Name() string {
 	return fg.name
 }
 
-func (fg *FailoverGroup) StartWorkers() {
+func (fg *FailoverGroup) StartWorkers(maxCacheLifeTime time.Duration) {
+	queryCache := newQueryCache(fg.cacheSize, maxCacheLifeTime)
+	fg.cacheCollector = newCacheCollector(queryCache, fg.name)
+	prometheus.MustRegister(fg.cacheCollector)
 	for _, prom := range fg.servers {
+		prom.cache = queryCache
 		prom.StartWorkers()
 	}
 }
@@ -54,11 +64,15 @@ func (fg *FailoverGroup) Close() {
 	for _, prom := range fg.servers {
 		prom.Close()
 	}
+	prometheus.Unregister(fg.cacheCollector)
 }
 
 func (fg *FailoverGroup) CleanCache() {
 	for _, prom := range fg.servers {
-		prom.purgeExpiredCache()
+		if prom.cache != nil {
+			prom.cache.gc()
+			return
+		}
 	}
 }
 

@@ -115,11 +115,13 @@ func TestMetadata(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.metric, func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, 100)
-			prom.StartWorkers()
-			defer prom.Close()
+			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100),
+			}, 1000, true)
+			fg.StartWorkers(time.Minute)
+			defer fg.Close()
 
-			metadata, err := prom.Metadata(context.Background(), tc.metric)
+			metadata, err := fg.Metadata(context.Background(), tc.metric)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {

@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -66,14 +65,12 @@ func (q instantQuery) String() string {
 	return q.expr
 }
 
-func (q instantQuery) CacheKey() string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, q.Endpoint())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.expr)
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func (q instantQuery) CacheAfter() int {
+	return 0
+}
+
+func (q instantQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
 }
 
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {

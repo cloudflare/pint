@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -64,14 +63,12 @@ func (q metadataQuery) String() string {
 	return q.metric
 }
 
-func (q metadataQuery) CacheKey() string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, q.Endpoint())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.metric)
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func (q metadataQuery) CacheAfter() int {
+	return 0
+}
+
+func (q metadataQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.metric, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
 }
 
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {

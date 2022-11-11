@@ -1374,3 +1374,22 @@ func TestConfigErrors(t *testing.T) {
 		})
 	}
 }
+
+func TestDuplicatedPrometeusName(t *testing.T) {
+	dir := t.TempDir()
+	path := path.Join(dir, "config.hcl")
+	err := os.WriteFile(path, []byte(`
+prometheus "prom" {
+  uri     = "http://localhost:3000"
+  timeout = "1s"
+}
+prometheus "prom" {
+	uri     = "http://localhost:3001"
+	timeout = "1s"
+  }
+`), 0o644)
+	require.NoError(t, err)
+
+	_, err = config.Load(path, true)
+	require.EqualError(t, err, `prometheus server name must be unique, found two or more config blocks using "prom" name`)
+}

@@ -2,7 +2,6 @@ package promapi
 
 import (
 	"context"
-	"crypto/sha1"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -79,18 +78,12 @@ func (q rangeQuery) String() string {
 	return q.expr
 }
 
-func (q rangeQuery) CacheKey() string {
-	h := sha1.New()
-	_, _ = io.WriteString(h, q.Endpoint())
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.expr)
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.r.Start.Format(time.RFC3339))
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, q.r.End.Round(q.r.Step).Format(time.RFC3339))
-	_, _ = io.WriteString(h, "\n")
-	_, _ = io.WriteString(h, output.HumanizeDuration(q.r.Step))
-	return fmt.Sprintf("%x", h.Sum(nil))
+func (q rangeQuery) CacheAfter() int {
+	return 1
+}
+
+func (q rangeQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, q.r.Start.Format(time.RFC3339), q.r.End.Round(q.r.Step).Format(time.RFC3339), output.HumanizeDuration(q.r.Step))
 }
 
 type RangeQueryTimes interface {

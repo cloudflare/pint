@@ -186,11 +186,13 @@ func TestQuery(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.query, func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, 100)
-			prom.StartWorkers()
-			defer prom.Close()
+			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100),
+			}, 1000, true)
+			fg.StartWorkers(time.Minute)
+			defer fg.Close()
 
-			qr, err := prom.Query(context.Background(), tc.query)
+			qr, err := fg.Query(context.Background(), tc.query)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {

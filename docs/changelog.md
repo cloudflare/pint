@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.32.0
+
+### Added
+
+- Added `pint_prometheus_cache_evictions_total` metric tracking the number of times
+  cache results were evicted from query cache.
+
+### Changed
+
+- Refactored query cache to only store queries that are requested more than once.
+  This will avoid storing big responses that are never requested from the cache.
+
+### Fixed
+
+- Config validation will now check for duplicated `prometheus` block names.
+
 ## v0.31.1
 
 ### Fixed

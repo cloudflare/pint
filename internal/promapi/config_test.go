@@ -121,7 +121,7 @@ func TestConfig(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 1000, 100)
+			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 100)
 			prom.StartWorkers()
 			defer prom.Close()
 
@@ -175,11 +175,14 @@ func TestConfigHeaders(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			prom := promapi.NewPrometheus("test", srv.URL, tc.config, time.Second, 1, 1000, 100)
-			prom.StartWorkers()
-			defer prom.Close()
+			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, tc.config, time.Second, 1, 100),
+			}, 1000, true)
 
-			_, err := prom.Config(context.Background())
+			fg.StartWorkers(time.Minute)
+			defer fg.Close()
+
+			_, err := fg.Config(context.Background())
 			require.NoError(t, err)
 		})
 	}

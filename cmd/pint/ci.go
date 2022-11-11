@@ -74,7 +74,7 @@ func actionCI(c *cli.Context) error {
 	}
 
 	for _, prom := range meta.cfg.PrometheusServers {
-		prom.StartWorkers()
+		prom.StartWorkers(time.Hour)
 	}
 	defer meta.cleanup()
 
