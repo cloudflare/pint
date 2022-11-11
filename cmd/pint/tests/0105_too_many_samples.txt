@@ -1,0 +1,33 @@
+http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
+http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"--storage.tsdb.retention.time": "1d"}}
+http response prometheus /api/v1/query_range 400 {"status":"error","errorType":"execution","error":"query processing would load too many samples into memory in query execution"}
+http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
+http start prometheus 127.0.0.1:7105
+
+pint.error --no-color lint rules
+! stdout .
+stderr 'level=error msg="Query returned an error" error="query processing would load too many samples into memory in query execution" query=count\(up\) uri=http://127.0.0.1:7105'
+stderr 'level=warn msg="Cannot detect Prometheus uptime gaps" error="execution: query processing would load too many samples into memory in query execution" name=prom'
+
+-- rules/1.yaml --
+- record: one
+  expr: up == 0
+- record: two
+  expr: up == 0
+-- rules/2.yaml --
+- record: one
+  expr: up == 0
+- record: two
+  expr: up == 0
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7105"
+  required = false
+}
+parser {
+  relaxed = [".*"]
+}
+
+rule{}
