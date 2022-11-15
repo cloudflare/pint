@@ -64,6 +64,15 @@ func TestPrometheusConfig(t *testing.T) {
 			},
 			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
 		},
+		{
+			conf: PrometheusConfig{
+				Name:    "prom",
+				URI:     "http://localhost",
+				Timeout: "5m",
+				Uptime:  "xxx{foo=bar}",
+			},
+			err: errors.New(`invalid Prometheus uptime metric selector "xxx{foo=bar}": 1:8: expected '==', found '='`),
+		},
 	}
 
 	for _, tc := range testCases {

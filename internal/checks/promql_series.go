@@ -160,9 +160,15 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, "count(up)", promapi.NewRelativeRange(rangeLookback, rangeStep))
+		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), promapi.NewRelativeRange(rangeLookback, rangeStep))
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
+		}
+		if promUptime != nil && promUptime.Series.Ranges.Len() == 0 {
+			log.Warn().
+				Str("name", c.prom.Name()).
+				Str("metric", c.prom.UptimeMetric()).
+				Msg("No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config")
 		}
 
 		bareSelector := stripLabels(selector)
@@ -219,22 +225,19 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 			continue
 		}
 
-		highChurnLabels := []string{}
-
 		// 3. If foo is ALWAYS/SOMETIMES there BUT {bar OR baz} is NEVER there -> BUG
 		for _, name := range labelNames {
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s) by (%s)", l.String(), name), promapi.NewRelativeRange(rangeLookback, rangeStep))
+			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), promapi.NewRelativeRange(rangeLookback, rangeStep))
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
 			}
 			trsLabelCount.Series.FindGaps(promUptime.Series, trsLabelCount.Series.From, trsLabelCount.Series.Until)
 
-			labelRanges := withLabelName(trsLabelCount.Series.Ranges, name)
-			if len(labelRanges) == 0 {
+			if trsLabelCount.Series.Ranges.Len() == 1 && len(trsLabelCount.Series.Gaps) == 0 {
 				problems = append(problems, Problem{
 					Fragment: selector.String(),
 					Lines:    expr.Lines(),
@@ -245,12 +248,6 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 					Severity: Bug,
 				})
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("No historical series with label used for the query")
-			}
-
-			if len(trsLabelCount.Series.Gaps) > 0 &&
-				len(labelValues(trsLabelCount.Series.Ranges, name)) == len(trsLabelCount.Series.Ranges) &&
-				avgLife(trsLabelCount.Series.Ranges) < (trsLabelCount.Series.Until.Sub(trsLabelCount.Series.From)/2) {
-				highChurnLabels = append(highChurnLabels, name)
 			}
 		}
 		if len(problems) > 0 {
@@ -322,25 +319,20 @@ func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []disc
 
 			// 5. If foo is ALWAYS/SOMETIMES there BUT {bar OR baz} value is NEVER there -> BUG
 			if len(trsLabel.Series.Ranges) == 0 {
-				text := fmt.Sprintf(
-					"%s has %q metric with %q label but there are no series matching {%s} in the last %s",
-					promText(c.prom.Name(), trsLabel.URI), bareSelector.String(), lm.Name, lm.String(), sinceDesc(trs.Series.From))
-				s := Bug
-				for _, name := range highChurnLabels {
-					if lm.Name == name {
-						s = Warning
-						text += fmt.Sprintf(", %q looks like a high churn label", name)
-						break
-					}
-				}
-
-				text, s = c.textAndSeverity(settings, bareSelector.String(), text, s)
+				text, severity := c.textAndSeverity(
+					settings,
+					bareSelector.String(),
+					fmt.Sprintf(
+						"%s has %q metric with %q label but there are no series matching {%s} in the last %s",
+						promText(c.prom.Name(), trsLabel.URI), bareSelector.String(), lm.Name, lm.String(), sinceDesc(trs.Series.From)),
+					Bug,
+				)
 				problems = append(problems, Problem{
 					Fragment: selector.String(),
 					Lines:    expr.Lines(),
 					Reporter: c.Reporter(),
 					Text:     text,
-					Severity: s,
+					Severity: severity,
 				})
 				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("No historical series matching filter used in the query")
 				continue
@@ -598,32 +590,6 @@ func newest(ranges []promapi.MetricTimeRange) (ts time.Time) {
 		if ts.IsZero() || r.End.After(ts) {
 			ts = r.End
 		}
-	}
-	return
-}
-
-func withLabelName(ranges []promapi.MetricTimeRange, name string) (r []promapi.MetricTimeRange) {
-	for _, s := range ranges {
-		for _, l := range s.Labels {
-			if l.Name == name {
-				r = append(r, s)
-			}
-		}
-	}
-	return r
-}
-
-func labelValues(ranges []promapi.MetricTimeRange, name string) (vals []string) {
-	vm := map[string]struct{}{}
-	for _, s := range ranges {
-		for _, l := range s.Labels {
-			if l.Name == name {
-				vm[l.Value] = struct{}{}
-			}
-		}
-	}
-	for v := range vm {
-		vals = append(vals, v)
 	}
 	return
 }

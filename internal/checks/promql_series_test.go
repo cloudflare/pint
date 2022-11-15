@@ -595,23 +595,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"job": "xxx"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
+						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
@@ -658,7 +649,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
+						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
 					},
 					resp: respondWithInternalError(),
 				},
@@ -704,7 +695,7 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -720,14 +711,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
 								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
 								time.Now().Add(time.Minute*-50),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -785,14 +776,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-4),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -801,14 +792,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -876,14 +867,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -892,18 +883,9 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
@@ -951,34 +933,16 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
@@ -1026,14 +990,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1042,14 +1006,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1111,14 +1075,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1127,14 +1091,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1196,14 +1160,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1212,14 +1176,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1288,14 +1252,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"job": "foo"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1304,14 +1268,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1370,50 +1334,23 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
+						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"notfound": "found"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found{instance=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -1465,50 +1402,23 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{instance=~".+"}) by (instance)`},
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{notfound=~".+"}) by (notfound)`},
+						formCond{key: "query", value: `absent(found{notfound=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"notfound": "found"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count(found{instance=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"instance": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
@@ -1560,18 +1470,9 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{error=~".+"}) by (error)`},
+						formCond{key: "query", value: `absent(found{error=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"error": "bar"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
@@ -1600,8 +1501,8 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `sometimes{churn="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w") + `, "churn" looks like a high churn label`,
-						Severity: checks.Warning,
+						Text:     noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w"),
+						Severity: checks.Bug,
 					},
 				}
 			},
@@ -1644,24 +1545,24 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(sometimes{churn=~".+"}) by (churn)`},
+						formCond{key: "query", value: `absent(sometimes{churn=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"churn": "aaa"},
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-7),
 								time.Now().Add(time.Hour*24*-7).Add(time.Hour),
 								time.Minute*5,
 							),
 							generateSampleStream(
-								map[string]string{"churn": "bbb"},
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-5),
 								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
 								time.Minute*5,
 							),
 							generateSampleStream(
-								map[string]string{"churn": "ccc"},
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-2),
 								time.Now().Add(time.Hour*24*-2).Add(time.Minute*20),
 								time.Minute*5,
@@ -1713,18 +1614,9 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(foo{error=~".+"}) by (error)`},
+						formCond{key: "query", value: `absent(foo{error=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"error": "yyy"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
@@ -1769,14 +1661,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{removed=~".+"}) by (removed)`},
+						formCond{key: "query", value: `absent(found{removed=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"removed": "xxx"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1852,14 +1744,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{removed=~".+"}) by (removed)`},
+						formCond{key: "query", value: `absent(found{removed=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"removed": "xxx"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1918,14 +1810,14 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{removed=~".+"}) by (removed)`},
+						formCond{key: "query", value: `absent(found{removed=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"removed": "xxx"},
-								time.Now().Add(time.Hour*24*-7),
+								map[string]string{},
 								time.Now().Add(time.Minute*-150),
+								time.Now(),
 								time.Minute*5,
 							),
 						},
@@ -1990,38 +1882,32 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{sometimes=~".+"}) by (sometimes)`},
+						formCond{key: "query", value: `absent(found{sometimes=~".+"})`},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
 							generateSampleStream(
-								map[string]string{"sometimes": "aaa"},
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
+								time.Now().Add(time.Hour*24*-6),
 								time.Minute*5,
 							),
 							generateSampleStream(
-								map[string]string{"sometimes": "bbb"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-4),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{"sometimes": "xxx"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now().Add(time.Hour*24*-6).Add(time.Hour*8),
-								time.Minute*5,
-							),
-							generateSampleStream(
-								map[string]string{"sometimes": "xxx"},
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-5),
-								time.Now().Add(time.Hour*24*-4),
+								time.Now().Add(time.Hour*24*-5).Add(time.Hour*8),
 								time.Minute*5,
 							),
 							generateSampleStream(
-								map[string]string{"sometimes": "xxx"},
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-4),
+								time.Now().Add(time.Hour*24*-3),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
 								time.Now().Add(time.Hour*24*-2),
-								time.Now().Add(time.Hour*24*-2),
+								time.Now().Add(time.Hour*24*-1),
 								time.Minute*5,
 							),
 						},
@@ -2219,18 +2105,9 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count(found{job=~".+"}) by (job)`},
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
-					resp: matrixResponse{
-						samples: []*model.SampleStream{
-							generateSampleStream(
-								map[string]string{"job": "found"},
-								time.Now().Add(time.Hour*24*-7),
-								time.Now(),
-								time.Minute*5,
-							),
-						},
-					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{

@@ -25,7 +25,7 @@ type flagsQuery struct {
 	timestamp time.Time
 }
 
-func (q flagsQuery) Run() queryResult {
+func (q flagsQuery) Run() (queryResult, int) {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus flags")
@@ -33,23 +33,27 @@ func (q flagsQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+	var qr queryResult
 
 	args := url.Values{}
 	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus flags: %w", err)
-		return qr
+		return qr, 1
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr
+		return qr, 1
 	}
 
-	qr.value, qr.err = streamFlags(resp.Body)
-	return qr
+	flags, err := streamFlags(resp.Body)
+	qr.value, qr.err = flags, err
+	if cost := len(flags); cost > 0 {
+		return qr, cost
+	}
+	return qr, 1
 }
 
 func (q flagsQuery) Endpoint() string {
@@ -60,12 +64,12 @@ func (q flagsQuery) String() string {
 	return "/api/v1/status/flags"
 }
 
-func (q flagsQuery) CacheAfter() int {
-	return 0
+func (q flagsQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint())
 }
 
-func (q flagsQuery) CacheKey() uint64 {
-	return hash(q.prom.unsafeURI, q.Endpoint(), q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
+func (q flagsQuery) CacheTTL() time.Duration {
+	return time.Minute * 10
 }
 
 func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {

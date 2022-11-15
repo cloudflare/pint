@@ -68,6 +68,7 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 		},
 		1000,
 		required,
+		"up",
 	)
 }
 
@@ -122,7 +123,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 			prom := tc.prometheus(uri)
 			if prom != nil {
-				prom.StartWorkers(time.Hour)
+				prom.StartWorkers()
 				defer prom.Close()
 			}
 

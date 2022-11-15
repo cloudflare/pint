@@ -29,20 +29,35 @@ func (e *FailoverGroupError) IsStrict() bool {
 	return e.isStrict
 }
 
+func cacheCleaner(cache *queryCache, interval time.Duration, quit chan bool) {
+	ticker := time.NewTicker(interval)
+	for {
+		select {
+		case <-quit:
+			return
+		case <-ticker.C:
+			cache.gc()
+		}
+	}
+}
+
 type FailoverGroup struct {
 	name           string
 	servers        []*Prometheus
 	cacheSize      int
 	strictErrors   bool
+	uptimeMetric   string
 	cacheCollector *cacheCollector
+	quitChan       chan bool
 }
 
-func NewFailoverGroup(name string, servers []*Prometheus, cacheSize int, strictErrors bool) *FailoverGroup {
+func NewFailoverGroup(name string, servers []*Prometheus, cacheSize int, strictErrors bool, uptimeMetric string) *FailoverGroup {
 	return &FailoverGroup{
 		name:         name,
 		servers:      servers,
 		cacheSize:    cacheSize,
 		strictErrors: strictErrors,
+		uptimeMetric: uptimeMetric,
 	}
 }
 
@@ -50,8 +65,15 @@ func (fg *FailoverGroup) Name() string {
 	return fg.name
 }
 
-func (fg *FailoverGroup) StartWorkers(maxCacheLifeTime time.Duration) {
-	queryCache := newQueryCache(fg.cacheSize, maxCacheLifeTime)
+func (fg *FailoverGroup) UptimeMetric() string {
+	return fg.uptimeMetric
+}
+
+func (fg *FailoverGroup) StartWorkers() {
+	queryCache := newQueryCache(fg.cacheSize, time.Hour, 0.333)
+	fg.quitChan = make(chan bool)
+	go cacheCleaner(queryCache, time.Minute*2, fg.quitChan)
+
 	fg.cacheCollector = newCacheCollector(queryCache, fg.name)
 	prometheus.MustRegister(fg.cacheCollector)
 	for _, prom := range fg.servers {
@@ -65,6 +87,7 @@ func (fg *FailoverGroup) Close() {
 		prom.Close()
 	}
 	prometheus.Unregister(fg.cacheCollector)
+	fg.quitChan <- true
 }
 
 func (fg *FailoverGroup) CleanCache() {

@@ -1,135 +1,200 @@
 package promapi
 
 import (
+	"sort"
 	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-func newQueryCache(maxSize int, maxSinceLastRequest time.Duration) *queryCache {
+type cacheEntry struct {
+	data      queryResult
+	expiresAt time.Time
+	lastGet   time.Time
+	cost      int
+	gets      int
+}
+
+type cacheLine struct {
+	key       uint64
+	val       *cacheEntry
+	ttl       time.Duration
+	isExpired bool
+}
+
+type cacheLines []cacheLine
+
+func (cl cacheLines) Len() int {
+	return len(cl)
+}
+
+func (cl cacheLines) Swap(i, j int) {
+	cl[i], cl[j] = cl[j], cl[i]
+}
+
+// [expired, costly, cheap, high ttl]
+func (cl cacheLines) Less(i, j int) bool {
+	if cl[i].isExpired != cl[j].isExpired {
+		return cl[i].isExpired
+	}
+
+	if cl[i].val.cost != cl[j].val.cost {
+		if cl[i].val.gets == 0 || cl[j].val.gets == 0 {
+			return cl[i].val.cost >= cl[j].val.cost
+		}
+
+		ca := float64(cl[i].val.cost) / float64(cl[i].val.gets)
+		cb := float64(cl[j].val.cost) / float64(cl[j].val.gets)
+		if ca != cb {
+			return ca >= cb
+		}
+	}
+
+	return cl[i].ttl < cl[j].ttl
+}
+
+type endpointStats struct {
+	hits   int
+	misses int
+}
+
+func (e *endpointStats) hit()  { e.hits++ }
+func (e *endpointStats) miss() { e.misses++ }
+
+func newQueryCache(maxSize int, maxStale time.Duration, maxEntry float64) *queryCache {
 	return &queryCache{
-		requests:            map[uint64]cacheRequest{},
-		entries:             map[uint64]queryResult{},
-		maxSize:             maxSize,
-		maxSinceLastRequest: maxSinceLastRequest,
-		hits:                map[string]int{},
-		misses:              map[string]int{},
+		entries:  map[uint64]*cacheEntry{},
+		stats:    map[string]*endpointStats{},
+		maxCost:  maxSize,
+		maxStale: maxStale,
+		maxEntry: int(float64(maxSize) * maxEntry),
 	}
 }
 
-type cacheRequest struct {
-	lastGet time.Time
-	count   int
+type queryCache struct {
+	mu        sync.Mutex
+	entries   map[uint64]*cacheEntry
+	stats     map[string]*endpointStats
+	maxStale  time.Duration
+	maxEntry  int
+	cost      int
+	maxCost   int
+	evictions int
 }
 
-type queryCache struct {
-	mu                  sync.Mutex
-	requests            map[uint64]cacheRequest
-	entries             map[uint64]queryResult
-	maxSize             int
-	maxSinceLastRequest time.Duration
-	hits                map[string]int
-	misses              map[string]int
-	evictions           int
+func (c *queryCache) endpointStats(endpoint string) *endpointStats {
+	e, ok := c.stats[endpoint]
+	if ok {
+		return e
+	}
+
+	e = &endpointStats{}
+	c.stats[endpoint] = e
+	return e
 }
 
 func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var r cacheRequest
-	r, ok = c.requests[key]
-	if ok {
-		r.lastGet = time.Now()
-		r.count++
-		c.requests[key] = r
-	} else {
-		c.requests[key] = cacheRequest{
-			lastGet: time.Now(),
-			count:   1,
-		}
+	var ce *cacheEntry
+	ce, ok = c.entries[key]
+	if !ok {
+		c.endpointStats(endpoint).miss()
+		return v, ok
 	}
 
-	v, ok = c.entries[key]
-	if ok {
-		c.hits[endpoint]++
-	} else {
-		c.misses[endpoint]++
-	}
+	ce.gets++
+	c.endpointStats(endpoint).hit()
 
-	return v, ok
+	ce.lastGet = time.Now()
+	return ce.data, true
 }
 
-func (c *queryCache) set(key uint64, val queryResult, minRequests int) {
+// Cache results if it was requested at least twice EVER - which means it's either
+// popular and requested multiple times within a loop OR this cache key survives between loops.
+func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost int, endpoint string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if minRequests > 0 {
-		if r, ok := c.requests[key]; !ok || r.count <= minRequests {
+	if cost > c.maxEntry {
+		return
+	}
+
+	oe, ok := c.entries[key]
+	if ok {
+		c.cost -= oe.cost
+	}
+
+	// If we're not updating in-place then we need to make room for this entry
+	if !ok && c.cost+cost > c.maxCost {
+		c.makeRoom(cost)
+	}
+
+	c.cost += cost
+	c.entries[key] = &cacheEntry{
+		data: val,
+		cost: cost,
+	}
+	if ttl > 0 {
+		c.entries[key].expiresAt = time.Now().Add(ttl)
+	}
+}
+
+func (c *queryCache) makeRoom(needed int) {
+	now := time.Now()
+	purgeEmptyBefore := now.Add(c.maxStale * -1)
+	for key, ce := range c.entries {
+		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || ce.lastGet.Before(purgeEmptyBefore) {
+			c.cost -= ce.cost
+			needed -= ce.cost
+			delete(c.entries, key)
+			c.evictions++
+		}
+	}
+	if needed <= 0 {
+		return
+	}
+
+	entries := make(cacheLines, 0, len(c.entries))
+	for key, ce := range c.entries {
+		entries = append(entries, cacheLine{
+			key:       key,
+			val:       ce,
+			ttl:       ce.expiresAt.Sub(now).Round(time.Second),
+			isExpired: ce.expiresAt.Before(now),
+		})
+	}
+	sort.Stable(entries)
+
+	for i := len(entries) - 1; i >= 0; i-- {
+		c.cost -= entries[i].val.cost
+		needed -= entries[i].val.cost
+		delete(c.entries, entries[i].key)
+		c.evictions++
+		if needed <= 0 {
 			return
 		}
 	}
-
-	if len(c.entries) >= c.maxSize {
-		c.purgeOne()
-	}
-
-	c.entries[key] = val
-}
-
-func (c *queryCache) purgeOne() {
-	var purgeKey uint64
-	purgeRequests := -100
-	var purgeLastGet time.Time
-	for k, r := range c.requests {
-		if r.count < purgeRequests || purgeRequests < 0 || (r.count == purgeRequests && r.lastGet.Before(purgeLastGet)) {
-			purgeKey = k
-			purgeRequests = r.count
-			purgeLastGet = r.lastGet
-		}
-	}
-	delete(c.entries, purgeKey)
-	delete(c.requests, purgeKey)
-	c.evictions++
 }
 
 func (c *queryCache) gc() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var r cacheRequest
-	var ok bool
+	entries := map[uint64]*cacheEntry{}
 
-	requests := map[uint64]cacheRequest{}
-	entries := map[uint64]queryResult{}
 	now := time.Now()
-	for k, v := range c.entries {
-		r, ok = c.requests[k]
-		if !ok || (ok && now.Sub(r.lastGet) >= c.maxSinceLastRequest) {
+	purgeEmptyBefore := now.Add(c.maxStale * -1)
+	for key, ce := range c.entries {
+		if ce.lastGet.Before(purgeEmptyBefore) || (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) {
+			c.cost -= ce.cost
 			c.evictions++
 			continue
 		}
-		if v.expires.IsZero() || !v.expires.Before(now) {
-			if ok {
-				requests[k] = r
-			}
-			entries[k] = v
-		} else {
-			c.evictions++
-		}
+		entries[key] = ce
 	}
-
-	for k, r := range c.requests {
-		if _, ok = requests[k]; ok {
-			continue
-		}
-		if now.Sub(r.lastGet) < c.maxSinceLastRequest {
-			requests[k] = r
-		}
-	}
-
-	c.requests = requests
 	c.entries = entries
 }
 
@@ -181,12 +246,11 @@ func (c *cacheCollector) Describe(ch chan<- *prometheus.Desc) {
 func (c *cacheCollector) Collect(ch chan<- prometheus.Metric) {
 	c.cache.mu.Lock()
 	defer c.cache.mu.Unlock()
-	ch <- prometheus.MustNewConstMetric(c.entries, prometheus.GaugeValue, float64(len(c.cache.entries)))
-	for endpoint, hits := range c.cache.hits {
-		ch <- prometheus.MustNewConstMetric(c.hits, prometheus.CounterValue, float64(hits), endpoint)
-	}
-	for endpoint, misses := range c.cache.misses {
-		ch <- prometheus.MustNewConstMetric(c.misses, prometheus.CounterValue, float64(misses), endpoint)
+	ch <- prometheus.MustNewConstMetric(c.entries, prometheus.GaugeValue, float64(c.cache.cost))
+
+	for endpoint, stats := range c.cache.stats {
+		ch <- prometheus.MustNewConstMetric(c.hits, prometheus.CounterValue, float64(stats.hits), endpoint)
+		ch <- prometheus.MustNewConstMetric(c.misses, prometheus.CounterValue, float64(stats.misses), endpoint)
 	}
 	ch <- prometheus.MustNewConstMetric(c.evictions, prometheus.CounterValue, float64(c.cache.evictions))
 }

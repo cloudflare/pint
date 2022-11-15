@@ -2,6 +2,8 @@ package config
 
 import (
 	"errors"
+	"fmt"
+	"go/parser"
 	"regexp"
 )
 
@@ -14,6 +16,7 @@ type PrometheusConfig struct {
 	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
 	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
 	Cache       int               `hcl:"cache,optional" json:"cache"`
+	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
 	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
 	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
 	Required    bool              `hcl:"required,optional" json:"required"`
@@ -27,6 +30,12 @@ func (pc PrometheusConfig) validate() error {
 	if pc.Timeout != "" {
 		if _, err := parseDuration(pc.Timeout); err != nil {
 			return err
+		}
+	}
+
+	if pc.Uptime != "" {
+		if _, err := parser.ParseExpr(pc.Uptime); err != nil {
+			return fmt.Errorf("invalid Prometheus uptime metric selector %q: %w", pc.Uptime, err)
 		}
 	}
 

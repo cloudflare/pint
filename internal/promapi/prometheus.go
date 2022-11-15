@@ -19,8 +19,6 @@ import (
 	"github.com/cloudflare/pint/internal/output"
 )
 
-var cacheExpiry = time.Minute * 5
-
 type QueryError struct {
 	err error
 	msg string
@@ -38,8 +36,8 @@ type querier interface {
 	Endpoint() string
 	String() string
 	CacheKey() uint64
-	CacheAfter() int
-	Run() queryResult
+	CacheTTL() time.Duration
+	Run() (queryResult, int)
 }
 
 type queryRequest struct {
@@ -48,9 +46,8 @@ type queryRequest struct {
 }
 
 type queryResult struct {
-	value   any
-	err     error
-	expires time.Time
+	value any
+	err   error
 }
 
 func sanitizeURI(s string) string {
@@ -182,11 +179,12 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 
 	prom.rateLimiter.Take()
 	start := time.Now()
-	result := job.query.Run()
+	result, cost := job.query.Run()
 	dur := time.Since(start)
 	log.Debug().
 		Str("uri", prom.safeURI).
 		Str("query", job.query.String()).
+		Int("cost", cost).
 		Str("endpoint", job.query.Endpoint()).
 		Str("duration", output.HumanizeDuration(dur)).
 		Msg("Query completed")
@@ -206,7 +204,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	}
 
 	if prom.cache != nil {
-		prom.cache.set(cacheKey, result, job.query.CacheAfter())
+		prom.cache.set(cacheKey, result, job.query.CacheTTL(), cost, job.query.Endpoint())
 	}
 
 	return result

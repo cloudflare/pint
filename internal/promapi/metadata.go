@@ -26,7 +26,7 @@ type metadataQuery struct {
 	timestamp time.Time
 }
 
-func (q metadataQuery) Run() queryResult {
+func (q metadataQuery) Run() (queryResult, int) {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Str("metric", q.metric).
@@ -35,24 +35,32 @@ func (q metadataQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+	var qr queryResult
 
 	args := url.Values{}
 	args.Set("metric", q.metric)
 	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)
-		return qr
+		return qr, 1
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr
+		return qr, 1
 	}
 
-	qr.value, qr.err = streamMetadata(resp.Body)
-	return qr
+	meta, err := streamMetadata(resp.Body)
+	qr.value, qr.err = meta, err
+	var cost int
+	for _, vals := range meta {
+		cost += len(vals)
+	}
+	if cost > 0 {
+		return qr, cost
+	}
+	return qr, 1
 }
 
 func (q metadataQuery) Endpoint() string {
@@ -63,12 +71,12 @@ func (q metadataQuery) String() string {
 	return q.metric
 }
 
-func (q metadataQuery) CacheAfter() int {
-	return 0
+func (q metadataQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.metric)
 }
 
-func (q metadataQuery) CacheKey() uint64 {
-	return hash(q.prom.unsafeURI, q.Endpoint(), q.metric, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
+func (q metadataQuery) CacheTTL() time.Duration {
+	return time.Minute * 10
 }
 
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {

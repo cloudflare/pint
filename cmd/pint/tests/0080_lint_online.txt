@@ -11,6 +11,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
+level=warn msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" metric=prometheus_ready name=prom1
 rules/1.yml:2: http_errors_total[2d] selector is trying to query Prometheus for 2d worth of metrics, but prometheus "prom1" at http://127.0.0.1:7080 is configured to only keep 1d of metrics history (promql/range_query)
  2 |   expr: rate(http_errors_total[2d]) > 0
 
@@ -24,9 +25,10 @@ level=info msg="Problems found" Warning=2
 
 -- .pint.hcl --
 prometheus "prom1" {
-  uri     = "http://127.0.0.1:7080"
-  timeout = "5s"
+  uri      = "http://127.0.0.1:7080"
+  timeout  = "5s"
   required = true
+  uptime   = "prometheus_ready"
 }
 parser {
   relaxed = [".*"]
