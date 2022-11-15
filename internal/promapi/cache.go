@@ -11,7 +11,6 @@ import (
 type cacheEntry struct {
 	data      queryResult
 	expiresAt time.Time
-	lastGet   time.Time
 	cost      int
 	gets      int
 }
@@ -39,16 +38,23 @@ func (cl cacheLines) Less(i, j int) bool {
 		return cl[i].isExpired
 	}
 
-	if cl[i].val.cost != cl[j].val.cost {
-		if cl[i].val.gets == 0 || cl[j].val.gets == 0 {
-			return cl[i].val.cost >= cl[j].val.cost
-		}
+	if cl[i].val.gets == 0 {
+		return true
+	}
+	if cl[j].val.gets == 0 {
+		return false
+	}
 
+	if cl[i].val.cost != cl[j].val.cost {
 		ca := float64(cl[i].val.cost) / float64(cl[i].val.gets)
 		cb := float64(cl[j].val.cost) / float64(cl[j].val.gets)
 		if ca != cb {
 			return ca >= cb
 		}
+	}
+
+	if cl[i].val.gets != cl[j].val.gets {
+		return cl[i].val.gets < cl[j].val.gets
 	}
 
 	return cl[i].ttl < cl[j].ttl
@@ -62,13 +68,11 @@ type endpointStats struct {
 func (e *endpointStats) hit()  { e.hits++ }
 func (e *endpointStats) miss() { e.misses++ }
 
-func newQueryCache(maxSize int, maxStale time.Duration, maxEntry float64) *queryCache {
+func newQueryCache(maxSize int) *queryCache {
 	return &queryCache{
-		entries:  map[uint64]*cacheEntry{},
-		stats:    map[string]*endpointStats{},
-		maxCost:  maxSize,
-		maxStale: maxStale,
-		maxEntry: int(float64(maxSize) * maxEntry),
+		entries: map[uint64]*cacheEntry{},
+		stats:   map[string]*endpointStats{},
+		maxCost: maxSize,
 	}
 }
 
@@ -76,8 +80,6 @@ type queryCache struct {
 	mu        sync.Mutex
 	entries   map[uint64]*cacheEntry
 	stats     map[string]*endpointStats
-	maxStale  time.Duration
-	maxEntry  int
 	cost      int
 	maxCost   int
 	evictions int
@@ -108,7 +110,6 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 	ce.gets++
 	c.endpointStats(endpoint).hit()
 
-	ce.lastGet = time.Now()
 	return ce.data, true
 }
 
@@ -117,10 +118,6 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost int, endpoint string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-
-	if cost > c.maxEntry {
-		return
-	}
 
 	oe, ok := c.entries[key]
 	if ok {
@@ -144,9 +141,8 @@ func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost in
 
 func (c *queryCache) makeRoom(needed int) {
 	now := time.Now()
-	purgeEmptyBefore := now.Add(c.maxStale * -1)
 	for key, ce := range c.entries {
-		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || ce.lastGet.Before(purgeEmptyBefore) {
+		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
 			c.cost -= ce.cost
 			needed -= ce.cost
 			delete(c.entries, key)
@@ -186,9 +182,8 @@ func (c *queryCache) gc() {
 	entries := map[uint64]*cacheEntry{}
 
 	now := time.Now()
-	purgeEmptyBefore := now.Add(c.maxStale * -1)
 	for key, ce := range c.entries {
-		if ce.lastGet.Before(purgeEmptyBefore) || (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) {
+		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
 			c.cost -= ce.cost
 			c.evictions++
 			continue

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.33.1
+
+### Fixed
+
+- Fixed a regression causing poor query cache hit rate.
+
 ## v0.33.0
 
 ### Added
