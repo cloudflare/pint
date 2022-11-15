@@ -1,5 +1,34 @@
 # Changelog
 
+## v0.33.0
+
+### Added
+
+- Added `uptime` field in `prometheus` configuration block.
+  This field can be used to set a custom metric used for Prometheus uptime checks
+  and by default uses `up` metric.
+  If you have a Prometheus with a large number of scrape targets there might
+  be a huge number of `up` time series making those uptime checks slow to run.
+  If your Prometheus is configured to scrape itself, then you most likely want to use
+  one of metrics exported by Prometheus, like `prometheus_build_info`:
+
+  ```javascript
+  prometheus "prod" {
+    uri    = "https://prometheus.example.com"
+    uptime = "prometheus_build_info"
+  }
+  ```
+
+### Changed
+
+- Refactored some quries used by [promql/series](checks/promql/series.md) check to
+  avoid sending quries that might be very slow and/or return a huge amount of data.
+- Prometheus query cache now takes into account the size of cached response.
+  This makes memory usage needed for query cache more predictable.
+  As a result the `cache` option for `prometheus` config block now means
+  `the number of time series cached` instead of `the number of responses cached`
+  and the default for this option is now `50000`.
+
 ## v0.32.1
 
 ### Fixed

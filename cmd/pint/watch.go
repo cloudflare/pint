@@ -142,7 +142,7 @@ func actionWatch(c *cli.Context) error {
 	interval := c.Duration(intervalFlag)
 
 	for _, prom := range meta.cfg.PrometheusServers {
-		prom.StartWorkers(interval * 3)
+		prom.StartWorkers()
 	}
 
 	// start timer to run every $interval
@@ -192,9 +192,6 @@ func startTimer(ctx context.Context, cfg config.Config, workers int, interval ti
 					log.Error().Err(err).Msg("Got an error when running checks")
 				}
 				checkIterationsTotal.Inc()
-				for _, prom := range cfg.PrometheusServers {
-					prom.CleanCache()
-				}
 			case <-stop:
 				ticker.Stop()
 				log.Info().Msg("Background worker finished")

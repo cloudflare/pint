@@ -44,7 +44,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -90,7 +91,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -132,7 +134,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -141,7 +144,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -186,7 +190,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.yml"
       ],
@@ -231,7 +236,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         ".*"
       ],
@@ -279,7 +285,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "exclude": [
         "rules.yml"
       ],
@@ -324,7 +331,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -369,7 +377,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -381,7 +390,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.+"
       ],
@@ -603,7 +613,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -615,7 +626,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -741,7 +753,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -753,7 +766,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -1232,7 +1246,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -1291,7 +1306,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -1325,7 +1341,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -1364,7 +1381,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -1408,7 +1426,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -1760,6 +1779,62 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/defaults - 2]
 {
   "ci": {
@@ -1805,7 +1880,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -1851,7 +1927,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -1893,7 +1970,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -1902,7 +1980,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -1947,7 +2026,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.yml"
       ],
@@ -1992,7 +2072,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         ".*"
       ],
@@ -2040,7 +2121,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "exclude": [
         "rules.yml"
       ],
@@ -2085,7 +2167,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -2130,7 +2213,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -2142,7 +2226,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.+"
       ],
@@ -2364,7 +2449,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -2376,7 +2462,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -2502,7 +2589,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -2514,7 +2602,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -2993,7 +3082,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3052,7 +3142,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3086,7 +3177,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3125,7 +3217,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3169,7 +3262,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3521,6 +3615,62 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 2]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/defaults - 3]
 {
   "ci": {
@@ -3566,7 +3716,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -3612,7 +3763,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -3654,7 +3806,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -3663,7 +3816,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -3708,7 +3862,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.yml"
       ],
@@ -3753,7 +3908,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         ".*"
       ],
@@ -3801,7 +3957,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "exclude": [
         "rules.yml"
       ],
@@ -3846,7 +4003,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3891,7 +4049,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -3903,7 +4062,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.+"
       ],
@@ -4125,7 +4285,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4137,7 +4298,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4263,7 +4425,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4275,7 +4438,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4754,7 +4918,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4813,7 +4978,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4847,7 +5013,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4886,7 +5053,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -4930,7 +5098,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -5282,6 +5451,62 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 3]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/defaults - 4]
 {
   "ci": {
@@ -5327,7 +5552,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -5373,7 +5599,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -5415,7 +5642,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -5424,7 +5652,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -5469,7 +5698,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.yml"
       ],
@@ -5514,7 +5744,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         ".*"
       ],
@@ -5562,7 +5793,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "exclude": [
         "rules.yml"
       ],
@@ -5607,7 +5839,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -5652,7 +5885,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -5664,7 +5898,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.+"
       ],
@@ -5886,7 +6121,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -5898,7 +6134,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6024,7 +6261,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6036,7 +6274,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6515,7 +6754,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6574,7 +6814,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6608,7 +6849,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6647,7 +6889,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -6691,7 +6934,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -7043,6 +7287,62 @@
 }
 ---
 
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 4]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
 [TestGetChecksForRule/defaults - 5]
 {
   "ci": {
@@ -7088,7 +7388,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -7134,7 +7435,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -7176,7 +7478,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -7185,7 +7488,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],
@@ -7230,7 +7534,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.yml"
       ],
@@ -7275,7 +7580,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         ".*"
       ],
@@ -7323,7 +7629,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "exclude": [
         "rules.yml"
       ],
@@ -7368,7 +7675,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -7413,7 +7721,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -7425,7 +7734,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "foo.+"
       ],
@@ -7647,7 +7957,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -7659,7 +7970,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -7785,7 +8097,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -7797,7 +8110,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -8276,7 +8590,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -8335,7 +8650,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -8369,7 +8685,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -8408,7 +8725,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -8452,7 +8770,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "include": [
         "rules.yml"
       ],
@@ -8804,222 +9123,6 @@
 }
 ---
 
-[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 2]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 3]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 4]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 10000,
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
-    ]
-  }
-}
----
-
 [TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 5]
 {
   "ci": {
@@ -9034,7 +9137,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -9043,7 +9147,8 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],

@@ -17,7 +17,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "timeout": "2m",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": true
     },
     {
@@ -26,7 +27,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "timeout": "2m0s",
       "concurrency": 32,
       "rateLimit": 100,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     },
     {
@@ -39,6 +41,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "concurrency": 16,
       "rateLimit": 100,
       "cache": 32,
+      "uptime": "up",
       "required": false
     },
     {
@@ -47,7 +50,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "timeout": "15s",
       "concurrency": 16,
       "rateLimit": 1,
-      "cache": 10000,
+      "cache": 50000,
+      "uptime": "up",
       "required": false
     }
   ],

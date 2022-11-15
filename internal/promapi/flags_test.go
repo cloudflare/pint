@@ -94,9 +94,9 @@ func TestFlags(t *testing.T) {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 100),
-			}, 1000, true)
+			}, 1000, true, "up")
 
-			fg.StartWorkers(time.Minute)
+			fg.StartWorkers()
 			defer fg.Close()
 
 			flags, err := fg.Flags(context.Background())

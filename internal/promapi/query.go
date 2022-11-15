@@ -11,13 +11,14 @@ import (
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prymitive/current"
 	"github.com/rs/zerolog/log"
 )
 
 type QueryResult struct {
 	URI    string
-	Series []model.Sample
+	Series []Sample
 }
 
 type instantQuery struct {
@@ -27,7 +28,7 @@ type instantQuery struct {
 	timestamp time.Time
 }
 
-func (q instantQuery) Run() queryResult {
+func (q instantQuery) Run() (queryResult, int) {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Str("query", q.expr).
@@ -36,7 +37,7 @@ func (q instantQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+	var qr queryResult
 
 	args := url.Values{}
 	args.Set("query", q.expr)
@@ -44,17 +45,21 @@ func (q instantQuery) Run() queryResult {
 	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
-		return qr
+		return qr, 1
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr
+		return qr, 1
 	}
 
-	qr.value, qr.err = streamSamples(resp.Body)
-	return qr
+	samples, err := streamSamples(resp.Body)
+	qr.value, qr.err = samples, err
+	if len(samples) > 0 {
+		return qr, len(samples)
+	}
+	return qr, 1
 }
 
 func (q instantQuery) Endpoint() string {
@@ -65,12 +70,12 @@ func (q instantQuery) String() string {
 	return q.expr
 }
 
-func (q instantQuery) CacheAfter() int {
-	return 0
+func (q instantQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr)
 }
 
-func (q instantQuery) CacheKey() uint64 {
-	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
+func (q instantQuery) CacheTTL() time.Duration {
+	return time.Minute * 5
 }
 
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
@@ -93,18 +98,23 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 
 	qr := QueryResult{
 		URI:    p.safeURI,
-		Series: result.value.([]model.Sample),
+		Series: result.value.([]Sample),
 	}
 	log.Debug().Str("uri", p.safeURI).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 
 	return &qr, nil
 }
 
-func streamSamples(r io.Reader) (samples []model.Sample, err error) {
+type Sample struct {
+	Labels labels.Labels
+	Value  float64
+}
+
+func streamSamples(r io.Reader) (samples []Sample, err error) {
 	defer dummyReadAll(r)
 
 	var status, resultType, errType, errText string
-	samples = []model.Sample{}
+	samples = []Sample{}
 	var sample model.Sample
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, isNil bool) {
@@ -123,7 +133,10 @@ func streamSamples(r io.Reader) (samples []model.Sample, err error) {
 			current.Key("result", current.Array(
 				&sample,
 				func() {
-					samples = append(samples, sample)
+					samples = append(samples, Sample{
+						Labels: MetricToLabels(sample.Metric),
+						Value:  float64(sample.Value),
+					})
 					sample.Metric = model.Metric{}
 				},
 			)),

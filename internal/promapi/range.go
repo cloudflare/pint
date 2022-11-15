@@ -33,7 +33,7 @@ type rangeQuery struct {
 	r    v1.Range
 }
 
-func (q rangeQuery) Run() queryResult {
+func (q rangeQuery) Run() (queryResult, int) {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Str("query", q.expr).
@@ -57,17 +57,21 @@ func (q rangeQuery) Run() queryResult {
 	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
-		return qr
+		return qr, 1
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr
+		return qr, 1
 	}
 
-	qr.value, qr.err = streamSampleStream(resp.Body, q.r.Step)
-	return qr
+	ranges, err := streamSampleStream(resp.Body, q.r.Step)
+	qr.value, qr.err = ranges, err
+	if ranges.Len() > 0 {
+		return qr, ranges.Len()
+	}
+	return qr, 1
 }
 
 func (q rangeQuery) Endpoint() string {
@@ -78,12 +82,12 @@ func (q rangeQuery) String() string {
 	return q.expr
 }
 
-func (q rangeQuery) CacheAfter() int {
-	return 1
-}
-
 func (q rangeQuery) CacheKey() uint64 {
 	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, q.r.Start.Format(time.RFC3339), q.r.End.Round(q.r.Step).Format(time.RFC3339), output.HumanizeDuration(q.r.Step))
+}
+
+func (q rangeQuery) CacheTTL() time.Duration {
+	return 0
 }
 
 type RangeQueryTimes interface {

@@ -75,7 +75,7 @@ func (c CostCheck) Check(ctx context.Context, rule parser.Rule, entries []discov
 		result, err := c.prom.Query(ctx, BytesPerSampleQuery)
 		if err == nil {
 			for _, s := range result.Series {
-				estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(int(float64(s.Value)*float64(series))))
+				estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(int(s.Value*float64(series))))
 				break
 			}
 		}

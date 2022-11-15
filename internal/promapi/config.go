@@ -37,7 +37,7 @@ type configQuery struct {
 	timestamp time.Time
 }
 
-func (q configQuery) Run() queryResult {
+func (q configQuery) Run() (queryResult, int) {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus configuration")
@@ -45,23 +45,27 @@ func (q configQuery) Run() queryResult {
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
-	qr := queryResult{expires: q.timestamp.Add(cacheExpiry * 2)}
+	var qr queryResult
 
 	args := url.Values{}
 	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus config: %w", err)
-		return qr
+		return qr, 1
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr
+		return qr, 1
 	}
 
-	qr.value, qr.err = streamConfig(resp.Body)
-	return qr
+	qr.value, err = streamConfig(resp.Body)
+	if err != nil {
+		prometheusQueryErrorsTotal.WithLabelValues(q.prom.name, "/api/v1/status/config", errReason(err)).Inc()
+		qr.err = fmt.Errorf("failed to decode config data in %s response: %w", q.prom.safeURI, err)
+	}
+	return qr, 1
 }
 
 func (q configQuery) Endpoint() string {
@@ -72,12 +76,12 @@ func (q configQuery) String() string {
 	return "/api/v1/status/config"
 }
 
-func (q configQuery) CacheAfter() int {
-	return 0
+func (q configQuery) CacheKey() uint64 {
+	return hash(q.prom.unsafeURI, q.Endpoint())
 }
 
-func (q configQuery) CacheKey() uint64 {
-	return hash(q.prom.unsafeURI, q.Endpoint(), q.timestamp.Round(cacheExpiry).Format(time.RFC3339))
+func (q configQuery) CacheTTL() time.Duration {
+	return time.Minute * 10
 }
 
 func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
@@ -98,31 +102,15 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	var cfg PrometheusConfig
-	if err := yaml.Unmarshal([]byte(result.value.(string)), &cfg); err != nil {
-		prometheusQueryErrorsTotal.WithLabelValues(p.name, "/api/v1/status/config", errReason(err)).Inc()
-		return nil, fmt.Errorf("failed to decode config data in %s response: %w", p.safeURI, err)
-	}
-
-	if cfg.Global.ScrapeInterval == 0 {
-		cfg.Global.ScrapeInterval = time.Minute
-	}
-	if cfg.Global.ScrapeTimeout == 0 {
-		cfg.Global.ScrapeTimeout = time.Second * 10
-	}
-	if cfg.Global.EvaluationInterval == 0 {
-		cfg.Global.EvaluationInterval = time.Minute
-	}
-
-	r := ConfigResult{URI: p.safeURI, Config: cfg}
+	r := ConfigResult{URI: p.safeURI, Config: result.value.(PrometheusConfig)}
 
 	return &r, nil
 }
 
-func streamConfig(r io.Reader) (cfg string, err error) {
+func streamConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 	defer dummyReadAll(r)
 
-	var status, errType, errText string
+	var yamlBody, status, errType, errText string
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, isNil bool) {
 			status = s
@@ -135,7 +123,7 @@ func streamConfig(r io.Reader) (cfg string, err error) {
 		})),
 		current.Key("data", current.Object(
 			current.Key("yaml", current.Value(func(s string, isNil bool) {
-				cfg = s
+				yamlBody = s
 			})),
 		)),
 	)
@@ -147,6 +135,20 @@ func streamConfig(r io.Reader) (cfg string, err error) {
 
 	if status != "success" {
 		return cfg, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+	}
+
+	if err = yaml.Unmarshal([]byte(yamlBody), &cfg); err != nil {
+		return cfg, err
+	}
+
+	if cfg.Global.ScrapeInterval == 0 {
+		cfg.Global.ScrapeInterval = time.Minute
+	}
+	if cfg.Global.ScrapeTimeout == 0 {
+		cfg.Global.ScrapeTimeout = time.Second * 10
+	}
+	if cfg.Global.EvaluationInterval == 0 {
+		cfg.Global.EvaluationInterval = time.Minute
 	}
 
 	return cfg, nil

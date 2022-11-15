@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/prometheus/common/model"
+	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
@@ -112,7 +112,7 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			result: promapi.QueryResult{
 				URI:    srv.URL,
-				Series: []model.Sample{},
+				Series: []promapi.Sample{},
 			},
 		},
 		{
@@ -120,11 +120,10 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second * 5,
 			result: promapi.QueryResult{
 				URI: srv.URL,
-				Series: []model.Sample{
+				Series: []promapi.Sample{
 					{
-						Metric:    model.Metric{},
-						Value:     model.SampleValue(1),
-						Timestamp: model.Time(1614859502068),
+						Labels: labels.EmptyLabels(),
+						Value:  1,
 					},
 				},
 			},
@@ -134,21 +133,18 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			result: promapi.QueryResult{
 				URI: srv.URL,
-				Series: []model.Sample{
+				Series: []promapi.Sample{
 					{
-						Metric:    model.Metric{"instance": "1"},
-						Value:     model.SampleValue(1),
-						Timestamp: model.Time(1614859502068),
+						Labels: labels.FromStrings("instance", "1"),
+						Value:  1,
 					},
 					{
-						Metric:    model.Metric{"instance": "2"},
-						Value:     model.SampleValue(2),
-						Timestamp: model.Time(1614859502168),
+						Labels: labels.FromStrings("instance", "2"),
+						Value:  2,
 					},
 					{
-						Metric:    model.Metric{"instance": "3"},
-						Value:     model.SampleValue(3),
-						Timestamp: model.Time(1614859503000),
+						Labels: labels.FromStrings("instance", "3"),
+						Value:  3,
 					},
 				},
 			},
@@ -173,11 +169,10 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			result: promapi.QueryResult{
 				URI: srv.URL,
-				Series: []model.Sample{
+				Series: []promapi.Sample{
 					{
-						Metric:    model.Metric{},
-						Value:     model.SampleValue(1),
-						Timestamp: model.Time(1614859502068),
+						Labels: labels.EmptyLabels(),
+						Value:  1,
 					},
 				},
 			},
@@ -188,8 +183,8 @@ func TestQuery(t *testing.T) {
 		t.Run(tc.query, func(t *testing.T) {
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100),
-			}, 1000, true)
-			fg.StartWorkers(time.Minute)
+			}, 1000, true, "up")
+			fg.StartWorkers()
 			defer fg.Close()
 
 			qr, err := fg.Query(context.Background(), tc.query)
