@@ -70,7 +70,7 @@ func (fg *FailoverGroup) UptimeMetric() string {
 }
 
 func (fg *FailoverGroup) StartWorkers() {
-	queryCache := newQueryCache(fg.cacheSize, time.Hour, 0.333)
+	queryCache := newQueryCache(fg.cacheSize)
 	fg.quitChan = make(chan bool)
 	go cacheCleaner(queryCache, time.Minute*2, fg.quitChan)
 

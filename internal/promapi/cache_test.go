@@ -14,7 +14,7 @@ import (
 func TestQueryCacheOnlySet(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -29,7 +29,7 @@ func TestQueryCacheOnlySet(t *testing.T) {
 func TestQueryCacheReplace(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	cache.set(6, queryResult{err: mockErr}, 0, 7, "/foo")
 	cache.set(6, queryResult{err: mockErr}, 0, 7, "/foo")
@@ -40,23 +40,10 @@ func TestQueryCacheReplace(t *testing.T) {
 	require.Equal(t, 0, cache.evictions)
 }
 
-func TestQueryCachSetOver50Percent(t *testing.T) {
-	const maxSize = 100
-	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.5)
-
-	cache.set(1, queryResult{err: mockErr}, 0, 50, "/foo")
-	cache.set(2, queryResult{err: mockErr}, 0, 51, "/foo")
-
-	require.Equal(t, 50, cache.cost)
-	require.Equal(t, 1, len(cache.entries))
-	require.Equal(t, 0, cache.evictions)
-}
-
 func TestQueryCacheGetAndSet(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -92,7 +79,7 @@ func TestQueryCacheGetAndSet(t *testing.T) {
 func TestQueryCachePurgeMaxCost(t *testing.T) {
 	const maxSize = 460
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= 100; i++ {
@@ -125,7 +112,7 @@ func TestQueryCachePurgeMaxCost(t *testing.T) {
 func TestQueryCachePurgeZeroTTL(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -147,7 +134,7 @@ func TestQueryCachePurgeZeroTTL(t *testing.T) {
 func TestQueryCachePurgeExpired(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -173,7 +160,7 @@ func TestQueryCachePurgeExpired(t *testing.T) {
 func TestQueryCacheOverrideExpired(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -197,7 +184,7 @@ func TestQueryCacheOverrideExpired(t *testing.T) {
 func TestQueryCachePurgeOldLastGet(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(maxSize, time.Second, 0.25)
+	cache := newQueryCache(maxSize)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -235,7 +222,7 @@ func TestQueryCachePurgeOldLastGet(t *testing.T) {
 
 func TestCacheCollector(t *testing.T) {
 	const maxSize = 100
-	cache := newQueryCache(maxSize, time.Minute, 0.25)
+	cache := newQueryCache(maxSize)
 
 	names := []string{
 		"pint_prometheus_cache_size",
