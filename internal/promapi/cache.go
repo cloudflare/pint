@@ -102,20 +102,6 @@ func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost in
 }
 
 func (c *queryCache) makeRoom(needed int) {
-	now := time.Now()
-	for key, ce := range c.entries {
-		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
-			c.cost -= ce.cost
-			needed -= ce.cost
-			c.useList.Remove(ce.lst)
-			delete(c.entries, key)
-			c.evictions++
-		}
-	}
-	if needed <= 0 {
-		return
-	}
-
 	for c.useList.Len() > 0 && needed > 0 {
 		if lst := c.useList.Back(); lst != nil {
 			key := lst.Value.(uint64)
