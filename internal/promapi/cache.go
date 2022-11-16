@@ -1,7 +1,7 @@
 package promapi
 
 import (
-	"sort"
+	"container/list"
 	"sync"
 	"time"
 
@@ -9,55 +9,10 @@ import (
 )
 
 type cacheEntry struct {
+	lst       *list.Element
 	data      queryResult
 	expiresAt time.Time
 	cost      int
-	gets      int
-}
-
-type cacheLine struct {
-	key       uint64
-	val       *cacheEntry
-	ttl       time.Duration
-	isExpired bool
-}
-
-type cacheLines []cacheLine
-
-func (cl cacheLines) Len() int {
-	return len(cl)
-}
-
-func (cl cacheLines) Swap(i, j int) {
-	cl[i], cl[j] = cl[j], cl[i]
-}
-
-// [expired, costly, cheap, high ttl]
-func (cl cacheLines) Less(i, j int) bool {
-	if cl[i].isExpired != cl[j].isExpired {
-		return cl[i].isExpired
-	}
-
-	if cl[i].val.gets == 0 {
-		return true
-	}
-	if cl[j].val.gets == 0 {
-		return false
-	}
-
-	if cl[i].val.cost != cl[j].val.cost {
-		ca := float64(cl[i].val.cost) / float64(cl[i].val.gets)
-		cb := float64(cl[j].val.cost) / float64(cl[j].val.gets)
-		if ca != cb {
-			return ca >= cb
-		}
-	}
-
-	if cl[i].val.gets != cl[j].val.gets {
-		return cl[i].val.gets < cl[j].val.gets
-	}
-
-	return cl[i].ttl < cl[j].ttl
 }
 
 type endpointStats struct {
@@ -73,6 +28,7 @@ func newQueryCache(maxSize int) *queryCache {
 		entries: map[uint64]*cacheEntry{},
 		stats:   map[string]*endpointStats{},
 		maxCost: maxSize,
+		useList: list.New(),
 	}
 }
 
@@ -83,6 +39,7 @@ type queryCache struct {
 	cost      int
 	maxCost   int
 	evictions int
+	useList   *list.List
 }
 
 func (c *queryCache) endpointStats(endpoint string) *endpointStats {
@@ -107,7 +64,7 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 		return v, ok
 	}
 
-	ce.gets++
+	c.useList.MoveToFront(ce.lst)
 	c.endpointStats(endpoint).hit()
 
 	return ce.data, true
@@ -119,9 +76,13 @@ func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost in
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	var lst *list.Element
 	oe, ok := c.entries[key]
 	if ok {
 		c.cost -= oe.cost
+		lst = oe.lst
+	} else {
+		lst = c.useList.PushFront(key)
 	}
 
 	// If we're not updating in-place then we need to make room for this entry
@@ -133,6 +94,7 @@ func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost in
 	c.entries[key] = &cacheEntry{
 		data: val,
 		cost: cost,
+		lst:  lst,
 	}
 	if ttl > 0 {
 		c.entries[key].expiresAt = time.Now().Add(ttl)
@@ -145,6 +107,7 @@ func (c *queryCache) makeRoom(needed int) {
 		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
 			c.cost -= ce.cost
 			needed -= ce.cost
+			c.useList.Remove(ce.lst)
 			delete(c.entries, key)
 			c.evictions++
 		}
@@ -153,24 +116,14 @@ func (c *queryCache) makeRoom(needed int) {
 		return
 	}
 
-	entries := make(cacheLines, 0, len(c.entries))
-	for key, ce := range c.entries {
-		entries = append(entries, cacheLine{
-			key:       key,
-			val:       ce,
-			ttl:       ce.expiresAt.Sub(now).Round(time.Second),
-			isExpired: ce.expiresAt.Before(now),
-		})
-	}
-	sort.Stable(entries)
-
-	for i := len(entries) - 1; i >= 0; i-- {
-		c.cost -= entries[i].val.cost
-		needed -= entries[i].val.cost
-		delete(c.entries, entries[i].key)
-		c.evictions++
-		if needed <= 0 {
-			return
+	for c.useList.Len() > 0 && needed > 0 {
+		if lst := c.useList.Back(); lst != nil {
+			key := lst.Value.(uint64)
+			c.cost -= c.entries[key].cost
+			needed -= c.entries[key].cost
+			delete(c.entries, key)
+			c.useList.Remove(lst)
+			c.evictions++
 		}
 	}
 }
@@ -184,6 +137,7 @@ func (c *queryCache) gc() {
 	now := time.Now()
 	for key, ce := range c.entries {
 		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
+			c.useList.Remove(ce.lst)
 			c.cost -= ce.cost
 			c.evictions++
 			continue
