@@ -23,6 +23,7 @@ func TestQueryCacheOnlySet(t *testing.T) {
 
 	require.Equal(t, maxSize, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 }
 
@@ -37,6 +38,7 @@ func TestQueryCacheReplace(t *testing.T) {
 
 	require.Equal(t, 7, cache.cost)
 	require.Equal(t, 1, len(cache.entries))
+	require.Equal(t, 1, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 }
 
@@ -64,6 +66,7 @@ func TestQueryCacheGetAndSet(t *testing.T) {
 
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 50, len(cache.entries))
+	require.Equal(t, 50, cache.useList.Len())
 	require.Equal(t, 100, cache.stats["/foo"].hits)
 	require.Equal(t, 100, cache.stats["/foo"].misses)
 	require.Equal(t, 50, cache.evictions)
@@ -71,6 +74,7 @@ func TestQueryCacheGetAndSet(t *testing.T) {
 	cache.gc()
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 50, len(cache.entries))
+	require.Equal(t, 50, cache.useList.Len())
 	require.Equal(t, 100, cache.stats["/foo"].hits)
 	require.Equal(t, 100, cache.stats["/foo"].misses)
 	require.Equal(t, 50, cache.evictions)
@@ -93,6 +97,7 @@ func TestQueryCachePurgeMaxCost(t *testing.T) {
 
 	require.Equal(t, cache.maxCost, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 
 	for i = 101; i <= 110; i++ {
@@ -104,9 +109,10 @@ func TestQueryCachePurgeMaxCost(t *testing.T) {
 		cache.set(i, queryResult{err: mockErr}, 0, cost, "/bar")
 		_, _ = cache.get(i, "/foo")
 	}
-	require.Equal(t, 459, cache.cost)
-	require.Equal(t, 74, len(cache.entries))
-	require.Equal(t, 36, cache.evictions)
+	require.Equal(t, 460, cache.cost)
+	require.Equal(t, 96, len(cache.entries))
+	require.Equal(t, 96, cache.useList.Len())
+	require.Equal(t, 14, cache.evictions)
 }
 
 func TestQueryCachePurgeZeroTTL(t *testing.T) {
@@ -128,6 +134,7 @@ func TestQueryCachePurgeZeroTTL(t *testing.T) {
 	cache.gc()
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 }
 
@@ -145,6 +152,7 @@ func TestQueryCachePurgeExpired(t *testing.T) {
 	}
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 
 	for i = 1; i <= maxSize/2; i++ {
@@ -154,6 +162,7 @@ func TestQueryCachePurgeExpired(t *testing.T) {
 	cache.gc()
 	require.Equal(t, 50, cache.cost)
 	require.Equal(t, 50, len(cache.entries))
+	require.Equal(t, 50, cache.useList.Len())
 	require.Equal(t, 50, cache.evictions)
 }
 
@@ -169,6 +178,7 @@ func TestQueryCacheOverrideExpired(t *testing.T) {
 	}
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 
 	cache.entries[maxSize/2].expiresAt = time.Now().Add(time.Second * -1)
@@ -178,46 +188,46 @@ func TestQueryCacheOverrideExpired(t *testing.T) {
 
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 1, cache.evictions)
 }
 
-func TestQueryCachePurgeOldLastGet(t *testing.T) {
+func TestQueryCacheEvictLRU(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
 	cache := newQueryCache(maxSize)
 
-	var i uint64
+	var i, j uint64
 	for i = 1; i <= maxSize; i++ {
 		cache.set(i, queryResult{err: mockErr}, time.Second, 1, "/foo")
-		_, _ = cache.get(i, "/foo")
+		for j = 1; j <= i; j++ {
+			_, _ = cache.get(i, "/foo")
+		}
 	}
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 
 	cache.gc()
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
+	require.Equal(t, 100, cache.useList.Len())
 	require.Equal(t, 0, cache.evictions)
 
-	time.Sleep(time.Millisecond * 500)
-	for i = 1; i <= maxSize/2; i++ {
-		_, _ = cache.get(i, "/foo")
+	for i = maxSize + 1; i <= maxSize+20; i++ {
+		cache.set(i, queryResult{err: mockErr}, time.Second, 1, "/foo")
 	}
-	cache.gc()
 	require.Equal(t, 100, cache.cost)
 	require.Equal(t, 100, len(cache.entries))
-	require.Equal(t, 0, cache.evictions)
+	require.Equal(t, 100, cache.useList.Len())
+	require.Equal(t, 20, cache.evictions)
 
-	time.Sleep(time.Millisecond * 2600)
-	for i = 1; i <= maxSize/2; i++ {
-		cache.entries[i].expiresAt = time.Now().Add(time.Minute)
-		_, _ = cache.get(i, "/foo")
+	var ok bool
+	for i = 1; i <= 20; i++ {
+		_, ok = cache.get(i, "/foo")
+		require.False(t, ok)
 	}
-	cache.gc()
-	require.Equal(t, 50, cache.cost)
-	require.Equal(t, 50, len(cache.entries))
-	require.Equal(t, 50, cache.evictions)
 }
 
 func TestCacheCollector(t *testing.T) {
