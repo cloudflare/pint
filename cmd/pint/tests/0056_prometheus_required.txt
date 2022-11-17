@@ -10,13 +10,21 @@ stderr 'level=info msg="Problems found" Warning=12'
 -- rules/1.yaml --
 - record: one
   expr: up == 0
+  labels:
+    path: a
 - record: two
   expr: up == 0
+  labels:
+    path: a
 -- rules/2.yaml --
 - record: one
   expr: up == 0
+  labels:
+    path: b
 - record: two
   expr: up == 0
+  labels:
+    path: b
 
 -- .pint.hcl --
 prometheus "prom" {

@@ -61,7 +61,7 @@ func (c SeriesCheck) Reporter() string {
 	return SeriesCheckName
 }
 
-func (c SeriesCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	var settings *PromqlSeriesSettings
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
 		settings = s.(*PromqlSeriesSettings)

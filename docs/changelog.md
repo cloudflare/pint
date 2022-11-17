@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.34.0
+
+### Added
+
+- Added [rule/duplicate](checks/rule/duplicate.md) check.
+
 ## v0.33.1
 
 ### Fixed

@@ -39,7 +39,7 @@ func (c AggregationCheck) Reporter() string {
 	return AggregationCheckName
 }
 
-func (c AggregationCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c AggregationCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

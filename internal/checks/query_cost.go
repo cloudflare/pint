@@ -44,7 +44,7 @@ func (c CostCheck) Reporter() string {
 	return CostCheckName
 }
 
-func (c CostCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c CostCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {

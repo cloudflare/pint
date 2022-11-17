@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"time"
 
 	"golang.org/x/exp/slices"
@@ -131,6 +132,10 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.RangeQueryCheckName,
 			check: checks.NewRangeQueryCheck(p),
+		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.RuleDuplicateCheckName,
+			check: checks.NewRuleDuplicateCheck(p),
 		})
 	}
 
@@ -289,7 +294,14 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		for _, uri := range prom.Failover {
 			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, rateLimit))
 		}
-		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, cacheSize, prom.Required, uptime))
+		var include, exclude []*regexp.Regexp
+		for _, path := range prom.Include {
+			include = append(include, strictRegex(path))
+		}
+		for _, path := range prom.Exclude {
+			exclude = append(exclude, strictRegex(path))
+		}
+		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, cacheSize, prom.Required, uptime, include, exclude))
 	}
 
 	for _, rule := range cfg.Rules {
