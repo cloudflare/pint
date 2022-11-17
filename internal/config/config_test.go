@@ -37,7 +37,6 @@ func TestDisableOnlineChecksWithPrometheus(t *testing.T) {
 	err := os.WriteFile(path, []byte(`
 prometheus "prom" {
   uri     = "http://localhost"
-  timeout = "1s"
 }
 `), 0o644)
 	require.NoError(t, err)
@@ -1391,6 +1390,14 @@ func TestConfigErrors(t *testing.T) {
   }
 }`,
 			err: `not a valid duration string: "abc"`,
+		},
+		{
+			config: `rule {
+  cost {
+    severity  = "xxx"
+  }
+}`,
+			err: "unknown severity: xxx",
 		},
 	}
 

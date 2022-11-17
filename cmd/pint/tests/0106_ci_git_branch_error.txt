@@ -1,0 +1,7 @@
+pint.error -l debug --no-color ci
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=debug msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
+level=fatal msg="Fatal error" error="failed to get the name of current branch"

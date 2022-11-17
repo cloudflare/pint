@@ -91,18 +91,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, rule parser.Rule, entries []di
 		ctx, cancel := context.WithTimeout(ctx, c.timeout)
 		defer cancel()
 
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
-		if err != nil {
-			problems = append(problems, Problem{
-				Fragment: ann.Value.Value,
-				Lines:    ann.Lines(),
-				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("cannot test if %s is a valid link: %s", uri, err),
-				Severity: c.severity,
-			})
-			log.Debug().Str("uri", uri).Err(err).Msg("Cannot create link request")
-			continue
-		}
+		req, _ := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 
 		for k, v := range c.headers {
 			req.Header.Set(k, v)

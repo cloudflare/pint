@@ -204,6 +204,21 @@ func TestRuleLinkCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   noProblems,
 		},
+		{
+			description: "link with invalid URL",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: 'http://%41:8080/'",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleLinkCheck(
+					checks.MustTemplatedRegexp(".*"),
+					"",
+					time.Second,
+					map[string]string{},
+					checks.Bug,
+				)
+			},
+			prometheus: noProm,
+			problems:   noProblems,
+		},
 	}
 	runTests(t, testCases)
 }
