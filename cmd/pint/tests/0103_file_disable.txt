@@ -21,6 +21,7 @@ level=debug msg="Stopping query workers" name=prom uri=http://127.0.0.1:7103
 - record: "colo:test1"
   expr: sum(foo) without(job)
 
+# pint file/disable rule/duplicate
 
 -- .pint.hcl --
 prometheus "prom" {

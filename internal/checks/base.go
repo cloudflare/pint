@@ -26,6 +26,7 @@ var (
 		VectorMatchingCheckName,
 		CostCheckName,
 		SeriesCheckName,
+		RuleDuplicateCheckName,
 		LabelCheckName,
 		RuleLinkCheckName,
 		RejectCheckName,
@@ -37,6 +38,7 @@ var (
 		VectorMatchingCheckName,
 		CostCheckName,
 		SeriesCheckName,
+		RuleDuplicateCheckName,
 		RuleLinkCheckName,
 	}
 )
@@ -109,7 +111,7 @@ type RuleChecker interface {
 	String() string
 	Reporter() string
 	Meta() CheckMeta
-	Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) []Problem
+	Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) []Problem
 }
 
 type exprProblem struct {

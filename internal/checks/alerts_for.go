@@ -32,7 +32,7 @@ func (c AlertsForChecksFor) Reporter() string {
 	return AlertForCheckName
 }
 
-func (c AlertsForChecksFor) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c AlertsForChecksFor) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil || rule.AlertingRule.For == nil {
 		return
 	}

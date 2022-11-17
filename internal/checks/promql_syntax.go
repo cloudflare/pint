@@ -30,7 +30,7 @@ func (c SyntaxCheck) Reporter() string {
 	return SyntaxCheckName
 }
 
-func (c SyntaxCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c SyntaxCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	q := rule.Expr()
 	if q.SyntaxError != nil {
 		problems = append(problems, Problem{

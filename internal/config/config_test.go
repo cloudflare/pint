@@ -165,6 +165,7 @@ prometheus "prom" {
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
+				checks.RuleDuplicateCheckName + "(prom)",
 			},
 		},
 		{
@@ -188,6 +189,7 @@ prometheus "prom" {
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
+				checks.RuleDuplicateCheckName + "(prom)",
 			},
 		},
 		{
@@ -211,6 +213,7 @@ checks {
 # pint disable promql/series
 # pint disable promql/vector_matching
 # pint disable promql/range_query
+# pint disable rule/duplicate
 - record: foo
   expr: sum(foo)
 `),
@@ -304,6 +307,7 @@ prometheus "prom" {
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
+				checks.RuleDuplicateCheckName + "(prom)",
 			},
 		},
 		{
@@ -332,6 +336,7 @@ prometheus "ignore" {
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
+				checks.RuleDuplicateCheckName + "(prom)",
 			},
 		},
 		{
@@ -448,6 +453,7 @@ prometheus "prom2" {
 - record: foo
   # pint disable promql/rate(prom2)
   # pint disable promql/vector_matching(prom1)
+  # pint disable rule/duplicate(prom1)
   expr: sum(foo)
 `),
 			checks: []string{
@@ -462,6 +468,7 @@ prometheus "prom2" {
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
+				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.CostCheckName + "(prom1)",
 			},
 		},
@@ -550,6 +557,7 @@ rule {
 # pint disable promql/vector_matching(prom1)
 # pint disable promql/vector_matching(prom2)
 # pint disable promql/range_query
+# pint disable rule/duplicate
 - record: foo
   # pint disable promql/fragile
   # pint disable promql/regexp
@@ -811,6 +819,7 @@ checks {
     "promql/rate",
 	"promql/vector_matching",
 	"promql/range_query",
+	"rule/duplicate",
   ]
 }
 prometheus "prom1" {
@@ -869,6 +878,7 @@ prometheus "prom1" {
 				checks.SeriesCheckName + "(prom1)",
 				checks.VectorMatchingCheckName + "(prom1)",
 				checks.RangeQueryCheckName + "(prom1)",
+				checks.RuleDuplicateCheckName + "(prom1)",
 				checks.AlertsCheckName + "(prom1)",
 			},
 		},
@@ -1171,7 +1181,7 @@ checks {
 				checks.FragileCheckName,
 				checks.RegexpCheckName,
 			},
-			disabledChecks: []string{"promql/rate", "promql/vector_matching"},
+			disabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate"},
 		},
 	}
 

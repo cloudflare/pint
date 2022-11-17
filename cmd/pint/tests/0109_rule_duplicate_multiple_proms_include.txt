@@ -1,0 +1,56 @@
+pint.ok --no-color -d 'promql/.*' -d alerts/count lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+-- rules/0001.yml --
+- record: "colo:duplicate"
+  expr: sum(foo) without(job)
+- record: "colo:labels:empty"
+  expr: sum(foo) without(job)
+- record: "colo:labels:mismatch"
+  expr: sum(foo) without(job)
+  labels:
+    file: a
+- record: "colo:labels:equal"
+  expr: sum(foo) without(job)
+  labels:
+    same: yes
+
+-- rules/0002.yml --
+- record: "colo:duplicate"
+  expr: sum(foo) without(job)
+- record: "colo:labels:empty"
+  expr: sum(foo) without(job)
+  labels:
+    empty: nope
+- record: "colo:labels:mismatch"
+  expr: sum(foo) without(job)
+  labels:
+    file: b
+- record: "colo:labels:equal"
+  expr: sum(foo) without(job)
+  labels:
+    same: yes
+
+# pint file/disable rule/duplicate
+
+-- .pint.hcl --
+prometheus "prom1" {
+  uri      = "http://127.0.0.1:7109/1"
+  failover = []
+  timeout  = "5s"
+  required = true
+  include  = ["rules/0001.yml"]
+}
+prometheus "prom2" {
+  uri      = "http://127.0.0.1:7109/2"
+  failover = []
+  timeout  = "5s"
+  required = true
+  include  = ["rules/0002.yml"]
+}
+parser {
+  relaxed = [".*"]
+}

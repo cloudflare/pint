@@ -38,7 +38,7 @@ func (c AnnotationCheck) Reporter() string {
 	return AnnotationCheckName
 }
 
-func (c AnnotationCheck) Check(ctx context.Context, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c AnnotationCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return nil
 	}

@@ -1,0 +1,60 @@
+pint.error --no-color -d 'promql/.*' -d alerts/count lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+rules/0001.yml:1-2: duplicated rule, identical rule found at rules/0002.yml:1 (rule/duplicate)
+ 1 | - record: "colo:duplicate"
+ 2 |   expr: sum(foo) without(job)
+
+rules/0001.yml:9-12: duplicated rule, identical rule found at rules/0002.yml:11 (rule/duplicate)
+  9 | - record: "colo:labels:equal"
+ 10 |   expr: sum(foo) without(job)
+ 11 |   labels:
+ 12 |     same: yes
+
+level=info msg="Problems found" Bug=2
+level=fatal msg="Fatal error" error="problems found"
+-- rules/0001.yml --
+- record: "colo:duplicate"
+  expr: sum(foo) without(job)
+- record: "colo:labels:empty"
+  expr: sum(foo) without(job)
+- record: "colo:labels:mismatch"
+  expr: sum(foo) without(job)
+  labels:
+    file: a
+- record: "colo:labels:equal"
+  expr: sum(foo) without(job)
+  labels:
+    same: yes
+
+-- rules/0002.yml --
+- record: "colo:duplicate"
+  expr: sum(foo) without(job)
+- record: "colo:labels:empty"
+  expr: sum(foo) without(job)
+  labels:
+    empty: nope
+- record: "colo:labels:mismatch"
+  expr: sum(foo) without(job)
+  labels:
+    file: b
+- record: "colo:labels:equal"
+  expr: sum(foo) without(job)
+  labels:
+    same: yes
+
+# pint file/disable rule/duplicate
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7108"
+  failover = []
+  timeout  = "5s"
+  required = true
+}
+parser {
+  relaxed = [".*"]
+}
