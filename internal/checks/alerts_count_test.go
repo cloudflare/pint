@@ -379,6 +379,60 @@ func TestAlertsCountCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "uptime query error",
+			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n",
+			checker:     newAlertsCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 3, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-23),
+								time.Now().Add(time.Hour*-23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-22),
+								time.Now().Add(time.Hour*-22).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-21),
+								time.Now().Add(time.Hour*-21).Add(time.Minute),
+								time.Minute,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithInternalError(),
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)

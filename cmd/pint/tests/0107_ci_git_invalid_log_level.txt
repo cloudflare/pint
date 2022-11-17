@@ -1,0 +1,6 @@
+pint.error -l xxx --no-color ci
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="failed to set log level: 'xxx' is not a valid log level"
