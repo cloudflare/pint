@@ -47,7 +47,7 @@ func (c FragileCheck) Check(ctx context.Context, path string, rule parser.Rule, 
 			Severity: Warning,
 		})
 	}
-	return
+	return problems
 }
 
 func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
@@ -96,5 +96,5 @@ NEXT:
 		problems = append(problems, c.checkNode(child)...)
 	}
 
-	return
+	return problems
 }

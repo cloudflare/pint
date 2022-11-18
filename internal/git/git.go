@@ -107,8 +107,8 @@ func (gcr CommitRangeResults) String() string {
 	return fmt.Sprintf("%s^..%s", gcr.From, gcr.To)
 }
 
-func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, err error) {
-	cr.Commits = []string{}
+func CommitRange(cmd CommandRunner, baseBranch string) (CommitRangeResults, error) {
+	cr := CommitRangeResults{Commits: []string{}}
 
 	out, err := cmd("log", "--format=%H", "--no-abbrev-commit", "--reverse", fmt.Sprintf("%s..HEAD", baseBranch))
 	if err != nil {
@@ -130,7 +130,7 @@ func CommitRange(cmd CommandRunner, baseBranch string) (cr CommitRangeResults, e
 		return cr, fmt.Errorf("empty commit range")
 	}
 
-	return
+	return cr, nil
 }
 
 func CurrentBranch(cmd CommandRunner) (string, error) {

@@ -36,7 +36,7 @@ func emptyLine(line string) (emptied string) {
 		emptied += "\n"
 	}
 
-	return
+	return emptied
 }
 
 func hasComment(line, comment string) bool {

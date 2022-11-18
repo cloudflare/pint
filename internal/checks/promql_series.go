@@ -411,7 +411,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		}
 	}
 
-	return
+	return problems
 }
 
 func (c SeriesCheck) queryProblem(err error, selector string, expr parser.PromQLExpr) Problem {
@@ -507,7 +507,7 @@ func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) 
 		selectors = append(selectors, getSelectors(child)...)
 	}
 
-	return
+	return selectors
 }
 
 func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
@@ -582,7 +582,7 @@ func oldest(ranges []promapi.MetricTimeRange) (ts time.Time) {
 			ts = r.Start
 		}
 	}
-	return
+	return ts
 }
 
 func newest(ranges []promapi.MetricTimeRange) (ts time.Time) {
@@ -591,5 +591,5 @@ func newest(ranges []promapi.MetricTimeRange) (ts time.Time) {
 			ts = r.End
 		}
 	}
-	return
+	return ts
 }

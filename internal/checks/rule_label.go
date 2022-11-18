@@ -44,7 +44,7 @@ func (c LabelCheck) Check(ctx context.Context, path string, rule parser.Rule, en
 		problems = append(problems, c.checkAlertingRule(rule)...)
 	}
 
-	return
+	return problems
 }
 
 func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
@@ -58,7 +58,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Severity: c.severity,
 			})
 		}
-		return
+		return problems
 	}
 
 	val := rule.RecordingRule.Labels.GetValue(c.key)
@@ -72,12 +72,12 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Severity: c.severity,
 			})
 		}
-		return
+		return problems
 	}
 
 	problems = append(problems, c.checkValue(rule, val)...)
 
-	return
+	return problems
 }
 
 func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
@@ -91,7 +91,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Severity: c.severity,
 			})
 		}
-		return
+		return problems
 	}
 
 	val := rule.AlertingRule.Labels.GetValue(c.key)
@@ -105,12 +105,12 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Severity: c.severity,
 			})
 		}
-		return
+		return problems
 	}
 
 	problems = append(problems, c.checkValue(rule, val)...)
 
-	return
+	return problems
 }
 
 func (c LabelCheck) checkValue(rule parser.Rule, val *parser.YamlNode) (problems []Problem) {
@@ -123,5 +123,5 @@ func (c LabelCheck) checkValue(rule parser.Rule, val *parser.YamlNode) (problems
 			Severity: c.severity,
 		})
 	}
-	return
+	return problems
 }

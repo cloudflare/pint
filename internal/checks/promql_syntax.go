@@ -41,5 +41,5 @@ func (c SyntaxCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			Severity: Fatal,
 		})
 	}
-	return
+	return problems
 }

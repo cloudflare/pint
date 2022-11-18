@@ -99,5 +99,5 @@ func (c RegexpCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		}
 	}
 
-	return
+	return problems
 }

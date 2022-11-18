@@ -135,5 +135,5 @@ func walkDir(dirname string) (paths filePaths, err error) {
 			return nil
 		})
 
-	return
+	return paths, err
 }

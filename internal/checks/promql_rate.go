@@ -72,7 +72,7 @@ func (c RateCheck) Check(ctx context.Context, path string, rule parser.Rule, ent
 		})
 	}
 
-	return
+	return problems
 }
 
 func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *promapi.ConfigResult, done *completedList) (problems []exprProblem) {
@@ -127,7 +127,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *
 		problems = append(problems, c.checkNode(ctx, child, cfg, done)...)
 	}
 
-	return
+	return problems
 }
 
 type completedList struct {

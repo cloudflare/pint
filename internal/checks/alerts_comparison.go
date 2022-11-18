@@ -67,7 +67,7 @@ func (c ComparisonCheck) Check(ctx context.Context, path string, rule parser.Rul
 		Severity: Warning,
 	})
 
-	return
+	return problems
 }
 
 func hasComparision(n promParser.Node) *promParser.BinaryExpr {

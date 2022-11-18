@@ -57,7 +57,7 @@ func (c VectorMatchingCheck) Check(ctx context.Context, path string, rule parser
 		})
 	}
 
-	return
+	return problems
 }
 
 func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLNode) (problems []exprProblem) {
@@ -198,7 +198,7 @@ NEXT:
 		problems = append(problems, c.checkNode(ctx, child)...)
 	}
 
-	return
+	return problems
 }
 
 func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, error) {

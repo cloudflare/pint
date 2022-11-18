@@ -60,7 +60,7 @@ func (c Reject) Check(ctx context.Context, path string, rule parser.Rule, entrie
 			problems = append(problems, c.reject(rule, ann, "annotation")...)
 		}
 	}
-	return
+	return problems
 }
 
 func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string) (problems []Problem) {
@@ -82,5 +82,5 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 			Severity: c.severity,
 		})
 	}
-	return
+	return problems
 }

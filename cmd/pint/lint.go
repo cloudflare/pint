@@ -119,5 +119,5 @@ func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
 			},
 		})
 	}
-	return
+	return reports
 }

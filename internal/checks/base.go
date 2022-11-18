@@ -144,7 +144,7 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 		}
 		severity = s
 	}
-	return
+	return text, severity
 }
 
 func promText(name, uri string) string {

@@ -249,7 +249,7 @@ func parseDurationMatch(expr string) (dm durationMatch, err error) {
 	parts := strings.SplitN(expr, opSeparator, 2)
 	if len(parts) == 2 {
 		if dm.op, err = parseMatchOperation(parts[0]); err != nil {
-			return
+			return dm, err
 		}
 		dm.dur, err = parseDuration(parts[1])
 	} else {
@@ -257,7 +257,7 @@ func parseDurationMatch(expr string) (dm durationMatch, err error) {
 		dm.dur, err = parseDuration(expr)
 	}
 
-	return
+	return dm, err
 }
 
 type durationMatch struct {

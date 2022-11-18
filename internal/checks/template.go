@@ -88,7 +88,7 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 			}
 		}
 	}
-	return
+	return c
 }
 
 type TemplateContext struct {

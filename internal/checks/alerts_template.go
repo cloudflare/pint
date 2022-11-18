@@ -491,7 +491,7 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 		}
 	}
 
-	return
+	return msgs
 }
 
 func absentLabels(f utils.PromQLFragment) []string {
