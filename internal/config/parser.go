@@ -22,5 +22,5 @@ func (p Parser) CompileRelaxed() (r []*regexp.Regexp) {
 	for _, pattern := range p.Relaxed {
 		r = append(r, regexp.MustCompile("^"+pattern+"$"))
 	}
-	return
+	return r
 }

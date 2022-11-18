@@ -118,7 +118,7 @@ func blameReports(reports []Report, gitCmd git.CommandRunner) (pb git.FileBlames
 			return
 		}
 	}
-	return
+	return pb, nil
 }
 
 func shouldReport(report Report) bool {

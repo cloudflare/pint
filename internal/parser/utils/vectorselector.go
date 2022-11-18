@@ -15,5 +15,5 @@ func HasVectorSelector(node *parser.PromQLNode) (vs []*promParser.VectorSelector
 		vs = append(vs, HasVectorSelector(child)...)
 	}
 
-	return
+	return vs
 }

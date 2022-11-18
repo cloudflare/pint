@@ -127,7 +127,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 			Str("path", report.SourcePath).
 			Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
 			Msg("Problem reported on unmodified line, skipping")
-		return
+		return annotations
 	}
 
 	var msgPrefix string
@@ -166,7 +166,7 @@ func (r BitBucketReporter) makeAnnotation(report Report, pb git.FileBlames) (ann
 	}
 	annotations = append(annotations, a)
 
-	return
+	return annotations
 }
 
 func (r BitBucketReporter) bitBucketRequest(method, url string, body []byte) error {

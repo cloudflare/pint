@@ -65,7 +65,7 @@ func (c AlertsCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			Text:     text,
 			Severity: severity,
 		})
-		return
+		return problems
 	}
 
 	if len(qr.Series.Ranges) > 0 {
@@ -105,5 +105,5 @@ func (c AlertsCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
 		Severity: Information,
 	})
-	return
+	return problems
 }

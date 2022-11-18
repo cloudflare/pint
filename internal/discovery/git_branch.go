@@ -186,5 +186,5 @@ func getOverlap(a, b []int) (o []int) {
 			}
 		}
 	}
-	return
+	return o
 }

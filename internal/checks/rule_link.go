@@ -126,5 +126,5 @@ func (c RuleLinkCheck) Check(ctx context.Context, path string, rule parser.Rule,
 		log.Debug().Str("uri", uri).Str("status", resp.Status).Msg("Link request returned a valid status code")
 	}
 
-	return
+	return problems
 }

@@ -60,7 +60,7 @@ func (fp FilePosition) FirstLine() (line int) {
 			line = l
 		}
 	}
-	return
+	return line
 }
 
 func (fp FilePosition) LastLine() (line int) {
@@ -69,7 +69,7 @@ func (fp FilePosition) LastLine() (line int) {
 			line = l
 		}
 	}
-	return
+	return line
 }
 
 func mergeComments(node *yaml.Node) (comments []string) {
@@ -82,7 +82,7 @@ func mergeComments(node *yaml.Node) (comments []string) {
 	if node.FootComment != "" {
 		comments = append(comments, node.FootComment)
 	}
-	return
+	return comments
 }
 
 type YamlNode struct {
@@ -122,7 +122,7 @@ type YamlKeyValue struct {
 func (ykv YamlKeyValue) Lines() (lines []int) {
 	lines = appendLine(lines, ykv.Key.Position.Lines...)
 	lines = appendLine(lines, ykv.Value.Position.Lines...)
-	return
+	return lines
 }
 
 type YamlMap struct {
@@ -135,7 +135,7 @@ func (ym YamlMap) Lines() (lines []int) {
 	for _, item := range ym.Items {
 		lines = appendLine(lines, item.Lines()...)
 	}
-	return
+	return lines
 }
 
 func (ym YamlMap) GetValue(key string) *YamlNode {
@@ -202,7 +202,7 @@ type PromQLExpr struct {
 func (pqle PromQLExpr) Lines() (lines []int) {
 	lines = appendLine(lines, pqle.Key.Position.Lines...)
 	lines = appendLine(lines, pqle.Value.Position.Lines...)
-	return
+	return lines
 }
 
 func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
@@ -242,7 +242,7 @@ func (ar AlertingRule) Lines() (lines []int) {
 		lines = appendLine(lines, ar.Annotations.Lines()...)
 	}
 	slices.Sort(lines)
-	return
+	return lines
 }
 
 func (ar AlertingRule) Comments() (comments []string) {
@@ -268,7 +268,7 @@ func (ar AlertingRule) Comments() (comments []string) {
 			comments = append(comments, annotation.Value.Comments...)
 		}
 	}
-	return
+	return comments
 }
 
 type RecordingRule struct {
@@ -284,7 +284,7 @@ func (rr RecordingRule) Lines() (lines []int) {
 		lines = appendLine(lines, rr.Labels.Lines()...)
 	}
 	slices.Sort(lines)
-	return
+	return lines
 }
 
 func (rr RecordingRule) Comments() (comments []string) {
@@ -299,7 +299,7 @@ func (rr RecordingRule) Comments() (comments []string) {
 			comments = append(comments, label.Value.Comments...)
 		}
 	}
-	return
+	return comments
 }
 
 type ParseError struct {
@@ -400,7 +400,7 @@ func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
 			return val, ok
 		}
 	}
-	return
+	return s, ok
 }
 
 func (r Rule) GetComments(key string) (cs []Comment) {

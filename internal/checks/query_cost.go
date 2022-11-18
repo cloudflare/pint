@@ -48,7 +48,7 @@ func (c CostCheck) Check(ctx context.Context, path string, rule parser.Rule, ent
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
-		return
+		return problems
 	}
 
 	query := fmt.Sprintf("count(%s)", expr.Value.Value)
@@ -62,7 +62,7 @@ func (c CostCheck) Check(ctx context.Context, path string, rule parser.Rule, ent
 			Text:     text,
 			Severity: severity,
 		})
-		return
+		return problems
 	}
 
 	var series int
@@ -95,5 +95,5 @@ func (c CostCheck) Check(ctx context.Context, path string, rule parser.Rule, ent
 		Text:     fmt.Sprintf("%s returned %d result(s)%s%s", promText(c.prom.Name(), qr.URI), series, estimate, above),
 		Severity: severity,
 	})
-	return
+	return problems
 }

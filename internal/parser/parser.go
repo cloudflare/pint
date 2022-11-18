@@ -191,7 +191,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 				Err:  fmt.Errorf("got both %s and %s keys in a single rule", recordKey, alertKey),
 			},
 		}
-		return
+		return rule, isEmpty, err
 	}
 	if recordPart != nil && exprPart == nil {
 		isEmpty = false
@@ -201,7 +201,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 				Err:  fmt.Errorf("missing %s key", exprKey),
 			},
 		}
-		return
+		return rule, isEmpty, err
 	}
 	if alertPart != nil && exprPart == nil {
 		isEmpty = false
@@ -211,7 +211,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 				Err:  fmt.Errorf("missing %s key", exprKey),
 			},
 		}
-		return
+		return rule, isEmpty, err
 	}
 	if exprPart != nil && alertPart == nil && recordPart == nil {
 		isEmpty = false
@@ -221,7 +221,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 				Err:  fmt.Errorf("incomplete rule, no %s or %s key", alertKey, recordKey),
 			},
 		}
-		return
+		return rule, isEmpty, err
 	}
 	if (recordPart != nil || alertPart != nil) && len(unknownKeys) > 0 {
 		isEmpty = false
@@ -235,7 +235,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 				Err:  fmt.Errorf("invalid key(s) found: %s", strings.Join(keys, ", ")),
 			},
 		}
-		return
+		return rule, isEmpty, err
 	}
 
 	if recordPart != nil && exprPart != nil {
@@ -245,7 +245,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 			Expr:   *exprPart,
 			Labels: labelsPart,
 		}}
-		return
+		return rule, isEmpty, err
 	}
 
 	if alertPart != nil && exprPart != nil {
@@ -257,10 +257,10 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 			Labels:      labelsPart,
 			Annotations: annotationsPart,
 		}}
-		return
+		return rule, isEmpty, err
 	}
 
-	return
+	return rule, isEmpty, err
 }
 
 func unpackNodes(node *yaml.Node) []*yaml.Node {

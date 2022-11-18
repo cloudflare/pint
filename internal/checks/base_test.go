@@ -531,7 +531,7 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 		})
 		from = from.Add(step)
 	}
-	return
+	return s
 }
 
 func checkErrorBadData(name, uri, err string) string {

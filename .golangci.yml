@@ -22,6 +22,7 @@ linters:
     - gocritic
     - importas
     - maligned
+    - nakedret
     - prealloc
     - promlinter
     - unconvert
@@ -40,3 +41,5 @@ linters-settings:
     local-prefixes: github.com/cloudflare/pint
   gofumpt:
     extra-rules: true
+  nakedret:
+    max-func-lines: 0
