@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
+	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/cloudflare/pint/internal/config"
 )
@@ -92,6 +93,12 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {
 		return meta, fmt.Errorf("failed to set log level: %w", err)
+	}
+
+	undo, err := maxprocs.Set()
+	defer undo()
+	if err != nil {
+		log.Error().Err(err).Msg("failed to set GOMAXPROCS")
 	}
 
 	meta.workers = c.Int(workersFlag)
