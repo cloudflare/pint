@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.35.0
+
+### Added
+
+- Use [uber-go/automaxprocs](https://github.com/uber-go/automaxprocs) to
+  automatically set GOMAXPROCS to match Linux container CPU quota.
+
 ## v0.34.0
 
 ### Added
