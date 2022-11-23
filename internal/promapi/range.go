@@ -31,6 +31,7 @@ type rangeQuery struct {
 	ctx  context.Context
 	expr string
 	r    v1.Range
+	ttl  time.Duration
 }
 
 func (q rangeQuery) Run() (queryResult, int) {
@@ -87,7 +88,7 @@ func (q rangeQuery) CacheKey() uint64 {
 }
 
 func (q rangeQuery) CacheTTL() time.Duration {
-	return 0
+	return q.ttl
 }
 
 type RangeQueryTimes interface {
@@ -140,6 +141,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 					End:   s.End,
 					Step:  step,
 				},
+				ttl: s.End.Sub(start) + time.Minute*10,
 			},
 		}
 

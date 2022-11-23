@@ -164,7 +164,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 				Str("query", job.query.String()).
 				Uint64("key", cacheKey).
 				Msg("Cache hit")
-			return cached
+			return queryResult{value: cached}
 		}
 	}
 
@@ -204,7 +204,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	}
 
 	if prom.cache != nil {
-		prom.cache.set(cacheKey, result, job.query.CacheTTL(), cost, job.query.Endpoint())
+		prom.cache.set(cacheKey, result.value, job.query.CacheTTL(), cost, job.query.Endpoint())
 	}
 
 	return result

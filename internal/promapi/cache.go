@@ -10,8 +10,9 @@ import (
 
 type cacheEntry struct {
 	lst       *list.Element
-	data      queryResult
+	data      any
 	expiresAt time.Time
+	lastGet   time.Time
 	cost      int
 }
 
@@ -23,12 +24,13 @@ type endpointStats struct {
 func (e *endpointStats) hit()  { e.hits++ }
 func (e *endpointStats) miss() { e.misses++ }
 
-func newQueryCache(maxSize int) *queryCache {
+func newQueryCache(maxSize int, maxStale time.Duration) *queryCache {
 	return &queryCache{
-		entries: map[uint64]*cacheEntry{},
-		stats:   map[string]*endpointStats{},
-		maxCost: maxSize,
-		useList: list.New(),
+		entries:  map[uint64]*cacheEntry{},
+		stats:    map[string]*endpointStats{},
+		maxCost:  maxSize,
+		maxStale: maxStale,
+		useList:  list.New(),
 	}
 }
 
@@ -36,6 +38,7 @@ type queryCache struct {
 	mu        sync.Mutex
 	entries   map[uint64]*cacheEntry
 	stats     map[string]*endpointStats
+	maxStale  time.Duration
 	cost      int
 	maxCost   int
 	evictions int
@@ -53,7 +56,7 @@ func (c *queryCache) endpointStats(endpoint string) *endpointStats {
 	return e
 }
 
-func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
+func (c *queryCache) get(key uint64, endpoint string) (v any, ok bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -64,6 +67,7 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 		return v, ok
 	}
 
+	ce.lastGet = time.Now()
 	c.useList.MoveToFront(ce.lst)
 	c.endpointStats(endpoint).hit()
 
@@ -72,7 +76,7 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 
 // Cache results if it was requested at least twice EVER - which means it's either
 // popular and requested multiple times within a loop OR this cache key survives between loops.
-func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost int, endpoint string) {
+func (c *queryCache) set(key uint64, val any, ttl time.Duration, cost int, endpoint string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -92,9 +96,10 @@ func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost in
 
 	c.cost += cost
 	c.entries[key] = &cacheEntry{
-		data: val,
-		cost: cost,
-		lst:  lst,
+		data:    val,
+		cost:    cost,
+		lst:     lst,
+		lastGet: time.Now(),
 	}
 	if ttl > 0 {
 		c.entries[key].expiresAt = time.Now().Add(ttl)
@@ -122,7 +127,7 @@ func (c *queryCache) gc() {
 
 	now := time.Now()
 	for key, ce := range c.entries {
-		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
+		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || now.Sub(ce.lastGet) >= c.maxStale {
 			c.useList.Remove(ce.lst)
 			c.cost -= ce.cost
 			c.evictions++
