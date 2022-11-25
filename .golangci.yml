@@ -41,5 +41,7 @@ linters-settings:
     local-prefixes: github.com/cloudflare/pint
   gofumpt:
     extra-rules: true
+  govet:
+    check-shadowing: true
   nakedret:
     max-func-lines: 0

@@ -88,10 +88,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, path string, rule parser.Rule,
 			log.Debug().Stringer("link", u).Str("uri", uri).Msg("Link URI rewritten by rule")
 		}
 
-		ctx, cancel := context.WithTimeout(ctx, c.timeout)
+		rctx, cancel := context.WithTimeout(ctx, c.timeout)
 		defer cancel()
 
-		req, _ := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+		req, _ := http.NewRequestWithContext(rctx, http.MethodGet, uri, nil)
 
 		for k, v := range c.headers {
 			req.Header.Set(k, v)

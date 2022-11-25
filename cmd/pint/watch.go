@@ -91,15 +91,15 @@ func actionWatch(c *cli.Context) error {
 	pidfile := c.String(pidfileFlag)
 	if pidfile != "" {
 		pid := os.Getpid()
-		err := os.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0o644)
+		err = os.WriteFile(pidfile, []byte(fmt.Sprintf("%d\n", pid)), 0o644)
 		if err != nil {
 			return err
 		}
 		log.Info().Str("path", pidfile).Msg("Pidfile created")
 		defer func() {
-			err := os.RemoveAll(pidfile)
-			if err != nil {
-				log.Error().Err(err).Str("path", pidfile).Msg("Failed to remove pidfile")
+			pidErr := os.RemoveAll(pidfile)
+			if pidErr != nil {
+				log.Error().Err(pidErr).Str("path", pidfile).Msg("Failed to remove pidfile")
 			}
 			log.Info().Str("path", pidfile).Msg("Pidfile removed")
 		}()
@@ -133,8 +133,8 @@ func actionWatch(c *cli.Context) error {
 		WriteTimeout: time.Second * 30,
 	}
 	go func() {
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			log.Error().Err(err).Str("listen", listen).Msg("HTTP server returned an error")
+		if httpErr := server.ListenAndServe(); !errors.Is(httpErr, http.ErrServerClosed) {
+			log.Error().Err(httpErr).Str("listen", listen).Msg("HTTP server returned an error")
 		}
 	}()
 	log.Info().Str("address", listen).Msg("Started HTTP server")

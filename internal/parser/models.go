@@ -396,7 +396,8 @@ func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
 		comments = r.AlertingRule.Comments()
 	}
 	for _, c := range comments {
-		if val, ok := GetLastComment(c, comment...); ok {
+		var val Comment
+		if val, ok = GetLastComment(c, comment...); ok {
 			return val, ok
 		}
 	}
