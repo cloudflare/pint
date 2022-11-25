@@ -52,7 +52,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 	}
 
 	pathCommits := map[string]map[string]struct{}{}
-	var commit string
+	var commit, msg string
 
 	for _, line := range strings.Split(string(out), "\n") {
 		parts := strings.Split(removeRedundantSpaces(line), " ")
@@ -71,7 +71,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 				continue
 			}
 
-			msg, err := git.CommitMessage(f.gitCmd, commit)
+			msg, err = git.CommitMessage(f.gitCmd, commit)
 			if err != nil {
 				return nil, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
 			}
@@ -106,8 +106,10 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 		}
 	}
 
+	var lbs git.LineBlames
+	var els []Entry
 	for path, commits := range pathCommits {
-		lbs, err := git.Blame(path, f.gitCmd)
+		lbs, err = git.Blame(path, f.gitCmd)
 		if err != nil {
 			return nil, fmt.Errorf("failed to run git blame for %s: %w", path, err)
 		}
@@ -121,7 +123,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			allowedLines = append(allowedLines, lb.Line)
 		}
 
-		els, err := readFile(path, !matchesAny(f.relaxed, path))
+		els, err = readFile(path, !matchesAny(f.relaxed, path))
 		if err != nil {
 			return nil, err
 		}

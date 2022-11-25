@@ -195,7 +195,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		Rules: []Rule{},
 	}
 
-	if _, err := os.Stat(path); err == nil || failOnMissing {
+	if _, err = os.Stat(path); err == nil || failOnMissing {
 		log.Info().Str("path", path).Msg("Loading configuration file")
 		err = hclsimple.DecodeFile(path, nil, &cfg)
 		if err != nil {

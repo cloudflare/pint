@@ -482,8 +482,7 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 				}
 				if found == excludeLabels {
 					if _, ok := done[v[1]]; !ok {
-						msg := fmt.Sprintf(msg, v[1])
-						msgs = append(msgs, msg)
+						msgs = append(msgs, fmt.Sprintf(msg, v[1]))
 						done[v[1]] = struct{}{}
 					}
 				}

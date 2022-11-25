@@ -52,19 +52,21 @@ func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err e
 		return
 	}
 
+	var rl []Rule
+	var rule Rule
 	for _, root := range node.Content {
 		// nolint: exhaustive
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
-				ret, err := parseNode(content, n, offset)
+				rl, err = parseNode(content, n, offset)
 				if err != nil {
 					return nil, err
 				}
-				rules = append(rules, ret...)
+				rules = append(rules, rl...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty, err := parseRule(content, root, offset)
+			rule, isEmpty, err = parseRule(content, root, offset)
 			if err != nil {
 				return nil, err
 			}
@@ -72,11 +74,11 @@ func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err e
 				rules = append(rules, rule)
 			} else {
 				for _, n := range root.Content {
-					ret, err := parseNode(content, n, offset)
+					rl, err = parseNode(content, n, offset)
 					if err != nil {
 						return nil, err
 					}
-					rules = append(rules, ret...)
+					rules = append(rules, rl...)
 				}
 			}
 		case yaml.ScalarNode:
