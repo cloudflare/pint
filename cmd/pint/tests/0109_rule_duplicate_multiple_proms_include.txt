@@ -1,4 +1,4 @@
-pint.ok --no-color -d 'promql/.*' -d alerts/count lint rules
+pint.ok --no-color -d 'promql/.*' -d alerts/count -d labels/conflict lint rules
 ! stdout .
 cmp stderr stderr.txt
 

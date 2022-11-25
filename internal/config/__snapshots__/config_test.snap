@@ -12,6 +12,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -26,155 +27,6 @@
       "rule/label",
       "rule/link",
       "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/single_prometheus_server - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/multiple_URIs - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "failover": [
-        "http://localhost/1",
-        "http://localhost/2"
-      ],
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
     ]
   }
 }
@@ -208,6 +60,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -258,6 +111,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -305,113 +159,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/single_prometheus_server_/_path_match - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  }
-}
----
-
-[TestGetChecksForRule/multiple_prometheus_servers - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "ignore",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "foo.+"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -444,6 +192,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -479,6 +228,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -532,6 +282,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -585,6 +336,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -612,71 +364,6 @@
 }
 ---
 
-[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {}
-    }
-  ]
-}
----
-
 [TestGetChecksForRule/duplicated_rules - 1]
 {
   "ci": {
@@ -690,6 +377,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -754,85 +442,6 @@
 }
 ---
 
-[TestGetChecksForRule/multiple_cost_checks - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {
-        "severity": "info"
-      }
-    },
-    {
-      "cost": {
-        "maxSeries": 10000,
-        "severity": "warning"
-      }
-    },
-    {
-      "cost": {
-        "maxSeries": 20000,
-        "severity": "bug"
-      }
-    }
-  ]
-}
----
-
 [TestGetChecksForRule/reject_rules - 1]
 {
   "ci": {
@@ -846,6 +455,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -898,6 +508,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -951,6 +562,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1004,6 +616,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1057,6 +670,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1110,6 +724,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1163,6 +778,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1216,6 +832,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1251,103 +868,6 @@
           "severity": "bug"
         }
       ]
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/checks_disabled_via_config - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "promql/rate",
-      "promql/vector_matching",
-      "promql/range_query",
-      "rule/duplicate"
-    ]
-  },
-  "rules": [
-    {
-      "alerts": {
-        "range": "1h",
-        "step": "1m",
-        "resolve": "5m"
-      }
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/single_check_enabled_via_config - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "cache": 50000,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {},
-  "rules": [
-    {
-      "alerts": {
-        "range": "1h",
-        "step": "1m",
-        "resolve": "5m"
-      }
     }
   ]
 }
@@ -1496,6 +1016,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1543,6 +1064,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1590,6 +1112,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1637,6 +1160,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1684,6 +1208,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1731,6 +1256,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1778,6 +1304,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1807,6 +1334,208 @@
           "severity": "bug"
         }
       ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/multiple_cost_checks - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {
+        "severity": "info"
+      }
+    },
+    {
+      "cost": {
+        "maxSeries": 10000,
+        "severity": "warning"
+      }
+    },
+    {
+      "cost": {
+        "maxSeries": 20000,
+        "severity": "bug"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching",
+      "promql/range_query",
+      "rule/duplicate",
+      "labels/conflict"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
     }
   ]
 }
@@ -1847,6 +1576,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1869,6 +1599,310 @@
 }
 ---
 
+[TestGetChecksForRule/single_check_enabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server_/_path_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/multiple_prometheus_servers - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "ignore",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "foo.+"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/multiple_URIs - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "failover": [
+        "http://localhost/1",
+        "http://localhost/2"
+      ],
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  }
+}
+---
+
+[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "cache": 50000,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {}
+    }
+  ]
+}
+---
+
 [TestGetChecksForRule/defaults - 2]
 {
   "ci": {
@@ -1882,6 +1916,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1926,6 +1961,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -1974,6 +2010,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2028,6 +2065,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2078,6 +2116,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2128,6 +2167,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2175,6 +2215,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2222,6 +2263,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2282,6 +2324,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2314,6 +2357,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2349,6 +2393,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2402,6 +2447,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2455,6 +2501,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2523,6 +2570,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2560,6 +2608,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2665,6 +2714,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2716,6 +2766,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2768,6 +2819,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2821,6 +2873,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2874,6 +2927,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2927,6 +2981,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -2980,6 +3035,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3033,6 +3089,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3086,6 +3143,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3154,6 +3212,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3173,7 +3232,8 @@
       "promql/rate",
       "promql/vector_matching",
       "promql/range_query",
-      "rule/duplicate"
+      "rule/duplicate",
+      "labels/conflict"
     ]
   },
   "rules": [
@@ -3366,6 +3426,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3413,6 +3474,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3460,6 +3522,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3507,6 +3570,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3554,6 +3618,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3601,6 +3666,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3648,6 +3714,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3717,6 +3784,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3752,6 +3820,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3796,6 +3865,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3844,6 +3914,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3898,6 +3969,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3948,6 +4020,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -3998,6 +4071,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4045,6 +4119,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4092,6 +4167,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4152,6 +4228,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4184,6 +4261,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4219,6 +4297,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4272,6 +4351,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4325,6 +4405,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4393,6 +4474,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4430,6 +4512,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4535,6 +4618,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4586,6 +4670,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4638,6 +4723,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4691,6 +4777,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4744,6 +4831,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4797,6 +4885,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4850,6 +4939,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4903,6 +4993,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -4956,6 +5047,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5024,6 +5116,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5043,7 +5136,8 @@
       "promql/rate",
       "promql/vector_matching",
       "promql/range_query",
-      "rule/duplicate"
+      "rule/duplicate",
+      "labels/conflict"
     ]
   },
   "rules": [
@@ -5236,6 +5330,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5283,6 +5378,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5330,6 +5426,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5377,6 +5474,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5424,6 +5522,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5471,6 +5570,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5518,6 +5618,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5587,6 +5688,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5622,6 +5724,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5666,6 +5769,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5714,6 +5818,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5768,6 +5873,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5818,6 +5924,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5868,6 +5975,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5915,6 +6023,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -5962,6 +6071,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6022,6 +6132,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6054,6 +6165,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6089,6 +6201,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6142,6 +6255,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6195,6 +6309,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6263,6 +6378,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6300,6 +6416,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6405,6 +6522,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6456,6 +6574,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6508,6 +6627,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6561,6 +6681,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6614,6 +6735,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6667,6 +6789,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6720,6 +6843,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6773,6 +6897,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6826,6 +6951,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6894,6 +7020,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -6913,7 +7040,8 @@
       "promql/rate",
       "promql/vector_matching",
       "promql/range_query",
-      "rule/duplicate"
+      "rule/duplicate",
+      "labels/conflict"
     ]
   },
   "rules": [
@@ -7106,6 +7234,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7153,6 +7282,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7200,6 +7330,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7247,6 +7378,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7294,6 +7426,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7341,6 +7474,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7388,6 +7522,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7457,6 +7592,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7492,6 +7628,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7536,6 +7673,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7584,6 +7722,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7638,6 +7777,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7688,6 +7828,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7738,6 +7879,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7785,6 +7927,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7832,6 +7975,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7892,6 +8036,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7924,6 +8069,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -7959,6 +8105,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8012,6 +8159,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8065,6 +8213,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8133,6 +8282,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8170,6 +8320,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8275,6 +8426,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8326,6 +8478,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8378,6 +8531,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8431,6 +8585,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8484,6 +8639,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8537,6 +8693,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8590,6 +8747,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8643,6 +8801,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8696,6 +8855,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8764,6 +8924,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -8783,7 +8944,8 @@
       "promql/rate",
       "promql/vector_matching",
       "promql/range_query",
-      "rule/duplicate"
+      "rule/duplicate",
+      "labels/conflict"
     ]
   },
   "rules": [
@@ -8976,6 +9138,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9023,6 +9186,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9070,6 +9234,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9117,6 +9282,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9164,6 +9330,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9211,6 +9378,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9258,6 +9426,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
@@ -9327,6 +9496,7 @@
       "alerts/count",
       "alerts/for",
       "alerts/template",
+      "labels/conflict",
       "promql/aggregate",
       "alerts/comparison",
       "promql/fragile",
