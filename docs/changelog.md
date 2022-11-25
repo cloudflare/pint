@@ -6,6 +6,7 @@
 
 - Use [uber-go/automaxprocs](https://github.com/uber-go/automaxprocs) to
   automatically set GOMAXPROCS to match Linux container CPU quota.
+- Added [labels/conflict](checks/labels/conflict.md) check.
 
 ## v0.34.0
 

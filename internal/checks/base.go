@@ -16,6 +16,7 @@ var (
 		AlertsCheckName,
 		AlertForCheckName,
 		TemplateCheckName,
+		LabelsConflictCheckName,
 		AggregationCheckName,
 		ComparisonCheckName,
 		FragileCheckName,
@@ -33,6 +34,7 @@ var (
 	}
 	OnlineChecks = []string{
 		AlertsCheckName,
+		LabelsConflictCheckName,
 		RangeQueryCheckName,
 		RateCheckName,
 		VectorMatchingCheckName,

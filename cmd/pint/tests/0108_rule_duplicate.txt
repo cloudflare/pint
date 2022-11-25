@@ -4,9 +4,18 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
+level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
+level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
+level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
+level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
+level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
 rules/0001.yml:1-2: duplicated rule, identical rule found at rules/0002.yml:1 (rule/duplicate)
  1 | - record: "colo:duplicate"
  2 |   expr: sum(foo) without(job)
+
+rules/0001.yml:7-8: couldn't run "labels/conflict" checks due to prometheus "prom" at http://127.0.0.1:7108 connection error: connection refused (labels/conflict)
+ 7 |   labels:
+ 8 |     file: a
 
 rules/0001.yml:9-12: duplicated rule, identical rule found at rules/0002.yml:11 (rule/duplicate)
   9 | - record: "colo:labels:equal"
@@ -14,7 +23,23 @@ rules/0001.yml:9-12: duplicated rule, identical rule found at rules/0002.yml:11 
  11 |   labels:
  12 |     same: yes
 
-level=info msg="Problems found" Bug=2
+rules/0001.yml:11-12: couldn't run "labels/conflict" checks due to prometheus "prom" at http://127.0.0.1:7108 connection error: connection refused (labels/conflict)
+ 11 |   labels:
+ 12 |     same: yes
+
+rules/0002.yml:5-6: couldn't run "labels/conflict" checks due to prometheus "prom" at http://127.0.0.1:7108 connection error: connection refused (labels/conflict)
+ 5 |   labels:
+ 6 |     empty: nope
+
+rules/0002.yml:9-10: couldn't run "labels/conflict" checks due to prometheus "prom" at http://127.0.0.1:7108 connection error: connection refused (labels/conflict)
+  9 |   labels:
+ 10 |     file: b
+
+rules/0002.yml:13-14: couldn't run "labels/conflict" checks due to prometheus "prom" at http://127.0.0.1:7108 connection error: connection refused (labels/conflict)
+ 13 |   labels:
+ 14 |     same: yes
+
+level=info msg="Problems found" Bug=7
 level=fatal msg="Fatal error" error="problems found"
 -- rules/0001.yml --
 - record: "colo:duplicate"

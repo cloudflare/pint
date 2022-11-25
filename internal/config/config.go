@@ -137,6 +137,10 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 			name:  checks.RuleDuplicateCheckName,
 			check: checks.NewRuleDuplicateCheck(p),
 		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.LabelsConflictCheckName,
+			check: checks.NewLabelsConflictCheck(p),
+		})
 	}
 
 	for _, rule := range cfg.Rules {

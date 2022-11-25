@@ -5,7 +5,7 @@ pint.ok -l debug --no-color lint rules
 ! stdout .
 stderr 'level=error msg="Query returned an error" error="server error: 500" query=count\(up\) uri=http://127.0.0.1:7056'
 stderr 'level=error msg="Query returned an error" error="server error: 500" query=/api/v1/status/config uri=http://127.0.0.1:7056'
-stderr 'level=info msg="Problems found" Warning=12'
+stderr 'level=info msg="Problems found" Warning=[0-9]+'
 
 -- rules/1.yaml --
 - record: one
