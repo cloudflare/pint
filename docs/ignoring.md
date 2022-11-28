@@ -105,3 +105,22 @@ A single comment can only disable one check, so repeat it for every check you wi
 to disable.
 
 See each individual [check](checks/index.md) documentation for details.
+
+## Snoozing individual checks for specific rules
+
+If you want to disable invididual checks just for some time then you can snooze them
+instead of disabling forever.
+
+The difference between `# pint disable ...` and `# pint snooze ...` comments is that
+the snooze comment must include a timestamp. Selected check will be disabled *until*
+that timestamp.
+Timestamp must either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339) syntax
+or `YYYY-MM-DD` (if you don't care about time and want to snooze until given date).
+Examples:
+
+```yaml
+# pint snooze 2023-01-12T10:00:00Z promql/series
+# pint snooze 2023-01-12 promql/rate
+- record: ...
+  expr: ...
+```

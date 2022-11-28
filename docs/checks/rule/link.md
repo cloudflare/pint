@@ -115,3 +115,14 @@ you can add a more specific comment.
 Example:
 
 `# pint disable rule/link(^https?://.+$)`
+
+## How to snooze it
+
+You can disable this check until given time by adding a comment to it. Example:
+
+`# pint snooze $TIMESTAMP rule/link`
+
+Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
+formatted  or `YYYY-MM-DD`.
+Adding this comment will disable `rule/link` *until* `$TIMESTAMP`, after that
+check will be re-enabled.

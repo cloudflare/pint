@@ -121,3 +121,14 @@ label "severity" {
 Example comment disabling that rule:
 
 `# pint disable rule/label(severity:true)`
+
+## How to snooze it
+
+You can disable this check until given time by adding a comment to it. Example:
+
+`# pint snooze $TIMESTAMP rule/label`
+
+Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
+formatted  or `YYYY-MM-DD`.
+Adding this comment will disable `rule/label` *until* `$TIMESTAMP`, after that
+check will be re-enabled.

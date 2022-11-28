@@ -7,6 +7,22 @@
 - Use [uber-go/automaxprocs](https://github.com/uber-go/automaxprocs) to
   automatically set GOMAXPROCS to match Linux container CPU quota.
 - Added [labels/conflict](checks/labels/conflict.md) check.
+- If you want to disable invididual checks just for some time then you can now
+  snooze them instead of disabling forever.
+
+  The difference between `# pint disable ...` and `# pint snooze ...` comments is that
+  the snooze comment must include a timestamp. Selected check will be disabled *until*
+  that timestamp.
+  Timestamp must either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339) syntax
+  or `YYYY-MM-DD` (if you don't care about time and want to snooze until given date).
+  Examples:
+
+  ```yaml
+  # pint snooze 2023-01-12T10:00:00Z promql/series
+  # pint snooze 2023-01-12 promql/rate
+  - record: ...
+    expr: ...
+  ```
 
 ## v0.34.0
 

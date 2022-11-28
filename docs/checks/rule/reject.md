@@ -123,3 +123,14 @@ Example:
 Example:
 
 `# pint disable rule/reject(val=~'^https?://.+$')`
+
+## How to snooze it
+
+You can disable this check until given time by adding a comment to it. Example:
+
+`# pint snooze $TIMESTAMP rule/reject`
+
+Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
+formatted  or `YYYY-MM-DD`.
+Adding this comment will disable `rule/reject` *until* `$TIMESTAMP`, after that
+check will be re-enabled.
