@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
@@ -237,11 +239,11 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 
 func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker) bool {
 	instance := check.String()
-	comments := []string{
+
+	for _, comment := range []string{
 		fmt.Sprintf("disable %s", name),
 		fmt.Sprintf("disable %s", instance),
-	}
-	for _, comment := range comments {
+	} {
 		if rule.HasComment(comment) {
 			log.Debug().
 				Str("check", instance).
@@ -249,6 +251,34 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 				Msg("Check disabled by comment")
 			return false
 		}
+	}
+
+	now := time.Now()
+	disabled := []string{name, instance}
+	for _, comment := range rule.GetComments("snooze") {
+		s := parseSnooze(comment.Value)
+		if s == nil {
+			continue
+		}
+		if !slices.Contains(disabled, s.text) {
+			continue
+		}
+		if !s.until.After(now) {
+			log.Debug().
+				Str("check", instance).
+				Str("comment", comment.String()).
+				Time("until", s.until).
+				Str("snooze", s.text).
+				Msg("Expired snooze")
+			continue
+		}
+		log.Debug().
+			Str("check", instance).
+			Str("comment", comment.String()).
+			Time("until", s.until).
+			Str("snooze", s.text).
+			Msg("Check snoozed by comment")
+		return false
 	}
 
 	for _, c := range disabledChecks {
@@ -265,6 +295,37 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 		}
 	}
 	return false
+}
+
+type snoozed struct {
+	until time.Time
+	text  string
+}
+
+func parseSnooze(comment string) *snoozed {
+	parts := strings.SplitN(comment, " ", 2)
+	if len(parts) != 2 {
+		return nil
+	}
+
+	s := snoozed{text: parts[1]}
+
+	var ts time.Time
+	var err error
+
+	ts, err = time.Parse(time.RFC3339, parts[0])
+	if err == nil {
+		s.until = ts
+		return &s
+	}
+
+	ts, err = time.Parse("2006-01-02", parts[0])
+	if err == nil {
+		s.until = ts
+		return &s
+	}
+
+	return nil
 }
 
 func strictRegex(s string) *regexp.Regexp {

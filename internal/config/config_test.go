@@ -1193,6 +1193,45 @@ checks {
 			},
 			disabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict"},
 		},
+		{
+			title: "two prometheus servers / snoozed checks via comment",
+			config: `
+prometheus "prom1" {
+  uri     = "http://localhost/1"
+  timeout = "1s"
+}
+prometheus "prom2" {
+  uri     = "http://localhost/2"
+  timeout = "1s"
+}
+checks {
+  disabled = [ "alerts/template", "promql/regexp" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint snooze 2099-11-AB labels/conflict
+# pint snooze 2099-11-28 labels/conflict won't work
+# pint snooze 2099-11-28
+# pint snooze 2099-11-28 promql/series(prom1)
+# pint snooze 2099-11-28T10:24:18Z promql/range_query
+# pint snooze 2099-11-28 rule/duplicate
+# pint snooze 2099-11-28T00:00:00+00:00 promql/vector_matching
+- record: foo
+  expr: sum(foo)
+# pint file/disable promql/vector_matching
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.LabelsConflictCheckName + "(prom1)",
+				checks.SeriesCheckName + "(prom2)",
+				checks.LabelsConflictCheckName + "(prom2)",
+			},
+			disabledChecks: []string{"promql/rate"},
+		},
 	}
 
 	dir := t.TempDir()

@@ -102,3 +102,14 @@ Where `$prometheus` is the name of Prometheus server to disable.
 Example:
 
 `# pint disable promql/rate(prod)`
+
+## How to snooze it
+
+You can disable this check until given time by adding a comment to it. Example:
+
+`# pint snooze $TIMESTAMP promql/rate`
+
+Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
+formatted  or `YYYY-MM-DD`.
+Adding this comment will disable `promql/rate` *until* `$TIMESTAMP`, after that
+check will be re-enabled.
