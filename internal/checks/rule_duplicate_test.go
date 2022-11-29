@@ -159,7 +159,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					[]*promapi.Prometheus{
 						promapi.NewPrometheus("prom", uri, map[string]string{}, time.Second, 4, 100),
 					},
-					1000,
 					true,
 					"up",
 					nil,

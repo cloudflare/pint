@@ -34,7 +34,7 @@ type rangeQuery struct {
 	ttl  time.Duration
 }
 
-func (q rangeQuery) Run() (queryResult, int) {
+func (q rangeQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Str("query", q.expr).
@@ -58,21 +58,18 @@ func (q rangeQuery) Run() (queryResult, int) {
 	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
-		return qr, 1
+		return qr
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr, 1
+		return qr
 	}
 
 	ranges, err := streamSampleStream(resp.Body, q.r.Step)
 	qr.value, qr.err = ranges, err
-	if ranges.Len() > 0 {
-		return qr, ranges.Len()
-	}
-	return qr, 1
+	return qr
 }
 
 func (q rangeQuery) Endpoint() string {

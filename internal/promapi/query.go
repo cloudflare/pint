@@ -28,7 +28,7 @@ type instantQuery struct {
 	timestamp time.Time
 }
 
-func (q instantQuery) Run() (queryResult, int) {
+func (q instantQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Str("query", q.expr).
@@ -45,21 +45,18 @@ func (q instantQuery) Run() (queryResult, int) {
 	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
-		return qr, 1
+		return qr
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr, 1
+		return qr
 	}
 
 	samples, err := streamSamples(resp.Body)
 	qr.value, qr.err = samples, err
-	if len(samples) > 0 {
-		return qr, len(samples)
-	}
-	return qr, 1
+	return qr
 }
 
 func (q instantQuery) Endpoint() string {

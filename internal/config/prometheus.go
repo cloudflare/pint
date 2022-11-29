@@ -15,7 +15,6 @@ type PrometheusConfig struct {
 	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
 	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
 	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
-	Cache       int               `hcl:"cache,optional" json:"cache"`
 	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
 	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
 	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`

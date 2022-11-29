@@ -37,7 +37,7 @@ type querier interface {
 	String() string
 	CacheKey() uint64
 	CacheTTL() time.Duration
-	Run() (queryResult, int)
+	Run() queryResult
 }
 
 type queryRequest struct {
@@ -179,12 +179,11 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 
 	prom.rateLimiter.Take()
 	start := time.Now()
-	result, cost := job.query.Run()
+	result := job.query.Run()
 	dur := time.Since(start)
 	log.Debug().
 		Str("uri", prom.safeURI).
 		Str("query", job.query.String()).
-		Int("cost", cost).
 		Str("endpoint", job.query.Endpoint()).
 		Str("duration", output.HumanizeDuration(dur)).
 		Msg("Query completed")
@@ -204,7 +203,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	}
 
 	if prom.cache != nil {
-		prom.cache.set(cacheKey, result.value, job.query.CacheTTL(), cost, job.query.Endpoint())
+		prom.cache.set(cacheKey, result.value, job.query.CacheTTL(), job.query.Endpoint())
 	}
 
 	return result

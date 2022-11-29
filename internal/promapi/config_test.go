@@ -177,7 +177,7 @@ func TestConfigHeaders(t *testing.T) {
 
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, tc.config, time.Second, 1, 100),
-			}, 1000, true, "up", nil, nil)
+			}, true, "up", nil, nil)
 
 			fg.StartWorkers()
 			defer fg.Close()

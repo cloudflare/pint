@@ -66,7 +66,6 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 		[]*promapi.Prometheus{
 			promapi.NewPrometheus(name, uri, map[string]string{"X-Debug": "1"}, timeout, 16, 1000),
 		},
-		1000,
 		required,
 		"up",
 		nil,

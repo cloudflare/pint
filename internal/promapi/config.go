@@ -37,7 +37,7 @@ type configQuery struct {
 	timestamp time.Time
 }
 
-func (q configQuery) Run() (queryResult, int) {
+func (q configQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus configuration")
@@ -51,13 +51,13 @@ func (q configQuery) Run() (queryResult, int) {
 	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus config: %w", err)
-		return qr, 1
+		return qr
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr, 1
+		return qr
 	}
 
 	qr.value, err = streamConfig(resp.Body)
@@ -65,7 +65,7 @@ func (q configQuery) Run() (queryResult, int) {
 		prometheusQueryErrorsTotal.WithLabelValues(q.prom.name, "/api/v1/status/config", errReason(err)).Inc()
 		qr.err = fmt.Errorf("failed to decode config data in %s response: %w", q.prom.safeURI, err)
 	}
-	return qr, 1
+	return qr
 }
 
 func (q configQuery) Endpoint() string {

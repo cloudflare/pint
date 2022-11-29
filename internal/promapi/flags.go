@@ -25,7 +25,7 @@ type flagsQuery struct {
 	timestamp time.Time
 }
 
-func (q flagsQuery) Run() (queryResult, int) {
+func (q flagsQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus flags")
@@ -39,21 +39,18 @@ func (q flagsQuery) Run() (queryResult, int) {
 	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus flags: %w", err)
-		return qr, 1
+		return qr
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr, 1
+		return qr
 	}
 
 	flags, err := streamFlags(resp.Body)
 	qr.value, qr.err = flags, err
-	if cost := len(flags); cost > 0 {
-		return qr, cost
-	}
-	return qr, 1
+	return qr
 }
 
 func (q flagsQuery) Endpoint() string {
