@@ -274,12 +274,6 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			cfg.Prometheus[i].Concurrency = concurrency
 		}
 
-		cacheSize := prom.Cache
-		if cacheSize <= 0 {
-			cacheSize = 50000
-			cfg.Prometheus[i].Cache = cacheSize
-		}
-
 		rateLimit := prom.RateLimit
 		if rateLimit <= 0 {
 			rateLimit = 100
@@ -305,7 +299,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		for _, path := range prom.Exclude {
 			exclude = append(exclude, strictRegex(path))
 		}
-		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, cacheSize, prom.Required, uptime, include, exclude))
+		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, uptime, include, exclude))
 	}
 
 	for _, rule := range cfg.Rules {

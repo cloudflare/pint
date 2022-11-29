@@ -171,7 +171,6 @@ prometheus "$name" {
   timeout     = "2m"
   concurrency = 16
   rateLimit   = 100
-  cache       = 50000
   required    = true|false
   include     = ["...", ...]
   exclude     = ["...", ...]
@@ -197,7 +196,6 @@ prometheus "$name" {
 - `rateLimit` - per second rate limit for all API requests send to this Prometheus server.
   Setting it to `1000` would allow for up to 1000 requests per each wall clock second.
   Optional, default to 100 requests per second.
-- `cache` - the maximum number of cached time series, defaults to 50000.
 - `uptime` - metric selector used to detect gaps in Prometheus uptime.
   Since some checks are sending queries to validate if given metric always present in Prometheus
   they might find gaps when Prometheus itself was down. Pint tries to detect that by querying

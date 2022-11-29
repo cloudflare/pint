@@ -1,7 +1,6 @@
 package promapi
 
 import (
-	"container/list"
 	"sync"
 	"time"
 
@@ -9,10 +8,9 @@ import (
 )
 
 type cacheEntry struct {
-	lst       *list.Element
-	data      queryResult
+	data      any
 	expiresAt time.Time
-	cost      int
+	lastGet   time.Time
 }
 
 type endpointStats struct {
@@ -23,12 +21,11 @@ type endpointStats struct {
 func (e *endpointStats) hit()  { e.hits++ }
 func (e *endpointStats) miss() { e.misses++ }
 
-func newQueryCache(maxSize int) *queryCache {
+func newQueryCache(maxStale time.Duration) *queryCache {
 	return &queryCache{
-		entries: map[uint64]*cacheEntry{},
-		stats:   map[string]*endpointStats{},
-		maxCost: maxSize,
-		useList: list.New(),
+		entries:  map[uint64]*cacheEntry{},
+		stats:    map[string]*endpointStats{},
+		maxStale: maxStale,
 	}
 }
 
@@ -36,10 +33,8 @@ type queryCache struct {
 	mu        sync.Mutex
 	entries   map[uint64]*cacheEntry
 	stats     map[string]*endpointStats
-	cost      int
-	maxCost   int
+	maxStale  time.Duration
 	evictions int
-	useList   *list.List
 }
 
 func (c *queryCache) endpointStats(endpoint string) *endpointStats {
@@ -53,7 +48,7 @@ func (c *queryCache) endpointStats(endpoint string) *endpointStats {
 	return e
 }
 
-func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
+func (c *queryCache) get(key uint64, endpoint string) (v any, ok bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -64,7 +59,7 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 		return v, ok
 	}
 
-	c.useList.MoveToFront(ce.lst)
+	ce.lastGet = time.Now()
 	c.endpointStats(endpoint).hit()
 
 	return ce.data, true
@@ -72,45 +67,16 @@ func (c *queryCache) get(key uint64, endpoint string) (v queryResult, ok bool) {
 
 // Cache results if it was requested at least twice EVER - which means it's either
 // popular and requested multiple times within a loop OR this cache key survives between loops.
-func (c *queryCache) set(key uint64, val queryResult, ttl time.Duration, cost int, endpoint string) {
+func (c *queryCache) set(key uint64, val any, ttl time.Duration, endpoint string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var lst *list.Element
-	oe, ok := c.entries[key]
-	if ok {
-		c.cost -= oe.cost
-		lst = oe.lst
-	} else {
-		lst = c.useList.PushFront(key)
-	}
-
-	// If we're not updating in-place then we need to make room for this entry
-	if !ok && c.cost+cost > c.maxCost {
-		c.makeRoom(cost)
-	}
-
-	c.cost += cost
 	c.entries[key] = &cacheEntry{
-		data: val,
-		cost: cost,
-		lst:  lst,
+		data:    val,
+		lastGet: time.Now(),
 	}
 	if ttl > 0 {
 		c.entries[key].expiresAt = time.Now().Add(ttl)
-	}
-}
-
-func (c *queryCache) makeRoom(needed int) {
-	for c.useList.Len() > 0 && needed > 0 {
-		if lst := c.useList.Back(); lst != nil {
-			key := lst.Value.(uint64)
-			c.cost -= c.entries[key].cost
-			needed -= c.entries[key].cost
-			delete(c.entries, key)
-			c.useList.Remove(lst)
-			c.evictions++
-		}
 	}
 }
 
@@ -122,9 +88,7 @@ func (c *queryCache) gc() {
 
 	now := time.Now()
 	for key, ce := range c.entries {
-		if !ce.expiresAt.IsZero() && ce.expiresAt.Before(now) {
-			c.useList.Remove(ce.lst)
-			c.cost -= ce.cost
+		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || now.Sub(ce.lastGet) >= c.maxStale {
 			c.evictions++
 			continue
 		}
@@ -181,7 +145,7 @@ func (c *cacheCollector) Describe(ch chan<- *prometheus.Desc) {
 func (c *cacheCollector) Collect(ch chan<- prometheus.Metric) {
 	c.cache.mu.Lock()
 	defer c.cache.mu.Unlock()
-	ch <- prometheus.MustNewConstMetric(c.entries, prometheus.GaugeValue, float64(c.cache.cost))
+	ch <- prometheus.MustNewConstMetric(c.entries, prometheus.GaugeValue, float64(len(c.cache.entries)))
 
 	for endpoint, stats := range c.cache.stats {
 		ch <- prometheus.MustNewConstMetric(c.hits, prometheus.CounterValue, float64(stats.hits), endpoint)

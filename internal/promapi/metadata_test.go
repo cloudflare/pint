@@ -117,7 +117,7 @@ func TestMetadata(t *testing.T) {
 		t.Run(tc.metric, func(t *testing.T) {
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100),
-			}, 1000, true, "up", nil, nil)
+			}, true, "up", nil, nil)
 			fg.StartWorkers()
 			defer fg.Close()
 

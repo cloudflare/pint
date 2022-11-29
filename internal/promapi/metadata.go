@@ -26,7 +26,7 @@ type metadataQuery struct {
 	timestamp time.Time
 }
 
-func (q metadataQuery) Run() (queryResult, int) {
+func (q metadataQuery) Run() queryResult {
 	log.Debug().
 		Str("uri", q.prom.safeURI).
 		Str("metric", q.metric).
@@ -42,25 +42,18 @@ func (q metadataQuery) Run() (queryResult, int) {
 	resp, err := q.prom.doRequest(ctx, http.MethodGet, q.Endpoint(), args)
 	if err != nil {
 		qr.err = fmt.Errorf("failed to query Prometheus metrics metadata: %w", err)
-		return qr, 1
+		return qr
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode/100 != 2 {
 		qr.err = tryDecodingAPIError(resp)
-		return qr, 1
+		return qr
 	}
 
 	meta, err := streamMetadata(resp.Body)
 	qr.value, qr.err = meta, err
-	var cost int
-	for _, vals := range meta {
-		cost += len(vals)
-	}
-	if cost > 0 {
-		return qr, cost
-	}
-	return qr, 1
+	return qr
 }
 
 func (q metadataQuery) Endpoint() string {

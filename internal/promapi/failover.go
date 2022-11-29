@@ -45,7 +45,6 @@ func cacheCleaner(cache *queryCache, interval time.Duration, quit chan bool) {
 type FailoverGroup struct {
 	name           string
 	servers        []*Prometheus
-	cacheSize      int
 	strictErrors   bool
 	uptimeMetric   string
 	cacheCollector *cacheCollector
@@ -55,11 +54,10 @@ type FailoverGroup struct {
 	pathsExclude []*regexp.Regexp
 }
 
-func NewFailoverGroup(name string, servers []*Prometheus, cacheSize int, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp) *FailoverGroup {
+func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp) *FailoverGroup {
 	return &FailoverGroup{
 		name:         name,
 		servers:      servers,
-		cacheSize:    cacheSize,
 		strictErrors: strictErrors,
 		uptimeMetric: uptimeMetric,
 		pathsInclude: include,
@@ -93,7 +91,7 @@ func (fg *FailoverGroup) IsEnabledForPath(path string) bool {
 }
 
 func (fg *FailoverGroup) StartWorkers() {
-	queryCache := newQueryCache(fg.cacheSize)
+	queryCache := newQueryCache(time.Hour)
 	fg.quitChan = make(chan bool)
 	go cacheCleaner(queryCache, time.Minute*2, fg.quitChan)
 

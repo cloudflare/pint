@@ -24,6 +24,28 @@
     expr: ...
   ```
 
+### Changed
+
+- Removed `cache` option from `prometheus` config blocks. Query cache will now auto-size itself
+  as needed.
+
+  If you have a config entry with `cache` option, example:
+
+  ```javascript
+  prometheus "prod" {
+    uri   = "https://prometheus.example.com"
+    cache = 20000
+  }
+  ```
+
+  Then pint will fail to start. To fix this simply remove the `cache` option:
+
+  ```javascript
+  prometheus "prod" {
+    uri = "https://prometheus.example.com"
+  }
+  ```
+
 ## v0.34.0
 
 ### Added

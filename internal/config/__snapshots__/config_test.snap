@@ -46,7 +46,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.yml"
@@ -94,7 +93,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         ".*"
@@ -145,7 +143,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "exclude": [
         "rules.yml"
@@ -887,7 +884,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -927,7 +923,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -972,7 +967,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1353,7 +1347,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -1363,7 +1356,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -1411,7 +1403,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1424,7 +1415,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1491,7 +1481,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1555,7 +1544,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -1565,7 +1553,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -1613,7 +1600,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1648,7 +1634,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -1693,7 +1678,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1741,7 +1725,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1754,7 +1737,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.+"
@@ -1806,7 +1788,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -1851,7 +1832,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1864,7 +1844,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -1917,7 +1896,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -1927,7 +1905,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -2009,7 +1986,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -2058,7 +2034,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -2103,7 +2078,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -2113,7 +2087,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -2161,7 +2134,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.yml"
@@ -2209,7 +2181,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         ".*"
@@ -2260,7 +2231,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "exclude": [
         "rules.yml"
@@ -2308,7 +2278,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -2356,7 +2325,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -2369,7 +2337,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.+"
@@ -2602,7 +2569,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -2615,7 +2581,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -2746,7 +2711,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -2759,7 +2723,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -3257,7 +3220,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -3321,7 +3283,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -3356,7 +3317,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -3396,7 +3356,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -3441,7 +3400,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -3822,7 +3780,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -3832,7 +3789,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -3880,7 +3836,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -3890,7 +3845,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -3972,7 +3926,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -4021,7 +3974,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -4066,7 +4018,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -4076,7 +4027,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -4124,7 +4074,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.yml"
@@ -4172,7 +4121,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         ".*"
@@ -4223,7 +4171,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "exclude": [
         "rules.yml"
@@ -4271,7 +4218,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -4319,7 +4265,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -4332,7 +4277,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.+"
@@ -4565,7 +4509,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -4578,7 +4521,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -4709,7 +4651,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -4722,7 +4663,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -5220,7 +5160,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -5284,7 +5223,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -5319,7 +5257,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -5359,7 +5296,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -5404,7 +5340,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -5785,7 +5720,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -5795,7 +5729,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -5843,7 +5776,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -5853,7 +5785,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -5935,7 +5866,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -5984,7 +5914,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -6029,7 +5958,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -6039,7 +5967,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -6087,7 +6014,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.yml"
@@ -6135,7 +6061,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         ".*"
@@ -6186,7 +6111,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "exclude": [
         "rules.yml"
@@ -6234,7 +6158,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -6282,7 +6205,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -6295,7 +6217,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.+"
@@ -6528,7 +6449,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -6541,7 +6461,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -6672,7 +6591,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -6685,7 +6603,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -7183,7 +7100,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -7247,7 +7163,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -7282,7 +7197,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -7322,7 +7236,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -7367,7 +7280,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -7748,7 +7660,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -7758,7 +7669,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -7806,7 +7716,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -7816,7 +7725,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -7898,7 +7806,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -7947,7 +7854,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -7992,7 +7898,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -8002,7 +7907,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -8050,7 +7954,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.yml"
@@ -8098,7 +8001,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         ".*"
@@ -8149,7 +8051,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "exclude": [
         "rules.yml"
@@ -8197,7 +8098,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -8245,7 +8145,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -8258,7 +8157,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "foo.+"
@@ -8491,7 +8389,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -8504,7 +8401,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -8635,7 +8531,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -8648,7 +8543,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -9146,7 +9040,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -9210,7 +9103,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -9245,7 +9137,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -9285,7 +9176,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -9330,7 +9220,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "include": [
         "rules.yml"
@@ -9711,7 +9600,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -9721,7 +9609,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
@@ -9769,7 +9656,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     },
@@ -9779,7 +9665,6 @@
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
-      "cache": 50000,
       "uptime": "up",
       "required": false
     }
