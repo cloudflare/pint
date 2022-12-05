@@ -1,0 +1,91 @@
+env FOO=BAR
+env AUTH_KEY=1234
+pint.ok --no-color config
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {
+    "relaxed": [
+      ".*"
+    ]
+  },
+  "prometheus": [
+    {
+      "name": "prod",
+      "uri": "http://localhost",
+      "headers": {
+        "X-Auth": "1234"
+      },
+      "timeout": "2m0s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "recording"
+        }
+      ],
+      "aggregate": [
+        {
+          "name": ".+",
+          "keep": [
+            "BAR"
+          ]
+        }
+      ]
+    }
+  ]
+}
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+prometheus "prod" {
+  uri = "http://localhost"
+  headers = {
+    X-Auth = "${ENV_AUTH_KEY}"
+  }
+}
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep = [ "${ENV_FOO}" ]
+    }
+}

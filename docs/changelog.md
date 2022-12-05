@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.36.0
+
+### Added
+
+- Added ability to expand environment variables in pint configuration file.
+  See [configuration](configuration.md) for details.
+
 ## v0.35.0
 
 ### Added

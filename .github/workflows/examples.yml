@@ -25,6 +25,7 @@ jobs:
 
       - name: Verify examples
         run: |
+          export AUTH_KEY=12345
           for CFG in docs/examples/* ; do
             echo ">>> $CFG"
             ./pint -c "$CFG" config
