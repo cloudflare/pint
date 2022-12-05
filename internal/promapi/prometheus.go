@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -143,7 +144,15 @@ func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args
 	}
 
 	for k, v := range prom.headers {
-		req.Header.Set(k, v)
+		// Expand environment variables in header values.
+		req.Header.Set(k, os.Expand(v, func(name string) string {
+			// Let `$` be escaped by prefixing it with a dollar sign,
+			// i.e. `$$` is expanded to `$`.
+			if name == "$" {
+				return name
+			}
+			return os.Getenv(name)
+		}))
 	}
 
 	return prom.client.Do(req)

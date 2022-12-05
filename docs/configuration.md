@@ -189,7 +189,8 @@ prometheus "$name" {
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
 - `headers` - a list of HTTP headers that will be set on all requests for this Prometheus
-  server.
+  server. The header value can include environment variables (e.g. `$ENV` or `${ENV}`);
+  litteral dollar signs need to be escaped as `$$`.
 - `timeout` - timeout to be used for API requests. Defaults to 2 minutes.
 - `concurrency` - how many concurrent requests can pint send to this Prometheus server.
   Optional, defaults to 16.
@@ -245,6 +246,13 @@ prometheus "dev" {
   timeout = "30s"
   include = [ "alerts/test/.*" ]
   exclude = [ "alerts/test/docs/.*" ]
+}
+
+prometheus "auth" {
+  uri     = "https://prometheus-auth.example.com"
+  headers = {
+    "Authorization": "Bearer $CI_JWT",
+  }
 }
 ```
 
