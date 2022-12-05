@@ -3,7 +3,7 @@ module github.com/cloudflare/pint
 go 1.19
 
 require (
-	github.com/cespare/xxhash/v2 v2.1.2
+	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/fatih/color v1.13.0
 	github.com/gkampitakis/go-snaps v0.4.2
 	github.com/google/go-cmp v0.5.9
