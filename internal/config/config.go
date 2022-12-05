@@ -6,14 +6,18 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 
 	"golang.org/x/exp/slices"
+
+	"github.com/zclconf/go-cty/cty"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 
+	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
@@ -185,6 +189,16 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 	return enabled
 }
 
+func getContext() *hcl.EvalContext {
+	vars := map[string]cty.Value{}
+	for _, e := range os.Environ() {
+		if i := strings.Index(e, "="); i >= 0 {
+			vars[fmt.Sprintf("ENV_%s", e[:i])] = cty.StringVal(e[i+1:])
+		}
+	}
+	return &hcl.EvalContext{Variables: vars}
+}
+
 func Load(path string, failOnMissing bool) (cfg Config, err error) {
 	cfg = Config{
 		CI: &CI{
@@ -201,7 +215,8 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 
 	if _, err = os.Stat(path); err == nil || failOnMissing {
 		log.Info().Str("path", path).Msg("Loading configuration file")
-		err = hclsimple.DecodeFile(path, nil, &cfg)
+		ectx := getContext()
+		err = hclsimple.DecodeFile(path, ectx, &cfg)
 		if err != nil {
 			return cfg, err
 		}

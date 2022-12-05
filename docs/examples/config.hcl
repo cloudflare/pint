@@ -75,7 +75,8 @@ rule {
     timeout = "30s"
     # Pass custom headers to all requests
     headers = {
-      X-Auth = "secret key"
+      # Read X-Auth value from environment variable AUTH_KEY
+      X-Auth = "${ENV_AUTH_KEY}"
     }
   }
 }

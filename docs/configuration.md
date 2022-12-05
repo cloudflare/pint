@@ -13,6 +13,25 @@ nav_order: 2
 1. TOC
 {:toc}
 
+## Environment variables
+
+Environment variables can be expanded inside pint configuration file as `ENV_*` HCL
+variables. To use a variable named `FOO` reference it as `${ENV_FOO}`.
+
+Examples:
+
+If you have `AUTH_KEY` environment variable set that you want to use a header
+for Prometheus requests then use this:
+
+```js
+prometheus "..." {
+  uri = "..."
+  headers = {
+    X-Auth = "${ENV_AUTH_KEY}"
+  }
+}
+```
+
 ## Regexp matchers
 
 All regexp patterns use [Go regexp](https://pkg.go.dev/regexp) module and are fully anchored.
