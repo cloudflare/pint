@@ -192,8 +192,8 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 func getContext() *hcl.EvalContext {
 	vars := map[string]cty.Value{}
 	for _, e := range os.Environ() {
-		if i := strings.Index(e, "="); i >= 0 {
-			vars[fmt.Sprintf("ENV_%s", e[:i])] = cty.StringVal(e[i+1:])
+		if k, v, ok := strings.Cut(e, "="); ok {
+			vars[fmt.Sprintf("ENV_%s", k)] = cty.StringVal(v)
 		}
 	}
 	return &hcl.EvalContext{Variables: vars}

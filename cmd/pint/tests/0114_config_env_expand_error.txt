@@ -1,0 +1,26 @@
+env FOO=BAR
+pint.error --no-color config
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": .pint.hcl:7,17-29: Unknown variable; There is no variable named \"ENV_AUTH_KEY\"., and 1 other diagnostic(s)"
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+prometheus "prod" {
+  uri = "http://localhost"
+  headers = {
+    X-Auth = "${ENV_AUTH_KEY}"
+  }
+}
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep = [ "${ENV_FOO}" ]
+    }
+}

@@ -1,5 +1,6 @@
 env FOO=BAR
 env AUTH_KEY=1234
+env FAKE_ENV=KEY=VAL
 pint.ok --no-color config
 ! stdout .
 cmp stderr stderr.txt
@@ -64,7 +65,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
         {
           "name": ".+",
           "keep": [
-            "BAR"
+            "BAR",
+            "KEY=VAL"
           ]
         }
       ]
@@ -86,6 +88,6 @@ rule {
       kind = "recording"
     }
     aggregate ".+" {
-        keep = [ "${ENV_FOO}" ]
+        keep = [ "${ENV_FOO}", "${ENV_FAKE_ENV}" ]
     }
 }
