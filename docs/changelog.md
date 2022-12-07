@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.37.0
+
+### Added
+
+- Added `pint_rule_file_owner` metric.
+
 ## v0.36.0
 
 ### Added
