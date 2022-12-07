@@ -166,6 +166,10 @@ pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems
+# HELP pint_rule_file_owner This is a boolean metric that describes who is the configured owner for given rule file
+# TYPE pint_rule_file_owner gauge
+pint_rule_file_owner{filename="rules/alice.yml",owner="alice"}
+pint_rule_file_owner{filename="rules/bob.yml",owner="bob"}
 # HELP pint_rules_parsed_total Total number of rules parsed since startup
 # TYPE pint_rules_parsed_total counter
 pint_rules_parsed_total{kind="alerting"}

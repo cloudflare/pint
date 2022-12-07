@@ -145,6 +145,9 @@ pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1"
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/client_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom2",reason="connection/error"}
+# HELP pint_rule_file_owner This is a boolean metric that describes who is the configured owner for given rule file
+# TYPE pint_rule_file_owner gauge
+pint_rule_file_owner{filename="rules/2.yml",owner="bob and alice"}
 # HELP pint_rules_parsed_total Total number of rules parsed since startup
 # TYPE pint_rules_parsed_total counter
 pint_rules_parsed_total{kind="alerting"}
