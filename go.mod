@@ -12,8 +12,8 @@ require (
 	github.com/klauspost/compress v1.15.12
 	github.com/prometheus/client_golang v1.14.0
 	github.com/prometheus/client_model v0.3.0
-	github.com/prometheus/common v0.37.0
-	github.com/prometheus/prometheus v0.40.5
+	github.com/prometheus/common v0.37.1
+	github.com/prometheus/prometheus v0.40.6
 	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.28.0
