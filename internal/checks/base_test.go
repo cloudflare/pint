@@ -70,6 +70,7 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 		"up",
 		nil,
 		nil,
+		nil,
 	)
 }
 

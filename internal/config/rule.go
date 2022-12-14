@@ -135,6 +135,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 			enabled = append(enabled, checkMeta{
 				name:  checks.CostCheckName,
 				check: checks.NewCostCheck(prom, rule.Cost.MaxSeries, severity),
+				tags:  prom.Tags(),
 			})
 		}
 	}
@@ -184,6 +185,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 			enabled = append(enabled, checkMeta{
 				name:  checks.AlertsCheckName,
 				check: checks.NewAlertsCheck(prom, qRange, qStep, qResolve),
+				tags:  prom.Tags(),
 			})
 		}
 	}
@@ -237,13 +239,18 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 	return enabled
 }
 
-func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker) bool {
+func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
 	instance := check.String()
 
-	for _, comment := range []string{
+	comments := []string{
 		fmt.Sprintf("disable %s", name),
 		fmt.Sprintf("disable %s", instance),
-	} {
+	}
+	for _, tag := range promTags {
+		comments = append(comments, fmt.Sprintf("disable %s(+%s)", name, tag))
+	}
+
+	for _, comment := range comments {
 		if rule.HasComment(comment) {
 			log.Debug().
 				Str("check", instance).
@@ -255,6 +262,9 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 
 	now := time.Now()
 	disabled := []string{name, instance}
+	for _, tag := range promTags {
+		disabled = append(disabled, fmt.Sprintf("%s(+%s)", name, tag))
+	}
 	for _, comment := range rule.GetComments("snooze") {
 		s := parseSnooze(comment.Value)
 		if s == nil {

@@ -1232,6 +1232,147 @@ checks {
 			},
 			disabledChecks: []string{"promql/rate"},
 		},
+		{
+			title: "two prometheus servers / expired snooze",
+			config: `
+prometheus "prom1" {
+  uri     = "http://localhost/1"
+  timeout = "1s"
+}
+prometheus "prom2" {
+  uri     = "http://localhost/2"
+  timeout = "1s"
+}
+checks {
+  disabled = [ "alerts/template", "promql/regexp" ]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint snooze 2000-11-28 promql/series(prom1)
+# pint snooze 2000-11-28T10:24:18Z promql/range_query
+# pint snooze 2000-11-28 rule/duplicate
+# pint snooze 2000-11-28T00:00:00+00:00 promql/vector_matching
+- record: foo
+  expr: sum(foo)
+# pint file/disable promql/vector_matching
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.SeriesCheckName + "(prom1)",
+				checks.VectorMatchingCheckName + "(prom1)",
+				checks.RangeQueryCheckName + "(prom1)",
+				checks.RuleDuplicateCheckName + "(prom1)",
+				checks.LabelsConflictCheckName + "(prom1)",
+				checks.SeriesCheckName + "(prom2)",
+				checks.VectorMatchingCheckName + "(prom2)",
+				checks.RangeQueryCheckName + "(prom2)",
+				checks.RuleDuplicateCheckName + "(prom2)",
+				checks.LabelsConflictCheckName + "(prom2)",
+			},
+			disabledChecks: []string{"promql/rate"},
+		},
+		{
+			title: "tag disables all prometheus checks",
+			config: `
+prometheus "prom1" {
+  uri  = "http://localhost/1"
+  tags = ["foo", "disable", "bar"]
+}
+prometheus "prom2" {
+  uri  = "http://localhost/2"
+  tags = []
+}
+prometheus "prom3" {
+  uri  = "http://localhost/3"
+  tags = ["foo"]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint disable alerts/count(+disable)
+# pint disable labels/conflict(+disable)
+# pint disable promql/range_query(+disable)
+# pint disable promql/regexp(+disable)
+# pint disable promql/series(+disable)
+# pint disable promql/rate(+disable)
+# pint disable promql/vector_matching(+disable)
+# pint disable rule/duplicate(+disable)
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName, checks.RateCheckName + "(prom2)",
+				checks.SeriesCheckName + "(prom2)",
+				checks.VectorMatchingCheckName + "(prom2)",
+				checks.RangeQueryCheckName + "(prom2)",
+				checks.RuleDuplicateCheckName + "(prom2)",
+				checks.LabelsConflictCheckName + "(prom2)",
+				checks.RateCheckName + "(prom3)",
+				checks.SeriesCheckName + "(prom3)",
+				checks.VectorMatchingCheckName + "(prom3)",
+				checks.RangeQueryCheckName + "(prom3)",
+				checks.RuleDuplicateCheckName + "(prom3)",
+				checks.LabelsConflictCheckName + "(prom3)",
+			},
+		},
+		{
+			title: "tag snoozes all prometheus checks",
+			config: `
+prometheus "prom1" {
+  uri  = "http://localhost/1"
+  tags = ["foo", "disable", "bar"]
+}
+prometheus "prom2" {
+  uri  = "http://localhost/2"
+  tags = []
+}
+prometheus "prom3" {
+  uri  = "http://localhost/3"
+  tags = ["foo"]
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, `
+# pint snooze 2099-11-28 alerts/count(+disable)
+# pint snooze 2099-11-28 labels/conflict(+disable)
+# pint snooze 2099-11-28 promql/range_query(+disable)
+# pint snooze 2099-11-28 promql/regexp(+disable)
+# pint snooze 2099-11-28 promql/series(+disable)
+# pint snooze 2099-11-28 promql/rate(+disable)
+# pint snooze 2099-11-28 promql/vector_matching(+disable)
+# pint snooze 2099-11-28 rule/duplicate(+disable)
+- record: foo
+  expr: sum(foo)
+`),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName, checks.RateCheckName + "(prom2)",
+				checks.SeriesCheckName + "(prom2)",
+				checks.VectorMatchingCheckName + "(prom2)",
+				checks.RangeQueryCheckName + "(prom2)",
+				checks.RuleDuplicateCheckName + "(prom2)",
+				checks.LabelsConflictCheckName + "(prom2)",
+				checks.RateCheckName + "(prom3)",
+				checks.SeriesCheckName + "(prom3)",
+				checks.VectorMatchingCheckName + "(prom3)",
+				checks.RangeQueryCheckName + "(prom3)",
+				checks.RuleDuplicateCheckName + "(prom3)",
+				checks.LabelsConflictCheckName + "(prom3)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
