@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/parser"
 	"regexp"
+	"strings"
 )
 
 type PrometheusConfig struct {
@@ -18,6 +19,7 @@ type PrometheusConfig struct {
 	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
 	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
 	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
+	Tags        []string          `hcl:"tags,optional" json:"tags,omitempty"`
 	Required    bool              `hcl:"required,optional" json:"required"`
 }
 
@@ -47,6 +49,14 @@ func (pc PrometheusConfig) validate() error {
 	for _, path := range pc.Exclude {
 		if _, err := regexp.Compile(path); err != nil {
 			return err
+		}
+	}
+
+	for _, tag := range pc.Tags {
+		for _, s := range []string{" ", "\n"} {
+			if strings.Contains(tag, s) {
+				return fmt.Errorf("prometheus tag %q cannot contain %q", tag, s)
+			}
 		}
 	}
 

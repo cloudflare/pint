@@ -163,6 +163,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					"up",
 					nil,
 					[]*regexp.Regexp{regexp.MustCompile(".*")},
+					nil,
 				)
 			},
 			problems: noProblems,

@@ -73,6 +73,14 @@ func TestPrometheusConfig(t *testing.T) {
 			},
 			err: errors.New(`invalid Prometheus uptime metric selector "xxx{foo=bar}": 1:8: expected '==', found '='`),
 		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				Tags: []string{"a b c"},
+			},
+			err: errors.New(`prometheus tag "a b c" cannot contain " "`),
+		},
 	}
 
 	for _, tc := range testCases {

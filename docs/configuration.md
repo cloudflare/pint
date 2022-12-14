@@ -186,6 +186,7 @@ Syntax:
 prometheus "$name" {
   uri         = "https://..."
   failover    = ["https://...", ...]
+  tags        = ["...", ...]
   headers     = { "...": "..." }
   timeout     = "2m"
   concurrency = 16
@@ -207,6 +208,9 @@ prometheus "$name" {
   It's highly recommended that all URIs point to Prometheus servers with identical
   configuration, otherwise pint checks might return unreliable results and potential
   false positives.
+- `tags` - a list of strings that can be used to group Prometheus servers together.
+  Tags cannot contain spaces.
+  Tags can be later used when disabling checks via comments, see [ignoring](ignoring.md).
 - `headers` - a list of HTTP headers that will be set on all requests for this Prometheus
   server.
 - `timeout` - timeout to be used for API requests. Defaults to 2 minutes.
@@ -248,6 +252,7 @@ Example:
 ```js
 prometheus "prod" {
   uri         = "https://prometheus-prod.example.com"
+  tags        = ["prod"]
   headers     = {
     "X-Auth": "secret"
   }

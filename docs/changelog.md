@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.38.0
+
+### Added
+
+- `prometheus` configuration blocks now accepts `tags` field with a list of tags.
+  Tags can be used to disable or snooze specific checks on all Prometheus instances
+  with that tag.
+  See [ignoring](ignoring.md) for details.
+
 ## v0.37.0
 
 ### Added

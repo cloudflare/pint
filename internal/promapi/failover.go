@@ -52,9 +52,10 @@ type FailoverGroup struct {
 
 	pathsInclude []*regexp.Regexp
 	pathsExclude []*regexp.Regexp
+	tags         []string
 }
 
-func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp) *FailoverGroup {
+func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
 	return &FailoverGroup{
 		name:         name,
 		servers:      servers,
@@ -62,11 +63,16 @@ func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool, upt
 		uptimeMetric: uptimeMetric,
 		pathsInclude: include,
 		pathsExclude: exclude,
+		tags:         tags,
 	}
 }
 
 func (fg *FailoverGroup) Name() string {
 	return fg.name
+}
+
+func (fg *FailoverGroup) Tags() []string {
+	return fg.tags
 }
 
 func (fg *FailoverGroup) UptimeMetric() string {

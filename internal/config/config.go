@@ -124,26 +124,32 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.RateCheckName,
 			check: checks.NewRateCheck(p),
+			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.SeriesCheckName,
 			check: checks.NewSeriesCheck(p),
+			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.VectorMatchingCheckName,
 			check: checks.NewVectorMatchingCheck(p),
+			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.RangeQueryCheckName,
 			check: checks.NewRangeQueryCheck(p),
+			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.RuleDuplicateCheckName,
 			check: checks.NewRuleDuplicateCheck(p),
+			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.LabelsConflictCheckName,
 			check: checks.NewLabelsConflictCheck(p),
+			tags:  p.Tags(),
 		})
 	}
 
@@ -153,12 +159,12 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 
 	for _, cm := range allChecks {
 		// check if check is disabled for specific rule
-		if !isEnabled(cfg.Checks.Enabled, disabledChecks, r, cm.name, cm.check) {
+		if !isEnabled(cfg.Checks.Enabled, disabledChecks, r, cm.name, cm.check, cm.tags) {
 			continue
 		}
 
 		// check if rule was disabled
-		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, r, cm.name, cm.check) {
+		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, r, cm.name, cm.check, cm.tags) {
 			continue
 		}
 		// check if rule was already enabled
@@ -314,7 +320,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		for _, path := range prom.Exclude {
 			exclude = append(exclude, strictRegex(path))
 		}
-		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, uptime, include, exclude))
+		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, uptime, include, exclude, prom.Tags))
 	}
 
 	for _, rule := range cfg.Rules {
@@ -337,4 +343,5 @@ func parseDuration(d string) (time.Duration, error) {
 type checkMeta struct {
 	name  string
 	check checks.RuleChecker
+	tags  []string
 }

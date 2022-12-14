@@ -106,6 +106,32 @@ to disable.
 
 See each individual [check](checks/index.md) documentation for details.
 
+Checks can also be disabled for specific Prometheus servers using
+`# pint disable ...($prometheus)` comments. Replace `$prometheus` with the name
+of the Prometheus configuration block in pint that you want to disable it for.
+Examples:
+
+If you have a `stating` Prometheus configuration block in pint config file:
+
+```js
+prometheus "staging" {
+  uri  = "https://prometheus-staging.example.com"
+  tags = ["testing"]
+}
+```
+
+and have a rule where you want to disable `promql/series` checks run against that
+Prometheus server then add a comment:
+
+`# pint disable promql/series(staging)`
+
+You can also use tags set on Prometheus configuration blocks inside comments.
+Tags must use `+` prefix, so if you want to disable `promql/series` check on all
+Prometheus servers with `testing` tag then add this comment:
+
+`# pint disable promql/series(+testing)`
+
+
 ## Snoozing individual checks for specific rules
 
 If you want to disable invididual checks just for some time then you can snooze them
@@ -121,6 +147,15 @@ Examples:
 ```yaml
 # pint snooze 2023-01-12T10:00:00Z promql/series
 # pint snooze 2023-01-12 promql/rate
+- record: ...
+  expr: ...
+```
+
+Just like with `# pint disable ...` you can also use tags with snooze comments.
+
+```yaml
+# pint snooze 2023-01-12T10:00:00Z promql/series(+tag)
+# pint snooze 2023-01-12 promql/rate(+tag)
 - record: ...
   expr: ...
 ```
