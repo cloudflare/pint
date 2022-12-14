@@ -38,13 +38,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compile binaries
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         with:
           args: build --snapshot --rm-dist --single-target
 
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
-        uses: goreleaser/goreleaser-action@v3
+        uses: goreleaser/goreleaser-action@v4
         with:
           args: release --rm-dist
         env:
