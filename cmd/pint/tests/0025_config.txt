@@ -21,6 +21,33 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "required": true
     },
     {
+      "name": "prom-with-failover",
+      "uri": "http://127.0.0.1",
+      "failover": [
+        "http://127.0.0.1",
+        "http://127.0.0.1"
+      ],
+      "timeout": "2m0s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom-with-tags",
+      "uri": "http://127.0.0.1",
+      "timeout": "2m0s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "tags": [
+        "a",
+        "@",
+        "1"
+      ],
+      "required": false
+    },
+    {
       "name": "custom-concurrency",
       "uri": "http://127.0.0.1",
       "timeout": "2m0s",
@@ -153,6 +180,16 @@ prometheus "prom" {
   uri     = "http://127.0.0.1"
   timeout = "2m"
   required = true
+}
+
+prometheus "prom-with-failover" {
+  uri      = "http://127.0.0.1"
+  failover = ["http://127.0.0.1", "http://127.0.0.1"]
+}
+
+prometheus "prom-with-tags" {
+  uri  = "http://127.0.0.1"
+  tags = ["a", "@", "1"]
 }
 
 prometheus "custom-concurrency" {
