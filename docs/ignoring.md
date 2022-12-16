@@ -98,6 +98,12 @@ anywhere in the file. This will disable given check for all rules in that file.
 
 See each individual [check](checks/index.md) documentation for details.
 
+You can also use tags set on Prometheus configuration blocks inside comments.
+Tags must use `+` prefix, so if you want to disable `promql/series` check on all
+Prometheus servers with `testing` tag then add this comment:
+
+`# pint file/disable promql/series(+testing)`
+
 ## Disabling individual checks for specific rules
 
 To disable individual check for a specific rule use `# pint disable ...` comments.
