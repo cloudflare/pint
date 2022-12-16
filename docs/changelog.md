@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.38.1
+
+### Fixed
+
+- `# pint file/disable` comments didn't properly handle Prometheus tags, this is fixed now.
+
 ## v0.38.0
 
 ### Added

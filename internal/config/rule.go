@@ -295,6 +295,11 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 		if c == name || c == instance {
 			return false
 		}
+		for _, tag := range promTags {
+			if c == fmt.Sprintf("%s(+%s)", name, tag) {
+				return false
+			}
+		}
 	}
 	if len(enabledChecks) == 0 {
 		return true
