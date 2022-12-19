@@ -1,0 +1,6 @@
+groups:
+- name: test
+  rules:
+  - alert: Service Is Down
+    expr: up == 0
+    for: 0m

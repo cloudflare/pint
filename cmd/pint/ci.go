@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -115,16 +114,6 @@ func actionCI(c *cli.Context) error {
 			return fmt.Errorf("GITHUB_AUTH_TOKEN env variable is required when reporting to GitHub")
 		}
 
-		prVal, ok := os.LookupEnv("GITHUB_PULL_REQUEST_NUMBER")
-		if !ok {
-			return fmt.Errorf("GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub")
-		}
-
-		prNum, err := strconv.Atoi(prVal)
-		if err != nil {
-			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
-		}
-
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
 		gr := reporter.NewGithubReporter(
 			meta.cfg.Repository.GitHub.BaseURI,
@@ -133,7 +122,6 @@ func actionCI(c *cli.Context) error {
 			token,
 			meta.cfg.Repository.GitHub.Owner,
 			meta.cfg.Repository.GitHub.Repo,
-			prNum,
 			git.RunGit,
 		)
 		reps = append(reps, gr)
@@ -173,6 +161,7 @@ func detectCI(cfg *config.CI) *config.CI {
 	if bb := os.Getenv("GITHUB_BASE_REF"); bb != "" {
 		isDirty = true
 		cfg.BaseBranch = bb
+		log.Debug().Str("branch", bb).Msg("got base branch from GITHUB_BASE_REF env variable")
 	}
 
 	if isNil && !isDirty {
@@ -201,15 +190,7 @@ func detectRepository(cfg *config.Repository) *config.Repository {
 }
 
 func detectGithubActions(gh *config.GitHub) *config.GitHub {
-	if os.Getenv("GITHUB_PULL_REQUEST_NUMBER") == "" &&
-		os.Getenv("GITHUB_EVENT_NAME") == "pull_request" &&
-		os.Getenv("GITHUB_REF") != "" {
-		parts := strings.Split(os.Getenv("GITHUB_REF"), "/")
-		if len(parts) >= 4 {
-			log.Info().Str("pr", parts[2]).Msg("Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable")
-			os.Setenv("GITHUB_PULL_REQUEST_NUMBER", parts[2])
-		}
-	}
+	log.Debug().Msg("GitHub actions environment detected")
 
 	var isDirty, isNil bool
 

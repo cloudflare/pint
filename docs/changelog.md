@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.39.0
+
+### Changed
+
+- GitHub integration now uses [Check Runs](https://docs.github.com/en/rest/checks/runs) API - #478.
+
 ## v0.38.1
 
 ### Fixed
