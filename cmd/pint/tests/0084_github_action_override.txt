@@ -21,14 +21,12 @@ exec git commit -am 'v2'
 env GITHUB_AUTH_TOKEN=12345
 env GITHUB_ACTION=YES
 env GITHUB_EVENT_NAME=pull_request
-env GITHUB_REF=refs/pull/123/merge
 env GITHUB_BASE_REF=main
 env GITHUB_REPOSITORY=foo/bar
 env GITHUB_API_URL=http://127.0.0.1:6084
 pint.ok -l debug --offline --no-color ci
 ! stdout .
 stderr 'level=info msg="Report submitted" status="200 OK"'
-stderr 'level=info msg="Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable" pr=123'
 stderr 'level=info msg="Setting repository base URI from GITHUB_API_URL env variable" baseuri=http://127.0.0.1:6084'
 
 -- src/v1.yml --
