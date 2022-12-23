@@ -9,7 +9,7 @@ permissions:
   checks: write
 
 jobs:
-  golangci-lint:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
