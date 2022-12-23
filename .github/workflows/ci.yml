@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+
 jobs:
   golangci-lint:
     runs-on: ubuntu-latest
