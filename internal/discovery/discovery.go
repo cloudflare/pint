@@ -18,6 +18,7 @@ import (
 const (
 	FileOwnerComment         = "file/owner"
 	FileDisabledCheckComment = "file/disable"
+	FileSnoozeCheckComment   = "file/snooze"
 	RuleOwnerComment         = "rule/owner"
 )
 
@@ -89,6 +90,21 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 		if !slices.Contains(disabledChecks, comment.Value) {
 			disabledChecks = append(disabledChecks, comment.Value)
 		}
+	}
+	for _, comment := range parser.GetComments(body, FileSnoozeCheckComment) {
+		s := parser.ParseSnooze(comment.Value)
+		if s == nil {
+			continue
+		}
+		if !slices.Contains(disabledChecks, s.Text) {
+			disabledChecks = append(disabledChecks, s.Text)
+		}
+		log.Debug().
+			Str("check", s.Text).
+			Str("comment", comment.String()).
+			Time("until", s.Until).
+			Str("snooze", s.Text).
+			Msg("Check snoozed by comment")
 	}
 
 	if content.Ignored {

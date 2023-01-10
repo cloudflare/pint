@@ -52,6 +52,9 @@ func (cfg *Config) DisableOnlineChecks() {
 func (cfg *Config) SetDisabledChecks(l []string) {
 	disabled := map[string]struct{}{}
 	for _, s := range l {
+		// add raw string: promql/series(prom)
+		disabled[s] = struct{}{}
+		// find any check name that matches string as regexp
 		re := strictRegex(s)
 		for _, name := range checks.CheckNames {
 			if re.MatchString(name) {
@@ -64,6 +67,7 @@ func (cfg *Config) SetDisabledChecks(l []string) {
 		for _, c := range cfg.Checks.Disabled {
 			if c == name {
 				found = true
+				break
 			}
 		}
 		if !found {

@@ -1,0 +1,37 @@
+pint.ok -l debug --no-color lint --min-severity=info rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+level=debug msg="Check snoozed by comment" check=promql/aggregate(job:true) comment="file/snooze 2099-11-28T10:24:18Z promql/aggregate(job:true)" snooze=promql/aggregate(job:true) until=2099-11-28T10:24:18Z
+level=debug msg="Check snoozed by comment" check=alerts/for comment="file/snooze 2099-11-28T10:24:18Z alerts/for" snooze=alerts/for until=2099-11-28T10:24:18Z
+level=debug msg="File parsed" path=rules/0001.yml rules=2
+level=debug msg="Found recording rule" lines=4-5 path=rules/0001.yml record=sum-job
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=sum-job
+level=debug msg="Found alerting rule" alert=Down lines=7-9 path=rules/0001.yml
+level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=Down
+-- rules/0001.yml --
+# pint file/snooze 2099-11-28T10:24:18Z promql/aggregate(job:true)
+# pint file/snooze 2099-11-28T10:24:18Z alerts/for
+
+- record: sum-job
+  expr: sum(foo)
+
+- alert: Down
+  expr: up == 0
+  for: 0s
+
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep     = [ "job" ]
+        severity = "bug"
+    }
+}
