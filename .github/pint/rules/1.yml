@@ -3,4 +3,8 @@ groups:
   rules:
   - alert: Service Is Down
     expr: up == 0
+    for: 0s
+
+  - alert: Service Is Down
+    expr: up{xxx=bbb} == 0
     for: 0m
