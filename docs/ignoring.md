@@ -138,9 +138,9 @@ Prometheus servers with `testing` tag then add this comment:
 `# pint disable promql/series(+testing)`
 
 
-## Snoozing individual checks for specific rules
+## Snoozing checks
 
-If you want to disable invididual checks just for some time then you can snooze them
+If you want to disable some checks just for some time then you can snooze them
 instead of disabling forever.
 
 The difference between `# pint disable ...` and `# pint snooze ...` comments is that
@@ -165,3 +165,6 @@ Just like with `# pint disable ...` you can also use tags with snooze comments.
 - record: ...
   expr: ...
 ```
+
+If you want to snooze some checks for the entire file then you can use
+`# pint file/snooze ...` comment anywhere in given file.

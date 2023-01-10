@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.40.0
+
+### Added
+
+- Allow snoozing checks for entire file using `# pint file/snooze ...` comments.
+
 ## v0.39.0
 
 ### Changed
