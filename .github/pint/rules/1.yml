@@ -7,3 +7,6 @@ groups:
 
   - alert: Service Is Down
     expr: up{xx=bbb} == 0
+
+  - alert: Service Is Down
+    expr: up >
