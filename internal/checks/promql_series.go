@@ -21,8 +21,12 @@ import (
 )
 
 type PromqlSeriesSettings struct {
-	IgnoreMetrics   []string `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
-	ignoreMetricsRe []*regexp.Regexp
+	LookbackRange         string `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
+	lookbackRangeDuration time.Duration
+	LookbackStep          string `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
+	LookbackStepDuration  time.Duration
+	IgnoreMetrics         []string `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
+	ignoreMetricsRe       []*regexp.Regexp
 }
 
 func (c *PromqlSeriesSettings) Validate() error {
@@ -32,6 +36,24 @@ func (c *PromqlSeriesSettings) Validate() error {
 			return err
 		}
 		c.ignoreMetricsRe = append(c.ignoreMetricsRe, re)
+	}
+
+	c.lookbackRangeDuration = time.Hour * 24 * 7
+	if c.LookbackRange != "" {
+		dur, err := model.ParseDuration(c.LookbackRange)
+		if err != nil {
+			return err
+		}
+		c.lookbackRangeDuration = time.Duration(dur)
+	}
+
+	c.LookbackStepDuration = time.Minute * 5
+	if c.LookbackStep != "" {
+		dur, err := model.ParseDuration(c.LookbackStep)
+		if err != nil {
+			return err
+		}
+		c.LookbackStepDuration = time.Duration(dur)
 	}
 
 	return nil
@@ -66,15 +88,16 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
 		settings = s.(*PromqlSeriesSettings)
 	}
+	if settings == nil {
+		settings = &PromqlSeriesSettings{}
+		_ = settings.Validate()
+	}
 
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
 		return
 	}
-
-	rangeLookback := time.Hour * 24 * 7
-	rangeStep := time.Minute * 5
 
 	done := map[string]bool{}
 	for _, selector := range getSelectors(expr.Query) {
@@ -160,7 +183,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), promapi.NewRelativeRange(rangeLookback, rangeStep))
+		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		}
@@ -175,7 +198,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), promapi.NewRelativeRange(rangeLookback, rangeStep))
+		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -230,7 +253,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), promapi.NewRelativeRange(rangeLookback, rangeStep))
+			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -256,8 +279,8 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 		// 4. If foo was ALWAYS there but it's NO LONGER there (for more than min-age) -> BUG
 		if len(trs.Series.Ranges) == 1 &&
-			!oldest(trs.Series.Ranges).After(trs.Series.From.Add(rangeStep)) &&
-			newest(trs.Series.Ranges).Before(trs.Series.Until.Add(rangeStep*-1)) {
+			!oldest(trs.Series.Ranges).After(trs.Series.From.Add(settings.LookbackStepDuration)) &&
+			newest(trs.Series.Ranges).Before(trs.Series.Until.Add(settings.LookbackStepDuration*-1)) {
 
 			minAge, p := c.getMinAge(rule, selector)
 			if len(p) > 0 {
@@ -310,7 +333,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), promapi.NewRelativeRange(rangeLookback, rangeStep))
+			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
@@ -340,8 +363,8 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 			// 6. If foo is ALWAYS/SOMETIMES there AND {bar OR baz} used to be there ALWAYS BUT it's NO LONGER there -> BUG
 			if len(trsLabel.Series.Ranges) == 1 &&
-				!oldest(trsLabel.Series.Ranges).After(trsLabel.Series.Until.Add(rangeLookback-1).Add(rangeStep)) &&
-				newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(rangeStep*-1)) {
+				!oldest(trsLabel.Series.Ranges).After(trsLabel.Series.Until.Add(settings.lookbackRangeDuration-1).Add(settings.LookbackStepDuration)) &&
+				newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(settings.LookbackStepDuration*-1)) {
 
 				minAge, p := c.getMinAge(rule, selector)
 				if len(p) > 0 {
@@ -482,12 +505,10 @@ func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.V
 }
 
 func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text string, s Severity) (string, Severity) {
-	if settings != nil {
-		for _, re := range settings.ignoreMetricsRe {
-			if name != "" && re.MatchString(name) {
-				log.Debug().Str("check", c.Reporter()).Str("metric", name).Stringer("regexp", re).Msg("Metric matches check ignore rules")
-				return fmt.Sprintf("%s. Metric name %q matches %q check ignore regexp %q", text, name, c.Reporter(), re), Warning
-			}
+	for _, re := range settings.ignoreMetricsRe {
+		if name != "" && re.MatchString(name) {
+			log.Debug().Str("check", c.Reporter()).Str("metric", name).Stringer("regexp", re).Msg("Metric matches check ignore rules")
+			return fmt.Sprintf("%s. Metric name %q matches %q check ignore regexp %q", text, name, c.Reporter(), re), Warning
 		}
 	}
 	return text, s

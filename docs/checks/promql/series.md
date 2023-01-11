@@ -131,6 +131,17 @@ check "promql/series" {
 }
 ```
 
+- `lookbackRange` - how far back to query when checking if given metric was ever
+  present in Prometheus.
+  Default is `7d`, meaning that if a metric is missing pint will query last 7 days
+  of metrics to tell you if this metric was ever present and if so, when was it last
+  seen.
+- `lookbackStep` - lookback query resulution.
+  Default is `5m` which matches Prometheus default
+  [staleness](https://prometheus.io/docs/prometheus/latest/querying/basics/#staleness)
+  checks.
+  If you have a custom `--query.lookback-delta` flag passed to Prometheus you might want
+  to set this option to the same value.
 - `ignoreMetrics` - list of regexp matchers, if a metric is missing from Prometheus
   but the name matches any of provided regexp matchers then pint will only report a
   warning, instead of a bug level report.
@@ -139,6 +150,8 @@ Example:
 
 ```js
 check "promql/series" {
+  lookbackRange = "5d"
+  lookbackStep = "1m"
   ignoreMetrics = [
     ".*_error",
     ".*_error_.*",
