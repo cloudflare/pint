@@ -1,4 +1,7 @@
-http response github / 200 {}
+http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
+http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
+http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
+http method github POST /api/v3/repos/cloudflare/pint/pulls/1/comments 200 {}
 http start github 127.0.0.1:6032
 
 mkdir testrepo
@@ -19,9 +22,10 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env GITHUB_AUTH_TOKEN=12345
+env GITHUB_PULL_REQUEST_NUMBER=1
 pint.ok -l debug --offline --no-color ci
 ! stdout .
-stderr 'level=info msg="Report submitted" status="200 OK"'
+stderr 'level=info msg="Pull request review created" status="200 OK"'
 
 -- src/v1.yml --
 - alert: rule1
