@@ -126,7 +126,7 @@ func actionCI(c *cli.Context) error {
 		}
 
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
-		gr := reporter.NewGithubReporter(
+		gr, err := reporter.NewGithubReporter(
 			meta.cfg.Repository.GitHub.BaseURI,
 			meta.cfg.Repository.GitHub.UploadURI,
 			timeout,
@@ -136,6 +136,9 @@ func actionCI(c *cli.Context) error {
 			prNum,
 			git.RunGit,
 		)
+		if err != nil {
+			return err
+		}
 		reps = append(reps, gr)
 	}
 
