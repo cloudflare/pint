@@ -19,6 +19,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env GITHUB_AUTH_TOKEN=12345
+env GITHUB_PULL_REQUEST_NUMBER=1
 pint.error -l debug --no-color ci
 ! stdout .
 stderr 'level=info msg="Report submitted" status="200 OK"'

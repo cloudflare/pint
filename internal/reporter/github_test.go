@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -14,6 +16,8 @@ import (
 )
 
 func TestGithubReporter(t *testing.T) {
+	zerolog.SetGlobalLevel(zerolog.FatalLevel)
+
 	type errorCheck func(t *testing.T, err error) error
 
 	type testCaseT struct {
@@ -64,7 +68,7 @@ func TestGithubReporter(t *testing.T) {
 				if err == nil {
 					return fmt.Errorf("expected an error")
 				}
-				if err.Error() != "failed to create a new check run: context deadline exceeded" {
+				if err.Error() != "creating review: context deadline exceeded" {
 					return fmt.Errorf("unexpected error")
 				}
 				return nil
@@ -151,6 +155,7 @@ func TestGithubReporter(t *testing.T) {
 				tc.token,
 				tc.owner,
 				tc.repo,
+				tc.prNum,
 				tc.gitCmd,
 			)
 
