@@ -94,6 +94,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
   },
   "check": [
     {
+      "LookbackStepDuration": 300000000000,
       "ignoreMetrics": [
         ".*_error",
         ".*_error_.*",

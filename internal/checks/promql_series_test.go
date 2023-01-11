@@ -349,6 +349,44 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "#2 series never present, custom range",
+			content:     "- record: foo\n  expr: sum(notfound)\n",
+			ctx: func() context.Context {
+				s := checks.PromqlSeriesSettings{
+					LookbackRange: "3d",
+					LookbackStep:  "6m",
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "notfound",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "3d"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
+		{
 			description: "#2 series never present but recording rule provides it correctly",
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,

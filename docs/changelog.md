@@ -5,6 +5,8 @@
 ### Added
 
 - Allow snoozing checks for entire file using `# pint file/snooze ...` comments.
+- Added `lookbackRange` and `lookbackStep` configration option to the
+  [promql/series](checks/promql/series.md) check - #493.
 
 ## v0.39.0
 
