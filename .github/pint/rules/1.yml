@@ -3,4 +3,20 @@ groups:
   rules:
   - alert: Service Is Down
     expr: up == 0
-    for: 0m
+    for: 0s
+
+  - alert: Service Is Down
+    expr: up{job=abc} == 0
+
+  - alert: Service Is Down
+    expr: up >
+
+  - alert: Service Is Down
+    expr: sum(foo) without(abc) / bar
+  
+  - alert: Error Rate
+    expr: sum(rate(errors[2m])) > 0
+    annotations:
+      summary: "Too many errors on {{ $labels.instance }}"
+    labels:
+      value: "{{ $value }}"

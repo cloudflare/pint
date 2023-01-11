@@ -121,6 +121,11 @@ to be set. It should contain a personal access token used to authenticate with t
 **NOTE**: GitHub integration requires `GITHUB_AUTH_TOKEN` environment variable
 to be set to a personal access key that can access your repository.
 
+**NOTE** Pull request number must be known to pint so it can add comments if it detects any problems.
+If pint is run as part of GitHub actions workflow then this number will be detected from `GITHUB_REF`
+environment variable. For other use cases `GITHUB_PULL_REQUEST_NUMBER` environment variable must be set
+with the pull request number.
+
 Syntax:
 
 ```js

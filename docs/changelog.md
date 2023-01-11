@@ -8,6 +8,11 @@
 - Added `lookbackRange` and `lookbackStep` configration option to the
   [promql/series](checks/promql/series.md) check - #493.
 
+### Changed
+
+- Reverted GitHub integration to use [Pull Request Review](https://docs.github.com/en/rest/pulls/reviews)
+  API - #490.
+
 ## v0.39.0
 
 ### Changed
