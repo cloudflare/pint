@@ -10,3 +10,7 @@ groups:
 
   - alert: Service Is Down
     expr: up >
+
+  - alert: Service Is Down
+    expr: up == 1
+    for: 0h
