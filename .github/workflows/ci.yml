@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  checks: write
+  pull-requests: write
 
 jobs:
   ci:

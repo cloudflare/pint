@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/require"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -14,14 +17,14 @@ import (
 )
 
 func TestGithubReporter(t *testing.T) {
-	type errorCheck func(t *testing.T, err error) error
+	zerolog.SetGlobalLevel(zerolog.FatalLevel)
 
 	type testCaseT struct {
-		description  string
-		reports      []reporter.Report
-		httpHandler  http.Handler
-		errorHandler errorCheck
-		gitCmd       git.CommandRunner
+		description string
+		reports     []reporter.Report
+		httpHandler http.Handler
+		error       string
+		gitCmd      git.CommandRunner
 
 		owner   string
 		repo    string
@@ -60,15 +63,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				return nil, nil
 			},
-			errorHandler: func(t *testing.T, err error) error {
-				if err == nil {
-					return fmt.Errorf("expected an error")
-				}
-				if err.Error() != "failed to create a new check run: context deadline exceeded" {
-					return fmt.Errorf("unexpected error")
-				}
-				return nil
-			},
+			error: "failed to list pull request reviews: context deadline exceeded",
 			reports: []reporter.Report{
 				{
 					SourcePath:    "foo.txt",
@@ -91,9 +86,6 @@ func TestGithubReporter(t *testing.T) {
 			token:       "something",
 			prNum:       123,
 			timeout:     1000 * time.Millisecond,
-			errorHandler: func(t *testing.T, err error) error {
-				return err
-			},
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
@@ -144,20 +136,24 @@ func TestGithubReporter(t *testing.T) {
 			}
 			srv := httptest.NewServer(handler)
 			defer srv.Close()
-			r := reporter.NewGithubReporter(
+			r, err := reporter.NewGithubReporter(
+				"v0.999",
 				srv.URL,
 				srv.URL,
 				tc.timeout,
 				tc.token,
 				tc.owner,
 				tc.repo,
+				tc.prNum,
 				tc.gitCmd,
 			)
+			require.NoError(t, err)
 
-			err := r.Submit(reporter.NewSummary(tc.reports))
-			if e := tc.errorHandler(t, err); e != nil {
-				t.Errorf("error check failure: %s", e)
-				return
+			err = r.Submit(reporter.NewSummary(tc.reports))
+			if tc.error == "" {
+				require.NoError(t, err)
+			} else {
+				require.EqualError(t, err, tc.error)
 			}
 		})
 	}

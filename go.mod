@@ -7,7 +7,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/gkampitakis/go-snaps v0.4.2
 	github.com/google/go-cmp v0.5.9
-	github.com/google/go-github/v37 v37.0.0
+	github.com/google/go-github/v49 v49.1.0
 	github.com/hashicorp/hcl/v2 v2.15.0
 	github.com/klauspost/compress v1.15.14
 	github.com/prometheus/client_golang v1.14.0

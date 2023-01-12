@@ -3,4 +3,7 @@ groups:
   rules:
   - alert: Service Is Down
     expr: up == 0
-    for: 0m
+    for: 0s
+
+  - alert: Service Is Down
+    expr: up{job="abc"} == 0

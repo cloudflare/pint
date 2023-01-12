@@ -84,6 +84,21 @@ func httpServer(ts *testscript.TestScript, neg bool, args []string) {
 			_, err := w.Write([]byte(body))
 			ts.Check(err)
 		}})
+	case "method":
+		if len(args) < 6 {
+			ts.Fatalf("! http response command requires '$NAME $METHOD $PATH $CODE $BODY' args, got [%s]", strings.Join(args, " "))
+		}
+		name := args[1]
+		meth := args[2]
+		path := args[3]
+		code, err := strconv.Atoi(args[4])
+		ts.Check(err)
+		body := strings.Join(args[5:], " ")
+		mocks.add(name, httpMock{pattern: path, method: meth, handler: func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(code)
+			_, err := w.Write([]byte(body))
+			ts.Check(err)
+		}})
 	// http auth-response name /200 user password 200 OK
 	case "auth-response":
 		if len(args) < 7 {
@@ -145,15 +160,27 @@ func httpServer(ts *testscript.TestScript, neg bool, args []string) {
 		listen := args[2]
 
 		mux := http.NewServeMux()
-		for n, mockList := range mocks.responses {
-			if n == name {
-				for _, mock := range mockList {
-					mock := mock
-					mux.HandleFunc(mock.pattern, mock.handler)
+		mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			var done bool
+			for n, mockList := range mocks.responses {
+				if n == name {
+					for _, mock := range mockList {
+						if mock.pattern != "/" && (r.URL.Path != mock.pattern || !strings.HasPrefix(r.URL.Path, mock.pattern)) {
+							continue
+						}
+						if mock.method != "" && mock.method != r.Method {
+							continue
+						}
+						mock.handler(w, r)
+						done = true
+					}
+					break
 				}
-				break
 			}
-		}
+			if !done {
+				w.WriteHeader(http.StatusNotFound)
+			}
+		}))
 
 		listener, err := net.Listen("tcp", listen)
 		ts.Check(err)
@@ -175,6 +202,7 @@ func httpServer(ts *testscript.TestScript, neg bool, args []string) {
 
 type httpMock struct {
 	pattern string
+	method  string
 	handler func(http.ResponseWriter, *http.Request)
 }
 
