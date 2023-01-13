@@ -1,8 +1,9 @@
 package discovery
 
 import (
+	"encoding/json"
 	"errors"
-	"os"
+	"io"
 	"regexp"
 	"strings"
 
@@ -34,13 +35,6 @@ var ErrFileIsIgnored = errors.New("file was ignored")
 
 func isStrictIgnored(err error) bool {
 	s := err.Error()
-
-	werr := &rulefmt.WrappedError{}
-	if errors.As(err, &werr) {
-		if uerr := werr.Unwrap(); uerr != nil {
-			s = uerr.Error()
-		}
-	}
 	for _, ign := range ignoredErrors {
 		if strings.Contains(s, ign) {
 			return true
@@ -53,9 +47,41 @@ type RuleFinder interface {
 	Find() ([]Entry, error)
 }
 
+type ChangeType int
+
+func (c ChangeType) String() string {
+	switch c {
+	case Unknown:
+		return "unknown"
+	case Noop:
+		return "noop"
+	case Added:
+		return "added"
+	case Modified:
+		return "modified"
+	case Removed:
+		return "removed"
+	default:
+		return "---"
+	}
+}
+
+func (c *ChangeType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(c.String())
+}
+
+const (
+	Unknown ChangeType = iota
+	Noop
+	Added
+	Modified
+	Removed
+)
+
 type Entry struct {
-	ReportedPath   string
-	SourcePath     string
+	State          ChangeType
+	ReportedPath   string // symlink target
+	SourcePath     string // file path (can be symlink)
 	PathError      error
 	ModifiedLines  []int
 	Rule           parser.Rule
@@ -63,16 +89,10 @@ type Entry struct {
 	DisabledChecks []string
 }
 
-func readFile(path string, isStrict bool) (entries []Entry, err error) {
+func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (entries []Entry, err error) {
 	p := parser.NewParser()
 
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-
-	content, err := parser.ReadContent(f)
-	_ = f.Close()
+	content, err := parser.ReadContent(r)
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +129,8 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 
 	if content.Ignored {
 		entries = append(entries, Entry{
-			ReportedPath:  path,
-			SourcePath:    path,
+			ReportedPath:  reportedPath,
+			SourcePath:    sourcePath,
 			PathError:     ErrFileIsIgnored,
 			Owner:         fileOwner.Value,
 			ModifiedLines: contentLines,
@@ -120,18 +140,18 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 
 	if isStrict {
 		if _, errs := rulefmt.Parse(content.Body); len(errs) > 0 {
+			seen := map[string]struct{}{}
 			for _, err := range errs {
 				if isStrictIgnored(err) {
 					continue
 				}
-				log.Error().
-					Err(err).
-					Str("path", path).
-					Str("lines", output.FormatLineRangeString(contentLines)).
-					Msg("Failed to unmarshal file content")
+				if _, ok := seen[err.Error()]; ok {
+					continue
+				}
+				seen[err.Error()] = struct{}{}
 				entries = append(entries, Entry{
-					ReportedPath:  path,
-					SourcePath:    path,
+					ReportedPath:  reportedPath,
+					SourcePath:    sourcePath,
 					PathError:     err,
 					Owner:         fileOwner.Value,
 					ModifiedLines: contentLines,
@@ -147,12 +167,12 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 	if err != nil {
 		log.Error().
 			Err(err).
-			Str("path", path).
+			Str("path", sourcePath).
 			Str("lines", output.FormatLineRangeString(contentLines)).
 			Msg("Failed to parse file content")
 		entries = append(entries, Entry{
-			ReportedPath:  path,
-			SourcePath:    path,
+			ReportedPath:  reportedPath,
+			SourcePath:    sourcePath,
 			PathError:     err,
 			Owner:         fileOwner.Value,
 			ModifiedLines: contentLines,
@@ -166,15 +186,16 @@ func readFile(path string, isStrict bool) (entries []Entry, err error) {
 			owner = fileOwner
 		}
 		entries = append(entries, Entry{
-			ReportedPath:   path,
-			SourcePath:     path,
+			ReportedPath:   reportedPath,
+			SourcePath:     sourcePath,
 			Rule:           rule,
+			ModifiedLines:  rule.Lines(),
 			Owner:          owner.Value,
 			DisabledChecks: disabledChecks,
 		})
 	}
 
-	log.Debug().Str("path", path).Int("rules", len(entries)).Msg("File parsed")
+	log.Debug().Str("path", sourcePath).Int("rules", len(entries)).Msg("File parsed")
 	return entries, nil
 }
 

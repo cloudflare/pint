@@ -99,6 +99,9 @@ func actionLint(c *cli.Context) error {
 
 func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
 	for _, entry := range entries {
+		if entry.State == discovery.Removed {
+			continue
+		}
 		if entry.PathError != nil {
 			continue
 		}

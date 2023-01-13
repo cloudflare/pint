@@ -2,6 +2,7 @@ package parser
 
 import (
 	"bufio"
+	"fmt"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -314,6 +315,87 @@ type Rule struct {
 	Error         ParseError
 }
 
+func (r Rule) ToYAML() string {
+	if r.Error.Err != nil {
+		return fmt.Sprintf("line=%d fragment=%s err=%s", r.Error.Line, r.Error.Fragment, r.Error.Err)
+	}
+
+	if r.AlertingRule == nil && r.RecordingRule == nil {
+		return ""
+	}
+
+	var b strings.Builder
+	b.WriteString("- ")
+	if r.AlertingRule != nil {
+		b.WriteString("  ")
+		b.WriteString(r.AlertingRule.Alert.Key.Value)
+		b.WriteRune(':')
+		b.WriteString(r.AlertingRule.Alert.Value.Value)
+		b.WriteRune('\n')
+
+		b.WriteString("  ")
+		b.WriteString(r.AlertingRule.Expr.Key.Value)
+		b.WriteRune(':')
+		b.WriteString(r.AlertingRule.Expr.Value.Value)
+		b.WriteRune('\n')
+
+		if r.AlertingRule.For != nil {
+			b.WriteString("  ")
+			b.WriteString(r.AlertingRule.For.Key.Value)
+			b.WriteRune(':')
+			b.WriteString(r.AlertingRule.For.Value.Value)
+			b.WriteRune('\n')
+		}
+
+		if r.AlertingRule.Annotations != nil {
+			b.WriteString("  annotations:\n")
+			for _, a := range r.AlertingRule.Annotations.Items {
+				b.WriteString("    ")
+				b.WriteString(a.Key.Value)
+				b.WriteRune(':')
+				b.WriteString(a.Value.Value)
+				b.WriteRune('\n')
+			}
+		}
+
+		if r.AlertingRule.Labels != nil {
+			b.WriteString("  labels:\n")
+			for _, l := range r.AlertingRule.Labels.Items {
+				b.WriteString("    ")
+				b.WriteString(l.Key.Value)
+				b.WriteRune(':')
+				b.WriteString(l.Value.Value)
+				b.WriteRune('\n')
+			}
+		}
+
+		return b.String()
+	}
+
+	b.WriteString(r.RecordingRule.Record.Key.Value)
+	b.WriteRune(':')
+	b.WriteString(r.RecordingRule.Record.Value.Value)
+
+	b.WriteString("  ")
+	b.WriteString(r.RecordingRule.Expr.Key.Value)
+	b.WriteRune(':')
+	b.WriteString(r.RecordingRule.Expr.Value.Value)
+	b.WriteRune('\n')
+
+	if r.RecordingRule.Labels != nil {
+		b.WriteString("  labels:\n")
+		for _, l := range r.RecordingRule.Labels.Items {
+			b.WriteString("    ")
+			b.WriteString(l.Key.Value)
+			b.WriteRune(':')
+			b.WriteString(l.Value.Value)
+			b.WriteRune('\n')
+		}
+	}
+
+	return b.String()
+}
+
 func (r Rule) IsSame(nr Rule) bool {
 	if (r.AlertingRule != nil) != (nr.AlertingRule != nil) {
 		return false
@@ -328,6 +410,16 @@ func (r Rule) IsSame(nr Rule) bool {
 		return false
 	}
 	return true
+}
+
+func (r Rule) Name() string {
+	if r.RecordingRule != nil {
+		return r.RecordingRule.Record.Value.Value
+	}
+	if r.AlertingRule != nil {
+		return r.AlertingRule.Alert.Value.Value
+	}
+	return ""
 }
 
 func (r Rule) Expr() PromQLExpr {
@@ -420,6 +512,24 @@ func (r Rule) GetComments(key string) (cs []Comment) {
 		}
 	}
 	return cs
+}
+
+type RuleType string
+
+const (
+	AlertingRuleType  RuleType = "alerting"
+	RecordingRuleType RuleType = "recording"
+	InvalidRuleType   RuleType = "invalid"
+)
+
+func (r Rule) Type() RuleType {
+	if r.AlertingRule != nil {
+		return AlertingRuleType
+	}
+	if r.RecordingRule != nil {
+		return RecordingRuleType
+	}
+	return InvalidRuleType
 }
 
 type Result struct {

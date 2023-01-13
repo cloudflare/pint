@@ -25,8 +25,10 @@ pint.ok -l debug --no-color ci
 stderr 'level=debug msg="Got branch information" base=main current=v2'
 stderr 'level=debug msg="Found commit to scan" commit=.*'
 stderr 'level=debug msg="Found commit to scan" commit=.*'
-stderr 'level=debug msg="Git file change" allowed=false commit=.* path=a.yml'
-stderr 'level=debug msg="Git file change" allowed=false commit=.* path=b.yml'
+stderr 'level=debug msg="Git file change" change=A commit=.* path=a.yml'
+stderr 'level=debug msg="Git file change" change=A commit=.* path=b.yml'
+stderr 'level=debug msg="Skipping file due to include/exclude rules" path=a.yml'
+stderr 'level=debug msg="Skipping file due to include/exclude rules" path=b.yml'
 
 -- src/a.yml --
 - record: rule1
