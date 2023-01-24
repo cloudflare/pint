@@ -24,7 +24,7 @@ type PromqlSeriesSettings struct {
 	LookbackRange         string `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
 	lookbackRangeDuration time.Duration
 	LookbackStep          string `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
-	LookbackStepDuration  time.Duration
+	lookbackStepDuration  time.Duration
 	IgnoreMetrics         []string `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
 	ignoreMetricsRe       []*regexp.Regexp
 }
@@ -47,13 +47,13 @@ func (c *PromqlSeriesSettings) Validate() error {
 		c.lookbackRangeDuration = time.Duration(dur)
 	}
 
-	c.LookbackStepDuration = time.Minute * 5
+	c.lookbackStepDuration = time.Minute * 5
 	if c.LookbackStep != "" {
 		dur, err := model.ParseDuration(c.LookbackStep)
 		if err != nil {
 			return err
 		}
-		c.LookbackStepDuration = time.Duration(dur)
+		c.lookbackStepDuration = time.Duration(dur)
 	}
 
 	return nil
@@ -183,7 +183,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
+		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		}
@@ -198,7 +198,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
+		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -253,7 +253,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
+			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -279,8 +279,8 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 		// 4. If foo was ALWAYS there but it's NO LONGER there (for more than min-age) -> BUG
 		if len(trs.Series.Ranges) == 1 &&
-			!oldest(trs.Series.Ranges).After(trs.Series.From.Add(settings.LookbackStepDuration)) &&
-			newest(trs.Series.Ranges).Before(trs.Series.Until.Add(settings.LookbackStepDuration*-1)) {
+			!oldest(trs.Series.Ranges).After(trs.Series.From.Add(settings.lookbackStepDuration)) &&
+			newest(trs.Series.Ranges).Before(trs.Series.Until.Add(settings.lookbackStepDuration*-1)) {
 
 			minAge, p := c.getMinAge(rule, selector)
 			if len(p) > 0 {
@@ -333,7 +333,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.LookbackStepDuration))
+			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
@@ -363,8 +363,8 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 			// 6. If foo is ALWAYS/SOMETIMES there AND {bar OR baz} used to be there ALWAYS BUT it's NO LONGER there -> BUG
 			if len(trsLabel.Series.Ranges) == 1 &&
-				!oldest(trsLabel.Series.Ranges).After(trsLabel.Series.Until.Add(settings.lookbackRangeDuration-1).Add(settings.LookbackStepDuration)) &&
-				newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(settings.LookbackStepDuration*-1)) {
+				!oldest(trsLabel.Series.Ranges).After(trsLabel.Series.Until.Add(settings.lookbackRangeDuration-1).Add(settings.lookbackStepDuration)) &&
+				newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(settings.lookbackStepDuration*-1)) {
 
 				minAge, p := c.getMinAge(rule, selector)
 				if len(p) > 0 {
