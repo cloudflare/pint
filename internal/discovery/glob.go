@@ -46,16 +46,21 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 	}
 
 	for _, fp := range paths {
-		el, err := readFile(fp.path, !matchesAny(f.relaxed, fp.target))
+		fd, err := os.Open(fp.path)
 		if err != nil {
+			return nil, err
+		}
+		el, err := readRules(fp.target, fp.path, fd, !matchesAny(f.relaxed, fp.target))
+		if err != nil {
+			fd.Close()
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
 		}
+		fd.Close()
 		for _, e := range el {
+			e.State = Noop
 			if len(e.ModifiedLines) == 0 {
 				e.ModifiedLines = e.Rule.Lines()
 			}
-			e.SourcePath = fp.path
-			e.ReportedPath = fp.target
 			entries = append(entries, e)
 		}
 	}
@@ -85,14 +90,20 @@ func findFiles(path string) (paths filePaths, err error) {
 		return nil, err
 	}
 
-	if s.IsDir() {
+	// nolint: exhaustive
+	switch {
+	case s.IsDir():
 		subpaths, err := walkDir(path)
 		if err != nil {
 			return nil, err
 		}
 		paths = append(paths, subpaths...)
-	} else {
-		paths = append(paths, filePath{path: path, target: path})
+	default:
+		target, err := filepath.EvalSymlinks(path)
+		if err != nil {
+			return nil, err
+		}
+		paths = append(paths, filePath{path: path, target: target})
 	}
 
 	return paths, nil

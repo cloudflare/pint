@@ -1,13 +1,17 @@
 package discovery
 
 import (
+	"bytes"
 	"fmt"
 	"regexp"
 	"strings"
 
-	"github.com/cloudflare/pint/internal/git"
-
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
+
+	"github.com/cloudflare/pint/internal/git"
+	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 func NewGitBranchFinder(
@@ -39,101 +43,96 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of commits to scan: %w", err)
 	}
-
 	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
 
-	if f.maxCommits > 0 && len(cr.Commits) > f.maxCommits {
+	if len(cr.Commits) > f.maxCommits {
 		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(cr.Commits), f.maxCommits)
 	}
 
-	out, err := f.gitCmd("log", "--reverse", "--no-merges", "--pretty=format:%H", "--name-status", cr.String())
+	changes, err := git.Changes(f.gitCmd, cr)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
+		return nil, err
 	}
 
-	pathCommits := map[string]map[string]struct{}{}
-	var commit, msg string
+	shouldSkip, err := f.shouldSkipAllChecks(changes)
+	if err != nil {
+		return nil, err
+	}
+	if shouldSkip {
+		return nil, nil
+	}
 
-	for _, line := range strings.Split(string(out), "\n") {
-		parts := strings.Split(removeRedundantSpaces(line), " ")
-		if len(parts) == 1 && parts[0] != "" {
-			commit = parts[0]
-		} else if len(parts) >= 2 {
-			op := parts[0]
-			srcPath := parts[1]
-			dstPath := parts[len(parts)-1]
-			log.Debug().
-				Str("path", dstPath).
-				Str("commit", commit).
-				Bool("allowed", f.isPathAllowed(dstPath)).
-				Msg("Git file change")
-			if !f.isPathAllowed(dstPath) {
-				continue
-			}
+	for _, change := range changes {
+		if !f.isPathAllowed(change.Path.After.Name) {
+			log.Debug().Str("path", change.Path.After.Name).Msg("Skipping file due to include/exclude rules")
+			continue
+		}
 
-			msg, err = git.CommitMessage(f.gitCmd, commit)
-			if err != nil {
-				return nil, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
-			}
-			if strings.Contains(msg, "[skip ci]") {
-				log.Info().Str("commit", commit).Msg("Found a commit with '[skip ci]', skipping all checks")
-				return []Entry{}, nil
-			}
-			if strings.Contains(msg, "[no ci]") {
-				log.Info().Str("commit", commit).Msg("Found a commit with '[no ci]', skipping all checks")
-				return []Entry{}, nil
-			}
+		var entriesBefore, entriesAfter []Entry
+		entriesBefore, _ = readRules(
+			change.Path.Before.EffectivePath(),
+			change.Path.Before.Name,
+			bytes.NewReader(change.Body.Before),
+			!matchesAny(f.relaxed, change.Path.Before.Name),
+		)
+		entriesAfter, err = readRules(
+			change.Path.After.EffectivePath(),
+			change.Path.After.Name,
+			bytes.NewReader(change.Body.After),
+			!matchesAny(f.relaxed, change.Path.After.Name),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("invalid file syntax: %w", err)
+		}
 
-			if _, ok := pathCommits[dstPath]; !ok {
-				pathCommits[dstPath] = map[string]struct{}{}
-			}
-			// check if we're dealing with a rename and if so we need to
-			// rename results in pathCommits
-			if strings.HasPrefix(op, "R") {
-				if commits, ok := pathCommits[srcPath]; ok {
-					for c := range commits {
-						pathCommits[dstPath][c] = struct{}{}
-					}
-					delete(pathCommits, srcPath)
+		for _, me := range matchEntries(entriesBefore, entriesAfter) {
+			switch {
+			case me.before == nil && me.after != nil:
+				me.after.State = Added
+				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+				log.Debug().
+					Str("name", me.after.Rule.Name()).
+					Stringer("state", me.after.State).
+					Str("path", me.after.SourcePath).
+					Str("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())).
+					Str("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)).
+					Msg("Rule added on HEAD branch")
+				entries = append(entries, *me.after)
+			case me.before != nil && me.after != nil:
+				if me.isIdentical {
+					log.Debug().
+						Str("name", me.after.Rule.Name()).
+						Str("lines", output.FormatLineRangeString(me.after.Rule.Lines())).
+						Msg("Rule content was not modified on HEAD, identical rule present before")
+					continue
 				}
-			}
-			// check if file is being removed, if so drop it from the results
-			if strings.HasPrefix(op, "D") {
-				delete(pathCommits, srcPath)
-				continue
-			}
-			pathCommits[dstPath][commit] = struct{}{}
-		}
-	}
-
-	var lbs git.LineBlames
-	var els []Entry
-	for path, commits := range pathCommits {
-		lbs, err = git.Blame(path, f.gitCmd)
-		if err != nil {
-			return nil, fmt.Errorf("failed to run git blame for %s: %w", path, err)
-		}
-
-		allowedLines := []int{}
-		for _, lb := range lbs {
-			// skip commits that are not part of our diff
-			if _, ok := commits[lb.Commit]; !ok {
-				continue
-			}
-			allowedLines = append(allowedLines, lb.Line)
-		}
-
-		els, err = readFile(path, !matchesAny(f.relaxed, path))
-		if err != nil {
-			return nil, err
-		}
-		for _, e := range els {
-			e.ModifiedLines = getOverlap(e.Rule.Lines(), allowedLines)
-			if len(e.ModifiedLines) == 0 && e.PathError != nil {
-				e.ModifiedLines = allowedLines
-			}
-			if isOverlap(allowedLines, e.Rule.Lines()) || isOverlap(allowedLines, e.ModifiedLines) {
-				entries = append(entries, e)
+				me.after.State = Modified
+				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+				log.Debug().
+					Str("name", me.after.Rule.Name()).
+					Stringer("state", me.after.State).
+					Str("path", me.after.SourcePath).
+					Str("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())).
+					Str("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)).
+					Msg("Rule modified on HEAD branch")
+				entries = append(entries, *me.after)
+			case me.before != nil && me.after == nil:
+				me.before.State = Removed
+				log.Debug().
+					Str("name", me.before.Rule.Name()).
+					Stringer("state", me.before.State).
+					Str("path", me.before.SourcePath).
+					Str("ruleLines", output.FormatLineRangeString(me.before.Rule.Lines())).
+					Str("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)).
+					Msg("Rule removed on HEAD branch")
+				entries = append(entries, *me.before)
+			default:
+				log.Debug().
+					Stringer("state", me.before.State).
+					Str("path", me.before.SourcePath).
+					Str("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)).
+					Msg("Unknown rule")
+				entries = append(entries, *me.after)
 			}
 		}
 	}
@@ -165,28 +164,101 @@ func (f GitBranchFinder) isPathAllowed(path string) bool {
 	return false
 }
 
-func removeRedundantSpaces(line string) string {
-	return strings.Join(strings.Fields(line), " ")
-}
+func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, error) {
+	commits := map[string]struct{}{}
+	for _, change := range changes {
+		for _, commit := range change.Commits {
+			commits[commit] = struct{}{}
+		}
+	}
 
-func isOverlap(a, b []int) bool {
-	for _, i := range a {
-		for _, j := range b {
-			if i == j {
-				return true
+	for commit := range commits {
+		msg, err := git.CommitMessage(f.gitCmd, commit)
+		if err != nil {
+			return false, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
+		}
+		for _, comment := range []string{"[skip ci]", "[no ci]"} {
+			if strings.Contains(msg, comment) {
+				log.Info().Str("commit", commit).Msgf("Found a commit with '%s', skipping all checks", comment)
+				return true, nil
 			}
 		}
 	}
-	return false
+
+	return false, nil
 }
 
-func getOverlap(a, b []int) (o []int) {
-	for _, i := range a {
-		for _, j := range b {
-			if i == j {
-				o = append(o, i)
-			}
+func commonLines(a, b []int) (common []int) {
+	for _, ai := range a {
+		if slices.Contains(b, ai) {
+			common = append(common, ai)
 		}
 	}
-	return o
+	for _, bi := range b {
+		if slices.Contains(a, bi) && !slices.Contains(common, bi) {
+			common = append(common, bi)
+		}
+	}
+	return common
+}
+
+type matchedEntry struct {
+	before      *Entry
+	after       *Entry
+	isIdentical bool
+}
+
+func matchEntries(before, after []Entry) (ml []matchedEntry) {
+	for _, a := range after {
+		a := a
+
+		m := matchedEntry{after: &a}
+		beforeSwap := make([]Entry, 0, len(before))
+		var matches []Entry
+		var matched bool
+
+		for _, b := range before {
+			b := b
+
+			if !matched && a.Rule.Name() != "" && a.Rule.ToYAML() == b.Rule.ToYAML() {
+				m.before = &b
+				m.isIdentical = true
+				matched = true
+			} else {
+				beforeSwap = append(beforeSwap, b)
+			}
+		}
+		before = beforeSwap
+
+		if !matched {
+			before, matches = findRulesByName(before, a.Rule.Name(), a.Rule.Type())
+			switch len(matches) {
+			case 0:
+			case 1:
+				m.before = &matches[0]
+			default:
+				before = append(before, matches...)
+			}
+		}
+
+		ml = append(ml, m)
+	}
+
+	for _, b := range before {
+		b := b
+		ml = append(ml, matchedEntry{before: &b})
+	}
+
+	return ml
+}
+
+func findRulesByName(entries []Entry, name string, typ parser.RuleType) (nomatch, match []Entry) {
+	for _, entry := range entries {
+		if entry.PathError == nil && entry.Rule.Type() == typ && entry.Rule.Name() == name {
+			match = append(match, entry)
+		} else {
+			nomatch = append(nomatch, entry)
+		}
+	}
+	return nomatch, match
 }

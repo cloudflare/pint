@@ -113,7 +113,7 @@ func blameReports(reports []Report, gitCmd git.CommandRunner) (pb git.FileBlames
 		if _, ok := pb[report.SourcePath]; ok {
 			continue
 		}
-		pb[report.SourcePath], err = git.Blame(report.SourcePath, gitCmd)
+		pb[report.SourcePath], err = git.Blame(gitCmd, report.SourcePath)
 		if err != nil {
 			return
 		}

@@ -53,6 +53,9 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 
 	nentries := []Entry{}
 	for _, entry := range entries {
+		if entry.State == Removed {
+			continue
+		}
 		if entry.PathError != nil {
 			continue
 		}

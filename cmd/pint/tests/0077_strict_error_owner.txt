@@ -3,8 +3,6 @@ pint.error --no-color lint --require-owner rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=error msg="Failed to unmarshal file content" error="4:13: group \"foo\", rule 1, \"foo bar\": invalid field 'annotations' in recording rule" lines=1-7 path=rules/strict.yml
-level=error msg="Failed to unmarshal file content" error="4:13: group \"foo\", rule 1, \"foo bar\": invalid recording rule name: foo bar" lines=1-7 path=rules/strict.yml
 rules/strict.yml:4: "foo bar": invalid field 'annotations' in recording rule (yaml/parse)
  4 |   - record: foo bar
 

@@ -19,7 +19,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var baseBranchFlag = "base-branch"
+var (
+	baseBranchFlag = "base-branch"
+	devFlag        = "dev"
+)
 
 var ciCmd = &cli.Command{
 	Name:   "ci",
@@ -37,6 +40,12 @@ var ciCmd = &cli.Command{
 			Aliases: []string{"b"},
 			Value:   "",
 			Usage:   "Set base branch to use for PR checks (main, master, ...)",
+		},
+		&cli.BoolFlag{
+			Name:    devFlag,
+			Aliases: []string{"n"},
+			Value:   false,
+			Usage:   "Use experimental change detection",
 		},
 	},
 }
@@ -67,8 +76,14 @@ func actionCI(c *cli.Context) error {
 		return nil
 	}
 
-	finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
-	entries, err := finder.Find()
+	var entries []discovery.Entry
+	if c.Bool(devFlag) {
+		finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
+		entries, err = finder.Find()
+	} else {
+		finder := discovery.NewGitBlameFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
+		entries, err = finder.Find()
+	}
 	if err != nil {
 		return err
 	}
