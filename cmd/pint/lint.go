@@ -77,9 +77,10 @@ func actionLint(c *cli.Context) error {
 	}
 
 	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
-	var problems int
+	var problems, hiddenProblems int
 	for s, c := range summary.CountBySeverity() {
 		if s < minSeverity {
+			hiddenProblems++
 			continue
 		}
 		bySeverity[s.String()] = c
@@ -92,6 +93,9 @@ func actionLint(c *cli.Context) error {
 	}
 	if problems > 0 {
 		return fmt.Errorf("problems found")
+	}
+	if hiddenProblems > 0 {
+		log.Info().Msgf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag))
 	}
 
 	return nil
