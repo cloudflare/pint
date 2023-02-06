@@ -3,6 +3,7 @@ pint.ok --no-color lint --min-severity=bug rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
+level=info msg="1 problem(s) not visible because of --min-severity=bug flag"
 -- rules/0001.yml --
 groups:
 - name: foo
