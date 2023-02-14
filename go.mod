@@ -1,6 +1,6 @@
 module github.com/cloudflare/pint
 
-go 1.19
+go 1.20
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0
@@ -15,7 +15,7 @@ require (
 	github.com/prometheus/common v0.39.0
 	github.com/prometheus/prometheus v0.42.0
 	github.com/prymitive/current v0.1.0
-	github.com/rogpeppe/go-internal v1.9.0
+	github.com/rogpeppe/go-internal v1.9.1-0.20230209130841-f0583b8402aa
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.24.3
