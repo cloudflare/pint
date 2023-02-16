@@ -60,7 +60,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, path string, rule parser.Rul
 	// Default Prometheus retention
 	// https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects
 	retention := time.Hour * 24 * 15
-	if v, ok := flags.Flags["--storage.tsdb.retention.time"]; ok {
+	if v, ok := flags.Flags["storage.tsdb.retention.time"]; ok {
 		r, err := model.ParseDuration(v)
 		if err != nil {
 			problems = append(problems, Problem{

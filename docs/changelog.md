@@ -7,6 +7,7 @@
 - Fixed a bug in `pint ci` that would cause a failure if a directory was renamed.
 - Fixed false positive reports from `promql/series` check when a time series
   disappears from Prometheus.
+- Fixed Prometheus flags parsing in `promql/range_query` check.
 
 ## v0.40.0
 
