@@ -1,4 +1,4 @@
-http auth-response prometheus /api/v1/status/flags admin pass 200 {"status":"success","data":{"--storage.tsdb.retention.time": "1d"}}
+http auth-response prometheus /api/v1/status/flags admin pass 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
 http auth-response prometheus /api/v1/status/config admin pass 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
 http auth-response prometheus /api/v1/query_range admin pass 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
 http auth-response prometheus /api/v1/query admin pass 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1666873962.795,"1"]}]}}

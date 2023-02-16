@@ -76,7 +76,7 @@ func TestRangeQueryCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireFlagsPath},
 					resp: flagsResponse{flags: map[string]string{
-						"--storage.tsdb.retention.time": "abc",
+						"storage.tsdb.retention.time": "abc",
 					}},
 				},
 			},
@@ -127,7 +127,7 @@ func TestRangeQueryCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireFlagsPath},
 					resp: flagsResponse{flags: map[string]string{
-						"--storage.tsdb.retention.time": "11d",
+						"storage.tsdb.retention.time": "11d",
 					}},
 				},
 			},
@@ -152,7 +152,7 @@ func TestRangeQueryCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireFlagsPath},
 					resp: flagsResponse{flags: map[string]string{
-						"--storage.tsdb.retention.time": "11d",
+						"storage.tsdb.retention.time": "11d",
 					}},
 				},
 			},

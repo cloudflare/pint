@@ -1,4 +1,4 @@
-http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"--storage.tsdb.retention.time": "1d"}}
+http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
 http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
 http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}
 http response prometheus /api/v1/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
