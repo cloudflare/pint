@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.40.1
+
+### Fixed
+
+- Fixed a bug in `pint ci` that would cause a failure if a directory was renamed.
+
 ## v0.40.0
 
 ### Added
