@@ -701,6 +701,62 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "#3 metric disappeared, only one sample, absent race",
+			content:     "- record: foo\n  expr: sum(found{job=\"abc\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesDisappearedText("prom", uri, `found`, "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{job="abc"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-7).Add(time.Minute*5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
 			description: "#4 metric was present but disappeared 50m ago",
 			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
 			checker:     newSeriesCheck,

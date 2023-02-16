@@ -55,7 +55,9 @@ func (c AlertsCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		return
 	}
 
-	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, promapi.NewRelativeRange(c.lookBack, c.step))
+	params := promapi.NewRelativeRange(c.lookBack, c.step)
+
+	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, params)
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
@@ -69,7 +71,7 @@ func (c AlertsCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 	}
 
 	if len(qr.Series.Ranges) > 0 {
-		promUptime, err := c.prom.RangeQuery(ctx, "count(up)", promapi.NewRelativeRange(c.lookBack, c.step))
+		promUptime, err := c.prom.RangeQuery(ctx, "count(up)", params)
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		} else {

@@ -99,6 +99,8 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		return
 	}
 
+	params := promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration)
+
 	done := map[string]bool{}
 	for _, selector := range getSelectors(expr.Query) {
 		if _, ok := done[selector.String()]; ok {
@@ -183,7 +185,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			continue
 		}
 
-		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
+		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), params)
 		if err != nil {
 			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
 		}
@@ -198,7 +200,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 
 		// 2. If foo was NEVER there -> BUG
 		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
-		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
+		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
 			continue
@@ -253,7 +255,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
-			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
+			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), params)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
 				continue
@@ -261,6 +263,16 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			trsLabelCount.Series.FindGaps(promUptime.Series, trsLabelCount.Series.From, trsLabelCount.Series.Until)
 
 			if trsLabelCount.Series.Ranges.Len() == 1 && len(trsLabelCount.Series.Gaps) == 0 {
+				var isAbsentOutsideSeriesRange bool
+				for _, str := range trs.Series.Ranges {
+					if _, ok := promapi.Overlaps(str, trsLabelCount.Series.Ranges[0], trsLabelCount.Series.Step); !ok {
+						isAbsentOutsideSeriesRange = true
+						break
+					}
+				}
+				if isAbsentOutsideSeriesRange {
+					continue
+				}
 				problems = append(problems, Problem{
 					Fragment: selector.String(),
 					Lines:    expr.Lines(),
@@ -333,7 +345,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			}
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
-			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration))
+			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
 				continue
