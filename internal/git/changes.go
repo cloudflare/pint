@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"os"
 	"path"
 	"strings"
 
@@ -95,6 +96,12 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 		srcPath := parts[1]
 		dstPath := parts[len(parts)-1]
 		log.Debug().Str("path", dstPath).Str("commit", commit).Str("change", parts[0]).Msg("Git file change")
+
+		// ignore directories
+		if isDir, _ := isDirectoryPath(dstPath); isDir {
+			log.Debug().Str("path", dstPath).Msg("Skipping directory entry change")
+			continue
+		}
 
 		change := getChangeByPath(changes, dstPath)
 		if change == nil {
@@ -273,4 +280,13 @@ func CountLines(body []byte) (lines []int) {
 		lines = append(lines, line)
 	}
 	return lines
+}
+
+func isDirectoryPath(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+
+	return fileInfo.IsDir(), err
 }

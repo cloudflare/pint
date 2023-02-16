@@ -82,6 +82,12 @@ func (f GitBlameFinder) Find() (entries []Entry, err error) {
 				return []Entry{}, nil
 			}
 
+			// ignore directories
+			if isDir, _ := isDirectoryPath(dstPath); isDir {
+				log.Debug().Str("path", dstPath).Msg("Skipping directory entry change")
+				continue
+			}
+
 			if _, ok := pathCommits[dstPath]; !ok {
 				pathCommits[dstPath] = map[string]struct{}{}
 			}
@@ -196,4 +202,13 @@ func getOverlap(a, b []int) (o []int) {
 		}
 	}
 	return o
+}
+
+func isDirectoryPath(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+
+	return fileInfo.IsDir(), err
 }
