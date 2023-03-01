@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-rules/strict.yml:2: cannot unmarshal !!seq into rulefmt.RuleGroups (yaml/parse)
+rules/strict.yml:2 Fatal: cannot unmarshal !!seq into rulefmt.RuleGroups (yaml/parse)
  2 | - alert: No Owner
 
 level=info msg="Problems found" Fatal=1

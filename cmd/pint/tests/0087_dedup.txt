@@ -3,20 +3,20 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-rules/01.yml:5: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
+rules/01.yml:5 Warning: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
 
-rules/01.yml:5-12: template is using "cluster" label but the query removes it (alerts/template)
+rules/01.yml:5-12 Bug: template is using "cluster" label but the query removes it (alerts/template)
   5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
  ..
  12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
 
-rules/01.yml:5-13: template is using "cluster" label but the query removes it (alerts/template)
+rules/01.yml:5-13 Bug: template is using "cluster" label but the query removes it (alerts/template)
   5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
  ..
  13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
 
-rules/01.yml:5-12: template is using "instance" label but the query removes it (alerts/template)
+rules/01.yml:5-12 Bug: template is using "instance" label but the query removes it (alerts/template)
   5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
  ..
  12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"

@@ -12,7 +12,7 @@ level=debug msg="Found recording rule" lines=5-6 path=rules/0001.yml record=seco
 level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
 level=debug msg="Found alerting rule" alert=third lines=8-9 path=rules/0001.yml
 level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=third
-rules/0001.yml:6: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
+rules/0001.yml:6 Warning: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
  6 |   expr: sum(bar)
 
 level=info msg="Problems found" Warning=1

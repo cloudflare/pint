@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.41.0
+
+### Changed
+
+- `pint lint` output will now include severity level as a text label - #524.
+
 ## v0.40.1
 
 ### Fixed

@@ -31,7 +31,7 @@ cmp stderr ../stderr.txt
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
 level=info msg="Problems found" Fatal=1
-b.yml:2: syntax error: unexpected identifier "bi" (promql/syntax)
+b.yml:2 Fatal: syntax error: unexpected identifier "bi" (promql/syntax)
  2 |   expr: sum(foo) bi()
 
 level=fatal msg="Fatal error" error="problems found"

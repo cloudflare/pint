@@ -3,7 +3,7 @@ pint.ok --no-color lint --min-severity=info rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-rules/0001.yml:5-7: using the value of rate(errors[2m]) inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly (alerts/template)
+rules/0001.yml:5-7 Information: using the value of rate(errors[2m]) inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly (alerts/template)
  5 |     expr: rate(errors[2m]) > 0
  .
  7 |       summary: 'error rate: {{ $value }}'

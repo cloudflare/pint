@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-rules/0001.yml:8: incomplete rule, no alert or record key (yaml/parse)
+rules/0001.yml:8 Fatal: incomplete rule, no alert or record key (yaml/parse)
  8 |   - expr: sum(foo)
 
 level=info msg="Problems found" Fatal=1
