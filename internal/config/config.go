@@ -31,6 +31,7 @@ type Config struct {
 	Checks            *Checks                  `hcl:"checks,block" json:"checks,omitempty"`
 	Check             []Check                  `hcl:"check,block" json:"check,omitempty"`
 	Rules             []Rule                   `hcl:"rule,block" json:"rules,omitempty"`
+	Owners            *Owners                  `hcl:"owners,block" json:"owners,omitempty"`
 	PrometheusServers []*promapi.FailoverGroup `json:"-"`
 }
 
@@ -221,6 +222,9 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			Disabled: []string{},
 		},
 		Rules: []Rule{},
+		Owners: &Owners{
+			Allowed: []string{},
+		},
 	}
 
 	if _, err = os.Stat(path); err == nil || failOnMissing {
@@ -234,6 +238,12 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 
 	if cfg.CI != nil {
 		if err = cfg.CI.validate(); err != nil {
+			return cfg, err
+		}
+	}
+
+	if cfg.Owners != nil {
+		if err = cfg.Owners.validate(); err != nil {
 			return cfg, err
 		}
 	}

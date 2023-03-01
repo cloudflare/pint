@@ -1,0 +1,33 @@
+pint.error --no-color lint --require-owner rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+rules/1.yml:4-5 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+ 4 |   - alert: No Owner
+ 5 |     expr: up > 0
+
+rules/1.yml:7-8 Bug: this rule is set as owned by "bob" but "bob" doesn't match any of the allowed owner values (rule/owner)
+ 7 |   - alert: Invalid
+ 8 |     expr: up == 0
+
+level=info msg="Problems found" Bug=2
+level=fatal msg="Fatal error" error="problems found"
+-- rules/1.yml --
+groups:
+- name: foo
+  rules:
+  - alert: No Owner
+    expr: up > 0
+  # pint rule/owner bob
+  - alert: Invalid
+    expr: up == 0
+  # pint rule/owner alice
+  - alert: Owner Alice
+    expr: up > 0
+
+-- .pint.hcl --
+owners {
+  allowed = ["alice", "max", "not-bob"]
+}

@@ -17,6 +17,8 @@
     expr: rate(my:sum[5m])
   ```
 - Added [rule/for](checks/rule/for.md) check.
+- Added `owners` configuration block for setting the list of allowed rule owner values.
+  See [configuration](configuration.md) for details.
 
 ### Changed
 
