@@ -85,7 +85,7 @@ func actionWatch(c *cli.Context) error {
 
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
 	if err != nil {
-		return fmt.Errorf("invalid %s value: %w", minSeverityFlag, err)
+		return fmt.Errorf("invalid --%s value: %w", minSeverityFlag, err)
 	}
 
 	pidfile := c.String(pidfileFlag)

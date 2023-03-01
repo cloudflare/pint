@@ -2,6 +2,10 @@
 
 ## v0.41.0
 
+### Added
+
+- Added `--fail-on` flag to `pint ci` command - #525.
+
 ### Changed
 
 - `pint lint` output will now include severity level as a text label - #524.

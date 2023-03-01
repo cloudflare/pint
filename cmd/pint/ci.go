@@ -22,6 +22,7 @@ import (
 var (
 	baseBranchFlag = "base-branch"
 	devFlag        = "dev"
+	failOnFlag     = "fail-on"
 )
 
 var ciCmd = &cli.Command{
@@ -46,6 +47,12 @@ var ciCmd = &cli.Command{
 			Aliases: []string{"n"},
 			Value:   false,
 			Usage:   "Use experimental change detection",
+		},
+		&cli.StringFlag{
+			Name:    failOnFlag,
+			Aliases: []string{"w"},
+			Value:   "bug",
+			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected",
 		},
 	},
 }
@@ -135,13 +142,14 @@ func actionCI(c *cli.Context) error {
 			return fmt.Errorf("GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub")
 		}
 
-		prNum, err := strconv.Atoi(prVal)
-		if err != nil {
+		var prNum int
+		if prNum, err = strconv.Atoi(prVal); err != nil {
 			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
 		}
 
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
-		gr, err := reporter.NewGithubReporter(
+		var gr reporter.GithubReporter
+		if gr, err = reporter.NewGithubReporter(
 			version,
 			meta.cfg.Repository.GitHub.BaseURI,
 			meta.cfg.Repository.GitHub.UploadURI,
@@ -151,18 +159,22 @@ func actionCI(c *cli.Context) error {
 			meta.cfg.Repository.GitHub.Repo,
 			prNum,
 			git.RunGit,
-		)
-		if err != nil {
+		); err != nil {
 			return err
 		}
 		reps = append(reps, gr)
 	}
 
-	foundBugOrHigher := false
+	minSeverity, err := checks.ParseSeverity(c.String(failOnFlag))
+	if err != nil {
+		return fmt.Errorf("invalid --%s value: %w", failOnFlag, err)
+	}
+
+	problemsFound := false
 	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
 	for s, c := range summary.CountBySeverity() {
-		if s >= checks.Bug {
-			foundBugOrHigher = true
+		if s >= minSeverity {
+			problemsFound = true
 		}
 		bySeverity[s.String()] = c
 	}
@@ -174,7 +186,7 @@ func actionCI(c *cli.Context) error {
 		return fmt.Errorf("submitting reports: %w", err)
 	}
 
-	if foundBugOrHigher {
+	if problemsFound {
 		return fmt.Errorf("problems found")
 	}
 
