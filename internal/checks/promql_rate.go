@@ -10,6 +10,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -62,7 +63,7 @@ func (c RateCheck) Check(ctx context.Context, path string, rule parser.Rule, ent
 	}
 
 	done := &completedList{}
-	for _, problem := range c.checkNode(ctx, expr.Query, cfg, done) {
+	for _, problem := range c.checkNode(ctx, expr.Query, entries, cfg, done) {
 		problems = append(problems, Problem{
 			Fragment: problem.expr,
 			Lines:    expr.Lines(),
@@ -75,7 +76,7 @@ func (c RateCheck) Check(ctx context.Context, path string, rule parser.Rule, ent
 	return problems
 }
 
-func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *promapi.ConfigResult, done *completedList) (problems []exprProblem) {
+func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entries []discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []exprProblem) {
 	if n, ok := node.Node.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
@@ -119,12 +120,47 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, cfg *
 						})
 					}
 				}
+
+				for _, e := range entries {
+					if e.PathError != nil {
+						continue
+					}
+					if e.Rule.Error.Err != nil {
+						continue
+					}
+					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError == nil && e.Rule.RecordingRule.Record.Value.Value == s.Name {
+						for _, sm := range utils.HasOuterSum(e.Rule.RecordingRule.Expr.Query) {
+							if sv, ok := sm.Expr.(*promParser.VectorSelector); ok {
+								metadata, err := c.prom.Metadata(ctx, sv.Name)
+								if err != nil {
+									text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+									problems = append(problems, exprProblem{
+										expr:     sv.Name,
+										text:     text,
+										severity: severity,
+									})
+									continue
+								}
+								for _, m := range metadata.Metadata {
+									if m.Type == v1.MetricTypeCounter {
+										problems = append(problems, exprProblem{
+											expr: node.Expr,
+											text: fmt.Sprintf("rate(sum(counter)) chain detected, %s is called here on results of %s, calling rate on sum() results will return bogus results, always sum(rate(counter)), never rate(sum(counter))",
+												node.Expr, sm),
+											severity: Bug,
+										})
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, child, cfg, done)...)
+		problems = append(problems, c.checkNode(ctx, child, entries, cfg, done)...)
 	}
 
 	return problems
