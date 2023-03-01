@@ -23,6 +23,10 @@ func notCounterText(name, uri, fun, metric, kind string) string {
 	return fmt.Sprintf(`%s() should only be used with counters but %q is a %s according to metrics metadata from prometheus %q at %s`, fun, metric, kind, name, uri)
 }
 
+func rateSumText(rateName, sumExpr string) string {
+	return fmt.Sprintf("rate(sum(counter)) chain detected, rate(%s) is called here on results of %s, calling rate on sum() results will return bogus results, always sum(rate(counter)), never rate(sum(counter))", rateName, sumExpr)
+}
+
 func TestRateCheck(t *testing.T) {
 	testCases := []checkTest{
 		{
@@ -616,6 +620,128 @@ func TestRateCheck(t *testing.T) {
 					resp: metadataResponse{metadata: map[string][]v1.Metadata{
 						"foo": {{Type: "gauge"}},
 					}},
+				},
+			},
+		},
+		{
+			description: "rate_over_sum",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "rate(my:sum[5m])",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     rateSumText("my:sum[5m]", "sum(foo)"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "foo"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "counter"}},
+					}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "rate_over_sum_error",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: "promql/rate",
+						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "foo"},
+					},
+					resp: respondWithInternalError(),
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "rate_over_sum_on_gauge",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "foo"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"foo": {{Type: "gauge"}},
+					}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "sum_over_rate",
+			content:     "- alert: my alert\n  expr: sum(my:rate:5m)\n",
+			entries:     mustParseContent("- record: my:rate:5m\n  expr: rate(foo[5m])\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
 				},
 			},
 		},

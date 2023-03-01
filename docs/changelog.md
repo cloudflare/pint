@@ -5,6 +5,17 @@
 ### Added
 
 - Added `--fail-on` flag to `pint ci` command - #525.
+- [promql/rate](checks/promql/rate.md) will now look for queries that call
+  `rate()` on results of `sum(counter)` via recording rules.
+  Example:
+
+  ```yaml
+  - record: my:sum
+    expr: sum(http_requests_total)
+  
+  - alert: my alert
+    expr: rate(my:sum[5m])
+  ```
 
 ### Changed
 

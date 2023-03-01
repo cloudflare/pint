@@ -23,6 +23,12 @@ to verify that:
   For gauge metrics use [`delta()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#delta)
   or [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv) 
   functions instead.
+- `rate()` is never called on result of `sum(counter)` since that will always return
+  invalid results.
+  Chaining `rate(sum(...))` is only possible when passing a metric produced via recording rules
+  to `rate()` and so pint will try to find such chains.
+  See [this blog post](https://www.robustperception.io/rate-then-sum-never-sum-then-rate/)
+  for details.
 
 ## Common problems
 
