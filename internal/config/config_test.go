@@ -1599,6 +1599,41 @@ func TestConfigErrors(t *testing.T) {
 }`,
 			err: "unknown severity: xxx",
 		},
+		{
+			config: `rule {
+  for {
+    severity  = "xxx"
+  }
+}`,
+			err: "unknown severity: xxx",
+		},
+		{
+			config: `rule {
+  for {
+    severity  = "info"
+	min       = "v"
+  }
+}`,
+			err: `not a valid duration string: "v"`,
+		},
+		{
+			config: `rule {
+  for {
+    severity  = "info"
+	min       = "5m"
+	max       = "v"
+  }
+}`,
+			err: `not a valid duration string: "v"`,
+		},
+		{
+			config: `rule {
+  for {
+    severity  = "info"
+  }
+}`,
+			err: "must set either min or max option, or both",
+		},
 	}
 
 	dir := t.TempDir()

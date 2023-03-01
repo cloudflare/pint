@@ -49,6 +49,7 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"

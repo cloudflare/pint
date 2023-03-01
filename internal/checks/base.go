@@ -28,6 +28,7 @@ var (
 		CostCheckName,
 		SeriesCheckName,
 		RuleDuplicateCheckName,
+		RuleForCheckName,
 		LabelCheckName,
 		RuleLinkCheckName,
 		RejectCheckName,

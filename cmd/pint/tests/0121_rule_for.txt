@@ -1,0 +1,36 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+rules/0001.yml:6 Bug: this alert rule must have a 'for' field with a minimum duration of 5m (rule/for)
+ 6 |   for: 3m
+
+rules/0001.yml:9 Bug: this alert rule must have a 'for' field with a maximum duration of 10m (rule/for)
+ 9 |   for: 13m
+
+level=info msg="Problems found" Bug=2
+level=fatal msg="Fatal error" error="problems found"
+-- rules/0001.yml --
+- alert: ok
+  expr: up == 0
+  for: 5m
+- alert: 3m
+  expr: up == 0
+  for: 3m
+- alert: 13m
+  expr: up == 0
+  for: 13m
+
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+rule {
+  for {
+    severity = "bug"
+    min      = "5m"
+    max      = "10m"
+  }
+}
