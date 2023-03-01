@@ -16,6 +16,7 @@
   - alert: my alert
     expr: rate(my:sum[5m])
   ```
+- Added [rule/for](checks/rule/for.md) check.
 
 ### Changed
 

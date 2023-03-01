@@ -24,6 +24,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -71,6 +72,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -121,6 +123,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -168,6 +171,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -201,6 +205,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -237,6 +242,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -291,6 +297,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -345,6 +352,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -386,6 +394,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -464,6 +473,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -517,6 +527,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -571,6 +582,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -625,6 +637,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -679,6 +692,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -733,6 +747,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -787,6 +802,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -841,6 +857,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1022,6 +1039,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1070,6 +1088,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1118,6 +1137,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1166,6 +1186,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1214,6 +1235,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1262,6 +1284,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1310,6 +1333,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1378,6 +1402,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1440,6 +1465,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1506,6 +1532,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1575,6 +1602,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1656,6 +1684,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1703,6 +1732,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1762,6 +1792,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1810,6 +1841,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1869,6 +1901,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1927,6 +1960,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2001,6 +2035,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2054,6 +2089,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2128,6 +2164,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2161,6 +2198,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2205,6 +2243,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2253,6 +2292,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2306,6 +2346,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2356,6 +2397,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2406,6 +2448,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2453,6 +2496,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2500,6 +2544,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2559,6 +2604,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2592,6 +2638,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2628,6 +2675,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2682,6 +2730,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2736,6 +2785,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2803,6 +2853,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2841,6 +2892,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2945,6 +2997,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2997,6 +3050,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3050,6 +3104,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3104,6 +3159,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3158,6 +3214,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3212,6 +3269,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3266,6 +3324,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3320,6 +3379,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3374,6 +3434,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3442,6 +3503,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3652,6 +3714,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3700,6 +3763,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3748,6 +3812,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3796,6 +3861,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3844,6 +3910,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3892,6 +3959,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -3940,6 +4008,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4008,6 +4077,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4064,6 +4134,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4121,6 +4192,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4195,6 +4267,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4265,6 +4338,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4298,6 +4372,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4342,6 +4417,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4390,6 +4466,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4443,6 +4520,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4493,6 +4571,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4543,6 +4622,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4590,6 +4670,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4637,6 +4718,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4696,6 +4778,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4729,6 +4812,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4765,6 +4849,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4819,6 +4904,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4873,6 +4959,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4940,6 +5027,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -4978,6 +5066,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5082,6 +5171,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5134,6 +5224,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5187,6 +5278,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5241,6 +5333,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5295,6 +5388,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5349,6 +5443,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5403,6 +5498,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5457,6 +5553,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5511,6 +5608,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5579,6 +5677,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5789,6 +5888,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5837,6 +5937,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5885,6 +5986,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5933,6 +6035,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -5981,6 +6084,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6029,6 +6133,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6077,6 +6182,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6145,6 +6251,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6201,6 +6308,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6258,6 +6366,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6332,6 +6441,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6402,6 +6512,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6435,6 +6546,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6479,6 +6591,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6527,6 +6640,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6580,6 +6694,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6630,6 +6745,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6680,6 +6796,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6727,6 +6844,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6774,6 +6892,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6833,6 +6952,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6866,6 +6986,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6902,6 +7023,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -6956,6 +7078,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7010,6 +7133,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7077,6 +7201,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7115,6 +7240,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7219,6 +7345,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7271,6 +7398,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7324,6 +7452,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7378,6 +7507,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7432,6 +7562,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7486,6 +7617,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7540,6 +7672,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7594,6 +7727,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7648,6 +7782,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7716,6 +7851,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7926,6 +8062,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -7974,6 +8111,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8022,6 +8160,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8070,6 +8209,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8118,6 +8258,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8166,6 +8307,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8214,6 +8356,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8282,6 +8425,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8338,6 +8482,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8395,6 +8540,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8469,6 +8615,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8539,6 +8686,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8572,6 +8720,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8616,6 +8765,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8664,6 +8814,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8717,6 +8868,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8767,6 +8919,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8817,6 +8970,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8864,6 +9018,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8911,6 +9066,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -8970,6 +9126,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9003,6 +9160,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9039,6 +9197,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9093,6 +9252,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9147,6 +9307,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9214,6 +9375,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9252,6 +9414,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9356,6 +9519,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9408,6 +9572,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9461,6 +9626,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9515,6 +9681,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9569,6 +9736,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9623,6 +9791,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9677,6 +9846,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9731,6 +9901,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9785,6 +9956,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -9853,6 +10025,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10063,6 +10236,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10111,6 +10285,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10159,6 +10334,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10207,6 +10383,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10255,6 +10432,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10303,6 +10481,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10351,6 +10530,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10419,6 +10599,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10475,6 +10656,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10532,6 +10714,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10606,6 +10789,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -10676,6 +10860,7 @@
       "query/cost",
       "promql/series",
       "rule/duplicate",
+      "rule/for",
       "rule/label",
       "rule/link",
       "rule/reject"

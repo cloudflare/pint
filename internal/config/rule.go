@@ -22,6 +22,7 @@ type Rule struct {
 	Label      []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
 	Cost       *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
 	Alerts     *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
+	For        *ForSettings         `hcl:"for,block" json:"for,omitempty"`
 	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 	RuleLink   []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
 }
@@ -77,6 +78,12 @@ func (rule Rule) validate() (err error) {
 
 	for _, link := range rule.RuleLink {
 		if err = link.validate(); err != nil {
+			return err
+		}
+	}
+
+	if rule.For != nil {
+		if err = rule.For.validate(); err != nil {
 			return err
 		}
 	}
@@ -232,6 +239,21 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleLinkCheckName,
 			check: checks.NewRuleLinkCheck(re, link.URI, timeout, link.Headers, severity),
+		})
+	}
+
+	if rule.For != nil {
+		severity := rule.For.getSeverity(checks.Bug)
+		var minFor, maxFor time.Duration
+		if rule.For.Min != "" {
+			minFor, _ = parseDuration(rule.For.Min)
+		}
+		if rule.For.Max != "" {
+			maxFor, _ = parseDuration(rule.For.Max)
+		}
+		enabled = append(enabled, checkMeta{
+			name:  checks.RuleForCheckName,
+			check: checks.NewRuleForCheck(minFor, maxFor, severity),
 		})
 	}
 
