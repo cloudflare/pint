@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
@@ -62,7 +63,7 @@ func actionLint(c *cli.Context) error {
 	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
 
 	if c.Bool(requireOwnerFlag) {
-		summary.Report(verifyOwners(entries)...)
+		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)
 	}
 
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
@@ -101,7 +102,7 @@ func actionLint(c *cli.Context) error {
 	return nil
 }
 
-func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
+func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (reports []reporter.Report) {
 	for _, entry := range entries {
 		if entry.State == discovery.Removed {
 			continue
@@ -109,8 +110,26 @@ func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
 		if entry.PathError != nil {
 			continue
 		}
-		if entry.Owner != "" {
-			continue
+		if entry.Owner == "" {
+			reports = append(reports, reporter.Report{
+				ReportedPath:  entry.ReportedPath,
+				SourcePath:    entry.SourcePath,
+				ModifiedLines: entry.ModifiedLines,
+				Rule:          entry.Rule,
+				Problem: checks.Problem{
+					Lines:    entry.Rule.Lines(),
+					Reporter: discovery.RuleOwnerComment,
+					Text: fmt.Sprintf(`%s comments are required in all files, please add a "# pint %s $owner" somewhere in this file and/or "# pint %s $owner" on top of each rule`,
+						discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
+					Severity: checks.Bug,
+				},
+			})
+			goto NEXT
+		}
+		for _, re := range allowedOwners {
+			if re.MatchString(entry.Owner) {
+				goto NEXT
+			}
 		}
 		reports = append(reports, reporter.Report{
 			ReportedPath:  entry.ReportedPath,
@@ -120,11 +139,11 @@ func verifyOwners(entries []discovery.Entry) (reports []reporter.Report) {
 			Problem: checks.Problem{
 				Lines:    entry.Rule.Lines(),
 				Reporter: discovery.RuleOwnerComment,
-				Text: fmt.Sprintf(`%s comments are required in all files, please add a "# pint %s $owner" somewhere in this file and/or "# pint %s $owner" on top of each rule`,
-					discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
+				Text:     fmt.Sprintf("this rule is set as owned by %q but %q doesn't match any of the allowed owner values", entry.Owner, entry.Owner),
 				Severity: checks.Bug,
 			},
 		})
+	NEXT:
 	}
 	return reports
 }

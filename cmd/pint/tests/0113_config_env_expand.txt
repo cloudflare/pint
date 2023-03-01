@@ -72,7 +72,8 @@ level=info msg="Loading configuration file" path=.pint.hcl
         }
       ]
     }
-  ]
+  ],
+  "owners": {}
 }
 -- .pint.hcl --
 parser {

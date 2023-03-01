@@ -85,6 +85,28 @@ parser {
   This option takes a list of file patterns, all files matching those regexp rules
   will be parsed in relaxed mode.
 
+## Owners
+
+When `pint ci` or `pint lint` is run with `--require-owner` flag it will require
+all Prometheus rules to have an owner assigned via comment.
+See [rule/owner](checks/rule/owner.md) for details.
+
+Those checks can be further customised by setting a list of allowed owner names.
+
+Syntax:
+
+```js
+owners {
+  allowed = [ "(.*)", ... ]
+}
+```
+
+- `allowed` - list of allowed owner names, this option accepts regexp rules.
+  When set all owners set via comments must much at least one entry on this list.
+
+If there's no `owners:allowed` configuration block, or if it's empty, then any
+owner name is accepted.
+
 ## CI
 
 Configure continuous integration environments.

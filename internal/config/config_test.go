@@ -1634,6 +1634,12 @@ func TestConfigErrors(t *testing.T) {
 }`,
 			err: "must set either min or max option, or both",
 		},
+		{
+			config: `owners {
+  allowed = [".+++"]
+}`,
+			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
 	}
 
 	dir := t.TempDir()
