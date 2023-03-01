@@ -3,10 +3,10 @@ pint.error --no-color lint --require-owner rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-rules/strict.yml:4: "foo bar": invalid field 'annotations' in recording rule (yaml/parse)
+rules/strict.yml:4 Fatal: "foo bar": invalid field 'annotations' in recording rule (yaml/parse)
  4 |   - record: foo bar
 
-rules/strict.yml:4: "foo bar": invalid recording rule name: foo bar (yaml/parse)
+rules/strict.yml:4 Fatal: "foo bar": invalid recording rule name: foo bar (yaml/parse)
  4 |   - record: foo bar
 
 level=info msg="Problems found" Fatal=2

@@ -136,99 +136,99 @@ rule {
 }
 
 -- stderr.txt --
-rules.yml:4-5: link annotation is required (alerts/annotation)
+rules.yml:4-5 Bug: link annotation is required (alerts/annotation)
  4 |   - alert: syntax error
  5 |     expr: sum(foo) bar
 
-rules.yml:4-5: summary annotation is required (alerts/annotation)
+rules.yml:4-5 Bug: summary annotation is required (alerts/annotation)
  4 |   - alert: syntax error
  5 |     expr: sum(foo) bar
 
-rules.yml:4-5: component label is required (rule/label)
+rules.yml:4-5 Bug: component label is required (rule/label)
  4 |   - alert: syntax error
  5 |     expr: sum(foo) bar
 
-rules.yml:4-5: notify label is required (rule/label)
+rules.yml:4-5 Bug: notify label is required (rule/label)
  4 |   - alert: syntax error
  5 |     expr: sum(foo) bar
 
-rules.yml:4-5: priority label is required (rule/label)
+rules.yml:4-5 Bug: priority label is required (rule/label)
  4 |   - alert: syntax error
  5 |     expr: sum(foo) bar
 
-rules.yml:4-5: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:4-5 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  4 |   - alert: syntax error
  5 |     expr: sum(foo) bar
 
-rules.yml:5: syntax error: unexpected identifier "bar" (promql/syntax)
+rules.yml:5 Fatal: syntax error: unexpected identifier "bar" (promql/syntax)
  5 |     expr: sum(foo) bar
 
-rules.yml:7-8: link annotation is required (alerts/annotation)
+rules.yml:7-8 Bug: link annotation is required (alerts/annotation)
  7 |   - alert: missing required fields
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:7-8: summary annotation is required (alerts/annotation)
+rules.yml:7-8 Bug: summary annotation is required (alerts/annotation)
  7 |   - alert: missing required fields
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:7-8: component label is required (rule/label)
+rules.yml:7-8 Bug: component label is required (rule/label)
  7 |   - alert: missing required fields
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:7-8: notify label is required (rule/label)
+rules.yml:7-8 Bug: notify label is required (rule/label)
  7 |   - alert: missing required fields
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:7-8: priority label is required (rule/label)
+rules.yml:7-8 Bug: priority label is required (rule/label)
  7 |   - alert: missing required fields
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:7-8: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:7-8 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  7 |   - alert: missing required fields
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:8: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
+rules.yml:8 Warning: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
  8 |     expr: no_such_metric{job="fake"}
 
-rules.yml:10-11: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:10-11 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  10 |   - record: vector_matching
  11 |     expr: up{job="prometheus"} / prometheus_build_info{job="prometheus"}
 
-rules.yml:13-17: link annotation is required (alerts/annotation)
+rules.yml:13-17 Bug: link annotation is required (alerts/annotation)
  13 |   - alert: count
  14 |     expr: up{job="prometheus"} == 0
  15 |     for: 2m
  16 |     labels:
  17 |       notify: blackhole
 
-rules.yml:13-17: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:13-17 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  13 |   - alert: count
  14 |     expr: up{job="prometheus"} == 0
  15 |     for: 2m
  16 |     labels:
  17 |       notify: blackhole
 
-rules.yml:19-23: link annotation is required (alerts/annotation)
+rules.yml:19-23 Bug: link annotation is required (alerts/annotation)
  19 |   - alert: for_and_rate
  20 |     expr: rate(no_such_metric[10s])
  21 |     for: 0m
  22 |     labels:
  23 |       notify: blackhole
 
-rules.yml:19-23: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:19-23 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  19 |   - alert: for_and_rate
  20 |     expr: rate(no_such_metric[10s])
  21 |     for: 0m
  22 |     labels:
  23 |       notify: blackhole
 
-rules.yml:20: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
+rules.yml:20 Warning: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
  20 |     expr: rate(no_such_metric[10s])
 
-rules.yml:21: "0m" is the default value of "for", consider removing this line (alerts/for)
+rules.yml:21 Information: "0m" is the default value of "for", consider removing this line (alerts/for)
  21 |     for: 0m
 
-rules.yml:25-30: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:25-30 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  25 |   - alert: template
  26 |     expr: sum(no_such_metric) by(foo) > 0
  27 |     labels:
@@ -236,102 +236,102 @@ rules.yml:25-30: rule/owner comments are required in all files, please add a "# 
  29 |     annotations:
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
-rules.yml:26-30: template is using "instance" label but the query removes it (alerts/template)
+rules.yml:26-30 Bug: template is using "instance" label but the query removes it (alerts/template)
  26 |     expr: sum(no_such_metric) by(foo) > 0
  ..
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
-rules.yml:27-28: component label is required (rule/label)
+rules.yml:27-28 Bug: component label is required (rule/label)
  27 |     labels:
  28 |       value: '{{ $value }}'
 
-rules.yml:27-28: notify label is required (rule/label)
+rules.yml:27-28 Bug: notify label is required (rule/label)
  27 |     labels:
  28 |       value: '{{ $value }}'
 
-rules.yml:27-28: priority label is required (rule/label)
+rules.yml:27-28 Bug: priority label is required (rule/label)
  27 |     labels:
  28 |       value: '{{ $value }}'
 
-rules.yml:28: using $value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
+rules.yml:28 Bug: using $value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
  28 |       value: '{{ $value }}'
 
-rules.yml:29-30: link annotation is required (alerts/annotation)
+rules.yml:29-30 Bug: link annotation is required (alerts/annotation)
  29 |     annotations:
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
-rules.yml:29-30: summary annotation is required (alerts/annotation)
+rules.yml:29-30 Bug: summary annotation is required (alerts/annotation)
  29 |     annotations:
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
-rules.yml:32-33: link annotation is required (alerts/annotation)
+rules.yml:32-33 Bug: link annotation is required (alerts/annotation)
  32 |   - alert: fragile
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:32-33: summary annotation is required (alerts/annotation)
+rules.yml:32-33 Bug: summary annotation is required (alerts/annotation)
  32 |   - alert: fragile
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:32-33: component label is required (rule/label)
+rules.yml:32-33 Bug: component label is required (rule/label)
  32 |   - alert: fragile
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:32-33: notify label is required (rule/label)
+rules.yml:32-33 Bug: notify label is required (rule/label)
  32 |   - alert: fragile
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:32-33: priority label is required (rule/label)
+rules.yml:32-33 Bug: priority label is required (rule/label)
  32 |   - alert: fragile
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:32-33: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:32-33 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  32 |   - alert: fragile
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:33: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
+rules.yml:33 Warning: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:33: aggregation using without() can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using by() to ensure consistent labels (promql/fragile)
+rules.yml:33 Warning: aggregation using without() can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using by() to ensure consistent labels (promql/fragile)
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:35-36: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:35-36 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  35 |   - record: regexp
  36 |     expr: sum(no_such_metric{job=~"fake"})
 
-rules.yml:36: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
+rules.yml:36 Bug: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
  36 |     expr: sum(no_such_metric{job=~"fake"})
 
-rules.yml:36: unnecessary regexp match on static string job=~"fake", use job="fake" instead (promql/regexp)
+rules.yml:36 Bug: unnecessary regexp match on static string job=~"fake", use job="fake" instead (promql/regexp)
  36 |     expr: sum(no_such_metric{job=~"fake"})
 
-rules.yml:38-39: link annotation is required (alerts/annotation)
+rules.yml:38-39 Bug: link annotation is required (alerts/annotation)
  38 |   - alert: dups
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:38-39: summary annotation is required (alerts/annotation)
+rules.yml:38-39 Bug: summary annotation is required (alerts/annotation)
  38 |   - alert: dups
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:38-39: component label is required (rule/label)
+rules.yml:38-39 Bug: component label is required (rule/label)
  38 |   - alert: dups
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:38-39: notify label is required (rule/label)
+rules.yml:38-39 Bug: notify label is required (rule/label)
  38 |   - alert: dups
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:38-39: priority label is required (rule/label)
+rules.yml:38-39 Bug: priority label is required (rule/label)
  38 |   - alert: dups
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:38-39: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules.yml:38-39 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
  38 |   - alert: dups
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:39: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
+rules.yml:39 Warning: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
  39 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:39: aggregation using without() can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using by() to ensure consistent labels (promql/fragile)
+rules.yml:39 Warning: aggregation using without() can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using by() to ensure consistent labels (promql/fragile)
  39 |     expr: errors / sum(requests) without(rack)
 
 level=fatal msg="Fatal error" error="submitting reports: fatal error(s) reported"

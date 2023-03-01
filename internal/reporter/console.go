@@ -81,14 +81,14 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 			path = fmt.Sprintf("%s ~> %s", report.SourcePath, report.ReportedPath)
 		}
 
-		msg = append(msg, color.CyanString("%s:%s: ", path, printLineRange(firstLine, lastLine)))
+		msg = append(msg, color.CyanString("%s:%s ", path, printLineRange(firstLine, lastLine)))
 		switch report.Problem.Severity {
 		case checks.Bug, checks.Fatal:
-			msg = append(msg, color.RedString(report.Problem.Text))
+			msg = append(msg, color.RedString("%s: %s", report.Problem.Severity, report.Problem.Text))
 		case checks.Warning:
-			msg = append(msg, color.YellowString(report.Problem.Text))
+			msg = append(msg, color.YellowString("%s: %s", report.Problem.Severity, report.Problem.Text))
 		case checks.Information:
-			msg = append(msg, color.HiBlackString(report.Problem.Text))
+			msg = append(msg, color.HiBlackString("%s: %s", report.Problem.Severity, report.Problem.Text))
 		}
 		msg = append(msg, color.MagentaString(" (%s)\n", report.Problem.Reporter))
 

@@ -3,7 +3,7 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-rules/strict.yml:4: missing expr key (yaml/parse)
+rules/strict.yml:4 Fatal: missing expr key (yaml/parse)
  4 |   - record: foo
 
 level=info msg="Problems found" Fatal=1
