@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.41.1
+
+### Fixed
+
+- Fixed parsing of alert `for` field values with long durations (`for: 1d`).
+
 ## v0.41.0
 
 ### Added

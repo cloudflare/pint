@@ -6,6 +6,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -80,14 +81,14 @@ func (c AlertsCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		}
 	}
 
-	var forDur time.Duration
+	var forDur model.Duration
 	if rule.AlertingRule.For != nil {
-		forDur, _ = time.ParseDuration(rule.AlertingRule.For.Value.Value)
+		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
 	}
 
 	var alerts int
 	for _, r := range qr.Series.Ranges {
-		if r.End.Sub(r.Start) > forDur {
+		if r.End.Sub(r.Start) > time.Duration(forDur) {
 			alerts++
 		}
 	}

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -45,11 +47,11 @@ func (c RuleForCheck) Check(ctx context.Context, path string, rule parser.Rule, 
 		return nil
 	}
 
-	var forDur time.Duration
+	var forDur model.Duration
 	var fragment string
 	var lines []int
 	if rule.AlertingRule.For != nil {
-		forDur, _ = time.ParseDuration(rule.AlertingRule.For.Value.Value)
+		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
 		fragment = rule.AlertingRule.For.Value.Value
 		lines = rule.AlertingRule.For.Lines()
 	}
@@ -58,7 +60,7 @@ func (c RuleForCheck) Check(ctx context.Context, path string, rule parser.Rule, 
 		lines = rule.AlertingRule.Alert.Lines()
 	}
 
-	if forDur < c.minFor {
+	if time.Duration(forDur) < c.minFor {
 		problems = append(problems, Problem{
 			Fragment: fragment,
 			Lines:    lines,
@@ -68,7 +70,7 @@ func (c RuleForCheck) Check(ctx context.Context, path string, rule parser.Rule, 
 		})
 	}
 
-	if c.maxFor > 0 && forDur > c.maxFor {
+	if c.maxFor > 0 && time.Duration(forDur) > c.maxFor {
 		problems = append(problems, Problem{
 			Fragment: fragment,
 			Lines:    lines,
