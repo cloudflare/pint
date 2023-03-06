@@ -78,6 +78,50 @@ func TestRange(t *testing.T) {
 			},
 		},
 		{
+			query:   "5m",
+			start:   timeParse("2022-06-14T00:00:00Z"),
+			end:     timeParse("2022-06-14T03:00:00Z"),
+			step:    time.Minute * 5,
+			timeout: time.Second,
+			out: promapi.SeriesTimeRanges{
+				Ranges: promapi.MetricTimeRanges{
+					{
+						Labels: labels.FromStrings("instance", "1"),
+						Start:  timeParse("2022-06-14T01:00:00Z"),
+						End:    timeParse("2022-06-14T01:04:59Z"),
+					},
+				},
+			},
+			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
+				err := r.ParseForm()
+				if err != nil {
+					t.Fatal(err)
+				}
+				require.Equal(t, r.Form.Get("query"), "5m")
+				require.Equal(t, r.Form.Get("step"), "300")
+
+				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+
+				switch start {
+				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T03:00:00Z").Unix()), end, "invalid end for #1")
+
+				default:
+					t.Fatalf("unknown start: %.2f", start)
+				}
+
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				var values []string
+				values = append(values, fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()))
+				_, _ = w.Write([]byte(fmt.Sprintf(
+					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))))
+			},
+		},
+		{
 			query:   "1h",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T01:00:00Z"),
@@ -136,6 +180,52 @@ func TestRange(t *testing.T) {
 			},
 		},
 		{
+			query:   "2h1m",
+			start:   timeParse("2022-06-14T16:34:00Z"),
+			end:     timeParse("2022-06-14T18:35:00Z"),
+			step:    time.Minute,
+			timeout: time.Second,
+			out: promapi.SeriesTimeRanges{
+				Ranges: promapi.MetricTimeRanges{
+					{
+						Labels: labels.FromStrings("instance", "1"),
+						Start:  timeParse("2022-06-14T16:34:00Z"),
+						End:    timeParse("2022-06-14T18:35:59Z"),
+					},
+				},
+			},
+			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
+				err := r.ParseForm()
+				if err != nil {
+					t.Fatal(err)
+				}
+				require.Equal(t, r.Form.Get("query"), "2h1m")
+				require.Equal(t, r.Form.Get("step"), "60")
+
+				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+
+				switch start {
+				case float64(timeParse("2022-06-14T16:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T17:59:59Z").Unix()), end, "invalid end for #0")
+				case float64(timeParse("2022-06-14T18:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T18:35:00Z").Unix()), end, "invalid end for #1")
+
+				default:
+					t.Fatalf("unknown start: %.2f", start)
+				}
+
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				var values []string
+				for i := float64(timeParse("2022-06-14T16:34:00Z").Unix()); i <= float64(timeParse("2022-06-14T18:35:00Z").Unix()); i += 60 {
+					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
+				}
+				_, _ = w.Write([]byte(fmt.Sprintf(
+					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))))
+			},
+		},
+		{
 			query:   "3h",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T03:00:00Z"),
@@ -146,17 +236,17 @@ func TestRange(t *testing.T) {
 					{
 						Labels: labels.FromStrings("instance", "1"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
-						End:    timeParse("2022-06-14T03:00:00Z"),
+						End:    timeParse("2022-06-14T02:59:59Z"),
 					},
 					{
 						Labels: labels.FromStrings("instance", "2"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
-						End:    timeParse("2022-06-14T03:00:00Z"),
+						End:    timeParse("2022-06-14T02:59:59Z"),
 					},
 					{
 						Labels: labels.FromStrings("instance", "3"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
-						End:    timeParse("2022-06-14T03:00:00Z"),
+						End:    timeParse("2022-06-14T02:59:59Z"),
 					},
 				},
 			},
@@ -193,6 +283,88 @@ func TestRange(t *testing.T) {
 			},
 		},
 		{
+			query:   "gap",
+			start:   time.Unix(1677780240, 0),
+			end:     time.Unix(1677786840, 0),
+			step:    time.Minute * 5,
+			timeout: time.Second,
+			out: promapi.SeriesTimeRanges{
+				Ranges: promapi.MetricTimeRanges{
+					{
+						Labels: labels.EmptyLabels(),
+						Start:  timeParse("2023-03-02T18:04:00Z"),
+						End:    timeParse("2023-03-02T19:33:59Z"),
+					},
+					// last sample is for 2023-03-02T19:29:00Z
+					// gap at for 2023-03-02T19:34:00Z
+					{
+						Labels: labels.EmptyLabels(),
+						Start:  timeParse("2023-03-02T19:39:00Z"),
+						End:    timeParse("2023-03-02T19:58:59Z"),
+					},
+				},
+			},
+			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
+				err := r.ParseForm()
+				if err != nil {
+					t.Fatal(err)
+				}
+				require.Equal(t, r.Form.Get("query"), "gap")
+				require.Equal(t, r.Form.Get("step"), "300")
+
+				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+
+				switch start {
+				case float64(1677780240):
+					require.Equal(t, float64(1677786840), end, "invalid end for #0")
+				default:
+					t.Fatalf("unknown start: %.2f", start)
+				}
+
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				_, _ = w.Write([]byte(`
+					{
+						"status":"success",
+						"data":{
+							"resultType":"matrix",
+							"result":[
+								{
+									"metric":{},
+									"values":[
+										[1677780240,"1"],
+										[1677780540,"1"],
+										[1677780840,"1"],
+										[1677781140,"1"],
+										[1677781440,"1"],
+										[1677781740,"1"],
+										[1677782040,"1"],
+										[1677782340,"1"],
+										[1677782640,"1"],
+										[1677782940,"1"],
+										[1677783240,"1"],
+										[1677783540,"1"],
+										[1677783840,"1"],
+										[1677784140,"1"],
+										[1677784440,"1"],
+										[1677784740,"1"],
+										[1677785040,"1"],
+										[1677785340,"1"],
+										
+										[1677785940,"1"],
+										[1677786240,"1"],
+										[1677786540,"1"],
+										[1677786840,"1"]
+									]
+								}
+							]
+						}
+					}
+				`))
+			},
+		},
+		{
 			query:   "7h",
 			start:   timeParse("2022-06-14T00:00:00Z"),
 			end:     timeParse("2022-06-14T07:00:00Z"),
@@ -203,7 +375,7 @@ func TestRange(t *testing.T) {
 					{
 						Labels: labels.FromStrings("instance", "1"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
-						End:    timeParse("2022-06-14T07:00:00Z"),
+						End:    timeParse("2022-06-14T06:59:59Z"),
 					},
 				},
 			},
@@ -253,7 +425,7 @@ func TestRange(t *testing.T) {
 					{
 						Labels: labels.FromStrings("instance", "1"),
 						Start:  timeParse("2022-06-14T00:00:00Z"),
-						End:    timeParse("2022-06-14T07:30:00Z"),
+						End:    timeParse("2022-06-14T07:29:59Z"),
 					},
 				},
 			},

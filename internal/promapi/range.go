@@ -68,6 +68,7 @@ func (q rangeQuery) Run() queryResult {
 	}
 
 	ranges, err := streamSampleStream(resp.Body, q.r.Step)
+	ExpandRangesEnd(ranges, q.r.Step)
 	qr.value, qr.err = ranges, err
 	return qr
 }
@@ -102,9 +103,13 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	lookback := params.Dur()
 	step := params.Step()
 
+	var slices []TimeRange
 	queryStep := (time.Hour * 2).Round(step)
 	if queryStep > lookback {
 		queryStep = lookback
+		slices = append(slices, TimeRange{Start: start, End: end})
+	} else {
+		slices = sliceRange(start, end, step, queryStep)
 	}
 
 	log.Debug().
@@ -125,7 +130,6 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	slices := sliceRange(start, end, step, queryStep)
 	results := make(chan queryResult, len(slices))
 	for _, s := range slices {
 		query := queryRequest{

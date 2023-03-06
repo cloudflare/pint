@@ -336,7 +336,7 @@ func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
 		var values []model.SamplePair
 		for _, v := range s.Values {
 			ts := float64(v.Timestamp.Time().Unix())
-			if ts >= start && ts < end {
+			if ts >= start && ts <= end {
 				values = append(values, v)
 			}
 		}

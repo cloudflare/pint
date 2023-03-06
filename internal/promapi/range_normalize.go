@@ -240,8 +240,7 @@ func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges,
 
 		found = false
 		for i := 0; i < len(merged[src.Fingerprint]); i++ {
-			if tr, ok = Overlaps(merged[src.Fingerprint][i], src, step); ok { // 1. [s e]
-				//    [ts]
+			if tr, ok = Overlaps(merged[src.Fingerprint][i], src, step); ok {
 				merged[src.Fingerprint][i].Start = tr.Start
 				merged[src.Fingerprint][i].End = tr.End
 				found = true
@@ -276,6 +275,12 @@ func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges,
 	return all, hadMerged
 }
 
+func ExpandRangesEnd(src MetricTimeRanges, step time.Duration) {
+	for i := range src {
+		src[i].End = src[i].End.Add(step - time.Second)
+	}
+}
+
 func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.SamplePair, step time.Duration) MetricTimeRanges {
 	fp := ls.Hash()
 
@@ -283,17 +288,22 @@ func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.S
 	var found bool
 	for _, v := range vals {
 		ts = v.Timestamp.Time()
+
 		found = false
 		for i := range dst {
 			if dst[i].Fingerprint != fp {
 				continue
 			}
 
+			if !ts.Before(dst[i].Start.Add(step*-1)) && !ts.After(dst[i].Start) {
+				dst[i].Start = ts
+				found = true
+				break
+			}
+
 			if !ts.Before(dst[i].Start) &&
 				!ts.After(dst[i].End.Add(step)) {
-				if ts.Add(step).After(dst[i].End) {
-					dst[i].End = ts.Add(step)
-				}
+				dst[i].End = ts
 				found = true
 				break
 			}
@@ -303,10 +313,11 @@ func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.S
 				Fingerprint: fp,
 				Labels:      ls,
 				Start:       ts,
-				End:         ts.Add(step),
+				End:         ts,
 			})
 		}
 	}
+
 	return dst
 }
 

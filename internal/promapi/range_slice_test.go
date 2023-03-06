@@ -200,6 +200,18 @@ func TestSliceRange(t *testing.T) {
 				},
 			},
 		},
+		{
+			start:      timeParse("2022-01-01T11:11:11Z"),
+			end:        timeParse("2022-01-01T11:21:11Z"),
+			resolution: time.Minute * 5,
+			sliceSize:  time.Hour * 2,
+			output: []TimeRange{
+				{
+					Start: timeParse("2022-01-01T10:00:00Z"),
+					End:   timeParse("2022-01-01T11:21:11Z"),
+				},
+			},
+		},
 	}
 
 	for i, tc := range testCases {
