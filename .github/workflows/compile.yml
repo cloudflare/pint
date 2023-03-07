@@ -41,12 +41,12 @@ jobs:
       - name: Compile binaries
         uses: goreleaser/goreleaser-action@v4
         with:
-          args: build --snapshot --rm-dist --single-target
+          args: build --snapshot --clean --single-target
 
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v4
         with:
-          args: release --rm-dist
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
