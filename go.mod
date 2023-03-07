@@ -18,7 +18,7 @@ require (
 	github.com/rogpeppe/go-internal v1.9.1-0.20230209130841-f0583b8402aa
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.2
-	github.com/urfave/cli/v2 v2.24.4
+	github.com/urfave/cli/v2 v2.25.0
 	github.com/zclconf/go-cty v1.13.0
 	go.uber.org/atomic v1.10.0
 	go.uber.org/automaxprocs v1.5.1
