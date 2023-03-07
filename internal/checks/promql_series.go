@@ -262,17 +262,19 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 			}
 			trsLabelCount.Series.FindGaps(promUptime.Series, trsLabelCount.Series.From, trsLabelCount.Series.Until)
 
-			if trsLabelCount.Series.Ranges.Len() == 1 && len(trsLabelCount.Series.Gaps) == 0 {
-				var isAbsentOutsideSeriesRange bool
+			var isAbsentInsideSeriesRange bool
+			for _, lr := range trsLabelCount.Series.Ranges {
 				for _, str := range trs.Series.Ranges {
-					if _, ok := promapi.Overlaps(str, trsLabelCount.Series.Ranges[0], trsLabelCount.Series.Step); !ok {
-						isAbsentOutsideSeriesRange = true
-						break
+					if _, ok := promapi.Overlaps(lr, str, trsLabelCount.Series.Step); ok {
+						isAbsentInsideSeriesRange = true
 					}
 				}
-				if isAbsentOutsideSeriesRange {
-					continue
-				}
+			}
+			if !isAbsentInsideSeriesRange {
+				continue
+			}
+
+			if trsLabelCount.Series.Ranges.Len() == 1 && len(trsLabelCount.Series.Gaps) == 0 {
 				problems = append(problems, Problem{
 					Fragment: selector.String(),
 					Lines:    expr.Lines(),
@@ -378,6 +380,26 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 				!oldest(trsLabel.Series.Ranges).After(trsLabel.Series.Until.Add(settings.lookbackRangeDuration-1).Add(settings.lookbackStepDuration)) &&
 				newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(settings.lookbackStepDuration*-1)) {
 
+				var labelGapOutsideBaseGaps bool
+				for _, lg := range trsLabel.Series.Gaps {
+					a := promapi.MetricTimeRange{Start: lg.Start, End: lg.End}
+					var ok bool
+					for _, bg := range trs.Series.Gaps {
+						b := promapi.MetricTimeRange{Start: bg.Start, End: bg.End}
+						_, ov := promapi.Overlaps(a, b, trs.Series.Step)
+						if ov {
+							ok = true
+						}
+					}
+					if !ok {
+						labelGapOutsideBaseGaps = true
+					}
+				}
+
+				if !labelGapOutsideBaseGaps {
+					continue
+				}
+
 				minAge, p := c.getMinAge(rule, selector)
 				if len(p) > 0 {
 					problems = append(problems, p...)
@@ -432,7 +454,7 @@ func (c SeriesCheck) Check(ctx context.Context, path string, rule parser.Rule, e
 		}
 
 		// 8. If foo is SOMETIMES there -> WARN
-		if len(trs.Series.Ranges) > 1 && len(trs.Series.Gaps) > 0 {
+		if len(trs.Series.Ranges) > 0 && len(trs.Series.Gaps) > 0 {
 			problems = append(problems, Problem{
 				Fragment: bareSelector.String(),
 				Lines:    expr.Lines(),
@@ -601,7 +623,9 @@ func sinceDesc(t time.Time) (s string) {
 
 func avgLife(ranges []promapi.MetricTimeRange) (d time.Duration) {
 	for _, r := range ranges {
-		d += r.End.Sub(r.Start)
+		// ranges are aligned to $(step - 1 second) so here we add that second back
+		// to have more round results
+		d += r.End.Sub(r.Start) + time.Second
 	}
 	if len(ranges) == 0 {
 		return time.Duration(0)

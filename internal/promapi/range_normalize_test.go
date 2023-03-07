@@ -62,19 +62,19 @@ func TestAppendSampleToRanges(t *testing.T) {
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "2").Hash(),
 					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "3").Hash(),
 					Labels:      labels.FromStrings("instance", "3"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 			},
 		},
@@ -104,25 +104,25 @@ func TestAppendSampleToRanges(t *testing.T) {
 					Fingerprint: labels.FromStrings().Hash(),
 					Labels:      labels.FromStrings(),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("job", "bar").Hash(),
 					Labels:      labels.FromStrings("job", "bar"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1", "job", "foo").Hash(),
 					Labels:      labels.FromStrings("instance", "1", "job", "foo"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 			},
 		},
@@ -132,19 +132,19 @@ func TestAppendSampleToRanges(t *testing.T) {
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "3").Hash(),
 					Labels:      labels.FromStrings("instance", "3"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "2").Hash(),
 					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 			},
 			samples: []model.SampleStream{
@@ -171,31 +171,31 @@ func TestAppendSampleToRanges(t *testing.T) {
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-13T10:00:00Z"),
-					End:         timeParse("2022-06-13T13:00:00Z"),
+					End:         timeParse("2022-06-13T12:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-13T23:00:00Z"),
-					End:         timeParse("2022-06-14T04:00:00Z"),
+					End:         timeParse("2022-06-14T03:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "2").Hash(),
 					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "2").Hash(),
 					Labels:      labels.FromStrings("instance", "2"),
 					Start:       timeParse("2022-06-15T10:00:00Z"),
-					End:         timeParse("2022-06-15T13:00:00Z"),
+					End:         timeParse("2022-06-15T12:55:00Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "3").Hash(),
 					Labels:      labels.FromStrings("instance", "3"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T03:00:00Z"),
+					End:         timeParse("2022-06-14T02:55:00Z"),
 				},
 			},
 		},
@@ -221,7 +221,7 @@ func TestAppendSampleToRanges(t *testing.T) {
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-06-14T00:00:00Z"),
-					End:         timeParse("2022-06-14T08:00:00Z"),
+					End:         timeParse("2022-06-14T07:55:00Z"),
 				},
 			},
 		},
@@ -263,43 +263,187 @@ func TestAppendSampleToRanges(t *testing.T) {
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T09:14:59Z"),
-					End:         timeParse("2022-10-27T09:21:59Z"),
+					End:         timeParse("2022-10-27T09:20:59Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T10:14:59Z"),
-					End:         timeParse("2022-10-27T10:21:59Z"),
+					End:         timeParse("2022-10-27T10:20:59Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T11:14:59Z"),
-					End:         timeParse("2022-10-27T11:16:59Z"),
+					End:         timeParse("2022-10-27T11:15:59Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T12:14:59Z"),
-					End:         timeParse("2022-10-27T12:31:59Z"),
+					End:         timeParse("2022-10-27T12:30:59Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T13:14:59Z"),
-					End:         timeParse("2022-10-27T13:51:59Z"),
+					End:         timeParse("2022-10-27T13:50:59Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T14:14:59Z"),
-					End:         timeParse("2022-10-27T14:51:59Z"),
+					End:         timeParse("2022-10-27T14:50:59Z"),
 				},
 				{
 					Fingerprint: labels.FromStrings("instance", "1").Hash(),
 					Labels:      labels.FromStrings("instance", "1"),
 					Start:       timeParse("2022-10-27T23:14:59Z"),
-					End:         timeParse("2022-10-28T01:15:59Z"),
+					End:         timeParse("2022-10-28T01:14:59Z"),
+				},
+			},
+		},
+		{
+			in: nil,
+			samples: []model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T00:00:00Z"), time.Minute*5),
+				},
+			},
+			step: time.Minute * 5,
+			out: []promapi.MetricTimeRange{
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T00:00:00Z"),
+				},
+			},
+		},
+		{
+			in: nil,
+			samples: []model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T00:00:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:05:00Z"), timeParse("2022-06-14T00:05:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:15:00Z"), timeParse("2022-06-14T00:15:00Z"), time.Minute*5),
+				},
+			},
+			step: time.Minute * 5,
+			out: []promapi.MetricTimeRange{
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T00:05:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T00:15:00Z"),
+					End:         timeParse("2022-06-14T00:15:00Z"),
+				},
+			},
+		},
+		{
+			in: nil,
+			samples: []model.SampleStream{
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T05:00:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T05:10:00Z"), timeParse("2022-06-14T06:10:00Z"), time.Minute*5),
+				},
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T06:20:00Z"), timeParse("2022-06-14T06:20:00Z"), time.Minute*5),
+				},
+			},
+			step: time.Minute * 5,
+			out: []promapi.MetricTimeRange{
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T05:00:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T05:10:00Z"),
+					End:         timeParse("2022-06-14T06:10:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T06:20:00Z"),
+					End:         timeParse("2022-06-14T06:20:00Z"),
+				},
+			},
+		},
+		{
+			in: nil,
+			samples: []model.SampleStream{
+				// #5. 06:00 - 06:25
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T06:00:00Z"), timeParse("2022-06-14T06:20:00Z"), time.Minute*5),
+				},
+				// #1. 00:00 - 05:05
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T05:00:00Z"), time.Minute*5),
+				},
+				// #2. 05:10 - 05:15
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T05:10:00Z"), timeParse("2022-06-14T05:10:00Z"), time.Minute*5),
+				},
+				// #6. 06:20 - 06:25
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T06:20:00Z"), timeParse("2022-06-14T06:20:00Z"), time.Minute*5),
+				},
+				// #4. 05:25 - 06:00
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T05:25:00Z"), timeParse("2022-06-14T05:55:00Z"), time.Minute*5),
+				},
+				// #3. 05:20 - 05:25
+				{
+					Metric: model.Metric{"instance": "1"},
+					Values: generateSamples(timeParse("2022-06-14T05:20:00Z"), timeParse("2022-06-14T05:20:00Z"), time.Minute*5),
+				},
+			},
+			step: time.Minute * 5,
+			out: []promapi.MetricTimeRange{
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T00:00:00Z"),
+					End:         timeParse("2022-06-14T05:00:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T05:10:00Z"),
+					End:         timeParse("2022-06-14T05:10:00Z"),
+				},
+				{
+					Fingerprint: labels.FromStrings("instance", "1").Hash(),
+					Labels:      labels.FromStrings("instance", "1"),
+					Start:       timeParse("2022-06-14T05:20:00Z"),
+					End:         timeParse("2022-06-14T06:20:00Z"),
 				},
 			},
 		},
@@ -308,6 +452,7 @@ func TestAppendSampleToRanges(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			for i := 0; i < 50; i++ {
+				tc := tc
 				for _, s := range tc.samples {
 					lset := promapi.MetricToLabels(s.Metric)
 					tc.in = promapi.AppendSampleToRanges(tc.in, lset, s.Values, tc.step)
@@ -381,7 +526,7 @@ func TestMergeRanges(t *testing.T) {
 				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T06:00:44Z"), End: timeParse("2022-10-22T12:00:44Z")},
 			},
 			out: promapi.MetricTimeRanges{
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
+				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-26T10:56:43Z")},
 			},
 			step:      time.Minute,
 			wasMerged: true,
@@ -392,6 +537,7 @@ func TestMergeRanges(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			for i := 0; i < 50; i++ {
 				out, wasMerged := promapi.MergeRanges(tc.in, tc.step)
+				promapi.ExpandRangesEnd(out, tc.step)
 				require.Equal(t, tc.wasMerged, wasMerged)
 				sort.Stable(out)
 				require.Equal(t, printRange(tc.out), printRange(out))

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.42.0
+
+### Fixed
+
+- Fixed incorrect results in `promql/series` check for time series with only a single
+  data point.
+
 ## v0.41.1
 
 ### Fixed

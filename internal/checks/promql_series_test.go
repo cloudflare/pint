@@ -708,10 +708,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
+						Fragment: `found{job="abc"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesDisappearedText("prom", uri, `found`, "1w"),
+						Text:     noLabelKeyText("prom", uri, "found", "job", "1w"),
 						Severity: checks.Bug,
 					},
 				}
@@ -746,6 +746,256 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `absent(found{job=~".+"})`},
 					},
 					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#3 metric present once",
+			content:     "- record: foo\n  expr: sum(found{job=\"abc\", cluster=\"dev\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesSometimesText("prom", uri, `found`, "1w", "5m"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{cluster="dev",job="abc"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job="abc"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{cluster="dev"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{cluster=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#3 metric present once with labels",
+			content:     "- record: foo\n  expr: sum(found{job=\"abc\", cluster=\"dev\"})\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `found`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{cluster="dev",job="abc"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-4),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{job="abc"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found{cluster="dev"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*5),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{cluster=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*-10),
+								time.Minute*5,
+							),
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-5).Add(time.Minute*10),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
 				},
 				{
 					conds: []requestCondition{
