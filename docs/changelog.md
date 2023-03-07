@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.42.1
+
+### Fixed
+
+- Fixed `--initial-branch` flag handling.
+  Value of this flag wasn't being used correctly - #559.
+
 ## v0.42.0
 
 ### Fixed

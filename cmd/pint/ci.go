@@ -85,10 +85,10 @@ func actionCI(c *cli.Context) error {
 
 	var entries []discovery.Entry
 	if c.Bool(devFlag) {
-		finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
+		finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
 		entries, err = finder.Find()
 	} else {
-		finder := discovery.NewGitBlameFinder(git.RunGit, includeRe, meta.cfg.CI.BaseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
+		finder := discovery.NewGitBlameFinder(git.RunGit, includeRe, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
 		entries, err = finder.Find()
 	}
 	if err != nil {
