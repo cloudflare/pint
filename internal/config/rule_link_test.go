@@ -54,7 +54,7 @@ func TestRuleLinkSettings(t *testing.T) {
 				Regex:   "foo",
 				Timeout: "11f",
 			},
-			err: errors.New(`not a valid duration string: "11f"`),
+			err: errors.New(`unknown unit "f" in duration "11f"`),
 		},
 	}
 

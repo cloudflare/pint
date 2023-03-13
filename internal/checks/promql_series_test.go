@@ -2058,7 +2058,7 @@ func TestSeriesCheck(t *testing.T) {
 						Fragment: `rule/set promql/series(found) min-age 1e`,
 						Lines:    []int{3, 4},
 						Reporter: checks.SeriesCheckName,
-						Text:     `failed to parse pint comment as duration: not a valid duration string: "1e"`,
+						Text:     `failed to parse pint comment as duration: unknown unit "e" in duration "1e"`,
 						Severity: checks.Warning,
 					},
 					{

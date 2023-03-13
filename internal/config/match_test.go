@@ -27,7 +27,7 @@ func TestDurationMatch(t *testing.T) {
 		},
 		{
 			input: "= 3s ",
-			err:   `not a valid duration string: "3s "`,
+			err:   `unknown unit "s " in duration "3s "`,
 		},
 		{
 			input: "= = 3s",
