@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0
-	github.com/fatih/color v1.14.1
+	github.com/fatih/color v1.15.0
 	github.com/gkampitakis/go-snaps v0.4.2
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v50 v50.1.0
