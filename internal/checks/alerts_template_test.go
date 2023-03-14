@@ -427,6 +427,22 @@ func TestTemplateCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "don't trigger for label_replace() provided labels",
+			content: `
+- alert: label_replace_not_checked_correctly
+  expr: |
+    label_replace(
+      sum by (pod) (pod_status) > 0
+      ,"cluster", "$1", "pod", "(.*)"
+    )
+  annotations:
+    summary: "Some error found in {{ $labels.cluster }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
 			description: "annotation label present on metrics (absent)",
 			content: `
 - alert: Foo Is Missing

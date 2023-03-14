@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.42.2
+
+### Fixed
+
+- `alerts/template` check didn't correctly handle `label_replace()` calls
+  in queries - #568.
+
 ## v0.42.1
 
 ### Fixed
