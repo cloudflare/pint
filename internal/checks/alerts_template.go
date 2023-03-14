@@ -108,6 +108,16 @@ func (c TemplateCheck) Check(ctx context.Context, path string, rule parser.Rule,
 			safeLabels = append(safeLabels, be.VectorMatching.Include...)
 		}
 	}
+	for _, cl := range calls(rule.AlertingRule.Expr.Query, "label_replace") {
+		for i, v := range cl.Args {
+			if i == 1 {
+				if s, ok := v.(*promParser.StringLiteral); ok {
+					safeLabels = append(safeLabels, s.Val)
+				}
+				break
+			}
+		}
+	}
 
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
 
@@ -477,11 +487,8 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 						found = true
 					}
 				}
-				if found && slices.Contains(safeLabels, v[1]) {
-					found = !excludeLabels
-				}
 				if found == excludeLabels {
-					if _, ok := done[v[1]]; !ok {
+					if _, ok := done[v[1]]; !ok && !slices.Contains(safeLabels, v[1]) {
 						msgs = append(msgs, fmt.Sprintf(msg, v[1]))
 						done[v[1]] = struct{}{}
 					}
@@ -538,4 +545,16 @@ func binaryExprs(node *parser.PromQLNode) (be []*promParser.BinaryExpr) {
 	}
 
 	return be
+}
+
+func calls(node *parser.PromQLNode, name string) (cl []*promParser.Call) {
+	if n, ok := node.Node.(*promParser.Call); ok && n.Func.Name == name {
+		cl = append(cl, n)
+	}
+
+	for _, child := range node.Children {
+		cl = append(cl, calls(child, name)...)
+	}
+
+	return cl
 }
