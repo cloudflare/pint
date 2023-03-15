@@ -35,15 +35,6 @@ type rangeQuery struct {
 }
 
 func (q rangeQuery) Run() queryResult {
-	log.Debug().
-		Str("uri", q.prom.safeURI).
-		Str("query", q.expr).
-		Str("start", q.r.Start.Format(time.RFC3339)).
-		Str("end", q.r.End.Format(time.RFC3339)).
-		Str("range", output.HumanizeDuration(q.r.End.Sub(q.r.Start))).
-		Str("step", output.HumanizeDuration(q.r.Step)).
-		Msg("Running prometheus range query slice")
-
 	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
 	defer cancel()
 
@@ -118,6 +109,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		Str("lookback", output.HumanizeDuration(lookback)).
 		Str("step", output.HumanizeDuration(step)).
 		Str("slice", output.HumanizeDuration(queryStep)).
+		Int("slices", len(slices)).
 		Msg("Scheduling prometheus range query")
 
 	key := fmt.Sprintf("/api/v1/query_range/%s/%s", expr, params.String())

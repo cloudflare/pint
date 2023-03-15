@@ -16,10 +16,12 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -102,7 +104,7 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
-	zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
@@ -531,6 +533,13 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 		})
 		from = from.Add(step)
 	}
+	log.Debug().
+		Stringer("labels", metric).
+		Str("from", from.UTC().Format(time.RFC3339Nano)).
+		Str("until", until.UTC().Format(time.RFC3339Nano)).
+		Str("step", output.HumanizeDuration(step)).
+		Int("samples", len(s.Values)).
+		Msg("Generating sample stream for tests")
 	return s
 }
 

@@ -15,8 +15,6 @@ import (
 	"github.com/klauspost/compress/gzhttp"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/ratelimit"
-
-	"github.com/cloudflare/pint/internal/output"
 )
 
 type QueryError struct {
@@ -159,34 +157,15 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	cacheKey := job.query.CacheKey()
 	if prom.cache != nil {
 		if cached, ok := prom.cache.get(cacheKey, job.query.Endpoint()); ok {
-			log.Debug().
-				Str("uri", prom.safeURI).
-				Str("query", job.query.String()).
-				Uint64("key", cacheKey).
-				Msg("Cache hit")
 			return queryResult{value: cached}
 		}
 	}
-
-	log.Debug().
-		Str("uri", prom.safeURI).
-		Str("query", job.query.String()).
-		Uint64("key", cacheKey).
-		Msg("Cache miss")
 
 	prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 	prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 
 	prom.rateLimiter.Take()
-	start := time.Now()
 	result := job.query.Run()
-	dur := time.Since(start)
-	log.Debug().
-		Str("uri", prom.safeURI).
-		Str("query", job.query.String()).
-		Str("endpoint", job.query.Endpoint()).
-		Str("duration", output.HumanizeDuration(dur)).
-		Msg("Query completed")
 	prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Dec()
 
 	if result.err != nil {
