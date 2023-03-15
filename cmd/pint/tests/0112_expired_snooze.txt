@@ -11,7 +11,7 @@ rules/0001.yml:3 Bug: job label is required and should be preserved when aggrega
  3 |   expr: sum(foo)
 
 level=info msg="Problems found" Bug=1
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 # pint snooze 2000-11-28T10:24:18Z promql/aggregate
 - record: sum-job

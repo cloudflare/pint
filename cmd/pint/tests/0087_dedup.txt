@@ -22,7 +22,7 @@ rules/01.yml:5-12 Bug: template is using "instance" label but the query removes 
  12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
 
 level=info msg="Problems found" Bug=3 Warning=1
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/01.yml --
 groups:
 - name: foo

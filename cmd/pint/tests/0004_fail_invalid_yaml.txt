@@ -12,7 +12,7 @@ rules/ok.yml:5 Fatal: syntax error: unclosed left bracket (promql/syntax)
  5 |     expr: sum(foo[5m)
 
 level=info msg="Problems found" Fatal=2
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/ok.yml --
 groups:
 - name: foo

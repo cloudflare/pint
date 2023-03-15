@@ -27,7 +27,7 @@ rules/1.yml:28 Fatal: duplicated expr key (yaml/parse)
  28 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
 
 level=info msg="Problems found" Bug=4 Fatal=2
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 2 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 ---
 kind: ConfigMap
