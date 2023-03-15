@@ -1,0 +1,9 @@
+pint.error --no-color lint --fail-on=xxx rules
+! stdout .
+cmp stderr stderr.txt
+
+-- rules/0001.yml --
+# empty
+
+-- stderr.txt --
+level=fatal msg="Fatal error" error="invalid --fail-on value: unknown severity: xxx"

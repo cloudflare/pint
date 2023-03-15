@@ -19,7 +19,7 @@ rules/strict.yml:20 Fatal: template parse error: function "bogus" not defined (a
  20 |       dashboard: '{{ bogus }}'
 
 level=info msg="Problems found" Fatal=5
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 groups:
 - name: foo

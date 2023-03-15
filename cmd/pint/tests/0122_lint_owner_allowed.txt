@@ -13,7 +13,7 @@ rules/1.yml:7-8 Bug: this rule is set as owned by "bob" but "bob" doesn't match 
  8 |     expr: up == 0
 
 level=info msg="Problems found" Bug=2
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 groups:
 - name: foo

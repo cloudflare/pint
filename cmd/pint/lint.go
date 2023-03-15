@@ -34,6 +34,12 @@ var lintCmd = &cli.Command{
 			Value:   "warning",
 			Usage:   "Set minimum severity for reported problems",
 		},
+		&cli.StringFlag{
+			Name:    failOnFlag,
+			Aliases: []string{"w"},
+			Value:   "bug",
+			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected",
+		},
 	},
 }
 
@@ -70,6 +76,10 @@ func actionLint(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("invalid --%s value: %w", minSeverityFlag, err)
 	}
+	failOn, err := checks.ParseSeverity(c.String(failOnFlag))
+	if err != nil {
+		return fmt.Errorf("invalid --%s value: %w", failOnFlag, err)
+	}
 
 	r := reporter.NewConsoleReporter(os.Stderr, minSeverity)
 	err = r.Submit(summary)
@@ -78,11 +88,13 @@ func actionLint(c *cli.Context) error {
 	}
 
 	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
-	var problems, hiddenProblems int
+	var problems, hiddenProblems, failProblems int
 	for s, c := range summary.CountBySeverity() {
+		if s >= failOn {
+			failProblems++
+		}
 		if s < minSeverity {
 			hiddenProblems++
-			continue
 		}
 		bySeverity[s.String()] = c
 		if s >= checks.Bug {
@@ -92,13 +104,13 @@ func actionLint(c *cli.Context) error {
 	if len(bySeverity) > 0 {
 		log.Info().Fields(bySeverity).Msg("Problems found")
 	}
-	if problems > 0 {
-		return fmt.Errorf("problems found")
-	}
 	if hiddenProblems > 0 {
 		log.Info().Msgf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag))
 	}
 
+	if failProblems > 0 {
+		return fmt.Errorf("found %d problem(s) with severity %s or higher", failProblems, failOn)
+	}
 	return nil
 }
 

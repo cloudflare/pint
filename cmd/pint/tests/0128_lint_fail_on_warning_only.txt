@@ -1,0 +1,15 @@
+pint.error --no-color lint --fail-on=warning --min-severity=bug rules
+! stdout .
+cmp stderr stderr.txt
+
+-- rules/0001.yml --
+groups:
+  - name: foo
+    rules:
+    - alert: foo
+      expr: up{job="xxx"}
+
+-- stderr.txt --
+level=info msg="Problems found" Warning=1
+level=info msg="1 problem(s) not visible because of --min-severity=bug flag"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Warning or higher"

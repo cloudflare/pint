@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.43.0
+
+### Added
+
+- Added `--fail-on` flag to `pint lint` command - #570.
+
 ## v0.42.2
 
 ### Fixed

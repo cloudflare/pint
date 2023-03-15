@@ -11,7 +11,7 @@ rules/0001.yml:9 Bug: this alert rule must have a 'for' field with a maximum dur
  9 |   for: 13m
 
 level=info msg="Problems found" Bug=2
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - alert: ok
   expr: up == 0

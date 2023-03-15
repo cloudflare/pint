@@ -11,7 +11,7 @@ rules/0001.yml:5 Warning: job label is required and should be preserved when agg
  5 |       expr: sum by (instance) (http_inprogress_requests)
 
 level=info msg="Problems found" Bug=1 Warning=1
-level=fatal msg="Fatal error" error="problems found"
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 groups:
   - name: example
