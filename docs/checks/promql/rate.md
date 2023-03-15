@@ -30,6 +30,10 @@ to verify that:
   See [this blog post](https://www.robustperception.io/rate-then-sum-never-sum-then-rate/)
   for details.
 
+The check uses the `/api/v1/status/config` Prometheus endpoint, if you are
+running Pint against a [Thanos](https://thanos.io) system you should [disable
+this check](#how-to-disable-it).
+
 ## Common problems
 
 ### Metadata mismatch
