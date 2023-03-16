@@ -7,7 +7,29 @@ has_children: true
 
 # pint
 
-pint is a Prometheus rule linter.
+pint is a Prometheus rule linter/validator.
+
+## Requirements
+
+pint will run checks on Prometheus alerting & recording rules to detect potential problems
+with those rules.
+Some checks rely only on the rule itself and can be run "offline" - without talking to any
+Prometheus server.
+You can run pint in "offline" if you:
+- Don't pass any configuration file to pint.
+- You pass configuration file to pint that **doesn't** contain any `prometheus` definition.
+- You pass `--offline` flag to `pint` command.
+
+Most checks included in pint will require sending queries to a running Prometheus server where
+those rules are, or would be, deployed.
+Those checks are enabled if you pass a configuration file to pint that includes at least one
+`prometheus` block will.
+Checks might use various Prometheus
+[HTTP API endpoints](https://prometheus.io/docs/prometheus/latest/querying/api/) to retrive
+extra information, for example Prometheus configuration or metrics metadata.
+If you run pint against a different service, like [Thanos](https://thanos.io/) some checks
+might return an erorr, since not all Prometheus HTTP APIs are supported by it.
+In that case you might want to disable failing checks in pint configuration file.
 
 ## Usage
 
@@ -224,3 +246,19 @@ Steps:
    ```shell
    ./pint --config /etc/pint.hcl lint /etc/prometheus/rules/*.yml
    ```
+
+# License
+
+Copyright (c) 2021-2023 Cloudflare, Inc.
+ 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+ 
+    http://www.apache.org/licenses/LICENSE-2.0
+ 
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
