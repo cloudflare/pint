@@ -89,36 +89,50 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable promql/aggregate`
+```yaml
+# pint file/disable promql/aggregate
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable promql/aggregate`
+```yaml
+# pint disable promql/aggregate
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
 ### If `keep` is set
 
-`# pint disable promql/aggregate($label:true)`
+```yaml
+# pint disable promql/aggregate($label:true)
+```
 
 Example:
 
-`# pint disable promql/aggregate(job:true)`
+```yaml
+# pint disable promql/aggregate(job:true)
+```
 
 ### If `strip` is set
 
-`# pint disable promql/aggregate($label:false)`
+```yaml
+# pint disable promql/aggregate($label:false)
+```
 
 Example:
 
-`# pint disable promql/aggregate(instance:true)`
+```yaml
+# pint disable promql/aggregate(instance:true)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP promql/aggregate`
+```yaml
+# pint snooze $TIMESTAMP promql/aggregate
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

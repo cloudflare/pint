@@ -92,28 +92,38 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable promql/rate`
+```yaml
+# pint file/disable promql/rate
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable promql/rate`
+```yaml
+# pint disable promql/rate
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
-`# pint disable promql/rate($prometheus)`
+```yaml
+# pint disable promql/rate($prometheus)
+```
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable promql/rate(prod)`
+```yaml
+# pint disable promql/rate(prod)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP promql/rate`
+```yaml
+# pint snooze $TIMESTAMP promql/rate
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

@@ -56,17 +56,23 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable promql/regexp`
+```yaml
+# pint file/disable promql/regexp
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable promql/regexp`
+```yaml
+# pint disable promql/regexp
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP promql/regexp`
+```yaml
+# pint snooze $TIMESTAMP promql/regexp
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.
