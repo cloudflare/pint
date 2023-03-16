@@ -8,6 +8,7 @@ grand_parent: Documentation
 
 This check inspects `rate()` and `irate()` function calls used in queries
 to verify that:
+
 - [Range queries](https://prometheus.io/docs/prometheus/latest/querying/basics/#range-vector-selectors)
   are using a valid time duration.
   This is done by first getting global `scrape_interval` value for selected
@@ -21,7 +22,7 @@ to verify that:
   problems. This is because counters are only allowed to increase in value and any
   value drop is interpreted as counter overflow.
   For gauge metrics use [`delta()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#delta)
-  or [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv) 
+  or [`deriv()`](https://prometheus.io/docs/prometheus/latest/querying/functions/#deriv)
   functions instead.
 - `rate()` is never called on result of `sum(counter)` since that will always return
   invalid results.
@@ -87,7 +88,6 @@ checks {
   disabled = ["promql/rate"]
 }
 ```
-
 
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:

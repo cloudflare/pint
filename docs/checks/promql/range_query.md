@@ -11,8 +11,9 @@ It will warn if a query tries to request a time range that
 is bigger than Prometheus retention limits.
 
 By default Prometheus keeps [15 days of data](https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects),
-this can be customized by setting time or disk space limits.
+this can be customised by setting time or disk space limits.
 There are two main ways of configuring retention limits in Prometheus:
+
 * time based - Prometheus will keep last N days of metrics
 * disk based - Prometheus will try to use up to N bytes of disk space.
 
@@ -24,7 +25,7 @@ data then Prometheus can store.
 
 For example if Prometheus is running with `--storage.tsdb.retention.time=30d`
 then it will store up to 30 days of historical metrics data.
-If we would try to query `foo[40d]` then that query can only return up 
+If we would try to query `foo[40d]` then that query can only return up
 to 30 days of data, it will never return more.
 
 This usually isn't really a problem but can indicate a mismatch between

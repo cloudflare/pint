@@ -16,6 +16,7 @@ with those rules.
 Some checks rely only on the rule itself and can be run "offline" - without talking to any
 Prometheus server.
 You can run pint in "offline" if you:
+
 - Don't pass any configuration file to pint.
 - You pass configuration file to pint that **doesn't** contain any `prometheus` definition.
 - You pass `--offline` flag to `pint` command.
@@ -66,6 +67,7 @@ The easiest way of using `pint` with GitHub Actions is by using
 Here's an example workflow:
 
 {% raw %}
+
 ```yaml
 name: pint
 
@@ -92,9 +94,10 @@ jobs:
           # directory containing Prometheus rules
           workdir: 'rules'
 ```
+
 {% endraw %}
 
-To customize pint checks create a `.pint.hcl` file in the root of your repository.
+To customise pint checks create a `.pint.hcl` file in the root of your repository.
 See [Configuration](configuration.md) for a description of all options.
 
 If your repository contains other files, not only Prometheus rules, then tell pint
@@ -141,7 +144,7 @@ pint watch rules.yml
 ```
 
 By default it will start a HTTP server on port `8080` and run all checks every
-10 minutes. This can be customized by passing extra flags to the `watch` command.
+10 minutes. This can be customised by passing extra flags to the `watch` command.
 Run `pint watch -h` to see all available flags.
 
 Query `/metrics` to see all expose metrics, example with default flags:
@@ -190,6 +193,7 @@ Example:
 Here's an example alert you can use for problems detected by pint:
 
 {% raw %}
+
 ```yaml
 - alert: Pint Problem Detected
   # pint_problem is only present if pint detects any problems
@@ -204,6 +208,7 @@ Here's an example alert you can use for problems detected by pint:
       {{ end }}
     docs: "https://cloudflare.github.io/pint/checks/{{ $labels.reporter }}.html"
 ```
+
 {% endraw %}
 
 ## Release Notes
@@ -247,18 +252,20 @@ Steps:
    ./pint --config /etc/pint.hcl lint /etc/prometheus/rules/*.yml
    ```
 
-# License
+## License
 
+```text
 Copyright (c) 2021-2023 Cloudflare, Inc.
- 
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
- 
+    
     http://www.apache.org/licenses/LICENSE-2.0
- 
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```

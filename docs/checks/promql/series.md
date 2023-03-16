@@ -19,7 +19,7 @@ to determine why, by checking if:
 - `my_metric` metric was ever present in Prometheus
 - `my_metric` was present but disappeared
 - `my_metric` has any series with `foo` label
-- `my_metric` has any series matching `foo="bar"` 
+- `my_metric` has any series matching `foo="bar"`
 
 ## Common problems
 
@@ -71,17 +71,17 @@ problems like label mismatch.
 
 ### Your query cannot return anything
 
-  - You are trying to use a metric that is not present in Prometheus at all.
-  - Service exporting your metric is not working or no longer being scraped.
-  - You are querying wrong Prometheus server.
-  - You are trying to filter a metric that exists using a label key that is
+- You are trying to use a metric that is not present in Prometheus at all.
+- Service exporting your metric is not working or no longer being scraped.
+- You are querying wrong Prometheus server.
+- You are trying to filter a metric that exists using a label key that is
     never present on that metric.
-  - You are using label value as a filter, but that value is never present.
+- You are using label value as a filter, but that value is never present.
 
 If that's the case you need to fix you query. Make sure your metric is present
 and it has all the labels you expect to see.
 
-### Metrics you are using have unstable labeling scheme
+### Metrics you are using have unstable labelling scheme
 
 Some time series for the same metric will have label `foo` and some won't.
 Although there's nothing technically wrong with this and Prometheus allows
@@ -91,7 +91,7 @@ label `foo` will be mixed with other results not having that label.
 All queries would effectively need a `{foo!=""}` or `{foo=""}` filter to
 select only one variant of this metric.
 
-Best solution here is to fix labeling scheme.
+Best solution here is to fix labelling scheme.
 
 ### Metric labels are generated dynamically in response to some activity
 
@@ -100,7 +100,7 @@ are generated for serviced HTTP request and they include some details of
 those requests that cannot be known ahead of time, like request path or
 method.
 
-When possible this can be addressed by initializing metrics with all known
+When possible this can be addressed by initialising metrics with all known
 label values to zero on startup:
 
 ```go
@@ -125,7 +125,7 @@ that.
 
 ## Configuration
 
-This check supports setting extra configuration option to fine tune its behavior.
+This check supports setting extra configuration option to fine tune its behaviour.
 
 Syntax:
 
@@ -140,7 +140,7 @@ check "promql/series" {
   Default is `7d`, meaning that if a metric is missing pint will query last 7 days
   of metrics to tell you if this metric was ever present and if so, when was it last
   seen.
-- `lookbackStep` - lookback query resulution.
+- `lookbackStep` - look-back query resolution.
   Default is `5m` which matches Prometheus default
   [staleness](https://prometheus.io/docs/prometheus/latest/querying/basics/#staleness)
   checks.

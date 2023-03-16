@@ -37,6 +37,7 @@ configuration and it contains some extra lines that are not valid YAML.
 Example:
 
 {% raw %}
+
 ```yaml
 {% set some_jinja_var1 = "bar" %} # pint ignore/line
 groups:
@@ -48,6 +49,7 @@ groups:
 # pint ignore/next-line
 {% set some_jinja_var2 = "foo" %}
 ```
+
 {% endraw %}
 
 ## Ignoring a range of lines
@@ -58,6 +60,7 @@ To ignore a part of a file wrap it with `# pint ignore/begin` and
 Example:
 
 {% raw %}
+
 ```yaml
 # pint ignore/begin
 {% set some_jinja_var1 = "bar" %}
@@ -70,6 +73,7 @@ groups:
     - record: job:http_inprogress_requests:sum
       expr: sum by (job) (http_inprogress_requests)
 ```
+
 {% endraw %}
 
 ## Disabling checks globally
@@ -91,7 +95,7 @@ checks {
 }
 ```
 
-## Disabling invididual checks for specific files
+## Disabling individual checks for specific files
 
 To disable individual check for a specific rule use `# pint file/disable ...` comments
 anywhere in the file. This will disable given check for all rules in that file.
@@ -142,7 +146,6 @@ Prometheus servers with `testing` tag then add this comment:
 ```yaml
 # pint disable promql/series(+testing)
 ```
-
 
 ## Snoozing checks
 
