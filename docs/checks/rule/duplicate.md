@@ -12,7 +12,7 @@ When Prometheus is configured with two identical recording rules that
 are producing the exact time series it will discard results from one
 of them. When that happens you will see warnings in logs, example:
 
-```
+```text
 msg="Rule evaluation result discarded" err="duplicate sample for timestamp"
 ```
 

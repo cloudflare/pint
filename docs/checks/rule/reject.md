@@ -72,6 +72,7 @@ rule {
 Disallow label and annotation values equal to alert name:
 
 {% raw %}
+
 ```js
 rule {
   match {
@@ -84,6 +85,7 @@ rule {
   }
 }
 ```
+
 {% endraw %}
 
 ## How to disable it

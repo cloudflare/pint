@@ -52,7 +52,6 @@ checks {
 }
 ```
 
-
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 

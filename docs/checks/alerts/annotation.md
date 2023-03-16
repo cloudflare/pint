@@ -24,7 +24,7 @@ annotation "$pattern" {
   to reference checked rule fields, see [Configuration](../../configuration.md)
   for details
 - `severity` - set custom severity for reported issues, defaults to a warning
-- `value` - optional value pattern to enforce, if not set only the 
+- `value` - optional value pattern to enforce, if not set only the
 - `required` - if `true` pint will require every alert to have this annotation set,
   if `false` it will only check values where annotation is set
 
@@ -36,6 +36,7 @@ To enable it add one or more `rule {...}` blocks and specify all required
 annotations there.
 
 Example set of rules that will:
+
 - require `summary` annotation to be present, if missing it will be reported as a warning
 - if a `dashboard` annotation is provided it must match `https://grafana\.example\.com/.+`
   pattern, if it doesn't match that pattern it will be reported as a bug
@@ -61,6 +62,7 @@ Example that enforces all alerting rules with non-zero `for` field to have an
 annotation called `alert_for` and value equal to `for` field.
 
 {% raw %}
+
 ```js
 rule {
   match {
@@ -73,6 +75,7 @@ rule {
   }
 }
 ```
+
 {% endraw %}
 
 ## How to disable it

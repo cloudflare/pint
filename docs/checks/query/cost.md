@@ -17,7 +17,7 @@ and use that to estimate the amount of memory needed for all time series
 returned by given query.
 The `bytes per time series` number is calculated using this query:
 
-```
+```js
 avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))
 ```
 

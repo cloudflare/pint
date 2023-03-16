@@ -11,7 +11,7 @@ Below is the list of conflicts it looks for.
 
 ## External labels
 
-If recording rules are manually setting some lables that are
+If recording rules are manually setting some labels that are
 already present in `external_labels` Prometheus configuration option
 then both labels might conflict when metrics are federated or when sending
 alerts.

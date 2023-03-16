@@ -27,7 +27,7 @@ label "$pattern" {
   to reference checked rule fields, see [Configuration](../../configuration.md)
   for details
 - `severity` - set custom severity for reported issues, defaults to a warning
-- `value` - optional value pattern to enforce, if not set only the 
+- `value` - optional value pattern to enforce, if not set only the
 - `required` - if `true` pint will require every rule to have this label set,
   if `false` it will only check values where label is set
 
@@ -59,6 +59,7 @@ than 5 minutes field to have a label called `alert_for` and value equal to
 `for` field.
 
 {% raw %}
+
 ```js
 rule {
   match {
@@ -71,6 +72,7 @@ rule {
   }
 }
 ```
+
 {% endraw %}
 
 ## How to disable it

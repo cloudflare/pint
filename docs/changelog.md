@@ -49,6 +49,7 @@
   - alert: my alert
     expr: rate(my:sum[5m])
   ```
+
 - Added [rule/for](checks/rule/for.md) check.
 - Added `owners` configuration block for setting the list of allowed rule owner values.
   See [configuration](configuration.md) for details.
@@ -71,7 +72,7 @@
 ### Added
 
 - Allow snoozing checks for entire file using `# pint file/snooze ...` comments.
-- Added `lookbackRange` and `lookbackStep` configration option to the
+- Added `lookbackRange` and `lookbackStep` configuration option to the
   [promql/series](checks/promql/series.md) check - #493.
 
 ### Changed
@@ -120,7 +121,7 @@
 - Use [uber-go/automaxprocs](https://github.com/uber-go/automaxprocs) to
   automatically set GOMAXPROCS to match Linux container CPU quota.
 - Added [labels/conflict](checks/labels/conflict.md) check.
-- If you want to disable invididual checks just for some time then you can now
+- If you want to disable individual checks just for some time then you can now
   snooze them instead of disabling forever.
 
   The difference between `# pint disable ...` and `# pint snooze ...` comments is that
@@ -192,8 +193,8 @@
 
 ### Changed
 
-- Refactored some quries used by [promql/series](checks/promql/series.md) check to
-  avoid sending quries that might be very slow and/or return a huge amount of data.
+- Refactored some queries used by [promql/series](checks/promql/series.md) check to
+  avoid sending queries that might be very slow and/or return a huge amount of data.
 - Prometheus query cache now takes into account the size of cached response.
   This makes memory usage needed for query cache more predictable.
   As a result the `cache` option for `prometheus` config block now means
@@ -251,7 +252,7 @@
 ### Changed
 
 - Prometheus range query handling was rewritten to improve memory usage
-  caused by queries returing huge number of results.
+  caused by queries returning huge number of results.
   As a result pint should use up to 5x less memory.
 
 ### Fixed
@@ -259,20 +260,22 @@
 - Fixed false positive reports in [promql/vector_matching](checks/promql/vector_matching.md)
   for rules using `on(...)`. Example:
 
-  ```
+  ```yaml
   sum(foo) without(instance) * on(app_name) group_left() bar
   ```
+
 - Don't log passwords when Prometheus URI is using basic authentication.
 - Fixed false positive reports in [alerts/template](checks/alerts/template.md)
-  suggeting to use `humanize` on queries that already use `round()`.
+  suggesting to use `humanize` on queries that already use `round()`.
 - Fixed false positive reports in [alerts/comparison](checks/alerts/comparison.md)
-  when `bool` modifier is used on a condtion that is guarded by another conditon.
+  when `bool` modifier is used on a condition that is guarded by another condition.
   Example:
 
   ```yaml
   alert: Foo
   expr: (foo > 1) > bool 1
   ```
+
 - Fixed false positive reports in [alerts/template](checks/alerts/template.md)
   warning about labels removed in a query despite being re-added by a join.
 
@@ -303,6 +306,7 @@
   Example template using `sum(xxx` query that's missing closing `)`:
 
   {% raw %}
+
   ```yaml
   - alert: ...
     expr: ...
@@ -312,6 +316,7 @@
         {{ . | first | value | humanize }}
         {{ end }}
   ```
+
   {% endraw %}
 
 - If a file is ignored pint will now note that using `Information` level annotation.
@@ -326,11 +331,11 @@
   This means that when modifying symlink target file checks must be executed against
   both symlink source and target.
   Until now pint was ignoring symlinks but starting with this release it will try to
-  follow them. This means that if you modify a file that has symlinks pointint to them
+  follow them. This means that if you modify a file that has symlinks pointing to them
   pint will try run checks against those symlinks too.
 
   **NOTE**: pint can only detect and check symlinks if they are located in the current
-  working directory (as seen by running pint process) or its subdirectories.
+  working directory (as seen by running pint process) or its sub-directories.
 
 ### Fixed
 
@@ -472,7 +477,6 @@
   }
   ```
 
-
 ### Fixed
 
 - `pint_last_run_checks` and `pint_last_run_checks_done` were not updated properly.
@@ -505,9 +509,9 @@
 ### Changed
 
 - All timeout options are now optional. This includes following config blocks:
-  * `prometheus { timeout = ... }`
-  * `repository { bitbucket { timeout = ... } }`
-  * `repository { github { timeout = ... } }`
+  - `prometheus { timeout = ... }`
+  - `repository { bitbucket { timeout = ... } }`
+  - `repository { github { timeout = ... } }`
 - `pint` will now try to discover all repository settings from environment variables
   when run as part of GitHub Actions workflow and so it doesn't need any
   `repository { github { ... } }` configuration block for that anymore.
@@ -528,7 +532,7 @@
 ### Added
 
 - Added rate limit for Prometheus API requests with a default value of 100
-  requests per second. To customize it set `rateLimit` field inside selected
+  requests per second. To customise it set `rateLimit` field inside selected
   `prometheus` server definition.
 - Added `pint_last_run_checks` and `pint_last_run_checks_done` metrics to track
   progress when running `pint watch`.
@@ -659,7 +663,7 @@
 ### Changed
 
 - `promql/series` will now report missing metrics only if they were last seen
-  over 2 hours ago by default. This can be customized per rule with comments.
+  over 2 hours ago by default. This can be customised per rule with comments.
 
 ## v0.17.7
 
@@ -735,9 +739,9 @@
   Previous releases were only looking for individual rules so `groups` object
   wasn't required. Now pint will fail to read any file that doesn't follow
   Prometheus syntax exactly.
-  To enable old behavior add `parser { relaxed = ["(.+)", ...]}` option in
+  To enable old behaviour add `parser { relaxed = ["(.+)", ...]}` option in
   the config file. See [Configuration](configuration.md) for details.
-  To enable old (relaxed) behavior for all files add:
+  To enable old (relaxed) behaviour for all files add:
 
   ```yaml
   parser {
@@ -842,6 +846,7 @@
     }
   }
   ```
+
 - Regexp matchers used in check rules can now reference rule fields.
   See [Configuration](configuration.md) for details.
 
@@ -866,7 +871,7 @@
 
 ### Fixed
 
-- Don't use failover Prometheus servers in case of errors caused by the query
+- Don't use fail-over Prometheus servers in case of errors caused by the query
   itself, like `many-to-many matching not allowed`.
 
 ## v0.13.0
@@ -883,8 +888,8 @@
 
 ### Changed
 
-- `prometheus` config block now allows to specify failover URIs using `failover` field.
-  If failover URIs are set and main URI fails to respond pint will attempt to use them
+- `prometheus` config block now allows to specify fail-over URIs using `failover` field.
+  If fail-over URIs are set and main URI fails to respond pint will attempt to use them
   in the order specified until one of them works.
 - `prometheus` config block now allows to define how upstream errors are handled using
   `required` field. If `required` is set to `true` any check that depends on remote
@@ -998,7 +1003,7 @@
 
 ### Added
 
-- Cache each Prometheus server responses to minimize the number of API calls.
+- Cache each Prometheus server responses to minimise the number of API calls.
 - `pint watch` will start a daemon that will continuously check all matching rules
   and expose metrics describing all discovered problems.
 
@@ -1068,10 +1073,10 @@
   `by` and `without` conditions. As a result this check might now find issues
   previously undetected.
   Check suppression comments will need to be migrated:
-  * `# pint disable promql/by` becomes `# pint disable promql/aggregate`
-  * `# pint disable promql/without` becomes `# pint disable promql/aggregate`
-  * `# pint ignore promql/by` becomes `# pint ignore promql/aggregate`
-  * `# pint ignore promql/without` becomes `# pint ignore promql/aggregate`
+  - `# pint disable promql/by` becomes `# pint disable promql/aggregate`
+  - `# pint disable promql/without` becomes `# pint disable promql/aggregate`
+  - `# pint ignore promql/by` becomes `# pint ignore promql/aggregate`
+  - `# pint ignore promql/without` becomes `# pint ignore promql/aggregate`
 
 ## v0.5.3
 
@@ -1144,12 +1149,14 @@
   Example:
 
   {% raw %}
+
   ```yaml
   - alert: Foo
     expr: absent(foo{env="prod"})
     annotations:
       summary: 'foo metric is missing for job {{ $labels.job }}'
   ```
+
   {% endraw %}
 
   Would generate a warning since `absent()` can only return labels that are explicitly
@@ -1209,12 +1216,14 @@
   Example:
 
   {% raw %}
+
   ```yaml
   - alert: Foo
     expr: count(up) without(instance) == 0
     annotations:
       summary: 'foo is down on {{ $labels.instance }}'
   ```
+
   {% endraw %}
 
   Would generate a warning since `instance` label is being stripped by `without(instance)`.
@@ -1248,7 +1257,7 @@
 ### Fixed
 
 - `# pint skip/line` place between `# pint skip/begin` and `# pint skip/end` lines would
-  reset ignore rules causing lines that should be ignored to be parsed. 
+  reset ignore rules causing lines that should be ignored to be parsed.
 
 ## v0.1.1
 

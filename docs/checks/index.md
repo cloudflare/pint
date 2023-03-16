@@ -7,6 +7,7 @@ has_children: true
 ---
 
 # List of supported checks
+
 {: .no_toc }
 
 1. TOC
