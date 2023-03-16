@@ -86,16 +86,22 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable rule/label`
+```yaml
+# pint file/disable rule/label
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable rule/label`
+```yaml
+# pint disable rule/label
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
-`# pint disable rule/label($label:$required)`
+```yaml
+# pint disable rule/label($label:$required)
+```
 
 Where `$label` is the label name and `$required` is the configure value
 of `required` option.
@@ -120,13 +126,17 @@ label "severity" {
 
 Example comment disabling that rule:
 
-`# pint disable rule/label(severity:true)`
+```yaml
+# pint disable rule/label(severity:true)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP rule/label`
+```yaml
+# pint snooze $TIMESTAMP rule/label
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

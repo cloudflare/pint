@@ -102,7 +102,9 @@ You can also use tags set on Prometheus configuration blocks inside comments.
 Tags must use `+` prefix, so if you want to disable `promql/series` check on all
 Prometheus servers with `testing` tag then add this comment:
 
-`# pint file/disable promql/series(+testing)`
+```yaml
+# pint file/disable promql/series(+testing)
+```
 
 ## Disabling individual checks for specific rules
 
@@ -129,13 +131,17 @@ prometheus "staging" {
 and have a rule where you want to disable `promql/series` checks run against that
 Prometheus server then add a comment:
 
-`# pint disable promql/series(staging)`
+```yaml
+# pint disable promql/series(staging)
+```
 
 You can also use tags set on Prometheus configuration blocks inside comments.
 Tags must use `+` prefix, so if you want to disable `promql/series` check on all
 Prometheus servers with `testing` tag then add this comment:
 
-`# pint disable promql/series(+testing)`
+```yaml
+# pint disable promql/series(+testing)
+```
 
 
 ## Snoozing checks

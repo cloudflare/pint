@@ -46,17 +46,23 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable rule/for`
+```yaml
+# pint file/disable rule/for
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable rule/for`
+```yaml
+# pint disable rule/for
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP rule/for`
+```yaml
+# pint snooze $TIMESTAMP rule/for
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

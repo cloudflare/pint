@@ -81,40 +81,54 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable query/cost`
+```yaml
+# pint file/disable query/cost
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable query/cost`
+```yaml
+# pint disable query/cost
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
 ### If `maxSeries` is set
 
-`# pint disable query/cost($prometheus:$maxSeries)`
+```yaml
+# pint disable query/cost($prometheus:$maxSeries)
+```
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable query/cost(dev:5000)`
+```yaml
+# pint disable query/cost(dev:5000)
+```
 
 ### If `maxSeries` is NOT set
 
-`# pint disable query/cost($prometheus)`
+```yaml
+# pint disable query/cost($prometheus)
+```
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable query/cost(dev)`
+```yaml
+# pint disable query/cost(dev)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP query/cost`
+```yaml
+# pint snooze $TIMESTAMP query/cost
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

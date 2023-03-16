@@ -44,17 +44,23 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable alerts/comparison`
+```yaml
+# pint file/disable alerts/comparison
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable alerts/comparison`
+```yaml
+# pint disable alerts/comparison
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP alerts/comparison`
+```yaml
+# pint snooze $TIMESTAMP alerts/comparison
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

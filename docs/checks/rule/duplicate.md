@@ -63,28 +63,38 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable rule/duplicate`
+```yaml
+# pint file/disable rule/duplicate
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable rule/duplicate`
+```yaml
+# pint disable rule/duplicate
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
-`# pint disable rule/duplicate($prometheus)`
+```yaml
+# pint disable rule/duplicate($prometheus)
+```
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable rule/duplicate(prod)`
+```yaml
+# pint disable rule/duplicate(prod)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP rule/duplicate`
+```yaml
+# pint snooze $TIMESTAMP rule/duplicate
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

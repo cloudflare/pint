@@ -29,7 +29,9 @@ of different issues. Here are some usual cases.
 ### Your query is using ALERTS or ALERTS_FOR_STATE metrics
 
 Prometheus itself exposes [metrics about active alerts](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#inspecting-alerts-during-runtime).
+
 And it's possible to use those metrics in recording or alerting rules.
+
 If pint finds a query using either `ALERTS{alertname="..."}` or
 `ALERTS_FOR_STATE{alertname="..."}` selector it will check if there's
 alerting rule with matching name defined. For queries that don't pass any
@@ -59,6 +61,7 @@ Example with alert rule that depends on two recording rules:
 If all three rules where added in a single PR and pint didn't try to match
 metrics to recording rule then `pint ci` would block such PR because metrics
 this alert is using are not present in Prometheus.
+
 To avoid this pint will only emit a warning, to make it obvious that it was
 unable to run a full set of checks, but won't report any problems.
 
@@ -84,6 +87,7 @@ Some time series for the same metric will have label `foo` and some won't.
 Although there's nothing technically wrong with this and Prometheus allows
 you to do so, this makes querying metrics difficult as results containing
 label `foo` will be mixed with other results not having that label.
+
 All queries would effectively need a `{foo!=""}` or `{foo=""}` filter to
 select only one variant of this metric.
 
@@ -170,11 +174,15 @@ Syntax:
 
 To set `min-age` for all metrics in a query:
 
-`# pint rule/set promql/series min-age $duration`
+```yaml
+# pint rule/set promql/series min-age $duration
+```
 
 To set `min-age` for specific metric:
 
-`# pint rule/set promql/series($metric_name) min-age $duration`
+```yaml
+# pint rule/set promql/series($metric_name) min-age $duration
+```
 
 Example:
 
@@ -196,20 +204,27 @@ Example:
 
 By default pint will report a problem if a rule uses query with a label filter
 and the value of that filter query doesn't match anything.
+
 For example `rate(http_errors_total{code="500"}[2m])` will report a problem
 if there are no `http_errors_total` series with `code="500"`.
+
 The goal here is to catch typos in label filters or labels with values that
 got renamed, but in some cases this will report false positive problems,
 especially if label values are exported dynamically, for example after
 HTTP status code is observed.
+
 In the `http_errors_total{code="500"}` example if `code` label is generated
 based on HTTP responses then there won't be any series with `code="500"` until
 there's at least one HTTP response that generated this code.
+
 You can relax pint checks so it doesn't validate if label values for specific
 labels are present on any time series.
-Syntax
 
-`# pint rule/set promql/series ignore/label-value $labelName`
+Syntax:
+
+```yaml
+# pint rule/set promql/series ignore/label-value $labelName`
+```
 
 Example:
 
@@ -269,30 +284,39 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable promql/series`
+```yaml
+# pint file/disable promql/series
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable promql/series`
+```yaml
+# pint disable promql/series`
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
-`# pint disable promql/series($prometheus)`
+```yaml
+# pint disable promql/series($prometheus)
+```
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable promql/series(prod)`
+```yaml
+# pint disable promql/series(prod)
+```
 
 You can also disable `promql/series` for specific metric using
 `# pint disable promql/series($selector)` comment.
 
 Just like with PromQL if a selector doesn't have any matchers then it will match all instances,
+
 Example:
 
-```YAML
+```yaml
 - alert: foo
   # Disable promql/series for any instance of my_metric_name metric selector
   # pint disable promql/series(my_metric_name)
@@ -300,9 +324,10 @@ Example:
 ```
 
 To disable individual selectors you can pass matchers.
+
 Example:
 
-```YAML
+```yaml
 - alert: foo
   # Disable promql/series only for my_metric_name{instance="a"} metric selector
   # pint disable promql/series(my_metric_name{instance="a"})
@@ -311,9 +336,10 @@ Example:
 
 Matching is done the same way PromQL matchers work - if the selector from
 the query has more matchers than the comment the it will be still matched.
+
 Example:
 
-```YAML
+```yaml
 - alert: foo
   # Disable promql/series for any selector at least partially matching {job="dev"}
   # pint disable promql/series({job="dev"})
@@ -324,7 +350,9 @@ Example:
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP promql/series`
+```yaml
+# pint snooze $TIMESTAMP promql/series
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

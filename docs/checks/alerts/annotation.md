@@ -88,11 +88,15 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable alerts/annotation`
+```yaml
+# pint file/disable alerts/annotation
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable alerts/annotation`
+```yaml
+# pint disable alerts/annotation
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
@@ -118,7 +122,9 @@ annotation "summary" {
 
 Example comment disabling that rule:
 
-`# pint disable alerts/annotation(summary:true)`
+```yaml
+# pint disable alerts/annotation(summary:true)
+```
 
 ### If `value` is set
 
@@ -142,13 +148,17 @@ annotation "dashboard" {
 
 Example comment disabling that rule:
 
-`# pint disable alerts/annotation(dashboard:https://grafana\.example\.com/.+:true)`
+```yaml
+# pint disable alerts/annotation(dashboard:https://grafana\.example\.com/.+:true)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP alerts/annotation`
+```yaml
+# pint snooze $TIMESTAMP alerts/annotation
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

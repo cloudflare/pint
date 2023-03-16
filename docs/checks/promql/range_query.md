@@ -76,28 +76,38 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable promql/range_query`
+```yaml
+# pint file/disable promql/range_query
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable promql/range_query`
+```yaml
+# pint disable promql/range_query
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
-`# pint disable promql/range_query($prometheus)`
+```yaml
+# pint disable promql/range_query($prometheus)
+```
 
 Where `$prometheus` is the name of Prometheus server to disable.
 
 Example:
 
-`# pint disable promql/range_query(prod)`
+```yaml
+# pint disable promql/range_query(prod)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP promql/range_query`
+```yaml
+# pint snooze $TIMESTAMP promql/range_query
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

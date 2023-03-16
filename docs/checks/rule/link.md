@@ -101,26 +101,36 @@ checks {
 You can also disable it for all rules inside given file by adding
 a comment anywhere in that file. Example:
 
-`# pint file/disable rule/link`
+```yaml
+# pint file/disable rule/link
+```
 
 Or you can disable it per rule by adding a comment to it. Example:
 
-`# pint disable rule/link`
+```yaml
+# pint disable rule/link
+```
 
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
-`# pint disable rule/link($pattern)`
+```yaml
+# pint disable rule/link($pattern)
+```
 
 Example:
 
-`# pint disable rule/link(^https?://.+$)`
+```yaml
+# pint disable rule/link(^https?://.+$)
+```
 
 ## How to snooze it
 
 You can disable this check until given time by adding a comment to it. Example:
 
-`# pint snooze $TIMESTAMP rule/link`
+```yaml
+# pint snooze $TIMESTAMP rule/link
+```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
 formatted  or `YYYY-MM-DD`.

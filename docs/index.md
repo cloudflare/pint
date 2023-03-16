@@ -23,12 +23,12 @@ You can run pint in "offline" if you:
 Most checks included in pint will require sending queries to a running Prometheus server where
 those rules are, or would be, deployed.
 Those checks are enabled if you pass a configuration file to pint that includes at least one
-`prometheus` block will.
+`prometheus` block.
 Checks might use various Prometheus
-[HTTP API endpoints](https://prometheus.io/docs/prometheus/latest/querying/api/) to retrive
+[HTTP API endpoints](https://prometheus.io/docs/prometheus/latest/querying/api/) to retrieve
 extra information, for example Prometheus configuration or metrics metadata.
 If you run pint against a different service, like [Thanos](https://thanos.io/) some checks
-might return an erorr, since not all Prometheus HTTP APIs are supported by it.
+might return problems due to API call errors, since not all Prometheus HTTP APIs are supported by it.
 In that case you might want to disable failing checks in pint configuration file.
 
 ## Usage
