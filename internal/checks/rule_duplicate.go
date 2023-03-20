@@ -62,7 +62,7 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 	return problems
 }
 
-func (c RuleDuplicateCheck) compareRules(ctx context.Context, rule *parser.RecordingRule, entry discovery.Entry) (problems []Problem) {
+func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry) (problems []Problem) {
 	ruleALabels := buildRuleLabels(rule)
 	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule)
 

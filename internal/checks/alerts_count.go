@@ -47,7 +47,7 @@ func (c AlertsCheck) Reporter() string {
 	return AlertsCheckName
 }
 
-func (c AlertsCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return
 	}

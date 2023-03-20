@@ -100,18 +100,10 @@ func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	}
 }
 
-func newYamlNodeWithParent(parent, node *yaml.Node, offset int) *YamlNode {
-	return &YamlNode{
-		Position: NewFilePosition(nodeLines(node, offset)),
-		Value:    node.Value,
-		Comments: mergeComments(node),
-	}
-}
-
 func newYamlKeyValue(key, val *yaml.Node, offset int) *YamlKeyValue {
 	return &YamlKeyValue{
 		Key:   newYamlNode(key, offset),
-		Value: newYamlNodeWithParent(key, val, offset),
+		Value: newYamlNode(val, offset),
 	}
 }
 
@@ -209,7 +201,7 @@ func (pqle PromQLExpr) Lines() (lines []int) {
 func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 	expr := PromQLExpr{
 		Key:   newYamlNode(key, offset),
-		Value: newYamlNodeWithParent(key, val, offset),
+		Value: newYamlNode(val, offset),
 	}
 
 	qlNode, err := DecodeExpr(val.Value)

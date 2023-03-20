@@ -33,7 +33,7 @@ func (c LabelsConflictCheck) Reporter() string {
 	return LabelsConflictCheckName
 }
 
-func (c LabelsConflictCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.RecordingRule == nil || rule.RecordingRule.Expr.SyntaxError != nil {
 		return nil
 	}

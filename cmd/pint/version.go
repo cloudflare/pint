@@ -12,7 +12,7 @@ var versionCmd = &cli.Command{
 	Action: actionVersion,
 }
 
-func actionVersion(c *cli.Context) (err error) {
+func actionVersion(_ *cli.Context) error {
 	fmt.Printf("%s (revision: %s)\n", version, commit)
 	return nil
 }

@@ -114,7 +114,7 @@ type RuleChecker interface {
 	String() string
 	Reporter() string
 	Meta() CheckMeta
-	Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) []Problem
+	Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) []Problem
 }
 
 type exprProblem struct {

@@ -80,7 +80,7 @@ func newSimpleProm(uri string) *promapi.FailoverGroup {
 	return simpleProm("prom", uri, time.Second*5, true)
 }
 
-func noProm(uri string) *promapi.FailoverGroup {
+func noProm(_ string) *promapi.FailoverGroup {
 	return nil
 }
 
@@ -194,7 +194,7 @@ func mustParseContent(content string) (entries []discovery.Entry) {
 	return entries
 }
 
-func noProblems(uri string) []checks.Problem {
+func noProblems(_ string) []checks.Problem {
 	return nil
 }
 
@@ -277,7 +277,7 @@ type promError struct {
 	err       string
 }
 
-func (pe promError) respond(w http.ResponseWriter, r *http.Request) {
+func (pe promError) respond(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(pe.code)
 	w.Header().Set("Content-Type", "application/json")
 	perr := struct {
@@ -300,7 +300,7 @@ type vectorResponse struct {
 	samples model.Vector
 }
 
-func (vr vectorResponse) respond(w http.ResponseWriter, r *http.Request) {
+func (vr vectorResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
@@ -379,7 +379,7 @@ type configResponse struct {
 	yaml string
 }
 
-func (cr configResponse) respond(w http.ResponseWriter, r *http.Request) {
+func (cr configResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
@@ -400,7 +400,7 @@ type flagsResponse struct {
 	flags map[string]string
 }
 
-func (fg flagsResponse) respond(w http.ResponseWriter, r *http.Request) {
+func (fg flagsResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
@@ -421,7 +421,7 @@ type metadataResponse struct {
 	metadata map[string][]v1.Metadata
 }
 
-func (mr metadataResponse) respond(w http.ResponseWriter, r *http.Request) {
+func (mr metadataResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	// _, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
@@ -443,7 +443,7 @@ type sleepResponse struct {
 	sleep time.Duration
 }
 
-func (sr sleepResponse) respond(w http.ResponseWriter, r *http.Request) {
+func (sr sleepResponse) respond(_ http.ResponseWriter, _ *http.Request) {
 	time.Sleep(sr.sleep)
 }
 

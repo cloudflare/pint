@@ -90,7 +90,7 @@ func (c TemplateCheck) Reporter() string {
 	return TemplateCheckName
 }
 
-func (c TemplateCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return nil
 	}
@@ -256,7 +256,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems 
 	return problems
 }
 
-func queryFunc(ctx context.Context, expr string, ts time.Time) (promql.Vector, error) {
+func queryFunc(_ context.Context, expr string, _ time.Time) (promql.Vector, error) {
 	if _, err := promParser.ParseExpr(expr); err != nil {
 		return nil, err
 	}

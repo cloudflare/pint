@@ -17,7 +17,7 @@ func TestQueryCacheOnlySet(t *testing.T) {
 
 	var i uint64
 	for i = 1; i <= 100; i++ {
-		cache.set(i, mockErr, 0, "/foo")
+		cache.set(i, mockErr, 0)
 	}
 
 	require.Equal(t, 100, len(cache.entries))
@@ -28,9 +28,9 @@ func TestQueryCacheReplace(t *testing.T) {
 	mockErr := errors.New("Fake Error")
 	cache := newQueryCache(time.Minute)
 
-	cache.set(6, mockErr, 0, "/foo")
-	cache.set(6, mockErr, 0, "/foo")
-	cache.set(6, mockErr, 0, "/foo")
+	cache.set(6, mockErr, 0)
+	cache.set(6, mockErr, 0)
+	cache.set(6, mockErr, 0)
 
 	require.Equal(t, 1, len(cache.entries))
 	require.Equal(t, 0, cache.evictions)
@@ -48,7 +48,7 @@ func TestQueryCacheGetAndSet(t *testing.T) {
 		require.Zero(t, v)
 
 		// first set
-		cache.set(i, mockErr, time.Minute, "/foo")
+		cache.set(i, mockErr, time.Minute)
 
 		// second get, should be in cache now
 		v, ok = cache.get(i, "/foo")
@@ -76,7 +76,7 @@ func TestQueryCachePurgeZeroTTL(t *testing.T) {
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
-		cache.set(i, mockErr, 0, "/foo")
+		cache.set(i, mockErr, 0)
 		_, _ = cache.get(i, "/foo")
 	}
 	require.Equal(t, 100, len(cache.entries))
@@ -98,7 +98,7 @@ func TestQueryCachePurgeExpired(t *testing.T) {
 	for i = 1; i <= maxSize; i++ {
 		_, _ = cache.get(i, "/foo")
 		_, _ = cache.get(i, "/foo")
-		cache.set(i, mockErr, time.Second, "/foo")
+		cache.set(i, mockErr, time.Second)
 		_, _ = cache.get(i, "/foo")
 	}
 	require.Equal(t, 100, len(cache.entries))
@@ -119,7 +119,7 @@ func TestQueryCacheEvictMaxStale(t *testing.T) {
 
 	var i, j uint64
 	for i = 1; i <= 100; i++ {
-		cache.set(i, mockErr, time.Minute, "/foo")
+		cache.set(i, mockErr, time.Minute)
 		for j = 1; j <= i; j++ {
 			_, _ = cache.get(i, "/foo")
 		}
@@ -178,9 +178,9 @@ pint_prometheus_cache_size{name="prom"} 0
 		endpoint := fmt.Sprintf("/foo/%d", i%10)
 		_, _ = cache.get(i, endpoint)
 		_, _ = cache.get(i, endpoint)
-		cache.set(i, queryResult{}, time.Minute, endpoint)
+		cache.set(i, queryResult{}, time.Minute)
 		_, _ = cache.get(i, endpoint)
-		cache.set(i, queryResult{}, time.Minute, endpoint)
+		cache.set(i, queryResult{}, time.Minute)
 		_, _ = cache.get(i, endpoint)
 	}
 
@@ -224,7 +224,7 @@ pint_prometheus_cache_size{name="prom"} 100
 		endpoint := fmt.Sprintf("/foo/%d", i%10)
 		_, _ = cache.get(i, endpoint)
 		_, _ = cache.get(i, endpoint)
-		cache.set(i, queryResult{}, time.Minute, endpoint)
+		cache.set(i, queryResult{}, time.Minute)
 	}
 
 	require.NoError(t, testutil.CollectAndCompare(
@@ -267,10 +267,8 @@ pint_prometheus_cache_size{name="prom"} 110
 func BenchmarkQueryCacheOnlySet(b *testing.B) {
 	mockErr := errors.New("Fake Error")
 	cache := newQueryCache(time.Minute)
-
-	endpoint := "/foo"
 	for n := 0; n < b.N; n++ {
-		cache.set(1, mockErr, 0, endpoint)
+		cache.set(1, mockErr, 0)
 	}
 }
 
@@ -281,12 +279,11 @@ func BenchmarkQueryCacheSetGrow(b *testing.B) {
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
-		cache.set(i, mockErr, 0, "/foo")
+		cache.set(i, mockErr, 0)
 	}
 
-	endpoint := "/foo"
 	for n := 1; n <= b.N; n++ {
-		cache.set(uint64(maxSize+n), mockErr, 0, endpoint)
+		cache.set(uint64(maxSize+n), mockErr, 0)
 	}
 }
 
@@ -312,7 +309,7 @@ func BenchmarkQueryCacheGC(b *testing.B) {
 			ttl = time.Millisecond
 		}
 		for i = 1; i <= 1000; i++ {
-			cache.set(i, mockErr, ttl, "/foo")
+			cache.set(i, mockErr, ttl)
 		}
 		time.Sleep(time.Millisecond * 2)
 		b.StartTimer()

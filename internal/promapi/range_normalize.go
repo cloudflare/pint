@@ -218,7 +218,7 @@ func (str SeriesTimeRanges) covers(ts time.Time) bool {
 }
 
 func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until time.Time) {
-	for !from.After(str.Until) {
+	for !from.After(until) {
 		if str.covers(from) || !baseline.covers(from) {
 			from = from.Add(str.Step)
 			continue

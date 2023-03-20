@@ -41,7 +41,7 @@ func (c VectorMatchingCheck) Reporter() string {
 	return VectorMatchingCheckName
 }
 
-func (c VectorMatchingCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c VectorMatchingCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

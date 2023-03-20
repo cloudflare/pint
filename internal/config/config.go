@@ -159,7 +159,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 	}
 
 	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(ctx, path, r, cfg.Checks.Enabled, cfg.Checks.Disabled, proms)...)
+		allChecks = append(allChecks, rule.resolveChecks(ctx, path, r, proms)...)
 	}
 
 	for _, cm := range allChecks {

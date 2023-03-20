@@ -174,7 +174,7 @@ func actionWatch(c *cli.Context) error {
 	return nil
 }
 
-func startTimer(ctx context.Context, cfg config.Config, workers int, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
+func startTimer(ctx context.Context, _ config.Config, workers int, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
 	ticker := time.NewTicker(time.Second)
 	stop := make(chan bool, 1)
 	wasBootstrapped := false

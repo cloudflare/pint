@@ -33,7 +33,7 @@ func (c RegexpCheck) Reporter() string {
 	return RegexpCheckName
 }
 
-func (c RegexpCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

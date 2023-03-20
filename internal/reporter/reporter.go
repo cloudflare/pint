@@ -6,7 +6,6 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -105,20 +104,6 @@ func (s Summary) CountBySeverity() map[checks.Severity]int {
 
 type Reporter interface {
 	Submit(Summary) error
-}
-
-func blameReports(reports []Report, gitCmd git.CommandRunner) (pb git.FileBlames, err error) {
-	pb = make(git.FileBlames)
-	for _, report := range reports {
-		if _, ok := pb[report.SourcePath]; ok {
-			continue
-		}
-		pb[report.SourcePath], err = git.Blame(gitCmd, report.SourcePath)
-		if err != nil {
-			return
-		}
-	}
-	return pb, nil
 }
 
 func shouldReport(report Report) bool {
