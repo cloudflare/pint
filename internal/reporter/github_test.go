@@ -41,6 +41,13 @@ func TestGithubReporter(t *testing.T) {
   expr: sum(errors) by (job)
 `))
 
+	blameLine := func(sha string, line int, filename, content string) string {
+		return fmt.Sprintf(`%s %d %d 1
+filename %s
+	%s
+`, sha, line, line, filename, content)
+	}
+
 	for _, tc := range []testCaseT{
 		{
 			description: "timeout errors out",

@@ -19,13 +19,6 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-func blameLine(sha string, line int, filename, content string) string {
-	return fmt.Sprintf(`%s %d %d 1
-filename %s
-	%s
-`, sha, line, line, filename, content)
-}
-
 func TestBitBucketReporter(t *testing.T) {
 	zerolog.SetGlobalLevel(zerolog.FatalLevel)
 
@@ -71,10 +64,6 @@ func TestBitBucketReporter(t *testing.T) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
 				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
 				return nil, nil
 			},
 			reports: []reporter.Report{
@@ -102,10 +91,6 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
 				}
 				return nil, nil
 			},
@@ -137,10 +122,6 @@ func TestBitBucketReporter(t *testing.T) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
 				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
 				return nil, nil
 			},
 			reports: []reporter.Report{
@@ -170,10 +151,6 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0") + blameLine("fake-commit-id", 4, "foo.txt", "errors")
-					return []byte(content), nil
 				}
 				return nil, nil
 			},
@@ -299,14 +276,6 @@ func TestBitBucketReporter(t *testing.T) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
 				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-00", 1, "foo.txt", "ignore") +
-						blameLine("fake-commit-00", 2, "foo.txt", "ignore") +
-						blameLine("fake-commit-id", 3, "foo.txt", "ok") +
-						blameLine("fake-commit-id", 4, "foo.txt", "syntax error") +
-						blameLine("fake-commit-01", 5, "foo.txt", "ignore")
-					return []byte(content), nil
-				}
 				return nil, nil
 			},
 			reports: []reporter.Report{
@@ -363,10 +332,6 @@ func TestBitBucketReporter(t *testing.T) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
 				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0") + blameLine("fake-commit-id", 4, "foo.txt", "errors")
-					return []byte(content), nil
-				}
 				return nil, nil
 			},
 			report: reporter.BitBucketReport{
@@ -395,10 +360,6 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 4, "foo.txt", "errors")
-					return []byte(content), nil
 				}
 				return nil, nil
 			},
