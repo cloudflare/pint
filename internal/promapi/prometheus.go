@@ -182,7 +182,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	}
 
 	if prom.cache != nil {
-		prom.cache.set(cacheKey, result.value, job.query.CacheTTL(), job.query.Endpoint())
+		prom.cache.set(cacheKey, result.value, job.query.CacheTTL())
 	}
 
 	return result

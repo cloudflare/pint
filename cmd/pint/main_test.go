@@ -60,7 +60,7 @@ func TestScripts(t *testing.T) {
 	})
 }
 
-func httpServer(ts *testscript.TestScript, neg bool, args []string) {
+func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 	mocks := ts.Value("mocks").(*httpMocks)
 
 	if len(args) == 0 {

@@ -37,7 +37,7 @@ func (c RangeQueryCheck) Reporter() string {
 	return RangeQueryCheckName
 }
 
-func (c RangeQueryCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {

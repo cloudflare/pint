@@ -78,7 +78,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 		return fmt.Errorf("failed to list pull request reviews: %w", err)
 	}
 	if review != nil {
-		if err = gr.updateReview(review, headCommit, summary); err != nil {
+		if err = gr.updateReview(review, summary); err != nil {
 			return err
 		}
 	} else {
@@ -87,7 +87,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 		}
 	}
 
-	return gr.addReviewComments(review, headCommit, summary)
+	return gr.addReviewComments(headCommit, summary)
 }
 
 func (gr GithubReporter) findExistingReview() (*github.PullRequestReview, error) {
@@ -108,7 +108,7 @@ func (gr GithubReporter) findExistingReview() (*github.PullRequestReview, error)
 	return nil, nil
 }
 
-func (gr GithubReporter) updateReview(review *github.PullRequestReview, headCommit string, summary Summary) error {
+func (gr GithubReporter) updateReview(review *github.PullRequestReview, summary Summary) error {
 	log.Info().Str("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)).Msg("Updating pull request review")
 
 	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
@@ -125,7 +125,7 @@ func (gr GithubReporter) updateReview(review *github.PullRequestReview, headComm
 	return err
 }
 
-func (gr GithubReporter) addReviewComments(review *github.PullRequestReview, headCommit string, summary Summary) error {
+func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) error {
 	log.Info().Msg("Creating review comments")
 
 	existingComments, err := gr.getReviewComments()
@@ -148,7 +148,7 @@ func (gr GithubReporter) addReviewComments(review *github.PullRequestReview, hea
 			continue
 		}
 
-		if err := gr.createComment(review, comment); err != nil {
+		if err := gr.createComment(comment); err != nil {
 			return err
 		}
 	}
@@ -164,7 +164,7 @@ func (gr GithubReporter) getReviewComments() ([]*github.PullRequestComment, erro
 	return comments, err
 }
 
-func (gr GithubReporter) createComment(review *github.PullRequestReview, comment *github.PullRequestComment) error {
+func (gr GithubReporter) createComment(comment *github.PullRequestComment) error {
 	log.Debug().Str("body", comment.GetBody()).Str("commit", comment.GetCommitID()).Msg("Creating review comment")
 
 	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)

@@ -67,7 +67,7 @@ func (c *queryCache) get(key uint64, endpoint string) (v any, ok bool) {
 
 // Cache results if it was requested at least twice EVER - which means it's either
 // popular and requested multiple times within a loop OR this cache key survives between loops.
-func (c *queryCache) set(key uint64, val any, ttl time.Duration, endpoint string) {
+func (c *queryCache) set(key uint64, val any, ttl time.Duration) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

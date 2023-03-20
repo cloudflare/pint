@@ -17,7 +17,7 @@ type failingReader struct {
 	err error
 }
 
-func (r failingReader) Read(p []byte) (int, error) {
+func (r failingReader) Read(_ []byte) (int, error) {
 	return 0, r.err
 }
 

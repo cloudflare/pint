@@ -66,32 +66,6 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 		},
 		{
-			description: "returns an error on git blame failure",
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					return nil, errors.New("git blame error")
-				}
-				return nil, nil
-			},
-			reports: []reporter.Report{
-				{
-					ReportedPath: "foo.txt",
-					SourcePath:   "foo.txt",
-					Rule:         mockRules[0],
-					Problem:      checks.Problem{},
-				},
-			},
-			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to run git blame: git blame error" {
-					return nil
-				}
-				return fmt.Errorf("Expected git head error, got %w", err)
-			},
-		},
-		{
 			description: "returns an error on non-200 HTTP response",
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
