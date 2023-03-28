@@ -15,7 +15,7 @@ require (
 	github.com/prometheus/common v0.42.0
 	github.com/prometheus/prometheus v0.43.0
 	github.com/prymitive/current v0.1.0
-	github.com/rogpeppe/go-internal v1.9.1-0.20230209130841-f0583b8402aa
+	github.com/rogpeppe/go-internal v1.10.0
 	github.com/rs/zerolog v1.29.0
 	github.com/stretchr/testify v1.8.2
 	github.com/urfave/cli/v2 v2.25.1
@@ -65,7 +65,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mwitkow/go-conntrack v0.0.0-20190716064945-2f068394615f // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
-	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/common/sigv4 v0.1.0 // indirect
