@@ -345,6 +345,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				Name:          metricName,
 				LabelMatchers: []*labels.Matcher{lm},
 			}
+			addNameSelectorIfNeeded(&labelSelector, selector.LabelMatchers)
 			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
 
 			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
@@ -649,4 +650,21 @@ func newest(ranges []promapi.MetricTimeRange) (ts time.Time) {
 		}
 	}
 	return ts
+}
+
+func addNameSelectorIfNeeded(selector *promParser.VectorSelector, matchers []*labels.Matcher) {
+	if selector.Name != "" {
+		return
+	}
+	for _, lm := range selector.LabelMatchers {
+		if lm.Name == model.MetricNameLabel {
+			return
+		}
+	}
+
+	for _, lm := range matchers {
+		if lm.Name == model.MetricNameLabel {
+			selector.LabelMatchers = append(selector.LabelMatchers, lm)
+		}
+	}
 }

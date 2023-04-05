@@ -124,29 +124,30 @@ type exprProblem struct {
 }
 
 func textAndSeverityFromError(err error, reporter, prom string, s Severity) (text string, severity Severity) {
-	if promapi.IsUnavailableError(err) {
-		text = fmt.Sprintf("couldn't run %q checks due to %q connection error: %s", reporter, prom, err)
-		var perr *promapi.FailoverGroupError
-		if errors.As(err, &perr) {
-			if uri := perr.URI(); uri != "" {
-				text = fmt.Sprintf("couldn't run %q checks due to %s connection error: %s", reporter, promText(prom, uri), err)
-			}
-			if perr.IsStrict() {
-				severity = Bug
-			} else {
-				severity = Warning
-			}
-		} else {
-			severity = Warning
+	promDesc := fmt.Sprintf("%q", prom)
+	var perr *promapi.FailoverGroupError
+	perrOk := errors.As(err, &perr)
+	if perrOk {
+		if uri := perr.URI(); uri != "" {
+			promDesc = promText(prom, uri)
 		}
-	} else {
-		text = fmt.Sprintf("%q failed with: %s", prom, err)
-		var perr *promapi.FailoverGroupError
-		if errors.As(err, &perr) {
-			text = fmt.Sprintf("%s failed with: %s", promText(prom, perr.URI()), err)
+	}
+
+	switch {
+	case promapi.IsQueryTooExpensive(err):
+		text = fmt.Sprintf("couldn't run %q checks on %s because some queries are too expensive: %s", reporter, promDesc, err)
+		severity = Warning
+	case promapi.IsUnavailableError(err):
+		text = fmt.Sprintf("couldn't run %q checks due to %s connection error: %s", reporter, promDesc, err)
+		severity = Warning
+		if perrOk && perr.IsStrict() {
+			severity = Bug
 		}
+	default:
+		text = fmt.Sprintf("%s failed with: %s", promDesc, err)
 		severity = s
 	}
+
 	return text, severity
 }
 

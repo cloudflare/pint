@@ -34,7 +34,7 @@ func (q instantQuery) Run() queryResult {
 		Str("query", q.expr).
 		Msg("Running prometheus query")
 
-	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
+	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
 
 	var qr queryResult

@@ -30,7 +30,7 @@ func (q flagsQuery) Run() queryResult {
 		Str("uri", q.prom.safeURI).
 		Msg("Getting prometheus flags")
 
-	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
+	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
 
 	var qr queryResult

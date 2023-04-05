@@ -112,6 +112,60 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "overload",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithTooManySamples(),
+				},
+			},
+		},
+		{
+			description: "expanding series: context deadline exceeded",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "foo",
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithTimeoutExpandingSeriesSamples(),
+				},
+			},
+		},
+		{
 			description: "simple query",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
 			checker:     newSeriesCheck,
@@ -2906,6 +2960,69 @@ func TestSeriesCheck(t *testing.T) {
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
 			problems:   noProblems,
+		},
+		{
+			description: "__name__=~ shouldn't run {foo=bar} queries",
+			content:     "- alert: NameRegex\n  expr: rate({__name__=~\"(foo|bar)_panics_total\", job=\"myjob\"}[2m]) > 0",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `{__name__=~"(foo|bar)_panics_total",job="myjob"}`,
+						Lines:    []int{2},
+						Reporter: checks.SeriesCheckName,
+						Text:     noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent({__name__=~"(foo|bar)_panics_total",job=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Minute*-50),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+			},
 		},
 	}
 	runTests(t, testCases)

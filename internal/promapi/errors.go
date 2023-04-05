@@ -7,10 +7,12 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strings"
 	"syscall"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prymitive/current"
+	"github.com/rs/zerolog/log"
 )
 
 func IsUnavailableError(err error) bool {
@@ -18,8 +20,23 @@ func IsUnavailableError(err error) bool {
 	if ok := errors.As(err, &e1); ok {
 		return e1.ErrorType == v1.ErrServer
 	}
-
 	return true
+}
+
+func IsQueryTooExpensive(err error) bool {
+	var e1 APIError
+	if ok := errors.As(err, &e1); ok {
+		if e1.ErrorType != v1.ErrExec {
+			return false
+		}
+		if strings.HasPrefix(e1.Err, "query processing would load too many samples into memory in ") {
+			return true
+		}
+		if strings.HasSuffix(e1.Err, "expanding series: context deadline exceeded") {
+			return true
+		}
+	}
+	return false
 }
 
 type APIError struct {
@@ -58,18 +75,23 @@ func decodeErrorType(s string) v1.ErrorType {
 	}
 }
 
+const (
+	errConnRefused = "connection refused"
+	errConnTimeout = "connection timeout"
+)
+
 func decodeError(err error) string {
 	if errors.Is(err, context.Canceled) {
 		return context.Canceled.Error()
 	}
 
 	if errors.Is(err, syscall.ECONNREFUSED) {
-		return "connection refused"
+		return errConnRefused
 	}
 
 	var neterr net.Error
 	if ok := errors.As(err, &neterr); ok && neterr.Timeout() {
-		return "connection timeout"
+		return errConnTimeout
 	}
 
 	var e1 APIError
@@ -81,6 +103,8 @@ func decodeError(err error) string {
 }
 
 func tryDecodingAPIError(resp *http.Response) error {
+	log.Debug().Int("code", resp.StatusCode).Msg("Trying to parse Prometheus error response")
+
 	var status, errType, errText string
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, isNil bool) {
