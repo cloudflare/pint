@@ -147,6 +147,10 @@ func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args
 	return prom.client.Do(req)
 }
 
+func (prom *Prometheus) requestContext(ctx context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(ctx, prom.timeout+time.Second)
+}
+
 func queryWorker(prom *Prometheus, queries chan queryRequest) {
 	for job := range queries {
 		job.result <- processJob(prom, job)

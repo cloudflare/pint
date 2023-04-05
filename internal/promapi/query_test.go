@@ -79,7 +79,7 @@ func TestQuery(t *testing.T) {
 		case "timeout":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{
 				"status":"success",
 				"data":{
@@ -87,6 +87,14 @@ func TestQuery(t *testing.T) {
 					"result":[]
 				}
 			}`))
+		case "overload":
+			w.WriteHeader(422)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{
+					"status":"error",
+					"errorType":"execution",
+					"error":"query processing would load too many samples into memory in query execution"
+				}`))
 		default:
 			w.WriteHeader(400)
 			w.Header().Set("Content-Type", "application/json")
@@ -176,6 +184,11 @@ func TestQuery(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			query:   "overload",
+			timeout: time.Second,
+			err:     "execution: query processing would load too many samples into memory in query execution",
 		},
 	}
 

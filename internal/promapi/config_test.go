@@ -37,7 +37,7 @@ func TestConfig(t *testing.T) {
 		case "/slow/api/v1/status/config":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
 		case "/error/api/v1/status/config":
 			w.WriteHeader(500)

@@ -454,6 +454,12 @@ var (
 	respondWithInternalError = func() responseWriter {
 		return promError{code: 500, errorType: v1.ErrServer, err: "internal error"}
 	}
+	respondWithTooManySamples = func() responseWriter {
+		return promError{code: 422, errorType: v1.ErrExec, err: "query processing would load too many samples into memory in query execution"}
+	}
+	respondWithTimeoutExpandingSeriesSamples = func() responseWriter {
+		return promError{code: 422, errorType: v1.ErrExec, err: "expanding series: context deadline exceeded"}
+	}
 	respondWithEmptyVector = func() responseWriter {
 		return vectorResponse{samples: model.Vector{}}
 	}
@@ -549,4 +555,8 @@ func checkErrorBadData(name, uri, err string) string {
 
 func checkErrorUnableToRun(c, name, uri, err string) string {
 	return fmt.Sprintf(`couldn't run %q checks due to prometheus %q at %s connection error: %s`, c, name, uri, err)
+}
+
+func checkErrorTooExpensiveToRun(c, name, uri, err string) string {
+	return fmt.Sprintf(`couldn't run %q checks on prometheus %q at %s because some queries are too expensive: %s`, c, name, uri, err)
 }

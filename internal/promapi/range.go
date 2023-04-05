@@ -35,7 +35,7 @@ type rangeQuery struct {
 }
 
 func (q rangeQuery) Run() queryResult {
-	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
+	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
 
 	qr := queryResult{}

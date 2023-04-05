@@ -90,7 +90,7 @@ func TestCostCheck(t *testing.T) {
 						requireQueryPath,
 						formCond{key: "query", value: `count(sum(foo))`},
 					},
-					resp: sleepResponse{sleep: time.Millisecond * 100},
+					resp: sleepResponse{sleep: time.Millisecond * 1500},
 				},
 			},
 		},

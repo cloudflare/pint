@@ -32,7 +32,7 @@ func (q metadataQuery) Run() queryResult {
 		Str("metric", q.metric).
 		Msg("Getting prometheus metrics metadata")
 
-	ctx, cancel := context.WithTimeout(q.ctx, q.prom.timeout)
+	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
 
 	var qr queryResult

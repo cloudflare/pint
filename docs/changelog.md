@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.44.0
+
+### Changed
+
+- If a query run by pint fails because it was too expensive too run it will
+  now be reported as a warning instead of an error.
+
 ## v0.43.0
 
 ### Added

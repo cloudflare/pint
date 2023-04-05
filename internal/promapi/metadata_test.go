@@ -45,7 +45,7 @@ func TestMetadata(t *testing.T) {
 		case "slow":
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
-			time.Sleep(time.Second)
+			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
 		case "error":
 			w.WriteHeader(500)
