@@ -2969,15 +2969,22 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `{__name__=~"(foo|bar)_panics_total"}`,
+						Fragment: `{__name__=~"(foo|bar)_panics_total",job="myjob"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
+						Text:     noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
 						Severity: checks.Bug,
 					},
 				}
 			},
 			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
@@ -2990,14 +2997,30 @@ func TestSeriesCheck(t *testing.T) {
 						requireRangeQueryPath,
 						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
 					},
-					resp: respondWithEmptyMatrix(),
+					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: "count(up)"},
+						formCond{key: "query", value: `absent({__name__=~"(foo|bar)_panics_total",job=~".+"})`},
 					},
-					resp: respondWithSingleRangeVector1W(),
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Minute*-50),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+					},
+					resp: respondWithEmptyMatrix(),
 				},
 			},
 		},

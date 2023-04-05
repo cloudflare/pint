@@ -7,6 +7,12 @@
 - If a query run by pint fails because it was too expensive too run it will
   now be reported as a warning instead of an error.
 
+### Fixed
+
+- When validating queries using `{__name__=~"...", foo="bar"}` selectors pint could end up
+  running queries matching a single label, like `count({foo="bar"})`, which could return too many
+  results. This version ensures that queries always include name matcher to avoid that.
+
 ## v0.43.0
 
 ### Added
