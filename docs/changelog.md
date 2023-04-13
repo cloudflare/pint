@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.44.0
+## v0.43.0
+
+### Added
+
+- Added `--fail-on` flag to `pint lint` command - #570.
 
 ### Changed
 
@@ -12,12 +16,6 @@
 - When validating queries using `{__name__=~"...", foo="bar"}` selectors pint could end up
   running queries matching a single label, like `count({foo="bar"})`, which could return too many
   results. This version ensures that queries always include name matcher to avoid that.
-
-## v0.43.0
-
-### Added
-
-- Added `--fail-on` flag to `pint lint` command - #570.
 
 ## v0.42.2
 
