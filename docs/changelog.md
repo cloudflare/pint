@@ -5,6 +5,7 @@
 ### Added
 
 - Added `--fail-on` flag to `pint lint` command - #570.
+- Added `tls` section to `prometheus` configuration block - #540.
 
 ### Changed
 
@@ -659,7 +660,7 @@
 
 ### Fixed
 
-- Fixed incorrect line reported when pint fails to unmarshall YAML file.
+- Fixed incorrect line reported when pint fails to unmarshal YAML file.
 
 ## v0.18.0
 

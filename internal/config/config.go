@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -321,11 +322,16 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			cfg.Prometheus[i].Uptime = uptime
 		}
 
+		var tlsConf *tls.Config
+		tlsConf, err = prom.getTLSConfig()
+		if err != nil {
+			return cfg, fmt.Errorf("invalid prometheus TLS configuration: %w", err)
+		}
 		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, concurrency, rateLimit),
+			promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, concurrency, rateLimit, tlsConf),
 		}
 		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, rateLimit))
+			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, rateLimit, tlsConf))
 		}
 		var include, exclude []*regexp.Regexp
 		for _, path := range prom.Include {

@@ -195,7 +195,7 @@ func TestQuery(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.query, func(t *testing.T) {
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100),
+				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 			fg.StartWorkers()
 			defer fg.Close()

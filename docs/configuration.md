@@ -217,6 +217,13 @@ prometheus "$name" {
   required    = true|false
   include     = ["...", ...]
   exclude     = ["...", ...]
+  tls {
+    serverName = "..."
+    caCert     = "..."
+    clientCert = "..."
+    clientKey  = "..."
+    skipVerify = true|false
+  }
 }
 ```
 
@@ -269,6 +276,16 @@ prometheus "$name" {
 - `exclude` - optional path filter, if specified any path matching one of listed regexp
   patterns will never use this Prometheus server for checks.
   `exclude` takes precedence over `include.
+- `tls` - optional TLS configuration for HTTP requests sent to this Prometheus server.
+- `tls:serverName` - server name (SNI) for TLS handshakes. Optional, default is unset.
+- `tls:caCert` - path for CA certificate to use. Optional, default is unset.
+- `tls:clientCert` - path for client certificate to use. Optional, default is unset.
+  If set `clientKey` must also be set.
+- `tls:clientKey` - path for client key file to use. Optional, default is unset.
+  If set `clientCert` must also be set.
+- `tls:skipVerify` - if `true` all TLS certificate checks will be skipped.
+  Enabling this option can be a security risk, use only for testing.
+  Optional, default is false.
 
 Example:
 
@@ -280,6 +297,17 @@ prometheus "prod" {
     "X-Auth": "secret"
   }
   concurrency = 40
+}
+
+prometheus "prod-tls" {
+  uri         = "https://prometheus-tls.example.com"
+  tags        = ["prod"]
+  tls {
+    serverName = "prometheus.example.com"
+    clientCert = "/ssl/ca.pem"
+    clientCert = "/ssl/client.pem"
+    clientKey  = "/ssl/client.key"
+  }
 }
 
 prometheus "staging" {

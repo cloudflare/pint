@@ -1,0 +1,25 @@
+cert $WORK prom
+http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http response prometheus /api/v1/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1666873962.795,"1"]}]}}
+http start prometheus 127.0.0.1:7129 $WORK/prom.pem $WORK/prom.key
+
+pint.error -l debug --no-color lint rules
+! stdout .
+stderr 'tls: failed to verify certificate: x509: certificate signed by unknown authority'
+
+-- rules/1.yml --
+groups:
+- name: foo
+  rules:
+  - record: aggregate
+    expr: sum(foo) without(job)
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "https://127.0.0.1:7129"
+  failover = []
+  timeout  = "5s"
+  required = true
+}
