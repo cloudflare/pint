@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.43.1
+
+### Fixed
+
+- Fixed `--base-branch` flag handling when branch name contains `/`.
+
 ## v0.43.0
 
 ### Added
@@ -29,7 +35,7 @@
 
 ### Fixed
 
-- Fixed `--initial-branch` flag handling.
+- Fixed `--base-branch` flag handling.
   Value of this flag wasn't being used correctly - #559.
 
 ## v0.42.0

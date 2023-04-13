@@ -69,7 +69,7 @@ func actionCI(c *cli.Context) error {
 	}
 
 	meta.cfg.CI = detectCI(meta.cfg.CI)
-	baseBranch := strings.Split(meta.cfg.CI.BaseBranch, "/")[len(strings.Split(meta.cfg.CI.BaseBranch, "/"))-1]
+	baseBranch := meta.cfg.CI.BaseBranch
 	if c.String(baseBranchFlag) != "" {
 		baseBranch = c.String(baseBranchFlag)
 	}
@@ -78,7 +78,7 @@ func actionCI(c *cli.Context) error {
 		return fmt.Errorf("failed to get the name of current branch")
 	}
 	log.Debug().Str("current", currentBranch).Str("base", baseBranch).Msg("Got branch information")
-	if currentBranch == baseBranch {
+	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
 		log.Info().Str("branch", currentBranch).Msg("Running from base branch, skipping checks")
 		return nil
 	}
