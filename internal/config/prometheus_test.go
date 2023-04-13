@@ -81,6 +81,73 @@ func TestPrometheusConfig(t *testing.T) {
 			},
 			err: errors.New(`prometheus tag "a b c" cannot contain " "`),
 		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					InsecureSkipVerify: false,
+				},
+			},
+		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					ServerName:         "bob",
+					InsecureSkipVerify: false,
+				},
+			},
+		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					InsecureSkipVerify: true,
+				},
+			},
+		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					CaCert: "/404/xxx/foo.crt",
+				},
+			},
+		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					ClientCert: "/404/xxx/cert.pem",
+				},
+			},
+			err: errors.New("clientCert and clientKey must be set together"),
+		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					ClientKey: "/404/xxx/cert.pem",
+				},
+			},
+			err: errors.New("clientCert and clientKey must be set together"),
+		},
+		{
+			conf: PrometheusConfig{
+				Name: "prom",
+				URI:  "http://localhost",
+				TLS: &TLSConfig{
+					ClientCert: "/404/xxx/cert.pem",
+					ClientKey:  "/404/xxx/key.pem",
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

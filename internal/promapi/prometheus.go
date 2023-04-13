@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"io"
 	"net/http"
@@ -77,14 +78,19 @@ type Prometheus struct {
 	queries     chan queryRequest
 }
 
-func NewPrometheus(name, uri string, headers map[string]string, timeout time.Duration, concurrency, rl int) *Prometheus {
+func NewPrometheus(name, uri string, headers map[string]string, timeout time.Duration, concurrency, rl int, tlsConf *tls.Config) *Prometheus {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	if tlsConf != nil {
+		transport.TLSClientConfig = tlsConf
+	}
+
 	prom := Prometheus{
 		name:        name,
 		unsafeURI:   uri,
 		safeURI:     sanitizeURI(uri),
 		headers:     headers,
 		timeout:     timeout,
-		client:      http.Client{Transport: gzhttp.Transport(http.DefaultTransport)},
+		client:      http.Client{Transport: gzhttp.Transport(transport)},
 		locker:      newPartitionLocker((&sync.Mutex{})),
 		rateLimiter: ratelimit.New(rl),
 		concurrency: concurrency,

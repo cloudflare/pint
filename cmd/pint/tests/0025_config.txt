@@ -1,3 +1,5 @@
+cert $WORK prom
+
 pint.ok --no-color config
 ! stdout .
 cmp stderr stderr.txt
@@ -64,6 +66,32 @@ level=info msg="Loading configuration file" path=.pint.hcl
       "rateLimit": 1,
       "uptime": "up",
       "required": false
+    },
+    {
+      "name": "tls-skipVerify",
+      "uri": "http://127.0.0.1",
+      "timeout": "15s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false,
+      "tls": {
+        "skipVerify": true
+      }
+    },
+    {
+      "name": "tls-ca",
+      "uri": "http://127.0.0.1",
+      "timeout": "15s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false,
+      "tls": {
+        "caCert": "prom-ca.pem",
+        "clientCert": "prom.pem",
+        "clientKey": "prom.key"
+      }
     }
   ],
   "checks": {
@@ -204,6 +232,24 @@ prometheus "custom-rateLimit" {
   uri       = "http://user:pass@127.0.0.1"
   timeout   = "15s"
   rateLimit = 1
+}
+
+prometheus "tls-skipVerify" {
+  uri       = "http://127.0.0.1"
+  timeout   = "15s"
+  tls {
+    skipVerify = true
+  }
+}
+
+prometheus "tls-ca" {
+  uri       = "http://127.0.0.1"
+  timeout   = "15s"
+  tls {
+    caCert     = "prom-ca.pem"
+    clientCert = "prom.pem"
+    clientKey  = "prom.key"
+  }
 }
 
 checks {

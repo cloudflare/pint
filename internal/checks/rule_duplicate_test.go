@@ -157,7 +157,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return promapi.NewFailoverGroup(
 					"prom",
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, map[string]string{}, time.Second, 4, 100),
+						promapi.NewPrometheus("prom", uri, map[string]string{}, time.Second, 4, 100, nil),
 					},
 					true,
 					"up",
