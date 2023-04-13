@@ -18,7 +18,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20.1
+          go-version: 1.20.3
           cache: true
           cache-dependency-path: tools/golangci-lint/go.sum
 
@@ -34,7 +34,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20.1
+          go-version: 1.20.3
           cache: true
           cache-dependency-path: tools/gofumpt/go.sum
 
