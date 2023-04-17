@@ -120,7 +120,7 @@ func walkDir(dirname string) (paths filePaths, err error) {
 			switch d.Type() {
 			case fs.ModeDir:
 				return nil
-			case fs.ModeSymlink:
+			default:
 				dest, err := filepath.EvalSymlinks(path)
 				if err != nil {
 					return err
@@ -139,8 +139,6 @@ func walkDir(dirname string) (paths filePaths, err error) {
 				} else {
 					paths = append(paths, filePath{path: path, target: dest})
 				}
-			default:
-				paths = append(paths, filePath{path: path, target: path})
 			}
 
 			return nil
