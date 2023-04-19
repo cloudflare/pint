@@ -8,9 +8,6 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
-	"github.com/rs/zerolog/log"
-
-	"github.com/cloudflare/pint/internal/output"
 )
 
 func labelValue(ls labels.Labels, name string) (string, bool) {
@@ -285,13 +282,6 @@ func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges,
 		all = append(all, ranges...)
 	}
 	sort.Stable(all)
-
-	log.Debug().
-		Bool("merged", hadMerged).
-		Stringer("source", source).
-		Str("step", output.HumanizeDuration(step)).
-		Stringer("merged", all).
-		Msg("Merged time ranges")
 
 	return all, hadMerged
 }
