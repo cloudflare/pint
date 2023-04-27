@@ -1,0 +1,29 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+rules/0001.yml:4 Bug: annotation_.* annotation value must match "^bar$" (alerts/annotation)
+ 4 |     annotation_foo: foo
+
+level=info msg="Problems found" Bug=1
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+-- rules/0001.yml --
+- alert: Instance Is Down 1
+  expr: up == 0
+  annotations:
+    annotation_foo: foo
+    annotation_bar: bar
+
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+rule {
+  annotation "annotation_.*" {
+    required = true
+    value    = "bar"
+    severity = "bug"
+  }
+}

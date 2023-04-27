@@ -13,7 +13,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), true, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), true, checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -22,7 +22,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "doesn't ignore rules with syntax errors",
 			content:     "- alert: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), true, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), true, checks.Warning)
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
@@ -41,7 +41,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "no annotations / required",
 			content:     "- alert: foo\n  expr: sum(foo)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), true, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), true, checks.Warning)
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
@@ -60,7 +60,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "no annotations / not required",
 			content:     "- alert: foo\n  expr: sum(foo)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), false, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), false, checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -69,7 +69,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "missing annotation / required",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    foo: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), true, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), true, checks.Warning)
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
@@ -88,7 +88,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "missing annotation / not required",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    foo: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), false, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), false, checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -97,7 +97,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "wrong annotation value / required",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    severity: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), true, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), true, checks.Warning)
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
@@ -116,7 +116,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "wrong annotation value / not required",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    severity: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical"), false, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical"), false, checks.Warning)
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
@@ -135,7 +135,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "valid annotation / required",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    severity: info\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical|info|debug"), true, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical|info|debug"), true, checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -144,7 +144,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "valid annotation / not required",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    severity: info\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("severity", checks.MustTemplatedRegexp("critical|info|debug"), false, checks.Warning)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), checks.MustTemplatedRegexp("critical|info|debug"), false, checks.Warning)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -153,7 +153,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "templated annotation value / passing",
 			content:     "- alert: foo\n  expr: sum(foo)\n  for: 5m\n  annotations:\n    for: 5m\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("for", checks.MustTemplatedRegexp("{{ $for }}"), true, checks.Bug)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("for"), checks.MustTemplatedRegexp("{{ $for }}"), true, checks.Bug)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -162,7 +162,7 @@ func TestAnnotationCheck(t *testing.T) {
 			description: "templated annotation value / passing",
 			content:     "- alert: foo\n  expr: sum(foo)\n  for: 5m\n  annotations:\n    for: 4m\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAnnotationCheck("for", checks.MustTemplatedRegexp("{{ $for }}"), true, checks.Bug)
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("for"), checks.MustTemplatedRegexp("{{ $for }}"), true, checks.Bug)
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
@@ -173,6 +173,62 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Text:     `for annotation value must match "^{{ $for }}$"`,
 						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "valid annotation key regex / required",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    annotation_1: info\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), checks.MustTemplatedRegexp("critical|info|debug"), true, checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "valid annotation key regex / not required",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    annotation_1: info\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), checks.MustTemplatedRegexp("critical|info|debug"), false, checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "wrong annotation key regex value / required",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    annotation_1: bar\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), checks.MustTemplatedRegexp("critical"), true, checks.Warning)
+			},
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "annotation_1: bar",
+						Lines:    []int{4},
+						Reporter: checks.AnnotationCheckName,
+						Text:     `annotation_.* annotation value must match "^critical$"`,
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "wrong annotation key regex value / not required",
+			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    annotation_1: bar\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), checks.MustTemplatedRegexp("critical"), false, checks.Warning)
+			},
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "annotation_1: bar",
+						Lines:    []int{4},
+						Reporter: checks.AnnotationCheckName,
+						Text:     `annotation_.* annotation value must match "^critical$"`,
+						Severity: checks.Warning,
 					},
 				}
 			},
