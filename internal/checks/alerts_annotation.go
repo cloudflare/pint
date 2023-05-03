@@ -12,7 +12,7 @@ const (
 	AnnotationCheckName = "alerts/annotation"
 )
 
-func NewAnnotationCheck(keyRe *TemplatedRegexp, valueRe *TemplatedRegexp, isReguired bool, severity Severity) AnnotationCheck {
+func NewAnnotationCheck(keyRe, valueRe *TemplatedRegexp, isReguired bool, severity Severity) AnnotationCheck {
 	return AnnotationCheck{keyRe: keyRe, valueRe: valueRe, isReguired: isReguired, severity: severity}
 }
 
