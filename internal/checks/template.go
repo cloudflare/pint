@@ -10,7 +10,7 @@ import (
 )
 
 func NewTemplatedRegexp(s string) (*TemplatedRegexp, error) {
-	tr := TemplatedRegexp{anchored: "^" + s + "$"}
+	tr := TemplatedRegexp{anchored: "^" + s + "$", original: s}
 	_, err := tr.Expand(parser.Rule{})
 	if err != nil {
 		return nil, err
@@ -26,6 +26,7 @@ func MustTemplatedRegexp(re string) *TemplatedRegexp {
 
 type TemplatedRegexp struct {
 	anchored string
+	original string
 }
 
 func (tr TemplatedRegexp) Expand(rule parser.Rule) (*regexp.Regexp, error) {

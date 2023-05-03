@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.44.0
+
+### Fixed
+
+- Fixed `alerts/annotation` check regexp matching - #613.
+
 ## v0.43.1
 
 ### Fixed

@@ -12,12 +12,12 @@ const (
 	AnnotationCheckName = "alerts/annotation"
 )
 
-func NewAnnotationCheck(key string, valueRe *TemplatedRegexp, isReguired bool, severity Severity) AnnotationCheck {
-	return AnnotationCheck{key: key, valueRe: valueRe, isReguired: isReguired, severity: severity}
+func NewAnnotationCheck(keyRe, valueRe *TemplatedRegexp, isReguired bool, severity Severity) AnnotationCheck {
+	return AnnotationCheck{keyRe: keyRe, valueRe: valueRe, isReguired: isReguired, severity: severity}
 }
 
 type AnnotationCheck struct {
-	key        string
+	keyRe      *TemplatedRegexp
 	valueRe    *TemplatedRegexp
 	isReguired bool
 	severity   Severity
@@ -29,9 +29,9 @@ func (c AnnotationCheck) Meta() CheckMeta {
 
 func (c AnnotationCheck) String() string {
 	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.key, c.valueRe.anchored, c.isReguired)
+		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.keyRe.original, c.valueRe.anchored, c.isReguired)
 	}
-	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.key, c.isReguired)
+	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.keyRe.original, c.isReguired)
 }
 
 func (c AnnotationCheck) Reporter() string {
@@ -49,33 +49,37 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Fragment: fmt.Sprintf("%s: %s", rule.AlertingRule.Alert.Key.Value, rule.AlertingRule.Alert.Value.Value),
 				Lines:    rule.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s annotation is required", c.key),
+				Text:     fmt.Sprintf("%s annotation is required", c.keyRe.original),
 				Severity: c.severity,
 			})
 		}
 		return
 	}
 
-	val := rule.AlertingRule.Annotations.GetValue(c.key)
-	if val == nil {
-		if c.isReguired {
-			problems = append(problems, Problem{
-				Fragment: fmt.Sprintf("%s:", rule.AlertingRule.Annotations.Key.Value),
-				Lines:    rule.AlertingRule.Annotations.Lines(),
-				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s annotation is required", c.key),
-				Severity: c.severity,
-			})
+	var foundAnnotation bool
+
+	for _, annotation := range rule.AlertingRule.Annotations.Items {
+		if c.keyRe.MustExpand(rule).MatchString(annotation.Key.Value) {
+			foundAnnotation = true
+			if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(annotation.Value.Value) {
+				problems = append(problems, Problem{
+					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
+					Lines:    annotation.Value.Position.Lines,
+					Reporter: c.Reporter(),
+					Text:     fmt.Sprintf("%s annotation value must match %q", c.keyRe.original, c.valueRe.anchored),
+					Severity: c.severity,
+				})
+				return
+			}
 		}
-		return
 	}
 
-	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(val.Value) {
+	if !foundAnnotation && c.isReguired {
 		problems = append(problems, Problem{
-			Fragment: fmt.Sprintf("%s: %s", c.key, val.Value),
-			Lines:    val.Position.Lines,
+			Fragment: fmt.Sprintf("%s:", rule.AlertingRule.Annotations.Key.Value),
+			Lines:    rule.AlertingRule.Annotations.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s annotation value must match %q", c.key, c.valueRe.anchored),
+			Text:     fmt.Sprintf("%s annotation is required", c.keyRe.original),
 			Severity: c.severity,
 		})
 		return

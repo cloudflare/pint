@@ -155,7 +155,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 			severity := ann.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
 				name:  checks.AnnotationCheckName,
-				check: checks.NewAnnotationCheck(ann.Key, valueRegex, ann.Required, severity),
+				check: checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), valueRegex, ann.Required, severity),
 			})
 		}
 	}
