@@ -10,7 +10,7 @@ require (
 	github.com/google/go-github/v50 v50.2.0
 	github.com/hashicorp/hcl/v2 v2.16.2
 	github.com/klauspost/compress v1.16.5
-	github.com/prometheus/client_golang v1.15.0
+	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/client_model v0.3.0
 	github.com/prometheus/common v0.42.0
 	github.com/prometheus/prometheus v0.43.0
