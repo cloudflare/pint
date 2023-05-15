@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_golang v1.15.1
 	github.com/prometheus/client_model v0.4.0
 	github.com/prometheus/common v0.43.0
-	github.com/prometheus/prometheus v0.43.1
+	github.com/prometheus/prometheus v0.44.0
 	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.10.0
 	github.com/rs/zerolog v1.29.1
@@ -34,7 +34,7 @@ require (
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/andres-erbsen/clock v0.0.0-20160526145045-9e14626cd129 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
-	github.com/aws/aws-sdk-go v1.44.217 // indirect
+	github.com/aws/aws-sdk-go v1.44.245 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
