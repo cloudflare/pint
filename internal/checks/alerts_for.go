@@ -34,7 +34,7 @@ func (c AlertsForChecksFor) Reporter() string {
 
 func (c AlertsForChecksFor) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil || rule.AlertingRule.For == nil {
-		return
+		return problems
 	}
 
 	d, err := model.ParseDuration(rule.AlertingRule.For.Value.Value)

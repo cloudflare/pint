@@ -96,7 +96,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
-		return
+		return problems
 	}
 
 	params := promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration)

@@ -13,7 +13,10 @@ func newPartitionLocker(l sync.Locker) *partitionLocker {
 	return &partitionLocker{c: sync.NewCond(l), l: l, s: make(map[string]struct{})}
 }
 
-func (p *partitionLocker) locked(id string) (ok bool) { _, ok = p.s[id]; return }
+func (p *partitionLocker) locked(id string) (ok bool) {
+	_, ok = p.s[id]
+	return ok
+}
 
 func (p *partitionLocker) lock(id string) {
 	p.l.Lock()

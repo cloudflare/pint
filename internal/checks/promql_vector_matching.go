@@ -75,10 +75,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				text:     text,
 				severity: severity,
 			})
-			return
+			return problems
 		}
 		if len(qr.Series) > 0 {
-			return
+			return problems
 		}
 
 		ignored := []model.LabelName{model.MetricNameLabel}
@@ -118,7 +118,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 						text:     fmt.Sprintf("left hand side uses {%s=%q} while right hand side uses {%s=%q}, this will never match", k, lv, k, rv),
 						severity: Bug,
 					})
-					return
+					return problems
 				}
 			}
 		}
@@ -131,7 +131,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				text:     text,
 				severity: severity,
 			})
-			return
+			return problems
 		}
 		if leftLabels == nil {
 			goto NEXT
@@ -145,7 +145,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				text:     text,
 				severity: severity,
 			})
-			return
+			return problems
 		}
 		if rightLabels == nil {
 			goto NEXT

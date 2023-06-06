@@ -164,10 +164,10 @@ NEXT:
 			// sum() + sum()
 		case promParser.CardManyToOne, promParser.CardManyToMany:
 			problems = append(problems, c.checkNode(node.Children[0])...)
-			return
+			return problems
 		case promParser.CardOneToMany:
 			problems = append(problems, c.checkNode(node.Children[1])...)
-			return
+			return problems
 		default:
 			log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
 		}

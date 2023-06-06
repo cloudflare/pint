@@ -24,7 +24,7 @@ type Parser struct{}
 
 func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 	if len(content) == 0 {
-		return
+		return nil, nil
 	}
 
 	defer func() {
@@ -49,7 +49,7 @@ func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err e
 	}
 	if !isEmpty {
 		rules = append(rules, ret)
-		return
+		return rules, nil
 	}
 
 	var rl []Rule
@@ -103,7 +103,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 	isEmpty = true
 
 	if node.Kind != yaml.MappingNode {
-		return
+		return rule, isEmpty, err
 	}
 
 	var recordPart *YamlKeyValue

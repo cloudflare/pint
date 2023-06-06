@@ -52,7 +52,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 			Text:     text,
 			Severity: severity,
 		})
-		return
+		return problems
 	}
 
 	for _, label := range rule.RecordingRule.Labels.Items {

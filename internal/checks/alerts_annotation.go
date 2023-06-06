@@ -53,7 +53,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Severity: c.severity,
 			})
 		}
-		return
+		return problems
 	}
 
 	var foundAnnotation bool
@@ -69,7 +69,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 					Text:     fmt.Sprintf("%s annotation value must match %q", c.keyRe.original, c.valueRe.anchored),
 					Severity: c.severity,
 				})
-				return
+				return problems
 			}
 		}
 	}
@@ -82,7 +82,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 			Text:     fmt.Sprintf("%s annotation is required", c.keyRe.original),
 			Severity: c.severity,
 		})
-		return
+		return problems
 	}
 
 	return nil

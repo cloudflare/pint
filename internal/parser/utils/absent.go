@@ -65,7 +65,7 @@ func HasOuterAbsent(node *parser.PromQLNode) (calls []PromQLFragment) {
 			default:
 				log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
 			}
-			return
+			return calls
 		}
 	}
 

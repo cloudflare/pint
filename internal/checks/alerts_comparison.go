@@ -33,11 +33,11 @@ func (c ComparisonCheck) Reporter() string {
 
 func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
-		return
+		return problems
 	}
 
 	if rule.AlertingRule.Expr.SyntaxError != nil {
-		return
+		return problems
 	}
 
 	expr := rule.Expr().Query
@@ -52,11 +52,11 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Severity: Bug,
 			})
 		}
-		return
+		return problems
 	}
 
 	if hasAbsent(expr) {
-		return
+		return problems
 	}
 
 	problems = append(problems, Problem{
