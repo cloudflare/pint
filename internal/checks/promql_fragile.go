@@ -87,7 +87,7 @@ func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 				severity: Warning,
 			}
 			problems = append(problems, p)
-			return
+			return problems
 		}
 	}
 

@@ -49,11 +49,11 @@ func (c AlertsCheck) Reporter() string {
 
 func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
-		return
+		return problems
 	}
 
 	if rule.AlertingRule.Expr.SyntaxError != nil {
-		return
+		return problems
 	}
 
 	params := promapi.NewRelativeRange(c.lookBack, c.step)

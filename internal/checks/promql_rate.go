@@ -46,7 +46,7 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
-		return
+		return problems
 	}
 
 	cfg, err := c.prom.Config(ctx)
@@ -59,7 +59,7 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 			Text:     text,
 			Severity: severity,
 		})
-		return
+		return problems
 	}
 
 	done := &completedList{}

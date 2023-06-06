@@ -132,7 +132,7 @@ func (fg *FailoverGroup) Config(ctx context.Context) (cfg *ConfigResult, err err
 		uri = prom.safeURI
 		cfg, err = prom.Config(ctx)
 		if err == nil {
-			return
+			return cfg, nil
 		}
 		if !IsUnavailableError(err) {
 			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
@@ -147,7 +147,7 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 		uri = prom.safeURI
 		qr, err = prom.Query(ctx, expr)
 		if err == nil {
-			return
+			return qr, nil
 		}
 		if !IsUnavailableError(err) {
 			return qr, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
@@ -162,7 +162,7 @@ func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params Ran
 		uri = prom.safeURI
 		rqr, err = prom.RangeQuery(ctx, expr, params)
 		if err == nil {
-			return
+			return rqr, nil
 		}
 		if !IsUnavailableError(err) {
 			return rqr, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
@@ -177,7 +177,7 @@ func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata 
 		uri = prom.safeURI
 		metadata, err = prom.Metadata(ctx, metric)
 		if err == nil {
-			return
+			return metadata, nil
 		}
 		if !IsUnavailableError(err) {
 			return metadata, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
@@ -192,7 +192,7 @@ func (fg *FailoverGroup) Flags(ctx context.Context) (flags *FlagsResult, err err
 		uri = prom.safeURI
 		flags, err = prom.Flags(ctx)
 		if err == nil {
-			return
+			return flags, nil
 		}
 		if !IsUnavailableError(err) {
 			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}

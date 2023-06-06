@@ -41,7 +41,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, 
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {
-		return
+		return problems
 	}
 
 	flags, err := c.prom.Flags(ctx)
@@ -54,7 +54,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, 
 			Text:     text,
 			Severity: severity,
 		})
-		return
+		return problems
 	}
 
 	// Default Prometheus retention
