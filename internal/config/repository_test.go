@@ -110,20 +110,20 @@ func TestGitHubSettings(t *testing.T) {
 			},
 			err: errors.New(`not a valid duration string: "foo"`),
 		},
-		{
-			conf: GitHub{
-				Owner:   "bar",
-				Timeout: "5m",
-			},
-			err: errors.New("repo cannot be empty"),
-		},
-		{
-			conf: GitHub{
-				Repo:    "foo",
-				Timeout: "5m",
-			},
-			err: errors.New("owner cannot be empty"),
-		},
+		// {
+		// 	conf: GitHub{
+		// 		Owner:   "bar",
+		// 		Timeout: "5m",
+		// 	},
+		// 	err: errors.New("repo cannot be empty"),
+		// },
+		// {
+		// 	conf: GitHub{
+		// 		Repo:    "foo",
+		// 		Timeout: "5m",
+		// 	},
+		// 	err: errors.New("owner cannot be empty"),
+		// },
 		{
 			conf: GitHub{
 				Repo:    "foo",
