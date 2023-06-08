@@ -3,7 +3,6 @@ package reporter
 import (
 	"context"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -256,24 +255,23 @@ func formatGHReviewBody(version string, summary Summary) string {
 }
 
 func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestComment {
+	var msgPrefix string
+	reportLine, srcLine := moveReportedLine(rep)
+	if reportLine != srcLine {
+		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
+	}
+
 	c := github.PullRequestComment{
 		CommitID: github.String(headCommit),
 		Path:     github.String(rep.ReportedPath),
 		Body: github.String(fmt.Sprintf(
-			"[%s](https://cloudflare.github.io/pint/checks/%s.html): %s",
+			"[%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s",
 			rep.Problem.Reporter,
 			rep.Problem.Reporter,
+			msgPrefix,
 			rep.Problem.Text,
 		)),
-	}
-
-	if len(rep.ModifiedLines) == 1 {
-		c.Line = github.Int(rep.ModifiedLines[0])
-	} else {
-		sort.Ints(rep.ModifiedLines)
-		start, end := rep.ModifiedLines[0], rep.ModifiedLines[len(rep.ModifiedLines)-1]
-		c.Line = github.Int(end)
-		c.StartLine = github.Int(start)
+		Line: github.Int(reportLine),
 	}
 
 	return &c

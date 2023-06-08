@@ -13,6 +13,8 @@
 ### Fixed
 
 - Fixed `alerts/annotation` check regexp matching - #613.
+- When running `pint ci` using GitHub integration annotation comments are now
+  reported only on modified lines - #640.
 
 ## v0.43.1
 
