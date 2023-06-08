@@ -12,7 +12,7 @@ import (
 )
 
 func newAlertsCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
-	return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5)
+	return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 0, checks.Information)
 }
 
 func alertsText(name, uri string, count int, since string) string {
@@ -209,6 +209,218 @@ func TestAlertsCountCheck(t *testing.T) {
 					},
 				}
 			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-24),
+								time.Now().Add(time.Hour*-24).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-23),
+								time.Now().Add(time.Hour*-23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-22),
+								time.Now().Add(time.Hour*-22).Add(time.Minute),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-21),
+								time.Now().Add(time.Hour*-21).Add(time.Minute*16),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-18),
+								time.Now().Add(time.Hour*-18).Add(time.Hour*2),
+								time.Minute,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
+				},
+			},
+		},
+		{
+			description: "minCount=2",
+			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 2, checks.Information)
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2, 3},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 2, "1d"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-24),
+								time.Now().Add(time.Hour*-24).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-23),
+								time.Now().Add(time.Hour*-23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-22),
+								time.Now().Add(time.Hour*-22).Add(time.Minute),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-21),
+								time.Now().Add(time.Hour*-21).Add(time.Minute*16),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-18),
+								time.Now().Add(time.Hour*-18).Add(time.Hour*2),
+								time.Minute,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
+				},
+			},
+		},
+		{
+			description: "minCount=2 severity=bug",
+			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 2, checks.Bug)
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `up{job="foo"} == 0`,
+						Lines:    []int{2, 3},
+						Reporter: "alerts/count",
+						Text:     alertsText("prom", uri, 2, "1d"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `up{job="foo"} == 0`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-24),
+								time.Now().Add(time.Hour*-24).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-23),
+								time.Now().Add(time.Hour*-23).Add(time.Minute*6),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-22),
+								time.Now().Add(time.Hour*-22).Add(time.Minute),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-21),
+								time.Now().Add(time.Hour*-21).Add(time.Minute*16),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-20),
+								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Minute,
+							),
+							generateSampleStream(
+								map[string]string{"job": "foo"},
+								time.Now().Add(time.Hour*-18),
+								time.Now().Add(time.Hour*-18).Add(time.Hour*2),
+								time.Minute,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithSingleRangeVector1D(),
+				},
+			},
+		},
+		{
+			description: "minCount=10",
+			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 10, checks.Information)
+			},
+			prometheus: newSimpleProm,
+			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
