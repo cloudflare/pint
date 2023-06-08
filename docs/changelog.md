@@ -9,6 +9,8 @@
   This allows to only show estimated alerts count only if there would be high
   enough (`>= minCount`) number of alerts.
   Setting `severity` as well allows to block rules that would create too many alerts.
+- GitHub reporter will now included folded list of all problems in the summary
+  comment - #608.
 
 ### Fixed
 
