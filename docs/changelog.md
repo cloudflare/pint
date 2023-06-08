@@ -2,6 +2,10 @@
 
 ## v0.44.0
 
+### Added
+
+- Added `exclude` option to `ci` config block - #609.
+
 ### Fixed
 
 - Fixed `alerts/annotation` check regexp matching - #613.

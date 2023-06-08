@@ -86,6 +86,7 @@ func TestGitBlameFinder(t *testing.T) {
 					return nil, fmt.Errorf("mock error")
 				},
 				nil,
+				nil,
 				"main",
 				0,
 				nil,
@@ -103,6 +104,7 @@ func TestGitBlameFinder(t *testing.T) {
 						return nil, fmt.Errorf("mock error")
 					}
 				},
+				nil,
 				nil,
 				"main",
 				0,
@@ -127,6 +129,7 @@ func TestGitBlameFinder(t *testing.T) {
 						return nil, nil
 					}
 				},
+				nil,
 				nil,
 				"main",
 				0,
@@ -153,6 +156,7 @@ func TestGitBlameFinder(t *testing.T) {
 						return nil, nil
 					}
 				},
+				nil,
 				nil,
 				"main",
 				0,
@@ -184,6 +188,7 @@ func TestGitBlameFinder(t *testing.T) {
 						return nil, nil
 					}
 				},
+				nil,
 				nil,
 				"main",
 				0,
@@ -217,6 +222,7 @@ func TestGitBlameFinder(t *testing.T) {
 						return nil, nil
 					}
 				},
+				nil,
 				nil,
 				"main",
 				0,
@@ -330,6 +336,7 @@ R090    foo/c2c.yml         c2c.yml
 					regexp.MustCompile("^foo/.*"),
 					regexp.MustCompile("^c.*.yml$"),
 				},
+				nil,
 				"main",
 				0,
 				[]*regexp.Regexp{regexp.MustCompile(".*")},
@@ -382,6 +389,7 @@ R090    foo/c2c.yml         c2c.yml
 					}
 				},
 				nil,
+				nil,
 				"main",
 				0,
 				nil,
@@ -410,6 +418,7 @@ R090    foo/c2c.yml         c2c.yml
 					}
 				},
 				nil,
+				nil,
 				"main",
 				0,
 				[]*regexp.Regexp{regexp.MustCompile(".*")},
@@ -435,6 +444,7 @@ R090    foo/c2c.yml         c2c.yml
 						return nil, nil
 					}
 				},
+				nil,
 				nil,
 				"main",
 				0,

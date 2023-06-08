@@ -17,6 +17,7 @@ import (
 func NewGitBranchFinder(
 	gitCmd git.CommandRunner,
 	include []*regexp.Regexp,
+	exclude []*regexp.Regexp,
 	baseBranch string,
 	maxCommits int,
 	relaxed []*regexp.Regexp,
@@ -24,6 +25,7 @@ func NewGitBranchFinder(
 	return GitBranchFinder{
 		gitCmd:     gitCmd,
 		include:    include,
+		exclude:    exclude,
 		baseBranch: baseBranch,
 		maxCommits: maxCommits,
 		relaxed:    relaxed,
@@ -33,6 +35,7 @@ func NewGitBranchFinder(
 type GitBranchFinder struct {
 	gitCmd     git.CommandRunner
 	include    []*regexp.Regexp
+	exclude    []*regexp.Regexp
 	baseBranch string
 	maxCommits int
 	relaxed    []*regexp.Regexp
@@ -152,8 +155,14 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 }
 
 func (f GitBranchFinder) isPathAllowed(path string) bool {
-	if len(f.include) == 0 {
+	if len(f.include) == 0 && len(f.exclude) == 0 {
 		return true
+	}
+
+	for _, pattern := range f.exclude {
+		if pattern.MatchString(path) {
+			return false
+		}
 	}
 
 	for _, pattern := range f.include {
@@ -161,6 +170,7 @@ func (f GitBranchFinder) isPathAllowed(path string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

@@ -68,6 +68,11 @@ func actionCI(c *cli.Context) error {
 		includeRe = append(includeRe, regexp.MustCompile("^"+pattern+"$"))
 	}
 
+	excludeRe := []*regexp.Regexp{}
+	for _, pattern := range meta.cfg.CI.Exclude {
+		excludeRe = append(excludeRe, regexp.MustCompile("^"+pattern+"$"))
+	}
+
 	meta.cfg.CI = detectCI(meta.cfg.CI)
 	baseBranch := meta.cfg.CI.BaseBranch
 	if c.String(baseBranchFlag) != "" {
@@ -85,10 +90,10 @@ func actionCI(c *cli.Context) error {
 
 	var entries []discovery.Entry
 	if c.Bool(devFlag) {
-		finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
+		finder := discovery.NewGitBranchFinder(git.RunGit, includeRe, excludeRe, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
 		entries, err = finder.Find()
 	} else {
-		finder := discovery.NewGitBlameFinder(git.RunGit, includeRe, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
+		finder := discovery.NewGitBlameFinder(git.RunGit, includeRe, excludeRe, baseBranch, meta.cfg.CI.MaxCommits, meta.cfg.Parser.CompileRelaxed())
 		entries, err = finder.Find()
 	}
 	if err != nil {
