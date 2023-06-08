@@ -289,7 +289,13 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 			msgPrefix,
 			rep.Problem.Text,
 		)),
-		Line: github.Int(reportLine),
+	}
+
+	if reportLine < 0 {
+		// If we couldn't find a nearby line to attach the comment to, put it on the first line of the diff
+		c.Position = github.Int(1)
+	} else {
+		c.Line = github.Int(reportLine)
 	}
 
 	return &c
