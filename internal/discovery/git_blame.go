@@ -14,6 +14,7 @@ import (
 func NewGitBlameFinder(
 	gitCmd git.CommandRunner,
 	include []*regexp.Regexp,
+	exclude []*regexp.Regexp,
 	baseBranch string,
 	maxCommits int,
 	relaxed []*regexp.Regexp,
@@ -21,6 +22,7 @@ func NewGitBlameFinder(
 	return GitBlameFinder{
 		gitCmd:     gitCmd,
 		include:    include,
+		exclude:    exclude,
 		baseBranch: baseBranch,
 		maxCommits: maxCommits,
 		relaxed:    relaxed,
@@ -30,6 +32,7 @@ func NewGitBlameFinder(
 type GitBlameFinder struct {
 	gitCmd     git.CommandRunner
 	include    []*regexp.Regexp
+	exclude    []*regexp.Regexp
 	baseBranch string
 	maxCommits int
 	relaxed    []*regexp.Regexp
@@ -166,8 +169,14 @@ func (f GitBlameFinder) Find() (entries []Entry, err error) {
 }
 
 func (f GitBlameFinder) isPathAllowed(path string) bool {
-	if len(f.include) == 0 {
+	if len(f.include) == 0 && len(f.exclude) == 0 {
 		return true
+	}
+
+	for _, pattern := range f.exclude {
+		if pattern.MatchString(path) {
+			return false
+		}
 	}
 
 	for _, pattern := range f.include {
@@ -175,6 +184,7 @@ func (f GitBlameFinder) isPathAllowed(path string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

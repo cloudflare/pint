@@ -24,6 +24,13 @@ func TestCISettings(t *testing.T) {
 		},
 		{
 			conf: CI{
+				MaxCommits: 1,
+				BaseBranch: "main",
+				Exclude:    []string{"foo/.+"},
+			},
+		},
+		{
+			conf: CI{
 				MaxCommits: -5,
 			},
 			err: errors.New("maxCommits cannot be <= 0"),
@@ -38,6 +45,13 @@ func TestCISettings(t *testing.T) {
 			conf: CI{
 				MaxCommits: 20,
 				Include:    []string{".+++"},
+			},
+			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
+		},
+		{
+			conf: CI{
+				MaxCommits: 20,
+				Exclude:    []string{".+++"},
 			},
 			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
 		},

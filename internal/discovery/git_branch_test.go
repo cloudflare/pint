@@ -75,6 +75,7 @@ func TestGitBranchFinder(t *testing.T) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				},
 				includeAll,
+				nil,
 				"main",
 				50,
 				nil,
@@ -90,6 +91,7 @@ func TestGitBranchFinder(t *testing.T) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				},
 				includeAll,
+				nil,
 				"master",
 				50,
 				nil,
@@ -110,6 +112,7 @@ func TestGitBranchFinder(t *testing.T) {
 					}
 				},
 				includeAll,
+				nil,
 				"main",
 				3,
 				nil,
@@ -130,6 +133,7 @@ func TestGitBranchFinder(t *testing.T) {
 					}
 				},
 				includeAll,
+				nil,
 				"main",
 				4,
 				nil,
@@ -152,6 +156,7 @@ func TestGitBranchFinder(t *testing.T) {
 					}
 				},
 				includeAll,
+				nil,
 				"main",
 				4,
 				nil,
@@ -180,6 +185,7 @@ func TestGitBranchFinder(t *testing.T) {
 					}
 				},
 				includeAll,
+				nil,
 				"main",
 				4,
 				nil,
@@ -197,7 +203,7 @@ func TestGitBranchFinder(t *testing.T) {
 
 				commitFile(t, "rules.yml", "# v2\n", "v2")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: nil,
 		},
 		{
@@ -222,7 +228,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: nil,
 		},
 		{
@@ -247,7 +253,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -274,7 +280,7 @@ groups:
   expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -301,7 +307,7 @@ groups:
   expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, nil, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, nil, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -334,7 +340,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, []*regexp.Regexp{regexp.MustCompile("^foo#")}, "main", 4, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, []*regexp.Regexp{regexp.MustCompile("^foo#")}, nil, "main", 4, nil),
 			entries: nil,
 		},
 		{
@@ -359,7 +365,7 @@ groups:
     expr: count(up == 1)
 `, "v2\nskip this commit\n[skip ci]\n")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: nil,
 		},
 		{
@@ -384,7 +390,7 @@ groups:
     expr: count(up == 1)
 `, "v2\nskip this commit\n[no ci]\n")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: nil,
 		},
 		{
@@ -404,7 +410,7 @@ groups:
 				require.NoError(t, err, "git add")
 				gitCommit(t, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Added,
@@ -447,7 +453,7 @@ groups:
     expr: count(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -502,7 +508,7 @@ groups:
   for: 0s
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -531,7 +537,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Removed,
@@ -560,7 +566,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Removed,
@@ -593,7 +599,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Removed,
@@ -627,7 +633,7 @@ groups:
     expr: count(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, nil),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Added,
@@ -676,7 +682,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Added,
@@ -716,7 +722,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, "main", 4, includeAll),
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
