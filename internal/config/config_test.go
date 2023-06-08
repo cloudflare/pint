@@ -1472,6 +1472,28 @@ func TestConfigErrors(t *testing.T) {
 		},
 		{
 			config: `rule {
+  alerts {
+    range    = "1d"
+	step     = "5m"
+	resolve  = "5m"
+	minCount = -10
+  }
+}`,
+			err: `minCount cannot be < 0, got -10`,
+		},
+		{
+			config: `rule {
+  alerts {
+    range    = "1d"
+	step     = "5m"
+	resolve  = "5m"
+	severity = "bug"
+  }
+}`,
+			err: `cannot set serverity to "bug" when minCount is 0`,
+		},
+		{
+			config: `rule {
   match {
     path = ".+++"
   }

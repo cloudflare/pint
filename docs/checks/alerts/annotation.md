@@ -22,11 +22,11 @@ annotation "$pattern" {
 
 - `$pattern` - regexp pattern to match annotation name on, this can be templated
   to reference checked rule fields, see [Configuration](../../configuration.md)
-  for details
-- `severity` - set custom severity for reported issues, defaults to a warning
-- `value` - optional value pattern to enforce, if not set only the
+  for details.
+- `severity` - set custom severity for reported issues, defaults to a warning.
+- `value` - optional value pattern to enforce, if not set only the.
 - `required` - if `true` pint will require every alert to have this annotation set,
-  if `false` it will only check values where annotation is set
+  if `false` it will only check values where annotation is set.
 
 ## How to enable it
 

@@ -187,10 +187,11 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		if rule.Alerts.Resolve != "" {
 			qResolve, _ = parseDuration(rule.Alerts.Resolve)
 		}
+		severity := rule.Alerts.getSeverity(checks.Information)
 		for _, prom := range prometheusServers {
 			enabled = append(enabled, checkMeta{
 				name:  checks.AlertsCheckName,
-				check: checks.NewAlertsCheck(prom, qRange, qStep, qResolve),
+				check: checks.NewAlertsCheck(prom, qRange, qStep, qResolve, rule.Alerts.MinCount, severity),
 				tags:  prom.Tags(),
 			})
 		}

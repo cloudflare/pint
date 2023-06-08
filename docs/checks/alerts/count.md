@@ -20,6 +20,8 @@ alerts {
   range      = "1h"
   step       = "1m"
   resolve    = "5m"
+  minCount   = 0
+  severity   = "bug|warning|info"
 }
 ```
 
@@ -30,6 +32,11 @@ alerts {
   to `scrape_interval`, try to reduce it if that would load too many samples.
   Defaults to `1m`.
 - `resolve` - duration after which stale alerts are resolved. Defaults to `5m`.
+- `minCount` - minimal number of alerts for this check to report it. Default to `0`.
+  Set this to a no-zero value if you want this check to report only if the estimated
+  number of alerts is high enough.
+- `severity` - set custom severity for reported issues, defaults to `info`.
+  This can be only set when `minCount` is set to a non-zero value.
 
 ## How to enable it
 
@@ -51,6 +58,25 @@ rule {
     range      = "1d"
     step       = "1m"
     resolve    = "5m"
+  }
+}
+```
+
+Report an error if there would be too many (>=50) alerts firing:
+
+```js
+prometheus "prod" {
+  uri     = "https://prometheus-prod.example.com"
+  timeout = "60s"
+}
+
+rule {
+  alerts {
+    range      = "1d"
+    step       = "1m"
+    resolve    = "5m"
+    minCount   = 50
+    severity   = "bug"
   }
 }
 ```

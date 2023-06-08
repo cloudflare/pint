@@ -19,12 +19,14 @@ const (
 	AlertsCheckName = "alerts/count"
 )
 
-func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Duration) AlertsCheck {
+func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Duration, minCount int, severity Severity) AlertsCheck {
 	return AlertsCheck{
 		prom:     prom,
 		lookBack: lookBack,
 		step:     step,
 		resolve:  resolve,
+		minCount: minCount,
+		severity: severity,
 	}
 }
 
@@ -33,6 +35,8 @@ type AlertsCheck struct {
 	lookBack time.Duration
 	step     time.Duration
 	resolve  time.Duration
+	minCount int
+	severity Severity
 }
 
 func (c AlertsCheck) Meta() CheckMeta {
@@ -93,6 +97,10 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 		}
 	}
 
+	if alerts < c.minCount {
+		return problems
+	}
+
 	lines := []int{}
 	lines = append(lines, rule.AlertingRule.Expr.Lines()...)
 	if rule.AlertingRule.For != nil {
@@ -106,7 +114,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 		Lines:    lines,
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
-		Severity: Information,
+		Severity: c.severity,
 	})
 	return problems
 }

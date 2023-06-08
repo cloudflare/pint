@@ -5,6 +5,10 @@
 ### Added
 
 - Added `exclude` option to `ci` config block - #609.
+- Added `minCount` & `severity` to `alerts/count` check - #612.
+  This allows to only show estimated alerts count only if there would be high
+  enough (`>= minCount`) number of alerts.
+  Setting `severity` as well allows to block rules that would create too many alerts.
 
 ### Fixed
 
