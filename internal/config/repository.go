@@ -3,6 +3,8 @@ package config
 import (
 	"fmt"
 	"net/url"
+	"os"
+	"strings"
 )
 
 type BitBucket struct {
@@ -32,19 +34,32 @@ type GitHub struct {
 	BaseURI   string `hcl:"baseuri,optional"`
 	UploadURI string `hcl:"uploaduri,optional"`
 	Timeout   string `hcl:"timeout,optional"`
-	Owner     string `hcl:"owner"`
-	Repo      string `hcl:"repo"`
+	Owner     string `hcl:"owner,optional"`
+	Repo      string `hcl:"repo,optional"`
 }
 
 func (gh GitHub) validate() error {
+	if repo := os.Getenv("GITHUB_REPOSITORY"); repo != "" {
+		parts := strings.SplitN(repo, "/", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("GITHUB_REPOSITORY is set, but with an invalid repository format: %s", repo)
+		}
+		if gh.Repo == "" && parts[1] == "" {
+			return fmt.Errorf("repo cannot be empty")
+		}
+		if gh.Owner == "" && parts[0] == "" {
+			return fmt.Errorf("owner cannot be empty")
+		}
+	} else {
+		if gh.Repo == "" {
+			return fmt.Errorf("repo cannot be empty")
+		}
+		if gh.Owner == "" {
+			return fmt.Errorf("owner cannot be empty")
+		}
+	}
 	if _, err := parseDuration(gh.Timeout); err != nil {
 		return err
-	}
-	if gh.Repo == "" {
-		return fmt.Errorf("repo cannot be empty")
-	}
-	if gh.Owner == "" {
-		return fmt.Errorf("owner cannot be empty")
 	}
 	if gh.BaseURI != "" {
 		_, err := url.Parse(gh.BaseURI)
