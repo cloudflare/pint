@@ -1426,17 +1426,6 @@ func TestConfigErrors(t *testing.T) {
 			err: "project cannot be empty",
 		},
 		{
-			config: `repository {
-  github {
-    baseuri = ""
-    timeout = ""
-    owner   = ""
-    repo    = ""
-  }
-}`,
-			err: "repo cannot be empty",
-		},
-		{
 			config: `checks { enabled = ["foo"] }`,
 			err:    "unknown check name foo",
 		},

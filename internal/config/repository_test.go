@@ -84,6 +84,7 @@ func TestBitBucketSettings(t *testing.T) {
 func TestGitHubSettings(t *testing.T) {
 	type testCaseT struct {
 		conf GitHub
+		env  map[string]string
 		err  error
 	}
 
@@ -94,12 +95,14 @@ func TestGitHubSettings(t *testing.T) {
 				Owner:   "bar",
 				Timeout: "5m",
 			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
 		},
 		{
 			conf: GitHub{
 				Repo:  "foo",
 				Owner: "bar",
 			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
 			err: errors.New(`empty duration string`),
 		},
 		{
@@ -108,22 +111,25 @@ func TestGitHubSettings(t *testing.T) {
 				Owner:   "bar",
 				Timeout: "foo",
 			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
 			err: errors.New(`not a valid duration string: "foo"`),
 		},
-		// {
-		// 	conf: GitHub{
-		// 		Owner:   "bar",
-		// 		Timeout: "5m",
-		// 	},
-		// 	err: errors.New("repo cannot be empty"),
-		// },
-		// {
-		// 	conf: GitHub{
-		// 		Repo:    "foo",
-		// 		Timeout: "5m",
-		// 	},
-		// 	err: errors.New("owner cannot be empty"),
-		// },
+		{
+			conf: GitHub{
+				Owner:   "bar",
+				Timeout: "5m",
+			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
+			err: errors.New("repo cannot be empty"),
+		},
+		{
+			conf: GitHub{
+				Repo:    "foo",
+				Timeout: "5m",
+			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
+			err: errors.New("owner cannot be empty"),
+		},
 		{
 			conf: GitHub{
 				Repo:    "foo",
@@ -131,6 +137,7 @@ func TestGitHubSettings(t *testing.T) {
 				Timeout: "5m",
 				BaseURI: "http://%41:8080/",
 			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
 			err: errors.New(`invalid baseuri: parse "http://%41:8080/": invalid URL escape "%41"`),
 		},
 		{
@@ -140,12 +147,31 @@ func TestGitHubSettings(t *testing.T) {
 				Timeout:   "5m",
 				UploadURI: "http://%41:8080/",
 			},
+			env: map[string]string{"GITHUB_REPOSITORY": ""},
 			err: errors.New(`invalid uploaduri: parse "http://%41:8080/": invalid URL escape "%41"`),
+		},
+		{
+			conf: GitHub{},
+			env:  map[string]string{"GITHUB_REPOSITORY": "xxx"},
+			err:  errors.New("GITHUB_REPOSITORY is set, but with an invalid repository format: xxx"),
+		},
+		{
+			conf: GitHub{},
+			env:  map[string]string{"GITHUB_REPOSITORY": "/foo"},
+			err:  errors.New("owner cannot be empty"),
+		},
+		{
+			conf: GitHub{},
+			env:  map[string]string{"GITHUB_REPOSITORY": "foo/"},
+			err:  errors.New("repo cannot be empty"),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%v", tc.conf), func(t *testing.T) {
+			for k, v := range tc.env {
+				t.Setenv(k, v)
+			}
 			err := tc.conf.validate()
 			if err == nil || tc.err == nil {
 				require.Equal(t, tc.err, err)
