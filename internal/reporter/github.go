@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"strconv"
@@ -249,6 +250,23 @@ func formatGHReviewBody(version string, summary Summary) string {
 	b.WriteString(output.HumanizeDuration(summary.Duration))
 	b.WriteString(" |\n")
 
+	b.WriteString("\n</p>\n</details>\n\n")
+
+	b.WriteString("<details><summary>Problems</summary>\n<p>\n\n")
+	if summary.Entries > 0 {
+		buf := bytes.NewBuffer(nil)
+		cr := NewConsoleReporter(buf, checks.Information)
+		err := cr.Submit(summary)
+		if err != nil {
+			b.WriteString(fmt.Sprintf("Failed to generate list of problems: %s", err))
+		} else {
+			b.WriteString("```\n")
+			b.WriteString(buf.String())
+			b.WriteString("```\n")
+		}
+	} else {
+		b.WriteString("No problems reported")
+	}
 	b.WriteString("\n</p>\n</details>\n\n")
 
 	return b.String()
