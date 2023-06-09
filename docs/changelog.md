@@ -6,6 +6,7 @@
 
 - Rule names were not checked for correctly, allowing for rules with empty names
   to pass checks.
+- Fixed GitHub annotations being added to unmodified lines - #645.
 
 ## v0.44.0
 

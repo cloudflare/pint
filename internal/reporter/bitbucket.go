@@ -270,11 +270,8 @@ func moveReportedLine(report Report) (reported, original int) {
 		}
 	}
 
-	if reported < 0 && report.Problem.Severity == checks.Fatal {
-		for _, ml := range report.ModifiedLines {
-			reported = ml
-			break
-		}
+	if reported < 0 && len(report.ModifiedLines) > 0 {
+		return report.ModifiedLines[0], original
 	}
 
 	return reported, original
