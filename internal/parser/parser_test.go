@@ -43,7 +43,7 @@ func TestParse(t *testing.T) {
 		{
 			content: []byte("- record: |\n    multiline\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
+				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 2}},
 			},
 		},
 		{
@@ -1206,6 +1206,42 @@ data:
 						},
 					},
 				},
+			},
+		},
+		{
+			content: []byte("- alert:\n  expr: vector(1)\n"),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("alert value cannot be empty"), Line: 1}},
+			},
+		},
+		{
+			content: []byte("- alert: foo\n  expr:\n"),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2}},
+			},
+		},
+		{
+			content: []byte("- alert: foo\n"),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
+			},
+		},
+		{
+			content: []byte("- record:\n  expr:\n"),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("record value cannot be empty"), Line: 1}},
+			},
+		},
+		{
+			content: []byte("- record: foo\n  expr:\n"),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2}},
+			},
+		},
+		{
+			content: []byte("- record: foo\n"),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
 			},
 		},
 	}

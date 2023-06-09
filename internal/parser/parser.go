@@ -99,11 +99,9 @@ func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err e
 	return rules, nil
 }
 
-func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty bool, err error) {
-	isEmpty = true
-
+func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, err error) {
 	if node.Kind != yaml.MappingNode {
-		return rule, isEmpty, err
+		return rule, true, err
 	}
 
 	var recordPart *YamlKeyValue
@@ -186,47 +184,30 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 	}
 
 	if recordPart != nil && alertPart != nil {
-		isEmpty = false
 		rule = Rule{
 			Error: ParseError{
 				Line: node.Line + offset,
 				Err:  fmt.Errorf("got both %s and %s keys in a single rule", recordKey, alertKey),
 			},
 		}
-		return rule, isEmpty, err
-	}
-	if recordPart != nil && exprPart == nil {
-		isEmpty = false
-		rule = Rule{
-			Error: ParseError{
-				Line: recordPart.Key.Position.LastLine(),
-				Err:  fmt.Errorf("missing %s key", exprKey),
-			},
-		}
-		return rule, isEmpty, err
-	}
-	if alertPart != nil && exprPart == nil {
-		isEmpty = false
-		rule = Rule{
-			Error: ParseError{
-				Line: alertPart.Key.Position.LastLine(),
-				Err:  fmt.Errorf("missing %s key", exprKey),
-			},
-		}
-		return rule, isEmpty, err
+		return rule, false, err
 	}
 	if exprPart != nil && alertPart == nil && recordPart == nil {
-		isEmpty = false
 		rule = Rule{
 			Error: ParseError{
 				Line: exprPart.Key.Position.LastLine(),
 				Err:  fmt.Errorf("incomplete rule, no %s or %s key", alertKey, recordKey),
 			},
 		}
-		return rule, isEmpty, err
+		return rule, false, err
+	}
+	if r, ok := ensureRequiredKeys(recordPart, exprPart); !ok {
+		return r, false, err
+	}
+	if r, ok := ensureRequiredKeys(alertPart, exprPart); !ok {
+		return r, false, err
 	}
 	if (recordPart != nil || alertPart != nil) && len(unknownKeys) > 0 {
-		isEmpty = false
 		var keys []string
 		for _, n := range unknownKeys {
 			keys = append(keys, n.Value)
@@ -237,21 +218,19 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 				Err:  fmt.Errorf("invalid key(s) found: %s", strings.Join(keys, ", ")),
 			},
 		}
-		return rule, isEmpty, err
+		return rule, false, err
 	}
 
 	if recordPart != nil && exprPart != nil {
-		isEmpty = false
 		rule = Rule{RecordingRule: &RecordingRule{
 			Record: *recordPart,
 			Expr:   *exprPart,
 			Labels: labelsPart,
 		}}
-		return rule, isEmpty, err
+		return rule, false, err
 	}
 
 	if alertPart != nil && exprPart != nil {
-		isEmpty = false
 		rule = Rule{AlertingRule: &AlertingRule{
 			Alert:       *alertPart,
 			Expr:        *exprPart,
@@ -259,10 +238,10 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, isEmpty 
 			Labels:      labelsPart,
 			Annotations: annotationsPart,
 		}}
-		return rule, isEmpty, err
+		return rule, false, err
 	}
 
-	return rule, isEmpty, err
+	return rule, true, err
 }
 
 func unpackNodes(node *yaml.Node) []*yaml.Node {
@@ -309,6 +288,44 @@ func hasKey(node *yaml.Node, key string) bool {
 		}
 	}
 	return false
+}
+
+func hasValue(node *YamlNode) bool {
+	if node == nil {
+		return false
+	}
+	return node.Value != ""
+}
+
+func ensureRequiredKeys(key *YamlKeyValue, expr *PromQLExpr) (Rule, bool) {
+	if key == nil {
+		return Rule{}, true
+	}
+	if !hasValue(key.Value) {
+		return Rule{
+			Error: ParseError{
+				Line: key.Value.Position.LastLine(),
+				Err:  fmt.Errorf("%s value cannot be empty", key.Key.Value),
+			},
+		}, false
+	}
+	if expr == nil {
+		return Rule{
+			Error: ParseError{
+				Line: key.Value.Position.LastLine(),
+				Err:  fmt.Errorf("missing %s key", exprKey),
+			},
+		}, false
+	}
+	if !hasValue(expr.Value) {
+		return Rule{
+			Error: ParseError{
+				Line: expr.Value.Position.LastLine(),
+				Err:  fmt.Errorf("%s value cannot be empty", exprKey),
+			},
+		}, false
+	}
+	return Rule{}, true
 }
 
 func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
