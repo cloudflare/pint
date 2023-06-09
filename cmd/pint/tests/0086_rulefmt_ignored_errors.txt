@@ -6,7 +6,7 @@ cmp stderr stderr.txt
 rules/strict.yml:4 Fatal: incomplete rule, no alert or record key (yaml/parse)
  4 |   - expr: MissingAlertOrRecord
 
-rules/strict.yml:7 Fatal: syntax error: no expression found in input (promql/syntax)
+rules/strict.yml:7 Fatal: expr value cannot be empty (yaml/parse)
  7 |     expr: 
 
 rules/strict.yml:10 Fatal: syntax error: unknown function with name "sumz" (promql/syntax)

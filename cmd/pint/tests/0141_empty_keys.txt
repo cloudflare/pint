@@ -1,0 +1,41 @@
+pint.error --no-color lint rules.yml
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+rules.yml:4 Fatal: record value cannot be empty (yaml/parse)
+ 4 |       - record:
+
+rules.yml:6 Fatal: record value cannot be empty (yaml/parse)
+ 6 |       - record:
+
+rules.yml:9 Fatal: expr value cannot be empty (yaml/parse)
+ 9 |         expr:
+
+rules.yml:10 Fatal: alert value cannot be empty (yaml/parse)
+ 10 |       - alert:
+
+rules.yml:12 Fatal: alert value cannot be empty (yaml/parse)
+ 12 |       - alert:
+
+rules.yml:15 Fatal: expr value cannot be empty (yaml/parse)
+ 15 |         expr:
+
+level=info msg="Problems found" Fatal=6
+level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+-- rules.yml --
+groups:
+  - name: rules
+    rules:
+      - record:
+        expr:
+      - record:
+        expr: vector(1)
+      - record: foo
+        expr:
+      - alert:
+        expr:
+      - alert:
+        expr: vector(1) > 0
+      - alert: foo
+        expr:

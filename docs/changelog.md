@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.44.1
+
+### Fixed
+
+- Rule names were not checked for correctly, allowing for rules with empty names
+  to pass checks.
+
 ## v0.44.0
 
 ### Added
