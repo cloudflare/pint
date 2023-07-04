@@ -87,6 +87,11 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
+	err = report(summary, meta.cfg.Reporters)
+	if err != nil {
+		return err
+	}
+
 	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
 	var problems, hiddenProblems, failProblems int
 	for s, c := range summary.CountBySeverity() {
@@ -111,6 +116,19 @@ func actionLint(c *cli.Context) error {
 	if failProblems > 0 {
 		return fmt.Errorf("found %d problem(s) with severity %s or higher", failProblems, failOn)
 	}
+	return nil
+}
+
+func report(summary reporter.Summary, reporters *config.Reporters) error {
+
+	if reporters.JSON != nil {
+		r := reporter.NewJSONReporter(reporters.JSON.Path)
+		err := r.Submit(summary.Reports())
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

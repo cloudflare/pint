@@ -34,6 +34,7 @@ type Config struct {
 	Rules             []Rule                   `hcl:"rule,block" json:"rules,omitempty"`
 	Owners            *Owners                  `hcl:"owners,block" json:"owners,omitempty"`
 	PrometheusServers []*promapi.FailoverGroup `json:"-"`
+	Reporters         *Reporters               `hcl:"reporters,block" json:"reporters,omitempty"`
 }
 
 func (cfg *Config) DisableOnlineChecks() {

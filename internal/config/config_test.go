@@ -1373,6 +1373,7 @@ prometheus "prom3" {
 				checks.LabelsConflictCheckName + "(prom3)",
 			},
 		},
+		
 	}
 
 	dir := t.TempDir()
