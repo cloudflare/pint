@@ -1,8 +1,6 @@
 package reporter_test
 
 import (
-	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -36,18 +34,16 @@ func TestJSONReporter(t *testing.T) {
 			},
 		},
 	}
-	path := filepath.Join(os.TempDir(), "json-reporter-test.json")
-	//defer os.Remove(path)
-	fmt.Println(path)
+	path := filepath.Join(t.TempDir(), "json-reporter-test.json")
+	defer os.Remove(path)
 	json_reporter := reporter.NewJSONReporter(path)
 	json_reporter.Submit(reports)
 	jsonFile, err := os.Open(path)
 	require.NoError(t, err, "Couldn't open reported json file")
 	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var readReports []reporter.Report
-	err = json.Unmarshal(byteValue, &readReports)
-	require.NoError(t, err, "Error marshalling json")
-	require.Equal(t, reports, readReports)
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	require.NoError(t, err, "Error reading json")
+	expected := "[{\"reportedPath\":\"\",\"sourcePath\":\"foo.txt\",\"rule\":{\"name\":\"sum errors\",\"type\":\"recording\"},\"problem\":{\"Fragment\":\"syntax error\",\"Lines\":[2],\"Reporter\":\"mock\",\"Text\":\"syntax error\",\"Severity\":3},\"owner\":\"\"}]"
+	require.Equal(t, expected, string(byteValue))
 
 }

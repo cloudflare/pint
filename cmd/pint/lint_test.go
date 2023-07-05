@@ -6,6 +6,8 @@ import (
 	"path"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func mockRules(dir string, filesCount, rulesPerFile int) error {
@@ -151,4 +153,33 @@ func BenchmarkLint(b *testing.B) {
 			b.FailNow()
 		}
 	}
+}
+
+func TestLintReporters(t *testing.T) {
+	var err error
+
+	rulesDir := t.TempDir()
+	err = mockRules(rulesDir, 1, 1)
+	require.NoError(t, err)
+	configPath := path.Join(rulesDir, ".pint.hcl")
+	err = mockConfig(configPath)
+	require.NoError(t, err)
+
+	json_file := path.Join(rulesDir, ".reporter.json")
+	content := fmt.Sprintf(`
+  parser {
+    relaxed = ["(.*)"]
+  }
+  
+  reporters {
+    json {
+      path = "%s"
+    }
+  }
+  `, strings.Replace(json_file, `\`, `\\`, -1))
+	os.WriteFile(configPath, []byte(content), 0o644)
+	app := newApp()
+	err = app.Run([]string{"pint", "-c", configPath, "-l", "error", "--offline", "lint", rulesDir + "/*.yaml"})
+	require.NoError(t, err)
+	require.FileExists(t, json_file)
 }
