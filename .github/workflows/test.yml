@@ -32,4 +32,3 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./.cover/coverage.out
-          fail_ci_if_error: true
