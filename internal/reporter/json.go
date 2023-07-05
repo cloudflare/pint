@@ -29,9 +29,9 @@ type JSONReportRule struct {
 }
 
 func (cr JSONReporter) Submit(reports []Report) error {
-	json_reports := make([]JSONReport, 0, len(reports))
+	jsonReports := make([]JSONReport, 0, len(reports))
 	for _, report := range reports {
-		json_reports = append(json_reports, JSONReport{
+		jsonReports = append(jsonReports, JSONReport{
 			ReportedPath: report.ReportedPath,
 			SourcePath:   report.SourcePath,
 			Owner:        report.Owner,
@@ -42,7 +42,7 @@ func (cr JSONReporter) Submit(reports []Report) error {
 			},
 		})
 	}
-	result, err := json.Marshal(json_reports)
+	result, err := json.Marshal(jsonReports)
 	if err != nil {
 		return err
 	}

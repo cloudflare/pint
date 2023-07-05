@@ -1,15 +1,16 @@
 package reporter_test
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
-	"github.com/stretchr/testify/require"
 )
 
 func TestJSONReporter(t *testing.T) {
@@ -36,14 +37,13 @@ func TestJSONReporter(t *testing.T) {
 	}
 	path := filepath.Join(t.TempDir(), "json-reporter-test.json")
 	defer os.Remove(path)
-	json_reporter := reporter.NewJSONReporter(path)
-	json_reporter.Submit(reports)
+	jsonReporter := reporter.NewJSONReporter(path)
+	require.NoError(t, jsonReporter.Submit(reports))
 	jsonFile, err := os.Open(path)
 	require.NoError(t, err, "Couldn't open reported json file")
 	defer jsonFile.Close()
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
 	require.NoError(t, err, "Error reading json")
 	expected := "[{\"reportedPath\":\"\",\"sourcePath\":\"foo.txt\",\"rule\":{\"name\":\"sum errors\",\"type\":\"recording\"},\"problem\":{\"Fragment\":\"syntax error\",\"Lines\":[2],\"Reporter\":\"mock\",\"Text\":\"syntax error\",\"Severity\":3},\"owner\":\"\"}]"
 	require.Equal(t, expected, string(byteValue))
-
 }
