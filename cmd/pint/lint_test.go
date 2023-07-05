@@ -155,7 +155,7 @@ func BenchmarkLint(b *testing.B) {
 	}
 }
 
-func TestLintReporters(t *testing.T) {
+func TestJSONLintReporter(t *testing.T) {
 	var err error
 
 	rulesDir := t.TempDir()
@@ -183,4 +183,26 @@ func TestLintReporters(t *testing.T) {
 	err = app.Run([]string{"pint", "-c", configPath, "-l", "error", "--offline", "lint", rulesDir + "/*.yaml"})
 	require.NoError(t, err)
 	require.FileExists(t, jsonFile)
+}
+
+func TestNoLintReporters(t *testing.T) {
+	var err error
+
+	rulesDir := t.TempDir()
+	err = mockRules(rulesDir, 1, 1)
+	require.NoError(t, err)
+	configPath := path.Join(rulesDir, ".pint.hcl")
+	err = mockConfig(configPath)
+	require.NoError(t, err)
+
+	content := `
+  parser {
+    relaxed = ["(.*)"]
+  }
+  `
+	err = os.WriteFile(configPath, []byte(content), 0o644)
+	require.NoError(t, err)
+	app := newApp()
+	err = app.Run([]string{"pint", "-c", configPath, "-l", "error", "--offline", "lint", rulesDir + "/*.yaml"})
+	require.NoError(t, err)
 }

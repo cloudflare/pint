@@ -120,11 +120,13 @@ func actionLint(c *cli.Context) error {
 }
 
 func report(summary reporter.Summary, reporters *config.Reporters) error {
-	if reporters.JSON != nil {
-		r := reporter.NewJSONReporter(reporters.JSON.Path)
-		err := r.Submit(summary.Reports())
-		if err != nil {
-			return err
+	if reporters != nil {
+		if reporters.JSON != nil {
+			r := reporter.NewJSONReporter(reporters.JSON.Path)
+			err := r.Submit(summary.Reports())
+			if err != nil {
+				return err
+			}
 		}
 	}
 
