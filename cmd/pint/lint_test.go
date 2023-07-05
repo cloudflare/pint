@@ -165,7 +165,7 @@ func TestLintReporters(t *testing.T) {
 	err = mockConfig(configPath)
 	require.NoError(t, err)
 
-	json_file := path.Join(rulesDir, ".reporter.json")
+	jsonFile := path.Join(rulesDir, ".reporter.json")
 	content := fmt.Sprintf(`
   parser {
     relaxed = ["(.*)"]
@@ -176,10 +176,11 @@ func TestLintReporters(t *testing.T) {
       path = "%s"
     }
   }
-  `, strings.Replace(json_file, `\`, `\\`, -1))
-	os.WriteFile(configPath, []byte(content), 0o644)
+  `, strings.ReplaceAll(jsonFile, `\`, `\\`))
+	err = os.WriteFile(configPath, []byte(content), 0o644)
+	require.NoError(t, err)
 	app := newApp()
 	err = app.Run([]string{"pint", "-c", configPath, "-l", "error", "--offline", "lint", rulesDir + "/*.yaml"})
 	require.NoError(t, err)
-	require.FileExists(t, json_file)
+	require.FileExists(t, jsonFile)
 }
