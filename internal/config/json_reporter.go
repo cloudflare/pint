@@ -6,8 +6,8 @@ type JSONReporterSettings struct {
 	Path string `hcl:"path" json:"path"`
 }
 
-func (ag JSONReporterSettings) validate() error {
-	if ag.Path == "" {
+func (settings JSONReporterSettings) validate() error {
+	if settings.Path == "" {
 		return errors.New("empty path")
 	}
 

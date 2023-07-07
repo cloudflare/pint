@@ -123,8 +123,7 @@ func report(summary reporter.Summary, reporters *config.Reporters) error {
 	if reporters != nil && reporters.JSON != nil {
 		if reporters.JSON != nil {
 			r := reporter.NewJSONReporter(reporters.JSON.Path)
-			if err := r.Submit(summary.Reports()); err != nil { return err; }
-			if err != nil {
+			if err := r.Submit(summary.Reports()); err != nil {
 				return err
 			}
 		}
