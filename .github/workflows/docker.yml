@@ -33,7 +33,7 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/amd64
-          push: true
+          push: false
 
   arm64:
     if: github.event_name != 'pull_request'
