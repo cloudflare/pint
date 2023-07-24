@@ -21,7 +21,7 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/zclconf/go-cty v1.13.2
 	go.uber.org/atomic v1.11.0
-	go.uber.org/automaxprocs v1.5.2
+	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/ratelimit v0.3.0
 	golang.org/x/exp v0.0.0-20230522175609-2e198f4a06a1
 	golang.org/x/oauth2 v0.10.0
