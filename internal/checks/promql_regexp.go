@@ -46,55 +46,57 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 		}
 		done[selector.String()] = struct{}{}
 		for _, lm := range selector.LabelMatchers {
-			if re := lm.GetRegexString(); re != "" {
-				var isUseful bool
-				var beginText, endText int
-				r, _ := syntax.Parse(re, syntax.Perl)
-				for _, s := range r.Sub {
-					// nolint: exhaustive
-					switch s.Op {
-					case syntax.OpBeginText:
-						beginText++
-						continue
-					case syntax.OpEndText:
-						endText++
-						continue
-					case syntax.OpLiteral:
-						continue
-					case syntax.OpEmptyMatch:
-						continue
-					default:
-						isUseful = true
-					}
+			if lm.Type != labels.MatchRegexp && lm.Type != labels.MatchNotRegexp {
+				continue
+			}
+			re := lm.GetRegexString()
+			var isUseful bool
+			var beginText, endText int
+			r, _ := syntax.Parse(re, syntax.Perl)
+			for _, s := range r.Sub {
+				// nolint: exhaustive
+				switch s.Op {
+				case syntax.OpBeginText:
+					beginText++
+					continue
+				case syntax.OpEndText:
+					endText++
+					continue
+				case syntax.OpLiteral:
+					continue
+				case syntax.OpEmptyMatch:
+					continue
+				default:
+					isUseful = true
 				}
-				if !isUseful {
-					var op labels.MatchType
-					// nolint: exhaustive
-					switch lm.Type {
-					case labels.MatchRegexp:
-						op = labels.MatchEqual
-					case labels.MatchNotRegexp:
-						op = labels.MatchNotEqual
-					}
-					problems = append(problems, Problem{
-						Fragment: selector.String(),
-						Lines:    expr.Lines(),
-						Reporter: c.Reporter(),
-						Text:     fmt.Sprintf(`unnecessary regexp match on static string %s, use %s%s%q instead`, lm, lm.Name, op, lm.Value),
-						Severity: Bug,
-					})
+			}
+			if !isUseful {
+				var op labels.MatchType
+				// nolint: exhaustive
+				switch lm.Type {
+				case labels.MatchRegexp:
+					op = labels.MatchEqual
+				case labels.MatchNotRegexp:
+					op = labels.MatchNotEqual
 				}
-				if beginText > 1 || endText > 1 {
-					problems = append(problems, Problem{
-						Fragment: selector.String(),
-						Lines:    expr.Lines(),
-						Reporter: c.Reporter(),
-						Text: fmt.Sprintf(`prometheus regexp matchers are automatically fully anchored so match for %s will result in %s%s"^%s$", remove regexp anchors ^ and/or $`,
-							lm, lm.Name, lm.Type, lm.Value,
-						),
-						Severity: Bug,
-					})
-				}
+				problems = append(problems, Problem{
+					Fragment: selector.String(),
+					Lines:    expr.Lines(),
+					Reporter: c.Reporter(),
+					Text:     fmt.Sprintf(`unnecessary regexp match on static string %s, use %s%s%q instead`, lm, lm.Name, op, lm.Value),
+					Severity: Bug,
+				})
+			}
+			if beginText > 1 || endText > 1 {
+				problems = append(problems, Problem{
+					Fragment: selector.String(),
+					Lines:    expr.Lines(),
+					Reporter: c.Reporter(),
+					Text: fmt.Sprintf(`prometheus regexp matchers are automatically fully anchored so match for %s will result in %s%s"^%s$", remove regexp anchors ^ and/or $`,
+						lm, lm.Name, lm.Type, lm.Value,
+					),
+					Severity: Bug,
+				})
 			}
 		}
 	}
