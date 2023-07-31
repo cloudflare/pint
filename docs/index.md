@@ -252,6 +252,13 @@ Steps:
    ./pint --config /etc/pint.hcl lint /etc/prometheus/rules/*.yml
    ```
 
+There are docker images available on [GitHub](https://github.com/cloudflare/pint/pkgs/container/pint).
+Example usage:
+
+```shell
+docker run --mount=type=bind,source="$(pwd)",target=/rules,readonly ghcr.io/cloudflare/pint pint lint /rules
+```
+
 ## License
 
 ```text
