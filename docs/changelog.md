@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.44.2
+
+### Fixed
+
+- Fixed a crash in `promql/series` check when Prometheus instance becomes
+  unavailable - #682.
+
 ## v0.44.1
 
 ### Fixed
