@@ -195,6 +195,27 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				Str("metric", c.prom.UptimeMetric()).
 				Msg("No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config")
 		}
+		if promUptime == nil || promUptime.Series.Ranges.Len() == 0 {
+			log.Warn().
+				Str("name", c.prom.Name()).
+				Str("metric", c.prom.UptimeMetric()).
+				Msg("Using dummy Prometheus uptime metric results with no gaps")
+			promUptime = &promapi.RangeQueryResult{
+				Series: promapi.SeriesTimeRanges{
+					From:  params.Start(),
+					Until: params.End(),
+					Step:  params.Step(),
+					Ranges: promapi.MetricTimeRanges{
+						{
+							Fingerprint: 0,
+							Labels:      labels.Labels{},
+							Start:       params.Start(),
+							End:         params.End(),
+						},
+					},
+				},
+			}
+		}
 
 		bareSelector := stripLabels(selector)
 
