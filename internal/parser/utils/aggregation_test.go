@@ -45,7 +45,7 @@ func TestHasOuterAggregation(t *testing.T) {
 		},
 		{
 			expr:   "sum(foo) + sum(bar)",
-			output: []string{"sum(foo)", "sum(bar)"},
+			output: []string{"sum(foo)"},
 		},
 		{
 			expr: "foo / on(bbb) sum(bar)",
@@ -64,7 +64,7 @@ func TestHasOuterAggregation(t *testing.T) {
 		},
 		{
 			expr:   "1 + sum(foo) by(job) + sum(foo) by(notjob)",
-			output: []string{"sum by (job) (foo)", "sum by (notjob) (foo)"},
+			output: []string{"sum by (job) (foo)"},
 		},
 		{
 			expr:   "sum(foo) by (job) > count(bar)",
@@ -127,6 +127,15 @@ func TestHasOuterAggregation(t *testing.T) {
 		{
 			expr:   "(quantile(0.9, foo))",
 			output: []string{"quantile(0.9, foo)"},
+		},
+		{
+			expr: `abs(rate(scylla_cql_updates{conditional="no"}[1m]) - scalar(avg(rate(scylla_cql_updates{conditional="no"}[1m]))))`,
+		},
+		{
+			expr: `abs(rate(scylla_cql_updates{conditional="no"}[1m]) + scalar(avg(rate(scylla_cql_updates{conditional="no"}[1m]))))`,
+		},
+		{
+			expr: `abs(rate(scylla_cql_updates{conditional="no"}[1m]) / scalar(avg(rate(scylla_cql_updates{conditional="no"}[1m]))))`,
 		},
 	}
 
