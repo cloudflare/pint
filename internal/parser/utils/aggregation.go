@@ -78,7 +78,14 @@ NEXT:
 					aggs = append(aggs, HasOuterAggregation(child)...)
 				}
 				return aggs
-			case promParser.DIV, promParser.LUNLESS, promParser.LAND:
+			case promParser.LUNLESS, promParser.LAND:
+				for _, child := range node.Children {
+					return HasOuterAggregation(child)
+				}
+			case promParser.DIV, promParser.SUB, promParser.ADD:
+				if _, ok := n.LHS.(*promParser.NumberLiteral); ok {
+					goto CHILDREN
+				}
 				for _, child := range node.Children {
 					return HasOuterAggregation(child)
 				}
@@ -86,6 +93,7 @@ NEXT:
 		}
 	}
 
+CHILDREN:
 	for _, child := range node.Children {
 		aggs = append(aggs, HasOuterAggregation(child)...)
 	}

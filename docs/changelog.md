@@ -6,6 +6,7 @@
 
 - Fixed a crash in `promql/series` check when Prometheus instance becomes
   unavailable - #682.
+- Fixed false positive reports in `alerts/template` check - #681.
 
 ## v0.44.1
 

@@ -388,7 +388,7 @@ func TestTemplateCheck(t *testing.T) {
 		},
 		{
 			description: "annotation label missing from metrics (1+)",
-			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(job) + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
+			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
 			problems: func(uri string) []checks.Problem {
@@ -989,6 +989,29 @@ func TestTemplateCheck(t *testing.T) {
     sum(foo:count) by(job) > 20
   labels:
     notify: "{{ $labels.notify }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "abs / scalar",
+			content: `
+- alert: ScyllaNonBalancedcqlTraffic
+  expr: >
+    abs(rate(scylla_cql_updates{conditional="no"}[1m]) - scalar(avg(rate(scylla_cql_updates{conditional="no"}[1m]))))
+    /
+    scalar(stddev(rate(scylla_cql_updates{conditional="no"}[1m])) + 100) > 2
+  for: 10s
+  labels:
+    advisor: balanced
+    dashboard: cql
+    severity: moderate
+    status: "1"
+    team: team_devops
+  annotations:
+    description: CQL queries are not balanced among shards {{ $labels.instance }} shard {{ $labels.shard }}
+    summary: CQL queries are not balanced
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
