@@ -7,8 +7,11 @@ import (
 )
 
 type CostSettings struct {
-	MaxSeries int    `hcl:"maxSeries,optional" json:"maxSeries,omitempty"`
-	Severity  string `hcl:"severity,optional" json:"severity,omitempty"`
+	MaxSeries             int    `hcl:"maxSeries,optional" json:"maxSeries,omitempty"`
+	MaxPeakSamples        int    `hcl:"maxPeakSamples,optional" json:"maxPeakSamples,omitempty"`
+	MaxTotalSamples       int    `hcl:"maxTotalSamples,optional" json:"maxTotalSamples,omitempty"`
+	MaxEvaluationDuration string `hcl:"maxEvaluationDuration,optional" json:"maxEvaluationDuration,omitempty"`
+	Severity              string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (cs CostSettings) validate() error {
@@ -19,6 +22,17 @@ func (cs CostSettings) validate() error {
 	}
 	if cs.MaxSeries < 0 {
 		return fmt.Errorf("maxSeries value must be >= 0")
+	}
+	if cs.MaxTotalSamples < 0 {
+		return fmt.Errorf("maxTotalSamples value must be >= 0")
+	}
+	if cs.MaxPeakSamples < 0 {
+		return fmt.Errorf("maxPeakSamples value must be >= 0")
+	}
+	if cs.MaxEvaluationDuration != "" {
+		if _, err := parseDuration(cs.MaxEvaluationDuration); err != nil {
+			return err
+		}
 	}
 	return nil
 }

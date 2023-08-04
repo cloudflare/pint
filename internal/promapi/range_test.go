@@ -27,6 +27,7 @@ func TestRange(t *testing.T) {
 		step    time.Duration
 		timeout time.Duration
 		out     promapi.SeriesTimeRanges
+		stats   promapi.QueryStats
 		err     string
 		handler handlerFunc
 	}
@@ -543,6 +544,90 @@ func TestRange(t *testing.T) {
 				}`))
 			},
 		},
+		{
+			query:   "stats",
+			start:   timeParse("2022-06-14T00:00:00Z"),
+			end:     timeParse("2022-06-14T07:00:00Z"),
+			step:    time.Minute,
+			timeout: time.Second,
+			out: promapi.SeriesTimeRanges{
+				Ranges: promapi.MetricTimeRanges{
+					{
+						Labels: labels.FromStrings("instance", "1"),
+						Start:  timeParse("2022-06-14T00:00:00Z"),
+						End:    timeParse("2022-06-14T06:59:59Z"),
+					},
+				},
+			},
+			stats: promapi.QueryStats{
+				Timings: promapi.QueryTimings{
+					EvalTotalTime:        10.1 * 4,
+					ResultSortTime:       0.5 * 4,
+					QueryPreparationTime: 1.5 * 4,
+					InnerEvalTime:        0.7 * 4,
+					ExecQueueTime:        0.01 * 4,
+					ExecTotalTime:        5.1 * 4,
+				},
+				Samples: promapi.QuerySamples{
+					TotalQueryableSamples: 1000 * 4,
+					PeakSamples:           500 * 4,
+				},
+			},
+			handler: func(t *testing.T, w http.ResponseWriter, r *http.Request) {
+				err := r.ParseForm()
+				if err != nil {
+					t.Fatal(err)
+				}
+				require.Equal(t, r.Form.Get("query"), "stats")
+				require.Equal(t, r.Form.Get("step"), "60")
+
+				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
+				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
+
+				switch start {
+				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T03:59:59Z").Unix()), end, "invalid end for #1")
+				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T05:59:59Z").Unix()), end, "invalid end for #2")
+				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
+					require.Equal(t, float64(timeParse("2022-06-14T07:00:00Z").Unix()), end, "invalid end for #3")
+				default:
+					t.Fatalf("unknown start: %.2f", start)
+				}
+
+				w.WriteHeader(200)
+				w.Header().Set("Content-Type", "application/json")
+				var values []string
+				for i := start; i < end; i += 60 {
+					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
+				}
+				_, _ = w.Write([]byte(fmt.Sprintf(
+					`{
+						"status":"success",
+						"data":{
+							"resultType":"matrix",
+							"result":[{"metric":{"instance":"1"}, "values":[%s]}],
+							"stats": {
+								"timings": {
+									"evalTotalTime": 10.1,
+									  "resultSortTime": 0.5,
+									  "queryPreparationTime": 1.5,
+									  "innerEvalTime": 0.7,
+									  "execQueueTime": 0.01,
+									  "execTotalTime": 5.1
+								},
+								"samples": {
+									  "totalQueryableSamples": 1000,
+									  "peakSamples": 500
+								}
+							}
+						}
+					}`,
+					strings.Join(values, ","))))
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -566,6 +651,7 @@ func TestRange(t *testing.T) {
 					} else {
 						require.NoError(t, err)
 						require.Equal(t, printRange(tc.out.Ranges), printRange(qr.Series.Ranges), tc)
+						require.Equal(t, tc.stats, qr.Stats)
 					}
 				})
 			}

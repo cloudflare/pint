@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/url"
 	"sort"
@@ -24,6 +25,7 @@ import (
 type RangeQueryResult struct {
 	URI    string
 	Series SeriesTimeRanges
+	Stats  QueryStats
 }
 
 type rangeQuery struct {
@@ -46,6 +48,7 @@ func (q rangeQuery) Run() queryResult {
 	args.Set("end", formatTime(q.r.End))
 	args.Set("step", strconv.FormatFloat(q.r.Step.Seconds(), 'f', -1, 64))
 	args.Set("timeout", q.prom.timeout.String())
+	args.Set("stats", "1")
 	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
@@ -58,9 +61,10 @@ func (q rangeQuery) Run() queryResult {
 		return qr
 	}
 
-	ranges, err := streamSampleStream(resp.Body, q.r.Step)
+	var ranges MetricTimeRanges
+	ranges, qr.stats, qr.err = streamSampleStream(resp.Body, q.r.Step)
 	ExpandRangesEnd(ranges, q.r.Step)
-	qr.value, qr.err = ranges, err
+	qr.value = ranges
 	return qr
 }
 
@@ -175,6 +179,14 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 			continue
 		}
 		merged.Series.Ranges = append(merged.Series.Ranges, result.value.(MetricTimeRanges)...)
+		merged.Stats.Samples.PeakSamples += result.stats.Samples.PeakSamples
+		merged.Stats.Samples.TotalQueryableSamples += result.stats.Samples.TotalQueryableSamples
+		merged.Stats.Timings.EvalTotalTime += result.stats.Timings.EvalTotalTime
+		merged.Stats.Timings.ExecQueueTime += result.stats.Timings.ExecQueueTime
+		merged.Stats.Timings.ExecTotalTime += result.stats.Timings.ExecTotalTime
+		merged.Stats.Timings.InnerEvalTime += result.stats.Timings.InnerEvalTime
+		merged.Stats.Timings.QueryPreparationTime += result.stats.Timings.QueryPreparationTime
+		merged.Stats.Timings.ResultSortTime += result.stats.Timings.ResultSortTime
 		wg.Done()
 	}
 	if len(merged.Series.Ranges) > 1 {
@@ -293,7 +305,7 @@ func (ar AbsoluteRange) String() string {
 		output.HumanizeDuration(ar.step))
 }
 
-func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, err error) {
+func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, stats QueryStats, err error) {
 	defer dummyReadAll(r)
 
 	var status, errType, errText, resultType string
@@ -321,21 +333,51 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 					sample.Values = make([]model.SamplePair, 0, len(sample.Values))
 				},
 			)),
+			current.Key("stats", current.Object(
+				current.Key("timings", current.Object(
+					current.Key("evalTotalTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.EvalTotalTime = v
+					})),
+					current.Key("resultSortTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.ResultSortTime = v
+					})),
+					current.Key("queryPreparationTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.QueryPreparationTime = v
+					})),
+					current.Key("innerEvalTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.InnerEvalTime = v
+					})),
+					current.Key("execQueueTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.ExecQueueTime = v
+					})),
+					current.Key("execTotalTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.ExecTotalTime = v
+					})),
+				)),
+				current.Key("samples", current.Object(
+					current.Key("totalQueryableSamples", current.Value(func(v float64, isNil bool) {
+						stats.Samples.TotalQueryableSamples = int(math.Round(v))
+					})),
+					current.Key("peakSamples", current.Value(func(v float64, isNil bool) {
+						stats.Samples.PeakSamples = int(math.Round(v))
+					})),
+				)),
+			)),
 		)),
 	)
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
 	}
 
 	if status != "success" {
-		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+		return nil, stats, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
 	}
 
 	if resultType != "matrix" {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
 	}
 
-	return dst, nil
+	return dst, stats, nil
 }

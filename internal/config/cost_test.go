@@ -31,6 +31,24 @@ func TestCostSettings(t *testing.T) {
 			},
 			err: errors.New("unknown severity: foo"),
 		},
+		{
+			conf: CostSettings{
+				MaxPeakSamples: -1,
+			},
+			err: errors.New("maxPeakSamples value must be >= 0"),
+		},
+		{
+			conf: CostSettings{
+				MaxTotalSamples: -1,
+			},
+			err: errors.New("maxTotalSamples value must be >= 0"),
+		},
+		{
+			conf: CostSettings{
+				MaxEvaluationDuration: "1abc",
+			},
+			err: errors.New(`unknown unit "abc" in duration "1abc"`),
+		},
 	}
 
 	for _, tc := range testCases {

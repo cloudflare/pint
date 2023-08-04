@@ -9,11 +9,41 @@ grand_parent: Documentation
 This check is used to calculate cost of a query and optionally report an issue
 if that cost is too high. It will run `expr` query from every rule against
 selected Prometheus servers and report results.
-This check can be used for both recording and alerting rules, but is most
+This check can be used for both recording and alerting rules, but is mostly
 useful for recording rules.
 
+## Query evaluation duration
+
+The total duration of a query comes from Prometheus query stats included
+in the API response when `?stats=1` is passed.
+When enabled pint can report if `evalTotalTime` is higher than configured limit,
+which can be used either for informational purpose or to fail checks on queries
+that are too expensive (depending on configured `severity`).
+
+## Query evaluation samples
+
+Similar to evaluation duration this information comes from Prometheus query stats.
+There are two different stats that give us information about the number of samples
+used by given query:
+
+- `totalQueryableSamples` - the total number of samples read during the query execution.
+- `peakSamples` - the max samples kept in memory during the query execution and shows
+how close the query was to reach the `--query.max-samples`` limit.
+
+In general higher `totalQueryableSamples` means that a query either reads a lot of
+time series and/or queries a large time range, both translating into longer query
+execution times.
+Looking at `peakSamples` on the other hand can be useful to find queries that are
+complex and perform some operation on a large number of time series, for example
+when you run `max(...)` on a query that returns a huge number of results.
+
+## Series returned by the query
+
+For recording rules anything returned by the query will be saved into Prometheus
+as new time series. Checking how many time series does a rule return allows us
+to estimate how much extra memory will be needed.
 `pint` will try to estimate the number of bytes needed per single time series
-and use that to estimate the amount of memory needed for all time series
+and use that to estimate the amount of memory needed to store all the time series
 returned by given query.
 The `bytes per time series` number is calculated using this query:
 
@@ -23,7 +53,7 @@ avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_h
 
 Since Go uses garbage collector total Prometheus process memory will be more than the
 sum of all memory allocations, depending on many factors like memory pressure,
-Go version, GOGC settings etc. The estimate `pint` gives you should be considered
+Go version, `GOGC` settings etc. The estimate `pint` gives you should be considered
 `best case` scenario.
 
 ## Configuration
@@ -32,8 +62,11 @@ Syntax:
 
 ```js
 cost {
-  severity       = "bug|warning|info"
-  maxSeries      = 5000
+  severity              = "bug|warning|info"
+  maxSeries             = 5000
+  maxPeakSamples        = 10000
+  maxTotalSamples       = 200000
+  maxEvaluationDuration = "1m"
 }
 ```
 
@@ -43,6 +76,15 @@ cost {
   report it as information.
 - `maxSeries` - if set and number of results for given query exceeds this value
   it will be reported as a bug (or custom severity if `severity` is set).
+- `maxPeakSamples` - setting this to a non-zero value will tell pint to report
+  any query that has higher `peakSamples` values than the value configured here.
+  Nothing will be reported if this option is not set.
+- `maxTotalSamples` - setting this to a non-zero value will tell pint to report
+  any query that has higher `totalQueryableSamples` values than the value
+  configured here. Nothing will be reported if this option is not set.
+- `maxEvaluationDuration` - setting this to a non-zero value will tell pint to
+  report any query that has higher `evalTotalTime` values than the value
+  configured here. Nothing will be reported if this option is not set.
 
 ## How to enable it
 
@@ -65,6 +107,22 @@ prometheus "dev" {
 
 rule {
   cost {}
+}
+```
+
+Fail checks if any recording rule is using more than 300000 peak samples
+or if it's taking more than 30 seconds to evaluate.
+
+```js
+rule {
+  match {
+    kind = "recording"
+  }
+  cost {
+    maxPeakSamples        = 300000
+    maxEvaluationDuration = "30s"
+    severity              = "bug"
+  }
 }
 ```
 
