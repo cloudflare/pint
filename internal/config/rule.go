@@ -137,10 +137,11 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 
 	if rule.Cost != nil {
 		severity := rule.Cost.getSeverity(checks.Bug)
+		evalDur, _ := parseDuration(rule.Cost.MaxEvaluationDuration)
 		for _, prom := range prometheusServers {
 			enabled = append(enabled, checkMeta{
 				name:  checks.CostCheckName,
-				check: checks.NewCostCheck(prom, rule.Cost.MaxSeries, severity),
+				check: checks.NewCostCheck(prom, rule.Cost.MaxSeries, rule.Cost.MaxTotalSamples, rule.Cost.MaxPeakSamples, evalDur, severity),
 				tags:  prom.Tags(),
 			})
 		}

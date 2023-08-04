@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.45.0
+
+### Added
+
+- The `query/cost` check can now use Prometheus query stats to verify query
+  evaluation time and the number of samples used by a query. See
+  [query/cost](checks/query/cost.md) docs for details.
+
 ## v0.44.2
 
 ### Fixed

@@ -23,6 +23,18 @@ func maxSeriesText(m int) string {
 	return fmt.Sprintf(", maximum allowed series is %d", m)
 }
 
+func evalDurText(name, uri, dur, limit string) string {
+	return fmt.Sprintf(`prometheus %q at %s took %s when executing this query, which is more than the configured limit of %s`, name, uri, dur, limit)
+}
+
+func totalSamplesText(name, uri string, total, limit int) string {
+	return fmt.Sprintf(`prometheus %q at %s queried %d samples in total when executing this query, which is more than the configured limit of %d`, name, uri, total, limit)
+}
+
+func peakSamplesText(name, uri string, total, limit int) string {
+	return fmt.Sprintf(`prometheus %q at %s queried %d peak samples when executing this query, which is more than the configured limit of %d`, name, uri, total, limit)
+}
+
 func TestCostCheck(t *testing.T) {
 	content := "- record: foo\n  expr: sum(foo)\n"
 
@@ -31,7 +43,7 @@ func TestCostCheck(t *testing.T) {
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
@@ -40,7 +52,7 @@ func TestCostCheck(t *testing.T) {
 			description: "empty response",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -68,7 +80,7 @@ func TestCostCheck(t *testing.T) {
 			description: "response timeout",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: func(uri string) *promapi.FailoverGroup {
 				return simpleProm("prom", uri, time.Millisecond*50, true)
@@ -98,7 +110,7 @@ func TestCostCheck(t *testing.T) {
 			description: "bad request",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -126,7 +138,7 @@ func TestCostCheck(t *testing.T) {
 			description: "connection refused",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: func(s string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false)
@@ -147,7 +159,7 @@ func TestCostCheck(t *testing.T) {
 			description: "1 result",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -186,7 +198,7 @@ func TestCostCheck(t *testing.T) {
 			description: "7 results",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -235,7 +247,7 @@ func TestCostCheck(t *testing.T) {
 			description: "7 result with MB",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -284,7 +296,7 @@ func TestCostCheck(t *testing.T) {
 			description: "7 results with 1 series max (1KB bps)",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 1, checks.Bug)
+				return checks.NewCostCheck(prom, 1, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -333,7 +345,7 @@ func TestCostCheck(t *testing.T) {
 			description: "6 results with 5 series max",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 5, checks.Bug)
+				return checks.NewCostCheck(prom, 5, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -377,7 +389,7 @@ func TestCostCheck(t *testing.T) {
 			description: "7 results with 5 series max / infi",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 5, checks.Information)
+				return checks.NewCostCheck(prom, 5, 0, 0, 0, checks.Information)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -425,7 +437,7 @@ func TestCostCheck(t *testing.T) {
   expr: 'sum({__name__="foo"})'
 `,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, checks.Bug)
+				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -465,6 +477,194 @@ func TestCostCheck(t *testing.T) {
 					resp: vectorResponse{
 						samples: []*model.Sample{
 							generateSampleWithValue(map[string]string{}, 101),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "1s eval, 5s limit",
+			content:     content,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 0, 0, 0, time.Second*5, checks.Bug)
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{generateSample(map[string]string{})},
+						stats: promapi.QueryStats{
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 1,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "stats",
+			content:     content,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 0, 100, 10, time.Second*5, checks.Bug)
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Severity: checks.Information,
+					},
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     totalSamplesText("prom", uri, 200, 100),
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     peakSamplesText("prom", uri, 20, 10),
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     evalDurText("prom", uri, "5s100ms", "5s"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{generateSample(map[string]string{})},
+						stats: promapi.QueryStats{
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 5.1,
+							},
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 200,
+								PeakSamples:           20,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "stats - info",
+			content:     content,
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewCostCheck(prom, 0, 100, 10, time.Second*5, checks.Information)
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Severity: checks.Information,
+					},
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     totalSamplesText("prom", uri, 200, 100),
+						Severity: checks.Information,
+					},
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     peakSamplesText("prom", uri, 20, 10),
+						Severity: checks.Information,
+					},
+					{
+						Fragment: "sum(foo)",
+						Lines:    []int{2},
+						Reporter: "query/cost",
+						Text:     evalDurText("prom", uri, "5s100ms", "5s"),
+						Severity: checks.Information,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(sum(foo))`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{generateSample(map[string]string{})},
+						stats: promapi.QueryStats{
+							Timings: promapi.QueryTimings{
+								EvalTotalTime: 5.1,
+							},
+							Samples: promapi.QuerySamples{
+								TotalQueryableSamples: 200,
+								PeakSamples:           20,
+							},
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: checks.BytesPerSampleQuery},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSampleWithValue(map[string]string{}, 4096),
 						},
 					},
 				},

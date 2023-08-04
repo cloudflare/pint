@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -15,18 +16,24 @@ const (
 	BytesPerSampleQuery = "avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))"
 )
 
-func NewCostCheck(prom *promapi.FailoverGroup, maxSeries int, severity Severity) CostCheck {
+func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPeakSamples int, maxEvaluationDuration time.Duration, severity Severity) CostCheck {
 	return CostCheck{
-		prom:      prom,
-		maxSeries: maxSeries,
-		severity:  severity,
+		prom:                  prom,
+		maxSeries:             maxSeries,
+		maxTotalSamples:       maxTotalSamples,
+		maxPeakSamples:        maxPeakSamples,
+		maxEvaluationDuration: maxEvaluationDuration,
+		severity:              severity,
 	}
 }
 
 type CostCheck struct {
-	prom      *promapi.FailoverGroup
-	maxSeries int
-	severity  Severity
+	prom                  *promapi.FailoverGroup
+	maxSeries             int
+	maxTotalSamples       int
+	maxPeakSamples        int
+	maxEvaluationDuration time.Duration
+	severity              Severity
 }
 
 func (c CostCheck) Meta() CheckMeta {
@@ -95,5 +102,37 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 		Text:     fmt.Sprintf("%s returned %d result(s)%s%s", promText(c.prom.Name(), qr.URI), series, estimate, above),
 		Severity: severity,
 	})
+
+	if c.maxTotalSamples > 0 && qr.Stats.Samples.TotalQueryableSamples > c.maxTotalSamples {
+		problems = append(problems, Problem{
+			Fragment: expr.Value.Value,
+			Lines:    expr.Lines(),
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+			Severity: c.severity,
+		})
+	}
+
+	if c.maxPeakSamples > 0 && qr.Stats.Samples.PeakSamples > c.maxPeakSamples {
+		problems = append(problems, Problem{
+			Fragment: expr.Value.Value,
+			Lines:    expr.Lines(),
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+			Severity: c.severity,
+		})
+	}
+
+	evalDur := time.Duration(qr.Stats.Timings.EvalTotalTime * float64(time.Second))
+	if c.maxEvaluationDuration > 0 && evalDur > c.maxEvaluationDuration {
+		problems = append(problems, Problem{
+			Fragment: expr.Value.Value,
+			Lines:    expr.Lines(),
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+			Severity: c.severity,
+		})
+	}
+
 	return problems
 }

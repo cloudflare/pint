@@ -46,7 +46,27 @@ type queryRequest struct {
 
 type queryResult struct {
 	value any
+	stats QueryStats
 	err   error
+}
+
+type QueryTimings struct {
+	EvalTotalTime        float64 `json:"evalTotalTime"`
+	ResultSortTime       float64 `json:"resultSortTime"`
+	QueryPreparationTime float64 `json:"queryPreparationTime"`
+	InnerEvalTime        float64 `json:"innerEvalTime"`
+	ExecQueueTime        float64 `json:"execQueueTime"`
+	ExecTotalTime        float64 `json:"execTotalTime"`
+}
+
+type QuerySamples struct {
+	TotalQueryableSamples int `json:"totalQueryableSamples"`
+	PeakSamples           int `json:"peakSamples"`
+}
+
+type QueryStats struct {
+	Timings QueryTimings `json:"timings"`
+	Samples QuerySamples `json:"samples"`
 }
 
 func sanitizeURI(s string) string {
@@ -167,7 +187,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	cacheKey := job.query.CacheKey()
 	if prom.cache != nil {
 		if cached, ok := prom.cache.get(cacheKey, job.query.Endpoint()); ok {
-			return queryResult{value: cached}
+			return cached.(queryResult)
 		}
 	}
 
@@ -192,7 +212,7 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 	}
 
 	if prom.cache != nil {
-		prom.cache.set(cacheKey, result.value, job.query.CacheTTL())
+		prom.cache.set(cacheKey, result, job.query.CacheTTL())
 	}
 
 	return result

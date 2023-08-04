@@ -95,6 +95,30 @@ func TestQuery(t *testing.T) {
 					"errorType":"execution",
 					"error":"query processing would load too many samples into memory in query execution"
 				}`))
+		case "stats":
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{
+					"status":"success",
+					"data":{
+						"resultType":"vector",
+						"result":[{"metric":{},"value":[1614859502.068,"1"]}],
+						"stats": {
+							"timings": {
+								"evalTotalTime": 10.1,
+							  	"resultSortTime": 0.5,
+							  	"queryPreparationTime": 1.5,
+							  	"innerEvalTime": 0.7,
+							  	"execQueueTime": 0.01,
+							  	"execTotalTime": 5.1
+							},
+							"samples": {
+							  	"totalQueryableSamples": 1000,
+							  	"peakSamples": 500
+							}
+						}
+					}
+				}`))
 		default:
 			w.WriteHeader(400)
 			w.Header().Set("Content-Type", "application/json")
@@ -190,6 +214,33 @@ func TestQuery(t *testing.T) {
 			timeout: time.Second,
 			err:     "execution: query processing would load too many samples into memory in query execution",
 		},
+		{
+			query:   "stats",
+			timeout: time.Second * 5,
+			result: promapi.QueryResult{
+				URI: srv.URL,
+				Series: []promapi.Sample{
+					{
+						Labels: labels.EmptyLabels(),
+						Value:  1,
+					},
+				},
+				Stats: promapi.QueryStats{
+					Timings: promapi.QueryTimings{
+						EvalTotalTime:        10.1,
+						ResultSortTime:       0.5,
+						QueryPreparationTime: 1.5,
+						InnerEvalTime:        0.7,
+						ExecQueueTime:        0.01,
+						ExecTotalTime:        5.1,
+					},
+					Samples: promapi.QuerySamples{
+						TotalQueryableSamples: 1000,
+						PeakSamples:           500,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -209,6 +260,7 @@ func TestQuery(t *testing.T) {
 			if qr != nil {
 				require.Equal(t, tc.result.URI, qr.URI)
 				require.Equal(t, tc.result.Series, qr.Series)
+				require.Equal(t, tc.result.Stats, qr.Stats)
 			}
 		})
 	}

@@ -298,6 +298,7 @@ func (pe promError) respond(w http.ResponseWriter, _ *http.Request) {
 
 type vectorResponse struct {
 	samples model.Vector
+	stats   promapi.QueryStats
 }
 
 func (vr vectorResponse) respond(w http.ResponseWriter, _ *http.Request) {
@@ -306,17 +307,20 @@ func (vr vectorResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	result := struct {
 		Status string `json:"status"`
 		Data   struct {
-			ResultType string       `json:"resultType"`
-			Result     model.Vector `json:"result"`
+			ResultType string             `json:"resultType"`
+			Result     model.Vector       `json:"result"`
+			Stats      promapi.QueryStats `json:"stats"`
 		} `json:"data"`
 	}{
 		Status: "success",
 		Data: struct {
-			ResultType string       `json:"resultType"`
-			Result     model.Vector `json:"result"`
+			ResultType string             `json:"resultType"`
+			Result     model.Vector       `json:"result"`
+			Stats      promapi.QueryStats `json:"stats"`
 		}{
 			ResultType: "vector",
 			Result:     vr.samples,
+			Stats:      vr.stats,
 		},
 	}
 	d, err := json.MarshalIndent(result, "", "  ")
@@ -328,6 +332,7 @@ func (vr vectorResponse) respond(w http.ResponseWriter, _ *http.Request) {
 
 type matrixResponse struct {
 	samples []*model.SampleStream
+	stats   promapi.QueryStats
 }
 
 func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
@@ -357,15 +362,18 @@ func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
 		Data   struct {
 			ResultType string                `json:"resultType"`
 			Result     []*model.SampleStream `json:"result"`
+			Stats      promapi.QueryStats    `json:"stats"`
 		} `json:"data"`
 	}{
 		Status: "success",
 		Data: struct {
 			ResultType string                `json:"resultType"`
 			Result     []*model.SampleStream `json:"result"`
+			Stats      promapi.QueryStats    `json:"stats"`
 		}{
 			ResultType: "matrix",
 			Result:     samples,
+			Stats:      mr.stats,
 		},
 	}
 	d, err := json.MarshalIndent(result, "", "  ")

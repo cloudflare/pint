@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/url"
 	"time"
@@ -19,6 +20,7 @@ import (
 type QueryResult struct {
 	URI    string
 	Series []Sample
+	Stats  QueryStats
 }
 
 type instantQuery struct {
@@ -42,6 +44,7 @@ func (q instantQuery) Run() queryResult {
 	args := url.Values{}
 	args.Set("query", q.expr)
 	args.Set("timeout", q.prom.timeout.String())
+	args.Set("stats", "1")
 	resp, err := q.prom.doRequest(ctx, http.MethodPost, q.Endpoint(), args)
 	if err != nil {
 		qr.err = err
@@ -54,8 +57,7 @@ func (q instantQuery) Run() queryResult {
 		return qr
 	}
 
-	samples, err := streamSamples(resp.Body)
-	qr.value, qr.err = samples, err
+	qr.value, qr.stats, qr.err = streamSamples(resp.Body)
 	return qr
 }
 
@@ -96,6 +98,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	qr := QueryResult{
 		URI:    p.safeURI,
 		Series: result.value.([]Sample),
+		Stats:  result.stats,
 	}
 	log.Debug().Str("uri", p.safeURI).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
 
@@ -107,7 +110,7 @@ type Sample struct {
 	Value  float64
 }
 
-func streamSamples(r io.Reader) (samples []Sample, err error) {
+func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) {
 	defer dummyReadAll(r)
 
 	var status, resultType, errType, errText string
@@ -137,21 +140,51 @@ func streamSamples(r io.Reader) (samples []Sample, err error) {
 					sample.Metric = model.Metric{}
 				},
 			)),
+			current.Key("stats", current.Object(
+				current.Key("timings", current.Object(
+					current.Key("evalTotalTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.EvalTotalTime = v
+					})),
+					current.Key("resultSortTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.ResultSortTime = v
+					})),
+					current.Key("queryPreparationTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.QueryPreparationTime = v
+					})),
+					current.Key("innerEvalTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.InnerEvalTime = v
+					})),
+					current.Key("execQueueTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.ExecQueueTime = v
+					})),
+					current.Key("execTotalTime", current.Value(func(v float64, isNil bool) {
+						stats.Timings.ExecTotalTime = v
+					})),
+				)),
+				current.Key("samples", current.Object(
+					current.Key("totalQueryableSamples", current.Value(func(v float64, isNil bool) {
+						stats.Samples.TotalQueryableSamples = int(math.Round(v))
+					})),
+					current.Key("peakSamples", current.Value(func(v float64, isNil bool) {
+						stats.Samples.PeakSamples = int(math.Round(v))
+					})),
+				)),
+			)),
 		)),
 	)
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
 	}
 
 	if status != "success" {
-		return nil, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+		return nil, stats, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
 	}
 
 	if resultType != "vector" {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected vector, got %s", resultType)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected vector, got %s", resultType)}
 	}
 
-	return samples, nil
+	return samples, stats, nil
 }
