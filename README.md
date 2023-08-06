@@ -14,6 +14,14 @@ Changelog is kept at [docs/changelog.md](/docs/changelog.md).
 
 Check [examples](/docs/examples) dir for sample config files.
 
+
+## Setup
+
+Install latest GO SDK (e.g. >= 1.20)
+Make sure GOROOT variable is set to the path of the new sdk. (e.g. GoLand has a setting to update the path)
+Run `go mod tidy`
+Now we are ready to GO!
+
 ## License
 
 ```text
