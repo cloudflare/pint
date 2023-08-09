@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"encoding/json"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -76,6 +77,10 @@ func ParseSeverity(s string) (Severity, error) {
 	default:
 		return Fatal, fmt.Errorf("unknown severity: %s", s)
 	}
+}
+
+func (s Severity) MarshalJSON() ([]byte, error) {
+	return json.Marshal(s.String())
 }
 
 const (

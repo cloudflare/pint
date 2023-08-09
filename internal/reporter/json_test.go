@@ -44,6 +44,6 @@ func TestJSONReporter(t *testing.T) {
 	defer jsonFile.Close()
 	byteValue, err := io.ReadAll(jsonFile)
 	require.NoError(t, err, "Error reading json")
-	expected := "[{\"reportedPath\":\"\",\"sourcePath\":\"foo.txt\",\"rule\":{\"name\":\"sum errors\",\"type\":\"recording\"},\"problem\":{\"Fragment\":\"syntax error\",\"Lines\":[2],\"Reporter\":\"mock\",\"Text\":\"syntax error\",\"Severity\":3},\"owner\":\"\"}]"
+	expected := "[{\"reportedPath\":\"\",\"sourcePath\":\"foo.txt\",\"rule\":{\"name\":\"sum errors\",\"type\":\"recording\"},\"problem\":{\"Fragment\":\"syntax error\",\"Lines\":[2],\"Reporter\":\"mock\",\"Text\":\"syntax error\",\"Severity\":\"Fatal\"},\"owner\":\"\"}]"
 	require.Equal(t, expected, string(byteValue))
 }
