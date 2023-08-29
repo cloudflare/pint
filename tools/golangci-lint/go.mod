@@ -1,6 +1,6 @@
 module _
 
-go 1.21
+go 1.21.0
 
 require github.com/golangci/golangci-lint v1.54.2
 
