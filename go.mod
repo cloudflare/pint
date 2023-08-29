@@ -19,7 +19,7 @@ require (
 	github.com/rs/zerolog v1.30.0
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
-	github.com/zclconf/go-cty v1.13.2
+	github.com/zclconf/go-cty v1.13.3
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/ratelimit v0.3.0
