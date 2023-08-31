@@ -8,7 +8,7 @@ require (
 	github.com/gkampitakis/go-snaps v0.4.8
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v50 v50.2.0
-	github.com/hashicorp/hcl/v2 v2.17.0
+	github.com/hashicorp/hcl/v2 v2.18.0
 	github.com/klauspost/compress v1.16.7
 	github.com/prometheus/client_golang v1.16.0
 	github.com/prometheus/client_model v0.4.0
