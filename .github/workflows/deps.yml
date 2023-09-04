@@ -9,7 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout Repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
 
       - name: "Dependency Review"
         uses: actions/dependency-review-action@v3
+
+  govulncheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+
+      - id: govulncheck
+        uses: golang/govulncheck-action@v1
