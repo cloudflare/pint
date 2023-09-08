@@ -1,0 +1,15 @@
+pint.ok --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=info msg="Loading configuration file" path=.pint.hcl
+-- rules/0001.yml --
+- alert: Instance Is Down 1
+  expr: up == 0
+  keep_firing_for: 5m
+
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}

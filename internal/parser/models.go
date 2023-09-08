@@ -215,11 +215,12 @@ func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 }
 
 type AlertingRule struct {
-	Alert       YamlKeyValue
-	Expr        PromQLExpr
-	For         *YamlKeyValue
-	Labels      *YamlMap
-	Annotations *YamlMap
+	Alert         YamlKeyValue
+	Expr          PromQLExpr
+	For           *YamlKeyValue
+	KeepFiringFor *YamlKeyValue
+	Labels        *YamlMap
+	Annotations   *YamlMap
 }
 
 func (ar AlertingRule) Lines() (lines []int) {

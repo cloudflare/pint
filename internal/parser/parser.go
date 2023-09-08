@@ -8,12 +8,13 @@ import (
 )
 
 const (
-	recordKey      = "record"
-	exprKey        = "expr"
-	labelsKey      = "labels"
-	alertKey       = "alert"
-	forKey         = "for"
-	annotationsKey = "annotations"
+	recordKey        = "record"
+	exprKey          = "expr"
+	labelsKey        = "labels"
+	alertKey         = "alert"
+	forKey           = "for"
+	keepFiringForKey = "keep_firing_for"
+	annotationsKey   = "annotations"
 )
 
 func NewParser() Parser {
@@ -110,6 +111,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 
 	var alertPart *YamlKeyValue
 	var forPart *YamlKeyValue
+	var keepFiringForPart *YamlKeyValue
 	var annotationsPart *YamlMap
 
 	var key *yaml.Node
@@ -156,6 +158,11 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 					return duplicatedKeyError(part.Line+offset, annotationsKey, nil)
 				}
 				annotationsPart = newYamlMap(key, part, offset)
+			case keepFiringForKey:
+				if keepFiringForPart != nil {
+					return duplicatedKeyError(part.Line+offset, keepFiringForKey, nil)
+				}
+				keepFiringForPart = newYamlKeyValue(key, part, offset)
 			default:
 				unknownKeys = append(unknownKeys, key)
 			}
@@ -232,11 +239,12 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 
 	if alertPart != nil && exprPart != nil {
 		rule = Rule{AlertingRule: &AlertingRule{
-			Alert:       *alertPart,
-			Expr:        *exprPart,
-			For:         forPart,
-			Labels:      labelsPart,
-			Annotations: annotationsPart,
+			Alert:         *alertPart,
+			Expr:          *exprPart,
+			For:           forPart,
+			KeepFiringFor: keepFiringForPart,
+			Labels:        labelsPart,
+			Annotations:   annotationsPart,
 		}}
 		return rule, false, err
 	}
