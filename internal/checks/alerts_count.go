@@ -89,10 +89,15 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	if rule.AlertingRule.For != nil {
 		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
 	}
+	var keepFiringForDur model.Duration
+	if rule.AlertingRule.For != nil {
+		keepFiringForDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value.Value)
+	}
 
 	var alerts int
 	for _, r := range qr.Series.Ranges {
-		if r.End.Sub(r.Start) > time.Duration(forDur) {
+		// If `keepFiringFor` is not defined its Duration will be 0
+		if r.End.Sub(r.Start) > (time.Duration(forDur) + time.Duration(keepFiringForDur)) {
 			alerts++
 		}
 	}

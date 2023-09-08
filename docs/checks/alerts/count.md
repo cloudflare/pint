@@ -9,7 +9,7 @@ grand_parent: Documentation
 This check is used to estimate how many times given alert would fire.
 It will run `expr` query from every alert rule against selected Prometheus
 servers and report how many unique alerts it would generate.
-If `for` is set on alerts it will be used to adjust results.
+If `for` and/or `keep_firing_for` are set on alerts they will be used to adjust results.
 
 ## Configuration
 
