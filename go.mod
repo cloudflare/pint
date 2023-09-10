@@ -5,7 +5,7 @@ go 1.21.1
 require (
 	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/fatih/color v1.15.0
-	github.com/gkampitakis/go-snaps v0.4.8
+	github.com/gkampitakis/go-snaps v0.4.10
 	github.com/google/go-cmp v0.5.9
 	github.com/google/go-github/v50 v50.2.0
 	github.com/hashicorp/hcl/v2 v2.18.0
@@ -45,7 +45,7 @@ require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dennwc/varint v1.0.0 // indirect
 	github.com/edsrzf/mmap-go v1.1.0 // indirect
-	github.com/gkampitakis/ciinfo v0.2.4 // indirect
+	github.com/gkampitakis/ciinfo v0.2.5 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
@@ -79,7 +79,7 @@ require (
 	github.com/prometheus/procfs v0.11.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/tidwall/gjson v1.14.4 // indirect
+	github.com/tidwall/gjson v1.16.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
