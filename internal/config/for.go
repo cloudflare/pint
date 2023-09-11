@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
@@ -40,4 +41,15 @@ func (fs ForSettings) getSeverity(fallback checks.Severity) checks.Severity {
 		return sev
 	}
 	return fallback
+}
+
+func (fs ForSettings) resolve() (severity checks.Severity, minFor, maxFor time.Duration) {
+	severity = fs.getSeverity(checks.Bug)
+	if fs.Min != "" {
+		minFor, _ = parseDuration(fs.Min)
+	}
+	if fs.Max != "" {
+		maxFor, _ = parseDuration(fs.Max)
+	}
+	return severity, minFor, maxFor
 }

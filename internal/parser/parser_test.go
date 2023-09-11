@@ -126,6 +126,17 @@ func TestParse(t *testing.T) {
 		{
 			content: []byte(`
 - alert: foo
+  keep_firing_for: 5m
+  expr: bar
+  keep_firing_for: 1m
+`),
+			output: []parser.Rule{
+				{Error: parser.ParseError{Err: fmt.Errorf("duplicated keep_firing_for key"), Line: 5}},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
   labels: {}
   expr: bar
   labels: {}

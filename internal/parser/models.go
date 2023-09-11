@@ -229,6 +229,9 @@ func (ar AlertingRule) Lines() (lines []int) {
 	if ar.For != nil {
 		lines = appendLine(lines, ar.For.Lines()...)
 	}
+	if ar.KeepFiringFor != nil {
+		lines = appendLine(lines, ar.KeepFiringFor.Lines()...)
+	}
 	if ar.Labels != nil {
 		lines = appendLine(lines, ar.Labels.Lines()...)
 	}
@@ -247,6 +250,10 @@ func (ar AlertingRule) Comments() (comments []string) {
 	if ar.For != nil {
 		comments = append(comments, ar.For.Key.Comments...)
 		comments = append(comments, ar.For.Value.Comments...)
+	}
+	if ar.KeepFiringFor != nil {
+		comments = append(comments, ar.KeepFiringFor.Key.Comments...)
+		comments = append(comments, ar.KeepFiringFor.Value.Comments...)
 	}
 	if ar.Labels != nil {
 		comments = append(comments, ar.Labels.Key.Comments...)
@@ -337,6 +344,13 @@ func (r Rule) ToYAML() string {
 			b.WriteString(r.AlertingRule.For.Key.Value)
 			b.WriteRune(':')
 			b.WriteString(r.AlertingRule.For.Value.Value)
+			b.WriteRune('\n')
+		}
+		if r.AlertingRule.KeepFiringFor != nil {
+			b.WriteString("  ")
+			b.WriteString(r.AlertingRule.KeepFiringFor.Key.Value)
+			b.WriteRune(':')
+			b.WriteString(r.AlertingRule.KeepFiringFor.Value.Value)
 			b.WriteRune('\n')
 		}
 

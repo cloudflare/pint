@@ -90,7 +90,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
 	}
 	var keepFiringForDur model.Duration
-	if rule.AlertingRule.For != nil {
+	if rule.AlertingRule.KeepFiringFor != nil {
 		keepFiringForDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value.Value)
 	}
 
@@ -110,6 +110,9 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	lines = append(lines, rule.AlertingRule.Expr.Lines()...)
 	if rule.AlertingRule.For != nil {
 		lines = append(lines, rule.AlertingRule.For.Lines()...)
+	}
+	if rule.AlertingRule.KeepFiringFor != nil {
+		lines = append(lines, rule.AlertingRule.KeepFiringFor.Lines()...)
 	}
 	sort.Ints(lines)
 

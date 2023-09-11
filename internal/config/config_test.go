@@ -1041,6 +1041,76 @@ rule {
 			},
 		},
 		{
+			title: "for match / passing",
+			config: `
+rule {
+  match {
+	keep_firing_for = "> 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AnnotationCheckName + "(summary:true)",
+			},
+		},
+		{
+			title: "for match / passing",
+			config: `
+rule {
+  match {
+	keep_firing_for = "> 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "for match / passing",
+			config: `
+rule {
+  match {
+	keep_firing_for = "> 15m"
+  }
+  annotation "summary" {
+    required = true
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
 			title: "for match / recording rules / not passing",
 			config: `
 rule {
@@ -1640,6 +1710,33 @@ func TestConfigErrors(t *testing.T) {
 		{
 			config: `rule {
   for {
+    severity  = "xxx"
+  }
+}`,
+			err: "unknown severity: xxx",
+		},
+		{
+			config: `rule {
+  keep_firing_for {
+    severity  = "info"
+	min       = "v"
+  }
+}`,
+			err: `not a valid duration string: "v"`,
+		},
+		{
+			config: `rule {
+  keep_firing_for {
+    severity  = "info"
+	min       = "5m"
+	max       = "v"
+  }
+}`,
+			err: `not a valid duration string: "v"`,
+		},
+		{
+			config: `rule {
+  keep_firing_for {
     severity  = "info"
   }
 }`,

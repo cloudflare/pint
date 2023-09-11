@@ -388,6 +388,8 @@ rule {
   field present and matching provided value will be checked by this rule. Recording rules
   will never match it as they don't have `for` field.
   Syntax is `OP DURATION` where `OP` can be any of `=`, `!=`, `>`, `>=`, `<`, `<=`.
+- `match:keep_firing_for` - optional alerting rule `keep_firing_for` filter. Works the same
+  way as `for` match filter.
 - `ignore` - works exactly like `match` but does the opposite - any alerting or recording rule
   matching all conditions defined on `ignore` will not be checked by this `rule` block.
 
@@ -431,5 +433,14 @@ rule {
     for = ">= 5m"
   }
   [ check applied only to alerting rules with "for" field value that is >= 5m ]
+}
+```
+
+```js
+rule {
+  match {
+    keep_firing_for = "> 15m"
+  }
+  [ check applied only to alerting rules with "keep_firing_for" field value that is > 15m ]
 }
 ```

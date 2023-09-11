@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.46.0
+
+### Added
+
+- Added support for `keep_firing_for` in alerting rules - #713.
+- Added `rule/keep_firing_for` check - #713.
+- Added `alerts/count` check will now estimate alerts using
+  `keep_firing_for` field if set - #713.
+- Configuration rule `match` block supports a new filter `keep_firing_for`.
+
 ## v0.45.0
 
 ### Added

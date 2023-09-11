@@ -4,13 +4,13 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=info msg="Loading configuration file" path=.pint.hcl
-rules/0001.yml:6 Bug: this alert rule must have a 'for' field with a minimum duration of 5m (rule/for)
- 6 |   for: 3m
+rules/0001.yml:6 Bug: this alert rule must have a 'keep_firing_for' field with a minimum duration of 5m (rule/for)
+ 6 |   keep_firing_for: 3m
 
-rules/0001.yml:9 Bug: this alert rule must have a 'for' field with a maximum duration of 10m (rule/for)
- 9 |   for: 13m
+rules/0001.yml:9 Bug: this alert rule must have a 'keep_firing_for' field with a maximum duration of 10m (rule/for)
+ 9 |   keep_firing_for: 13m
 
-rules/0001.yml:10 Bug: this alert rule must have a 'for' field with a minimum duration of 5m (rule/for)
+rules/0001.yml:10 Bug: this alert rule must have a 'keep_firing_for' field with a minimum duration of 5m (rule/for)
  10 | - alert: none
 
 level=info msg="Problems found" Bug=3
@@ -18,13 +18,13 @@ level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or hig
 -- rules/0001.yml --
 - alert: ok
   expr: up == 0
-  for: 5m
+  keep_firing_for: 5m
 - alert: 3m
   expr: up == 0
-  for: 3m
+  keep_firing_for: 3m
 - alert: 13m
   expr: up == 0
-  for: 13m
+  keep_firing_for: 13m
 - alert: none
   expr: up == 0
 
@@ -33,7 +33,7 @@ parser {
   relaxed = [".*"]
 }
 rule {
-  for {
+  keep_firing_for {
     severity = "bug"
     min      = "5m"
     max      = "10m"

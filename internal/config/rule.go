@@ -15,16 +15,17 @@ import (
 )
 
 type Rule struct {
-	Match      []Match              `hcl:"match,block" json:"match,omitempty"`
-	Ignore     []Match              `hcl:"ignore,block" json:"ignore,omitempty"`
-	Aggregate  []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
-	Annotation []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
-	Label      []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
-	Cost       *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
-	Alerts     *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
-	For        *ForSettings         `hcl:"for,block" json:"for,omitempty"`
-	Reject     []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
-	RuleLink   []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
+	Match         []Match              `hcl:"match,block" json:"match,omitempty"`
+	Ignore        []Match              `hcl:"ignore,block" json:"ignore,omitempty"`
+	Aggregate     []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
+	Annotation    []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
+	Label         []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
+	Cost          *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
+	Alerts        *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
+	For           *ForSettings         `hcl:"for,block" json:"for,omitempty"`
+	KeepFiringFor *ForSettings         `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
+	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
+	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
 }
 
 func (rule Rule) validate() (err error) {
@@ -84,6 +85,12 @@ func (rule Rule) validate() (err error) {
 
 	if rule.For != nil {
 		if err = rule.For.validate(); err != nil {
+			return err
+		}
+	}
+
+	if rule.KeepFiringFor != nil {
+		if err = rule.KeepFiringFor.validate(); err != nil {
 			return err
 		}
 	}
@@ -245,17 +252,18 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 	}
 
 	if rule.For != nil {
-		severity := rule.For.getSeverity(checks.Bug)
-		var minFor, maxFor time.Duration
-		if rule.For.Min != "" {
-			minFor, _ = parseDuration(rule.For.Min)
-		}
-		if rule.For.Max != "" {
-			maxFor, _ = parseDuration(rule.For.Max)
-		}
+		severity, minFor, maxFor := rule.For.resolve()
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleForCheckName,
-			check: checks.NewRuleForCheck(minFor, maxFor, severity),
+			check: checks.NewRuleForCheck(checks.RuleForFor, minFor, maxFor, severity),
+		})
+	}
+
+	if rule.KeepFiringFor != nil {
+		severity, minFor, maxFor := rule.KeepFiringFor.resolve()
+		enabled = append(enabled, checkMeta{
+			name:  checks.RuleForCheckName,
+			check: checks.NewRuleForCheck(checks.RuleForKeepFiringFor, minFor, maxFor, severity),
 		})
 	}
 
