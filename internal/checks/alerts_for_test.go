@@ -78,6 +78,57 @@ func TestAlertsForCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "invalid keep_firing_for value",
+			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: abc\n",
+			checker:     newAlertsForCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "abc",
+						Lines:    []int{3},
+						Reporter: "alerts/for",
+						Text:     `invalid duration: not a valid duration string: "abc"`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "negative keep_firing_for value",
+			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: -5m\n",
+			checker:     newAlertsForCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "-5m",
+						Lines:    []int{3},
+						Reporter: "alerts/for",
+						Text:     `invalid duration: not a valid duration string: "-5m"`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "default for value",
+			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: 0h\n",
+			checker:     newAlertsForCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "0h",
+						Lines:    []int{3},
+						Reporter: "alerts/for",
+						Text:     `"0h" is the default value of "keep_firing_for", consider removing this line`,
+						Severity: checks.Information,
+					},
+				}
+			},
+		},
 	}
 	runTests(t, testCases)
 }

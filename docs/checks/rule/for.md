@@ -6,10 +6,10 @@ grand_parent: Documentation
 
 # rule/for
 
-This check allows to enforce the presence of `for` field on alerting
-rules.
+This check allows to enforce the presence of `for` or `keep_firing_for` field
+on alerting rules.
 You can configure it to enforce some minimal and/or maximum duration
-set on alerts via `for` field.
+set on alerts via `for` and/or `keep_firing_for` fields.
 
 ## Configuration
 
@@ -17,10 +17,13 @@ This check doesn't have any configuration options.
 
 ## How to enable it
 
+This check uses either `for` or `keep_firing_for` configuration
+blocks, depending on which alerting rule field you want to enforce.
+
 Syntax:
 
 ```js
-for {
+for|keep_firing_for {
   severity = "bug|warning|info"
   min      = "5m"
   max      = "10m"
@@ -32,6 +35,42 @@ for {
   If not set minimum `for` duration won't be enforced.
 - `max` - maximum allowed `for` value for matching alerting rules.
 - If not set maximum `for` duration won't be enforced.
+
+Example:
+
+Enforce that all alerts have `for` fields of `5m` or more:
+
+```js
+for {
+  severity = "bug"
+  min      = "5m"
+  max      = "10m"
+}
+```
+
+Enforce that all alerts have `keep_firing_for` fields with no more than `1h`:
+
+```js
+keep_firing_for {
+  severity = "bug"
+  max      = "1h"
+}
+```
+
+To enforce both at the same time:
+
+```js
+for {
+  severity = "bug"
+  min      = "5m"
+  max      = "10m"
+}
+
+keep_firing_for {
+  severity = "bug"
+  max      = "1h"
+}
+```
 
 ## How to disable it
 

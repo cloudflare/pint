@@ -29,13 +29,14 @@ var (
 )
 
 type Match struct {
-	Path       string             `hcl:"path,optional" json:"path,omitempty"`
-	Name       string             `hcl:"name,optional" json:"name,omitempty"`
-	Kind       string             `hcl:"kind,optional" json:"kind,omitempty"`
-	For        string             `hcl:"for,optional" json:"for,omitempty"`
-	Label      *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
-	Annotation *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
-	Command    *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
+	Path          string             `hcl:"path,optional" json:"path,omitempty"`
+	Name          string             `hcl:"name,optional" json:"name,omitempty"`
+	Kind          string             `hcl:"kind,optional" json:"kind,omitempty"`
+	For           string             `hcl:"for,optional" json:"for,omitempty"`
+	KeepFiringFor string             `hcl:"keep_firing_for,optional" json:"keep_firing_for,omitempty"`
+	Label         *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
+	Annotation    *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
+	Command       *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {
@@ -131,6 +132,19 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 		if r.AlertingRule != nil && r.AlertingRule.For != nil {
 			dm, _ := parseDurationMatch(m.For)
 			if dur, err := parseDuration(r.AlertingRule.For.Value.Value); err == nil {
+				if !dm.isMatch(dur) {
+					return false
+				}
+			}
+		} else {
+			return false
+		}
+	}
+
+	if m.KeepFiringFor != "" {
+		if r.AlertingRule != nil && r.AlertingRule.KeepFiringFor != nil {
+			dm, _ := parseDurationMatch(m.KeepFiringFor)
+			if dur, err := parseDuration(r.AlertingRule.KeepFiringFor.Value.Value); err == nil {
 				if !dm.isMatch(dur) {
 					return false
 				}

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/stretchr/testify/require"
 
@@ -754,6 +755,46 @@ groups:
 				},
 			},
 		},
+		{
+			title: "rule changed - modified for and added extra lines",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+- alert: rule1
+  expr: sum(foo) by(job)
+  for: 1s
+- alert: rule2
+  expr: sum(foo) by(job)
+  for: 1s
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+- alert: rule1
+  expr: sum(foo) by(job)
+  for: 1s
+- alert: rule2
+  expr: sum(foo) by(job)
+  keep_firing_for: 5m
+  for: 0s
+  annotations:
+    foo: bar
+  labels:
+    foo: bar
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
+			entries: []discovery.Entry{
+				{
+					State:         discovery.Modified,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{7, 8, 9, 10, 11, 12},
+					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -776,7 +817,10 @@ groups:
 				require.NoError(t, err, "json(expected)")
 				got, err := json.MarshalIndent(entries, "", "  ")
 				require.NoError(t, err, "json(got)")
-				require.Equal(t, string(expected), string(got))
+				if diff := cmp.Diff(string(expected), string(got)); diff != "" {
+					t.Errorf("tc.finder.Find()() returned wrong output (-want +got):\n%s", diff)
+					return
+				}
 			}
 		})
 	}

@@ -33,15 +33,26 @@ func (c AlertsForChecksFor) Reporter() string {
 }
 
 func (c AlertsForChecksFor) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil || rule.AlertingRule.For == nil {
+	if rule.AlertingRule == nil {
 		return problems
 	}
 
-	d, err := model.ParseDuration(rule.AlertingRule.For.Value.Value)
+	if rule.AlertingRule.For != nil {
+		problems = append(problems, c.checkField(rule.AlertingRule.For.Key.Value, rule.AlertingRule.For.Value.Value, rule.AlertingRule.For.Lines())...)
+	}
+	if rule.AlertingRule.KeepFiringFor != nil {
+		problems = append(problems, c.checkField(rule.AlertingRule.KeepFiringFor.Key.Value, rule.AlertingRule.KeepFiringFor.Value.Value, rule.AlertingRule.KeepFiringFor.Lines())...)
+	}
+
+	return problems
+}
+
+func (c AlertsForChecksFor) checkField(name, value string, lines []int) (problems []Problem) {
+	d, err := model.ParseDuration(value)
 	if err != nil {
 		problems = append(problems, Problem{
-			Fragment: rule.AlertingRule.For.Value.Value,
-			Lines:    rule.AlertingRule.For.Lines(),
+			Fragment: value,
+			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("invalid duration: %s", err),
 			Severity: Bug,
@@ -51,11 +62,10 @@ func (c AlertsForChecksFor) Check(_ context.Context, _ string, rule parser.Rule,
 
 	if d == 0 {
 		problems = append(problems, Problem{
-			Fragment: rule.AlertingRule.For.Value.Value,
-			Lines:    rule.AlertingRule.For.Lines(),
+			Fragment: value,
+			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text: fmt.Sprintf("%q is the default value of %q, consider removing this line",
-				rule.AlertingRule.For.Value.Value, rule.AlertingRule.For.Key.Value),
+			Text:     fmt.Sprintf("%q is the default value of %q, consider removing this line", value, name),
 			Severity: Information,
 		})
 	}

@@ -6,8 +6,8 @@ grand_parent: Documentation
 
 # alerts/for
 
-This check will warn if an alert rule uses invalid `for` value
-or if it passes default value that can be removed to simplify rule.
+This check will warn if an alert rule uses invalid `for` or `keep_firing_for`
+value or if it passes default value that can be removed to simplify rule.
 
 ## Configuration
 
