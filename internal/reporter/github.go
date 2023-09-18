@@ -52,14 +52,13 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 		&oauth2.Token{AccessToken: gr.authToken},
 	)
 	tc := oauth2.NewClient(context.Background(), ts)
+	gr.client = github.NewClient(tc)
 
 	if gr.uploadURL != "" && gr.baseURL != "" {
-		gr.client, err = github.NewEnterpriseClient(gr.baseURL, gr.uploadURL, tc)
+		gr.client, err = gr.client.WithEnterpriseURLs(gr.baseURL, gr.uploadURL)
 		if err != nil {
 			return gr, fmt.Errorf("creating new GitHub client: %w", err)
 		}
-	} else {
-		gr.client = github.NewClient(tc)
 	}
 
 	return gr, nil
