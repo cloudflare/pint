@@ -16,7 +16,7 @@ require (
 	github.com/prometheus/prometheus v0.47.0
 	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.11.0
-	github.com/rs/zerolog v1.30.0
+	github.com/rs/zerolog v1.31.0
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/zclconf/go-cty v1.14.0
