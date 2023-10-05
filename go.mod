@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_golang v1.17.0
 	github.com/prometheus/client_model v0.4.1-0.20230718164431-9a2bf3000d16
 	github.com/prometheus/common v0.44.0
-	github.com/prometheus/prometheus v0.47.0
+	github.com/prometheus/prometheus v0.47.1
 	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.11.0
 	github.com/rs/zerolog v1.31.0
