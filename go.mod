@@ -8,7 +8,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/fatih/color v1.15.0
 	github.com/gkampitakis/go-snaps v0.4.11
-	github.com/google/go-cmp v0.5.9
+	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v55 v55.0.0
 	github.com/hashicorp/hcl/v2 v2.18.1
 	github.com/klauspost/compress v1.17.0
