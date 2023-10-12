@@ -3,5 +3,5 @@ pint.error -l debug --no-color ci
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=debug msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
-level=fatal msg="Fatal error" error="failed to get the name of current branch"
+level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
+level=ERROR msg="Fatal error" err="failed to get the name of current branch"

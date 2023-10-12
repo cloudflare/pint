@@ -3,12 +3,12 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/0001.yml:8 Fatal: incomplete rule, no alert or record key (yaml/parse)
  8 |   - expr: sum(foo)
 
-level=info msg="Problems found" Fatal=1
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Fatal=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 groups:
 - name: foo

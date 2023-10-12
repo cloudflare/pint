@@ -3,4 +3,4 @@ pint.error --no-color watch --listen=127.0.0.1:6064
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" error="at least one file or directory required"
+level=ERROR msg="Fatal error" err="at least one file or directory required"

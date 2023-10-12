@@ -10,6 +10,6 @@ groups:
       expr: up{job="xxx"}
 
 -- stderr.txt --
-level=info msg="Problems found" Warning=1
-level=info msg="1 problem(s) not visible because of --min-severity=bug flag"
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Warning or higher"
+level=INFO msg="Problems found" Warning=1
+level=INFO msg="1 problem(s) not visible because of --min-severity=bug flag"
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Warning or higher"

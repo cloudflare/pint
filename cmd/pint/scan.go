@@ -3,13 +3,13 @@ package main
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"regexp"
 	"strconv"
 	"sync"
 	"time"
 
 	"github.com/prometheus/prometheus/model/rulefmt"
-	"github.com/rs/zerolog/log"
 	"go.uber.org/atomic"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -93,19 +93,19 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 			case entry.PathError == nil && entry.Rule.Error.Err == nil:
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
-					log.Debug().
-						Str("path", entry.SourcePath).
-						Str("record", entry.Rule.RecordingRule.Record.Value.Value).
-						Str("lines", output.FormatLineRangeString(entry.Rule.Lines())).
-						Msg("Found recording rule")
+					slog.Debug("Found recording rule",
+						slog.String("path", entry.SourcePath),
+						slog.String("record", entry.Rule.RecordingRule.Record.Value.Value),
+						slog.String("lines", output.FormatLineRangeString(entry.Rule.Lines())),
+					)
 				}
 				if entry.Rule.AlertingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
-					log.Debug().
-						Str("path", entry.SourcePath).
-						Str("alert", entry.Rule.AlertingRule.Alert.Value.Value).
-						Str("lines", output.FormatLineRangeString(entry.Rule.Lines())).
-						Msg("Found alerting rule")
+					slog.Debug("Found alerting rule",
+						slog.String("path", entry.SourcePath),
+						slog.String("alert", entry.Rule.AlertingRule.Alert.Value.Value),
+						slog.String("lines", output.FormatLineRangeString(entry.Rule.Lines())),
+					)
 				}
 
 				checkList := cfg.GetChecksForRule(ctx, entry.SourcePath, entry.Rule, entry.DisabledChecks)
@@ -121,10 +121,10 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 				}
 			default:
 				if entry.Rule.Error.Err != nil {
-					log.Debug().
-						Str("path", entry.SourcePath).
-						Str("lines", output.FormatLineRangeString(entry.Rule.Lines())).
-						Msg("Found invalid rule")
+					slog.Debug("Found invalid rule",
+						slog.String("path", entry.SourcePath),
+						slog.String("lines", output.FormatLineRangeString(entry.Rule.Lines())),
+					)
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
 				}
 				jobs <- scanJob{entry: entry, allEntries: entries, check: nil}

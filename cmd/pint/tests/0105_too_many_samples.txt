@@ -7,8 +7,8 @@ http start prometheus 127.0.0.1:7105
 
 pint.error --no-color lint rules
 ! stdout .
-stderr 'level=error msg="Query returned an error" error="query processing would load too many samples into memory in query execution" query=count\(up\) uri=http://127.0.0.1:7105'
-stderr 'level=warn msg="Cannot detect Prometheus uptime gaps" error="execution: query processing would load too many samples into memory in query execution" name=prom'
+stderr 'level=ERROR msg="Query returned an error" err="query processing would load too many samples into memory in query execution" uri=http://127.0.0.1:7105 query=count\(up\)'
+stderr 'level=WARN msg="Cannot detect Prometheus uptime gaps" err="execution: query processing would load too many samples into memory in query execution" name=prom'
 
 -- rules/1.yaml --
 - record: one

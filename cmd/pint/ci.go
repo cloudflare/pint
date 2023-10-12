@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"regexp"
 	"strconv"
@@ -15,7 +16,6 @@ import (
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/reporter"
 
-	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -82,9 +82,9 @@ func actionCI(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("failed to get the name of current branch")
 	}
-	log.Debug().Str("current", currentBranch).Str("base", baseBranch).Msg("Got branch information")
+	slog.Debug("Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
 	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
-		log.Info().Str("branch", currentBranch).Msg("Running from base branch, skipping checks")
+		slog.Info("Running from base branch, skipping checks", slog.String("branch", currentBranch))
 		return nil
 	}
 
@@ -176,15 +176,15 @@ func actionCI(c *cli.Context) error {
 	}
 
 	problemsFound := false
-	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
-	for s, c := range summary.CountBySeverity() {
+	bySeverity := summary.CountBySeverity()
+	for s := range bySeverity {
 		if s >= minSeverity {
 			problemsFound = true
+			break
 		}
-		bySeverity[s.String()] = c
 	}
 	if len(bySeverity) > 0 {
-		log.Info().Fields(bySeverity).Msg("Problems found")
+		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
 	}
 
 	if err := submitReports(reps, summary); err != nil {
@@ -198,6 +198,15 @@ func actionCI(c *cli.Context) error {
 	return nil
 }
 
+func logSeverityCounters(src map[checks.Severity]int) (attrs []any) {
+	for _, s := range []checks.Severity{checks.Fatal, checks.Bug, checks.Warning, checks.Information} {
+		if c, ok := src[s]; ok {
+			attrs = append(attrs, slog.Attr{Key: s.String(), Value: slog.IntValue(c)})
+		}
+	}
+	return attrs
+}
+
 func detectCI(cfg *config.CI) *config.CI {
 	var isNil, isDirty bool
 
@@ -209,7 +218,7 @@ func detectCI(cfg *config.CI) *config.CI {
 	if bb := os.Getenv("GITHUB_BASE_REF"); bb != "" {
 		isDirty = true
 		cfg.BaseBranch = bb
-		log.Debug().Str("branch", bb).Msg("got base branch from GITHUB_BASE_REF env variable")
+		slog.Debug("got base branch from GITHUB_BASE_REF env variable", slog.String("branch", bb))
 	}
 
 	if isNil && !isDirty {
@@ -243,7 +252,7 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		os.Getenv("GITHUB_REF") != "" {
 		parts := strings.Split(os.Getenv("GITHUB_REF"), "/")
 		if len(parts) >= 4 {
-			log.Info().Str("pr", parts[2]).Msg("Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable")
+			slog.Info("Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable", slog.String("pr", parts[2]))
 			os.Setenv("GITHUB_PULL_REQUEST_NUMBER", parts[2])
 		}
 	}
@@ -259,12 +268,12 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		parts := strings.SplitN(repo, "/", 2)
 		if len(parts) == 2 {
 			if gh.Owner == "" {
-				log.Info().Str("owner", parts[0]).Msg("Setting repository owner from GITHUB_REPOSITORY env variable")
+				slog.Info("Setting repository owner from GITHUB_REPOSITORY env variable", slog.String("owner", parts[0]))
 				gh.Owner = parts[0]
 				isDirty = true
 			}
 			if gh.Repo == "" {
-				log.Info().Str("repo", parts[1]).Msg("Setting repository name from GITHUB_REPOSITORY env variable")
+				slog.Info("Setting repository name from GITHUB_REPOSITORY env variable", slog.String("repo", parts[1]))
 				gh.Repo = parts[1]
 				isDirty = true
 			}
@@ -273,11 +282,11 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 
 	if api := os.Getenv("GITHUB_API_URL"); api != "" {
 		if gh.BaseURI == "" {
-			log.Info().Str("baseuri", api).Msg("Setting repository base URI from GITHUB_API_URL env variable")
+			slog.Info("Setting repository base URI from GITHUB_API_URL env variable", slog.String("baseuri", api))
 			gh.BaseURI = api
 		}
 		if gh.UploadURI == "" {
-			log.Info().Str("uploaduri", api).Msg("Setting repository upload URI from GITHUB_API_URL env variable")
+			slog.Info("Setting repository upload URI from GITHUB_API_URL env variable", slog.String("uploaduri", api))
 			gh.UploadURI = api
 		}
 	}

@@ -3,10 +3,10 @@ package config
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"regexp"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -283,10 +283,11 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 
 	for _, comment := range comments {
 		if rule.HasComment(comment) {
-			log.Debug().
-				Str("check", instance).
-				Str("comment", comment).
-				Msg("Check disabled by comment")
+			slog.Debug(
+				"Check disabled by comment",
+				slog.String("check", instance),
+				slog.String("comment", comment),
+			)
 			return false
 		}
 	}
@@ -303,12 +304,13 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 		if !slices.Contains(disabled, s.Text) {
 			continue
 		}
-		log.Debug().
-			Str("check", instance).
-			Str("comment", comment.String()).
-			Time("until", s.Until).
-			Str("snooze", s.Text).
-			Msg("Check snoozed by comment")
+		slog.Debug(
+			"Check snoozed by comment",
+			slog.String("check", instance),
+			slog.String("comment", comment.String()),
+			slog.Time("until", s.Until),
+			slog.String("snooze", s.Text),
+		)
 		return false
 	}
 

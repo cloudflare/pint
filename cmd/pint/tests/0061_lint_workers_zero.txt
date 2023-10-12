@@ -3,4 +3,4 @@ pint.error --workers=0 --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" error="--workers flag must be > 0"
+level=ERROR msg="Fatal error" err="--workers flag must be > 0"

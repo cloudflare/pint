@@ -21,13 +21,13 @@ exec git commit -am 'v2'
 env BITBUCKET_AUTH_TOKEN="12345"
 pint.error --no-color -l debug ci
 ! stdout .
-stderr 'level=info msg="Problems found" Fatal=1'
-stderr 'result\\":\\"FAIL\\"'
-stderr ',\\"line\\":3,'
-stderr 'level=debug msg="Sending a request to BitBucket" method=PUT'
-stderr 'level=debug msg="BitBucket request completed" status=200'
-stderr 'level=debug msg="Sending a request to BitBucket" method=DELETE'
-stderr 'level=debug msg="BitBucket request completed" status=200'
+stderr 'level=INFO msg="Problems found" Fatal=1'
+stderr 'result":"FAIL"'
+stderr ',"line":3,'
+stderr 'level=DEBUG msg="Sending a request to BitBucket" method=PUT'
+stderr 'level=DEBUG msg="BitBucket request completed" status=200'
+stderr 'level=DEBUG msg="Sending a request to BitBucket" method=DELETE'
+stderr 'level=DEBUG msg="BitBucket request completed" status=200'
 
 -- src/v1.yml --
 - alert: rule1

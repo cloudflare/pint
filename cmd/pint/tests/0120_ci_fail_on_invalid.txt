@@ -19,7 +19,7 @@ env GITHUB_AUTH_TOKEN=12345
 env GITHUB_PULL_REQUEST_NUMBER=1
 pint.error -l debug --offline --no-color ci --fail-on=bogus
 ! stdout .
-stderr 'level=fatal msg="Fatal error" error="invalid --fail-on value: unknown severity: bogus"'
+stderr 'level=ERROR msg="Fatal error" err="invalid --fail-on value: unknown severity: bogus"'
 
 -- src/v1.yml --
 - alert: rule1

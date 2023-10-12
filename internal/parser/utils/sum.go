@@ -1,8 +1,9 @@
 package utils
 
 import (
+	"log/slog"
+
 	promParser "github.com/prometheus/prometheus/promql/parser"
-	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -38,7 +39,7 @@ func HasOuterSum(node *parser.PromQLNode) (calls []*promParser.AggregateExpr) {
 				return HasOuterSum(node.Children[0])
 			case promParser.CardManyToMany:
 			default:
-				log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
+				slog.Warn("Unsupported VectorMatching operation", slog.String("matching", n.VectorMatching.Card.String()))
 			}
 		}
 

@@ -20,11 +20,14 @@ pint.error -l debug --no-color ci
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=debug msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
-level=debug msg="Got branch information" base=origin/main current=v2
-level=debug msg="Running git command" args=["log","--format=%H","--no-abbrev-commit","--reverse","origin/main..HEAD"]
-level=fatal msg="Fatal error" error="failed to get the list of commits to scan: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
+level=DEBUG msg="Got branch information" base=origin/main current=v2
+level=DEBUG msg="Running git command" args=["log","--format=%H","--no-abbrev-commit","--reverse","origin/main..HEAD"]
+level=ERROR msg="Fatal error" err="failed to get the list of commits to scan: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.
+Use '--' to separate paths from revisions, like this:
+'git <command> [<revision>...] -- [<file>...]'
+"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

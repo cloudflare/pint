@@ -3,7 +3,7 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/1.yaml:5 Fatal: syntax error: unexpected right parenthesis ')' (promql/syntax)
  5 |   expr: sum(errors_total) by )
 
@@ -19,8 +19,8 @@ rules/1.yaml:33 Warning: alert query doesn't have any condition, it will always 
 rules/1.yaml:33 Warning: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
  33 |   expr: sum(errors_total) without(job)
 
-level=info msg="Problems found" Fatal=2 Warning=3
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Fatal=2 Warning=3
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yaml --
 - record: disabled
   expr: sum(errors_total) by ) # pint disable promql/syntax

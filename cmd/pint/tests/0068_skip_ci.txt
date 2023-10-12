@@ -21,11 +21,11 @@ exec git commit -am '[skip ci] v2'
 env BITBUCKET_AUTH_TOKEN="12345"
 pint.ok -l debug --no-color ci
 ! stdout .
-stderr 'level=info msg="Found a commit with ''\[skip ci\]'', skipping all checks" commit=.*'
-stderr 'level=debug msg="Sending a request to BitBucket" method=PUT'
-stderr 'level=debug msg="BitBucket request completed" status=200'
-stderr 'level=debug msg="Sending a request to BitBucket" method=DELETE'
-stderr 'level=debug msg="BitBucket request completed" status=200'
+stderr 'level=INFO msg="Found a commit with ''\[skip ci\]'', skipping all checks" commit=.*'
+stderr 'level=DEBUG msg="Sending a request to BitBucket" method=PUT'
+stderr 'level=DEBUG msg="BitBucket request completed" status=200'
+stderr 'level=DEBUG msg="Sending a request to BitBucket" method=DELETE'
+stderr 'level=DEBUG msg="BitBucket request completed" status=200'
 
 -- src/v1.yml --
 - alert: rule1

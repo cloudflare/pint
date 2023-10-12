@@ -3,10 +3,10 @@ package discovery
 import (
 	"bytes"
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/git"
@@ -46,7 +46,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of commits to scan: %w", err)
 	}
-	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
+	slog.Debug("Got commit range from git", slog.String("from", cr.From), slog.String("to", cr.To))
 
 	if len(cr.Commits) > f.maxCommits {
 		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(cr.Commits), f.maxCommits)
@@ -67,7 +67,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 
 	for _, change := range changes {
 		if !f.isPathAllowed(change.Path.After.Name) {
-			log.Debug().Str("path", change.Path.After.Name).Msg("Skipping file due to include/exclude rules")
+			slog.Debug("Skipping file due to include/exclude rules", slog.String("path", change.Path.After.Name))
 			continue
 		}
 
@@ -93,48 +93,53 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 			case me.before == nil && me.after != nil:
 				me.after.State = Added
 				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
-				log.Debug().
-					Str("name", me.after.Rule.Name()).
-					Stringer("state", me.after.State).
-					Str("path", me.after.SourcePath).
-					Str("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())).
-					Str("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)).
-					Msg("Rule added on HEAD branch")
+				slog.Debug(
+					"Rule added on HEAD branch",
+					slog.String("name", me.after.Rule.Name()),
+					slog.String("state", me.after.State.String()),
+					slog.String("path", me.after.SourcePath),
+					slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
+					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+				)
 				entries = append(entries, *me.after)
 			case me.before != nil && me.after != nil:
 				if me.isIdentical {
-					log.Debug().
-						Str("name", me.after.Rule.Name()).
-						Str("lines", output.FormatLineRangeString(me.after.Rule.Lines())).
-						Msg("Rule content was not modified on HEAD, identical rule present before")
+					slog.Debug(
+						"Rule content was not modified on HEAD, identical rule present before",
+						slog.String("name", me.after.Rule.Name()),
+						slog.String("lines", output.FormatLineRangeString(me.after.Rule.Lines())),
+					)
 					continue
 				}
 				me.after.State = Modified
 				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
-				log.Debug().
-					Str("name", me.after.Rule.Name()).
-					Stringer("state", me.after.State).
-					Str("path", me.after.SourcePath).
-					Str("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())).
-					Str("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)).
-					Msg("Rule modified on HEAD branch")
+				slog.Debug(
+					"Rule modified on HEAD branch",
+					slog.String("name", me.after.Rule.Name()),
+					slog.String("state", me.after.State.String()),
+					slog.String("path", me.after.SourcePath),
+					slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
+					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+				)
 				entries = append(entries, *me.after)
 			case me.before != nil && me.after == nil:
 				me.before.State = Removed
-				log.Debug().
-					Str("name", me.before.Rule.Name()).
-					Stringer("state", me.before.State).
-					Str("path", me.before.SourcePath).
-					Str("ruleLines", output.FormatLineRangeString(me.before.Rule.Lines())).
-					Str("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)).
-					Msg("Rule removed on HEAD branch")
+				slog.Debug(
+					"Rule removed on HEAD branch",
+					slog.String("name", me.before.Rule.Name()),
+					slog.String("state", me.before.State.String()),
+					slog.String("path", me.before.SourcePath),
+					slog.String("ruleLines", output.FormatLineRangeString(me.before.Rule.Lines())),
+					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+				)
 				entries = append(entries, *me.before)
 			default:
-				log.Debug().
-					Stringer("state", me.before.State).
-					Str("path", me.before.SourcePath).
-					Str("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)).
-					Msg("Unknown rule")
+				slog.Debug(
+					"Unknown rule",
+					slog.String("state", me.before.State.String()),
+					slog.String("path", me.before.SourcePath),
+					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+				)
 				entries = append(entries, *me.after)
 			}
 		}
@@ -189,7 +194,9 @@ func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, e
 		}
 		for _, comment := range []string{"[skip ci]", "[no ci]"} {
 			if strings.Contains(msg, comment) {
-				log.Info().Str("commit", commit).Msgf("Found a commit with '%s', skipping all checks", comment)
+				slog.Info(
+					fmt.Sprintf("Found a commit with '%s', skipping all checks", comment),
+					slog.String("commit", commit))
 				return true, nil
 			}
 		}

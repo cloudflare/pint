@@ -21,7 +21,7 @@ exec git commit -am 'v2'
 env BITBUCKET_AUTH_TOKEN="12345"
 pint.ok --no-color ci
 ! stdout .
-stderr 'level=info msg="Problems found" Information=1'
+stderr 'level=INFO msg="Problems found" Information=1'
 
 -- src/v1.yml --
 - alert: rule1a

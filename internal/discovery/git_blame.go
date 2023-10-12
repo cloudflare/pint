@@ -2,13 +2,12 @@ package discovery
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"regexp"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/git"
-
-	"github.com/rs/zerolog/log"
 )
 
 func NewGitBlameFinder(
@@ -44,7 +43,7 @@ func (f GitBlameFinder) Find() (entries []Entry, err error) {
 		return nil, fmt.Errorf("failed to get the list of commits to scan: %w", err)
 	}
 
-	log.Debug().Str("from", cr.From).Str("to", cr.To).Msg("Got commit range from git")
+	slog.Debug("Got commit range from git", slog.String("from", cr.From), slog.String("to", cr.To))
 
 	if f.maxCommits > 0 && len(cr.Commits) > f.maxCommits {
 		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(cr.Commits), f.maxCommits)
@@ -66,9 +65,9 @@ func (f GitBlameFinder) Find() (entries []Entry, err error) {
 			op := parts[0]
 			srcPath := parts[1]
 			dstPath := parts[len(parts)-1]
-			log.Debug().Str("path", dstPath).Str("commit", commit).Str("change", parts[0]).Msg("Git file change")
+			slog.Debug("Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
 			if !f.isPathAllowed(dstPath) {
-				log.Debug().Str("path", dstPath).Msg("Skipping file due to include/exclude rules")
+				slog.Debug("Skipping file due to include/exclude rules", slog.String("path", dstPath))
 				continue
 			}
 
@@ -77,17 +76,17 @@ func (f GitBlameFinder) Find() (entries []Entry, err error) {
 				return nil, fmt.Errorf("failed to get commit message for %s: %w", commit, err)
 			}
 			if strings.Contains(msg, "[skip ci]") {
-				log.Info().Str("commit", commit).Msg("Found a commit with '[skip ci]', skipping all checks")
+				slog.Info("Found a commit with '[skip ci]', skipping all checks", slog.String("commit", commit))
 				return []Entry{}, nil
 			}
 			if strings.Contains(msg, "[no ci]") {
-				log.Info().Str("commit", commit).Msg("Found a commit with '[no ci]', skipping all checks")
+				slog.Info("Found a commit with '[no ci]', skipping all checks", slog.String("commit", commit))
 				return []Entry{}, nil
 			}
 
 			// ignore directories
 			if isDir, _ := isDirectoryPath(dstPath); isDir {
-				log.Debug().Str("path", dstPath).Msg("Skipping directory entry change")
+				slog.Debug("Skipping directory entry change", slog.String("path", dstPath))
 				continue
 			}
 

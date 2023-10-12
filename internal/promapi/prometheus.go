@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -14,7 +15,6 @@ import (
 
 	"github.com/cespare/xxhash/v2"
 	"github.com/klauspost/compress/gzhttp"
-	"github.com/rs/zerolog/log"
 	"go.uber.org/ratelimit"
 )
 
@@ -119,18 +119,18 @@ func NewPrometheus(name, uri string, headers map[string]string, timeout time.Dur
 }
 
 func (prom *Prometheus) Close() {
-	log.Debug().Str("name", prom.name).Str("uri", prom.safeURI).Msg("Stopping query workers")
+	slog.Debug("Stopping query workers", slog.String("name", prom.name), slog.String("uri", prom.safeURI))
 	close(prom.queries)
 	prom.wg.Wait()
 }
 
 func (prom *Prometheus) StartWorkers() {
-	log.Debug().
-		Str("name", prom.name).
-		Str("uri", prom.safeURI).
-		Int("workers", prom.concurrency).
-		Msg("Starting query workers")
-
+	slog.Debug(
+		"Starting query workers",
+		slog.String("name", prom.name),
+		slog.String("uri", prom.safeURI),
+		slog.Int("workers", prom.concurrency),
+	)
 	prom.queries = make(chan queryRequest, prom.concurrency*10)
 
 	for w := 1; w <= prom.concurrency; w++ {
@@ -203,11 +203,12 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 			return result
 		}
 		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
-		log.Error().
-			Err(result.err).
-			Str("uri", prom.safeURI).
-			Str("query", job.query.String()).
-			Msg("Query returned an error")
+		slog.Error(
+			"Query returned an error",
+			slog.Any("err", result.err),
+			slog.String("uri", prom.safeURI),
+			slog.String("query", job.query.String()),
+		)
 		return result
 	}
 

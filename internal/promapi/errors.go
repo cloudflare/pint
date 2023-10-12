@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net"
 	"net/http"
 	"strings"
@@ -12,7 +13,6 @@ import (
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prymitive/current"
-	"github.com/rs/zerolog/log"
 )
 
 func IsUnavailableError(err error) bool {
@@ -103,7 +103,7 @@ func decodeError(err error) string {
 }
 
 func tryDecodingAPIError(resp *http.Response) error {
-	log.Debug().Int("code", resp.StatusCode).Msg("Trying to parse Prometheus error response")
+	slog.Debug("Trying to parse Prometheus error response", slog.Int("code", resp.StatusCode))
 
 	var status, errType, errText string
 	decoder := current.Object(

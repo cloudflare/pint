@@ -3,14 +3,14 @@ pint.ok -l debug --no-color lint --min-severity=info rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=debug msg="Check snoozed by comment" check=promql/aggregate(job:true) comment="file/snooze 2099-11-28T10:24:18Z promql/aggregate(job:true)" snooze=promql/aggregate(job:true) until=2099-11-28T10:24:18Z
-level=debug msg="Check snoozed by comment" check=alerts/for comment="file/snooze 2099-11-28T10:24:18Z alerts/for" snooze=alerts/for until=2099-11-28T10:24:18Z
-level=debug msg="File parsed" path=rules/0001.yml rules=2
-level=debug msg="Found recording rule" lines=4-5 path=rules/0001.yml record=sum-job
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=sum-job
-level=debug msg="Found alerting rule" alert=Down lines=7-9 path=rules/0001.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=Down
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="Check snoozed by comment" check=promql/aggregate(job:true) comment="file/snooze 2099-11-28T10:24:18Z promql/aggregate(job:true)" until="2099-11-28T10:24:18Z" snooze=promql/aggregate(job:true)
+level=DEBUG msg="Check snoozed by comment" check=alerts/for comment="file/snooze 2099-11-28T10:24:18Z alerts/for" until="2099-11-28T10:24:18Z" snooze=alerts/for
+level=DEBUG msg="File parsed" path=rules/0001.yml rules=2
+level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum-job lines=4-5
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=sum-job
+level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=Down lines=7-9
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=Down
 -- rules/0001.yml --
 # pint file/snooze 2099-11-28T10:24:18Z promql/aggregate(job:true)
 # pint file/snooze 2099-11-28T10:24:18Z alerts/for

@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log/slog"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/google/go-github/v55/github"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -70,7 +70,7 @@ func (gr GithubReporter) Submit(summary Summary) error {
 	if err != nil {
 		return fmt.Errorf("failed to get HEAD commit: %w", err)
 	}
-	log.Info().Str("commit", headCommit).Msg("Got HEAD commit from git")
+	slog.Info("Got HEAD commit from git", slog.String("commit", headCommit))
 
 	review, err := gr.findExistingReview()
 	if err != nil {
@@ -108,7 +108,7 @@ func (gr GithubReporter) findExistingReview() (*github.PullRequestReview, error)
 }
 
 func (gr GithubReporter) updateReview(review *github.PullRequestReview, summary Summary) error {
-	log.Info().Str("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)).Msg("Updating pull request review")
+	slog.Info("Updating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)))
 
 	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
 	defer cancel()
@@ -125,7 +125,7 @@ func (gr GithubReporter) updateReview(review *github.PullRequestReview, summary 
 }
 
 func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) error {
-	log.Info().Msg("Creating review comments")
+	slog.Info("Creating review comments")
 
 	existingComments, err := gr.getReviewComments()
 	if err != nil {
@@ -143,7 +143,7 @@ func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) e
 			}
 		}
 		if found {
-			log.Debug().Str("body", comment.GetBody()).Str("commit", comment.GetCommitID()).Msg("Comment already exist")
+			slog.Debug("Comment already exist", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
 			continue
 		}
 
@@ -164,7 +164,7 @@ func (gr GithubReporter) getReviewComments() ([]*github.PullRequestComment, erro
 }
 
 func (gr GithubReporter) createComment(comment *github.PullRequestComment) error {
-	log.Debug().Str("body", comment.GetBody()).Str("commit", comment.GetCommitID()).Msg("Creating review comment")
+	slog.Debug("Creating review comment", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
 
 	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
 	defer cancel()
@@ -174,7 +174,7 @@ func (gr GithubReporter) createComment(comment *github.PullRequestComment) error
 }
 
 func (gr GithubReporter) createReview(headCommit string, summary Summary) error {
-	log.Info().Str("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)).Str("commit", headCommit).Msg("Creating pull request review")
+	slog.Info("Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", headCommit))
 
 	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
 	defer cancel()
@@ -193,7 +193,7 @@ func (gr GithubReporter) createReview(headCommit string, summary Summary) error 
 	if err != nil {
 		return fmt.Errorf("failed to create review: %w", err)
 	}
-	log.Info().Str("status", resp.Status).Msg("Pull request review created")
+	slog.Info("Pull request review created", slog.String("status", resp.Status))
 	return nil
 }
 

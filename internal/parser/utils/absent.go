@@ -1,10 +1,11 @@
 package utils
 
 import (
+	"log/slog"
+
 	"github.com/cloudflare/pint/internal/parser"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
-	"github.com/rs/zerolog/log"
 )
 
 type PromQLFragment struct {
@@ -63,7 +64,7 @@ func HasOuterAbsent(node *parser.PromQLNode) (calls []PromQLFragment) {
 				}
 
 			default:
-				log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
+				slog.Warn("Unsupported VectorMatching operation", slog.String("matching", n.VectorMatching.Card.String()))
 			}
 			return calls
 		}

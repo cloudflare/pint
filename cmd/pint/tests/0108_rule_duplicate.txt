@@ -3,12 +3,12 @@ pint.error --no-color -d 'promql/.*' -d alerts/count lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
-level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
-level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
-level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
-level=error msg="Query returned an error" error="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:7108
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
+level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
+level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
+level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
+level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
 rules/0001.yml:1-2 Bug: duplicated rule, identical rule found at rules/0002.yml:1 (rule/duplicate)
  1 | - record: "colo:duplicate"
  2 |   expr: sum(foo) without(job)
@@ -39,8 +39,8 @@ rules/0002.yml:13-14 Bug: couldn't run "labels/conflict" checks due to prometheu
  13 |   labels:
  14 |     same: yes
 
-level=info msg="Problems found" Bug=7
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Bug=7
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - record: "colo:duplicate"
   expr: sum(foo) without(job)

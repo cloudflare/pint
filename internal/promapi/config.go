@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prymitive/current"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -38,9 +38,7 @@ type configQuery struct {
 }
 
 func (q configQuery) Run() queryResult {
-	log.Debug().
-		Str("uri", q.prom.safeURI).
-		Msg("Getting prometheus configuration")
+	slog.Debug("Getting prometheus configuration", slog.String("uri", q.prom.safeURI))
 
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
@@ -85,7 +83,7 @@ func (q configQuery) CacheTTL() time.Duration {
 }
 
 func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
-	log.Debug().Str("uri", p.safeURI).Msg("Scheduling Prometheus configuration query")
+	slog.Debug("Scheduling Prometheus configuration query", slog.String("uri", p.safeURI))
 
 	key := "/api/v1/status/config"
 	p.locker.lock(key)

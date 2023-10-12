@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"log/slog"
 	"os"
 	"path"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/slices"
 )
 
@@ -95,11 +95,11 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 		status := FileStatus(parts[0][0])
 		srcPath := parts[1]
 		dstPath := parts[len(parts)-1]
-		log.Debug().Str("path", dstPath).Str("commit", commit).Str("change", parts[0]).Msg("Git file change")
+		slog.Debug("Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
 
 		// ignore directories
 		if isDir, _ := isDirectoryPath(dstPath); isDir {
-			log.Debug().Str("path", dstPath).Msg("Skipping directory entry change")
+			slog.Debug("Skipping directory entry change", slog.String("path", dstPath))
 			continue
 		}
 
@@ -137,13 +137,13 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 				// so there's both "BEFORE" and "AFTER"
 				change.Body.Before = getContentAtCommit(cmd, commit+"^", change.Path.Before.SymlinkTarget)
 			default:
-				log.Debug().Str("path", dstPath).Str("commit", commit).Str("change", parts[0]).Msg("Unknown git change")
+				slog.Debug("Unknown git change", slog.String("path", dstPath), slog.String("commit", commit), slog.String("change", parts[0]))
 			}
 			changes = append(changes, change)
 		}
 		change.Commits = append(change.Commits, commit)
 	}
-	log.Debug().Int("changes", len(changes)).Msg("Parsed git log")
+	slog.Debug("Parsed git log", slog.Int("changes", len(changes)))
 
 	for _, change := range changes {
 		lastCommit := change.Commits[len(change.Commits)-1]
@@ -171,7 +171,7 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 			// new file body is empty, meaning that every line was modified
 			change.Body.ModifiedLines = CountLines(change.Body.Before)
 		default:
-			log.Debug().Str("change", fmt.Sprintf("+%v", change)).Msg("Unhandled change")
+			slog.Debug("Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
 		}
 
 		if change.Path.Before.Name == change.Path.Before.SymlinkTarget {
@@ -195,7 +195,7 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 }
 
 func getModifiedLines(cmd CommandRunner, commits []string, fpath string) ([]int, error) {
-	log.Debug().Strs("commits", commits).Str("path", fpath).Msg("Getting list of modified lines")
+	slog.Debug("Getting list of modified lines", slog.String("commits", fmt.Sprint(commits)), slog.String("path", fpath))
 	lines, err := Blame(cmd, fpath)
 	if err != nil {
 		return nil, err
@@ -215,7 +215,7 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 	args := []string{"ls-tree", "--format=%(objectmode) %(objecttype) %(path)", commit, fpath}
 	out, err := cmd(args...)
 	if err != nil {
-		log.Debug().Err(err).Strs("args", args).Msg("git command returned an error")
+		slog.Debug("git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
 		return Missing
 	}
 
@@ -266,7 +266,7 @@ func getContentAtCommit(cmd CommandRunner, commit, fpath string) []byte {
 	args := []string{"cat-file", "blob", fmt.Sprintf("%s:%s", commit, fpath)}
 	body, err := cmd(args...)
 	if err != nil {
-		log.Debug().Err(err).Strs("args", args).Msg("git command returned an error")
+		slog.Debug("git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
 		return nil
 	}
 	return body

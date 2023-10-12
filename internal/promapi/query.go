@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"math"
 	"net/http"
 	"net/url"
@@ -14,7 +15,6 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prymitive/current"
-	"github.com/rs/zerolog/log"
 )
 
 type QueryResult struct {
@@ -31,10 +31,11 @@ type instantQuery struct {
 }
 
 func (q instantQuery) Run() queryResult {
-	log.Debug().
-		Str("uri", q.prom.safeURI).
-		Str("query", q.expr).
-		Msg("Running prometheus query")
+	slog.Debug(
+		"Running prometheus query",
+		slog.String("uri", q.prom.safeURI),
+		slog.String("query", q.expr),
+	)
 
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
@@ -78,7 +79,7 @@ func (q instantQuery) CacheTTL() time.Duration {
 }
 
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
-	log.Debug().Str("uri", p.safeURI).Str("query", expr).Msg("Scheduling prometheus query")
+	slog.Debug("Scheduling prometheus query", slog.String("uri", p.safeURI), slog.String("query", expr))
 
 	key := fmt.Sprintf("/api/v1/query/%s", expr)
 	p.locker.lock(key)
@@ -100,7 +101,7 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 		Series: result.value.([]Sample),
 		Stats:  result.stats,
 	}
-	log.Debug().Str("uri", p.safeURI).Str("query", expr).Int("series", len(qr.Series)).Msg("Parsed response")
+	slog.Debug("Parsed response", slog.String("uri", p.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
 
 	return &qr, nil
 }

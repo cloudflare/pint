@@ -334,4 +334,4 @@ rules.yml:39 Warning: alert query doesn't have any condition, it will always fir
 rules.yml:39 Warning: aggregation using without() can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using by() to ensure consistent labels (promql/fragile)
  39 |     expr: errors / sum(requests) without(rack)
 
-level=fatal msg="Fatal error" error="submitting reports: fatal error(s) reported"
+level=ERROR msg="Fatal error" err="submitting reports: fatal error(s) reported"

@@ -22,13 +22,13 @@ exec git commit -am 'v2'
 
 pint.ok -l debug --no-color ci
 ! stdout .
-stderr 'level=debug msg="Got branch information" base=main current=v2'
-stderr 'level=debug msg="Found commit to scan" commit=.*'
-stderr 'level=debug msg="Found commit to scan" commit=.*'
-stderr 'level=debug msg="Git file change" change=A commit=.* path=a.yml'
-stderr 'level=debug msg="Git file change" change=A commit=.* path=b.yml'
-stderr 'level=debug msg="Skipping file due to include/exclude rules" path=a.yml'
-stderr 'level=debug msg="Skipping file due to include/exclude rules" path=b.yml'
+stderr 'level=DEBUG msg="Got branch information" base=main current=v2'
+stderr 'level=DEBUG msg="Found commit to scan" commit=.*'
+stderr 'level=DEBUG msg="Found commit to scan" commit=.*'
+stderr 'level=DEBUG msg="Git file change" change=A path=a.yml commit=.*'
+stderr 'level=DEBUG msg="Git file change" change=A path=b.yml commit=.*'
+stderr 'level=DEBUG msg="Skipping file due to include/exclude rules" path=a.yml'
+stderr 'level=DEBUG msg="Skipping file due to include/exclude rules" path=b.yml'
 
 -- src/a.yml --
 - record: rule1

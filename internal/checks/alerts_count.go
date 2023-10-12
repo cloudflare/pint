@@ -3,11 +3,11 @@ package checks
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"sort"
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -78,7 +78,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	if len(qr.Series.Ranges) > 0 {
 		promUptime, err := c.prom.RangeQuery(ctx, "count(up)", params)
 		if err != nil {
-			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
+			slog.Warn("Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		} else {
 			// FIXME: gaps are not used
 			qr.Series.FindGaps(promUptime.Series, qr.Series.From, qr.Series.Until)

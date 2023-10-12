@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 	"go.uber.org/automaxprocs/maxprocs"
 
@@ -45,7 +44,7 @@ func newApp() *cli.App {
 			&cli.StringFlag{
 				Name:    logLevelFlag,
 				Aliases: []string{"l"},
-				Value:   zerolog.InfoLevel.String(),
+				Value:   slog.LevelInfo.String(),
 				Usage:   "Log level",
 			},
 			&cli.BoolFlag{
@@ -98,7 +97,7 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 	undo, err := maxprocs.Set()
 	defer undo()
 	if err != nil {
-		log.Error().Err(err).Msg("failed to set GOMAXPROCS")
+		slog.Error("failed to set GOMAXPROCS", slog.Any("err", err))
 	}
 
 	meta.workers = c.Int(workersFlag)
@@ -122,7 +121,7 @@ func main() {
 	app := newApp()
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Execution completed with error(s)")
+		slog.Error("Execution completed with error(s)", slog.Any("err", err))
 		os.Exit(1)
 	}
 }

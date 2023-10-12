@@ -2,22 +2,23 @@ package reporter_test
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
 
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
+	"github.com/cloudflare/pint/internal/log"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
 func TestGithubReporter(t *testing.T) {
-	zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	log.Level.Set(slog.LevelError)
 
 	type testCaseT struct {
 		description string

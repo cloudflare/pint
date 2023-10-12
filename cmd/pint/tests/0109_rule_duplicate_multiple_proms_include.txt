@@ -3,7 +3,7 @@ pint.ok --no-color -d 'promql/.*' -d alerts/count -d labels/conflict lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 -- rules/0001.yml --
 - record: "colo:duplicate"
   expr: sum(foo) without(job)

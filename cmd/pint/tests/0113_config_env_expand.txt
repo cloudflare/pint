@@ -6,7 +6,7 @@ pint.ok --no-color config
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 {
   "ci": {
     "maxCommits": 20,

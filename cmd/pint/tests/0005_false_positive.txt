@@ -3,7 +3,7 @@ pint.ok --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 -- rules/0001.yml --
 - record: "colo:test1"
   expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[5m])) BY (zoneId,job))

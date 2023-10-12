@@ -3,15 +3,15 @@ pint.error -l debug --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=debug msg="File parsed" path=rules/0001.yml rules=1
-level=debug msg="Found recording rule" lines=2-3 path=rules/0001.yml record=sum-job
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=sum-job
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
+level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum-job lines=2-3
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=sum-job
 rules/0001.yml:3 Bug: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
  3 |   expr: sum(foo)
 
-level=info msg="Problems found" Bug=1
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Bug=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 # pint snooze 2000-11-28T10:24:18Z promql/aggregate
 - record: sum-job

@@ -3,10 +3,9 @@ package discovery
 import (
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
-
-	"github.com/rs/zerolog/log"
 )
 
 type symlink struct {
@@ -68,7 +67,7 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 
 		for _, sl := range slinks {
 			if sl.to == entry.SourcePath {
-				log.Debug().Str("to", sl.to).Str("from", sl.from).Msg("Found a symlink")
+				slog.Debug("Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
 				nentries = append(nentries, Entry{
 					ReportedPath:   sl.to,
 					SourcePath:     sl.from,
