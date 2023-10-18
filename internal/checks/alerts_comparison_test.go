@@ -158,6 +158,57 @@ func TestComparisonCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    noProblems,
 		},
+		{
+			description: "vector(0) or (foo > 0)",
+			content:     "- alert: Foo Is Down\n  expr: (foo > 0) or vector(0)\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `(foo > 0) or vector(0)`,
+						Lines:    []int{2},
+						Reporter: checks.ComparisonCheckName,
+						Text:     "alert query uses 'or' operator with one side of the query that will always return a result, this alert will always fire",
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "(foo > 0) or vector(0)",
+			content:     "- alert: Foo Is Down\n  expr: (foo > 0) or vector(0)\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `(foo > 0) or vector(0)`,
+						Lines:    []int{2},
+						Reporter: checks.ComparisonCheckName,
+						Text:     "alert query uses 'or' operator with one side of the query that will always return a result, this alert will always fire",
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "absent(foo) or vector(0)",
+			content:     "- alert: Foo Is Down\n  expr: (foo > 0) or vector(0)\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `(foo > 0) or vector(0)`,
+						Lines:    []int{2},
+						Reporter: checks.ComparisonCheckName,
+						Text:     "alert query uses 'or' operator with one side of the query that will always return a result, this alert will always fire",
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
 	}
 
 	runTests(t, testCases)

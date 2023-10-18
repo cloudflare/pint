@@ -20,6 +20,9 @@
 
   {% endraw %}
 
+- `alerts/comparison` check can now warn if alerting rules use a query
+  with `foo > 0 OR vector(1)`, which would always fire.
+
 ## v0.46.0
 
 ### Added
