@@ -22,6 +22,18 @@
 
 - `alerts/comparison` check can now warn if alerting rules use a query
   with `foo > 0 OR vector(1)`, which would always fire.
+- `alerts/template` check will now look check `on(...)` clause on binary
+  expressions. When `on(...)` is set only labels listed there will appear
+  on result metrics.
+  For example `app_type` here cannot appear on query results, even if it's
+  present on `foo` time series.
+
+  ```yaml
+  - alert: ...
+    expr: foo / on (instance, app_name) bar
+    annotations:
+      summary: ... {{ $labels.app_type }} ...
+  ```
 
 ## v0.46.0
 

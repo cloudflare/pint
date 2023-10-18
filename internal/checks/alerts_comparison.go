@@ -106,6 +106,13 @@ func isAbsent(node promParser.Node) bool {
 	if node, ok := node.(*promParser.Call); ok && (node.Func.Name == "absent") {
 		return true
 	}
+
+	for _, child := range promParser.Children(node) {
+		if isAbsent(child) {
+			return true
+		}
+	}
+
 	return false
 }
 

@@ -1075,6 +1075,36 @@ func TestTemplateCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "foo / on(...) bar",
+			content: `- alert: Foo
+  expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
+  annotations:
+    summary: "{{ $labels.app_type }} is using {{ $value }} fds."
+  labels:
+    job: "{{ $labels.job_name }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `job: {{ $labels.job_name }}`,
+						Lines:    []int{2, 6},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "job_name" label but the query uses on(...) without it being set there, this label will be missing from the query result`,
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: `summary: {{ $labels.app_type }} is using {{ $value }} fds.`,
+						Lines:    []int{2, 4},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "app_type" label but the query uses on(...) without it being set there, this label will be missing from the query result`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
 	}
 	runTests(t, testCases)
 }
