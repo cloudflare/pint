@@ -28,6 +28,7 @@ const (
 
 	msgAggregation = "template is using %q label but the query removes it"
 	msgAbsent      = "template is using %q label but absent() is not passing it"
+	msgOn          = "template is using %q label but the query uses on(...) without it being set there, this label will be missing from the query result"
 )
 
 var (
@@ -101,11 +102,13 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 
 	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
 	absentCalls := utils.HasOuterAbsent(rule.AlertingRule.Expr.Query)
+	binExpr := utils.HasOuterBinaryExpr(rule.AlertingRule.Expr.Query)
 	vectors := utils.HasVectorSelector(rule.AlertingRule.Expr.Query)
 
 	var safeLabels []string
 	for _, be := range binaryExprs(rule.AlertingRule.Expr.Query) {
 		if be.VectorMatching != nil {
+			safeLabels = append(safeLabels, be.VectorMatching.MatchingLabels...)
 			safeLabels = append(safeLabels, be.VectorMatching.Include...)
 		}
 	}
@@ -171,6 +174,18 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 					continue
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false, safeLabels) {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
+						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
+						Reporter: c.Reporter(),
+						Text:     msg,
+						Severity: Bug,
+					})
+				}
+			}
+
+			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
+				for _, msg := range checkMetricLabels(msgOn, label.Key.Value, label.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
 					problems = append(problems, Problem{
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
@@ -250,6 +265,18 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     fmt.Sprintf("template is using %q label but the query doesn't produce any labels", name),
+						Severity: Bug,
+					})
+				}
+			}
+
+			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
+				for _, msg := range checkMetricLabels(msgOn, annotation.Key.Value, annotation.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
+						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Reporter: c.Reporter(),
+						Text:     msg,
 						Severity: Bug,
 					})
 				}

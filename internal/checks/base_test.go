@@ -104,7 +104,7 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
+	zerolog.SetGlobalLevel(zerolog.FatalLevel)
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
