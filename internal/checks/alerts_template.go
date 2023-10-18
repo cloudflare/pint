@@ -101,6 +101,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 
 	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
 	absentCalls := utils.HasOuterAbsent(rule.AlertingRule.Expr.Query)
+	vectors := utils.HasVectorSelector(rule.AlertingRule.Expr.Query)
 
 	var safeLabels []string
 	for _, be := range binaryExprs(rule.AlertingRule.Expr.Query) {
@@ -179,6 +180,19 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 					})
 				}
 			}
+
+			labelNames := getTemplateLabels(label.Key.Value, label.Value.Value)
+			if len(labelNames) > 0 && len(vectors) == 0 {
+				for _, name := range labelNames {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
+						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
+						Reporter: c.Reporter(),
+						Text:     fmt.Sprintf("template is using %q label but the query doesn't produce any labels", name),
+						Severity: Bug,
+					})
+				}
+			}
 		}
 	}
 
@@ -223,6 +237,19 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Severity: Bug,
+					})
+				}
+			}
+
+			labelNames := getTemplateLabels(annotation.Key.Value, annotation.Value.Value)
+			if len(labelNames) > 0 && len(vectors) == 0 {
+				for _, name := range labelNames {
+					problems = append(problems, Problem{
+						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
+						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Reporter: c.Reporter(),
+						Text:     fmt.Sprintf("template is using %q label but the query doesn't produce any labels", name),
 						Severity: Bug,
 					})
 				}
@@ -458,7 +485,7 @@ func getVariables(node parse.Node) (vars [][]string) {
 	return vars
 }
 
-func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLabels bool, safeLabels []string) (msgs []string) {
+func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap, ok bool) {
 	t, err := textTemplate.
 		New(name).
 		Funcs(templateFuncMap).
@@ -466,14 +493,40 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 		Parse(strings.Join(append(templateDefs, text), ""))
 	if err != nil {
 		// no need to double report errors
-		return nil
+		return vars, aliases, false
 	}
 
-	aliases := aliasMap{aliases: map[string]map[string]struct{}{}}
-	vars := [][]string{}
+	aliases.aliases = map[string]map[string]struct{}{}
 	for _, node := range t.Root.Nodes {
 		getAliases(node, &aliases)
 		vars = append(vars, getVariables(node)...)
+	}
+
+	return vars, aliases, true
+}
+
+func getTemplateLabels(name, text string) (names []string) {
+	vars, aliases, ok := findTemplateVariables(name, text)
+	if !ok {
+		return nil
+	}
+
+	labelsAliases := aliases.varAliases(".Labels")
+	for _, v := range vars {
+		for _, a := range labelsAliases {
+			if len(v) > 1 && v[0] == a {
+				names = append(names, v[1])
+			}
+		}
+	}
+
+	return names
+}
+
+func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLabels bool, safeLabels []string) (msgs []string) {
+	vars, aliases, ok := findTemplateVariables(name, text)
+	if !ok {
+		return nil
 	}
 
 	done := map[string]struct{}{}

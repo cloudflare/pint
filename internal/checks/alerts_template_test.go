@@ -1017,6 +1017,64 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   noProblems,
 		},
+		{
+			description: "annotation label from vector(0)",
+			content:     "- alert: DeadMansSwitch\n  expr: vector(1)\n  annotations:\n    summary: 'Deadmans switch on {{ $labels.instance }} is firing'\n",
+			checker:     newTemplateCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `summary: Deadmans switch on {{ $labels.instance }} is firing`,
+						Lines:    []int{2, 4},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "instance" label but the query doesn't produce any labels`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "labels label from vector(0)",
+			content:     "- alert: DeadMansSwitch\n  expr: vector(1)\n  labels:\n    summary: 'Deadmans switch on {{ $labels.instance }} is firing'\n",
+			checker:     newTemplateCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `summary: Deadmans switch on {{ $labels.instance }} is firing`,
+						Lines:    []int{2, 4},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "instance" label but the query doesn't produce any labels`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "annotation label from number",
+			content:     "- alert: DeadMansSwitch\n  expr: 1 > bool 0\n  annotations:\n    summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'\n",
+			checker:     newTemplateCheck,
+			prometheus:  noProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: `summary: Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing`,
+						Lines:    []int{2, 4},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "instance" label but the query doesn't produce any labels`,
+						Severity: checks.Bug,
+					},
+					{
+						Fragment: `summary: Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing`,
+						Lines:    []int{2, 4},
+						Reporter: checks.TemplateCheckName,
+						Text:     `template is using "job" label but the query doesn't produce any labels`,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
 	}
 	runTests(t, testCases)
 }
