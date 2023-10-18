@@ -1,5 +1,25 @@
 # Changelog
 
+## v0.47.0
+
+### Added
+
+- `alerts/template` check can now report problems with alerting rules
+  when trying to use templates on a query that doesn't produce any labels
+  at all.
+  For example when using [`vector(...)`](https://prometheus.io/docs/prometheus/latest/querying/functions/#vector) function:
+
+  {% raw %}
+
+  ```yaml
+  - alert: DeadMansSwitch
+    expr: vector(1)
+    annotations:
+      summary: Deadman's switch on {{ $labels.instance }} is firing
+  ```
+
+  {% endraw %}
+
 ## v0.46.0
 
 ### Added
@@ -115,7 +135,7 @@
   ```yaml
   - record: my:sum
     expr: sum(http_requests_total)
-  
+
   - alert: my alert
     expr: rate(my:sum[5m])
   ```
@@ -195,7 +215,7 @@
   snooze them instead of disabling forever.
 
   The difference between `# pint disable ...` and `# pint snooze ...` comments is that
-  the snooze comment must include a timestamp. Selected check will be disabled *until*
+  the snooze comment must include a timestamp. Selected check will be disabled _until_
   that timestamp.
   Timestamp must either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339) syntax
   or `YYYY-MM-DD` (if you don't care about time and want to snooze until given date).
@@ -640,7 +660,7 @@
 ### Changed
 
 - The way `pint` sends API requests to Prometheus was changed to improve performance.
-  
+
   First change is that each `prometheus` server definition in `pint` config file can
   now accept optional `concurrency` field (defaults to 16) that sets a limit on how
   many concurrent requests can that server receive. There is a new metric that
@@ -800,10 +820,10 @@
 
   ```yaml
   groups:
-  - name: example
-    rules:
-    - record: ...
-      expr: ...
+    - name: example
+      rules:
+        - record: ...
+          expr: ...
   ```
 
   Previous releases were only looking for individual rules so `groups` object
@@ -815,7 +835,7 @@
 
   ```yaml
   parser {
-    relaxed = ["(.*)"]
+  relaxed = ["(.*)"]
   }
   ```
 
@@ -974,7 +994,7 @@
 
 ### Added
 
-- Added  `pint_last_run_time_seconds` and `pint_rules_parsed_total` metrics when running `pint watch`.
+- Added `pint_last_run_time_seconds` and `pint_rules_parsed_total` metrics when running `pint watch`.
 
 ### Changed
 
@@ -997,7 +1017,7 @@
 ### Added
 
 - Added `promql/regexp` check that will warn about unnecessary regexp matchers.
-- Added  `pint_prometheus_queries_total` and `pint_prometheus_query_errors_total`
+- Added `pint_prometheus_queries_total` and `pint_prometheus_query_errors_total`
   metric when running `pint watch`.
 
 ## v0.10.1
@@ -1090,7 +1110,7 @@
 ### Fixed
 
 - `promql/rate`, `query/series` and `promql/vector_matching` checks were not enabled
-  for all defined `prometheus {}` blocks  unless there was at least one `rule {}` block.
+  for all defined `prometheus {}` blocks unless there was at least one `rule {}` block.
 - `annotation` based `match` blocks didn't work correctly.
 
 ## v0.6.6
@@ -1224,7 +1244,7 @@
   - alert: Foo
     expr: absent(foo{env="prod"})
     annotations:
-      summary: 'foo metric is missing for job {{ $labels.job }}'
+      summary: "foo metric is missing for job {{ $labels.job }}"
   ```
 
   {% endraw %}
@@ -1291,7 +1311,7 @@
   - alert: Foo
     expr: count(up) without(instance) == 0
     annotations:
-      summary: 'foo is down on {{ $labels.instance }}'
+      summary: "foo is down on {{ $labels.instance }}"
   ```
 
   {% endraw %}
@@ -1302,7 +1322,7 @@
 
 ### Fixed
 
-- Fixed file descriptor leak due to missing file `Close()`  #69.
+- Fixed file descriptor leak due to missing file `Close()` #69.
 
 ## v0.1.4
 
