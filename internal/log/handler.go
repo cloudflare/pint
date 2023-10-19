@@ -12,20 +12,17 @@ import (
 )
 
 const (
-	reset  = "\033[0m"
-	dim    = "\033[2m"
-	normal = "\u001B[22m"
-
-	fgHiRed     = "\033[91m"
-	fgHiYellow  = "\033[93m"
-	fgHiBlue    = "\033[94m"
-	fgHiMagenta = "\033[95m"
-	fgHiCyan    = "\033[96m"
-	fgHiWhite   = "\033[97m"
+	dim         = 2
+	fgHiRed     = 91
+	fgHiYellow  = 93
+	fgHiBlue    = 94
+	fgHiMagenta = 95
+	fgHiCyan    = 96
+	fgHiWhite   = 97
 )
 
 type handler struct {
-	mtx     *sync.Mutex
+	mtx     sync.Mutex
 	dst     io.Writer
 	level   slog.Level
 	noColor bool
@@ -35,12 +32,12 @@ type handler struct {
 
 func newHandler(dst io.Writer, level slog.Level, noColor bool) *handler {
 	h := handler{
-		mtx:     &sync.Mutex{},
+		mtx:     sync.Mutex{},
 		dst:     dst,
 		level:   level,
 		noColor: noColor,
+		escaper: strings.NewReplacer(`"`, `\"`),
 	}
-	h.escaper = strings.NewReplacer(`"`, `\"`)
 	return &h
 }
 
@@ -49,9 +46,9 @@ func (h *handler) Enabled(_ context.Context, level slog.Level) bool {
 }
 
 func (h *handler) Handle(_ context.Context, record slog.Record) error {
-	buf := bytes.NewBuffer(make([]byte, 0, 256))
+	buf := bytes.NewBuffer(make([]byte, 0, 128))
 
-	lc := ""
+	var lc int
 	switch record.Level {
 	case slog.LevelInfo:
 		lc = fgHiWhite
@@ -64,16 +61,16 @@ func (h *handler) Handle(_ context.Context, record slog.Record) error {
 	}
 	h.printKey(buf, "level")
 	h.printVal(buf, record.Level.String(), lc)
-	_, _ = buf.WriteString(" ")
+	_, _ = buf.WriteRune(' ')
 	h.printKey(buf, "msg")
 	h.printVal(buf, record.Message, fgHiWhite)
 
 	record.Attrs(func(attr slog.Attr) bool {
-		_, _ = buf.WriteString(" ")
+		_, _ = buf.WriteRune(' ')
 		h.appendAttr(buf, attr)
 		return true
 	})
-	buf.WriteString("\n")
+	_, _ = buf.WriteRune('\n')
 
 	h.mtx.Lock()
 	defer h.mtx.Unlock()
@@ -97,18 +94,18 @@ func (h *handler) printKey(buf *bytes.Buffer, s string) {
 	_, _ = buf.WriteString(h.maybeWriteColor(s+"=", dim))
 }
 
-func (h *handler) printVal(buf *bytes.Buffer, s, color string) {
+func (h *handler) printVal(buf *bytes.Buffer, s string, color int) {
 	if !strings.HasPrefix(s, "[") && !strings.HasPrefix(s, "{") && strings.Contains(s, " ") {
 		s = "\"" + h.escaper.Replace(s) + "\""
 	}
 	_, _ = buf.WriteString(h.maybeWriteColor(s, color))
 }
 
-func (h *handler) maybeWriteColor(s, color string) string {
+func (h *handler) maybeWriteColor(s string, color int) string {
 	if h.noColor {
 		return s
 	}
-	return fmt.Sprintf("%s%s%s", color, s, reset)
+	return fmt.Sprintf("\033[%dm%s\033[0m", color, s)
 }
 
 func (h *handler) appendAttr(buf *bytes.Buffer, attr slog.Attr) {
