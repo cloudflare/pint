@@ -9,13 +9,13 @@ import (
 
 var Level = &slog.LevelVar{}
 
-func Setup(level slog.Leveler, noColor bool) {
+func Setup(level slog.Level, noColor bool) {
 	Level.Set(level.Level())
 	logger := slog.New(newHandler(os.Stderr, Level.Level(), noColor))
 	slog.SetDefault(logger)
 }
 
-func ParseLevel(s string) (slog.Leveler, error) {
+func ParseLevel(s string) (slog.Level, error) {
 	switch strings.ToLower(s) {
 	case "error":
 		return slog.LevelError, nil
@@ -26,6 +26,6 @@ func ParseLevel(s string) (slog.Leveler, error) {
 	case "debug":
 		return slog.LevelDebug, nil
 	default:
-		return nil, fmt.Errorf("%q is not a valid log level", s)
+		return slog.LevelInfo, fmt.Errorf("%q is not a valid log level", s)
 	}
 }
