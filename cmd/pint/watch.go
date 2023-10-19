@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -23,7 +24,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	dto "github.com/prometheus/client_model/go"
-	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -95,13 +95,13 @@ func actionWatch(c *cli.Context) error {
 		if err != nil {
 			return err
 		}
-		log.Info().Str("path", pidfile).Msg("Pidfile created")
+		slog.Info("Pidfile created", slog.String("path", pidfile))
 		defer func() {
 			pidErr := os.RemoveAll(pidfile)
 			if pidErr != nil {
-				log.Error().Err(pidErr).Str("path", pidfile).Msg("Failed to remove pidfile")
+				slog.Error("Failed to remove pidfile", slog.Any("err", pidErr), slog.String("path", pidfile))
 			}
-			log.Info().Str("path", pidfile).Msg("Pidfile removed")
+			slog.Info("Pidfile removed", slog.String("path", pidfile))
 		}()
 	}
 
@@ -134,10 +134,10 @@ func actionWatch(c *cli.Context) error {
 	}
 	go func() {
 		if httpErr := server.ListenAndServe(); !errors.Is(httpErr, http.ErrServerClosed) {
-			log.Error().Err(httpErr).Str("listen", listen).Msg("HTTP server returned an error")
+			slog.Error("HTTP server returned an error", slog.Any("err", httpErr), slog.String("listen", listen))
 		}
 	}()
-	log.Info().Str("address", listen).Msg("Started HTTP server")
+	slog.Info("Started HTTP server", slog.String("address", listen))
 
 	interval := c.Duration(intervalFlag)
 
@@ -154,11 +154,11 @@ func actionWatch(c *cli.Context) error {
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Info().Msg("Shutting down")
+	slog.Info("Shutting down")
 	mainCancel()
 
 	stop <- true
-	log.Info().Msg("Waiting for all background tasks to finish")
+	slog.Info("Waiting for all background tasks to finish")
 	<-ack
 
 	for _, prom := range meta.cfg.PrometheusServers {
@@ -168,7 +168,7 @@ func actionWatch(c *cli.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	if err = server.Shutdown(ctx); err != nil {
-		log.Error().Err(err).Msg("HTTP server returned an error while shutting down")
+		slog.Error("HTTP server returned an error while shutting down", slog.Any("err", err))
 	}
 
 	return nil
@@ -183,24 +183,24 @@ func startTimer(ctx context.Context, _ config.Config, workers int, interval time
 		for {
 			select {
 			case <-ticker.C:
-				log.Debug().Msg("Running checks")
+				slog.Debug("Running checks")
 				if !wasBootstrapped {
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
 				if err := collector.scan(ctx, workers); err != nil {
-					log.Error().Err(err).Msg("Got an error when running checks")
+					slog.Error("Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
 			case <-stop:
 				ticker.Stop()
-				log.Info().Msg("Background worker finished")
+				slog.Info("Background worker finished")
 				ack <- true
 				return
 			}
 		}
 	}()
-	log.Info().Stringer("interval", interval).Msg("Will continuously run checks until terminated")
+	slog.Info("Will continuously run checks until terminated", slog.String("interval", interval.String()))
 
 	return stop
 }
@@ -293,7 +293,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, report := range c.summary.Reports() {
 		if report.Problem.Severity < c.minSeverity {
-			log.Debug().Stringer("severity", report.Problem.Severity).Msg("Skipping report")
+			slog.Debug("Skipping report", slog.String("severity", report.Problem.Severity.String()))
 			continue
 		}
 
@@ -323,7 +323,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 		var out dto.Metric
 		err := metric.Write(&out)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to write metric to a buffer")
+			slog.Error("Failed to write metric to a buffer", slog.Any("err", err))
 			continue
 		}
 

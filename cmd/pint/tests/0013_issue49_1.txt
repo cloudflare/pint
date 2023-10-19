@@ -3,5 +3,5 @@ pint.error --no-color --config not_existed_config.hcl lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=not_existed_config.hcl
-level=fatal msg="Fatal error" error="failed to load config file \"not_existed_config.hcl\": <nil>: Configuration file not found; The configuration file not_existed_config.hcl does not exist."
+level=INFO msg="Loading configuration file" path=not_existed_config.hcl
+level=ERROR msg="Fatal error" err="failed to load config file \"not_existed_config.hcl\": <nil>: Configuration file not found; The configuration file not_existed_config.hcl does not exist."

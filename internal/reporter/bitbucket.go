@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -90,7 +89,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 	if err != nil {
 		return fmt.Errorf("failed to get HEAD commit: %w", err)
 	}
-	log.Info().Str("commit", headCommit).Msg("Got HEAD commit from git")
+	slog.Info("Got HEAD commit from git", slog.String("commit", headCommit))
 
 	annotations := []BitBucketAnnotation{}
 	for _, report := range summary.Reports() {
@@ -118,10 +117,11 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 
 func (r BitBucketReporter) makeAnnotation(report Report) (annotations []BitBucketAnnotation) {
 	if !shouldReport(report) {
-		log.Debug().
-			Str("path", report.SourcePath).
-			Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
-			Msg("Problem reported on unmodified line, skipping")
+		slog.Debug(
+			"Problem reported on unmodified line, skipping",
+			slog.String("path", report.SourcePath),
+			slog.String("lines", output.FormatLineRangeString(report.Problem.Lines)),
+		)
 		return annotations
 	}
 
@@ -165,8 +165,8 @@ func (r BitBucketReporter) makeAnnotation(report Report) (annotations []BitBucke
 }
 
 func (r BitBucketReporter) bitBucketRequest(method, url string, body []byte) error {
-	log.Debug().Str("url", url).Str("method", method).Msg("Sending a request to BitBucket")
-	log.Debug().Bytes("body", body).Msg("Request payload")
+	slog.Debug("Sending a request to BitBucket", slog.String("method", method), slog.String("url", url))
+	slog.Debug("Request payload", slog.String("body", string(body)))
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
 	if err != nil {
 		return err
@@ -184,13 +184,13 @@ func (r BitBucketReporter) bitBucketRequest(method, url string, body []byte) err
 	}
 	defer resp.Body.Close()
 
-	log.Debug().Int("status", resp.StatusCode).Msg("BitBucket request completed")
+	slog.Debug("BitBucket request completed", slog.Int("status", resp.StatusCode))
 	if resp.StatusCode >= 300 {
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
-			log.Error().Err(err).Msg("Failed to read response body")
+			slog.Error("Failed to read response body", slog.Any("err", err))
 		}
-		log.Error().Bytes("body", body).Str("url", url).Int("code", resp.StatusCode).Msg("Got a non 2xx response")
+		slog.Error("Got a non 2xx response", slog.String("body", string(body)), slog.String("url", url), slog.Int("code", resp.StatusCode))
 		return fmt.Errorf("%s request failed", method)
 	}
 

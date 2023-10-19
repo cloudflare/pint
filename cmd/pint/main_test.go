@@ -9,6 +9,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math/big"
 	"net"
 	"net/http"
@@ -20,8 +21,6 @@ import (
 	"time"
 
 	"github.com/rogpeppe/go-internal/testscript"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 // mock command that fails tests if error is returned
@@ -29,7 +28,7 @@ func mockMainShouldSucceed() int {
 	app := newApp()
 	err := app.Run(os.Args)
 	if err != nil {
-		log.WithLevel(zerolog.FatalLevel).Err(err).Msg("Fatal error")
+		slog.Error("Fatal error", slog.Any("err", err))
 		return 1
 	}
 	return 0
@@ -40,7 +39,7 @@ func mockMainShouldFail() int {
 	app := newApp()
 	err := app.Run(os.Args)
 	if err != nil {
-		log.WithLevel(zerolog.FatalLevel).Err(err).Msg("Fatal error")
+		slog.Error("Fatal error", slog.Any("err", err))
 		return 0
 	}
 	fmt.Fprintf(os.Stderr, "expected an error but none was returned\n")

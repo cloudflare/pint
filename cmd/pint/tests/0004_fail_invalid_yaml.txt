@@ -3,16 +3,16 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=error msg="Failed to parse file content" error="yaml: line 4: did not find expected key" lines=1-7 path=rules/bad.yaml
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Failed to parse file content" err="yaml: line 4: did not find expected key" path=rules/bad.yaml lines=1-7
 rules/bad.yaml:4 Fatal: did not find expected key (yaml/parse)
  4 | 
 
 rules/ok.yml:5 Fatal: syntax error: unclosed left bracket (promql/syntax)
  5 |     expr: sum(foo[5m)
 
-level=info msg="Problems found" Fatal=2
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Fatal=2
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/ok.yml --
 groups:
 - name: foo

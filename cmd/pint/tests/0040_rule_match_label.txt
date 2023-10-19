@@ -3,23 +3,23 @@ pint.ok --no-color -l debug lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=debug msg="File parsed" path=rules/rules.yml rules=4
-level=debug msg="Found recording rule" lines=1-2 path=rules/rules.yml record=ignore
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
-level=debug msg="Found recording rule" lines=4-7 path=rules/rules.yml record=match
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
-level=debug msg="Found alerting rule" alert=ignore lines=9-10 path=rules/rules.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
-level=debug msg="Found alerting rule" alert=match lines=12-15 path=rules/rules.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="File parsed" path=rules/rules.yml rules=4
+level=DEBUG msg="Found recording rule" path=rules/rules.yml record=ignore lines=1-2
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
+level=DEBUG msg="Found recording rule" path=rules/rules.yml record=match lines=4-7
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
+level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=ignore lines=9-10
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
+level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=match lines=12-15
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
 rules/rules.yml:5 Warning: job label is required and should be preserved when aggregating "^.*$" rules, use by(job, ...) (promql/aggregate)
  5 |   expr: sum(foo)
 
 rules/rules.yml:13 Warning: job label is required and should be preserved when aggregating "^.*$" rules, use by(job, ...) (promql/aggregate)
  13 |   expr: sum(foo) > 0
 
-level=info msg="Problems found" Warning=2
+level=INFO msg="Problems found" Warning=2
 -- rules/rules.yml --
 - record: ignore
   expr: sum(foo)

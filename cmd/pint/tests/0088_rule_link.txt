@@ -10,7 +10,7 @@ pint.ok --no-color lint --min-severity=info rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/1.yml:10 Information: GET request for http://127.0.0.1:7088/404 returned invalid status code: 404 Not Found (rule/link)
  10 |       r404: http://127.0.0.1:7088/404
 
@@ -20,7 +20,7 @@ rules/1.yml:11 Information: GET request for http://127.0.0.1:7088/500 returned i
 rules/1.yml:13 Warning: GET request for http://127.0.0.1:7088/redirect/404 returned invalid status code: 404 Not Found (rule/link)
  13 |       rewrite: https://xxxx.example.com/redirect/404
 
-level=info msg="Problems found" Information=2 Warning=1
+level=INFO msg="Problems found" Warning=1 Information=2
 -- rules/1.yml --
 groups:
 - name: foo

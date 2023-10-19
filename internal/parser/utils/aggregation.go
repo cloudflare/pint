@@ -1,10 +1,11 @@
 package utils
 
 import (
+	"log/slog"
+
 	"github.com/cloudflare/pint/internal/parser"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
-	"github.com/rs/zerolog/log"
 )
 
 func HasOuterAggregation(node *parser.PromQLNode) (aggs []*promParser.AggregateExpr) {
@@ -25,7 +26,7 @@ func HasOuterAggregation(node *parser.PromQLNode) (aggs []*promParser.AggregateE
 			goto NEXT
 		case promParser.QUANTILE:
 		default:
-			log.Warn().Str("op", n.Op.String()).Msg("Unsupported aggregation operation")
+			slog.Warn("Unsupported aggregation operation", slog.String("op", n.Op.String()))
 		}
 		aggs = append(aggs, n)
 		return aggs
@@ -54,7 +55,7 @@ NEXT:
 				return a
 			case promParser.CardManyToMany:
 			default:
-				log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
+				slog.Warn("Unsupported VectorMatching operation", slog.String("matching", n.VectorMatching.Card.String()))
 			}
 		}
 

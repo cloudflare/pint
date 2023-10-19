@@ -3,13 +3,13 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/0001.yml:1-2 Bug: annotation_.* annotation is required (alerts/annotation)
  1 | - alert: Instance Is Down 1
  2 |   expr: up == 0
 
-level=info msg="Problems found" Bug=1
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Bug=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - alert: Instance Is Down 1
   expr: up == 0

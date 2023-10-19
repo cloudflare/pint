@@ -5,11 +5,10 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os/exec"
 	"strconv"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 )
 
 type LineBlame struct {
@@ -25,7 +24,7 @@ type FileBlames map[string]LineBlames
 type CommandRunner func(args ...string) ([]byte, error)
 
 func RunGit(args ...string) (content []byte, err error) {
-	log.Debug().Strs("args", args).Msg("Running git command")
+	slog.Debug("Running git command", slog.Any("args", args))
 	cmd := exec.Command("git", args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -40,7 +39,7 @@ func RunGit(args ...string) (content []byte, err error) {
 }
 
 func Blame(cmd CommandRunner, path string) (lines LineBlames, err error) {
-	log.Debug().Str("path", path).Msg("Running git blame")
+	slog.Debug("Running git blame", slog.String("path", path))
 	output, err := cmd("blame", "--line-porcelain", "--", path)
 	if err != nil {
 		return nil, err
@@ -122,7 +121,7 @@ func CommitRange(cmd CommandRunner, baseBranch string) (CommitRangeResults, erro
 				cr.From = line
 			}
 			cr.To = line
-			log.Debug().Str("commit", line).Msg("Found commit to scan")
+			slog.Debug("Found commit to scan", slog.String("commit", line))
 		}
 	}
 

@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prymitive/current"
-	"github.com/rs/zerolog/log"
 )
 
 type MetadataResult struct {
@@ -27,10 +27,11 @@ type metadataQuery struct {
 }
 
 func (q metadataQuery) Run() queryResult {
-	log.Debug().
-		Str("uri", q.prom.safeURI).
-		Str("metric", q.metric).
-		Msg("Getting prometheus metrics metadata")
+	slog.Debug(
+		"Getting prometheus metrics metadata",
+		slog.String("uri", q.prom.safeURI),
+		slog.String("metric", q.metric),
+	)
 
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
@@ -73,7 +74,7 @@ func (q metadataQuery) CacheTTL() time.Duration {
 }
 
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
-	log.Debug().Str("uri", p.safeURI).Str("metric", metric).Msg("Scheduling Prometheus metrics metadata query")
+	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", p.safeURI), slog.String("metric", metric))
 
 	key := fmt.Sprintf("/api/v1/metadata/%s", metric)
 	p.locker.lock(key)

@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prymitive/current"
-	"github.com/rs/zerolog/log"
 )
 
 type FlagsResult struct {
@@ -26,9 +26,7 @@ type flagsQuery struct {
 }
 
 func (q flagsQuery) Run() queryResult {
-	log.Debug().
-		Str("uri", q.prom.safeURI).
-		Msg("Getting prometheus flags")
+	slog.Debug("Getting prometheus flags", slog.String("uri", q.prom.safeURI))
 
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
@@ -70,7 +68,7 @@ func (q flagsQuery) CacheTTL() time.Duration {
 }
 
 func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
-	log.Debug().Str("uri", p.safeURI).Msg("Scheduling Prometheus flags query")
+	slog.Debug("Scheduling Prometheus flags query", slog.String("uri", p.safeURI))
 
 	key := "/api/v1/status/flags"
 	p.locker.lock(key)

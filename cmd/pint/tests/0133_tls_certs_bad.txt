@@ -3,8 +3,8 @@ pint.error -l debug --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": invalid prometheus TLS configuration: open prom-ca.pem: no such file or directory"
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": invalid prometheus TLS configuration: open prom-ca.pem: no such file or directory"
 -- rules/1.yml --
 groups:
 - name: foo

@@ -16,8 +16,8 @@ pint.ok --no-color ci
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=info msg="Running from base branch, skipping checks" branch=main
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Running from base branch, skipping checks" branch=main
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

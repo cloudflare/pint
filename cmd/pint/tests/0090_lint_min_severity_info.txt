@@ -8,7 +8,7 @@ rules/0001.yml:5-7 Information: using the value of rate(errors[2m]) inside this 
  .
  7 |       summary: 'error rate: {{ $value }}'
 
-level=info msg="Problems found" Information=1
+level=INFO msg="Problems found" Information=1
 -- rules/0001.yml --
 groups:
 - name: foo

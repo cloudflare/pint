@@ -3,19 +3,19 @@ pint.ok --no-color -l debug lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=debug msg="File parsed" path=rules/0001.yml rules=2
-level=debug msg="Found recording rule" lines=1-2 path=rules/0001.yml record=colo:recording
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=colo:recording
-level=debug msg="Found alerting rule" alert=colo:alerting lines=4-5 path=rules/0001.yml
-level=debug msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=colo:alerting
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="File parsed" path=rules/0001.yml rules=2
+level=DEBUG msg="Found recording rule" path=rules/0001.yml record=colo:recording lines=1-2
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=colo:recording
+level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=colo:alerting lines=4-5
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=colo:alerting
 rules/0001.yml:5 Warning: alert query doesn't have any condition, it will always fire if the metric exists (alerts/comparison)
  5 |   expr: sum(bar) without(job)
 
 rules/0001.yml:5 Warning: job label is required and should be preserved when aggregating "^.+$" rules, remove job from without() (promql/aggregate)
  5 |   expr: sum(bar) without(job)
 
-level=info msg="Problems found" Warning=2
+level=INFO msg="Problems found" Warning=2
 -- rules/0001.yml --
 - record: "colo:recording"
   expr: sum(foo) without(job)

@@ -4,4 +4,4 @@ pint.error  --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" error="no matching files"
+level=ERROR msg="Fatal error" err="no matching files"

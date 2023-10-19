@@ -3,4 +3,4 @@ pint.error --no-color parse
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" error="a query string is required"
+level=ERROR msg="Fatal error" err="a query string is required"

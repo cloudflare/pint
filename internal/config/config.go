@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"os"
 	"regexp"
 	"strings"
@@ -21,7 +22,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
 	"github.com/prometheus/common/model"
-	"github.com/rs/zerolog/log"
 )
 
 type Config struct {
@@ -196,7 +196,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 	} else if r.RecordingRule != nil {
 		name = r.RecordingRule.Record.Value.Value
 	}
-	log.Debug().Strs("enabled", el).Str("path", path).Str("rule", name).Msg("Configured checks for rule")
+	slog.Debug("Configured checks for rule", slog.Any("enabled", el), slog.String("path", path), slog.String("rule", name))
 
 	return enabled
 }
@@ -229,7 +229,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 	}
 
 	if _, err = os.Stat(path); err == nil || failOnMissing {
-		log.Info().Str("path", path).Msg("Loading configuration file")
+		slog.Info("Loading configuration file", slog.String("path", path))
 		ectx := getContext()
 		err = hclsimple.DecodeFile(path, ectx, &cfg)
 		if err != nil {

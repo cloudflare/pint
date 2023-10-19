@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"regexp"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/reporter"
 
-	"github.com/rs/zerolog/log"
 	"github.com/urfave/cli/v2"
 )
 
@@ -87,25 +87,24 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	bySeverity := map[string]interface{}{} // interface{} is needed for log.Fields()
+	bySeverity := summary.CountBySeverity()
 	var problems, hiddenProblems, failProblems int
-	for s, c := range summary.CountBySeverity() {
+	for s, c := range bySeverity {
 		if s >= failOn {
 			failProblems++
 		}
 		if s < minSeverity {
 			hiddenProblems++
 		}
-		bySeverity[s.String()] = c
 		if s >= checks.Bug {
 			problems += c
 		}
 	}
 	if len(bySeverity) > 0 {
-		log.Info().Fields(bySeverity).Msg("Problems found")
+		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
 	}
 	if hiddenProblems > 0 {
-		log.Info().Msgf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag))
+		slog.Info(fmt.Sprintf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag)))
 	}
 
 	if failProblems > 0 {

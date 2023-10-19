@@ -5,8 +5,8 @@ http start prometheus 127.0.0.1:7055
 
 pint.error --no-color lint rules
 ! stdout .
-stderr 'level=error msg="Query returned an error" error="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" query=count\(foo\) uri=http://127.0.0.1:1055'
-stderr 'level=error msg="Query returned an error" error="failed to query Prometheus config: Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" query=/api/v1/status/config uri=http://127.0.0.1:1055'
+stderr 'level=ERROR msg="Query returned an error" err="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055 query=count\(foo\)'
+stderr 'level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055 query=/api/v1/status/config'
 ! stderr 'query="count\(foo offset '
 stderr 'rules/1.yml:2 Bug: prometheus "prom" at http://127.0.0.1:7055 didn''t have any series for "foo" metric in the last 1w \(promql/series\)'
 

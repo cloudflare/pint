@@ -30,12 +30,12 @@ env GITHUB_REPOSITORY=foo/bar
 env GITHUB_API_URL=http://127.0.0.1:6083
 pint.ok -l debug --offline --no-color ci
 ! stdout .
-stderr 'level=info msg="Pull request review created" status="200 OK"'
-stderr 'level=info msg="Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable" pr=123'
-stderr 'level=info msg="Setting repository owner from GITHUB_REPOSITORY env variable" owner=foo'
-stderr 'level=info msg="Setting repository name from GITHUB_REPOSITORY env variable" repo=bar'
-stderr 'level=info msg="Setting repository base URI from GITHUB_API_URL env variable" baseuri=http://127.0.0.1:6083'
-stderr 'level=info msg="Setting repository upload URI from GITHUB_API_URL env variable" uploaduri=http://127.0.0.1:6083'
+stderr 'level=INFO msg="Pull request review created" status="200 OK"'
+stderr 'level=INFO msg="Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable" pr=123'
+stderr 'level=INFO msg="Setting repository owner from GITHUB_REPOSITORY env variable" owner=foo'
+stderr 'level=INFO msg="Setting repository name from GITHUB_REPOSITORY env variable" repo=bar'
+stderr 'level=INFO msg="Setting repository base URI from GITHUB_API_URL env variable" baseuri=http://127.0.0.1:6083'
+stderr 'level=INFO msg="Setting repository upload URI from GITHUB_API_URL env variable" uploaduri=http://127.0.0.1:6083'
 
 -- src/v1.yml --
 groups:

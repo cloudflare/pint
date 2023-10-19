@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -15,12 +16,11 @@ import (
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/log"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -104,7 +104,7 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
-	zerolog.SetGlobalLevel(zerolog.FatalLevel)
+	log.Level.Set(slog.LevelError)
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
@@ -547,13 +547,14 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 		})
 		from = from.Add(step)
 	}
-	log.Debug().
-		Stringer("labels", metric).
-		Str("from", from.UTC().Format(time.RFC3339Nano)).
-		Str("until", until.UTC().Format(time.RFC3339Nano)).
-		Str("step", output.HumanizeDuration(step)).
-		Int("samples", len(s.Values)).
-		Msg("Generating sample stream for tests")
+	slog.Debug(
+		"Generating sample stream for tests",
+		slog.String("labels", metric.String()),
+		slog.String("from", from.UTC().Format(time.RFC3339Nano)),
+		slog.String("until", until.UTC().Format(time.RFC3339Nano)),
+		slog.String("step", output.HumanizeDuration(step)),
+		slog.Int("samples", len(s.Values)),
+	)
 	return s
 }
 

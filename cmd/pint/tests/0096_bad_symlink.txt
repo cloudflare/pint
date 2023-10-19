@@ -6,4 +6,4 @@ pint.error -l debug --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" error="lstat rules/../bad.yml: no such file or directory"
+level=ERROR msg="Fatal error" err="lstat rules/../bad.yml: no such file or directory"

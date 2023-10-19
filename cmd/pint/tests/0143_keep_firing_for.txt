@@ -3,7 +3,7 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/0001.yml:6 Bug: this alert rule must have a 'keep_firing_for' field with a minimum duration of 5m (rule/for)
  6 |   keep_firing_for: 3m
 
@@ -13,8 +13,8 @@ rules/0001.yml:9 Bug: this alert rule must have a 'keep_firing_for' field with a
 rules/0001.yml:10 Bug: this alert rule must have a 'keep_firing_for' field with a minimum duration of 5m (rule/for)
  10 | - alert: none
 
-level=info msg="Problems found" Bug=3
-level=fatal msg="Fatal error" error="found 1 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Bug=3
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - alert: ok
   expr: up == 0

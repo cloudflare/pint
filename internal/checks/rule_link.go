@@ -4,14 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"regexp"
 	"time"
 
 	"golang.org/x/exp/slices"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -78,14 +77,14 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 		}
 
 		uri = u.String()
-		log.Debug().Str("link", uri).Msg("Found link to check")
+		slog.Debug("Found link to check", slog.String("link", uri))
 		if c.uriRewrite != "" {
 			var result []byte
 			for _, submatches := range re.FindAllStringSubmatchIndex(uri, -1) {
 				result = re.ExpandString(result, c.uriRewrite, uri, submatches)
 			}
 			uri = string(result)
-			log.Debug().Stringer("link", u).Str("uri", uri).Msg("Link URI rewritten by rule")
+			slog.Debug("Link URI rewritten by rule", slog.String("link", u.String()), slog.String("uri", uri))
 		}
 
 		rctx, cancel := context.WithTimeout(ctx, c.timeout)
@@ -106,7 +105,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				Text:     fmt.Sprintf("GET request for %s returned an error: %s", uri, err),
 				Severity: c.severity,
 			})
-			log.Debug().Str("uri", uri).Err(err).Msg("Link request returned an error")
+			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
 			continue
 		}
 		_, _ = io.Copy(io.Discard, resp.Body)
@@ -120,10 +119,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				Text:     fmt.Sprintf("GET request for %s returned invalid status code: %s", uri, resp.Status),
 				Severity: c.severity,
 			})
-			log.Debug().Str("uri", uri).Str("status", resp.Status).Msg("Link request returned invalid status code")
+			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))
 			continue
 		}
-		log.Debug().Str("uri", uri).Str("status", resp.Status).Msg("Link request returned a valid status code")
+		slog.Debug("Link request returned a valid status code", slog.String("uri", uri), slog.String("status", resp.Status))
 	}
 
 	return problems

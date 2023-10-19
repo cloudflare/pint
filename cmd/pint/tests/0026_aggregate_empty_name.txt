@@ -3,8 +3,8 @@ pint.error --no-color config
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=fatal msg="Fatal error" error="failed to load config file \".pint.hcl\": empty name regex"
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": empty name regex"
 -- .pint.hcl --
 rule {
   match {

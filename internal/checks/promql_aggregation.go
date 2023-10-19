@@ -3,8 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
-
-	"github.com/rs/zerolog/log"
+	"log/slog"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -97,7 +96,7 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 			goto NEXT
 		case promParser.QUANTILE:
 		default:
-			log.Warn().Str("op", n.Op.String()).Msg("Unsupported aggregation operation")
+			slog.Warn("Unsupported aggregation operation", slog.String("op", n.Op.String()))
 		}
 
 		if !n.Without && !c.keep && len(n.Grouping) == 0 {
@@ -169,7 +168,7 @@ NEXT:
 			problems = append(problems, c.checkNode(node.Children[1])...)
 			return problems
 		default:
-			log.Warn().Str("matching", n.VectorMatching.Card.String()).Msg("Unsupported VectorMatching operation")
+			slog.Warn("Unsupported VectorMatching operation", slog.String("matching", n.VectorMatching.Card.String()))
 		}
 	}
 

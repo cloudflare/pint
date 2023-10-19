@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"math"
 	"net/http"
 	"net/url"
@@ -17,7 +18,6 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
 	"github.com/prymitive/current"
-	"github.com/rs/zerolog/log"
 
 	"github.com/cloudflare/pint/internal/output"
 )
@@ -107,14 +107,14 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		slices = sliceRange(start, end, step, queryStep)
 	}
 
-	log.Debug().
-		Str("uri", p.safeURI).
-		Str("query", expr).
-		Str("lookback", output.HumanizeDuration(lookback)).
-		Str("step", output.HumanizeDuration(step)).
-		Str("slice", output.HumanizeDuration(queryStep)).
-		Int("slices", len(slices)).
-		Msg("Scheduling prometheus range query")
+	slog.Debug("Scheduling prometheus range query",
+		slog.String("uri", p.safeURI),
+		slog.String("query", expr),
+		slog.String("lookback", output.HumanizeDuration(lookback)),
+		slog.String("step", output.HumanizeDuration(step)),
+		slog.String("slice", output.HumanizeDuration(queryStep)),
+		slog.Int("slices", len(slices)),
+	)
 
 	key := fmt.Sprintf("/api/v1/query_range/%s/%s", expr, params.String())
 	p.locker.lock(key)
@@ -199,7 +199,12 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 
 	sort.Stable(merged.Series.Ranges)
 
-	log.Debug().Str("uri", p.safeURI).Str("query", expr).Int("samples", len(merged.Series.Ranges)).Msg("Parsed range response")
+	slog.Debug(
+		"Parsed range response",
+		slog.String("uri", p.safeURI),
+		slog.String("query", expr),
+		slog.Int("samples", len(merged.Series.Ranges)),
+	)
 
 	return &merged, nil
 }

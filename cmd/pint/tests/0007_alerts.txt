@@ -3,7 +3,7 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/0001.yml:1-2 Bug: url annotation is required (alerts/annotation)
  1 | - alert: Always
  2 |   expr: up
@@ -47,8 +47,8 @@ rules/0002.yml:11 Bug: using $value in labels will generate a new alert on every
 rules/0002.yml:12 Bug: using .Value in labels will generate a new alert on every value change, move it to annotations (alerts/template)
  12 |     val: '{{ .Value|humanizeDuration }}'
 
-level=info msg="Problems found" Bug=5 Fatal=4 Warning=4
-level=fatal msg="Fatal error" error="found 2 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Fatal=4 Bug=5 Warning=4
+level=ERROR msg="Fatal error" err="found 2 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - alert: Always
   expr: up

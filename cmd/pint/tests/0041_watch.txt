@@ -3,17 +3,17 @@ exec bash -x ./test.sh &
 pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6041 --pidfile=pint.pid rules
 ! stdout .
 
-stderr 'level=info msg="Pidfile created" path=pint.pid'
-stderr 'level=info msg="Started HTTP server" address=127.0.0.1:6041'
-stderr 'level=info msg="Will continuously run checks until terminated" interval=5s'
-stderr 'level=debug msg="Running checks"'
-stderr 'level=error msg="Got an error when running checks" error="no matching files"'
-stderr 'level=debug msg="Running checks"'
-stderr 'level=error msg="Got an error when running checks" error="no matching files"'
-stderr 'level=info msg="Shutting down"'
-stderr 'level=info msg="Waiting for all background tasks to finish"'
-stderr 'level=info msg="Background worker finished"'
-stderr 'level=info msg="Pidfile removed" path=pint.pid'
+stderr 'level=INFO msg="Pidfile created" path=pint.pid'
+stderr 'level=INFO msg="Started HTTP server" address=127.0.0.1:6041'
+stderr 'level=INFO msg="Will continuously run checks until terminated" interval=5s'
+stderr 'level=DEBUG msg="Running checks"'
+stderr 'level=ERROR msg="Got an error when running checks" err="no matching files"'
+stderr 'level=DEBUG msg="Running checks"'
+stderr 'level=ERROR msg="Got an error when running checks" err="no matching files"'
+stderr 'level=INFO msg="Shutting down"'
+stderr 'level=INFO msg="Waiting for all background tasks to finish"'
+stderr 'level=INFO msg="Background worker finished"'
+stderr 'level=INFO msg="Pidfile removed" path=pint.pid'
 
 grep '^pint_check_iterations_total 2$' curl.txt
 

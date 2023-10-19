@@ -3,7 +3,7 @@ pint.error --no-color lint --min-severity=xxx rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=fatal msg="Fatal error" error="invalid --min-severity value: unknown severity: xxx"
+level=ERROR msg="Fatal error" err="invalid --min-severity value: unknown severity: xxx"
 -- rules/0001.yml --
 groups:
 - name: foo

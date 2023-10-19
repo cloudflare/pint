@@ -4,37 +4,21 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"github.com/cloudflare/pint/internal/log"
 )
 
-func msgFormatter(msg interface{}) string {
-	return fmt.Sprintf("msg=%q", msg)
-}
-
-func lvlFormatter(level interface{}) string {
-	if level == nil {
-		return ""
-	}
-	return fmt.Sprintf("level=%s", level)
-}
-
 func initLogger(level string, noColor bool) error {
-	log.Logger = log.Logger.Output(zerolog.ConsoleWriter{
-		Out:           os.Stderr,
-		NoColor:       noColor,
-		FormatLevel:   lvlFormatter,
-		FormatMessage: msgFormatter,
-		FormatTimestamp: func(interface{}) string {
-			return ""
-		},
-	})
-
-	l, err := zerolog.ParseLevel(level)
+	l, err := log.ParseLevel(level)
 	if err != nil {
 		return fmt.Errorf("'%s' is not a valid log level", level)
 	}
-	zerolog.SetGlobalLevel(l)
+
+	nc := os.Getenv("NO_COLOR")
+	if nc != "" && nc != "0" {
+		noColor = true
+	}
+
+	log.Setup(l, noColor)
 
 	return nil
 }

@@ -3,11 +3,11 @@ package checks
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -144,7 +144,11 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 					}
 				}
 				if arEntry != nil {
-					log.Debug().Stringer("selector", &selector).Str("path", arEntry.SourcePath).Msg("Metric is provided by alerting rule")
+					slog.Debug(
+						"Metric is provided by alerting rule",
+						slog.String("selector", (&selector).String()),
+						slog.String("path", arEntry.SourcePath),
+					)
 				} else {
 					problems = append(problems, Problem{
 						Fragment: selector.String(),
@@ -174,32 +178,34 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 		}
 
 		// 1. If foo{bar, baz} is there -> GOOD
-		log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Msg("Checking if selector returns anything")
+		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()))
 		count, _, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, selector.String(), expr))
 			continue
 		}
 		if count > 0 {
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Msg("Found series, skipping further checks")
+			slog.Debug("Found series, skipping further checks", slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()))
 			continue
 		}
 
 		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), params)
 		if err != nil {
-			log.Warn().Err(err).Str("name", c.prom.Name()).Msg("Cannot detect Prometheus uptime gaps")
+			slog.Warn("Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		}
 		if promUptime != nil && promUptime.Series.Ranges.Len() == 0 {
-			log.Warn().
-				Str("name", c.prom.Name()).
-				Str("metric", c.prom.UptimeMetric()).
-				Msg("No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config")
+			slog.Warn(
+				"No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config",
+				slog.String("name", c.prom.Name()),
+				slog.String("metric", c.prom.UptimeMetric()),
+			)
 		}
 		if promUptime == nil || promUptime.Series.Ranges.Len() == 0 {
-			log.Warn().
-				Str("name", c.prom.Name()).
-				Str("metric", c.prom.UptimeMetric()).
-				Msg("Using dummy Prometheus uptime metric results with no gaps")
+			slog.Warn(
+				"Using dummy Prometheus uptime metric results with no gaps",
+				slog.String("name", c.prom.Name()),
+				slog.String("metric", c.prom.UptimeMetric()),
+			)
 			promUptime = &promapi.RangeQueryResult{
 				Series: promapi.SeriesTimeRanges{
 					From:  params.Start(),
@@ -220,7 +226,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 		bareSelector := stripLabels(selector)
 
 		// 2. If foo was NEVER there -> BUG
-		log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Checking if base metric has historical series")
+		slog.Debug("Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
@@ -241,7 +247,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			}
 			if rrEntry != nil {
 				// Validate recording rule instead
-				log.Debug().Stringer("selector", &bareSelector).Str("path", rrEntry.SourcePath).Msg("Metric is provided by recording rule")
+				slog.Debug("Metric is provided by recording rule", slog.String("selector", (&bareSelector).String()), slog.String("path", rrEntry.SourcePath))
 				problems = append(problems, Problem{
 					Fragment: bareSelector.String(),
 					Lines:    expr.Lines(),
@@ -267,7 +273,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				Text:     text,
 				Severity: severity,
 			})
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("No historical series for base metric")
+			slog.Debug("No historical series for base metric", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 			continue
 		}
 
@@ -275,7 +281,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 		for _, name := range labelNames {
 			l := stripLabels(selector)
 			l.LabelMatchers = append(l.LabelMatchers, labels.MustNewMatcher(labels.MatchRegexp, name, ".+"))
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("Checking if base metric has historical series with required label")
+			slog.Debug("Checking if base metric has historical series with required label", slog.String("check", c.Reporter()), slog.String("selector", (&l).String()), slog.String("label", name))
 			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), params)
 			if err != nil {
 				problems = append(problems, c.queryProblem(err, selector.String(), expr))
@@ -305,7 +311,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 						promText(c.prom.Name(), trsLabelCount.URI), bareSelector.String(), name, sinceDesc(trsLabelCount.Series.From)),
 					Severity: Bug,
 				})
-				log.Debug().Str("check", c.Reporter()).Stringer("selector", &l).Str("label", name).Msg("No historical series with label used for the query")
+				slog.Debug("No historical series with label used for the query", slog.String("check", c.Reporter()), slog.String("selector", (&l).String()), slog.String("label", name))
 			}
 		}
 		if len(problems) > 0 {
@@ -323,12 +329,13 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			}
 
 			if !newest(trs.Series.Ranges).Before(trs.Series.Until.Add(minAge * -1)) {
-				log.Debug().
-					Str("check", c.Reporter()).
-					Stringer("selector", &selector).
-					Str("min-age", output.HumanizeDuration(minAge)).
-					Str("last-seen", sinceDesc(newest(trs.Series.Ranges))).
-					Msg("Series disappeared from prometheus but for less then configured min-age")
+				slog.Debug(
+					"Series disappeared from prometheus but for less then configured min-age",
+					slog.String("check", c.Reporter()),
+					slog.String("selector", (&selector).String()),
+					slog.String("min-age", output.HumanizeDuration(minAge)),
+					slog.String("last-seen", sinceDesc(newest(trs.Series.Ranges))),
+				)
 				continue
 			}
 
@@ -347,7 +354,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				Text:     text,
 				Severity: severity,
 			})
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Series disappeared from prometheus")
+			slog.Debug("Series disappeared from prometheus", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 			continue
 		}
 
@@ -359,7 +366,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				continue
 			}
 			if c.isLabelValueIgnored(rule, selector, lm.Name) {
-				log.Debug().Stringer("selector", &selector).Str("label", lm.Name).Msg("Label check disabled by comment")
+				slog.Debug("Label check disabled by comment", slog.String("selector", (&selector).String()), slog.String("label", lm.Name))
 				continue
 			}
 			labelSelector := promParser.VectorSelector{
@@ -367,7 +374,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				LabelMatchers: []*labels.Matcher{lm},
 			}
 			addNameSelectorIfNeeded(&labelSelector, selector.LabelMatchers)
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &labelSelector).Stringer("matcher", lm).Msg("Checking if there are historical series matching filter")
+			slog.Debug("Checking if there are historical series matching filter", slog.String("check", c.Reporter()), slog.String("selector", (&labelSelector).String()), slog.String("matcher", lm.String()))
 
 			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
 			if err != nil {
@@ -393,7 +400,8 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 					Text:     text,
 					Severity: severity,
 				})
-				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("No historical series matching filter used in the query")
+				slog.Debug("No historical series matching filter used in the query",
+					slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()), slog.String("matcher", lm.String()))
 				continue
 			}
 
@@ -428,12 +436,13 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 				}
 
 				if !newest(trsLabel.Series.Ranges).Before(trsLabel.Series.Until.Add(minAge * -1)) {
-					log.Debug().
-						Str("check", c.Reporter()).
-						Stringer("selector", &selector).
-						Str("min-age", output.HumanizeDuration(minAge)).
-						Str("last-seen", sinceDesc(newest(trsLabel.Series.Ranges))).
-						Msg("Series disappeared from prometheus but for less then configured min-age")
+					slog.Debug(
+						"Series disappeared from prometheus but for less then configured min-age",
+						slog.String("check", c.Reporter()),
+						slog.String("selector", (&selector).String()),
+						slog.String("min-age", output.HumanizeDuration(minAge)),
+						slog.String("last-seen", sinceDesc(newest(trsLabel.Series.Ranges))),
+					)
 					continue
 				}
 
@@ -452,7 +461,12 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 					Text:     text,
 					Severity: severity,
 				})
-				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("Series matching filter disappeared from prometheus ")
+				slog.Debug(
+					"Series matching filter disappeared from prometheus",
+					slog.String("check", c.Reporter()),
+					slog.String("selector", (&selector).String()),
+					slog.String("matcher", lm.String()),
+				)
 				continue
 			}
 
@@ -468,7 +482,12 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 						output.HumanizeDuration(avgLife(trsLabel.Series.Ranges))),
 					Severity: Warning,
 				})
-				log.Debug().Str("check", c.Reporter()).Stringer("selector", &selector).Stringer("matcher", lm).Msg("Series matching filter are only sometimes present")
+				slog.Debug(
+					"Series matching filter are only sometimes present",
+					slog.String("check", c.Reporter()),
+					slog.String("selector", (&selector).String()),
+					slog.String("matcher", lm.String()),
+				)
 			}
 		}
 		if len(problems) > 0 {
@@ -486,7 +505,11 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 					bareSelector.String(), promText(c.prom.Name(), trs.URI), output.HumanizeDuration(avgLife(trs.Series.Ranges)), sinceDesc(trs.Series.From)),
 				Severity: Warning,
 			})
-			log.Debug().Str("check", c.Reporter()).Stringer("selector", &bareSelector).Msg("Metric only sometimes present")
+			slog.Debug(
+				"Metric only sometimes present",
+				slog.String("check", c.Reporter()),
+				slog.String("selector", (&bareSelector).String()),
+			)
 		}
 	}
 
@@ -563,7 +586,11 @@ func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.V
 func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text string, s Severity) (string, Severity) {
 	for _, re := range settings.ignoreMetricsRe {
 		if name != "" && re.MatchString(name) {
-			log.Debug().Str("check", c.Reporter()).Str("metric", name).Stringer("regexp", re).Msg("Metric matches check ignore rules")
+			slog.Debug(
+				"Metric matches check ignore rules",
+				slog.String("check", c.Reporter()),
+				slog.String("metric", name),
+				slog.String("regexp", re.String()))
 			return fmt.Sprintf("%s. Metric name %q matches %q check ignore regexp %q", text, name, c.Reporter(), re), Warning
 		}
 	}

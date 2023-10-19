@@ -16,5 +16,5 @@ rules/0001.yml:5 Warning: alert query doesn't have any condition, it will always
 rules/0001.yml:5 Bug: unnecessary regexp match on static string job=~"xxx", use job="xxx" instead (promql/regexp)
  5 |       expr: up{job=~"xxx"}
 
-level=info msg="Problems found" Bug=1 Warning=1
-level=fatal msg="Fatal error" error="found 2 problem(s) with severity Warning or higher"
+level=INFO msg="Problems found" Bug=1 Warning=1
+level=ERROR msg="Fatal error" err="found 2 problem(s) with severity Warning or higher"

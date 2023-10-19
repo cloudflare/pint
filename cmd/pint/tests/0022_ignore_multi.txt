@@ -3,14 +3,14 @@ pint.ok --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Loading configuration file" path=.pint.hcl
 rules/1.yaml:2 Warning: dropped label should be removed when aggregating "^.+$" rules, remove dropped from by() (promql/aggregate)
  2 |   expr: sum(errors_total) by(keep,dropped)
 
 rules/1.yaml:5 Warning: keep label is required and should be preserved when aggregating "^.+$" rules, remove keep from without() (promql/aggregate)
  5 |   expr: sum(errors_total) without(keep,dropped)
 
-level=info msg="Problems found" Warning=2
+level=INFO msg="Problems found" Warning=2
 -- rules/1.yaml --
 - record: disabled
   expr: sum(errors_total) by(keep,dropped)

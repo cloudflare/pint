@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log/slog"
 	"regexp"
 	"strings"
 
@@ -12,8 +13,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
-
-	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -119,12 +118,13 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 		if !slices.Contains(disabledChecks, s.Text) {
 			disabledChecks = append(disabledChecks, s.Text)
 		}
-		log.Debug().
-			Str("check", s.Text).
-			Str("comment", comment.String()).
-			Time("until", s.Until).
-			Str("snooze", s.Text).
-			Msg("Check snoozed by comment")
+		slog.Debug(
+			"Check snoozed by comment",
+			slog.String("check", s.Text),
+			slog.String("comment", comment.String()),
+			slog.Time("until", s.Until),
+			slog.String("snooze", s.Text),
+		)
 	}
 
 	if content.Ignored {
@@ -165,11 +165,12 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 
 	rules, err := p.Parse(content.Body)
 	if err != nil {
-		log.Error().
-			Err(err).
-			Str("path", sourcePath).
-			Str("lines", output.FormatLineRangeString(contentLines)).
-			Msg("Failed to parse file content")
+		slog.Error(
+			"Failed to parse file content",
+			slog.Any("err", err),
+			slog.String("path", sourcePath),
+			slog.String("lines", output.FormatLineRangeString(contentLines)),
+		)
 		entries = append(entries, Entry{
 			ReportedPath:  reportedPath,
 			SourcePath:    sourcePath,
@@ -195,7 +196,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 		})
 	}
 
-	log.Debug().Str("path", sourcePath).Int("rules", len(entries)).Msg("File parsed")
+	slog.Debug("File parsed", slog.String("path", sourcePath), slog.Int("rules", len(entries)))
 	return entries, nil
 }
 

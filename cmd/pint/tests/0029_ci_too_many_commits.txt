@@ -27,8 +27,8 @@ pint.error --no-color ci
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
-level=info msg="Loading configuration file" path=.pint.hcl
-level=fatal msg="Fatal error" error="number of commits to check (3) is higher than maxCommits (2), exiting"
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Fatal error" err="number of commits to check (3) is higher than maxCommits (2), exiting"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

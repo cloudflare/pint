@@ -3,13 +3,13 @@ package reporter
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -56,10 +56,11 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 		}
 
 		if !shouldReport(report) {
-			log.Debug().
-				Str("path", report.SourcePath).
-				Str("lines", output.FormatLineRangeString(report.Problem.Lines)).
-				Msg("Problem reported on unmodified line, skipping")
+			slog.Debug(
+				"Problem reported on unmodified line, skipping",
+				slog.String("path", report.SourcePath),
+				slog.String("lines", output.FormatLineRangeString(report.Problem.Lines)),
+			)
 			continue
 		}
 
@@ -95,7 +96,10 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 		lines := strings.Split(content, "\n")
 		if lastLine > len(lines)-1 {
 			lastLine = len(lines) - 1
-			log.Warn().Str("path", report.SourcePath).Msgf("Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details")
+			slog.Warn(
+				"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
+				slog.String("path", report.SourcePath),
+			)
 		}
 
 		nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
