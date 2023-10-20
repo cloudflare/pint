@@ -1,14 +1,22 @@
 package config
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"fmt"
 	"go/parser"
+	"log/slog"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
+	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
 type TLSConfig struct {
@@ -17,6 +25,57 @@ type TLSConfig struct {
 	ClientCert         string `hcl:"clientCert,optional" json:"clientCert,omitempty"`
 	ClientKey          string `hcl:"clientKey,optional" json:"clientKey,omitempty"`
 	InsecureSkipVerify bool   `hcl:"skipVerify,optional" json:"skipVerify,omitempty"`
+}
+
+func (t TLSConfig) validate() error {
+	if (t.ClientCert != "") != (t.ClientKey != "") {
+		return fmt.Errorf("clientCert and clientKey must be set together")
+	}
+	return nil
+}
+
+func (t *TLSConfig) toHTTPConfig() (*tls.Config, error) {
+	if t == nil {
+		return nil, nil
+	}
+
+	var isDirty bool
+	cfg := &tls.Config{}
+
+	if t.ServerName != "" {
+		cfg.ServerName = t.ServerName
+		isDirty = true
+	}
+
+	if t.CaCert != "" {
+		caCert, err := os.ReadFile(t.CaCert)
+		if err != nil {
+			return nil, err
+		}
+		cfg.RootCAs = x509.NewCertPool()
+		cfg.RootCAs.AppendCertsFromPEM(caCert)
+		isDirty = true
+	}
+
+	if t.ClientCert != "" && t.ClientKey != "" {
+		cert, err := tls.LoadX509KeyPair(t.ClientCert, t.ClientKey)
+		if err != nil {
+			return nil, err
+		}
+		cfg.Certificates = []tls.Certificate{cert}
+		isDirty = true
+	}
+
+	if t.InsecureSkipVerify {
+		cfg.InsecureSkipVerify = true
+		isDirty = true
+	}
+
+	if isDirty {
+		return cfg, nil
+	}
+
+	return nil, nil
 }
 
 type PrometheusConfig struct {
@@ -38,6 +97,9 @@ type PrometheusConfig struct {
 func (pc PrometheusConfig) validate() error {
 	if pc.URI == "" {
 		return errors.New("prometheus URI cannot be empty")
+	}
+	if _, err := url.Parse(pc.URI); err != nil {
+		return fmt.Errorf("prometheus URI %q is invalid: %w", pc.URI, err)
 	}
 
 	if pc.Timeout != "" {
@@ -73,73 +135,127 @@ func (pc PrometheusConfig) validate() error {
 	}
 
 	if pc.TLS != nil {
-		if (pc.TLS.ClientCert != "") != (pc.TLS.ClientKey != "") {
-			return fmt.Errorf("clientCert and clientKey must be set together")
+		if err := pc.TLS.validate(); err != nil {
+			return err
 		}
 	}
 
 	return nil
 }
 
-func (pc PrometheusConfig) isEnabledForPath(path string) bool {
-	if len(pc.Include) == 0 && len(pc.Exclude) == 0 {
-		return true
+func (pc *PrometheusConfig) applyDefaults() {
+	if pc.Timeout == "" {
+		pc.Timeout = (time.Minute * 2).String()
 	}
-	for _, pattern := range pc.Exclude {
-		re := strictRegex(pattern)
-		if re.MatchString(path) {
-			return false
-		}
+
+	if pc.Concurrency <= 0 {
+		pc.Concurrency = 16
 	}
-	for _, pattern := range pc.Include {
-		re := strictRegex(pattern)
-		if re.MatchString(path) {
-			return true
-		}
+
+	if pc.RateLimit <= 0 {
+		pc.RateLimit = 100
 	}
-	return false
+
+	if pc.Uptime == "" {
+		pc.Uptime = "up"
+	}
 }
 
-func (pc PrometheusConfig) getTLSConfig() (*tls.Config, error) {
-	if pc.TLS == nil {
-		return nil, nil
+func newFailoverGroup(prom PrometheusConfig) *promapi.FailoverGroup {
+	timeout, _ := parseDuration(prom.Timeout)
+
+	var tlsConf *tls.Config
+	tlsConf, _ = prom.TLS.toHTTPConfig()
+	upstreams := []*promapi.Prometheus{
+		promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf),
 	}
-
-	var isDirty bool
-	cfg := &tls.Config{}
-
-	if pc.TLS.ServerName != "" {
-		cfg.ServerName = pc.TLS.ServerName
-		isDirty = true
+	for _, uri := range prom.Failover {
+		upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
 	}
+	include := make([]*regexp.Regexp, 0, len(prom.Include))
+	for _, path := range prom.Include {
+		include = append(include, strictRegex(path))
+	}
+	exclude := make([]*regexp.Regexp, 0, len(prom.Exclude))
+	for _, path := range prom.Exclude {
+		exclude = append(exclude, strictRegex(path))
+	}
+	return promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, prom.Uptime, include, exclude, prom.Tags)
+}
 
-	if pc.TLS.CaCert != "" {
-		caCert, err := os.ReadFile(pc.TLS.CaCert)
-		if err != nil {
-			return nil, err
+func NewPrometheusGenerator(cfg Config, metricsRegistry *prometheus.Registry) *PrometheusGenerator {
+	return &PrometheusGenerator{
+		metricsRegistry: metricsRegistry,
+		cfg:             cfg,
+	}
+}
+
+type PrometheusGenerator struct {
+	servers         []*promapi.FailoverGroup
+	metricsRegistry *prometheus.Registry
+	cfg             Config
+}
+
+func (pg *PrometheusGenerator) Count() int {
+	return len(pg.servers)
+}
+
+func (pg *PrometheusGenerator) Stop() {
+	for _, server := range pg.servers {
+		server.Close(pg.metricsRegistry)
+	}
+	pg.servers = nil
+}
+
+func (pg *PrometheusGenerator) ServersForPath(path string) []*promapi.FailoverGroup {
+	var servers []*promapi.FailoverGroup
+	for _, server := range pg.servers {
+		if server.IsEnabledForPath(path) {
+			server.StartWorkers(pg.metricsRegistry)
+			servers = append(servers, server)
 		}
-		cfg.RootCAs = x509.NewCertPool()
-		cfg.RootCAs.AppendCertsFromPEM(caCert)
-		isDirty = true
 	}
+	return servers
+}
 
-	if pc.TLS.ClientCert != "" && pc.TLS.ClientKey != "" {
-		cert, err := tls.LoadX509KeyPair(pc.TLS.ClientCert, pc.TLS.ClientKey)
-		if err != nil {
-			return nil, err
+func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
+	for _, s := range pg.servers {
+		if s.Name() == server.Name() {
+			return fmt.Errorf("Duplicated name for Prometheus server definition: %s", s.Name())
 		}
-		cfg.Certificates = []tls.Certificate{cert}
-		isDirty = true
+	}
+	pg.servers = append(pg.servers, server)
+	return nil
+}
+
+func (pg *PrometheusGenerator) Generate(ctx context.Context) (err error) {
+	for _, pc := range pg.cfg.Prometheus {
+		err = pg.addServer(newFailoverGroup(pc))
+		if err != nil {
+			return err
+		}
 	}
 
-	if pc.TLS.InsecureSkipVerify {
-		cfg.InsecureSkipVerify = true
-		isDirty = true
+	if pg.cfg.Discovery != nil {
+		servers, err := pg.cfg.Discovery.Discover(ctx)
+		if err != nil {
+			return err
+		}
+		for _, server := range servers {
+			err = pg.addServer(server)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
-	if isDirty {
-		return cfg, nil
+	for _, server := range pg.servers {
+		slog.Info(
+			"Configured new Prometheus server",
+			slog.String("name", server.Name()),
+			slog.Int("uris", server.ServerCount()),
+		)
 	}
 
-	return nil, nil
+	return nil
 }

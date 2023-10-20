@@ -32,10 +32,10 @@ var (
 	)
 )
 
-func RegisterMetrics() {
-	prometheus.MustRegister(prometheusQueriesRunning)
-	prometheus.MustRegister(prometheusQueriesTotal)
-	prometheus.MustRegister(prometheusQueryErrorsTotal)
+func RegisterMetrics(reg *prometheus.Registry) {
+	reg.MustRegister(prometheusQueriesRunning)
+	reg.MustRegister(prometheusQueriesTotal)
+	reg.MustRegister(prometheusQueryErrorsTotal)
 }
 
 func errReason(err error) string {

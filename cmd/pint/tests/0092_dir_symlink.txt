@@ -8,7 +8,9 @@ pint.ok -l debug --no-color lint rules linked rules/src/rule.yaml
 cmp stderr stderr.txt
 
 -- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules","linked","rules/src/rule.yaml"]
 level=DEBUG msg="File parsed" path=rules/src/rule.yaml rules=1
+level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/src/rule.yaml record=down lines=4-5
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/src/rule.yaml rule=down
 -- rules/src/rule.yaml --

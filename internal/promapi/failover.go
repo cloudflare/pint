@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"context"
+	"log/slog"
 	"regexp"
 	"time"
 
@@ -45,7 +46,6 @@ func cacheCleaner(cache *queryCache, interval time.Duration, quit chan bool) {
 type FailoverGroup struct {
 	name           string
 	servers        []*Prometheus
-	strictErrors   bool
 	uptimeMetric   string
 	cacheCollector *cacheCollector
 	quitChan       chan bool
@@ -53,6 +53,8 @@ type FailoverGroup struct {
 	pathsInclude []*regexp.Regexp
 	pathsExclude []*regexp.Regexp
 	tags         []string
+	started      bool
+	strictErrors bool
 }
 
 func NewFailoverGroup(name string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
@@ -79,6 +81,30 @@ func (fg *FailoverGroup) UptimeMetric() string {
 	return fg.uptimeMetric
 }
 
+func (fg *FailoverGroup) ServerCount() int {
+	return len(fg.servers)
+}
+
+func (fg *FailoverGroup) MergeUpstreams(src *FailoverGroup) {
+	for _, ns := range src.servers {
+		var present bool
+		for _, ol := range fg.servers {
+			if ol.unsafeURI == ns.unsafeURI {
+				present = true
+				break
+			}
+		}
+		if !present {
+			fg.servers = append(fg.servers, ns)
+			slog.Debug(
+				"Added new failover URI",
+				slog.String("name", ns.name),
+				slog.String("uri", ns.safeURI),
+			)
+		}
+	}
+}
+
 func (fg *FailoverGroup) IsEnabledForPath(path string) bool {
 	if len(fg.pathsInclude) == 0 && len(fg.pathsExclude) == 0 {
 		return true
@@ -96,24 +122,32 @@ func (fg *FailoverGroup) IsEnabledForPath(path string) bool {
 	return false
 }
 
-func (fg *FailoverGroup) StartWorkers() {
+func (fg *FailoverGroup) StartWorkers(reg *prometheus.Registry) {
+	if fg.started {
+		return
+	}
+
 	queryCache := newQueryCache(time.Hour)
 	fg.quitChan = make(chan bool)
 	go cacheCleaner(queryCache, time.Minute*2, fg.quitChan)
 
 	fg.cacheCollector = newCacheCollector(queryCache, fg.name)
-	prometheus.MustRegister(fg.cacheCollector)
+	reg.MustRegister(fg.cacheCollector)
 	for _, prom := range fg.servers {
 		prom.cache = queryCache
 		prom.StartWorkers()
 	}
+	fg.started = true
 }
 
-func (fg *FailoverGroup) Close() {
+func (fg *FailoverGroup) Close(reg *prometheus.Registry) {
+	if !fg.started {
+		return
+	}
 	for _, prom := range fg.servers {
 		prom.Close()
 	}
-	prometheus.Unregister(fg.cacheCollector)
+	reg.Unregister(fg.cacheCollector)
 	fg.quitChan <- true
 }
 

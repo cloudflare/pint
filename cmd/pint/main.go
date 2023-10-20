@@ -82,12 +82,6 @@ type actionMeta struct {
 	workers int
 }
 
-func (meta actionMeta) cleanup() {
-	for _, prom := range meta.cfg.PrometheusServers {
-		prom.Close()
-	}
-}
-
 func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {

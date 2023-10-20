@@ -60,13 +60,15 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	for _, prom := range meta.cfg.PrometheusServers {
-		prom.StartWorkers()
-	}
-	defer meta.cleanup()
-
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
-	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
+
+	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
+	defer gen.Stop()
+
+	summary, err := checkRules(ctx, meta.workers, gen, meta.cfg, entries)
+	if err != nil {
+		return err
+	}
 
 	if c.Bool(requireOwnerFlag) {
 		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)

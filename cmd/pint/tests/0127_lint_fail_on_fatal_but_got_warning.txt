@@ -10,5 +10,6 @@ groups:
       expr: up{job="xxx"}
 
 -- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Problems found" Warning=1
 level=INFO msg="1 problem(s) not visible because of --min-severity=bug flag"

@@ -1,0 +1,31 @@
+pint.error -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": .pint.hcl:5,14-14: Missing required argument; The argument \"name\" is required, but no definition was found."
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
+-- servers/prom1.yml --
+-- servers/prom1.yaml --
+-- servers/prom2.yml --
+-- servers/prom2.yaml --
+-- .pint.hcl --
+discovery {
+  filepath {
+    directory = "servers"
+    match = "(?P<name>\\w+).ya?ml"
+    template {
+      uri      = "https://{{ $name }}.example.com"
+    }
+  }
+}
+prometheus "prom2" {
+    uri      = "https://unique.example.com"
+    timeout  = "5s"
+}

@@ -118,12 +118,12 @@ func (h *handler) appendAttr(buf *bytes.Buffer, attr slog.Attr) {
 	case slog.KindAny:
 		switch attr.Value.Any().(type) {
 		case error:
-			h.printVal(buf, attr.Value.String(), fgHiRed)
+			h.printVal(buf, formatString(attr), fgHiRed)
 		default:
 			h.printVal(buf, formatAny(attr), fgHiCyan)
 		}
 	case slog.KindString:
-		h.printVal(buf, attr.Value.String(), fgHiCyan)
+		h.printVal(buf, formatString(attr), fgHiCyan)
 	default:
 		h.printVal(buf, formatAny(attr), fgHiBlue)
 	}
@@ -135,4 +135,8 @@ func formatAny(attr slog.Attr) string {
 		return attr.Value.String()
 	}
 	return string(data)
+}
+
+func formatString(attr slog.Attr) string {
+	return strings.ReplaceAll(attr.Value.String(), "\n", "\\n")
 }

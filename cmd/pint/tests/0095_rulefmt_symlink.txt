@@ -7,8 +7,10 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/relaxed/1.yml rules=1
 level=DEBUG msg="File parsed" path=rules/strict/symlink.yml rules=1
+level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/relaxed/1.yml record=foo lines=1-2
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/relaxed/1.yml rule=foo
 level=DEBUG msg="Found recording rule" path=rules/strict/symlink.yml record=foo lines=1-2

@@ -3,6 +3,8 @@ package main
 import "github.com/prometheus/client_golang/prometheus"
 
 var (
+	metricsRegistry = prometheus.NewRegistry()
+
 	pintVersion = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "pint_version",

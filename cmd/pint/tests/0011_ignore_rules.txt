@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
 rules/1.yaml:5 Fatal: syntax error: unexpected right parenthesis ')' (promql/syntax)
  5 |   expr: sum(errors_total) by )
 

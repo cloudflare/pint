@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
 rules/0001.yml:4-6 Bug: alert_for annotation is required (alerts/annotation)
  4 | - alert: Instance Is Down 2
  5 |   expr: up == 0

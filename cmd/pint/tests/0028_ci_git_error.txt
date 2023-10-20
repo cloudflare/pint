@@ -23,11 +23,9 @@ cmp stderr ../stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
 level=DEBUG msg="Got branch information" base=notmain current=v2
+level=INFO msg="Finding all rules to check on current git branch using git blame" base=notmain
 level=DEBUG msg="Running git command" args=["log","--format=%H","--no-abbrev-commit","--reverse","notmain..HEAD"]
-level=ERROR msg="Fatal error" err="failed to get the list of commits to scan: fatal: ambiguous argument 'notmain..HEAD': unknown revision or path not in the working tree.
-Use '--' to separate paths from revisions, like this:
-'git <command> [<revision>...] -- [<file>...]'
-"
+level=ERROR msg="Fatal error" err="failed to get the list of commits to scan: fatal: ambiguous argument 'notmain..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

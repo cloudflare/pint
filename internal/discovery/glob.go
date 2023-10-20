@@ -3,6 +3,7 @@ package discovery
 import (
 	"fmt"
 	"io/fs"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -21,6 +22,8 @@ type GlobFinder struct {
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
+	slog.Info("Finding all rules to check", slog.Any("paths", f.patterns))
+
 	paths := filePaths{}
 	for _, p := range f.patterns {
 		matches, err := filepath.Glob(p)

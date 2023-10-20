@@ -8,6 +8,7 @@ import (
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
@@ -118,8 +119,9 @@ func TestMetadata(t *testing.T) {
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
-			fg.StartWorkers()
-			defer fg.Close()
+			reg := prometheus.NewRegistry()
+			fg.StartWorkers(reg)
+			defer fg.Close(reg)
 
 			metadata, err := fg.Metadata(context.Background(), tc.metric)
 			if tc.err != "" {

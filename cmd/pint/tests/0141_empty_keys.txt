@@ -3,6 +3,7 @@ pint.error --no-color lint rules.yml
 cmp stderr stderr.txt
 
 -- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules.yml"]
 rules.yml:4 Fatal: record value cannot be empty (yaml/parse)
  4 |       - record:
 

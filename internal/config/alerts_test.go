@@ -54,6 +54,13 @@ func TestAlertsSettings(t *testing.T) {
 			},
 			err: errors.New(`not a valid duration string: "foo"`),
 		},
+		{
+			conf: AlertsSettings{
+				Resolve:  "7d",
+				Severity: "xxx",
+			},
+			err: errors.New("unknown severity: xxx"),
+		},
 	}
 
 	for _, tc := range testCases {

@@ -4,6 +4,8 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Configured new Prometheus server" name=disabled uris=1
 -- rules/ok.yml --
 - record: sum:foo
   expr: sum(foo)
