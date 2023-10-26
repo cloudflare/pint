@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -43,6 +44,11 @@ prometheus "prom" {
 
 	cfg, err := config.Load(path, true)
 	require.NoError(t, err)
+
+	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+	defer gen.Stop()
+	require.NoError(t, gen.Generate(context.Background()))
+
 	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.DisableOnlineChecks()
@@ -59,6 +65,11 @@ func TestDisableOnlineChecksWithoutPrometheus(t *testing.T) {
 
 	cfg, err := config.Load(path, true)
 	require.NoError(t, err)
+
+	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+	defer gen.Stop()
+	require.NoError(t, gen.Generate(context.Background()))
+
 	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.DisableOnlineChecks()
@@ -80,6 +91,11 @@ prometheus "prom" {
 
 	cfg, err := config.Load(path, true)
 	require.NoError(t, err)
+
+	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+	defer gen.Stop()
+	require.NoError(t, gen.Generate(context.Background()))
+
 	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
@@ -102,6 +118,11 @@ func TestSetDisabledChecks(t *testing.T) {
 
 	cfg, err := config.Load(path, true)
 	require.NoError(t, err)
+
+	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+	defer gen.Stop()
+	require.NoError(t, gen.Generate(context.Background()))
+
 	require.Empty(t, cfg.Checks.Disabled)
 
 	cfg.SetDisabledChecks([]string{checks.SyntaxCheckName})
@@ -1443,6 +1464,74 @@ prometheus "prom3" {
 				checks.LabelsConflictCheckName + "(prom3)",
 			},
 		},
+		{
+			title: "alerts/count defaults",
+			config: `
+prometheus "prom" {
+  uri     = "http://localhost"
+  timeout = "1s"
+}
+
+rule {
+  alerts {
+    range    = "1d"
+    step     = "1m"
+    resolve  = "5m"
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.SeriesCheckName + "(prom)",
+				checks.VectorMatchingCheckName + "(prom)",
+				checks.RangeQueryCheckName + "(prom)",
+				checks.RuleDuplicateCheckName + "(prom)",
+				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsCheckName + "(prom)",
+			},
+		},
+		{
+			title: "alerts/count full",
+			config: `
+prometheus "prom" {
+  uri     = "http://localhost"
+  timeout = "1s"
+}
+
+rule {
+  alerts {
+    range    = "1d"
+    step     = "1m"
+    resolve  = "5m"
+	minCount = 100
+	severity = "bug"
+  }
+}
+`,
+			path: "rules.yml",
+			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.SeriesCheckName + "(prom)",
+				checks.VectorMatchingCheckName + "(prom)",
+				checks.RangeQueryCheckName + "(prom)",
+				checks.RuleDuplicateCheckName + "(prom)",
+				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsCheckName + "(prom)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -1458,7 +1547,11 @@ prometheus "prom3" {
 			cfg, err := config.Load(path, false)
 			require.NoError(t, err)
 
-			checks := cfg.GetChecksForRule(ctx, tc.path, tc.rule, tc.disabledChecks)
+			gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
+			defer gen.Stop()
+			require.NoError(t, gen.Generate(ctx))
+
+			checks := cfg.GetChecksForRule(ctx, gen, tc.path, tc.rule, tc.disabledChecks)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())
@@ -1747,6 +1840,15 @@ func TestConfigErrors(t *testing.T) {
   allowed = [".+++"]
 }`,
 			err: "error parsing regexp: invalid nested repetition operator: `++`",
+		},
+		{
+			config: `discovery {
+  filepath {
+	directory = ""
+	match = ""
+  }
+}`,
+			err: "prometheusQuery discovery requires at least one template",
 		},
 	}
 

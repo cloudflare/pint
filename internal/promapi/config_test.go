@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
@@ -179,8 +180,9 @@ func TestConfigHeaders(t *testing.T) {
 				promapi.NewPrometheus("test", srv.URL, tc.config, time.Second, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 
-			fg.StartWorkers()
-			defer fg.Close()
+			reg := prometheus.NewRegistry()
+			fg.StartWorkers(reg)
+			defer fg.Close(reg)
 
 			_, err := fg.Config(context.Background())
 			require.NoError(t, err)

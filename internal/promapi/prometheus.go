@@ -115,7 +115,12 @@ func NewPrometheus(name, uri string, headers map[string]string, timeout time.Dur
 		rateLimiter: ratelimit.New(rl),
 		concurrency: concurrency,
 	}
+
 	return &prom
+}
+
+func (prom *Prometheus) SafeURI() string {
+	return prom.safeURI
 }
 
 func (prom *Prometheus) Close() {

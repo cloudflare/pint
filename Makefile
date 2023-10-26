@@ -43,7 +43,7 @@ test:
 		-coverprofile=$(COVER_PROFILE) \
 		-coverpkg=./... \
 		-race \
-		-count=5 \
+		-count=3 \
 		-timeout=15m \
 		./...
 

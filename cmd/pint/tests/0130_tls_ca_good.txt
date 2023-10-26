@@ -23,6 +23,7 @@ prometheus "prom" {
   timeout  = "5s"
   required = true
   tls {
-    caCert = "prom-ca.pem"
+    serverName = "prom"
+    caCert     = "prom-ca.pem"
   }
 }

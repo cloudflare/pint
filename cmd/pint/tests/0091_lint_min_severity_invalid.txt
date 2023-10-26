@@ -3,6 +3,7 @@ pint.error --no-color lint --min-severity=xxx rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
 level=ERROR msg="Fatal error" err="invalid --min-severity value: unknown severity: xxx"
 -- rules/0001.yml --
 groups:

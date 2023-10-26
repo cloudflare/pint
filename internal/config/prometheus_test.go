@@ -40,6 +40,10 @@ func TestPrometheusConfig(t *testing.T) {
 			err:  errors.New("prometheus URI cannot be empty"),
 		},
 		{
+			conf: PrometheusConfig{URI: "http://user{D@example.com"},
+			err:  errors.New("prometheus URI \"http://user{D@example.com\" is invalid: parse \"http://user{D@example.com\": net/url: invalid userinfo"),
+		},
+		{
 			conf: PrometheusConfig{
 				URI:     "http://localhost",
 				Timeout: "foo",

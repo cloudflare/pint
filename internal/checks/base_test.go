@@ -15,6 +15,7 @@ import (
 	"time"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
@@ -127,8 +128,9 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 			prom := tc.prometheus(uri)
 			if prom != nil {
-				prom.StartWorkers()
-				defer prom.Close()
+				reg := prometheus.NewRegistry()
+				prom.StartWorkers(reg)
+				defer prom.Close(reg)
 			}
 
 			entries, err := parseContent(tc.content)

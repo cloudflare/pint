@@ -3,6 +3,7 @@ pint.error --no-color lint rules
 cmp stderr stderr.txt
 
 -- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
 rules/strict.yml:2 Fatal: field alert not found in type rulefmt.RuleGroup (yaml/parse)
  2 | - alert: Conntrack_Table_Almost_Full
 

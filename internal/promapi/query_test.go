@@ -7,6 +7,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
@@ -248,8 +249,9 @@ func TestQuery(t *testing.T) {
 			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
-			fg.StartWorkers()
-			defer fg.Close()
+			reg := prometheus.NewRegistry()
+			fg.StartWorkers(reg)
+			defer fg.Close(reg)
 
 			qr, err := fg.Query(context.Background(), tc.query)
 			if tc.err != "" {

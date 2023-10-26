@@ -100,13 +100,17 @@ func actionCI(c *cli.Context) error {
 		return err
 	}
 
-	for _, prom := range meta.cfg.PrometheusServers {
-		prom.StartWorkers()
-	}
-	defer meta.cleanup()
-
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
-	summary := checkRules(ctx, meta.workers, meta.cfg, entries)
+
+	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
+	defer gen.Stop()
+
+	slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
+
+	summary, err := checkRules(ctx, meta.workers, gen, meta.cfg, entries)
+	if err != nil {
+		return err
+	}
 
 	if c.Bool(requireOwnerFlag) {
 		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)

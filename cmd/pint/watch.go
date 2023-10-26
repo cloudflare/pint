@@ -22,6 +22,7 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/urfave/cli/v2"
@@ -108,16 +109,21 @@ func actionWatch(c *cli.Context) error {
 	// start HTTP server for metrics
 	collector := newProblemCollector(meta.cfg, paths, minSeverity, c.Int(maxProblemsFlag))
 	// register all metrics
-	prometheus.MustRegister(collector)
-	prometheus.MustRegister(checkDuration)
-	prometheus.MustRegister(checkIterationsTotal)
-	prometheus.MustRegister(checkIterationChecks)
-	prometheus.MustRegister(checkIterationChecksDone)
-	prometheus.MustRegister(pintVersion)
-	prometheus.MustRegister(lastRunTime)
-	prometheus.MustRegister(lastRunDuration)
-	prometheus.MustRegister(rulesParsedTotal)
-	promapi.RegisterMetrics()
+	metricsRegistry.MustRegister(collector)
+	metricsRegistry.MustRegister(checkDuration)
+	metricsRegistry.MustRegister(checkIterationsTotal)
+	metricsRegistry.MustRegister(checkIterationChecks)
+	metricsRegistry.MustRegister(checkIterationChecksDone)
+	metricsRegistry.MustRegister(pintVersion)
+	metricsRegistry.MustRegister(lastRunTime)
+	metricsRegistry.MustRegister(lastRunDuration)
+	metricsRegistry.MustRegister(rulesParsedTotal)
+	promapi.RegisterMetrics(metricsRegistry)
+
+	metricsRegistry.MustRegister(
+		collectors.NewGoCollector(),
+		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
+	)
 
 	// init metrics if needed
 	pintVersion.WithLabelValues(version).Set(1)
@@ -125,7 +131,10 @@ func actionWatch(c *cli.Context) error {
 	rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Add(0)
 	rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Add(0)
 
-	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/metrics", promhttp.HandlerFor(metricsRegistry, promhttp.HandlerOpts{
+		ErrorLog: slog.NewLogLogger(slog.Default().Handler(), slog.LevelError),
+		Timeout:  time.Second * 20,
+	}))
 	listen := c.String(listenFlag)
 	server := http.Server{
 		Addr:         listen,
@@ -141,14 +150,12 @@ func actionWatch(c *cli.Context) error {
 
 	interval := c.Duration(intervalFlag)
 
-	for _, prom := range meta.cfg.PrometheusServers {
-		prom.StartWorkers()
-	}
+	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 
 	// start timer to run every $interval
 	ack := make(chan bool, 1)
 	mainCtx, mainCancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
-	stop := startTimer(mainCtx, meta.cfg, meta.workers, interval, ack, collector)
+	stop := startTimer(mainCtx, meta.workers, gen, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -161,9 +168,7 @@ func actionWatch(c *cli.Context) error {
 	slog.Info("Waiting for all background tasks to finish")
 	<-ack
 
-	for _, prom := range meta.cfg.PrometheusServers {
-		prom.Close()
-	}
+	gen.Stop()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
@@ -174,7 +179,7 @@ func actionWatch(c *cli.Context) error {
 	return nil
 }
 
-func startTimer(ctx context.Context, _ config.Config, workers int, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
+func startTimer(ctx context.Context, workers int, gen *config.PrometheusGenerator, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
 	ticker := time.NewTicker(time.Second)
 	stop := make(chan bool, 1)
 	wasBootstrapped := false
@@ -188,7 +193,7 @@ func startTimer(ctx context.Context, _ config.Config, workers int, interval time
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
-				if err := collector.scan(ctx, workers); err != nil {
+				if err := collector.scan(ctx, workers, gen); err != nil {
 					slog.Error("Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
@@ -246,7 +251,7 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 	}
 }
 
-func (c *problemCollector) scan(ctx context.Context, workers int) error {
+func (c *problemCollector) scan(ctx context.Context, workers int, gen *config.PrometheusGenerator) error {
 	finder := discovery.NewGlobFinder(c.paths, c.cfg.Parser.CompileRelaxed())
 	// nolint: contextcheck
 	entries, err := finder.Find()
@@ -254,7 +259,10 @@ func (c *problemCollector) scan(ctx context.Context, workers int) error {
 		return err
 	}
 
-	s := checkRules(ctx, workers, c.cfg, entries)
+	s, err := checkRules(ctx, workers, gen, c.cfg, entries)
+	if err != nil {
+		return err
+	}
 
 	c.lock.Lock()
 	defer c.lock.Unlock()

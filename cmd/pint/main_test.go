@@ -297,6 +297,7 @@ func tlsCert(ts *testscript.TestScript, _ bool, args []string) {
 			StreetAddress: []string{""},
 			PostalCode:    []string{""},
 		},
+		DNSNames:     []string{name},
 		IPAddresses:  []net.IP{net.IPv4(127, 0, 0, 1), net.IPv6loopback},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(0, 0, 1),

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.48.0
+
+### Added
+
+- Prometheus servers can now be dynamically configured using one of
+  supported discovery mechanism: file paths or Prometheus metrics query.
+
 ## v0.47.0
 
 ### Added

@@ -28,6 +28,7 @@ cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check on current git branch using git blame" base=main
 level=ERROR msg="Fatal error" err="number of commits to check (3) is higher than maxCommits (2), exiting"
 -- src/v1.yml --
 - record: rule1

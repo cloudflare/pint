@@ -54,7 +54,16 @@ func tryDecodingYamlError(err error) (l int, s string) {
 	return 1, s
 }
 
-func checkRules(ctx context.Context, workers int, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary) {
+func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
+	if len(entries) > 0 {
+		if err = gen.Generate(ctx); err != nil {
+			return summary, err
+		}
+		slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
+	} else {
+		slog.Info("No rules found, skipping Prometheus discovery")
+	}
+
 	checkIterationChecks.Set(0)
 	checkIterationChecksDone.Set(0)
 
@@ -108,7 +117,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 					)
 				}
 
-				checkList := cfg.GetChecksForRule(ctx, entry.SourcePath, entry.Rule, entry.DisabledChecks)
+				checkList := cfg.GetChecksForRule(ctx, gen, entry.SourcePath, entry.Rule, entry.DisabledChecks)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
 					check := check
@@ -143,7 +152,7 @@ func checkRules(ctx context.Context, workers int, cfg config.Config, entries []d
 
 	lastRunTime.SetToCurrentTime()
 
-	return summary
+	return summary, nil
 }
 
 type scanJob struct {

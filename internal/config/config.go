@@ -2,12 +2,10 @@ package config
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"log/slog"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
@@ -17,7 +15,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -25,15 +22,15 @@ import (
 )
 
 type Config struct {
-	CI                *CI                      `hcl:"ci,block" json:"ci,omitempty"`
-	Parser            *Parser                  `hcl:"parser,block" json:"parser,omitempty"`
-	Repository        *Repository              `hcl:"repository,block" json:"repository,omitempty"`
-	Prometheus        []PrometheusConfig       `hcl:"prometheus,block" json:"prometheus,omitempty"`
-	Checks            *Checks                  `hcl:"checks,block" json:"checks,omitempty"`
-	Check             []Check                  `hcl:"check,block" json:"check,omitempty"`
-	Rules             []Rule                   `hcl:"rule,block" json:"rules,omitempty"`
-	Owners            *Owners                  `hcl:"owners,block" json:"owners,omitempty"`
-	PrometheusServers []*promapi.FailoverGroup `json:"-"`
+	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
+	Parser     *Parser            `hcl:"parser,block" json:"parser,omitempty"`
+	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
+	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
+	Discovery  *Discovery         `hcl:"discovery,block" json:"discovery,omitempty"`
+	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
+	Check      []Check            `hcl:"check,block" json:"check,omitempty"`
+	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+	Owners     *Owners            `hcl:"owners,block" json:"owners,omitempty"`
 }
 
 func (cfg *Config) DisableOnlineChecks() {
@@ -83,7 +80,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.Rule, disabledChecks []string) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, path string, r parser.Rule, disabledChecks []string) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	allChecks := []checkMeta{
@@ -113,18 +110,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, path string, r parser.R
 		},
 	}
 
-	proms := []*promapi.FailoverGroup{}
-	for _, prom := range cfg.Prometheus {
-		if !prom.isEnabledForPath(path) {
-			continue
-		}
-		for _, p := range cfg.PrometheusServers {
-			if p.Name() == prom.Name {
-				proms = append(proms, p)
-				break
-			}
-		}
-	}
+	proms := gen.ServersForPath(path)
 
 	for _, p := range proms {
 		allChecks = append(allChecks, checkMeta{
@@ -296,51 +282,17 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		}
 		promNames = append(promNames, prom.Name)
 
-		var timeout time.Duration
-		if prom.Timeout != "" {
-			timeout, _ = parseDuration(prom.Timeout)
-		} else {
-			timeout = time.Minute * 2
-			cfg.Prometheus[i].Timeout = timeout.String()
-		}
+		cfg.Prometheus[i].applyDefaults()
 
-		concurrency := prom.Concurrency
-		if concurrency <= 0 {
-			concurrency = 16
-			cfg.Prometheus[i].Concurrency = concurrency
-		}
-
-		rateLimit := prom.RateLimit
-		if rateLimit <= 0 {
-			rateLimit = 100
-			cfg.Prometheus[i].RateLimit = rateLimit
-		}
-
-		uptime := prom.Uptime
-		if uptime == "" {
-			uptime = "up"
-			cfg.Prometheus[i].Uptime = uptime
-		}
-
-		var tlsConf *tls.Config
-		tlsConf, err = prom.getTLSConfig()
-		if err != nil {
+		if _, err = prom.TLS.toHTTPConfig(); err != nil {
 			return cfg, fmt.Errorf("invalid prometheus TLS configuration: %w", err)
 		}
-		upstreams := []*promapi.Prometheus{
-			promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, concurrency, rateLimit, tlsConf),
+	}
+
+	if cfg.Discovery != nil {
+		if err = cfg.Discovery.validate(); err != nil {
+			return cfg, err
 		}
-		for _, uri := range prom.Failover {
-			upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, concurrency, rateLimit, tlsConf))
-		}
-		var include, exclude []*regexp.Regexp
-		for _, path := range prom.Include {
-			include = append(include, strictRegex(path))
-		}
-		for _, path := range prom.Exclude {
-			exclude = append(exclude, strictRegex(path))
-		}
-		cfg.PrometheusServers = append(cfg.PrometheusServers, promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, uptime, include, exclude, prom.Tags))
 	}
 
 	for _, rule := range cfg.Rules {

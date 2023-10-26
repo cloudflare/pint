@@ -1,0 +1,41 @@
+http response prometheus /api/v1/query 500 {"status":"error","errorType":"bad_data","error":"bogus query"}
+http start prometheus 127.0.0.1:7151
+
+pint.error -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
+level=DEBUG msg="Starting query workers" name=discovery uri=http://127.0.0.1:7151 workers=1
+level=INFO msg="Finding Prometheus servers using Prometheus API query" uri=http://127.0.0.1:7151 query=prometheus_ready
+level=DEBUG msg="Scheduling prometheus query" uri=http://127.0.0.1:7151 query=prometheus_ready
+level=DEBUG msg="Running prometheus query" uri=http://127.0.0.1:7151 query=prometheus_ready
+level=DEBUG msg="Trying to parse Prometheus error response" code=500
+level=ERROR msg="Query returned an error" err="bogus query" uri=http://127.0.0.1:7151 query=prometheus_ready
+level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7151
+level=ERROR msg="Fatal error" err="prometheusQuery discovery failed to execute Prometheus query: bad_data: bogus query"
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
+-- .pint.hcl --
+discovery {
+  prometheusQuery {
+    uri = "http://127.0.0.1:7151"
+    query = "prometheus_ready"
+    template {
+      name     = "prom-ha"
+      uri      = "https://{{ $name }}.example.com"
+      timeout  = "5s"
+      headers = {
+        "X-Host": "hostname={{ $name }}"
+      }
+      tags = [ "{{ $name }}"]
+    }
+  }
+}

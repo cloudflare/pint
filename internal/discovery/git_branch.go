@@ -42,6 +42,8 @@ type GitBranchFinder struct {
 }
 
 func (f GitBranchFinder) Find() (entries []Entry, err error) {
+	slog.Info("Finding all rules to check on current git branch using logical diff", slog.String("base", f.baseBranch))
+
 	cr, err := git.CommitRange(f.gitCmd, f.baseBranch)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of commits to scan: %w", err)
