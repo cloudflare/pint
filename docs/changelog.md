@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.48.1
+
+- Prometheus `template` under `discovery` block can now template
+  `include` and `exclude` fields.
+
 ## v0.48.0
 
 ### Added

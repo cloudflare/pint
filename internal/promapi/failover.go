@@ -73,6 +73,22 @@ func (fg *FailoverGroup) Name() string {
 	return fg.name
 }
 
+func (fg *FailoverGroup) Include() []string {
+	sl := []string{}
+	for _, re := range fg.pathsInclude {
+		sl = append(sl, re.String())
+	}
+	return sl
+}
+
+func (fg *FailoverGroup) Exclude() []string {
+	sl := []string{}
+	for _, re := range fg.pathsExclude {
+		sl = append(sl, re.String())
+	}
+	return sl
+}
+
 func (fg *FailoverGroup) Tags() []string {
 	return fg.tags
 }

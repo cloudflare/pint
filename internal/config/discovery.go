@@ -26,7 +26,31 @@ func isEqualFailoverGroup(a, b *promapi.FailoverGroup) bool {
 	if a.Name() != b.Name() {
 		return false
 	}
+	if !slices.Equal(a.Include(), b.Include()) {
+		slog.Warn(
+			"Duplicated prometheus server with different include",
+			slog.String("name", a.Name()),
+			slog.Any("a", a.Include()),
+			slog.Any("b", b.Include()),
+		)
+		return false
+	}
+	if !slices.Equal(a.Exclude(), b.Exclude()) {
+		slog.Warn(
+			"Duplicated prometheus server with different exclude",
+			slog.String("name", a.Name()),
+			slog.Any("a", a.Exclude()),
+			slog.Any("b", b.Exclude()),
+		)
+		return false
+	}
 	if !slices.Equal(a.Tags(), b.Tags()) {
+		slog.Warn(
+			"Duplicated prometheus server with different tags",
+			slog.String("name", a.Name()),
+			slog.Any("a", a.Tags()),
+			slog.Any("b", b.Tags()),
+		)
 		return false
 	}
 	return true
@@ -137,10 +161,10 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 	var err error
 	var name, uri string
 	if name, err = renderTemplate(pt.Name, data); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("bad name template %q: %w", pt.Name, err)
 	}
 	if uri, err = renderTemplate(pt.URI, data); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("bad uri template %q: %w", pt.URI, err)
 	}
 
 	failover := make([]string, 0, len(pt.Failover))
@@ -148,7 +172,7 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 	for _, f := range pt.Failover {
 		furi, err = renderTemplate(f, data)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("bad failover template %q: %w", f, err)
 		}
 		failover = append(failover, furi)
 	}
@@ -159,14 +183,34 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 	for k, v := range pt.Headers {
 		key, err = renderTemplate(k, data)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("bad header key template %q: %w", k, err)
 		}
 		val, err = renderTemplate(v, data)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("bad header value template %q: %w", v, err)
 		}
 		headerNames = append(headerNames, key)
 		headers[key] = val
+	}
+
+	include := make([]string, 0, len(pt.Include))
+	var inc string
+	for _, t := range pt.Include {
+		inc, err = renderTemplate(t, data)
+		if err != nil {
+			return nil, fmt.Errorf("bad include template %q: %w", t, err)
+		}
+		include = append(include, inc)
+	}
+
+	exclude := make([]string, 0, len(pt.Exclude))
+	var exc string
+	for _, t := range pt.Exclude {
+		exc, err = renderTemplate(t, data)
+		if err != nil {
+			return nil, fmt.Errorf("bad exclude template %q: %w", t, err)
+		}
+		exclude = append(exclude, exc)
 	}
 
 	tags := make([]string, 0, len(pt.Tags))
@@ -174,7 +218,7 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 	for _, t := range pt.Tags {
 		tag, err = renderTemplate(t, data)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("bad tag template %q: %w", t, err)
 		}
 		tags = append(tags, tag)
 	}
@@ -188,8 +232,8 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 		Concurrency: pt.Concurrency,
 		RateLimit:   pt.RateLimit,
 		Uptime:      pt.Uptime,
-		Include:     pt.Include,
-		Exclude:     pt.Exclude,
+		Include:     include,
+		Exclude:     exclude,
 		Tags:        tags,
 		Required:    pt.Required,
 		TLS:         pt.TLS,
