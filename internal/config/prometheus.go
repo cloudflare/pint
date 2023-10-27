@@ -180,7 +180,9 @@ func newFailoverGroup(prom PrometheusConfig) *promapi.FailoverGroup {
 	for _, path := range prom.Exclude {
 		exclude = append(exclude, strictRegex(path))
 	}
-	return promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, prom.Uptime, include, exclude, prom.Tags)
+	tags := make([]string, 0, len(prom.Tags))
+	tags = append(tags, prom.Tags...)
+	return promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, prom.Uptime, include, exclude, tags)
 }
 
 func NewPrometheusGenerator(cfg Config, metricsRegistry *prometheus.Registry) *PrometheusGenerator {
@@ -254,6 +256,9 @@ func (pg *PrometheusGenerator) Generate(ctx context.Context) (err error) {
 			"Configured new Prometheus server",
 			slog.String("name", server.Name()),
 			slog.Int("uris", server.ServerCount()),
+			slog.Any("tags", server.Tags()),
+			slog.Any("include", server.Include()),
+			slog.Any("exclude", server.Exclude()),
 		)
 	}
 

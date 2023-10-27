@@ -17,6 +17,7 @@ level=DEBUG msg="Parsed response" uri=http://127.0.0.1:7150 query=prometheus_rea
 level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom1.example.com headers=["X-Host"] timeout=5s concurrency=16 rateLimit=100 uptime=up tags=["prom1"] required=false
 level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom2.example.com headers=["X-Host"] timeout=5s concurrency=16 rateLimit=100 uptime=up tags=["prom2"] required=false
 level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7150
+level=WARN msg="Duplicated prometheus server with different tags" name=prom-ha a=["prom2"] b=["prom1"]
 level=ERROR msg="Fatal error" err="Duplicated name for Prometheus server definition: prom-ha"
 -- rules/0001.yml --
 groups:

@@ -404,6 +404,8 @@ Fields that are allowed to be templated are:
 - `failover`
 - `headers`
 - `tags`
+- `include`
+- `exclude`
 
 ```js
 template {
@@ -430,7 +432,7 @@ template {
 
 Generated Prometheus servers will be deduplicated. If there are multiple servers with the same
 name but different URIs then extra URIs will be added to `failover` list.
-Servers must have identical tags to be deduplicated.
+Servers must have identical `name`, `tags`, `include` and `exclude` fields to be deduplicated.
 
 ### Examples
 

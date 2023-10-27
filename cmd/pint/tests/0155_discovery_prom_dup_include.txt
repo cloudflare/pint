@@ -1,0 +1,39 @@
+http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{"name":"prom1"},"value":[1698249632.491,"1"]},{"metric":{"name":"prom2"},"value":[1698249632.491,"1"]}]}}
+http start prometheus 127.0.0.1:7155
+
+pint.error -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
+level=DEBUG msg="Starting query workers" name=discovery uri=http://127.0.0.1:7155 workers=1
+level=INFO msg="Finding Prometheus servers using Prometheus API query" uri=http://127.0.0.1:7155 query=prometheus_ready
+level=DEBUG msg="Scheduling prometheus query" uri=http://127.0.0.1:7155 query=prometheus_ready
+level=DEBUG msg="Running prometheus query" uri=http://127.0.0.1:7155 query=prometheus_ready
+level=DEBUG msg="Parsed response" uri=http://127.0.0.1:7155 query=prometheus_ready series=2
+level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom1.example.com headers=[] timeout=2m0s concurrency=16 rateLimit=100 uptime=up tags=[] required=false
+level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom2.example.com headers=[] timeout=2m0s concurrency=16 rateLimit=100 uptime=up tags=[] required=false
+level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7155
+level=WARN msg="Duplicated prometheus server with different include" name=prom-ha a=["^prom2$"] b=["^prom1$"]
+level=ERROR msg="Fatal error" err="Duplicated name for Prometheus server definition: prom-ha"
+-- rules/0001.yml --
+groups:
+- name: foo
+  rules:
+  - record: sum:up
+    expr: sum(up)
+-- .pint.hcl --
+discovery {
+  prometheusQuery {
+    uri = "http://127.0.0.1:7155"
+    query = "prometheus_ready"
+    template {
+      name     = "prom-ha"
+      uri      = "https://{{ $name }}.example.com"
+      include = [ "{{ $name }}"]
+    }
+  }
+}

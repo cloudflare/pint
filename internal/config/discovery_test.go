@@ -250,14 +250,14 @@ func TestPrometheusTemplateRender(t *testing.T) {
 				URI:  "http://",
 			},
 			data: map[string]string{},
-			err:  `template: discovery:1: undefined variable "$name"`,
+			err:  `bad name template "{{ $name }}": template: discovery:1: undefined variable "$name"`,
 		},
 		{
 			template: PrometheusTemplate{
 				URI: "http://{{ $name }}",
 			},
 			data: map[string]string{},
-			err:  `template: discovery:1: undefined variable "$name"`,
+			err:  `bad uri template "http://{{ $name }}": template: discovery:1: undefined variable "$name"`,
 		},
 		{
 			template: PrometheusTemplate{
@@ -284,7 +284,25 @@ func TestPrometheusTemplateRender(t *testing.T) {
 				Failover: []string{"foo", "{{ $bob }}"},
 			},
 			data: map[string]string{},
-			err:  `template: discovery:1: undefined variable "$bob"`,
+			err:  `bad failover template "{{ $bob }}": template: discovery:1: undefined variable "$bob"`,
+		},
+		{
+			template: PrometheusTemplate{
+				Name:    "foo",
+				URI:     "http://",
+				Include: []string{"foo", "{{ $bob }}"},
+			},
+			data: map[string]string{},
+			err:  `bad include template "{{ $bob }}": template: discovery:1: undefined variable "$bob"`,
+		},
+		{
+			template: PrometheusTemplate{
+				Name:    "foo",
+				URI:     "http://",
+				Exclude: []string{"foo", "{{ $bob }}"},
+			},
+			data: map[string]string{},
+			err:  `bad exclude template "{{ $bob }}": template: discovery:1: undefined variable "$bob"`,
 		},
 		{
 			template: PrometheusTemplate{
@@ -293,7 +311,7 @@ func TestPrometheusTemplateRender(t *testing.T) {
 				Headers: map[string]string{"{{ $bob }}": "val"},
 			},
 			data: map[string]string{},
-			err:  `template: discovery:1: undefined variable "$bob"`,
+			err:  `bad header key template "{{ $bob }}": template: discovery:1: undefined variable "$bob"`,
 		},
 		{
 			template: PrometheusTemplate{
@@ -302,7 +320,7 @@ func TestPrometheusTemplateRender(t *testing.T) {
 				Headers: map[string]string{"key": "{{ $bob }}"},
 			},
 			data: map[string]string{},
-			err:  `template: discovery:1: undefined variable "$bob"`,
+			err:  `bad header value template "{{ $bob }}": template: discovery:1: undefined variable "$bob"`,
 		},
 		{
 			template: PrometheusTemplate{
@@ -311,7 +329,7 @@ func TestPrometheusTemplateRender(t *testing.T) {
 				Tags: []string{"key", "{{ $bob }}"},
 			},
 			data: map[string]string{},
-			err:  `template: discovery:1: undefined variable "$bob"`,
+			err:  `bad tag template "{{ $bob }}": template: discovery:1: undefined variable "$bob"`,
 		},
 		{
 			template: PrometheusTemplate{
