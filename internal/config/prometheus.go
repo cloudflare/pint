@@ -227,17 +227,28 @@ func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
 		}
 	}
 	pg.servers = append(pg.servers, server)
+	slog.Info(
+		"Configured new Prometheus server",
+		slog.String("name", server.Name()),
+		slog.Int("uris", server.ServerCount()),
+		slog.Any("tags", server.Tags()),
+		slog.Any("include", server.Include()),
+		slog.Any("exclude", server.Exclude()),
+	)
 	return nil
 }
 
-func (pg *PrometheusGenerator) Generate(ctx context.Context) (err error) {
+func (pg *PrometheusGenerator) GenerateStatic() (err error) {
 	for _, pc := range pg.cfg.Prometheus {
 		err = pg.addServer(newFailoverGroup(pc))
 		if err != nil {
 			return err
 		}
 	}
+	return nil
+}
 
+func (pg *PrometheusGenerator) GenerateDynamic(ctx context.Context) (err error) {
 	if pg.cfg.Discovery != nil {
 		servers, err := pg.cfg.Discovery.Discover(ctx)
 		if err != nil {
@@ -250,17 +261,5 @@ func (pg *PrometheusGenerator) Generate(ctx context.Context) (err error) {
 			}
 		}
 	}
-
-	for _, server := range pg.servers {
-		slog.Info(
-			"Configured new Prometheus server",
-			slog.String("name", server.Name()),
-			slog.Int("uris", server.ServerCount()),
-			slog.Any("tags", server.Tags()),
-			slog.Any("include", server.Include()),
-			slog.Any("exclude", server.Exclude()),
-		)
-	}
-
 	return nil
 }

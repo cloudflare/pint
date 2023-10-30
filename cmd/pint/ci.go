@@ -105,6 +105,10 @@ func actionCI(c *cli.Context) error {
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 	defer gen.Stop()
 
+	if err = gen.GenerateStatic(); err != nil {
+		return err
+	}
+
 	slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
 
 	summary, err := checkRules(ctx, meta.workers, gen, meta.cfg, entries)

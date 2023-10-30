@@ -151,6 +151,9 @@ func actionWatch(c *cli.Context) error {
 	interval := c.Duration(intervalFlag)
 
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
+	if err = gen.GenerateStatic(); err != nil {
+		return err
+	}
 
 	// start timer to run every $interval
 	ack := make(chan bool, 1)
