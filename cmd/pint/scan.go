@@ -56,7 +56,7 @@ func tryDecodingYamlError(err error) (l int, s string) {
 
 func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
 	if len(entries) > 0 {
-		if err = gen.Generate(ctx); err != nil {
+		if err = gen.GenerateDynamic(ctx); err != nil {
 			return summary, err
 		}
 		slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))

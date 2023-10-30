@@ -47,7 +47,7 @@ prometheus "prom" {
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
 	defer gen.Stop()
-	require.NoError(t, gen.Generate(context.Background()))
+	require.NoError(t, gen.GenerateStatic())
 
 	require.Empty(t, cfg.Checks.Disabled)
 
@@ -68,7 +68,7 @@ func TestDisableOnlineChecksWithoutPrometheus(t *testing.T) {
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
 	defer gen.Stop()
-	require.NoError(t, gen.Generate(context.Background()))
+	require.NoError(t, gen.GenerateStatic())
 
 	require.Empty(t, cfg.Checks.Disabled)
 
@@ -94,7 +94,7 @@ prometheus "prom" {
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
 	defer gen.Stop()
-	require.NoError(t, gen.Generate(context.Background()))
+	require.NoError(t, gen.GenerateStatic())
 
 	require.Empty(t, cfg.Checks.Disabled)
 
@@ -121,7 +121,7 @@ func TestSetDisabledChecks(t *testing.T) {
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
 	defer gen.Stop()
-	require.NoError(t, gen.Generate(context.Background()))
+	require.NoError(t, gen.GenerateStatic())
 
 	require.Empty(t, cfg.Checks.Disabled)
 
@@ -1549,7 +1549,7 @@ rule {
 
 			gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
 			defer gen.Stop()
-			require.NoError(t, gen.Generate(ctx))
+			require.NoError(t, gen.GenerateStatic())
 
 			checks := cfg.GetChecksForRule(ctx, gen, tc.path, tc.rule, tc.disabledChecks)
 			checkNames := make([]string, 0, len(checks))

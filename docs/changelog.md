@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.48.2
+
+### Fixed
+
+- Fixed `pint watch` to correctly work with `discovery`.
+
 ## v0.48.1
 
 - Prometheus `template` under `discovery` block can now template

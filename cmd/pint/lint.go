@@ -65,6 +65,10 @@ func actionLint(c *cli.Context) error {
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 	defer gen.Stop()
 
+	if err = gen.GenerateStatic(); err != nil {
+		return err
+	}
+
 	summary, err := checkRules(ctx, meta.workers, gen, meta.cfg, entries)
 	if err != nil {
 		return err
