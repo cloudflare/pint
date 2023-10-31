@@ -1,1419 +1,4 @@
 
-[TestGetChecksForRule/defaults - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_prometheus_server - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/multiple_URIs - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "failover": [
-        "http://localhost/1",
-        "http://localhost/2"
-      ],
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_prometheus_server_/_path_mismatch - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "foo.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_prometheus_server_/_include_&_exclude - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        ".*"
-      ],
-      "exclude": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_prometheus_server_/_excluded - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "exclude": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_prometheus_server_/_path_match - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/multiple_prometheus_servers - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "ignore",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "foo.+"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_empty_rule - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {}
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_aggregate_checks - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "aggregate": [
-        {
-          "name": ".+",
-          "keep": [
-            "job"
-          ],
-          "severity": "bug"
-        },
-        {
-          "name": ".+",
-          "strip": [
-            "instance",
-            "rack"
-          ],
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/multiple_checks_and_disable_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "aggregate": [
-        {
-          "name": ".+",
-          "keep": [
-            "job"
-          ],
-          "severity": "bug"
-        },
-        {
-          "name": ".+",
-          "strip": [
-            "instance",
-            "rack"
-          ],
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/prometheus_check_without_prometheus_server - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {
-        "maxSeries": 10000,
-        "severity": "warning"
-      }
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {}
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/duplicated_rules - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "label": [
-        {
-          "key": "team",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    },
-    {
-      "annotation": [
-        {
-          "key": "summary",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    },
-    {
-      "annotation": [
-        {
-          "key": "summary",
-          "required": true,
-          "severity": "bug"
-        }
-      ],
-      "label": [
-        {
-          "key": "team",
-          "severity": "warning"
-        }
-      ]
-    },
-    {
-      "annotation": [
-        {
-          "key": "summary",
-          "value": "foo.+",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/multiple_cost_checks - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "cost": {
-        "severity": "info"
-      }
-    },
-    {
-      "cost": {
-        "maxSeries": 10000,
-        "severity": "warning"
-      }
-    },
-    {
-      "cost": {
-        "maxSeries": 20000,
-        "severity": "bug"
-      }
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/reject_rules - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "reject": [
-        {
-          "key": "http://.+",
-          "label_keys": true,
-          "label_values": true
-        },
-        {
-          "key": ".* +.*",
-          "label_keys": true,
-          "annotation_keys": true
-        },
-        {
-          "annotation_values": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_label_match_/_type_mismatch - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "label": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_label_match_/_no_label - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "label": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_label_match_/_label_mismatch - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "label": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_label_match_/_label_match - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "label": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "annotation": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "annotation": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "annotation": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/checks_disabled_via_config - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "promql/rate",
-      "promql/vector_matching",
-      "promql/range_query",
-      "rule/duplicate",
-      "labels/conflict"
-    ]
-  },
-  "rules": [
-    {
-      "alerts": {
-        "range": "1h",
-        "step": "1m",
-        "resolve": "5m"
-      }
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/single_check_enabled_via_config - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "required": false
-    }
-  ],
-  "checks": {},
-  "rules": [
-    {
-      "alerts": {
-        "range": "1h",
-        "step": "1m",
-        "resolve": "5m"
-      }
-    }
-  ],
-  "owners": {}
-}
----
-
 [TestGetChecksForRule/two_checks_enabled_via_config - 1]
 {
   "ci": {
@@ -1544,6 +129,1138 @@
 }
 ---
 
+[TestGetChecksForRule/defaults - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/multiple_URIs - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "failover": [
+        "http://localhost/1",
+        "http://localhost/2"
+      ],
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server_/_path_mismatch - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "foo.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server_/_include_&_exclude - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        ".*"
+      ],
+      "exclude": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server_/_excluded - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "exclude": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_prometheus_server_/_path_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/multiple_prometheus_servers - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "ignore",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "foo.+"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_empty_rule - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {}
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_aggregate_checks - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "aggregate": [
+        {
+          "name": ".+",
+          "keep": [
+            "job"
+          ],
+          "severity": "bug"
+        },
+        {
+          "name": ".+",
+          "strip": [
+            "instance",
+            "rack"
+          ],
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/multiple_checks_and_disable_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "aggregate": [
+        {
+          "name": ".+",
+          "keep": [
+            "job"
+          ],
+          "severity": "bug"
+        },
+        {
+          "name": ".+",
+          "strip": [
+            "instance",
+            "rack"
+          ],
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/prometheus_check_without_prometheus_server - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {
+        "maxSeries": 10000,
+        "severity": "warning"
+      }
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/duplicated_rules - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "label": [
+        {
+          "key": "team",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "required": true,
+          "severity": "bug"
+        }
+      ],
+      "label": [
+        {
+          "key": "team",
+          "severity": "warning"
+        }
+      ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/reject_rules - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "reject": [
+        {
+          "key": "http://.+",
+          "label_keys": true,
+          "label_values": true
+        },
+        {
+          "key": ".* +.*",
+          "label_keys": true,
+          "annotation_keys": true
+        },
+        {
+          "annotation_values": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_label_match_/_type_mismatch - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_label_match_/_no_label - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_label_match_/_label_mismatch - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_label_match_/_label_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
 [TestGetChecksForRule/for_match_/_passing - 1]
 {
   "ci": {
@@ -1555,6 +1272,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1605,6 +1323,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1655,6 +1374,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1705,6 +1425,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1755,6 +1476,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1805,6 +1527,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1855,6 +1578,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1905,6 +1629,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -1955,6 +1680,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2005,6 +1731,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2044,7 +1771,7 @@
 }
 ---
 
-[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
+[TestGetChecksForRule/alerts/count_defaults - 1]
 {
   "ci": {
     "maxCommits": 20,
@@ -2053,17 +1780,8 @@
   "parser": {},
   "prometheus": [
     {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
+      "name": "prom",
+      "uri": "http://localhost",
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
@@ -2075,6 +1793,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2093,11 +1812,110 @@
       "rule/label",
       "rule/link",
       "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template"
     ]
   },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1d",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/alerts/count_full - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1d",
+        "step": "1m",
+        "resolve": "5m",
+        "minCount": 100,
+        "severity": "bug"
+      }
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/single_check_enabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {},
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ],
   "owners": {}
 }
 ---
@@ -2133,6 +1951,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2192,6 +2011,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2216,6 +2036,220 @@
       "promql/regexp"
     ]
   },
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/checks_disabled_via_config - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "promql/rate",
+      "promql/vector_matching",
+      "promql/range_query",
+      "rule/duplicate",
+      "labels/conflict"
+    ]
+  },
+  "rules": [
+    {
+      "alerts": {
+        "range": "1h",
+        "step": "1m",
+        "resolve": "5m"
+      }
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/multiple_cost_checks - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {
+        "severity": "info"
+      }
+    },
+    {
+      "cost": {
+        "maxSeries": 10000,
+        "severity": "warning"
+      }
+    },
+    {
+      "cost": {
+        "maxSeries": 20000,
+        "severity": "bug"
+      }
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "required": false
+    }
+  ],
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "cost": {}
+    }
+  ],
   "owners": {}
 }
 ---
@@ -2268,6 +2302,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2340,6 +2375,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2364,7 +2400,7 @@
 }
 ---
 
-[TestGetChecksForRule/alerts/count_defaults - 1]
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
 {
   "ci": {
     "maxCommits": 20,
@@ -2373,8 +2409,17 @@
   "parser": {},
   "prometheus": [
     {
-      "name": "prom",
-      "uri": "http://localhost",
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
@@ -2386,6 +2431,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2404,22 +2450,17 @@
       "rule/label",
       "rule/link",
       "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "alerts/external_labels"
     ]
   },
-  "rules": [
-    {
-      "alerts": {
-        "range": "1d",
-        "step": "1m",
-        "resolve": "5m"
-      }
-    }
-  ],
   "owners": {}
 }
 ---
 
-[TestGetChecksForRule/alerts/count_full - 1]
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
 {
   "ci": {
     "maxCommits": 20,
@@ -2428,8 +2469,17 @@
   "parser": {},
   "prometheus": [
     {
-      "name": "prom",
-      "uri": "http://localhost",
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "uptime": "up",
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
       "timeout": "1s",
       "concurrency": 16,
       "rateLimit": 100,
@@ -2441,6 +2491,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2459,19 +2510,12 @@
       "rule/label",
       "rule/link",
       "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "alerts/external_labels"
     ]
   },
-  "rules": [
-    {
-      "alerts": {
-        "range": "1d",
-        "step": "1m",
-        "resolve": "5m",
-        "minCount": 100,
-        "severity": "bug"
-      }
-    }
-  ],
   "owners": {}
 }
 ---
@@ -2487,6 +2531,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2533,6 +2578,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2583,6 +2629,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2638,6 +2685,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2658,7 +2706,8 @@
       "rule/reject"
     ],
     "disabled": [
-      "alerts/template"
+      "alerts/template",
+      "alerts/external_labels"
     ]
   },
   "owners": {}
@@ -2690,6 +2739,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2742,6 +2792,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2791,6 +2842,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2840,6 +2892,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2901,6 +2954,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2936,6 +2990,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -2974,6 +3029,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3030,6 +3086,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3086,6 +3143,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3155,6 +3213,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3195,6 +3254,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3301,6 +3361,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3355,6 +3416,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3410,6 +3472,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3466,6 +3529,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3522,6 +3586,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3578,6 +3643,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3634,6 +3700,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3690,6 +3757,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3746,6 +3814,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -3816,6 +3885,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4032,6 +4102,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4082,6 +4153,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4132,6 +4204,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4182,6 +4255,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4232,6 +4306,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4282,6 +4357,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4332,6 +4408,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4382,6 +4459,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4432,6 +4510,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4482,6 +4561,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4552,6 +4632,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4572,7 +4653,8 @@
       "rule/reject"
     ],
     "disabled": [
-      "alerts/template"
+      "alerts/template",
+      "alerts/external_labels"
     ]
   },
   "owners": {}
@@ -4610,6 +4692,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4669,6 +4752,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4745,6 +4829,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4817,6 +4902,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4863,6 +4949,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4918,6 +5005,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -4964,6 +5052,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5010,6 +5099,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5060,6 +5150,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5115,6 +5206,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5135,7 +5227,8 @@
       "rule/reject"
     ],
     "disabled": [
-      "alerts/template"
+      "alerts/template",
+      "alerts/external_labels"
     ]
   },
   "owners": {}
@@ -5167,6 +5260,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5219,6 +5313,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5268,6 +5363,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5317,6 +5413,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5378,6 +5475,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5413,6 +5511,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5451,6 +5550,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5507,6 +5607,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5563,6 +5664,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5632,6 +5734,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5672,6 +5775,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5778,6 +5882,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5832,6 +5937,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5887,6 +5993,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5943,6 +6050,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -5999,6 +6107,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6055,6 +6164,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6111,6 +6221,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6167,6 +6278,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6223,6 +6335,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6293,6 +6406,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6509,6 +6623,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6559,6 +6674,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6609,6 +6725,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6659,6 +6776,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6709,6 +6827,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6759,6 +6878,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6809,6 +6929,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6859,6 +6980,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6909,6 +7031,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -6959,6 +7082,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7029,6 +7153,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7049,7 +7174,8 @@
       "rule/reject"
     ],
     "disabled": [
-      "alerts/template"
+      "alerts/template",
+      "alerts/external_labels"
     ]
   },
   "owners": {}
@@ -7087,6 +7213,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7146,6 +7273,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7222,6 +7350,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7294,6 +7423,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7340,6 +7470,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
@@ -7395,6 +7526,7 @@
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",

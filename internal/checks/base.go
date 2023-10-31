@@ -14,6 +14,7 @@ var (
 	CheckNames = []string{
 		AnnotationCheckName,
 		AlertsCheckName,
+		AlertsExternalLabelsCheckName,
 		AlertForCheckName,
 		TemplateCheckName,
 		LabelsConflictCheckName,
@@ -35,6 +36,7 @@ var (
 	}
 	OnlineChecks = []string{
 		AlertsCheckName,
+		AlertsExternalLabelsCheckName,
 		LabelsConflictCheckName,
 		RangeQueryCheckName,
 		RateCheckName,
