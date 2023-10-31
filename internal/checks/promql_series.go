@@ -262,8 +262,12 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			text, severity := c.textAndSeverity(
 				settings,
 				bareSelector.String(),
-				fmt.Sprintf("%s didn't have any series for %q metric in the last %s",
-					promText(c.prom.Name(), trs.URI), bareSelector.String(), sinceDesc(trs.Series.From)),
+				fmt.Sprintf("%s didn't have any series for %q metric in the last %s%s",
+					promText(c.prom.Name(), trs.URI),
+					bareSelector.String(),
+					sinceDesc(trs.Series.From),
+					c.checkOtherServer(ctx, selector.String()),
+				),
 				Bug,
 			)
 			problems = append(problems, Problem{
@@ -514,6 +518,42 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 	}
 
 	return problems
+}
+
+func (c SeriesCheck) checkOtherServer(ctx context.Context, query string) string {
+	var servers []*promapi.FailoverGroup
+	if val := ctx.Value(promapi.AllPrometheusServers); val != nil {
+		servers = val.([]*promapi.FailoverGroup)
+	}
+
+	if len(servers) == 0 {
+		return ""
+	}
+
+	presentProms := []string{}
+	for _, prom := range servers {
+		slog.Debug("Checking if metric exists on any other Prometheus server", slog.String("check", c.Reporter()), slog.String("selector", query))
+
+		qr, err := prom.Query(ctx, fmt.Sprintf("count(%s)", query))
+		if err != nil {
+			continue
+		}
+
+		var series int
+		for _, s := range qr.Series {
+			series += int(s.Value)
+		}
+
+		if series > 0 {
+			presentProms = append(presentProms, prom.Name())
+		}
+	}
+
+	if len(presentProms) > 0 {
+		return fmt.Sprintf(", %q was found on other prometheus servers: %s, are you deploying this rule to the correct instance?", query, strings.Join(presentProms, ", "))
+	}
+
+	return ""
 }
 
 func (c SeriesCheck) queryProblem(err error, selector string, expr parser.PromQLExpr) Problem {

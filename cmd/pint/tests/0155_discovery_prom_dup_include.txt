@@ -19,6 +19,8 @@ level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom2.exam
 level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7155
 level=WARN msg="Duplicated prometheus server with different include" name=prom-ha a=["^prom2$"] b=["^prom1$"]
 level=INFO msg="Configured new Prometheus server" name=prom-ha uris=1 tags=[] include=["^prom1$"] exclude=[]
+level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom1.example.com workers=16
+level=DEBUG msg="Stopping query workers" name=prom-ha uri=https://prom1.example.com
 level=ERROR msg="Fatal error" err="Duplicated name for Prometheus server definition: prom-ha"
 -- rules/0001.yml --
 groups:

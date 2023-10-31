@@ -18,6 +18,12 @@ import (
 	"go.uber.org/ratelimit"
 )
 
+type PrometheusContextKey string
+
+const (
+	AllPrometheusServers = PrometheusContextKey("allServers")
+)
+
 type QueryError struct {
 	err error
 	msg string

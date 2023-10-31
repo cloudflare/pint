@@ -16,6 +16,7 @@ import (
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
@@ -76,6 +77,7 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 	results := make(chan reporter.Report, workers*5)
 	wg := sync.WaitGroup{}
 
+	ctx = context.WithValue(ctx, promapi.AllPrometheusServers, gen.Servers())
 	for _, s := range cfg.Check {
 		settings, _ := s.Decode()
 		key := checks.SettingsKey(s.Name)
