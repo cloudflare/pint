@@ -39,6 +39,9 @@ prometheus "prom" {
   uri     = "http://127.0.0.1"
   timeout = "5s"
 }
+checks {
+  disabled = [ "alerts/external_labels" ]
+}
 rule {
     match {
       kind = "recording"

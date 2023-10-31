@@ -44,6 +44,8 @@ parser {
 # TYPE pint_check_duration_seconds summary
 pint_check_duration_seconds_sum{check="alerts/comparison"}
 pint_check_duration_seconds_count{check="alerts/comparison"}
+pint_check_duration_seconds_sum{check="alerts/external_labels"}
+pint_check_duration_seconds_count{check="alerts/external_labels"}
 pint_check_duration_seconds_sum{check="alerts/for"}
 pint_check_duration_seconds_count{check="alerts/for"}
 pint_check_duration_seconds_sum{check="alerts/template"}
@@ -89,6 +91,8 @@ pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",p
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="couldn't run \"promql/series\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="prometheus \"prom1\" at http://127.0.0.1:7054 failed with: bad_data: bogus query",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="couldn't run \"alerts/external_labels\" checks due to prometheus \"prom1\" at http://127.0.0.1:7054 connection error: server_error: server error: 500",reporter="alerts/external_labels",severity="bug"}
+pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="couldn't run \"alerts/external_labels\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="alerts/external_labels",severity="bug"}
 pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="couldn't run \"promql/range_query\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/range_query",severity="bug"}
 pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="couldn't run \"promql/rate\" checks due to prometheus \"prom1\" at http://127.0.0.1:7054 connection error: server_error: server error: 500",reporter="promql/rate",severity="bug"}
 pint_problem{filename="rules/2.yml",kind="alerting",name="comparison",owner="bob and alice",problem="couldn't run \"promql/rate\" checks due to prometheus \"prom2\" at http://127.0.0.1:1054 connection error: connection refused",reporter="promql/rate",severity="bug"}

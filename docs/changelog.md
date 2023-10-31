@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.49.0
+
+### Added
+
+- Added [alerts/external_labels](checks/alerts/external_labels.md) check.
+
 ## v0.48.2
 
 ### Fixed

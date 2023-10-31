@@ -188,6 +188,7 @@ prometheus "prom" {
 				checks.RangeQueryCheckName + "(prom)",
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsExternalLabelsCheckName + "(prom)",
 			},
 		},
 		{
@@ -213,6 +214,7 @@ prometheus "prom" {
 				checks.RangeQueryCheckName + "(prom)",
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsExternalLabelsCheckName + "(prom)",
 			},
 		},
 		{
@@ -227,7 +229,7 @@ prometheus "prom2" {
   timeout = "1s"
 }
 checks {
-  disabled = [ "alerts/template" ]
+  disabled = [ "alerts/template", "alerts/external_labels" ]
 }
 `,
 			path: "rules.yml",
@@ -333,6 +335,7 @@ prometheus "prom" {
 				checks.RangeQueryCheckName + "(prom)",
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsExternalLabelsCheckName + "(prom)",
 			},
 		},
 		{
@@ -363,6 +366,7 @@ prometheus "ignore" {
 				checks.RangeQueryCheckName + "(prom)",
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsExternalLabelsCheckName + "(prom)",
 			},
 		},
 		{
@@ -481,6 +485,7 @@ prometheus "prom2" {
   # pint disable promql/vector_matching(prom1)
   # pint disable rule/duplicate(prom1)
   # pint disable labels/conflict(prom2)
+  # pint disable alerts/external_labels(prom2)
   expr: sum(foo)
 `),
 			checks: []string{
@@ -493,6 +498,7 @@ prometheus "prom2" {
 				checks.RateCheckName + "(prom1)",
 				checks.RangeQueryCheckName + "(prom1)",
 				checks.LabelsConflictCheckName + "(prom1)",
+				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
@@ -587,6 +593,7 @@ rule {
 # pint disable promql/range_query
 # pint disable rule/duplicate
 # pint disable labels/conflict
+# pint disable alerts/external_labels
 - record: foo
   # pint disable promql/fragile
   # pint disable promql/regexp
@@ -871,6 +878,7 @@ prometheus "prom1" {
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
 				checks.RegexpCheckName,
+				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.AlertsCheckName + "(prom1)",
 			},
 		},
@@ -910,6 +918,7 @@ prometheus "prom1" {
 				checks.RangeQueryCheckName + "(prom1)",
 				checks.RuleDuplicateCheckName + "(prom1)",
 				checks.LabelsConflictCheckName + "(prom1)",
+				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.AlertsCheckName + "(prom1)",
 			},
 		},
@@ -1263,7 +1272,7 @@ prometheus "prom2" {
   timeout = "1s"
 }
 checks {
-  disabled = [ "alerts/template" ]
+  disabled = [ "alerts/template", "alerts/external_labels" ]
 }
 `,
 			path: "rules.yml",
@@ -1318,8 +1327,10 @@ checks {
 				checks.ComparisonCheckName,
 				checks.FragileCheckName,
 				checks.LabelsConflictCheckName + "(prom1)",
+				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
+				checks.AlertsExternalLabelsCheckName + "(prom2)",
 			},
 			disabledChecks: []string{"promql/rate"},
 		},
@@ -1358,11 +1369,13 @@ checks {
 				checks.RangeQueryCheckName + "(prom1)",
 				checks.RuleDuplicateCheckName + "(prom1)",
 				checks.LabelsConflictCheckName + "(prom1)",
+				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
+				checks.AlertsExternalLabelsCheckName + "(prom2)",
 			},
 			disabledChecks: []string{"promql/rate"},
 		},
@@ -1385,6 +1398,7 @@ prometheus "prom3" {
 			path: "rules.yml",
 			rule: newRule(t, `
 # pint disable alerts/count(+disable)
+# pint disable alerts/external_labels(+disable)
 # pint disable labels/conflict(+disable)
 # pint disable promql/range_query(+disable)
 # pint disable promql/regexp(+disable)
@@ -1407,12 +1421,14 @@ prometheus "prom3" {
 				checks.RangeQueryCheckName + "(prom2)",
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
+				checks.AlertsExternalLabelsCheckName + "(prom2)",
 				checks.RateCheckName + "(prom3)",
 				checks.SeriesCheckName + "(prom3)",
 				checks.VectorMatchingCheckName + "(prom3)",
 				checks.RangeQueryCheckName + "(prom3)",
 				checks.RuleDuplicateCheckName + "(prom3)",
 				checks.LabelsConflictCheckName + "(prom3)",
+				checks.AlertsExternalLabelsCheckName + "(prom3)",
 			},
 		},
 		{
@@ -1434,6 +1450,7 @@ prometheus "prom3" {
 			path: "rules.yml",
 			rule: newRule(t, `
 # pint snooze 2099-11-28 alerts/count(+disable)
+# pint snooze 2099-11-28 alerts/external_labels(+disable)
 # pint snooze 2099-11-28 labels/conflict(+disable)
 # pint snooze 2099-11-28 promql/range_query(+disable)
 # pint snooze 2099-11-28 promql/regexp(+disable)
@@ -1456,12 +1473,14 @@ prometheus "prom3" {
 				checks.RangeQueryCheckName + "(prom2)",
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
+				checks.AlertsExternalLabelsCheckName + "(prom2)",
 				checks.RateCheckName + "(prom3)",
 				checks.SeriesCheckName + "(prom3)",
 				checks.VectorMatchingCheckName + "(prom3)",
 				checks.RangeQueryCheckName + "(prom3)",
 				checks.RuleDuplicateCheckName + "(prom3)",
 				checks.LabelsConflictCheckName + "(prom3)",
+				checks.AlertsExternalLabelsCheckName + "(prom3)",
 			},
 		},
 		{
@@ -1494,6 +1513,7 @@ rule {
 				checks.RangeQueryCheckName + "(prom)",
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.AlertsCheckName + "(prom)",
 			},
 		},
@@ -1529,6 +1549,7 @@ rule {
 				checks.RangeQueryCheckName + "(prom)",
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
+				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.AlertsCheckName + "(prom)",
 			},
 		},

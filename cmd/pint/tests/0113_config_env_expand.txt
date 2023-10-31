@@ -35,6 +35,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
     "enabled": [
       "alerts/annotation",
       "alerts/count",
+      "alerts/external_labels",
       "alerts/for",
       "alerts/template",
       "labels/conflict",
