@@ -7,6 +7,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=3
 level=INFO msg="Configured new Prometheus server" name=disabled uris=1 tags=[] include=["^invalid/.+$"] exclude=["^invalid/rules/.+$"]
+level=DEBUG msg="Starting query workers" name=disabled uri=http://127.0.0.1:123 workers=16
 level=DEBUG msg="Generated all Prometheus servers" count=1
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=first lines=1-3
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=first
@@ -18,6 +19,7 @@ rules/0001.yml:6 Warning: job label is required and should be preserved when agg
  6 |   expr: sum(bar)
 
 level=INFO msg="Problems found" Warning=1
+level=DEBUG msg="Stopping query workers" name=disabled uri=http://127.0.0.1:123
 -- rules/0001.yml --
 - alert: first
   expr: foo > 1

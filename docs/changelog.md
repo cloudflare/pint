@@ -6,6 +6,14 @@
 
 - Added [alerts/external_labels](checks/alerts/external_labels.md) check.
 
+### Changed
+
+- When [promql/series](checks/promql/series.md) finds that a time series used
+  by a rule is missing it will now also check other defined Prometheus servers
+  and add that information to the report.
+  This allows pint to flag rules that are most likely deployed to the wrong servers,
+  using missing scrape jobs.
+
 ## v0.48.2
 
 ### Fixed

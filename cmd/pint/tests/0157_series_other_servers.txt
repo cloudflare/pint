@@ -1,0 +1,45 @@
+http response prometheus1 /api/v1/metadata 200 {"status":"success","data":{}}
+http response prometheus1 /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http response prometheus1 /api/v1/status/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http response prometheus1 /api/v1/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http response prometheus1 /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
+http start prometheus1 127.0.0.1:7157
+
+http response prometheus2 /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1698249632.491,"1"]}]}}
+http start prometheus2 127.0.0.1:8157
+
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 tags=[] include=["^rules/1.yml$"] exclude=[]
+level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 tags=[] include=["^rules/2.yml$"] exclude=[]
+level=WARN msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" name=prom1 metric=up
+level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom1 metric=up
+rules/1.yml:5 Bug: prometheus "prom1" at http://127.0.0.1:7157 didn't have any series for "only_on_prom2" metric in the last 1w, "only_on_prom2" was found on other prometheus servers: prom2, are you deploying this rule to the correct instance? (promql/series)
+ 5 |     expr: only_on_prom2 == 0
+
+level=INFO msg="Problems found" Bug=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yml --
+groups:
+- name: foo
+  rules:
+  - alert: foo
+    expr: only_on_prom2 == 0
+-- .pint.hcl --
+prometheus "prom1" {
+  uri      = "http://127.0.0.1:7157"
+  timeout  = "5s"
+  required = true
+  include  = [ "rules/1.yml" ]
+}
+prometheus "prom2" {
+  uri      = "http://127.0.0.1:8157"
+  timeout  = "5s"
+  required = true
+  include  = [ "rules/2.yml" ]
+}

@@ -198,6 +198,10 @@ type PrometheusGenerator struct {
 	cfg             Config
 }
 
+func (pg *PrometheusGenerator) Servers() []*promapi.FailoverGroup {
+	return pg.servers
+}
+
 func (pg *PrometheusGenerator) Count() int {
 	return len(pg.servers)
 }
@@ -213,7 +217,6 @@ func (pg *PrometheusGenerator) ServersForPath(path string) []*promapi.FailoverGr
 	var servers []*promapi.FailoverGroup
 	for _, server := range pg.servers {
 		if server.IsEnabledForPath(path) {
-			server.StartWorkers(pg.metricsRegistry)
 			servers = append(servers, server)
 		}
 	}
@@ -235,6 +238,7 @@ func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
 		slog.Any("include", server.Include()),
 		slog.Any("exclude", server.Exclude()),
 	)
+	server.StartWorkers(pg.metricsRegistry)
 	return nil
 }
 
