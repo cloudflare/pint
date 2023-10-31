@@ -17,6 +17,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -62,7 +63,7 @@ func TestScripts(t *testing.T) {
 			"cert": tlsCert,
 		},
 		Setup: func(env *testscript.Env) error {
-			env.Values["mocks"] = &httpMocks{responses: map[string][]httpMock{}}
+			env.Values["mocks"] = &httpMocks{resps: map[string][]httpMock{}}
 			return nil
 		},
 	})
@@ -177,7 +178,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		mux := http.NewServeMux()
 		mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var done bool
-			for n, mockList := range mocks.responses {
+			for n, mockList := range mocks.responses() {
 				if n == name {
 					for _, mock := range mockList {
 						if mock.pattern != "/" && (r.URL.Path != mock.pattern || !strings.HasPrefix(r.URL.Path, mock.pattern)) {
@@ -231,14 +232,23 @@ type httpMock struct {
 }
 
 type httpMocks struct {
-	responses map[string][]httpMock
+	mtx   sync.Mutex
+	resps map[string][]httpMock
 }
 
 func (m *httpMocks) add(name string, mock httpMock) {
-	if _, ok := m.responses[name]; !ok {
-		m.responses[name] = []httpMock{}
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+	if _, ok := m.resps[name]; !ok {
+		m.resps[name] = []httpMock{}
 	}
-	m.responses[name] = append(m.responses[name], mock)
+	m.resps[name] = append(m.resps[name], mock)
+}
+
+func (m *httpMocks) responses() map[string][]httpMock {
+	m.mtx.Lock()
+	defer m.mtx.Unlock()
+	return m.resps
 }
 
 func tlsCert(ts *testscript.TestScript, _ bool, args []string) {
