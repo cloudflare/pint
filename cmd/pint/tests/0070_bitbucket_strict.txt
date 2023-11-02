@@ -1,4 +1,5 @@
-http response bitbucket / 200 OK
+http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {}
 http start bitbucket 127.0.0.1:6070
 
 mkdir testrepo
@@ -23,10 +24,10 @@ pint.error -l debug --no-color ci
 ! stdout .
 stderr 'result":"FAIL"'
 stderr ',"line":3,'
-stderr 'level=DEBUG msg="Sending a request to BitBucket" method=PUT'
-stderr 'level=DEBUG msg="BitBucket request completed" status=200'
-stderr 'level=DEBUG msg="Sending a request to BitBucket" method=DELETE'
-stderr 'level=DEBUG msg="BitBucket request completed" status=200'
+stderr 'msg="Sending a request to BitBucket" method=PUT'
+stderr 'msg="BitBucket request completed" status=200'
+stderr 'msg="Sending a request to BitBucket" method=DELETE'
+stderr 'msg="BitBucket request completed" status=200'
 
 -- src/v1.yml --
 - alert: rule1

@@ -13,6 +13,9 @@
   and add that information to the report.
   This allows pint to flag rules that are most likely deployed to the wrong servers,
   using missing scrape jobs.
+- Reporting problems to BitBucket will now use comments instead of annotations.
+  This is only if there is an  open pull request for tested branch, if there is no
+  open pull request problems will be reported using code insight annotations.
 
 ## v0.48.2
 

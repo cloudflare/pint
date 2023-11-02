@@ -14,6 +14,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/neilotoole/slogt"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
@@ -21,7 +22,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/log"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -105,10 +105,11 @@ type checkTest struct {
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
-	log.Level.Set(slog.LevelError)
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+
 			var uri string
 			if len(tc.mocks) > 0 {
 				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

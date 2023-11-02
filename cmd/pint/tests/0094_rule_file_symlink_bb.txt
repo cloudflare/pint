@@ -12,7 +12,8 @@ http response prometheus5m /api/v1/query_range 200 {"status":"success","data":{"
 http response prometheus5m /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus5m 127.0.0.1:2094
 
-http response bitbucket / 200 OK
+http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {}
 http start bitbucket 127.0.0.1:6094
 
 mkdir testrepo
