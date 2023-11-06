@@ -1,17 +1,11 @@
 package reporter
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"log/slog"
-	"net/http"
 	"time"
 
-	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
-	"github.com/cloudflare/pint/internal/output"
 )
 
 const (
@@ -20,92 +14,93 @@ const (
 		"Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server)."
 )
 
-type BitBucketReport struct {
-	Reporter string                `json:"reporter"`
-	Title    string                `json:"title"`
-	Result   string                `json:"result"`
-	Details  string                `json:"details"`
-	Link     string                `json:"link"`
-	Data     []BitBucketReportData `json:"data"`
-}
-
-type DataType string
-
-const (
-	BooleanType    DataType = "BOOLEAN"
-	DateType       DataType = "DATA"
-	DurationType   DataType = "DURATION"
-	LinkType       DataType = "LINK"
-	NumberType     DataType = "NUMBER"
-	PercentageType DataType = "PERCENTAGE"
-	TextType       DataType = "TEXT"
-)
-
-type BitBucketReportData struct {
-	Title string   `json:"title"`
-	Type  DataType `json:"type"`
-	Value any      `json:"value"`
-}
-
-type BitBucketAnnotation struct {
-	Path     string `json:"path"`
-	Line     int    `json:"line"`
-	Message  string `json:"message"`
-	Severity string `json:"severity"`
-	Type     string `json:"type"`
-	Link     string `json:"link"`
-}
-
-type BitBucketAnnotations struct {
-	Annotations []BitBucketAnnotation `json:"annotations"`
-}
-
 func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, gitCmd git.CommandRunner) BitBucketReporter {
 	return BitBucketReporter{
-		version:   version,
-		uri:       uri,
-		timeout:   timeout,
-		authToken: token,
-		project:   project,
-		repo:      repo,
-		gitCmd:    gitCmd,
+		api:    newBitBucketAPI(version, uri, timeout, token, project, repo),
+		gitCmd: gitCmd,
 	}
 }
 
 // BitBucketReporter send linter results to BitBucket using
 // https://docs.atlassian.com/bitbucket-server/rest/7.8.0/bitbucket-code-insights-rest.html
 type BitBucketReporter struct {
-	version   string
-	uri       string
-	timeout   time.Duration
-	authToken string
-	project   string
-	repo      string
-	gitCmd    git.CommandRunner
+	api    *bitBucketAPI
+	gitCmd git.CommandRunner
 }
 
 func (r BitBucketReporter) Submit(summary Summary) (err error) {
-	headCommit, err := git.HeadCommit(r.gitCmd)
-	if err != nil {
+	var headCommit string
+	if headCommit, err = git.HeadCommit(r.gitCmd); err != nil {
 		return fmt.Errorf("failed to get HEAD commit: %w", err)
 	}
 	slog.Info("Got HEAD commit from git", slog.String("commit", headCommit))
 
-	annotations := []BitBucketAnnotation{}
-	for _, report := range summary.Reports() {
-		annotations = append(annotations, r.makeAnnotation(report)...)
+	if err = r.api.deleteReport(headCommit); err != nil {
+		slog.Error("Failed to delete old BitBucket report", slog.Any("err", err))
 	}
 
-	isPassing := true
-	for _, ann := range annotations {
-		if ann.Type == "BUG" {
-			isPassing = false
-			break
+	if err = r.api.createReport(summary, headCommit); err != nil {
+		return fmt.Errorf("failed to create BitBucket report: %w", err)
+	}
+
+	var headBranch string
+	if headBranch, err = git.CurrentBranch(r.gitCmd); err != nil {
+		return fmt.Errorf("failed to get current branch: %w", err)
+	}
+
+	var pr *bitBucketPR
+	if pr, err = r.api.findPullRequestForBranch(headBranch, headCommit); err != nil {
+		return fmt.Errorf("failed to get open pull requests from BitBucket: %w", err)
+	}
+
+	if pr != nil {
+		slog.Info(
+			"Found open pull request, reporting problems using comments",
+			slog.Int("id", pr.ID),
+			slog.String("srcBranch", pr.srcBranch),
+			slog.String("srcCommit", pr.srcHead),
+			slog.String("dstBranch", pr.dstBranch),
+			slog.String("dstCommit", pr.dstHead),
+		)
+
+		slog.Info("Getting pull request changes from BitBucket")
+		var changes *bitBucketPRChanges
+		if changes, err = r.api.getPullRequestChanges(pr); err != nil {
+			return fmt.Errorf("failed to get pull request changes from BitBucket: %w", err)
 		}
-	}
+		slog.Info("Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
 
-	if err = r.postReport(headCommit, isPassing, annotations, summary); err != nil {
-		return err
+		var existingComments []bitBucketComment
+		if existingComments, err = r.api.getPullRequestComments(pr); err != nil {
+			return fmt.Errorf("failed to get pull request comments from BitBucket: %w", err)
+		}
+		slog.Info("Got existing pull request comments from BitBucket", slog.Int("count", len(existingComments)))
+
+		pendingComments := r.api.makeComments(summary, changes)
+		slog.Info("Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
+
+		slog.Info("Deleting stale comments from BitBucket")
+		r.api.pruneComments(pr, existingComments, pendingComments)
+
+		slog.Info("Adding missing comments to BitBucket")
+		if err = r.api.addComments(pr, existingComments, pendingComments, changes); err != nil {
+			return fmt.Errorf("failed to create BitBucket pull request comments: %w", err)
+		}
+
+	} else {
+		slog.Info(
+			"No open pull request found, reporting problems using code insight annotations",
+			slog.String("branch", headBranch),
+			slog.String("commit", headCommit),
+		)
+
+		if err = r.api.deleteAnnotations(headCommit); err != nil {
+			return fmt.Errorf("failed to delete existing BitBucket code insight annotations: %w", err)
+		}
+
+		if err = r.api.createAnnotations(summary, headCommit); err != nil {
+			return fmt.Errorf("failed to create BitBucket code insight annotations: %w", err)
+		}
 	}
 
 	if summary.HasFatalProblems() {
@@ -113,141 +108,6 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 	}
 
 	return nil
-}
-
-func (r BitBucketReporter) makeAnnotation(report Report) (annotations []BitBucketAnnotation) {
-	if !shouldReport(report) {
-		slog.Debug(
-			"Problem reported on unmodified line, skipping",
-			slog.String("path", report.SourcePath),
-			slog.String("lines", output.FormatLineRangeString(report.Problem.Lines)),
-		)
-		return annotations
-	}
-
-	var msgPrefix string
-	reportLine, srcLine := moveReportedLine(report)
-	if reportLine != srcLine {
-		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
-	}
-	if report.ReportedPath != report.SourcePath {
-		if msgPrefix == "" {
-			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s: ", report.SourcePath)
-		} else {
-			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s. %s", report.SourcePath, msgPrefix)
-		}
-	}
-
-	var severity, atype string
-	switch report.Problem.Severity {
-	case checks.Fatal:
-		severity = "HIGH"
-		atype = "BUG"
-	case checks.Bug:
-		severity = "MEDIUM"
-		atype = "BUG"
-	case checks.Warning, checks.Information:
-		severity = "LOW"
-		atype = "CODE_SMELL"
-	}
-
-	a := BitBucketAnnotation{
-		Path:     report.ReportedPath,
-		Line:     reportLine,
-		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Text),
-		Severity: severity,
-		Type:     atype,
-		Link:     fmt.Sprintf("https://cloudflare.github.io/pint/checks/%s.html", report.Problem.Reporter),
-	}
-	annotations = append(annotations, a)
-
-	return annotations
-}
-
-func (r BitBucketReporter) bitBucketRequest(method, url string, body []byte) error {
-	slog.Debug("Sending a request to BitBucket", slog.String("method", method), slog.String("url", url))
-	slog.Debug("Request payload", slog.String("body", string(body)))
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(body))
-	if err != nil {
-		return err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", r.authToken))
-
-	netClient := &http.Client{
-		Timeout: r.timeout,
-	}
-
-	resp, err := netClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	slog.Debug("BitBucket request completed", slog.Int("status", resp.StatusCode))
-	if resp.StatusCode >= 300 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			slog.Error("Failed to read response body", slog.Any("err", err))
-		}
-		slog.Error("Got a non 2xx response", slog.String("body", string(body)), slog.String("url", url), slog.Int("code", resp.StatusCode))
-		return fmt.Errorf("%s request failed", method)
-	}
-
-	return nil
-}
-
-func (r BitBucketReporter) createAnnotations(commit string, annotations []BitBucketAnnotation) error {
-	payload, _ := json.Marshal(BitBucketAnnotations{Annotations: annotations})
-	url := fmt.Sprintf("%s/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations",
-		r.uri, r.project, r.repo, commit)
-	return r.bitBucketRequest(http.MethodPost, url, payload)
-}
-
-func (r BitBucketReporter) deleteAnnotations(commit string) error {
-	url := fmt.Sprintf("%s/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations",
-		r.uri, r.project, r.repo, commit)
-	return r.bitBucketRequest(http.MethodDelete, url, nil)
-}
-
-func (r BitBucketReporter) postReport(commit string, isPassing bool, annotations []BitBucketAnnotation, summary Summary) error {
-	result := "PASS"
-	if !isPassing {
-		result = "FAIL"
-	}
-	payload, _ := json.Marshal(BitBucketReport{
-		Title:    fmt.Sprintf("pint %s", r.version),
-		Result:   result,
-		Reporter: "Prometheus rule linter",
-		Details:  BitBucketDescription,
-		Link:     "https://cloudflare.github.io/pint/",
-		Data: []BitBucketReportData{
-			{Title: "Number of rules checked", Type: NumberType, Value: summary.Entries},
-			{Title: "Number of problems found", Type: NumberType, Value: len(annotations)},
-			{Title: "Number of offline checks", Type: NumberType, Value: summary.OfflineChecks},
-			{Title: "Number of online checks", Type: NumberType, Value: summary.OnlineChecks},
-			{Title: "Checks duration", Type: DurationType, Value: summary.Duration.Milliseconds()},
-		},
-	})
-
-	url := fmt.Sprintf("%s/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint",
-		r.uri, r.project, r.repo, commit)
-	if err := r.bitBucketRequest(http.MethodPut, url, payload); err != nil {
-		return fmt.Errorf("failed to create BitBucket report: %w", err)
-	}
-
-	// Try to delete annotations when that happens so we don't end up with stale data if we run
-	// pint twice, first with problems found, and second without any.
-	if err := r.deleteAnnotations(commit); err != nil {
-		return err
-	}
-
-	// BitBucket API requires at least one annotation, if there aren't any report is PASS anyway
-	if len(annotations) == 0 {
-		return nil
-	}
-
-	return r.createAnnotations(commit, annotations)
 }
 
 // BitBucket only allows us to report annotations for modified lines.

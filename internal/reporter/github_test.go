@@ -8,18 +8,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/git"
-	"github.com/cloudflare/pint/internal/log"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
 func TestGithubReporter(t *testing.T) {
-	log.Level.Set(slog.LevelError)
-
 	type testCaseT struct {
 		description string
 		reports     []reporter.Report
@@ -121,6 +119,8 @@ filename %s
 		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+
 			var handler http.Handler
 			if tc.httpHandler != nil {
 				handler = tc.httpHandler

@@ -1,5 +1,6 @@
-http response prometheus / 200 OK
-http start prometheus 127.0.0.1:6076
+http response bitbucket /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint 200 OK
+http response bitbucket /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests 200 {}
+http start bitbucket 127.0.0.1:6076
 
 mkdir testrepo
 cd testrepo

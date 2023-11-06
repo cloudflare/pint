@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -84,7 +85,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			ts.Fatalf("! http response command requires '$NAME $PATH $CODE $BODY' args, got [%s]", strings.Join(args, " "))
 		}
 		name := args[1]
-		path := args[2]
+		path := regexp.MustCompile(args[2])
 		code, err := strconv.Atoi(args[3])
 		ts.Check(err)
 		body := strings.Join(args[4:], " ")
@@ -99,7 +100,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		}
 		name := args[1]
 		meth := args[2]
-		path := args[3]
+		path := regexp.MustCompile(args[3])
 		code, err := strconv.Atoi(args[4])
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
@@ -114,7 +115,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			ts.Fatalf("! http response command requires '$NAME $PATH $USER $PASS $CODE $BODY' args, got [%s]", strings.Join(args, " "))
 		}
 		name := args[1]
-		path := args[2]
+		path := regexp.MustCompile(args[2])
 		user := args[3]
 		pass := args[4]
 		code, err := strconv.Atoi(args[5])
@@ -136,7 +137,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			ts.Fatalf("! http response command requires '$NAME $PATH $DELAY $CODE $BODY' args, got [%s]", strings.Join(args, " "))
 		}
 		name := args[1]
-		path := args[2]
+		path := regexp.MustCompile(args[2])
 		delay, err := time.ParseDuration(args[3])
 		ts.Check(err)
 		code, err := strconv.Atoi(args[4])
@@ -154,7 +155,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			ts.Fatalf("! http redirect command requires '$NAME $SRCPATH $DSTPATH' args, got [%s]", strings.Join(args, " "))
 		}
 		name := args[1]
-		srcpath := args[2]
+		srcpath := regexp.MustCompile(args[2])
 		dstpath := args[3]
 		mocks.add(name, httpMock{pattern: srcpath, handler: func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Location", dstpath)
@@ -181,10 +182,10 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			for n, mockList := range mocks.responses() {
 				if n == name {
 					for _, mock := range mockList {
-						if mock.pattern != "/" && (r.URL.Path != mock.pattern || !strings.HasPrefix(r.URL.Path, mock.pattern)) {
+						if mock.method != "" && mock.method != r.Method {
 							continue
 						}
-						if mock.method != "" && mock.method != r.Method {
+						if !mock.pattern.MatchString(r.URL.Path) {
 							continue
 						}
 						mock.handler(w, r)
@@ -226,7 +227,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 }
 
 type httpMock struct {
-	pattern string
+	pattern *regexp.Regexp
 	method  string
 	handler func(http.ResponseWriter, *http.Request)
 }
