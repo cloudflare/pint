@@ -4,7 +4,7 @@ go 1.21.3
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0
-	github.com/fatih/color v1.15.0
+	github.com/fatih/color v1.16.0
 	github.com/gkampitakis/go-snaps v0.4.11
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v55 v55.0.0
@@ -90,7 +90,7 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.4.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
