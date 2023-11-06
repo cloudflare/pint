@@ -147,6 +147,7 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 	for result := range results {
 		summary.Report(result)
 	}
+	summary.SortReports()
 	summary.Duration = time.Since(start)
 	summary.Entries = len(entries)
 	summary.OnlineChecks = onlineChecksCount.Load()

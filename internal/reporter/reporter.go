@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"sort"
 	"time"
 
 	"golang.org/x/exp/slices"
@@ -73,6 +74,24 @@ func (s Summary) hasReport(r Report) bool {
 		}
 	}
 	return false
+}
+
+func (s *Summary) SortReports() {
+	sort.SliceStable(s.reports, func(i, j int) bool {
+		if s.reports[i].ReportedPath != s.reports[j].ReportedPath {
+			return s.reports[i].ReportedPath < s.reports[j].ReportedPath
+		}
+		if s.reports[i].SourcePath != s.reports[j].SourcePath {
+			return s.reports[i].SourcePath < s.reports[j].SourcePath
+		}
+		if s.reports[i].Problem.Lines[0] != s.reports[j].Problem.Lines[0] {
+			return s.reports[i].Problem.Lines[0] < s.reports[j].Problem.Lines[0]
+		}
+		if s.reports[i].Problem.Reporter != s.reports[j].Problem.Reporter {
+			return s.reports[i].Problem.Reporter < s.reports[j].Problem.Reporter
+		}
+		return s.reports[i].Problem.Text < s.reports[j].Problem.Text
+	})
 }
 
 func (s Summary) Reports() (reports []Report) {

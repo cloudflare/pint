@@ -1,0 +1,31 @@
+env NO_COLOR=1
+pint.error --no-color lint --min-severity=info --teamcity rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+##teamcity[testSuiteStarted name='alerts/comparison']
+##teamcity[testSuiteStarted name='Warning']
+##teamcity[testStarted name='rules/0001.yml:5']
+##teamcity[testStdErr name='rules/0001.yml:5' out='alert query doesn|'t have any condition, it will always fire if the metric exists']
+##teamcity[testFinished name='rules/0001.yml:5']
+##teamcity[testSuiteFinished name='Warning']
+##teamcity[testSuiteFinished name='alerts/comparison']
+##teamcity[testSuiteStarted name='promql/syntax']
+##teamcity[testSuiteStarted name='Fatal']
+##teamcity[testStarted name='rules/0001.yml:7']
+##teamcity[testFailed name='rules/0001.yml:7' message='' details='syntax error: unexpected identifier "with"']
+##teamcity[testFinished name='rules/0001.yml:7']
+##teamcity[testSuiteFinished name='Fatal']
+##teamcity[testSuiteFinished name='promql/syntax']
+level=INFO msg="Problems found" Fatal=1 Warning=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+-- rules/0001.yml --
+groups:
+- name: test
+  rules:
+  - alert: Example
+    expr: up
+  - alert: Example
+    expr: sum(xxx) with()

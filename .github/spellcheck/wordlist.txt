@@ -38,6 +38,7 @@ SNI
 symlink
 symlinked
 symlinks
+TeamCity
 templated
 Thanos
 TLS
