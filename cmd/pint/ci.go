@@ -23,6 +23,7 @@ var (
 	baseBranchFlag = "base-branch"
 	devFlag        = "dev"
 	failOnFlag     = "fail-on"
+	teamCityFlag   = "teamcity"
 )
 
 var ciCmd = &cli.Command{
@@ -53,6 +54,12 @@ var ciCmd = &cli.Command{
 			Aliases: []string{"w"},
 			Value:   "bug",
 			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected",
+		},
+		&cli.BoolFlag{
+			Name:    teamCityFlag,
+			Aliases: []string{"t"},
+			Value:   false,
+			Usage:   "Report problems using TeamCity Service Messages",
 		},
 	},
 }
@@ -120,8 +127,12 @@ func actionCI(c *cli.Context) error {
 		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)
 	}
 
-	reps := []reporter.Reporter{
-		reporter.NewConsoleReporter(os.Stderr, checks.Information),
+	reps := []reporter.Reporter{}
+
+	if c.Bool(teamCityFlag) {
+		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
+	} else {
+		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information))
 	}
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {

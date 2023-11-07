@@ -41,6 +41,7 @@ jobs:
       - name: Compile binaries
         uses: goreleaser/goreleaser-action@v5
         with:
+          version: v1.21.2
           args: build --snapshot --clean --single-target
 
       - name: Release binaries

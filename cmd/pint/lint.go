@@ -40,6 +40,12 @@ var lintCmd = &cli.Command{
 			Value:   "bug",
 			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected",
 		},
+		&cli.BoolFlag{
+			Name:    teamCityFlag,
+			Aliases: []string{"t"},
+			Value:   false,
+			Usage:   "Report problems using TeamCity Service Messages",
+		},
 	},
 }
 
@@ -87,7 +93,13 @@ func actionLint(c *cli.Context) error {
 		return fmt.Errorf("invalid --%s value: %w", failOnFlag, err)
 	}
 
-	r := reporter.NewConsoleReporter(os.Stderr, minSeverity)
+	var r reporter.Reporter
+	if c.Bool(teamCityFlag) {
+		r = reporter.NewTeamCityReporter(os.Stderr)
+	} else {
+		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
+	}
+
 	err = r.Submit(summary)
 	if err != nil {
 		return err

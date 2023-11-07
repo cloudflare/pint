@@ -5,6 +5,8 @@
 ### Added
 
 - Added [alerts/external_labels](checks/alerts/external_labels.md) check.
+- Added support for reporting problems to TeamCity using [Service Messages](https://www.jetbrains.com/help/teamcity/service-messages.html).
+  To enable run it run `pint --teamcity lint` or `pint --teamcity ci`.
 
 ### Changed
 
