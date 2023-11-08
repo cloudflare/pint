@@ -14,7 +14,11 @@ func newAlertsExternalLabelsCheck(prom *promapi.FailoverGroup) checks.RuleChecke
 }
 
 func alertsExternalLabelsText(name, uri, label string) string {
-	return fmt.Sprintf("template is using %q external label but prometheus %q at %s doesn't have this label configured in global:external_labels", label, name, uri)
+	return fmt.Sprintf("Template is using `%s` external label but `%s` Prometheus server at %s doesn't have this label configured in global:external_labels.", label, name, uri)
+}
+
+func alertsExternalLabelsDetails(name, uri string) string {
+	return fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", uri, name)
 }
 
 func TestAlertsExternalLabelsCountCheck(t *testing.T) {
@@ -112,6 +116,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Lines:    []int{9},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
@@ -119,6 +124,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Lines:    []int{10},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
@@ -126,6 +132,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Lines:    []int{10},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
@@ -133,6 +140,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Lines:    []int{6},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
@@ -140,6 +148,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Lines:    []int{6},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 				}

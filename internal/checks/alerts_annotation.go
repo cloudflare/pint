@@ -49,7 +49,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Fragment: fmt.Sprintf("%s: %s", rule.AlertingRule.Alert.Key.Value, rule.AlertingRule.Alert.Value.Value),
 				Lines:    rule.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s annotation is required", c.keyRe.original),
+				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 				Severity: c.severity,
 			})
 		}
@@ -66,7 +66,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 					Lines:    annotation.Value.Position.Lines,
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("%s annotation value must match %q", c.keyRe.original, c.valueRe.anchored),
+					Text:     fmt.Sprintf("`%s` annotation value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
 					Severity: c.severity,
 				})
 				return problems
@@ -79,7 +79,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 			Fragment: fmt.Sprintf("%s:", rule.AlertingRule.Annotations.Key.Value),
 			Lines:    rule.AlertingRule.Annotations.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s annotation is required", c.keyRe.original),
+			Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 			Severity: c.severity,
 		})
 		return problems

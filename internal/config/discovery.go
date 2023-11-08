@@ -120,6 +120,7 @@ func (d *Discovery) merge(dst, src []*promapi.FailoverGroup) ([]*promapi.Failove
 type PrometheusTemplate struct {
 	Name        string            `hcl:"name" json:"name"`
 	URI         string            `hcl:"uri" json:"uri"`
+	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
 	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
 	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
 	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
@@ -159,12 +160,19 @@ func (pt PrometheusTemplate) validate() (err error) {
 
 func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGroup, error) {
 	var err error
-	var name, uri string
+	var name, uri, publicURI string
 	if name, err = renderTemplate(pt.Name, data); err != nil {
 		return nil, fmt.Errorf("bad name template %q: %w", pt.Name, err)
 	}
 	if uri, err = renderTemplate(pt.URI, data); err != nil {
 		return nil, fmt.Errorf("bad uri template %q: %w", pt.URI, err)
+	}
+	if pt.PublicURI != "" {
+		if publicURI, err = renderTemplate(pt.PublicURI, data); err != nil {
+			return nil, fmt.Errorf("bad publicURI template %q: %w", pt.PublicURI, err)
+		}
+	} else {
+		publicURI = uri
 	}
 
 	failover := make([]string, 0, len(pt.Failover))
@@ -225,7 +233,8 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 
 	prom := PrometheusConfig{
 		Name:        name,
-		URI:         uri,
+		URI:         strings.TrimSuffix(uri, "/"),
+		PublicURI:   strings.TrimSuffix(publicURI, "/"),
 		Headers:     headers,
 		Failover:    failover,
 		Timeout:     pt.Timeout,
@@ -378,7 +387,7 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 	timeout, _ := parseDuration(pq.Timeout)
 	tls, _ := pq.TLS.toHTTPConfig()
 
-	prom := promapi.NewPrometheus("discovery", pq.URI, pq.Headers, timeout, 1, 100, tls)
+	prom := promapi.NewPrometheus("discovery", pq.URI, "", pq.Headers, timeout, 1, 100, tls)
 	prom.StartWorkers()
 	defer prom.Close()
 

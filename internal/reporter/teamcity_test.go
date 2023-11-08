@@ -46,6 +46,7 @@ func TestTeamCityReporter(t *testing.T) {
 						Lines:    []int{5, 6},
 						Reporter: "mock",
 						Text:     "mock text",
+						Details:  "mock details",
 						Severity: checks.Information,
 					},
 				},

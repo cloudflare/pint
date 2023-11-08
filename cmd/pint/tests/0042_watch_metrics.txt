@@ -160,9 +160,9 @@ pint_last_run_duration_seconds
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/bob.yml",kind="alerting",name="broken",owner="bob",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken",owner="bob",problem="Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems

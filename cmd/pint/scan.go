@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"regexp"
 	"strconv"
@@ -183,7 +184,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					Problem: checks.Problem{
 						Lines:    job.entry.ModifiedLines,
 						Reporter: ignoreFileReporter,
-						Text:     "This file was excluded from pint checks",
+						Text:     "This file was excluded from pint checks.",
 						Severity: checks.Information,
 					},
 					Owner: job.entry.Owner,
@@ -197,7 +198,11 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					Problem: checks.Problem{
 						Lines:    []int{line},
 						Reporter: yamlParseReporter,
-						Text:     e,
+						Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", e),
+						Details: `pint cannot read this file because YAML parser returned an error.
+This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
+If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
+`,
 						Severity: checks.Fatal,
 					},
 					Owner: job.entry.Owner,
@@ -212,7 +217,9 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 						Fragment: job.entry.Rule.Error.Fragment,
 						Lines:    []int{job.entry.Rule.Error.Line},
 						Reporter: yamlParseReporter,
-						Text:     job.entry.Rule.Error.Err.Error(),
+						Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", job.entry.Rule.Error.Err.Error()),
+						Details: `This Prometheus rule is not valid.
+This usually means that it's missing some required fields.`,
 						Severity: checks.Fatal,
 					},
 					Owner: job.entry.Owner,

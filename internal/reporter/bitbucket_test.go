@@ -832,6 +832,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text",
+						Details:  "mock details",
 						Severity: checks.Bug,
 					},
 				},
@@ -887,7 +888,7 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text\n\nmock details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
 					Severity: "NORMAL",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",

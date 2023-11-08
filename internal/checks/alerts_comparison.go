@@ -11,7 +11,12 @@ import (
 )
 
 const (
-	ComparisonCheckName = "alerts/comparison"
+	ComparisonCheckName    = "alerts/comparison"
+	ComparisonCheckDetails = `Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+In most cases this can be achieved by having some condition in the query expression.
+For example ` + "`" + `up == 0` + "`" + " or " + "`" + "rate(error_total[2m]) > 0" + "`." + `
+Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).`
 )
 
 func NewComparisonCheck() ComparisonCheck {
@@ -49,7 +54,8 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Fragment: rule.AlertingRule.Expr.Value.Value,
 				Lines:    rule.AlertingRule.Expr.Lines(),
 				Reporter: c.Reporter(),
-				Text:     "alert query uses 'or' operator with one side of the query that will always return a result, this alert will always fire",
+				Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+				Details:  ComparisonCheckDetails,
 				Severity: rewriteSeverity(Warning, n.LHS, n.RHS),
 			})
 		}
@@ -61,7 +67,8 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Fragment: rule.AlertingRule.Expr.Value.Value,
 				Lines:    rule.AlertingRule.Expr.Lines(),
 				Reporter: c.Reporter(),
-				Text:     "alert query uses bool modifier for comparison, this means it will always return a result and the alert will always fire",
+				Text:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
+				Details:  ComparisonCheckDetails,
 				Severity: Bug,
 			})
 		}
@@ -76,7 +83,8 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    rule.AlertingRule.Expr.Lines(),
 		Reporter: c.Reporter(),
-		Text:     "alert query doesn't have any condition, it will always fire if the metric exists",
+		Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
+		Details:  ComparisonCheckDetails,
 		Severity: Warning,
 	})
 

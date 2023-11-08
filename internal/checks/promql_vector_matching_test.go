@@ -16,15 +16,15 @@ func newVectorMatchingCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func differentLabelsText(l, r string) string {
-	return fmt.Sprintf(`both sides of the query have different labels: [%s] != [%s]`, l, r)
+	return fmt.Sprintf("This query will never return anything because the right and the left hand side have different labels: `[%s]` != `[%s]`.", l, r)
 }
 
 func usingMismatchText(f, l, r string) string {
-	return fmt.Sprintf(`using %s won't produce any results because both sides of the query have different labels: [%s] != [%s]`, f, l, r)
+	return fmt.Sprintf("Using `%s` won't produce any results because both sides of the query have different labels: `[%s]` != `[%s]`.", f, l, r)
 }
 
 func differentFilters(k, lv, rv string) string {
-	return fmt.Sprintf("left hand side uses {%s=%q} while right hand side uses {%s=%q}, this will never match", k, lv, k, rv)
+	return fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv)
 }
 
 func TestVectorMatchingCheck(t *testing.T) {
@@ -55,6 +55,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     differentLabelsText("instance, job, notfound", "instance, job"),
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -196,7 +197,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "foo / ignoring(xxx) app_registry",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingMismatchText(`ignoring("xxx")`, "instance, job", "app_name"),
+						Text:     usingMismatchText(`ignoring(xxx)`, "instance, job", "app_name"),
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -253,7 +255,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "foo / on(notfound) bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     `using on("notfound") won't produce any results because both sides of the query don't have this label`,
+						Text:     "Using `on(notfound)` won't produce any results because both sides of the query don't have this label.",
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -499,7 +502,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "foo / on(notfound) bar_with_notfound",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     `using on("notfound") won't produce any results because left hand side of the query doesn't have this label: "foo"`,
+						Text:     "Using `on(notfound)` won't produce any results because the left hand side of the query doesn't have this label: `foo`.",
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -554,7 +558,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "foo_with_notfound / on(notfound) bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     `using on("notfound") won't produce any results because right hand side of the query doesn't have this label: "bar"`,
+						Text:     "Using `on(notfound)` won't produce any results because the right hand side of the query doesn't have this label: `bar`.",
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -609,7 +614,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "(memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     `using on("app_name") won't produce any results because left hand side of the query doesn't have this label: "(memory_bytes / ignoring (job) (memory_limit > 0))"`,
+						Text:     "Using `on(app_name)` won't produce any results because the left hand side of the query doesn't have this label: `(memory_bytes / ignoring (job) (memory_limit > 0))`.",
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -797,7 +803,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     `both sides of the query have different labels: [instance, job, notfound] != [instance, job]`,
+						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.",
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -925,7 +932,8 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Fragment: "(foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "both sides of the query have different labels: [instance, job] != [dev, instance, job]",
+						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.",
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -1173,6 +1181,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     differentFilters("job", "a", "b"),
+						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
 				}

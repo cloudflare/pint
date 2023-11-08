@@ -71,23 +71,26 @@ func TestMetadata(t *testing.T) {
 			metric:  "gauge",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:      srv.URL,
-				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+				URI:       srv.URL,
+				PublicURI: srv.URL,
+				Metadata:  []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
 		},
 		{
 			metric:  "counter",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:      srv.URL,
-				Metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
+				URI:       srv.URL,
+				PublicURI: srv.URL,
+				Metadata:  []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
 			},
 		},
 		{
 			metric:  "mixed",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI: srv.URL,
+				URI:       srv.URL,
+				PublicURI: srv.URL,
 				Metadata: []v1.Metadata{
 					{Type: "gauge", Help: "Text1", Unit: "abc"},
 					{Type: "counter", Help: "Text2", Unit: ""},
@@ -108,16 +111,17 @@ func TestMetadata(t *testing.T) {
 			metric:  "once",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:      srv.URL,
-				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+				URI:       srv.URL,
+				PublicURI: srv.URL,
+				Metadata:  []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.metric, func(t *testing.T) {
-			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, nil),
+			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, "", nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)

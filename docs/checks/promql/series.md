@@ -168,7 +168,7 @@ check "promql/series" {
 ### min-age
 
 But default this check will report a problem if a metric was present
-in Prometheus but disappeared for at least two hours ago.
+in Prometheus but disappeared at least two hours ago.
 You can change this duration per Prometheus rule by adding a comment around it.
 Syntax:
 
@@ -177,6 +177,8 @@ To set `min-age` for all metrics in a query:
 ```yaml
 # pint rule/set promql/series min-age $duration
 ```
+
+Duration must follow syntax documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
 
 To set `min-age` for specific metric:
 

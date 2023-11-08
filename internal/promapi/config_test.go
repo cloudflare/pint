@@ -76,23 +76,26 @@ func TestConfig(t *testing.T) {
 			prefix:  "/default",
 			timeout: time.Second,
 			cfg: promapi.ConfigResult{
-				URI:    srv.URL + "/default",
-				Config: defaults,
+				URI:       srv.URL + "/default",
+				PublicURI: srv.URL + "/default",
+				Config:    defaults,
 			},
 		},
 		{
 			prefix:  "/1m",
 			timeout: time.Second,
 			cfg: promapi.ConfigResult{
-				URI:    srv.URL + "/1m",
-				Config: defaults,
+				URI:       srv.URL + "/1m",
+				PublicURI: srv.URL + "/1m",
+				Config:    defaults,
 			},
 		},
 		{
 			prefix:  "/30s",
 			timeout: time.Second,
 			cfg: promapi.ConfigResult{
-				URI: srv.URL + "/30s",
+				URI:       srv.URL + "/30s",
+				PublicURI: srv.URL + "/30s",
 				Config: promapi.PrometheusConfig{
 					Global: promapi.ConfigSectionGlobal{
 						ScrapeInterval:     time.Second * 30,
@@ -122,7 +125,7 @@ func TestConfig(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 100, nil)
+			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, "", nil, tc.timeout, 1, 100, nil)
 			prom.StartWorkers()
 			defer prom.Close()
 
@@ -176,8 +179,8 @@ func TestConfigHeaders(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, tc.config, time.Second, 1, 100, nil),
+			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, "", tc.config, time.Second, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 
 			reg := prometheus.NewRegistry()

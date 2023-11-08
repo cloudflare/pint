@@ -4,19 +4,19 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/strict.yml:4 Fatal: incomplete rule, no alert or record key (yaml/parse)
+rules/strict.yml:4 Fatal: This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`. (yaml/parse)
  4 |   - expr: MissingAlertOrRecord
 
-rules/strict.yml:7 Fatal: expr value cannot be empty (yaml/parse)
+rules/strict.yml:7 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
  7 |     expr: 
 
-rules/strict.yml:10 Fatal: syntax error: unknown function with name "sumz" (promql/syntax)
+rules/strict.yml:10 Fatal: Prometheus failed to parse the query with this PromQL error: unknown function with name "sumz". (promql/syntax)
  10 |     expr: sumz(0)
 
-rules/strict.yml:15 Fatal: template parse error: function "bogus" not defined (alerts/template)
+rules/strict.yml:15 Fatal: Template failed to parse with this error: `function "bogus" not defined`. (alerts/template)
  15 |       dashboard: '{{ bogus }}'
 
-rules/strict.yml:20 Fatal: template parse error: function "bogus" not defined (alerts/template)
+rules/strict.yml:20 Fatal: Template failed to parse with this error: `function "bogus" not defined`. (alerts/template)
  20 |       dashboard: '{{ bogus }}'
 
 level=INFO msg="Problems found" Fatal=5

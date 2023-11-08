@@ -5,7 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/0001.yml:4 Bug: annotation_.* annotation value must match "^bar$" (alerts/annotation)
+rules/0001.yml:4 Bug: `annotation_.*` annotation value must match `^bar$`. (alerts/annotation)
  4 |     annotation_foo: foo
 
 level=INFO msg="Problems found" Bug=1

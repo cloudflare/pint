@@ -93,7 +93,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, node *parser.PromQLNode,
 		if n.Range > retention {
 			problems = append(problems, exprProblem{
 				expr: node.Expr,
-				text: fmt.Sprintf("%s selector is trying to query Prometheus for %s worth of metrics, but %s is configured to only keep %s of metrics history",
+				text: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s is configured to only keep %s of metrics history.",
 					node.Expr, model.Duration(n.Range), promText(c.prom.Name(), uri), model.Duration(retention)),
 				severity: Warning,
 			})

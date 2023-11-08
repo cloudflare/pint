@@ -190,9 +190,11 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 			c.Anchor.LineType = "ADDED"
 			c.Anchor.FileType = "TO"
 		}
-		if m, ok := changes.pathLineMapping[pc.path]; ok {
-			if v, found := m[pc.line]; found {
-				c.Anchor.Line = v
+		if c.Anchor.FileType == "FROM" {
+			if m, ok := changes.pathLineMapping[pc.path]; ok {
+				if v, found := m[pc.line]; found {
+					c.Anchor.Line = v
+				}
 			}
 		}
 	}
@@ -548,8 +550,8 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 	return comments, nil
 }
 
-func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []pendingComment {
-	comments := []pendingComment{}
+func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
+	comments := []BitBucketPendingComment{}
 	for _, report := range summary.reports {
 		if _, ok := changes.pathModifiedLines[report.ReportedPath]; !ok {
 			continue
@@ -568,6 +570,10 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		buf.WriteString("** check.")
 		buf.WriteString("\n\n------\n\n")
 		buf.WriteString(report.Problem.Text)
+		if report.Problem.Details != "" {
+			buf.WriteString("\n\n")
+			buf.WriteString(report.Problem.Details)
+		}
 		buf.WriteString("\n\n------\n\n")
 		if report.ReportedPath != report.SourcePath {
 			buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
@@ -579,20 +585,21 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		buf.WriteString(report.Problem.Reporter)
 		buf.WriteString(".html).\n")
 
-		comments = append(comments, pendingComment{
+		pending := pendingComment{
 			path: report.ReportedPath,
 			line: report.Problem.Lines[0],
 			text: buf.String(),
-		})
+		}
+		comments = append(comments, pending.toBitBucketComment(changes))
 	}
 	return comments
 }
 
-func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []pendingComment) {
+func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []BitBucketPendingComment) {
 	for _, cur := range currentComments {
 		var keep bool
 		for _, pend := range pendingComments {
-			if cur.path == pend.path && cur.line == pend.line && cur.text == pend.text {
+			if cur.path == pend.Anchor.Path && cur.line == pend.Anchor.Line && cur.text == pend.Text {
 				keep = true
 				break
 			}
@@ -601,6 +608,12 @@ func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucke
 			}
 		}
 		if !keep {
+			slog.Debug(
+				"Deleting stale comment",
+				slog.Int("id", cur.id),
+				slog.String("path", cur.path),
+				slog.Int("line", cur.line),
+			)
 			_, err := bb.request(
 				http.MethodDelete,
 				fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d?version=%d",
@@ -621,12 +634,12 @@ func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucke
 	}
 }
 
-func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []pendingComment, changes *bitBucketPRChanges) error {
+func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []BitBucketPendingComment) error {
 	var added int
 	for _, pend := range pendingComments {
 		add := true
 		for _, cur := range currentComments {
-			if cur.path == pend.path && cur.line == pend.line && cur.text == pend.text {
+			if cur.path == pend.Anchor.Path && cur.line == pend.Anchor.Line && cur.text == pend.Text {
 				add = false
 			}
 			if cur.onCommit {
@@ -634,7 +647,15 @@ func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketC
 			}
 		}
 		if add {
-			payload, _ := json.Marshal(pend.toBitBucketComment(changes))
+			slog.Debug(
+				"Adding missing comment",
+				slog.String("path", pend.Anchor.Path),
+				slog.Int("line", pend.Anchor.Line),
+				slog.String("diffType", pend.Anchor.DiffType),
+				slog.String("lineType", pend.Anchor.LineType),
+				slog.String("fileType", pend.Anchor.FileType),
+			)
+			payload, _ := json.Marshal(pend)
 			_, err := bb.request(
 				http.MethodPost,
 				fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments",

@@ -59,7 +59,7 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job=~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -76,7 +76,7 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job!~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `unnecessary regexp match on static string job!~"bar", use job!="bar" instead`,
+						Text:     "Unnecessary regexp match on static string `job!~\"bar\"`, use `job!=\"bar\"` instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -93,7 +93,7 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job=~""}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `unnecessary regexp match on static string job=~"", use job="" instead`,
+						Text:     "Unnecessary regexp match on static string `job=~\"\"`, use `job=\"\"` instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -110,7 +110,7 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job=~"^.+$"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `prometheus regexp matchers are automatically fully anchored so match for job=~"^.+$" will result in job=~"^^.+$$", remove regexp anchors ^ and/or $`,
+						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"^.+$\"` will result in `job=~\"^^.+$$\"`, remove regexp anchors `^` and/or `$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -127,7 +127,7 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job=~"(foo|^.+)$"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `prometheus regexp matchers are automatically fully anchored so match for job=~"(foo|^.+)$" will result in job=~"^(foo|^.+)$$", remove regexp anchors ^ and/or $`,
+						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"(foo|^.+)$\"` will result in `job=~\"^(foo|^.+)$$\"`, remove regexp anchors `^` and/or `$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -144,7 +144,7 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job=~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -161,14 +161,14 @@ func TestRegexpCheck(t *testing.T) {
 						Fragment: `foo{job=~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Severity: checks.Bug,
 					},
 					{
 						Fragment: `foo{job=~"bar",level="total"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
-						Text:     `unnecessary regexp match on static string job=~"bar", use job="bar" instead`,
+						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Severity: checks.Bug,
 					},
 				}

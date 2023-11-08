@@ -15,10 +15,10 @@ level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=ignore lines=9-
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
 level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=match lines=12-15
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
-rules/rules.yml:5 Warning: job label is required and should be preserved when aggregating "^.*$" rules, use by(job, ...) (promql/aggregate)
+rules/rules.yml:5 Warning: `job` label is required and should be preserved when aggregating `^.*$` rules, use `by(job, ...)`. (promql/aggregate)
  5 |   expr: sum(foo)
 
-rules/rules.yml:13 Warning: job label is required and should be preserved when aggregating "^.*$" rules, use by(job, ...) (promql/aggregate)
+rules/rules.yml:13 Warning: `job` label is required and should be preserved when aggregating `^.*$` rules, use `by(job, ...)`. (promql/aggregate)
  13 |   expr: sum(foo) > 0
 
 level=INFO msg="Problems found" Warning=2

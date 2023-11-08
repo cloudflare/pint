@@ -7,7 +7,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Tried to read more lines than present in the source file, this is likely due to '
 ' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details" path=rules/1.yaml
-rules/1.yaml:9-13 Warning: runbook_url annotation is required (alerts/annotation)
+rules/1.yaml:9-13 Warning: `runbook_url` annotation is required. (alerts/annotation)
   9 |         annotations:
  10 |           summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
  11 |           description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"

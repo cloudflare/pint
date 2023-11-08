@@ -93,6 +93,7 @@ type Prometheus struct {
 	name        string
 	unsafeURI   string
 	safeURI     string
+	publicURI   string
 	headers     map[string]string
 	timeout     time.Duration
 	concurrency int
@@ -104,15 +105,22 @@ type Prometheus struct {
 	queries     chan queryRequest
 }
 
-func NewPrometheus(name, uri string, headers map[string]string, timeout time.Duration, concurrency, rl int, tlsConf *tls.Config) *Prometheus {
+func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeout time.Duration, concurrency, rl int, tlsConf *tls.Config) *Prometheus {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	if tlsConf != nil {
 		transport.TLSClientConfig = tlsConf
 	}
 
+	uri = strings.TrimSuffix(uri, "/")
+	publicURI = strings.TrimSuffix(publicURI, "/")
+	if publicURI == "" {
+		publicURI = uri
+	}
+
 	prom := Prometheus{
 		name:        name,
 		unsafeURI:   uri,
+		publicURI:   publicURI,
 		safeURI:     sanitizeURI(uri),
 		headers:     headers,
 		timeout:     timeout,

@@ -85,7 +85,7 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 			Fragment: fragment,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("this alert rule must have a '%s' field with a minimum duration of %s", c.key, output.HumanizeDuration(c.minFor)),
+			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
 			Severity: c.severity,
 		})
 	}
@@ -95,7 +95,7 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 			Fragment: fragment,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("this alert rule must have a '%s' field with a maximum duration of %s", c.key, output.HumanizeDuration(c.maxFor)),
+			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
 			Severity: c.severity,
 		})
 	}

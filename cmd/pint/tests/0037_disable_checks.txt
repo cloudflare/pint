@@ -15,7 +15,7 @@ level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum-job lines=
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","promql/aggregate(job:true)"] path=rules/0001.yml rule=sum-job
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=no-comparison lines=8-9
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)"] path=rules/0001.yml rule=no-comparison
-rules/0001.yml:6 Warning: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
+rules/0001.yml:6 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
  6 |   expr: sum(foo)
 
 level=INFO msg="Problems found" Warning=1

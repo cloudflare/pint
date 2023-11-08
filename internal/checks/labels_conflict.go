@@ -62,7 +62,8 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts", promText(c.prom.Name(), cfg.URI), k, v),
+					Text:     fmt.Sprintf("%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.", promText(c.prom.Name(), cfg.URI), k, v),
+					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
 					Severity: Warning,
 				})
 			}

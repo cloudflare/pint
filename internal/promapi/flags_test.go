@@ -62,16 +62,18 @@ func TestFlags(t *testing.T) {
 			prefix:  "/default",
 			timeout: time.Second,
 			flags: promapi.FlagsResult{
-				URI:   srv.URL + "/default",
-				Flags: v1.FlagsResult{},
+				URI:       srv.URL + "/default",
+				PublicURI: srv.URL + "/default",
+				Flags:     v1.FlagsResult{},
 			},
 		},
 		{
 			prefix:  "/foo",
 			timeout: time.Second,
 			flags: promapi.FlagsResult{
-				URI:   srv.URL + "/foo",
-				Flags: v1.FlagsResult{"foo": "bar"},
+				URI:       srv.URL + "/foo",
+				PublicURI: srv.URL + "/foo",
+				Flags:     v1.FlagsResult{"foo": "bar"},
 			},
 		},
 		{
@@ -93,8 +95,8 @@ func TestFlags(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL+tc.prefix, nil, tc.timeout, 1, 100, nil),
+			fg := promapi.NewFailoverGroup("test", srv.URL+tc.prefix, []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL+tc.prefix, "", nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 
 			reg := prometheus.NewRegistry()

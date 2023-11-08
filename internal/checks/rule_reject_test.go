@@ -86,7 +86,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `label key bad is not allowed to match "^bad$"`,
+						Text:     "Label key `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -105,7 +105,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `label value bad is not allowed to match "^bad$"`,
+						Text:     "Label value `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -124,7 +124,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `label key bad is not allowed to match "^bad$"`,
+						Text:     "Label key `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -143,7 +143,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `label value bad is not allowed to match "^bad$"`,
+						Text:     "Label value `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -181,7 +181,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `annotation key bad is not allowed to match "^bad$"`,
+						Text:     "Annotation key `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Information,
 					},
 				}
@@ -200,7 +200,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `annotation value bad is not allowed to match "^bad$"`,
+						Text:     "Annotation value `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -228,7 +228,7 @@ func TestRejectCheck(t *testing.T) {
 						Fragment: `foo`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
-						Text:     `annotation value foo is not allowed to match "^{{ $alert }}$"`,
+						Text:     "Annotation value `foo` is not allowed to match `^{{ $alert }}$`.",
 						Severity: checks.Bug,
 					},
 				}

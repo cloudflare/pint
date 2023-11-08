@@ -10,7 +10,7 @@ import (
 )
 
 func textExternalLabels(name, uri, k, v string) string {
-	return fmt.Sprintf("prometheus %q at %s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts", name, uri, k, v)
+	return fmt.Sprintf("`%s` Prometheus server at %s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.", name, uri, k, v)
 }
 
 func newLabelsConflict(prom *promapi.FailoverGroup) checks.RuleChecker {
@@ -71,6 +71,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 						Lines:    []int{4},
 						Reporter: checks.LabelsConflictCheckName,
 						Text:     textExternalLabels("prom", uri, "foo", "bob"),
+						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
 					},
 				}

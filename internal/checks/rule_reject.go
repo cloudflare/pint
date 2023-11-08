@@ -47,17 +47,17 @@ func (c Reject) Reporter() string {
 func (c Reject) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if c.checkLabels && rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label, "label")...)
+			problems = append(problems, c.reject(rule, label, "Label")...)
 		}
 	}
 	if c.checkLabels && rule.RecordingRule != nil && rule.RecordingRule.Labels != nil {
 		for _, label := range rule.RecordingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label, "label")...)
+			problems = append(problems, c.reject(rule, label, "Label")...)
 		}
 	}
 	if c.checkAnnotations && rule.AlertingRule != nil && rule.AlertingRule.Annotations != nil {
 		for _, ann := range rule.AlertingRule.Annotations.Items {
-			problems = append(problems, c.reject(rule, ann, "annotation")...)
+			problems = append(problems, c.reject(rule, ann, "Annotation")...)
 		}
 	}
 	return problems
@@ -69,7 +69,7 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 			Fragment: label.Key.Value,
 			Lines:    label.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s key %s is not allowed to match %q", kind, label.Key.Value, c.keyRe.anchored),
+			Text:     fmt.Sprintf("%s key `%s` is not allowed to match `%s`.", kind, label.Key.Value, c.keyRe.anchored),
 			Severity: c.severity,
 		})
 	}
@@ -78,7 +78,7 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 			Fragment: label.Value.Value,
 			Lines:    label.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s value %s is not allowed to match %q", kind, label.Value.Value, c.valueRe.anchored),
+			Text:     fmt.Sprintf("%s value `%s` is not allowed to match `%s`.", kind, label.Value.Value, c.valueRe.anchored),
 			Severity: c.severity,
 		})
 	}

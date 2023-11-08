@@ -13,7 +13,7 @@ func newRangeQueryCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func retentionToLow(name, uri, metric, qr, retention string) string {
-	return fmt.Sprintf("%s selector is trying to query Prometheus for %s worth of metrics, but prometheus %q at %s is configured to only keep %s of metrics history",
+	return fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but `%s` Prometheus server at %s is configured to only keep %s of metrics history.",
 		metric, qr, name, uri, retention)
 }
 

@@ -638,8 +638,8 @@ func TestRange(t *testing.T) {
 			}))
 			defer srv.Close()
 
-			fg := promapi.NewFailoverGroup("test", []*promapi.Prometheus{
-				promapi.NewPrometheus("test", srv.URL, nil, tc.timeout, 1, 100, nil),
+			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
+				promapi.NewPrometheus("test", srv.URL, "", nil, tc.timeout, 1, 100, nil),
 			}, true, "up", nil, nil, nil)
 			reg := prometheus.NewRegistry()
 			fg.StartWorkers(reg)

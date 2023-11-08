@@ -10,11 +10,11 @@ import (
 )
 
 func forMin(key, min string) string {
-	return fmt.Sprintf("this alert rule must have a '%s' field with a minimum duration of %s", key, min)
+	return fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", key, min)
 }
 
 func forMax(key, max string) string {
-	return fmt.Sprintf("this alert rule must have a '%s' field with a maximum duration of %s", key, max)
+	return fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", key, max)
 }
 
 func TestRuleForCheck(t *testing.T) {

@@ -101,6 +101,7 @@ type Problem struct {
 	Lines    []int
 	Reporter string
 	Text     string
+	Details  string
 	Severity Severity
 }
 
@@ -122,6 +123,7 @@ type RuleChecker interface {
 type exprProblem struct {
 	expr     string
 	text     string
+	details  string
 	severity Severity
 }
 
@@ -137,16 +139,16 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 
 	switch {
 	case promapi.IsQueryTooExpensive(err):
-		text = fmt.Sprintf("couldn't run %q checks on %s because some queries are too expensive: %s", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run %q checks on %s because some queries are too expensive: `%s`.", reporter, promDesc, err)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("couldn't run %q checks due to %s connection error: %s", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run %q checks due to %s connection error: `%s`.", reporter, promDesc, err)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug
 		}
 	default:
-		text = fmt.Sprintf("%s failed with: %s", promDesc, err)
+		text = fmt.Sprintf("%s failed with: `%s`.", promDesc, err)
 		severity = s
 	}
 
@@ -154,5 +156,5 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 }
 
 func promText(name, uri string) string {
-	return fmt.Sprintf("prometheus %q at %s", name, uri)
+	return fmt.Sprintf("`%s` Prometheus server at %s", name, uri)
 }

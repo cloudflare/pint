@@ -102,7 +102,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				Fragment: ann.Value.Value,
 				Lines:    ann.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("GET request for %s returned an error: %s", uri, err),
+				Text:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
@@ -116,7 +116,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				Fragment: ann.Value.Value,
 				Lines:    ann.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("GET request for %s returned invalid status code: %s", uri, resp.Status),
+				Text:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))

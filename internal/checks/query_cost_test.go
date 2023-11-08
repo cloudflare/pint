@@ -12,7 +12,7 @@ import (
 )
 
 func costText(name, uri string, count int) string {
-	return fmt.Sprintf(`prometheus %q at %s returned %d result(s)`, name, uri, count)
+	return fmt.Sprintf("`%s` Prometheus server at %s returned %d result(s)", name, uri, count)
 }
 
 func memUsageText(b string) string {
@@ -24,15 +24,15 @@ func maxSeriesText(m int) string {
 }
 
 func evalDurText(name, uri, dur, limit string) string {
-	return fmt.Sprintf(`prometheus %q at %s took %s when executing this query, which is more than the configured limit of %s`, name, uri, dur, limit)
+	return fmt.Sprintf("`%s` Prometheus server at %s took %s when executing this query, which is more than the configured limit of %s.", name, uri, dur, limit)
 }
 
 func totalSamplesText(name, uri string, total, limit int) string {
-	return fmt.Sprintf(`prometheus %q at %s queried %d samples in total when executing this query, which is more than the configured limit of %d`, name, uri, total, limit)
+	return fmt.Sprintf("`%s` Prometheus server at %s queried %d samples in total when executing this query, which is more than the configured limit of %d.", name, uri, total, limit)
 }
 
 func peakSamplesText(name, uri string, total, limit int) string {
-	return fmt.Sprintf(`prometheus %q at %s queried %d peak samples when executing this query, which is more than the configured limit of %d`, name, uri, total, limit)
+	return fmt.Sprintf("`%s` Prometheus server at %s queried %d peak samples when executing this query, which is more than the configured limit of %d.", name, uri, total, limit)
 }
 
 func TestCostCheck(t *testing.T) {
@@ -61,7 +61,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 0),
+						Text:     costText("prom", uri, 0) + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -168,7 +168,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -207,7 +207,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("707B"),
+						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -256,7 +256,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("7.0MiB"),
+						Text:     costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -305,7 +305,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1),
+						Text:     costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
 						Severity: checks.Bug,
 					},
 				}
@@ -354,7 +354,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 6) + maxSeriesText(5),
+						Text:     costText("prom", uri, 6) + maxSeriesText(5) + ".",
 						Severity: checks.Bug,
 					},
 				}
@@ -398,7 +398,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + maxSeriesText(5),
+						Text:     costText("prom", uri, 7) + maxSeriesText(5) + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -446,7 +446,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: `sum({__name__="foo"})`,
 						Lines:    []int{3},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("707B"),
+						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -495,7 +495,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -541,7 +541,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 					{
@@ -612,7 +612,7 @@ func TestCostCheck(t *testing.T) {
 						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB"),
+						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 					{

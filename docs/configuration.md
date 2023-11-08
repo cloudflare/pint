@@ -212,6 +212,7 @@ Syntax:
 ```js
 prometheus "$name" {
   uri         = "https://..."
+  publicURI   = "https://..."
   failover    = ["https://...", ...]
   tags        = ["...", ...]
   headers     = { "...": "..." }
@@ -234,6 +235,10 @@ prometheus "$name" {
 - `$name` - each defined server should have a unique name that can be used in check
   definitions.
 - `uri` - base URI of this Prometheus server, used for API requests and queries.
+- `publicURI` - optional URI to use instead of `uri` in problems reported to users.
+  Set it if Prometheus links used by pint in comments submitted to BitBucket or GitHub
+  should use different URIs then the one used by pint when querying Prometheus.
+  If not set `uri` will be used instead.
 - `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
   to requests or returns an error. This allows to configure fail-over Prometheus servers
   to avoid CI failures in case main Prometheus server is unreachable.
@@ -410,6 +415,7 @@ Fields that are allowed to be templated are:
 ```js
 template {
   name        = "..."
+  uri         = "https://..."
   uri         = "https://..."
   failover    = ["https://...", ...]
   tags        = ["...", ...]
