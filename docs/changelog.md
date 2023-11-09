@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.49.1
+
+### Fixed
+
+- `alerts/count` check wasn't using `uptime` field from `prometheus` config blocks
+  for metric gap detection.
+
 ## v0.49.0
 
 ### Added

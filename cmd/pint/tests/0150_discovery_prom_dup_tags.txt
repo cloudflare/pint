@@ -18,7 +18,7 @@ level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom1.exam
 level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom2.example.com headers=["X-Host"] timeout=5s concurrency=16 rateLimit=100 uptime=up tags=["prom2"] required=false
 level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7150
 level=WARN msg="Duplicated prometheus server with different tags" name=prom-ha a=["prom2"] b=["prom1"]
-level=INFO msg="Configured new Prometheus server" name=prom-ha uris=1 tags=["prom1"] include=[] exclude=[]
+level=INFO msg="Configured new Prometheus server" name=prom-ha uris=1 uptime=up tags=["prom1"] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom1.example.com workers=16
 level=DEBUG msg="Stopping query workers" name=prom-ha uri=https://prom1.example.com
 level=ERROR msg="Fatal error" err="Duplicated name for Prometheus server definition: prom-ha"

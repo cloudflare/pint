@@ -6,7 +6,7 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
-level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 tags=[] include=[] exclude=[]
+level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 uptime=up tags=[] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom2 uri=https://unique.example.com workers=16
 level=INFO msg="Finding Prometheus servers using file paths" dir=servers match=^(?P<name>\w+).ya?ml$
 level=DEBUG msg="Path discovery match" match=^(?P<name>\w+).ya?ml$ path=prom1.yaml
@@ -21,7 +21,7 @@ level=DEBUG msg="Rendered Prometheus server" name=prom2 uri=https://prom2.exampl
 level=DEBUG msg="Path discovery match" match=^(?P<name>\w+).ya?ml$ path=prom2.yml
 level=DEBUG msg="Extracted regexp variables" regexp=^(?P<name>\w+).ya?ml$ vars={"name":"prom2"}
 level=DEBUG msg="Rendered Prometheus server" name=prom2 uri=https://prom2.example.com headers=[] timeout=5s concurrency=16 rateLimit=100 uptime=up tags=["name/prom2"] required=true
-level=INFO msg="Configured new Prometheus server" name=prom1 uris=2 tags=["name/prom1"] include=[] exclude=[]
+level=INFO msg="Configured new Prometheus server" name=prom1 uris=2 uptime=up tags=["name/prom1"] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1.example.com workers=16
 level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1-backup.example.com workers=16
 level=DEBUG msg="Stopping query workers" name=prom2 uri=https://unique.example.com

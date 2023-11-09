@@ -1,6 +1,6 @@
 module github.com/cloudflare/pint
 
-go 1.21.4
+go 1.21.3
 
 require (
 	github.com/cespare/xxhash/v2 v2.2.0

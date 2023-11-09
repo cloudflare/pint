@@ -77,7 +77,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	}
 
 	if len(qr.Series.Ranges) > 0 {
-		promUptime, err := c.prom.RangeQuery(ctx, "count(up)", params)
+		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), params)
 		if err != nil {
 			slog.Warn("Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
 		} else {
