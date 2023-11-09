@@ -5,8 +5,8 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 tags=[] include=["^rules/0001.yml$"] exclude=[]
-level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 tags=[] include=["^rules/0002.yml$"] exclude=[]
+level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=up tags=[] include=["^rules/0001.yml$"] exclude=[]
+level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 uptime=up tags=[] include=["^rules/0002.yml$"] exclude=[]
 -- rules/0001.yml --
 - record: "colo:duplicate"
   expr: sum(foo) without(job)

@@ -19,10 +19,10 @@ level=DEBUG msg="Rendered Prometheus server" name=prom2 uri=https://prom2.exampl
 level=DEBUG msg="Path discovery match" match=^(?P<name>\w+).ya?ml$ path=prom2.yml
 level=DEBUG msg="Extracted regexp variables" regexp=^(?P<name>\w+).ya?ml$ vars={"name":"prom2"}
 level=DEBUG msg="Rendered Prometheus server" name=prom2 uri=https://prom2.example.com headers=["X-Host"] timeout=5s concurrency=16 rateLimit=100 uptime=up tags=["name/prom2"] required=true
-level=INFO msg="Configured new Prometheus server" name=prom1 uris=2 tags=["name/prom1"] include=[] exclude=["^.*$"]
+level=INFO msg="Configured new Prometheus server" name=prom1 uris=2 uptime=up tags=["name/prom1"] include=[] exclude=["^.*$"]
 level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1.example.com workers=16
 level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1-backup.example.com workers=16
-level=INFO msg="Configured new Prometheus server" name=prom2 uris=2 tags=["name/prom2"] include=[] exclude=["^.*$"]
+level=INFO msg="Configured new Prometheus server" name=prom2 uris=2 uptime=up tags=["name/prom2"] include=[] exclude=["^.*$"]
 level=DEBUG msg="Starting query workers" name=prom2 uri=https://prom2.example.com workers=16
 level=DEBUG msg="Starting query workers" name=prom2 uri=https://prom2-backup.example.com workers=16
 level=DEBUG msg="Generated all Prometheus servers" count=2

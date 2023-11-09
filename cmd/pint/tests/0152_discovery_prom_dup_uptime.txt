@@ -26,7 +26,7 @@ level=DEBUG msg="Parsed response" uri=http://127.0.0.1:7152 query=prometheus_rea
 level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom1.example.com headers=[] timeout=5s concurrency=16 rateLimit=100 uptime=prom2 tags=[] required=false
 level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom2.example.com headers=[] timeout=5s concurrency=16 rateLimit=100 uptime=prom2 tags=[] required=false
 level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7152
-level=INFO msg="Configured new Prometheus server" name=prom-ha uris=2 tags=[] include=[] exclude=["^.*$"]
+level=INFO msg="Configured new Prometheus server" name=prom-ha uris=2 uptime=prom1 tags=[] include=[] exclude=["^.*$"]
 level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom1.example.com workers=16
 level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom2.example.com workers=16
 level=DEBUG msg="Generated all Prometheus servers" count=1

@@ -18,7 +18,7 @@ level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom1.exam
 level=DEBUG msg="Rendered Prometheus server" name=prom-ha uri=https://prom2.example.com headers=["X-Host"] timeout=5s concurrency=16 rateLimit=100 uptime=up tags=[] required=false
 level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7149
 level=DEBUG msg="Added new failover URI" name=prom-ha uri=https://prom2.example.com
-level=INFO msg="Configured new Prometheus server" name=prom-ha uris=2 tags=[] include=[] exclude=["^.*$"]
+level=INFO msg="Configured new Prometheus server" name=prom-ha uris=2 uptime=up tags=[] include=[] exclude=["^.*$"]
 level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom1.example.com workers=16
 level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom2.example.com workers=16
 level=DEBUG msg="Generated all Prometheus servers" count=1
