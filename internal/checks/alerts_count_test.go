@@ -2,6 +2,7 @@ package checks_test
 
 import (
 	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
@@ -16,7 +17,14 @@ func newAlertsCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func alertsText(name, uri string, count int, since string) string {
-	return fmt.Sprintf(`prometheus %q at %s would trigger %d alert(s) in the last %s`, name, uri, count, since)
+	return fmt.Sprintf("`%s` Prometheus server at %s would trigger %d alert(s) in the last %s.", name, uri, count, since)
+}
+
+func alertsDetails(uri, query, since string) string {
+	return fmt.Sprintf(
+		`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.range_input=%s).`,
+		uri, url.QueryEscape(query), since,
+	)
 }
 
 func TestAlertsCountCheck(t *testing.T) {
@@ -94,6 +102,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 0, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}
@@ -120,6 +129,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 7, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}
@@ -205,6 +215,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}
@@ -279,6 +290,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}
@@ -353,6 +365,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Bug,
 					},
 				}
@@ -492,6 +505,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
+						Details:  alertsDetails(uri, `{__name__="up", job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}
@@ -549,6 +563,8 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
+						Details:  alertsDetails(uri, `{__name__=~"(up|foo)", job="foo"} == 0`, "1d"),
+
 						Severity: checks.Information,
 					},
 				}
@@ -603,6 +619,8 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
+
 						Severity: checks.Information,
 					},
 				}
@@ -657,6 +675,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}
@@ -729,6 +748,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Lines:    []int{2, 3, 4},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 1, "1d"),
+						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
 						Severity: checks.Information,
 					},
 				}

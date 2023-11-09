@@ -112,6 +112,7 @@ filename %s
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "syntax error",
+						Details:  "syntax details",
 						Severity: checks.Fatal,
 					},
 				},

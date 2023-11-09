@@ -24,11 +24,23 @@ import (
 )
 
 const (
-	TemplateCheckName = "alerts/template"
+	TemplateCheckName               = "alerts/template"
+	TemplateCheckSyntaxDetails      = `Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).`
+	TemplateCheckAggregationDetails = `The query used here is using one of [aggregation functions](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators) provided by PromQL.
+By default aggregations will remove *all* labels from the results, unless you explicitly specify which labels to remove or keep.
+This means that with current query it's impossible for the results to have labels you're trying to use.`
+	TemplateCheckAbsentDetails = `The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+You will only get any results back if the metric selector you pass doesn't match anything.
+Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+This means that the only labels you can get back from absent call are the ones you pass to it.
+If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the ` + "`up`" + ` metric instead.`
+	TemplateCheckOnDetails = `Using [vector matching](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) operations will impact which labels are available on the results of your query.
+When using ` + "`on()`" + `make sure that all labels you're trying to use in this templare match what the query can return.`
+	TemplateCheckLabelsDetails = `This query doesn't seem to be using any time series and so cannot have any labels.`
 
-	msgAggregation = "template is using %q label but the query removes it"
-	msgAbsent      = "template is using %q label but absent() is not passing it"
-	msgOn          = "template is using %q label but the query uses on(...) without it being set there, this label will be missing from the query result"
+	msgAggregation = "Template is using `%s` label but the query removes it."
+	msgAbsent      = "Template is using `%s` label but `absent()` is not passing it."
+	msgOn          = "Template is using `%s` label but the query uses `on(...)` without it being set there, this label will be missing from the query result."
 )
 
 var (
@@ -132,7 +144,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("template parse error: %s", err),
+					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
 				})
 			}
@@ -164,6 +177,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Details:  TemplateCheckAggregationDetails,
 						Severity: Bug,
 					})
 				}
@@ -179,6 +193,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Details:  TemplateCheckAbsentDetails,
 						Severity: Bug,
 					})
 				}
@@ -191,6 +206,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Details:  TemplateCheckOnDetails,
 						Severity: Bug,
 					})
 				}
@@ -203,7 +219,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
-						Text:     fmt.Sprintf("template is using %q label but the query doesn't produce any labels", name),
+						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
+						Details:  TemplateCheckLabelsDetails,
 						Severity: Bug,
 					})
 				}
@@ -218,7 +235,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 					Lines:    annotation.Lines(),
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("template parse error: %s", err),
+					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
 				})
 			}
@@ -230,6 +248,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Details:  TemplateCheckAggregationDetails,
 						Severity: Bug,
 					})
 				}
@@ -252,6 +271,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Details:  TemplateCheckAbsentDetails,
 						Severity: Bug,
 					})
 				}
@@ -264,7 +284,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
-						Text:     fmt.Sprintf("template is using %q label but the query doesn't produce any labels", name),
+						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
+						Details:  TemplateCheckLabelsDetails,
 						Severity: Bug,
 					})
 				}
@@ -277,6 +298,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
+						Details:  TemplateCheckOnDetails,
 						Severity: Bug,
 					})
 				}
@@ -303,7 +325,8 @@ func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems 
 	for _, call := range utils.HasOuterRate(node) {
 		problems = append(problems, exprProblem{
 			expr:     call.String(),
-			text:     fmt.Sprintf("using the value of %s inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly", call),
+			text:     fmt.Sprintf("Using the value of `%s` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.", call),
+			details:  "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
 			severity: Information,
 		})
 	}
@@ -370,7 +393,7 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 	aliases := aliasesForTemplate(t)
 	for _, node := range t.Root.Nodes {
 		if v, ok := containsAliasedNode(aliases, node, ".Value"); ok {
-			msg := fmt.Sprintf("using %s in labels will generate a new alert on every value change, move it to annotations", v)
+			msg := fmt.Sprintf("Using `%s` in labels will generate a new alert on every value change, move it to annotations.", v)
 			msgs = append(msgs, msg)
 		}
 	}

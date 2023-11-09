@@ -5,10 +5,10 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/0001.yml:5 Bug: instance label should be removed when aggregating "^colo(?:_.+)?:.+$" rules, remove instance from by() (promql/aggregate)
+rules/0001.yml:5 Bug: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, remove instance from `by()`. (promql/aggregate)
  5 |       expr: sum by (instance) (http_inprogress_requests)
 
-rules/0001.yml:5 Warning: job label is required and should be preserved when aggregating "^.+$" rules, use by(job, ...) (promql/aggregate)
+rules/0001.yml:5 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
  5 |       expr: sum by (instance) (http_inprogress_requests)
 
 level=INFO msg="Problems found" Bug=1 Warning=1

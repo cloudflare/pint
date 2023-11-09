@@ -54,7 +54,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Fragment: fmt.Sprintf("%s: %s", rule.RecordingRule.Record.Key.Value, rule.RecordingRule.Record.Value.Value),
 				Lines:    rule.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s label is required", c.key),
+				Text:     fmt.Sprintf("`%s` label is required.", c.key),
 				Severity: c.severity,
 			})
 		}
@@ -68,7 +68,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Fragment: fmt.Sprintf("%s:", rule.RecordingRule.Labels.Key.Value),
 				Lines:    rule.RecordingRule.Labels.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s label is required", c.key),
+				Text:     fmt.Sprintf("`%s` label is required.", c.key),
 				Severity: c.severity,
 			})
 		}
@@ -87,7 +87,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Fragment: fmt.Sprintf("%s: %s", rule.AlertingRule.Alert.Key.Value, rule.AlertingRule.Alert.Value.Value),
 				Lines:    rule.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s label is required", c.key),
+				Text:     fmt.Sprintf("`%s` label is required.", c.key),
 				Severity: c.severity,
 			})
 		}
@@ -101,7 +101,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Fragment: fmt.Sprintf("%s:", rule.AlertingRule.Labels.Key.Value),
 				Lines:    rule.AlertingRule.Labels.Lines(),
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("%s label is required", c.key),
+				Text:     fmt.Sprintf("`%s` label is required.", c.key),
 				Severity: c.severity,
 			})
 		}
@@ -119,7 +119,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, val *parser.YamlNode) (problems
 			Fragment: fmt.Sprintf("%s: %s", c.key, val.Value),
 			Lines:    val.Position.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s label value must match %q", c.key, c.valueRe.anchored),
+			Text:     fmt.Sprintf("`%s` label value must match `%s`.", c.key, c.valueRe.anchored),
 			Severity: c.severity,
 		})
 	}

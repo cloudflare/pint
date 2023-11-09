@@ -18,9 +18,10 @@ import (
 )
 
 type QueryResult struct {
-	URI    string
-	Series []Sample
-	Stats  QueryStats
+	URI       string
+	PublicURI string
+	Series    []Sample
+	Stats     QueryStats
 }
 
 type instantQuery struct {
@@ -97,9 +98,10 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	}
 
 	qr := QueryResult{
-		URI:    p.safeURI,
-		Series: result.value.([]Sample),
-		Stats:  result.stats,
+		URI:       p.safeURI,
+		PublicURI: p.publicURI,
+		Series:    result.value.([]Sample),
+		Stats:     result.stats,
 	}
 	slog.Debug("Parsed response", slog.String("uri", p.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
 

@@ -11,7 +11,8 @@ import (
 )
 
 const (
-	AlertForCheckName = "alerts/for"
+	AlertForCheckName         = "alerts/for"
+	AlertForCheckDurationHelp = `Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).`
 )
 
 func NewAlertsForCheck() AlertsForChecksFor {
@@ -55,6 +56,7 @@ func (c AlertsForChecksFor) checkField(name, value string, lines []int) (problem
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("invalid duration: %s", err),
+			Details:  AlertForCheckDurationHelp,
 			Severity: Bug,
 		})
 		return problems
@@ -65,7 +67,7 @@ func (c AlertsForChecksFor) checkField(name, value string, lines []int) (problem
 			Fragment: value,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%q is the default value of %q, consider removing this line", value, name),
+			Text:     fmt.Sprintf("`%s` is the default value of `%s`, consider removing this redundant line.", value, name),
 			Severity: Information,
 		})
 	}

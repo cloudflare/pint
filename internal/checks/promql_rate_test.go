@@ -16,15 +16,15 @@ func newRateCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func durationMustText(name, uri, fun, multi, using string) string {
-	return fmt.Sprintf(`duration for %s() must be at least %s x scrape_interval, prometheus %q at %s is using %s scrape_interval`, fun, multi, name, uri, using)
+	return fmt.Sprintf("Duration for `%s()` must be at least %s x scrape_interval, `%s` Prometheus server at %s is using `%s` scrape_interval.", fun, multi, name, uri, using)
 }
 
 func notCounterText(name, uri, fun, metric, kind string) string {
-	return fmt.Sprintf(`%s() should only be used with counters but %q is a %s according to metrics metadata from prometheus %q at %s`, fun, metric, kind, name, uri)
+	return fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from `%s` Prometheus server at %s.", fun, metric, kind, name, uri)
 }
 
 func rateSumText(rateName, sumExpr string) string {
-	return fmt.Sprintf("rate(sum(counter)) chain detected, rate(%s) is called here on results of %s, calling rate on sum() results will return bogus results, always sum(rate(counter)), never rate(sum(counter))", rateName, sumExpr)
+	return fmt.Sprintf("`rate(sum(counter))` chain detected, `rate(%s)` is called here on results of `%s`, calling `rate()` on `sum()` results will return bogus results, always `sum(rate(counter))`, never `rate(sum(counter))`.", rateName, sumExpr)
 }
 
 func TestRateCheck(t *testing.T) {
@@ -48,6 +48,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -115,6 +116,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "irate", "2", "1m"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -144,6 +146,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "deriv", "2", "1m"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -319,6 +322,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -456,6 +460,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
@@ -507,6 +512,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
@@ -514,6 +520,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -543,6 +550,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "bar_g", "gauge"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -603,6 +611,7 @@ func TestRateCheck(t *testing.T) {
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
+						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}

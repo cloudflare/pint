@@ -117,14 +117,14 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 			if found && c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, remove %s from without()", c.label, c.nameRegex.anchored, c.label),
+					text: fmt.Sprintf("`%s` label is required and should be preserved when aggregating `%s` rules, remove %s from `without()`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
 			if !found && !c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, use without(%s, ...)", c.label, c.nameRegex.anchored, c.label),
+					text: fmt.Sprintf("`%s` label should be removed when aggregating `%s` rules, use `without(%s, ...)`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
@@ -137,14 +137,14 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 			if found && !c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label should be removed when aggregating %q rules, remove %s from by()", c.label, c.nameRegex.anchored, c.label),
+					text: fmt.Sprintf("`%s` label should be removed when aggregating `%s` rules, remove %s from `by()`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
 			if !found && c.keep {
 				problems = append(problems, exprProblem{
 					expr: node.Expr,
-					text: fmt.Sprintf("%s label is required and should be preserved when aggregating %q rules, use by(%s, ...)", c.label, c.nameRegex.anchored, c.label),
+					text: fmt.Sprintf("`%s` label is required and should be preserved when aggregating `%s` rules, use `by(%s, ...)`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 

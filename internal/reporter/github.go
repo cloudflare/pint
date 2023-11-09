@@ -272,21 +272,25 @@ func formatGHReviewBody(version string, summary Summary) string {
 }
 
 func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestComment {
-	var msgPrefix string
+	var msgPrefix, msgSuffix string
 	reportLine, srcLine := moveReportedLine(rep)
 	if reportLine != srcLine {
 		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
+	}
+	if rep.Problem.Details != "" {
+		msgSuffix = "\n\n" + rep.Problem.Details
 	}
 
 	c := github.PullRequestComment{
 		CommitID: github.String(headCommit),
 		Path:     github.String(rep.ReportedPath),
 		Body: github.String(fmt.Sprintf(
-			"[%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s",
+			"[%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s%s",
 			rep.Problem.Reporter,
 			rep.Problem.Reporter,
 			msgPrefix,
 			rep.Problem.Text,
+			msgSuffix,
 		)),
 		Line: github.Int(reportLine),
 	}

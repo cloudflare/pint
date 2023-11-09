@@ -22,7 +22,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "record: foo",
 						Lines:    []int{1, 2},
 						Reporter: "rule/label",
-						Text:     "severity label is required",
+						Text:     "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -41,7 +41,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "record: foo",
 						Lines:    []int{1, 2},
 						Reporter: "rule/label",
-						Text:     "severity label is required",
+						Text:     "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -69,7 +69,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "labels:",
 						Lines:    []int{3, 4},
 						Reporter: "rule/label",
-						Text:     "severity label is required",
+						Text:     "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -97,7 +97,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "severity: warning",
 						Lines:    []int{4},
 						Reporter: "rule/label",
-						Text:     `severity label value must match "^critical$"`,
+						Text:     "`severity` label value must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -116,7 +116,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "severity: warning",
 						Lines:    []int{4},
 						Reporter: "rule/label",
-						Text:     `severity label value must match "^critical$"`,
+						Text:     "`severity` label value must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -135,7 +135,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "priority: 2a",
 						Lines:    []int{4},
 						Reporter: "rule/label",
-						Text:     `priority label value must match "^(1|2|3)$"`,
+						Text:     "`priority` label value must match `^(1|2|3)$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -154,7 +154,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "priority: 2a",
 						Lines:    []int{4},
 						Reporter: "rule/label",
-						Text:     `priority label value must match "^(1|2|3)$"`,
+						Text:     "`priority` label value must match `^(1|2|3)$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -173,7 +173,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "alert: foo",
 						Lines:    []int{1, 2},
 						Reporter: "rule/label",
-						Text:     "severity label is required",
+						Text:     "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -201,7 +201,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "labels:",
 						Lines:    []int{3, 4},
 						Reporter: "rule/label",
-						Text:     "severity label is required",
+						Text:     "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -229,7 +229,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "severity: warning",
 						Lines:    []int{4},
 						Reporter: "rule/label",
-						Text:     `severity label value must match "^critical|info$"`,
+						Text:     "`severity` label value must match `^critical|info$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -248,7 +248,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "severity: warning",
 						Lines:    []int{4},
 						Reporter: "rule/label",
-						Text:     `severity label value must match "^critical|info$"`,
+						Text:     "`severity` label value must match `^critical|info$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -312,7 +312,7 @@ func TestLabelCheck(t *testing.T) {
 						Fragment: "for: must wait 5m to fire",
 						Lines:    []int{5},
 						Reporter: "rule/label",
-						Text:     `for label value must match "^must wait {{$for}} to fire$"`,
+						Text:     "`for` label value must match `^must wait {{$for}} to fire$`.",
 						Severity: checks.Warning,
 					},
 				}

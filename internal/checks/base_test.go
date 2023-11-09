@@ -66,8 +66,9 @@ func TestParseSeverity(t *testing.T) {
 func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi.FailoverGroup {
 	return promapi.NewFailoverGroup(
 		name,
+		uri,
 		[]*promapi.Prometheus{
-			promapi.NewPrometheus(name, uri, map[string]string{"X-Debug": "1"}, timeout, 16, 1000, nil),
+			promapi.NewPrometheus(name, uri, "", map[string]string{"X-Debug": "1"}, timeout, 16, 1000, nil),
 		},
 		required,
 		"up",
@@ -562,13 +563,13 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 }
 
 func checkErrorBadData(name, uri, err string) string {
-	return fmt.Sprintf(`prometheus %q at %s failed with: %s`, name, uri, err)
+	return fmt.Sprintf("`%s` Prometheus server at %s failed with: `%s`.", name, uri, err)
 }
 
 func checkErrorUnableToRun(c, name, uri, err string) string {
-	return fmt.Sprintf(`couldn't run %q checks due to prometheus %q at %s connection error: %s`, c, name, uri, err)
+	return fmt.Sprintf("Couldn't run %q checks due to `%s` Prometheus server at %s connection error: `%s`.", c, name, uri, err)
 }
 
 func checkErrorTooExpensiveToRun(c, name, uri, err string) string {
-	return fmt.Sprintf(`couldn't run %q checks on prometheus %q at %s because some queries are too expensive: %s`, c, name, uri, err)
+	return fmt.Sprintf("Couldn't run %q checks on `%s` Prometheus server at %s because some queries are too expensive: `%s`.", c, name, uri, err)
 }

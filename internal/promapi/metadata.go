@@ -15,8 +15,9 @@ import (
 )
 
 type MetadataResult struct {
-	URI      string
-	Metadata []v1.Metadata
+	URI       string
+	PublicURI string
+	Metadata  []v1.Metadata
 }
 
 type metadataQuery struct {
@@ -91,7 +92,11 @@ func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResu
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	metadata := MetadataResult{URI: p.safeURI, Metadata: result.value.(map[string][]v1.Metadata)[metric]}
+	metadata := MetadataResult{
+		URI:       p.safeURI,
+		PublicURI: p.publicURI,
+		Metadata:  result.value.(map[string][]v1.Metadata)[metric],
+	}
 
 	return &metadata, nil
 }

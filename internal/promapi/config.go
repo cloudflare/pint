@@ -27,8 +27,9 @@ type PrometheusConfig struct {
 }
 
 type ConfigResult struct {
-	URI    string
-	Config PrometheusConfig
+	URI       string
+	PublicURI string
+	Config    PrometheusConfig
 }
 
 type configQuery struct {
@@ -100,7 +101,11 @@ func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	r := ConfigResult{URI: p.safeURI, Config: result.value.(PrometheusConfig)}
+	r := ConfigResult{
+		URI:       p.safeURI,
+		PublicURI: p.publicURI,
+		Config:    result.value.(PrometheusConfig),
+	}
 
 	return &r, nil
 }

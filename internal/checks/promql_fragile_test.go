@@ -12,7 +12,7 @@ func newFragileCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func TestFragileCheck(t *testing.T) {
-	text := "aggregation using without() can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using by() to ensure consistent labels"
+	text := "Aggregation using `without()` can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using `by()` to ensure consistent labels."
 
 	testCases := []checkTest{
 		{

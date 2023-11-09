@@ -18,7 +18,10 @@ import (
 )
 
 const (
-	VectorMatchingCheckName = "promql/vector_matching"
+	VectorMatchingCheckName    = "promql/vector_matching"
+	VectorMatchingCheckDetails = `Trying to match two different time series together will only work if both have the exact same set of labels.
+You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+[Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.`
 )
 
 func NewVectorMatchingCheck(prom *promapi.FailoverGroup) VectorMatchingCheck {
@@ -53,6 +56,7 @@ func (c VectorMatchingCheck) Check(ctx context.Context, _ string, rule parser.Ru
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     problem.text,
+			Details:  problem.details,
 			Severity: problem.severity,
 		})
 	}
@@ -115,7 +119,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				if rv, ok := rhsMatchers[k]; ok && rv != lv {
 					problems = append(problems, exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("left hand side uses {%s=%q} while right hand side uses {%s=%q}, this will never match", k, lv, k, rv),
+						text:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
+						details:  VectorMatchingCheckDetails,
 						severity: Bug,
 					})
 					return problems
@@ -156,21 +161,24 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("using on(%q) won't produce any results because left hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).LHS),
+						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because the left hand side of the query doesn't have this label: `%s`.", name, node.Node.(*promParser.BinaryExpr).LHS),
+						details:  VectorMatchingCheckDetails,
 						severity: Bug,
 					})
 				}
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("using on(%q) won't produce any results because right hand side of the query doesn't have this label: %q", name, node.Node.(*promParser.BinaryExpr).RHS),
+						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because the right hand side of the query doesn't have this label: `%s`.", name, node.Node.(*promParser.BinaryExpr).RHS),
+						details:  VectorMatchingCheckDetails,
 						severity: Bug,
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
 						expr:     node.Expr,
-						text:     fmt.Sprintf("using on(%q) won't produce any results because both sides of the query don't have this label", name),
+						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because both sides of the query don't have this label.", name),
+						details:  VectorMatchingCheckDetails,
 						severity: Bug,
 					})
 				}
@@ -180,13 +188,15 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			if len(n.VectorMatching.MatchingLabels) == 0 {
 				problems = append(problems, exprProblem{
 					expr:     node.Expr,
-					text:     fmt.Sprintf("both sides of the query have different labels: %s != %s", l, r),
+					text:     fmt.Sprintf("This query will never return anything because the right and the left hand side have different labels: `%s` != `%s`.", l, r),
+					details:  VectorMatchingCheckDetails,
 					severity: Bug,
 				})
 			} else {
 				problems = append(problems, exprProblem{
 					expr:     node.Expr,
-					text:     fmt.Sprintf("using ignoring(%q) won't produce any results because both sides of the query have different labels: %s != %s", strings.Join(n.VectorMatching.MatchingLabels, ","), l, r),
+					text:     fmt.Sprintf("Using `ignoring(%s)` won't produce any results because both sides of the query have different labels: `%s` != `%s`.", strings.Join(n.VectorMatching.MatchingLabels, ","), l, r),
+					details:  VectorMatchingCheckDetails,
 					severity: Bug,
 				})
 			}

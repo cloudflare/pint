@@ -75,7 +75,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 			Fragment: fmt.Sprintf("%s: %s", rule.Record.Key.Value, rule.Record.Value.Value),
 			Lines:    rule.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("duplicated rule, identical rule found at %s:%d", entry.ReportedPath, entry.Rule.RecordingRule.Record.Key.Position.FirstLine()),
+			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.ReportedPath, entry.Rule.RecordingRule.Record.Key.Position.FirstLine()),
 			Severity: Bug,
 		})
 	}

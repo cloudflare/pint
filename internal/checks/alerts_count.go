@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/url"
 	"sort"
 	"time"
 
@@ -116,12 +117,15 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	}
 	sort.Ints(lines)
 
-	delta := qr.Series.Until.Sub(qr.Series.From)
+	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
 	problems = append(problems, Problem{
 		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,
 		Reporter: c.Reporter(),
-		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
+		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
+		Details: fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.range_input=%s).`,
+			qr.PublicURI, url.QueryEscape(rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
+		),
 		Severity: c.severity,
 	})
 	return problems

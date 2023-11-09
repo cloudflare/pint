@@ -90,8 +90,9 @@ func TestDiscoveryConfig(t *testing.T) {
 						Match:     "foo-(.+).yaml",
 						Template: []PrometheusTemplate{
 							{
-								Name: "foo",
-								URI:  "http://localhost",
+								Name:      "foo",
+								URI:       "http://localhost",
+								PublicURI: "http://localhost",
 							},
 						},
 					},
@@ -258,6 +259,14 @@ func TestPrometheusTemplateRender(t *testing.T) {
 			},
 			data: map[string]string{},
 			err:  `bad uri template "http://{{ $name }}": template: discovery:1: undefined variable "$name"`,
+		},
+		{
+			template: PrometheusTemplate{
+				URI:       "http://{{ $name }}",
+				PublicURI: "http://{{ $foo }}",
+			},
+			data: map[string]string{"name": "foo"},
+			err:  `bad publicURI template "http://{{ $foo }}": template: discovery:1: undefined variable "$foo"`,
 		},
 		{
 			template: PrometheusTemplate{

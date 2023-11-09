@@ -39,6 +39,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "abc"`,
+						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
 					},
 				}
@@ -56,6 +57,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "-5m"`,
+						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
 					},
 				}
@@ -72,7 +74,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Fragment: "0h",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
-						Text:     `"0h" is the default value of "for", consider removing this line`,
+						Text:     "`0h` is the default value of `for`, consider removing this redundant line.",
 						Severity: checks.Information,
 					},
 				}
@@ -90,6 +92,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "abc"`,
+						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
 					},
 				}
@@ -107,6 +110,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "-5m"`,
+						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
 					},
 				}
@@ -123,7 +127,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Fragment: "0h",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
-						Text:     `"0h" is the default value of "keep_firing_for", consider removing this line`,
+						Text:     "`0h` is the default value of `keep_firing_for`, consider removing this redundant line.",
 						Severity: checks.Information,
 					},
 				}

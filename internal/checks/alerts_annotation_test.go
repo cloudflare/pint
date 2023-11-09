@@ -31,7 +31,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "alert: foo",
 						Lines:    []int{1, 2},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "severity annotation is required",
+						Text:     "`severity` annotation is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -50,7 +50,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "alert: foo",
 						Lines:    []int{1, 2},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "severity annotation is required",
+						Text:     "`severity` annotation is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -78,7 +78,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "annotations:",
 						Lines:    []int{3, 4},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "severity annotation is required",
+						Text:     "`severity` annotation is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -106,7 +106,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "severity: bar",
 						Lines:    []int{4},
 						Reporter: checks.AnnotationCheckName,
-						Text:     `severity annotation value must match "^critical$"`,
+						Text:     "`severity` annotation value must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -125,7 +125,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "severity: bar",
 						Lines:    []int{4},
 						Reporter: checks.AnnotationCheckName,
-						Text:     `severity annotation value must match "^critical$"`,
+						Text:     "`severity` annotation value must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -171,7 +171,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "for: 4m",
 						Lines:    []int{5},
 						Reporter: checks.AnnotationCheckName,
-						Text:     `for annotation value must match "^{{ $for }}$"`,
+						Text:     "`for` annotation value must match `^{{ $for }}$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -208,7 +208,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "annotation_1: bar",
 						Lines:    []int{4},
 						Reporter: checks.AnnotationCheckName,
-						Text:     `annotation_.* annotation value must match "^critical$"`,
+						Text:     "`annotation_.*` annotation value must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -227,7 +227,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Fragment: "annotation_1: bar",
 						Lines:    []int{4},
 						Reporter: checks.AnnotationCheckName,
-						Text:     `annotation_.* annotation value must match "^critical$"`,
+						Text:     "`annotation_.*` annotation value must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}

@@ -83,7 +83,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 		r.api.pruneComments(pr, existingComments, pendingComments)
 
 		slog.Info("Adding missing comments to BitBucket")
-		if err = r.api.addComments(pr, existingComments, pendingComments, changes); err != nil {
+		if err = r.api.addComments(pr, existingComments, pendingComments); err != nil {
 			return fmt.Errorf("failed to create BitBucket pull request comments: %w", err)
 		}
 

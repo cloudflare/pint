@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	SyntaxCheckName = "promql/syntax"
+	SyntaxCheckName    = "promql/syntax"
+	SyntaxCheckDetails = "[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation."
 )
 
 func NewSyntaxCheck() SyntaxCheck {
@@ -37,7 +38,8 @@ func (c SyntaxCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 			Fragment: q.Value.Value,
 			Lines:    q.Value.Position.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("syntax error: %s", q.SyntaxError),
+			Text:     fmt.Sprintf("Prometheus failed to parse the query with this PromQL error: %s.", q.SyntaxError),
+			Details:  SyntaxCheckDetails,
 			Severity: Fatal,
 		})
 	}

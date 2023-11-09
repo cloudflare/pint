@@ -81,6 +81,7 @@ func (t *TLSConfig) toHTTPConfig() (*tls.Config, error) {
 type PrometheusConfig struct {
 	Name        string            `hcl:",label" json:"name"`
 	URI         string            `hcl:"uri" json:"uri"`
+	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
 	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
 	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
 	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
@@ -167,10 +168,10 @@ func newFailoverGroup(prom PrometheusConfig) *promapi.FailoverGroup {
 	var tlsConf *tls.Config
 	tlsConf, _ = prom.TLS.toHTTPConfig()
 	upstreams := []*promapi.Prometheus{
-		promapi.NewPrometheus(prom.Name, prom.URI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf),
+		promapi.NewPrometheus(prom.Name, prom.URI, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf),
 	}
 	for _, uri := range prom.Failover {
-		upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
+		upstreams = append(upstreams, promapi.NewPrometheus(prom.Name, uri, prom.PublicURI, prom.Headers, timeout, prom.Concurrency, prom.RateLimit, tlsConf))
 	}
 	include := make([]*regexp.Regexp, 0, len(prom.Include))
 	for _, path := range prom.Include {
@@ -182,7 +183,7 @@ func newFailoverGroup(prom PrometheusConfig) *promapi.FailoverGroup {
 	}
 	tags := make([]string, 0, len(prom.Tags))
 	tags = append(tags, prom.Tags...)
-	return promapi.NewFailoverGroup(prom.Name, upstreams, prom.Required, prom.Uptime, include, exclude, tags)
+	return promapi.NewFailoverGroup(prom.Name, prom.PublicURI, upstreams, prom.Required, prom.Uptime, include, exclude, tags)
 }
 
 func NewPrometheusGenerator(cfg Config, metricsRegistry *prometheus.Registry) *PrometheusGenerator {

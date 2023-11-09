@@ -74,7 +74,7 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 				Severity: "NORMAL",
 				Anchor: BitBucketPendingCommentAnchor{
 					Path:     "foo.yaml",
-					Line:     4,
+					Line:     5,
 					DiffType: "EFFECTIVE",
 					LineType: "ADDED",
 					FileType: "TO",
@@ -114,6 +114,7 @@ func TestReportToAnnotation(t *testing.T) {
 					Lines:    []int{5},
 					Reporter: "mock",
 					Text:     "report text",
+					Details:  "mock details",
 					Severity: checks.Fatal,
 				},
 			},

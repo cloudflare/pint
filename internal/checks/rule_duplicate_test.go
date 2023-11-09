@@ -11,7 +11,7 @@ import (
 )
 
 func textDuplicateRule(path string, line int) string {
-	return fmt.Sprintf("duplicated rule, identical rule found at %s:%d", path, line)
+	return fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", path, line)
 }
 
 func TestRuleDuplicateCheck(t *testing.T) {
@@ -156,8 +156,9 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			prometheus: func(uri string) *promapi.FailoverGroup {
 				return promapi.NewFailoverGroup(
 					"prom",
+					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, map[string]string{}, time.Second, 4, 100, nil),
+						promapi.NewPrometheus("prom", uri, "", map[string]string{}, time.Second, 4, 100, nil),
 					},
 					true,
 					"up",

@@ -5,13 +5,13 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/0001.yml:6 Bug: this alert rule must have a 'for' field with a minimum duration of 5m (rule/for)
+rules/0001.yml:6 Bug: This alert rule must have a `for` field with a minimum duration of 5m. (rule/for)
  6 |   for: 3m
 
-rules/0001.yml:9 Bug: this alert rule must have a 'for' field with a maximum duration of 10m (rule/for)
+rules/0001.yml:9 Bug: This alert rule must have a `for` field with a maximum duration of 10m. (rule/for)
  9 |   for: 13m
 
-rules/0001.yml:10 Bug: this alert rule must have a 'for' field with a minimum duration of 5m (rule/for)
+rules/0001.yml:10 Bug: This alert rule must have a `for` field with a minimum duration of 5m. (rule/for)
  10 | - alert: none
 
 level=INFO msg="Problems found" Bug=3

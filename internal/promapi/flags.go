@@ -15,8 +15,9 @@ import (
 )
 
 type FlagsResult struct {
-	URI   string
-	Flags v1.FlagsResult
+	URI       string
+	PublicURI string
+	Flags     v1.FlagsResult
 }
 
 type flagsQuery struct {
@@ -85,7 +86,11 @@ func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
 		return nil, QueryError{err: result.err, msg: decodeError(result.err)}
 	}
 
-	r := FlagsResult{URI: p.safeURI, Flags: result.value.(v1.FlagsResult)}
+	r := FlagsResult{
+		URI:       p.safeURI,
+		PublicURI: p.publicURI,
+		Flags:     result.value.(v1.FlagsResult),
+	}
 
 	return &r, nil
 }

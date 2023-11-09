@@ -92,7 +92,9 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 	severity := Information
 	if c.maxSeries > 0 && series > c.maxSeries {
 		severity = c.severity
-		above = fmt.Sprintf(", maximum allowed series is %d", c.maxSeries)
+		above = fmt.Sprintf(", maximum allowed series is %d.", c.maxSeries)
+	} else {
+		estimate += "."
 	}
 
 	problems = append(problems, Problem{
@@ -108,7 +110,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
 			Severity: c.severity,
 		})
 	}
@@ -118,7 +120,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
 			Severity: c.severity,
 		})
 	}
@@ -129,7 +131,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
 			Severity: c.severity,
 		})
 	}

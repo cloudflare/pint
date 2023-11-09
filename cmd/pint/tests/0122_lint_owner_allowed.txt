@@ -5,11 +5,11 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/1.yml:4-5 Bug: rule/owner comments are required in all files, please add a "# pint file/owner $owner" somewhere in this file and/or "# pint rule/owner $owner" on top of each rule (rule/owner)
+rules/1.yml:4-5 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
  4 |   - alert: No Owner
  5 |     expr: up > 0
 
-rules/1.yml:7-8 Bug: this rule is set as owned by "bob" but "bob" doesn't match any of the allowed owner values (rule/owner)
+rules/1.yml:7-8 Bug: This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values. (rule/owner)
  7 |   - alert: Invalid
  8 |     expr: up == 0
 
