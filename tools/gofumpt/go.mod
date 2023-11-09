@@ -2,6 +2,8 @@ module _
 
 go 1.21.4
 
+toolchain go1.21.0
+
 require mvdan.cc/gofumpt v0.5.0
 
 require (
