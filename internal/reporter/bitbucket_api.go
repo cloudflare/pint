@@ -558,9 +558,14 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		}
 
 		var buf strings.Builder
-		icon := ":stop_sign:"
-		if report.Problem.Severity <= checks.Warning {
+		var icon string
+		switch report.Problem.Severity {
+		case checks.Fatal, checks.Bug:
+			icon = ":stop_sign:"
+		case checks.Warning:
 			icon = ":warning:"
+		case checks.Information:
+			icon = ":information_source:"
 		}
 		buf.WriteString(icon)
 		buf.WriteString(" **")
