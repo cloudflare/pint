@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.49.2
+
+### Fixed
+
+- Fixed false positive reports from `promql/regexp` - #782.
+
 ## v0.49.1
 
 ### Fixed

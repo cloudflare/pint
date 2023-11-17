@@ -174,6 +174,13 @@ func TestRegexpCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "regexp with a modifier",
+			content:     "- record: foo\n  expr: foo{job=~\"(?i)someone\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
 	}
 	runTests(t, testCases)
 }

@@ -53,7 +53,15 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 			var isUseful bool
 			var beginText, endText int
 			r, _ := syntax.Parse(re, syntax.Perl)
+			if r.Flags > 0 && r.Flags != syntax.Perl {
+				// If effective flags are different from default flags then we assume regexp is useful.
+				// It could be case sensitive match.
+				isUseful = true
+			}
 			for _, s := range r.Sub {
+				if s.Flags > 0 && s.Flags != syntax.Perl {
+					isUseful = true
+				}
 				// nolint: exhaustive
 				switch s.Op {
 				case syntax.OpBeginText:
