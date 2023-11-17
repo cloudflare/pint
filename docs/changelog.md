@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed false positive reports from `promql/regexp` - #782.
+- `Information` level reports using BitBucket were using wrong comment icon.
 
 ## v0.49.1
 
