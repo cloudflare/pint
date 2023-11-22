@@ -30,7 +30,7 @@ cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=INFO msg="Finding all rules to check on current git branch using git blame" base=main
+level=INFO msg="Finding all rules to check on current git branch" base=main
 level=INFO msg="Problems found" Fatal=1 Warning=1
 ##teamcity[testSuiteStarted name='promql/syntax']
 ##teamcity[testSuiteStarted name='Fatal']

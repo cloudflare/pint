@@ -667,37 +667,40 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 		},
 		{
-			description: "ignores failures from unmodified lines",
+			description: "reports failures from unmodified lines",
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath: "foo.txt",
-					SourcePath:   "foo.txt",
-					Rule:         mockRules[1],
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					Rule:          mockRules[1],
+					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
+						Text:     "this line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
 				{
-					ReportedPath: "bar.txt",
-					SourcePath:   "bar.txt",
-					Rule:         mockRules[1],
+					ReportedPath:  "bar.txt",
+					SourcePath:    "bar.txt",
+					Rule:          mockRules[1],
+					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
-						Text:     "this should be ignored, file is not part of the diff",
+						Text:     "this file is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
 				{
-					ReportedPath: "foo.txt",
-					SourcePath:   "foo.txt",
-					Rule:         mockRules[1],
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					Rule:          mockRules[1],
+					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Fragment: "up",
 						Lines:    []int{2},
@@ -707,9 +710,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath: "foo.txt",
-					SourcePath:   "foo.txt",
-					Rule:         mockRules[0],
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					Rule:          mockRules[0],
+					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Fragment: "up == 0",
 						Lines:    []int{2},
@@ -719,9 +723,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath: "foo.txt",
-					SourcePath:   "foo.txt",
-					Rule:         mockRules[1],
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					Rule:          mockRules[1],
+					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Fragment: "errors",
 						Lines:    []int{4},
@@ -731,7 +736,48 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 			},
-			report: emptyReport,
+			report: reporter.BitBucketReport{
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "FAIL",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
+			},
+			annotations: reporter.BitBucketAnnotations{
+				Annotations: []reporter.BitBucketAnnotation{
+					{
+						Path:     "foo.txt",
+						Line:     2,
+						Message:  "mock: bad name",
+						Severity: "MEDIUM",
+						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
+					},
+					{
+						Path:     "foo.txt",
+						Line:     2,
+						Message:  "mock: mock text",
+						Severity: "MEDIUM",
+						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
+					},
+					{
+						Path:     "foo.txt",
+						Line:     4,
+						Message:  "mock: mock text 2",
+						Severity: "LOW",
+						Type:     "CODE_SMELL",
+						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
+					},
+				},
+			},
 			errorHandler: func(err error) error {
 				if err != nil {
 					return fmt.Errorf("Unpexpected error: %w", err)

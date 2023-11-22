@@ -325,31 +325,34 @@ func (r Rule) ToYAML() string {
 	}
 
 	var b strings.Builder
-	b.WriteString("- ")
 	if r.AlertingRule != nil {
-		b.WriteString("  ")
+		for _, c := range r.AlertingRule.Comments() {
+			b.WriteString(c)
+			b.WriteRune('\n')
+		}
+		b.WriteString("- ")
 		b.WriteString(r.AlertingRule.Alert.Key.Value)
-		b.WriteRune(':')
+		b.WriteString(": ")
 		b.WriteString(r.AlertingRule.Alert.Value.Value)
 		b.WriteRune('\n')
 
 		b.WriteString("  ")
 		b.WriteString(r.AlertingRule.Expr.Key.Value)
-		b.WriteRune(':')
+		b.WriteString(": ")
 		b.WriteString(r.AlertingRule.Expr.Value.Value)
 		b.WriteRune('\n')
 
 		if r.AlertingRule.For != nil {
 			b.WriteString("  ")
 			b.WriteString(r.AlertingRule.For.Key.Value)
-			b.WriteRune(':')
+			b.WriteString(": ")
 			b.WriteString(r.AlertingRule.For.Value.Value)
 			b.WriteRune('\n')
 		}
 		if r.AlertingRule.KeepFiringFor != nil {
 			b.WriteString("  ")
 			b.WriteString(r.AlertingRule.KeepFiringFor.Key.Value)
-			b.WriteRune(':')
+			b.WriteString(": ")
 			b.WriteString(r.AlertingRule.KeepFiringFor.Value.Value)
 			b.WriteRune('\n')
 		}
@@ -359,7 +362,7 @@ func (r Rule) ToYAML() string {
 			for _, a := range r.AlertingRule.Annotations.Items {
 				b.WriteString("    ")
 				b.WriteString(a.Key.Value)
-				b.WriteRune(':')
+				b.WriteString(": ")
 				b.WriteString(a.Value.Value)
 				b.WriteRune('\n')
 			}
@@ -370,7 +373,7 @@ func (r Rule) ToYAML() string {
 			for _, l := range r.AlertingRule.Labels.Items {
 				b.WriteString("    ")
 				b.WriteString(l.Key.Value)
-				b.WriteRune(':')
+				b.WriteString(": ")
 				b.WriteString(l.Value.Value)
 				b.WriteRune('\n')
 			}
@@ -379,13 +382,19 @@ func (r Rule) ToYAML() string {
 		return b.String()
 	}
 
+	for _, c := range r.RecordingRule.Comments() {
+		b.WriteString(c)
+		b.WriteRune('\n')
+	}
+	b.WriteString("- ")
 	b.WriteString(r.RecordingRule.Record.Key.Value)
-	b.WriteRune(':')
+	b.WriteString(": ")
 	b.WriteString(r.RecordingRule.Record.Value.Value)
+	b.WriteRune('\n')
 
 	b.WriteString("  ")
 	b.WriteString(r.RecordingRule.Expr.Key.Value)
-	b.WriteRune(':')
+	b.WriteString(": ")
 	b.WriteString(r.RecordingRule.Expr.Value.Value)
 	b.WriteRune('\n')
 
@@ -394,7 +403,7 @@ func (r Rule) ToYAML() string {
 		for _, l := range r.RecordingRule.Labels.Items {
 			b.WriteString("    ")
 			b.WriteString(l.Key.Value)
-			b.WriteRune(':')
+			b.WriteString(": ")
 			b.WriteString(l.Value.Value)
 			b.WriteRune('\n')
 		}

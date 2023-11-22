@@ -190,6 +190,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 						}
 						mock.handler(w, r)
 						done = true
+						break
 					}
 					break
 				}

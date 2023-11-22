@@ -131,10 +131,11 @@ func shouldReport(report Report) bool {
 	}
 
 	for _, pl := range report.Problem.Lines {
-		for _, ml := range report.ModifiedLines {
-			if pl == ml {
-				return true
-			}
+		if slices.Contains(report.ModifiedLines, pl) {
+			return true
+		}
+		if slices.Contains(report.Rule.Lines(), pl) {
+			return true
 		}
 	}
 
