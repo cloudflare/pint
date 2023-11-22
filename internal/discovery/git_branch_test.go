@@ -27,7 +27,7 @@ func gitCommit(t *testing.T, message string) {
 }
 
 func commitFile(t *testing.T, path, content, message string) {
-	err := os.WriteFile("rules.yml", []byte(content), 0o644)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	require.NoError(t, err, "write %s", path)
 	_, err = git.RunGit("add", path)
 	require.NoError(t, err, "git add")
@@ -192,7 +192,7 @@ func TestGitBranchFinder(t *testing.T) {
 				nil,
 			),
 			entries: nil,
-			err:     "failed to run git blame for rules.yml: mock git error: [blame --line-porcelain -- rules.yml]",
+			err:     "failed to run git blame for rules.yml: mock git error: [blame --line-porcelain c1 -- rules.yml]",
 		},
 		{
 			title: "no rules in file",
@@ -792,6 +792,33 @@ groups:
 					SourcePath:    "rules.yml",
 					ModifiedLines: []int{7, 8, 9, 10, 11, 12},
 					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
+				},
+			},
+		},
+		{
+			title: "rule file moved",
+			setup: func(t *testing.T) {
+				commitFile(t, "a.yml", `
+- alert: rule
+  expr: up == 0
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				_, err = git.RunGit("mv", "a.yml", "b.yml")
+				require.NoError(t, err, "git mv")
+
+				gitCommit(t, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
+			entries: []discovery.Entry{
+				{
+					State:         discovery.Moved,
+					ReportedPath:  "b.yml",
+					SourcePath:    "b.yml",
+					ModifiedLines: []int{1, 2, 3},
+					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
 			},
 		},

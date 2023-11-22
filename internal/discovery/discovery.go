@@ -60,6 +60,8 @@ func (c ChangeType) String() string {
 		return "modified"
 	case Removed:
 		return "removed"
+	case Moved:
+		return "moved"
 	default:
 		return "---"
 	}
@@ -75,6 +77,7 @@ const (
 	Added
 	Modified
 	Removed
+	Moved
 )
 
 type Entry struct {

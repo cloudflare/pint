@@ -98,6 +98,7 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 		slog.Debug("Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
 
 		// ignore directories
+		// FIXME move all files instead?
 		if isDir, _ := isDirectoryPath(dstPath); isDir {
 			slog.Debug("Skipping directory entry change", slog.String("path", dstPath))
 			continue
@@ -157,7 +158,7 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 			// file was turned into a symlink, every source line is modification
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
-			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath())
+			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit)
 			if err != nil {
 				return nil, fmt.Errorf("failed to run git blame for %s: %w", change.Path.After.EffectivePath(), err)
 			}
@@ -194,9 +195,9 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 	return nil
 }
 
-func getModifiedLines(cmd CommandRunner, commits []string, fpath string) ([]int, error) {
+func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string) ([]int, error) {
 	slog.Debug("Getting list of modified lines", slog.String("commits", fmt.Sprint(commits)), slog.String("path", fpath))
-	lines, err := Blame(cmd, fpath)
+	lines, err := Blame(cmd, fpath, atCommit)
 	if err != nil {
 		return nil, err
 	}

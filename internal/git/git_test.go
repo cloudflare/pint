@@ -89,7 +89,7 @@ func TestGitBlame(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			output, err := git.Blame(tc.mock, tc.path)
+			output, err := git.Blame(tc.mock, tc.path, "")
 
 			hadError := (err != nil)
 			if hadError != tc.shouldError {
