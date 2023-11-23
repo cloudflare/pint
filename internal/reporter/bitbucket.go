@@ -115,6 +115,8 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 // to the first modified line.
 // Without this we could have a report that is marked as failed, but with no annotations
 // at all, which would make it more difficult to fix.
+// If we can't find any modified line to match with our report then we return 0,
+// which will create a file level annotation.
 func moveReportedLine(report Report) (reported, original int) {
 	reported = -1
 	original = -1
@@ -132,6 +134,10 @@ func moveReportedLine(report Report) (reported, original int) {
 
 	if reported < 0 && len(report.ModifiedLines) > 0 {
 		return report.ModifiedLines[0], original
+	}
+
+	if reported < 0 {
+		reported = 0
 	}
 
 	return reported, original

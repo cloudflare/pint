@@ -498,20 +498,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
-					ReportedPath:  "bar.txt",
-					SourcePath:    "bar.txt",
-					ModifiedLines: []int{},
-					Rule:          mockRules[1],
-					Problem: checks.Problem{
-						Fragment: "up",
-						Lines:    []int{1},
-						Reporter: "mock",
-						Text:     "this should be ignored, file is not part of the diff",
+						Text:     "line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -563,7 +550,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
@@ -571,6 +558,14 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			annotations: reporter.BitBucketAnnotations{
 				Annotations: []reporter.BitBucketAnnotation{
+					{
+						Path:     "foo.txt",
+						Line:     2,
+						Message:  "Problem reported on unmodified line 1, annotation moved here: mock: line is not part of the diff",
+						Severity: "MEDIUM",
+						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
+					},
 					{
 						Path:     "foo.txt",
 						Line:     2,
@@ -684,19 +679,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "bar.txt",
-					SourcePath:    "bar.txt",
-					Rule:          mockRules[1],
-					ModifiedLines: []int{2, 4},
-					Problem: checks.Problem{
-						Fragment: "up",
-						Lines:    []int{1},
-						Reporter: "mock",
-						Text:     "this file is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
 					ReportedPath:  "foo.txt",
 					SourcePath:    "foo.txt",
 					Rule:          mockRules[1],
@@ -744,7 +726,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
@@ -752,6 +734,14 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			annotations: reporter.BitBucketAnnotations{
 				Annotations: []reporter.BitBucketAnnotation{
+					{
+						Path:     "foo.txt",
+						Line:     2,
+						Message:  "Problem reported on unmodified line 1, annotation moved here: mock: this line is not part of the diff",
+						Severity: "MEDIUM",
+						Type:     "BUG",
+						Link:     "https://cloudflare.github.io/pint/checks/mock.html",
+					},
 					{
 						Path:     "foo.txt",
 						Line:     2,
@@ -843,19 +833,6 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "bar.txt",
-					SourcePath:    "bar.txt",
-					ModifiedLines: []int{},
-					Rule:          mockRules[1],
-					Problem: checks.Problem{
-						Fragment: "up",
-						Lines:    []int{1},
-						Reporter: "mock",
-						Text:     "this should be ignored, file is not part of the diff",
-						Severity: checks.Bug,
-					},
-				},
-				{
 					ReportedPath:  "foo.txt",
 					SourcePath:    "foo.txt",
 					ModifiedLines: []int{2, 4},
@@ -904,7 +881,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
