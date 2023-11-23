@@ -38,9 +38,9 @@ func RunGit(args ...string) (content []byte, err error) {
 	return stdout.Bytes(), nil
 }
 
-func Blame(cmd CommandRunner, path string) (lines LineBlames, err error) {
+func Blame(cmd CommandRunner, path, commit string) (lines LineBlames, err error) {
 	slog.Debug("Running git blame", slog.String("path", path))
-	output, err := cmd("blame", "--line-porcelain", "--", path)
+	output, err := cmd("blame", "--line-porcelain", commit, "--", path)
 	if err != nil {
 		return nil, err
 	}

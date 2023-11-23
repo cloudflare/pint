@@ -13,7 +13,6 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
 )
 
 func NewConsoleReporter(output io.Writer, minSeverity checks.Severity) ConsoleReporter {
@@ -52,15 +51,6 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 	perFile := map[string][]string{}
 	for _, report := range reports {
 		if report.Problem.Severity < cr.minSeverity {
-			continue
-		}
-
-		if !shouldReport(report) {
-			slog.Debug(
-				"Problem reported on unmodified line, skipping",
-				slog.String("path", report.SourcePath),
-				slog.String("lines", output.FormatLineRangeString(report.Problem.Lines)),
-			)
 			continue
 		}
 

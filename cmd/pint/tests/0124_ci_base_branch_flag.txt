@@ -21,7 +21,7 @@ cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=INFO msg="Finding all rules to check on current git branch using git blame" base=main
+level=INFO msg="Finding all rules to check on current git branch" base=main
 level=INFO msg="Problems found" Fatal=1
 rules.yml:2 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected identifier "bi". (promql/syntax)
  2 |   expr: sum(foo) bi(job)

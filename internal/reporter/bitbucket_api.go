@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
 )
 
 type BitBucketReport struct {
@@ -303,9 +302,6 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 	result := "PASS"
 	var reportedProblems int
 	for _, report := range summary.reports {
-		if !shouldReport(report) {
-			continue
-		}
 		reportedProblems++
 		if report.Problem.Severity >= checks.Bug {
 			result = "FAIL"
@@ -338,14 +334,6 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 	annotations := make([]BitBucketAnnotation, 0, len(summary.reports))
 	for _, report := range summary.reports {
-		if !shouldReport(report) {
-			slog.Debug(
-				"Problem reported on unmodified line, skipping",
-				slog.String("path", report.SourcePath),
-				slog.String("lines", output.FormatLineRangeString(report.Problem.Lines)),
-			)
-			continue
-		}
 		annotations = append(annotations, reportToAnnotation(report))
 	}
 

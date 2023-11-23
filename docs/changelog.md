@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.50.0
+
+### Changed
+
+- `pint ci` now uses a new logic for deciding which rules have changed when validating
+  pull requests. Changes that would previously be invisible to pint, like modifying
+  comments or moving the entire rules file, will now trigger checks for affected
+  rules.
+
 ## v0.49.2
 
 ### Fixed

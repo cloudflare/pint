@@ -175,7 +175,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 		default:
 			switch {
 			case job.entry.State == discovery.Removed:
-				// FIXME
+				// FIXME check if it breaks any other rule?
 			case errors.Is(job.entry.PathError, discovery.ErrFileIsIgnored):
 				results <- reporter.Report{
 					ReportedPath:  job.entry.ReportedPath,

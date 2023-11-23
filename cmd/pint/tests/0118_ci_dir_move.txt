@@ -2,7 +2,7 @@ http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/comments 200 {}
-http start github 127.0.0.1:6117
+http start github 127.0.0.1:6118
 
 mkdir testrepo
 cd testrepo
@@ -45,8 +45,8 @@ ci {
 }
 repository {
   github {
-    baseuri   = "http://127.0.0.1:6117"
-	uploaduri = "http://127.0.0.1:6117"
+    baseuri   = "http://127.0.0.1:6118"
+	uploaduri = "http://127.0.0.1:6118"
     owner     = "cloudflare"
     repo      = "pint"
   }

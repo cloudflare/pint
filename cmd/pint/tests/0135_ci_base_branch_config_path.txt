@@ -23,7 +23,7 @@ cmp stderr ../stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
 level=DEBUG msg="Got branch information" base=origin/main current=v2
-level=INFO msg="Finding all rules to check on current git branch using git blame" base=origin/main
+level=INFO msg="Finding all rules to check on current git branch" base=origin/main
 level=DEBUG msg="Running git command" args=["log","--format=%H","--no-abbrev-commit","--reverse","origin/main..HEAD"]
 level=ERROR msg="Fatal error" err="failed to get the list of commits to scan: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
 -- src/v1.yml --

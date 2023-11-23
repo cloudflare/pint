@@ -42,7 +42,7 @@ type GitBranchFinder struct {
 }
 
 func (f GitBranchFinder) Find() (entries []Entry, err error) {
-	slog.Info("Finding all rules to check on current git branch using logical diff", slog.String("base", f.baseBranch))
+	slog.Info("Finding all rules to check on current git branch", slog.String("base", f.baseBranch))
 
 	cr, err := git.CommitRange(f.gitCmd, f.baseBranch)
 	if err != nil {
@@ -105,7 +105,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 				)
 				entries = append(entries, *me.after)
 			case me.before != nil && me.after != nil:
-				if me.isIdentical {
+				if me.isIdentical && !me.wasMoved {
 					slog.Debug(
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
@@ -113,16 +113,26 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 					)
 					continue
 				}
-				me.after.State = Modified
-				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
-				slog.Debug(
-					"Rule modified on HEAD branch",
-					slog.String("name", me.after.Rule.Name()),
-					slog.String("state", me.after.State.String()),
-					slog.String("path", me.after.SourcePath),
-					slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
-				)
+				if me.wasMoved {
+					slog.Debug(
+						"Rule content was not modified on HEAD but the file was moved or renamed",
+						slog.String("name", me.after.Rule.Name()),
+						slog.String("lines", output.FormatLineRangeString(me.after.Rule.Lines())),
+					)
+					me.after.State = Moved
+					me.after.ModifiedLines = git.CountLines(change.Body.After)
+				} else {
+					slog.Debug(
+						"Rule modified on HEAD branch",
+						slog.String("name", me.after.Rule.Name()),
+						slog.String("state", me.after.State.String()),
+						slog.String("path", me.after.SourcePath),
+						slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
+						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+					)
+					me.after.State = Modified
+					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+				}
 				entries = append(entries, *me.after)
 			case me.before != nil && me.after == nil:
 				me.before.State = Removed
@@ -225,6 +235,7 @@ type matchedEntry struct {
 	before      *Entry
 	after       *Entry
 	isIdentical bool
+	wasMoved    bool
 }
 
 func matchEntries(before, after []Entry) (ml []matchedEntry) {
@@ -242,6 +253,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 			if !matched && a.Rule.Name() != "" && a.Rule.ToYAML() == b.Rule.ToYAML() {
 				m.before = &b
 				m.isIdentical = true
+				m.wasMoved = a.SourcePath != b.SourcePath
 				matched = true
 			} else {
 				beforeSwap = append(beforeSwap, b)
