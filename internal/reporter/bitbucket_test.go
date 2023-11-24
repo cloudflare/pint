@@ -922,7 +922,7 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text 2\n\n------\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text 2\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
 					Severity: "NORMAL",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
@@ -1510,6 +1510,306 @@ func TestBitBucketReporter(t *testing.T) {
 					return nil
 				}
 				return fmt.Errorf("Expected failed to create BitBucket pull request comments: POST request failed, got %w", err)
+			},
+		},
+		{
+			description: "sends a correct report with deduped comments",
+			gitCmd:      fakeGit,
+			reports: []reporter.Report{
+				{
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{1},
+						Reporter: "mock",
+						Text:     "this should be ignored, line is not part of the diff",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{1},
+						Reporter: "mock",
+						Text:     "this should be ignored, line is not part of the diff",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "up",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "bad name",
+						Details:  "bad name details",
+						Severity: checks.Warning,
+					},
+				},
+				{
+					ReportedPath:  "foo.txt",
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Fragment: "up == 0",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "mock text 1",
+						Details:  "mock details",
+						Severity: checks.Warning,
+					},
+				},
+				{
+					ReportedPath:  "foo.txt",
+					SourcePath:    "symlink.txt",
+					ModifiedLines: []int{2, 4},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Fragment: "errors",
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "mock text 2",
+						Details:  "mock details",
+						Severity: checks.Warning,
+					},
+				},
+			},
+			report: reporter.BitBucketReport{
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "FAIL",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(5)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
+			},
+			pullRequestComments: []reporter.BitBucketPendingComment{
+				{
+					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Severity: "NORMAL",
+					Anchor: reporter.BitBucketPendingCommentAnchor{
+						Path:     "foo.txt",
+						Line:     1,
+						LineType: "CONTEXT",
+						FileType: "FROM",
+						DiffType: "EFFECTIVE",
+					},
+				},
+				{
+					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\nbad name details\n\n------\n\nmock text 1\n\nmock details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Severity: "NORMAL",
+					Anchor: reporter.BitBucketPendingCommentAnchor{
+						Path:     "foo.txt",
+						Line:     2,
+						LineType: "ADDED",
+						FileType: "TO",
+						DiffType: "EFFECTIVE",
+					},
+				},
+				{
+					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text 2\n\nmock details\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Severity: "NORMAL",
+					Anchor: reporter.BitBucketPendingCommentAnchor{
+						Path:     "foo.txt",
+						Line:     2,
+						LineType: "ADDED",
+						FileType: "TO",
+						DiffType: "EFFECTIVE",
+					},
+				},
+			},
+			pullRequests: reporter.BitBucketPullRequests{
+				IsLastPage: true,
+				Values: []reporter.BitBucketPullRequest{
+					{
+						ID:   102,
+						Open: true,
+						FromRef: reporter.BitBucketRef{
+							ID:     "refs/heads/fake-branch",
+							Commit: "fake-commit-id",
+						},
+						ToRef: reporter.BitBucketRef{
+							ID:     "refs/heads/main",
+							Commit: "main-commit-id",
+						},
+					},
+				},
+			},
+			pullRequestChanges: reporter.BitBucketPullRequestChanges{
+				IsLastPage: true,
+				Values: []reporter.BitBucketPullRequestChange{
+					{
+						Path: reporter.BitBucketPath{
+							ToString: "index.txt",
+						},
+					},
+					{
+						Path: reporter.BitBucketPath{
+							ToString: "foo.txt",
+						},
+					},
+				},
+			},
+			pullRequestFileDiffs: map[string]reporter.BitBucketFileDiffs{
+				"index.txt": {
+					Diffs: []reporter.BitBucketFileDiff{
+						{
+							Hunks: []reporter.BitBucketDiffHunk{
+								{
+									Segments: []reporter.BitBucketDiffSegment{
+										{
+											Type: "ADDED",
+											Lines: []reporter.BitBucketDiffLine{
+												{Source: 1, Destination: 1},
+												{Source: 5, Destination: 5},
+											},
+										},
+										{
+											Type: "CONTEXT",
+											Lines: []reporter.BitBucketDiffLine{
+												{Source: 10, Destination: 6},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				"foo.txt": {
+					Diffs: []reporter.BitBucketFileDiff{
+						{
+							Hunks: []reporter.BitBucketDiffHunk{
+								{
+									Segments: []reporter.BitBucketDiffSegment{
+										{
+											Type: "ADDED",
+											Lines: []reporter.BitBucketDiffLine{
+												{Source: 2, Destination: 2},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Hunks: []reporter.BitBucketDiffHunk{
+								{
+									Segments: []reporter.BitBucketDiffSegment{
+										{
+											Type: "MODIFIED",
+											Lines: []reporter.BitBucketDiffLine{
+												{Source: 3, Destination: 4},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			pullRequestActivities: reporter.BitBucketPullRequestActivities{
+				IsLastPage: true,
+				Values: []reporter.BitBucketPullRequestActivity{
+					{
+						Action: "APPROVED",
+					},
+					{
+						Action:        "COMMENTED",
+						CommentAction: "ADDED",
+						CommentAnchor: reporter.BitBucketCommentAnchor{
+							Orphaned: true,
+							DiffType: "EFFECTIVE",
+							Path:     "foo.txt",
+							Line:     3,
+						},
+						Comment: reporter.BitBucketPullRequestComment{
+							ID:      1001,
+							Version: 0,
+							State:   "OPEN",
+							Author: reporter.BitBucketCommentAuthor{
+								Name: "pint_user",
+							},
+						},
+					},
+					{
+						Action:        "COMMENTED",
+						CommentAction: "ADDED",
+						CommentAnchor: reporter.BitBucketCommentAnchor{
+							Orphaned: true,
+							DiffType: "COMMIT",
+							Path:     "foo.txt",
+							Line:     10,
+						},
+						Comment: reporter.BitBucketPullRequestComment{
+							ID:      1002,
+							Version: 1,
+							State:   "OPEN",
+							Author: reporter.BitBucketCommentAuthor{
+								Name: "pint_user",
+							},
+						},
+					},
+					{
+						Action:        "COMMENTED",
+						CommentAction: "ADDED",
+						CommentAnchor: reporter.BitBucketCommentAnchor{
+							Orphaned: false,
+							DiffType: "EFFECTIVE",
+							Path:     "foo.txt",
+							Line:     3,
+						},
+						Comment: reporter.BitBucketPullRequestComment{
+							ID:      2001,
+							Version: 0,
+							State:   "OPEN",
+							Author: reporter.BitBucketCommentAuthor{
+								Name: "pint_user",
+							},
+						},
+					},
+					{
+						Action:        "COMMENTED",
+						CommentAction: "ADDED",
+						CommentAnchor: reporter.BitBucketCommentAnchor{
+							Orphaned: false,
+							DiffType: "COMMIT",
+							Path:     "foo.txt",
+							Line:     4,
+						},
+						Comment: reporter.BitBucketPullRequestComment{
+							ID:      2002,
+							Version: 1,
+							State:   "OPEN",
+							Author: reporter.BitBucketCommentAuthor{
+								Name: "pint_user",
+							},
+						},
+					},
+				},
+			},
+			errorHandler: func(err error) error {
+				if err != nil {
+					return fmt.Errorf("Unpexpected error: %w", err)
+				}
+				return nil
 			},
 		},
 	}

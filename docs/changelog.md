@@ -8,6 +8,8 @@
   pull requests. Changes that would previously be invisible to pint, like modifying
   comments or moving the entire rules file, will now trigger checks for affected
   rules.
+- pint will now try to create fewer BitBucket comments by merging multiple
+  problem reports into a single comment.
 
 ## v0.49.2
 
