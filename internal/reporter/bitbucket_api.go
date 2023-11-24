@@ -540,14 +540,14 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 
 func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
 	comments := []BitBucketPendingComment{}
-	for _, report := range summary.reports {
-		if _, ok := changes.pathModifiedLines[report.ReportedPath]; !ok {
+	for _, reports := range dedupReports(summary.reports) {
+		if _, ok := changes.pathModifiedLines[reports[0].ReportedPath]; !ok {
 			continue
 		}
 
 		var buf strings.Builder
 		var icon string
-		switch report.Problem.Severity {
+		switch reports[0].Problem.Severity {
 		case checks.Fatal, checks.Bug:
 			icon = ":stop_sign:"
 		case checks.Warning:
@@ -557,30 +557,33 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		}
 		buf.WriteString(icon)
 		buf.WriteString(" **")
-		buf.WriteString(report.Problem.Severity.String())
+		buf.WriteString(reports[0].Problem.Severity.String())
 		buf.WriteString("** reported by [pint](https://cloudflare.github.io/pint/) **")
-		buf.WriteString(report.Problem.Reporter)
-		buf.WriteString("** check.")
-		buf.WriteString("\n\n------\n\n")
-		buf.WriteString(report.Problem.Text)
-		if report.Problem.Details != "" {
+		buf.WriteString(reports[0].Problem.Reporter)
+		buf.WriteString("** check.\n\n")
+		for _, report := range reports {
+			buf.WriteString("------\n\n")
+			buf.WriteString(report.Problem.Text)
 			buf.WriteString("\n\n")
-			buf.WriteString(report.Problem.Details)
+			if report.Problem.Details != "" {
+				buf.WriteString(report.Problem.Details)
+				buf.WriteString("\n\n")
+			}
+			if report.ReportedPath != report.SourcePath {
+				buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
+				buf.WriteRune('`')
+				buf.WriteString(report.SourcePath)
+				buf.WriteString("`.\n\n")
+			}
 		}
-		buf.WriteString("\n\n------\n\n")
-		if report.ReportedPath != report.SourcePath {
-			buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
-			buf.WriteRune('`')
-			buf.WriteString(report.SourcePath)
-			buf.WriteString("`.\n\n")
-		}
+		buf.WriteString("------\n\n")
 		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
-		buf.WriteString(report.Problem.Reporter)
+		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString(".html).\n")
 
 		pending := pendingComment{
-			path: report.ReportedPath,
-			line: report.Problem.Lines[0],
+			path: reports[0].ReportedPath,
+			line: reports[0].Problem.Lines[0],
 			text: buf.String(),
 		}
 		comments = append(comments, pending.toBitBucketComment(changes))
@@ -701,4 +704,35 @@ func reportToAnnotation(report Report) BitBucketAnnotation {
 		Type:     atype,
 		Link:     fmt.Sprintf("https://cloudflare.github.io/pint/checks/%s.html", report.Problem.Reporter),
 	}
+}
+
+func dedupReports(src []Report) (dst [][]Report) {
+	for _, report := range src {
+		index := -1
+		for i, d := range dst {
+			if d[0].Problem.Severity != report.Problem.Severity {
+				continue
+			}
+			if d[0].Problem.Reporter != report.Problem.Reporter {
+				continue
+			}
+			if d[0].ReportedPath != report.ReportedPath {
+				continue
+			}
+			if d[0].SourcePath != report.SourcePath {
+				continue
+			}
+			if d[0].Problem.Lines[0] != report.Problem.Lines[0] {
+				continue
+			}
+			index = i
+			break
+		}
+		if index < 0 {
+			dst = append(dst, []Report{report})
+			continue
+		}
+		dst[index] = append(dst[index], report)
+	}
+	return dst
 }
