@@ -27,5 +27,5 @@ jobs:
       - id: govulncheck
         uses: golang/govulncheck-action@v1
         with:
-          go-version-file: go.mod
+          go-version-input: stable
           check-latest: true
