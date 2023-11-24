@@ -83,20 +83,21 @@ func mergeComments(node *yaml.Node) (comments []string) {
 	if node.FootComment != "" {
 		comments = append(comments, node.FootComment)
 	}
+	for _, child := range node.Content {
+		comments = append(comments, mergeComments(child)...)
+	}
 	return comments
 }
 
 type YamlNode struct {
 	Position FilePosition
 	Value    string
-	Comments []string
 }
 
 func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	return &YamlNode{
 		Position: NewFilePosition(nodeLines(node, offset)),
 		Value:    node.Value,
-		Comments: mergeComments(node),
 	}
 }
 
@@ -242,36 +243,6 @@ func (ar AlertingRule) Lines() (lines []int) {
 	return lines
 }
 
-func (ar AlertingRule) Comments() (comments []string) {
-	comments = append(comments, ar.Alert.Key.Comments...)
-	comments = append(comments, ar.Alert.Value.Comments...)
-	comments = append(comments, ar.Expr.Key.Comments...)
-	comments = append(comments, ar.Expr.Value.Comments...)
-	if ar.For != nil {
-		comments = append(comments, ar.For.Key.Comments...)
-		comments = append(comments, ar.For.Value.Comments...)
-	}
-	if ar.KeepFiringFor != nil {
-		comments = append(comments, ar.KeepFiringFor.Key.Comments...)
-		comments = append(comments, ar.KeepFiringFor.Value.Comments...)
-	}
-	if ar.Labels != nil {
-		comments = append(comments, ar.Labels.Key.Comments...)
-		for _, label := range ar.Labels.Items {
-			comments = append(comments, label.Key.Comments...)
-			comments = append(comments, label.Value.Comments...)
-		}
-	}
-	if ar.Annotations != nil {
-		comments = append(comments, ar.Annotations.Key.Comments...)
-		for _, annotation := range ar.Annotations.Items {
-			comments = append(comments, annotation.Key.Comments...)
-			comments = append(comments, annotation.Value.Comments...)
-		}
-	}
-	return comments
-}
-
 type RecordingRule struct {
 	Record YamlKeyValue
 	Expr   PromQLExpr
@@ -288,21 +259,6 @@ func (rr RecordingRule) Lines() (lines []int) {
 	return lines
 }
 
-func (rr RecordingRule) Comments() (comments []string) {
-	comments = append(comments, rr.Record.Key.Comments...)
-	comments = append(comments, rr.Record.Value.Comments...)
-	comments = append(comments, rr.Expr.Key.Comments...)
-	comments = append(comments, rr.Expr.Value.Comments...)
-	if rr.Labels != nil {
-		comments = append(comments, rr.Labels.Key.Comments...)
-		for _, label := range rr.Labels.Items {
-			comments = append(comments, label.Key.Comments...)
-			comments = append(comments, label.Value.Comments...)
-		}
-	}
-	return comments
-}
-
 type ParseError struct {
 	Fragment string
 	Err      error
@@ -312,6 +268,7 @@ type ParseError struct {
 type Rule struct {
 	AlertingRule  *AlertingRule
 	RecordingRule *RecordingRule
+	Comments      []string
 	Error         ParseError
 }
 
@@ -325,11 +282,13 @@ func (r Rule) ToYAML() string {
 	}
 
 	var b strings.Builder
+
+	for _, c := range r.Comments {
+		b.WriteString(c)
+		b.WriteRune('\n')
+	}
+
 	if r.AlertingRule != nil {
-		for _, c := range r.AlertingRule.Comments() {
-			b.WriteString(c)
-			b.WriteRune('\n')
-		}
 		b.WriteString("- ")
 		b.WriteString(r.AlertingRule.Alert.Key.Value)
 		b.WriteString(": ")
@@ -382,10 +341,6 @@ func (r Rule) ToYAML() string {
 		return b.String()
 	}
 
-	for _, c := range r.RecordingRule.Comments() {
-		b.WriteString(c)
-		b.WriteRune('\n')
-	}
 	b.WriteString("- ")
 	b.WriteString(r.RecordingRule.Record.Key.Value)
 	b.WriteString(": ")
@@ -482,13 +437,7 @@ func (r Rule) LineRange() []int {
 }
 
 func (r Rule) HasComment(comment string) bool {
-	var comments []string
-	if r.RecordingRule != nil {
-		comments = r.RecordingRule.Comments()
-	} else if r.AlertingRule != nil {
-		comments = r.AlertingRule.Comments()
-	}
-	for _, c := range comments {
+	for _, c := range r.Comments {
 		if hasComment(c, comment) {
 			return true
 		}
@@ -497,13 +446,7 @@ func (r Rule) HasComment(comment string) bool {
 }
 
 func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
-	var comments []string
-	if r.RecordingRule != nil {
-		comments = r.RecordingRule.Comments()
-	} else if r.AlertingRule != nil {
-		comments = r.AlertingRule.Comments()
-	}
-	for _, c := range comments {
+	for _, c := range r.Comments {
 		var val Comment
 		if val, ok = GetLastComment(c, comment...); ok {
 			return val, ok
@@ -513,13 +456,7 @@ func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
 }
 
 func (r Rule) GetComments(key string) (cs []Comment) {
-	var comments []string
-	if r.RecordingRule != nil {
-		comments = r.RecordingRule.Comments()
-	} else if r.AlertingRule != nil {
-		comments = r.AlertingRule.Comments()
-	}
-	for _, c := range comments {
+	for _, c := range r.Comments {
 		sc := bufio.NewScanner(strings.NewReader(c))
 		for sc.Scan() {
 			if val, ok := GetLastComment(sc.Text(), key); ok {
