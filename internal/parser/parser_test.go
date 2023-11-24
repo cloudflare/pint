@@ -252,17 +252,23 @@ func TestParse(t *testing.T) {
 `),
 			output: []parser.Rule{
 				{
+					Comments: []string{
+						"# head comment",
+						"# record comment",
+						"# expr comment",
+						"#  pre-labels comment",
+						"# pre-foo comment",
+						"# post-foo comment",
+					},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
 							Key: &parser.YamlNode{
 								Position: parser.FilePosition{Lines: []int{3}},
 								Value:    "record",
-								Comments: []string{"# head comment"},
 							},
 							Value: &parser.YamlNode{
 								Position: parser.FilePosition{Lines: []int{3}},
 								Value:    "foo",
-								Comments: []string{"# record comment"},
 							},
 						},
 						Expr: parser.PromQLExpr{
@@ -273,7 +279,6 @@ func TestParse(t *testing.T) {
 							Value: &parser.YamlNode{
 								Position: parser.FilePosition{Lines: []int{4}},
 								Value:    "foo offset 10m",
-								Comments: []string{"# expr comment"},
 							},
 							Query: &parser.PromQLNode{
 								Expr: "foo offset 10m",
@@ -283,14 +288,12 @@ func TestParse(t *testing.T) {
 							Key: &parser.YamlNode{
 								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "labels",
-								Comments: []string{"#  pre-labels comment"},
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
 										Position: parser.FilePosition{Lines: []int{8}},
 										Value:    "foo",
-										Comments: []string{"# pre-foo comment"},
 									},
 									Value: &parser.YamlNode{
 										Position: parser.FilePosition{Lines: []int{8}},
@@ -301,7 +304,6 @@ func TestParse(t *testing.T) {
 									Key: &parser.YamlNode{
 										Position: parser.FilePosition{Lines: []int{10}},
 										Value:    "bob",
-										Comments: []string{"# post-foo comment"},
 									},
 									Value: &parser.YamlNode{
 										Position: parser.FilePosition{Lines: []int{10}},
@@ -1164,6 +1166,7 @@ data:
 					},
 				},
 				{
+					Comments: []string{"# foot comment"},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
 							Key: &parser.YamlNode{
@@ -1190,7 +1193,6 @@ data:
 							Key: &parser.YamlNode{
 								Position: parser.FilePosition{Lines: []int{11}},
 								Value:    "labels",
-								Comments: []string{"# foot comment"},
 							},
 							Items: []*parser.YamlKeyValue{
 								{

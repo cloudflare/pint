@@ -117,13 +117,17 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
 
+	var comments []string
+
 	for i, part := range unpackNodes(node) {
-		if i == 0 && node.HeadComment != "" {
+		if i == 0 && node.HeadComment != "" && part.HeadComment == "" {
 			part.HeadComment = node.HeadComment
 		}
-		if i == len(node.Content)-1 && node.FootComment != "" {
+		if i == len(node.Content)-1 && node.FootComment != "" && part.HeadComment == "" {
 			part.FootComment = node.FootComment
 		}
+		comments = append(comments, mergeComments(part)...)
+
 		if i%2 == 0 {
 			key = part
 		} else {
@@ -229,23 +233,29 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 	}
 
 	if recordPart != nil && exprPart != nil {
-		rule = Rule{RecordingRule: &RecordingRule{
-			Record: *recordPart,
-			Expr:   *exprPart,
-			Labels: labelsPart,
-		}}
+		rule = Rule{
+			RecordingRule: &RecordingRule{
+				Record: *recordPart,
+				Expr:   *exprPart,
+				Labels: labelsPart,
+			},
+			Comments: comments,
+		}
 		return rule, false, err
 	}
 
 	if alertPart != nil && exprPart != nil {
-		rule = Rule{AlertingRule: &AlertingRule{
-			Alert:         *alertPart,
-			Expr:          *exprPart,
-			For:           forPart,
-			KeepFiringFor: keepFiringForPart,
-			Labels:        labelsPart,
-			Annotations:   annotationsPart,
-		}}
+		rule = Rule{
+			AlertingRule: &AlertingRule{
+				Alert:         *alertPart,
+				Expr:          *exprPart,
+				For:           forPart,
+				KeepFiringFor: keepFiringForPart,
+				Labels:        labelsPart,
+				Annotations:   annotationsPart,
+			},
+			Comments: comments,
+		}
 		return rule, false, err
 	}
 
