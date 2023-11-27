@@ -250,7 +250,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 		for _, b := range before {
 			b := b
 
-			if !matched && a.Rule.Name() != "" && a.Rule.ToYAML() == b.Rule.ToYAML() {
+			if !matched && a.Rule.Name() != "" && a.Rule.IsIdentical(b.Rule) {
 				m.before = &b
 				m.isIdentical = true
 				m.wasMoved = a.SourcePath != b.SourcePath

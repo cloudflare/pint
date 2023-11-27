@@ -5,8 +5,8 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=DEBUG msg="Check snoozed by comment" check=promql/aggregate(job:true) comment="file/snooze 2099-11-28T10:24:18Z promql/aggregate(job:true)" until="2099-11-28T10:24:18Z" snooze=promql/aggregate(job:true)
-level=DEBUG msg="Check snoozed by comment" check=alerts/for comment="file/snooze 2099-11-28T10:24:18Z alerts/for" until="2099-11-28T10:24:18Z" snooze=alerts/for
+level=DEBUG msg="Check snoozed by comment" check=promql/aggregate(job:true) match=promql/aggregate(job:true) until="2099-11-28T10:24:18Z"
+level=DEBUG msg="Check snoozed by comment" check=alerts/for match=alerts/for until="2099-11-28T10:24:18Z"
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=2
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum-job lines=4-5

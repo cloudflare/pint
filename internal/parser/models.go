@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"bufio"
 	"fmt"
 	"strings"
 
@@ -9,6 +8,8 @@ import (
 	"gopkg.in/yaml.v3"
 
 	promparser "github.com/prometheus/prometheus/promql/parser"
+
+	"github.com/cloudflare/pint/internal/comments"
 )
 
 func appendLine(lines []int, newLines ...int) []int {
@@ -119,6 +120,19 @@ func (ykv YamlKeyValue) Lines() (lines []int) {
 	return lines
 }
 
+func (ykv *YamlKeyValue) IsIdentical(b *YamlKeyValue) bool {
+	if (ykv == nil) != (b == nil) {
+		return false
+	}
+	if ykv == nil {
+		return true
+	}
+	if ykv.Value.Value != b.Value.Value {
+		return false
+	}
+	return true
+}
+
 type YamlMap struct {
 	Key   *YamlNode
 	Items []*YamlKeyValue
@@ -130,6 +144,28 @@ func (ym YamlMap) Lines() (lines []int) {
 		lines = appendLine(lines, item.Lines()...)
 	}
 	return lines
+}
+
+func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
+	var al, bl []string
+
+	if ym != nil && ym.Items != nil {
+		al = make([]string, 0, len(ym.Items))
+		for _, kv := range ym.Items {
+			al = append(al, fmt.Sprintf("%s: %s", kv.Key.Value, kv.Value.Value))
+		}
+		slices.Sort(al)
+	}
+
+	if b != nil && b.Items != nil {
+		bl = make([]string, 0, len(b.Items))
+		for _, kv := range b.Items {
+			bl = append(bl, fmt.Sprintf("%s: %s", kv.Key.Value, kv.Value.Value))
+		}
+		slices.Sort(bl)
+	}
+
+	return slices.Equal(al, bl)
 }
 
 func (ym YamlMap) GetValue(key string) *YamlNode {
@@ -199,6 +235,10 @@ func (pqle PromQLExpr) Lines() (lines []int) {
 	return lines
 }
 
+func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
+	return pqle.Value.Value == b.Value.Value
+}
+
 func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 	expr := PromQLExpr{
 		Key:   newYamlNode(key, offset),
@@ -243,6 +283,34 @@ func (ar AlertingRule) Lines() (lines []int) {
 	return lines
 }
 
+func (ar *AlertingRule) IsIdentical(b *AlertingRule) bool {
+	if (ar == nil) != (b == nil) {
+		return false
+	}
+	if ar == nil {
+		return true
+	}
+	if !ar.Alert.IsIdentical(&b.Alert) {
+		return false
+	}
+	if !ar.Expr.IsIdentical(b.Expr) {
+		return false
+	}
+	if !ar.For.IsIdentical(b.For) {
+		return false
+	}
+	if !ar.KeepFiringFor.IsIdentical(b.KeepFiringFor) {
+		return false
+	}
+	if !ar.Labels.IsIdentical(b.Labels) {
+		return false
+	}
+	if !ar.Annotations.IsIdentical(b.Annotations) {
+		return false
+	}
+	return true
+}
+
 type RecordingRule struct {
 	Record YamlKeyValue
 	Expr   PromQLExpr
@@ -259,6 +327,25 @@ func (rr RecordingRule) Lines() (lines []int) {
 	return lines
 }
 
+func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
+	if (rr == nil) != (b == nil) {
+		return false
+	}
+	if rr == nil {
+		return true
+	}
+	if !rr.Record.IsIdentical(&b.Record) {
+		return false
+	}
+	if !rr.Expr.IsIdentical(b.Expr) {
+		return false
+	}
+	if !rr.Labels.IsIdentical(b.Labels) {
+		return false
+	}
+	return true
+}
+
 type ParseError struct {
 	Fragment string
 	Err      error
@@ -268,103 +355,34 @@ type ParseError struct {
 type Rule struct {
 	AlertingRule  *AlertingRule
 	RecordingRule *RecordingRule
-	Comments      []string
+	Comments      []comments.Comment
 	Error         ParseError
 }
 
-func (r Rule) ToYAML() string {
-	if r.Error.Err != nil {
-		return fmt.Sprintf("line=%d fragment=%s err=%s", r.Error.Line, r.Error.Fragment, r.Error.Err)
+func (r Rule) IsIdentical(b Rule) bool {
+	if r.Type() != b.Type() {
+		return false
+	}
+	if !r.AlertingRule.IsIdentical(b.AlertingRule) {
+		return false
+	}
+	if !r.RecordingRule.IsIdentical(b.RecordingRule) {
+		return false
 	}
 
-	if r.AlertingRule == nil && r.RecordingRule == nil {
-		return ""
-	}
-
-	var b strings.Builder
-
+	ac := make([]string, 0, len(r.Comments))
 	for _, c := range r.Comments {
-		b.WriteString(c)
-		b.WriteRune('\n')
+		ac = append(ac, c.Value.String())
 	}
+	slices.Sort(ac)
 
-	if r.AlertingRule != nil {
-		b.WriteString("- ")
-		b.WriteString(r.AlertingRule.Alert.Key.Value)
-		b.WriteString(": ")
-		b.WriteString(r.AlertingRule.Alert.Value.Value)
-		b.WriteRune('\n')
-
-		b.WriteString("  ")
-		b.WriteString(r.AlertingRule.Expr.Key.Value)
-		b.WriteString(": ")
-		b.WriteString(r.AlertingRule.Expr.Value.Value)
-		b.WriteRune('\n')
-
-		if r.AlertingRule.For != nil {
-			b.WriteString("  ")
-			b.WriteString(r.AlertingRule.For.Key.Value)
-			b.WriteString(": ")
-			b.WriteString(r.AlertingRule.For.Value.Value)
-			b.WriteRune('\n')
-		}
-		if r.AlertingRule.KeepFiringFor != nil {
-			b.WriteString("  ")
-			b.WriteString(r.AlertingRule.KeepFiringFor.Key.Value)
-			b.WriteString(": ")
-			b.WriteString(r.AlertingRule.KeepFiringFor.Value.Value)
-			b.WriteRune('\n')
-		}
-
-		if r.AlertingRule.Annotations != nil {
-			b.WriteString("  annotations:\n")
-			for _, a := range r.AlertingRule.Annotations.Items {
-				b.WriteString("    ")
-				b.WriteString(a.Key.Value)
-				b.WriteString(": ")
-				b.WriteString(a.Value.Value)
-				b.WriteRune('\n')
-			}
-		}
-
-		if r.AlertingRule.Labels != nil {
-			b.WriteString("  labels:\n")
-			for _, l := range r.AlertingRule.Labels.Items {
-				b.WriteString("    ")
-				b.WriteString(l.Key.Value)
-				b.WriteString(": ")
-				b.WriteString(l.Value.Value)
-				b.WriteRune('\n')
-			}
-		}
-
-		return b.String()
+	bc := make([]string, 0, len(r.Comments))
+	for _, c := range b.Comments {
+		bc = append(bc, c.Value.String())
 	}
+	slices.Sort(bc)
 
-	b.WriteString("- ")
-	b.WriteString(r.RecordingRule.Record.Key.Value)
-	b.WriteString(": ")
-	b.WriteString(r.RecordingRule.Record.Value.Value)
-	b.WriteRune('\n')
-
-	b.WriteString("  ")
-	b.WriteString(r.RecordingRule.Expr.Key.Value)
-	b.WriteString(": ")
-	b.WriteString(r.RecordingRule.Expr.Value.Value)
-	b.WriteRune('\n')
-
-	if r.RecordingRule.Labels != nil {
-		b.WriteString("  labels:\n")
-		for _, l := range r.RecordingRule.Labels.Items {
-			b.WriteString("    ")
-			b.WriteString(l.Key.Value)
-			b.WriteString(": ")
-			b.WriteString(l.Value.Value)
-			b.WriteRune('\n')
-		}
-	}
-
-	return b.String()
+	return slices.Equal(ac, bc)
 }
 
 func (r Rule) IsSame(nr Rule) bool {
@@ -434,37 +452,6 @@ func (r Rule) LineRange() []int {
 		lines = append(lines, i)
 	}
 	return lines
-}
-
-func (r Rule) HasComment(comment string) bool {
-	for _, c := range r.Comments {
-		if hasComment(c, comment) {
-			return true
-		}
-	}
-	return false
-}
-
-func (r Rule) GetComment(comment ...string) (s Comment, ok bool) {
-	for _, c := range r.Comments {
-		var val Comment
-		if val, ok = GetLastComment(c, comment...); ok {
-			return val, ok
-		}
-	}
-	return s, ok
-}
-
-func (r Rule) GetComments(key string) (cs []Comment) {
-	for _, c := range r.Comments {
-		sc := bufio.NewScanner(strings.NewReader(c))
-		for sc.Scan() {
-			if val, ok := GetLastComment(sc.Text(), key); ok {
-				cs = append(cs, val)
-			}
-		}
-	}
-	return cs
 }
 
 type RuleType string

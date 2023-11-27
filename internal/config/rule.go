@@ -7,9 +7,8 @@ import (
 	"regexp"
 	"time"
 
-	"golang.org/x/exp/slices"
-
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -271,51 +270,45 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 }
 
 func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
-	instance := check.String()
-
-	comments := []string{
-		fmt.Sprintf("disable %s", name),
-		fmt.Sprintf("disable %s", instance),
+	matches := []string{
+		name,
+		check.String(),
 	}
 	for _, tag := range promTags {
-		comments = append(comments, fmt.Sprintf("disable %s(+%s)", name, tag))
+		matches = append(matches, fmt.Sprintf("%s(+%s)", name, tag))
 	}
 
-	for _, comment := range comments {
-		if rule.HasComment(comment) {
-			slog.Debug(
-				"Check disabled by comment",
-				slog.String("check", instance),
-				slog.String("comment", comment),
-			)
-			return false
+	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
+		for _, match := range matches {
+			if match == disable.Match {
+				slog.Debug(
+					"Check disabled by comment",
+					slog.String("check", check.String()),
+					slog.String("match", match),
+				)
+				return false
+			}
 		}
 	}
-
-	disabled := []string{name, instance}
-	for _, tag := range promTags {
-		disabled = append(disabled, fmt.Sprintf("%s(+%s)", name, tag))
-	}
-	for _, comment := range rule.GetComments("snooze") {
-		s := parser.ParseSnooze(comment.Value)
-		if s == nil {
+	for _, snooze := range comments.Only[comments.Snooze](rule.Comments, comments.SnoozeType) {
+		if !snooze.Until.After(time.Now()) {
 			continue
 		}
-		if !slices.Contains(disabled, s.Text) {
-			continue
+		for _, match := range matches {
+			if match == snooze.Match {
+				slog.Debug(
+					"Check snoozed by comment",
+					slog.String("check", check.String()),
+					slog.String("match", snooze.Match),
+					slog.Time("until", snooze.Until),
+				)
+				return false
+			}
 		}
-		slog.Debug(
-			"Check snoozed by comment",
-			slog.String("check", instance),
-			slog.String("comment", comment.String()),
-			slog.Time("until", s.Until),
-			slog.String("snooze", s.Text),
-		)
-		return false
 	}
 
 	for _, c := range disabledChecks {
-		if c == name || c == instance {
+		if c == name || c == check.String() {
 			return false
 		}
 		for _, tag := range promTags {

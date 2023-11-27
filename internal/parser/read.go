@@ -5,9 +5,11 @@ import (
 	"errors"
 	"io"
 	"strings"
+
+	"github.com/cloudflare/pint/internal/comments"
 )
 
-type skipMode int
+type skipMode uint8
 
 const (
 	skipNone skipMode = iota
@@ -17,10 +19,6 @@ const (
 	skipCurrentLine
 	skipFile
 )
-
-func removeRedundantSpaces(line string) string {
-	return strings.Join(strings.Fields(line), " ")
-}
 
 func emptyLine(line string) (emptied string) {
 	preComment := strings.TrimSuffix(line, "\n")
@@ -39,45 +37,12 @@ func emptyLine(line string) (emptied string) {
 	return emptied
 }
 
-func hasComment(line, comment string) bool {
-	sc := bufio.NewScanner(strings.NewReader(line))
-	for sc.Scan() {
-		elems := strings.Split(sc.Text(), "#")
-		lastComment := elems[len(elems)-1]
-		parts := strings.SplitN(removeRedundantSpaces(lastComment), " ", 2)
-		if len(parts) < 2 {
-			continue
-		}
-		if parts[0] == "pint" && parts[1] == comment {
-			return true
-		}
-	}
-	return false
-}
-
-func parseSkipComment(line string) (skipMode, bool) {
-	switch {
-	case hasComment(line, "ignore/file"):
-		return skipFile, true
-	case hasComment(line, "ignore/line"):
-		return skipCurrentLine, true
-	case hasComment(line, "ignore/next-line"):
-		return skipNextLine, true
-	case hasComment(line, "ignore/begin"):
-		return skipBegin, true
-	case hasComment(line, "ignore/end"):
-		return skipEnd, true
-	default:
-		return skipNone, false
-	}
-}
-
 type Content struct {
 	Body    []byte
 	Ignored bool
 }
 
-func ReadContent(r io.Reader) (out Content, err error) {
+func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err error) {
 	reader := bufio.NewReader(r)
 	var line string
 	var found bool
@@ -96,7 +61,44 @@ func ReadContent(r io.Reader) (out Content, err error) {
 		if skipAll {
 			out.Body = append(out.Body, []byte(emptyLine(line))...)
 		} else {
-			skip, found = parseSkipComment(line)
+			skip = skipNone
+			found = false
+			for _, comment := range comments.Parse(line) {
+				// nolint:exhaustive
+				switch comment.Type {
+				case comments.IgnoreFileType:
+					skip = skipFile
+					found = true
+				case comments.IgnoreLineType:
+					skip = skipCurrentLine
+					found = true
+				case comments.IgnoreBeginType:
+					skip = skipBegin
+					found = true
+				case comments.IgnoreEndType:
+					skip = skipEnd
+					found = true
+				case comments.IgnoreNextLineType:
+					skip = skipNextLine
+					found = true
+				case comments.FileOwnerType:
+					fileComments = append(fileComments, comment)
+				case comments.RuleOwnerType:
+					// pass
+				case comments.FileDisableType:
+					fileComments = append(fileComments, comment)
+				case comments.DisableType:
+					// pass
+				case comments.FileSnoozeType:
+					fileComments = append(fileComments, comment)
+				case comments.SnoozeType:
+					// pass
+				case comments.RuleSetType:
+					// pass
+				case comments.InvalidComment:
+					fileComments = append(fileComments, comment)
+				}
+			}
 			switch {
 			case found:
 				switch skip {
@@ -145,57 +147,8 @@ func ReadContent(r io.Reader) (out Content, err error) {
 	}
 
 	if !errors.Is(err, io.EOF) {
-		return out, err
+		return out, fileComments, err
 	}
 
-	return out, nil
-}
-
-type Comment struct {
-	Key   string
-	Value string
-}
-
-func (c Comment) String() string {
-	return c.Key + " " + c.Value
-}
-
-func GetComments(text string, comment ...string) (comments []Comment) {
-	sc := bufio.NewScanner(strings.NewReader(text))
-	for sc.Scan() {
-		elems := strings.Split(sc.Text(), "#")
-		lastComment := elems[len(elems)-1]
-		parts := strings.Split(removeRedundantSpaces(lastComment), " ")
-		if len(parts) < 2 {
-			continue
-		}
-		keys := make([]string, 0, len(parts))
-		values := make([]string, 0, len(parts))
-		if parts[0] == "pint" && len(parts) >= len(comment)+1 {
-			for i, c := range comment {
-				if parts[i+1] != c {
-					goto NEXT
-				}
-				keys = append(keys, parts[i+1])
-			}
-			for i := len(comment) + 1; i < len(parts); i++ {
-				values = append(values, parts[i])
-			}
-			comments = append(comments, Comment{
-				Key:   strings.Join(keys, " "),
-				Value: strings.Join(values, " "),
-			})
-		}
-	NEXT:
-	}
-
-	return comments
-}
-
-func GetLastComment(text string, comment ...string) (Comment, bool) {
-	comments := GetComments(text, comment...)
-	if len(comments) == 0 {
-		return Comment{}, false
-	}
-	return comments[len(comments)-1], true
+	return out, fileComments, nil
 }

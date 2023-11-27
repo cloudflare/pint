@@ -10,6 +10,8 @@
   rules.
 - pint will now try to create fewer BitBucket comments by merging multiple
   problem reports into a single comment.
+- Control comment handling code was refactored, there are some additional rules
+  that comment must follow. See `Control comments` section in [pint docs](./index.md).
 
 ## v0.49.2
 
