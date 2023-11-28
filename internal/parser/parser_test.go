@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"
 
 	"github.com/google/go-cmp/cmp"
@@ -239,26 +240,48 @@ func TestParse(t *testing.T) {
 		},
 		{
 			content: []byte(`
-# head comment
-- record: foo # record comment
-  expr: foo offset 10m # expr comment
-  #  pre-labels comment
+# pint disable head comment
+- record: foo # pint disable record comment
+  expr: foo offset 10m # pint disable expr comment
+  #  pint disable pre-labels comment
   labels:
-    # pre-foo comment
+    # pint disable pre-foo comment
     foo: bar
-    # post-foo comment
+    # pint disable post-foo comment
     bob: alice
-# foot comment
+  # pint disable foot comment
 `),
 			output: []parser.Rule{
 				{
-					Comments: []string{
-						"# head comment",
-						"# record comment",
-						"# expr comment",
-						"#  pre-labels comment",
-						"# pre-foo comment",
-						"# post-foo comment",
+					Comments: []comments.Comment{
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "head comment"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "record comment"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "expr comment"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "pre-labels comment"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "foot comment"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "pre-foo comment"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "post-foo comment"},
+						},
 					},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
@@ -1012,33 +1035,57 @@ data:
 			content: []byte(`groups:
 - name: certmanager
   rules:
-  - &recordAnchor
-    record: name1
-    expr: expr1
+  # pint disable before recordAnchor
+  - &recordAnchor # pint disable recordAnchor
+    record: name1 # pint disable name1
+    expr: expr1 # pint disable expr1
+    # pint disable after expr1
   - <<: *recordAnchor
     expr: expr2
   - <<: *recordAnchor
 `),
 			output: []parser.Rule{
 				{
+					Comments: []comments.Comment{
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "before recordAnchor"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "recordAnchor"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "name1"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "after expr1"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "expr1"},
+						},
+					},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
+								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "record",
 							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
+								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "name1",
 							},
 						},
 						Expr: parser.PromQLExpr{
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
+								Position: parser.FilePosition{Lines: []int{7}},
 								Value:    "expr",
 							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
+								Position: parser.FilePosition{Lines: []int{7}},
 								Value:    "expr1",
 							},
 							Query: &parser.PromQLNode{Expr: "expr1"},
@@ -1046,24 +1093,38 @@ data:
 					},
 				},
 				{
+					Comments: []comments.Comment{
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "before recordAnchor"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "recordAnchor"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "name1"},
+						},
+					},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
+								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "record",
 							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
+								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "name1",
 							},
 						},
 						Expr: parser.PromQLExpr{
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{8}},
+								Position: parser.FilePosition{Lines: []int{10}},
 								Value:    "expr",
 							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{8}},
+								Position: parser.FilePosition{Lines: []int{10}},
 								Value:    "expr2",
 							},
 							Query: &parser.PromQLNode{Expr: "expr2"},
@@ -1071,24 +1132,46 @@ data:
 					},
 				},
 				{
+					Comments: []comments.Comment{
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "before recordAnchor"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "recordAnchor"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "name1"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "after expr1"},
+						},
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "expr1"},
+						},
+					},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
+								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "record",
 							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
+								Position: parser.FilePosition{Lines: []int{6}},
 								Value:    "name1",
 							},
 						},
 						Expr: parser.PromQLExpr{
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
+								Position: parser.FilePosition{Lines: []int{7}},
 								Value:    "expr",
 							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
+								Position: parser.FilePosition{Lines: []int{7}},
 								Value:    "expr1",
 							},
 							Query: &parser.PromQLNode{Expr: "expr1"},
@@ -1109,7 +1192,7 @@ data:
   - record: name2
     expr: expr2
     labels: *labelsAnchor
-    # foot comment
+    # pint disable foot comment
 `),
 			output: []parser.Rule{
 				{
@@ -1166,7 +1249,12 @@ data:
 					},
 				},
 				{
-					Comments: []string{"# foot comment"},
+					Comments: []comments.Comment{
+						{
+							Type:  comments.DisableType,
+							Value: comments.Disable{Match: "foot comment"},
+						},
+					},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlKeyValue{
 							Key: &parser.YamlNode{
@@ -1256,6 +1344,77 @@ data:
 			output: []parser.Rule{
 				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
 			},
+		},
+		{
+			content: []byte(string(`
+# pint file/owner bob
+# pint ignore/begin
+# pint ignore/end
+# pint disable up
+
+- record: foo
+  expr: up
+
+# pint file/owner alice
+
+- record: foo
+  expr: up
+
+# pint ignore/next-line
+`)),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{7}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{7}},
+								Value:    "foo",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{8}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{8}},
+								Value:    "up",
+							},
+							Query: &parser.PromQLNode{Expr: "up"},
+						},
+					},
+				},
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{12}},
+								Value:    "record",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{12}},
+								Value:    "foo",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{13}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{13}},
+								Value:    "up",
+							},
+							Query: &parser.PromQLNode{Expr: "up"},
+						},
+					},
+				},
+			},
+			shouldError: false,
 		},
 	}
 

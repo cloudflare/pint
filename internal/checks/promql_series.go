@@ -10,6 +10,7 @@ import (
 
 	"golang.org/x/exp/slices"
 
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -615,18 +616,22 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 
 func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelector) (minAge time.Duration, problems []Problem) {
 	minAge = time.Hour * 2
-
 	bareSelector := stripLabels(selector)
-	for _, s := range [][]string{
-		{"rule/set", c.Reporter(), "min-age"},
-		{"rule/set", fmt.Sprintf("%s(%s)", c.Reporter(), bareSelector.String()), "min-age"},
-		{"rule/set", fmt.Sprintf("%s(%s)", c.Reporter(), selector.String()), "min-age"},
-	} {
-		if cmt, ok := rule.GetComment(s...); ok {
-			dur, err := model.ParseDuration(cmt.Value)
+	prefixes := []string{
+		fmt.Sprintf("%s min-age ", c.Reporter()),
+		fmt.Sprintf("%s(%s) min-age ", c.Reporter(), bareSelector.String()),
+		fmt.Sprintf("%s(%s) min-age ", c.Reporter(), selector.String()),
+	}
+	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
+		for _, prefix := range prefixes {
+			if !strings.HasPrefix(ruleSet.Value, prefix) {
+				continue
+			}
+			val := strings.TrimPrefix(ruleSet.Value, prefix)
+			dur, err := model.ParseDuration(val)
 			if err != nil {
 				problems = append(problems, Problem{
-					Fragment: cmt.String(),
+					Fragment: fmt.Sprintf("%s %s", comments.RuleSetComment, ruleSet.Value),
 					Lines:    rule.LineRange(),
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Failed to parse pint comment as duration: %s", err),
@@ -644,13 +649,16 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelec
 
 func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.VectorSelector, labelName string) bool {
 	bareSelector := stripLabels(selector)
-	for _, s := range []string{
-		fmt.Sprintf("rule/set %s ignore/label-value %s", c.Reporter(), labelName),
-		fmt.Sprintf("rule/set %s(%s) ignore/label-value %s", c.Reporter(), bareSelector.String(), labelName),
-		fmt.Sprintf("rule/set %s(%s) ignore/label-value %s", c.Reporter(), selector.String(), labelName),
-	} {
-		if rule.HasComment(s) {
-			return true
+	values := []string{
+		fmt.Sprintf("%s ignore/label-value %s", c.Reporter(), labelName),
+		fmt.Sprintf("%s(%s) ignore/label-value %s", c.Reporter(), bareSelector.String(), labelName),
+		fmt.Sprintf("%s(%s) ignore/label-value %s", c.Reporter(), selector.String(), labelName),
+	}
+	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
+		for _, val := range values {
+			if ruleSet.Value == val {
+				return true
+			}
 		}
 	}
 	return false
@@ -704,9 +712,9 @@ func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
 }
 
 func isDisabled(rule parser.Rule, selector promParser.VectorSelector) bool {
-	for _, c := range rule.GetComments("disable") {
-		if strings.HasPrefix(c.Value, SeriesCheckName+"(") && strings.HasSuffix(c.Value, ")") {
-			cs := strings.TrimSuffix(strings.TrimPrefix(c.Value, SeriesCheckName+"("), ")")
+	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
+		if strings.HasPrefix(disable.Match, SeriesCheckName+"(") && strings.HasSuffix(disable.Match, ")") {
+			cs := strings.TrimSuffix(strings.TrimPrefix(disable.Match, SeriesCheckName+"("), ")")
 			// try full string or name match first
 			if cs == selector.String() || cs == selector.Name {
 				return true

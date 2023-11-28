@@ -1,10 +1,13 @@
 package parser
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/cloudflare/pint/internal/comments"
 )
 
 const (
@@ -16,6 +19,8 @@ const (
 	keepFiringForKey = "keep_firing_for"
 	annotationsKey   = "annotations"
 )
+
+var ErrRuleCommentOnFile = errors.New("this comment is only valid when attached to a rule")
 
 func NewParser() Parser {
 	return Parser{}
@@ -40,7 +45,8 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		return nil, err
 	}
 
-	return parseNode(content, &node, 0)
+	rules, err = parseNode(content, &node, 0)
+	return rules, err
 }
 
 func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err error) {
@@ -117,16 +123,25 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
 
-	var comments []string
+	var ruleComments []comments.Comment
 
 	for i, part := range unpackNodes(node) {
 		if i == 0 && node.HeadComment != "" && part.HeadComment == "" {
 			part.HeadComment = node.HeadComment
 		}
+		if i == 0 && node.LineComment != "" && part.LineComment == "" {
+			part.LineComment = node.LineComment
+		}
 		if i == len(node.Content)-1 && node.FootComment != "" && part.HeadComment == "" {
 			part.FootComment = node.FootComment
 		}
-		comments = append(comments, mergeComments(part)...)
+		for _, s := range mergeComments(part) {
+			for _, c := range comments.Parse(s) {
+				if comments.IsRuleComment(c.Type) {
+					ruleComments = append(ruleComments, c)
+				}
+			}
+		}
 
 		if i%2 == 0 {
 			key = part
@@ -239,7 +254,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Expr:   *exprPart,
 				Labels: labelsPart,
 			},
-			Comments: comments,
+			Comments: ruleComments,
 		}
 		return rule, false, err
 	}
@@ -254,7 +269,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Labels:        labelsPart,
 				Annotations:   annotationsPart,
 			},
-			Comments: comments,
+			Comments: ruleComments,
 		}
 		return rule, false, err
 	}

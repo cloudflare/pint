@@ -2,13 +2,14 @@ package parser_test
 
 import (
 	"bytes"
-	"fmt"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -16,6 +17,7 @@ func TestReadContent(t *testing.T) {
 	type testCaseT struct {
 		input       []byte
 		output      []byte
+		comments    []comments.Comment
 		ignored     bool
 		shouldError bool
 	}
@@ -78,12 +80,12 @@ func TestReadContent(t *testing.T) {
 			output: []byte("#  pint   ignore/next-line  \n   \n"),
 		},
 		{
-			input:  []byte("#pint   ignore/next-line  \nfoo\n"),
-			output: []byte("#pint   ignore/next-line  \n   \n"),
+			input:  []byte("# pint   ignore/next-line  \nfoo\n"),
+			output: []byte("# pint   ignore/next-line  \n   \n"),
 		},
 		{
-			input:  []byte("#pintignore/next-line\nfoo\n"),
-			output: []byte("#pintignore/next-line\nfoo\n"),
+			input:  []byte("# pintignore/next-line\nfoo\n"),
+			output: []byte("# pintignore/next-line\nfoo\n"),
 		},
 		{
 			input:  []byte("# pint ignore/next-linex\nfoo\n"),
@@ -135,12 +137,33 @@ func TestReadContent(t *testing.T) {
 			input:  []byte("  {% raw %} # pint ignore/line\n"),
 			output: []byte("            # pint ignore/line\n"),
 		},
+		{
+			input:  []byte("# pint file/owner bob\n# pint rule/set xxx\n# pint bamboozle xxx\n"),
+			output: []byte("# pint file/owner bob\n# pint rule/set xxx\n# pint bamboozle xxx\n"),
+			comments: []comments.Comment{
+				{
+					Type:  comments.FileOwnerType,
+					Value: comments.Owner{Name: "bob"},
+				},
+			},
+		},
 	}
+
+	cmpErrorText := cmp.Comparer(func(x, y interface{}) bool {
+		xe := x.(error)
+		ye := y.(error)
+		return xe.Error() == ye.Error()
+	})
+	sameErrorText := cmp.FilterValues(func(x, y interface{}) bool {
+		_, xe := x.(error)
+		_, ye := y.(error)
+		return xe && ye
+	}, cmpErrorText)
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			r := bytes.NewReader(tc.input)
-			output, err := parser.ReadContent(r)
+			output, comments, err := parser.ReadContent(r)
 
 			hadError := err != nil
 			if hadError != tc.shouldError {
@@ -155,128 +178,13 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
+			if diff := cmp.Diff(tc.comments, comments, sameErrorText); diff != "" {
+				t.Errorf("ReadContent() returned wrong comments (-want +got):\n%s", diff)
+				return
+			}
+
 			require.Equal(t, string(tc.output), string(output.Body), "ReadContent() returned wrong output")
 			require.Equal(t, tc.ignored, output.Ignored, "ReadContent() returned wrong Ignored value")
-		})
-	}
-}
-
-func TestGetLastComment(t *testing.T) {
-	type testCaseT struct {
-		input   string
-		comment []string
-		output  parser.Comment
-		ok      bool
-	}
-
-	testCases := []testCaseT{
-		{
-			input:   "",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "\n",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "\n \n",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "foo bar",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "foo bar\n",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "line1\nline2",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "line1\nline2\n",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "line1\n\nline2\n\n",
-			comment: []string{"rule/owner"},
-		},
-		{
-			input:   "# pint rule/owner",
-			comment: []string{"rule/owner"},
-			ok:      true,
-			output:  parser.Comment{Key: "rule/owner"},
-		},
-		{
-			input:   "# pint rule/owner foo",
-			comment: []string{"rule/owner"},
-			ok:      true,
-			output:  parser.Comment{Key: "rule/owner", Value: "foo"},
-		},
-		{
-			input:   "# pint rule/owner foo bar bob/alice",
-			comment: []string{"rule/owner"},
-			ok:      true,
-			output:  parser.Comment{Key: "rule/owner", Value: "foo bar bob/alice"},
-		},
-		{
-			input:   "line1\n  # pint rule/owner foo bar bob/alice\n line2\n\n",
-			comment: []string{"rule/owner"},
-			ok:      true,
-			output:  parser.Comment{Key: "rule/owner", Value: "foo bar bob/alice"},
-		},
-		{
-			input:   "line1\n  ####    pint rule/owner    foo bar bob/alice\n line2\n\n",
-			comment: []string{"rule/owner"},
-			ok:      true,
-			output:  parser.Comment{Key: "rule/owner", Value: "foo bar bob/alice"},
-		},
-		{
-			input:   "# pint set promql/series min-age 1w",
-			comment: []string{"set promql/series min-age"},
-		},
-		{
-			input:   "# pint set promql/series min-age 1w",
-			comment: []string{"set", "promql/series", "min-age"},
-			ok:      true,
-			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
-		},
-		{
-			input:   "# pint set promql/series min-age 1d\n# pint set promql/series min-age 1w\n",
-			comment: []string{"set", "promql/series", "min-age"},
-			ok:      true,
-			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
-		},
-		{
-			input:   "# pint set promql/series min-age 2d\n# pint set promql/series min-age 1w\n# pint set promql/series min-age 1s\n",
-			comment: []string{"set", "promql/series", "min-age"},
-			ok:      true,
-			output:  parser.Comment{Key: "set promql/series min-age", Value: "1s"},
-		},
-		{
-			input:   "# pint set promql/series min-age 1w       ",
-			comment: []string{"set", "promql/series", "min-age"},
-			ok:      true,
-			output:  parser.Comment{Key: "set promql/series min-age", Value: "1w"},
-		},
-		{
-			input:   "# pint set",
-			comment: []string{"set", "promql/series", "min-age"},
-		},
-		{
-			input:   "# pint rule/set promql/series ignore/label-value error",
-			comment: []string{"rule/set", "promql/series", "ignore/label-value"},
-			ok:      true,
-			output:  parser.Comment{Key: "rule/set promql/series ignore/label-value", Value: "error"},
-		},
-	}
-
-	for i, tc := range testCases {
-		t.Run(fmt.Sprintf("%d/%s", i, tc.input), func(t *testing.T) {
-			output, ok := parser.GetLastComment(tc.input, tc.comment...)
-			require.Equal(t, tc.ok, ok)
-			require.Equal(t, tc.output, output)
 		})
 	}
 }

@@ -7,10 +7,12 @@ import (
 	"log/slog"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/prometheus/prometheus/model/rulefmt"
 	"golang.org/x/exp/slices"
 
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -94,7 +96,7 @@ type Entry struct {
 func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (entries []Entry, err error) {
 	p := parser.NewParser()
 
-	content, err := parser.ReadContent(r)
+	content, fileComments, err := parser.ReadContent(r)
 	if err != nil {
 		return nil, err
 	}
@@ -104,30 +106,34 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 		contentLines = append(contentLines, i)
 	}
 
-	body := string(content.Body)
-	fileOwner, _ := parser.GetLastComment(body, FileOwnerComment)
-
+	var fileOwner string
 	var disabledChecks []string
-	for _, comment := range parser.GetComments(body, FileDisabledCheckComment) {
-		if !slices.Contains(disabledChecks, comment.Value) {
-			disabledChecks = append(disabledChecks, comment.Value)
+	for _, comment := range fileComments {
+		// nolint:exhaustive
+		switch comment.Type {
+		case comments.FileOwnerType:
+			owner := comment.Value.(comments.Owner)
+			fileOwner = owner.Name
+		case comments.FileDisableType:
+			disable := comment.Value.(comments.Disable)
+			if !slices.Contains(disabledChecks, disable.Match) {
+				disabledChecks = append(disabledChecks, disable.Match)
+			}
+		case comments.FileSnoozeType:
+			snooze := comment.Value.(comments.Snooze)
+			if !snooze.Until.After(time.Now()) {
+				continue
+			}
+			if !slices.Contains(disabledChecks, snooze.Match) {
+				disabledChecks = append(disabledChecks, snooze.Match)
+			}
+			slog.Debug(
+				"Check snoozed by comment",
+				slog.String("check", snooze.Match),
+				slog.String("match", snooze.Match),
+				slog.Time("until", snooze.Until),
+			)
 		}
-	}
-	for _, comment := range parser.GetComments(body, FileSnoozeCheckComment) {
-		s := parser.ParseSnooze(comment.Value)
-		if s == nil {
-			continue
-		}
-		if !slices.Contains(disabledChecks, s.Text) {
-			disabledChecks = append(disabledChecks, s.Text)
-		}
-		slog.Debug(
-			"Check snoozed by comment",
-			slog.String("check", s.Text),
-			slog.String("comment", comment.String()),
-			slog.Time("until", s.Until),
-			slog.String("snooze", s.Text),
-		)
 	}
 
 	if content.Ignored {
@@ -135,7 +141,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			ReportedPath:  reportedPath,
 			SourcePath:    sourcePath,
 			PathError:     ErrFileIsIgnored,
-			Owner:         fileOwner.Value,
+			Owner:         fileOwner,
 			ModifiedLines: contentLines,
 		})
 		return entries, nil
@@ -156,7 +162,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 					ReportedPath:  reportedPath,
 					SourcePath:    sourcePath,
 					PathError:     err,
-					Owner:         fileOwner.Value,
+					Owner:         fileOwner,
 					ModifiedLines: contentLines,
 				})
 			}
@@ -178,23 +184,23 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			ReportedPath:  reportedPath,
 			SourcePath:    sourcePath,
 			PathError:     err,
-			Owner:         fileOwner.Value,
+			Owner:         fileOwner,
 			ModifiedLines: contentLines,
 		})
 		return entries, nil
 	}
 
 	for _, rule := range rules {
-		owner, ok := rule.GetComment(RuleOwnerComment)
-		if !ok {
-			owner = fileOwner
+		ruleOwner := fileOwner
+		for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
+			ruleOwner = owner.Name
 		}
 		entries = append(entries, Entry{
 			ReportedPath:   reportedPath,
 			SourcePath:     sourcePath,
 			Rule:           rule,
 			ModifiedLines:  rule.Lines(),
-			Owner:          owner.Value,
+			Owner:          ruleOwner,
 			DisabledChecks: disabledChecks,
 		})
 	}
