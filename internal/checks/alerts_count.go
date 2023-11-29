@@ -123,7 +123,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 		Lines:    lines,
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
-		Details: fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.range_input=%s).`,
+		Details: fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=1&g0.range_input=%s).`,
 			qr.PublicURI, url.QueryEscape(rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
 		),
 		Severity: c.severity,

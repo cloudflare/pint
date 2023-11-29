@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.50.1
+
+### Fixed
+
+- Fixed alert preview link on `alerts/count` reports.
+
 ## v0.50.0
 
 ### Changed
