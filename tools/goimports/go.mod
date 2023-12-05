@@ -1,6 +1,6 @@
 module _
 
-go 1.21.3
+go 1.21.4
 
 require golang.org/x/tools v0.16.0
 
