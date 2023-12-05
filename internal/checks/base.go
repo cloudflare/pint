@@ -28,6 +28,7 @@ var (
 		VectorMatchingCheckName,
 		CostCheckName,
 		SeriesCheckName,
+		RuleDependencyCheckName,
 		RuleDuplicateCheckName,
 		RuleForCheckName,
 		LabelCheckName,
@@ -43,7 +44,6 @@ var (
 		VectorMatchingCheckName,
 		CostCheckName,
 		SeriesCheckName,
-		RuleDuplicateCheckName,
 		RuleLinkCheckName,
 	}
 )
@@ -110,6 +110,7 @@ func (p Problem) LineRange() (int, int) {
 }
 
 type CheckMeta struct {
+	States   []discovery.ChangeType
 	IsOnline bool
 }
 

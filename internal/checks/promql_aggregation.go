@@ -27,7 +27,15 @@ type AggregationCheck struct {
 }
 
 func (c AggregationCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: false}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: false,
+	}
 }
 
 func (c AggregationCheck) String() string {

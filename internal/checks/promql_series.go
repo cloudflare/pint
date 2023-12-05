@@ -77,7 +77,15 @@ func NewSeriesCheck(prom *promapi.FailoverGroup) SeriesCheck {
 }
 
 func (c SeriesCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 type SeriesCheck struct {

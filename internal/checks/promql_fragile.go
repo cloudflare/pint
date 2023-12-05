@@ -21,7 +21,15 @@ func NewFragileCheck() FragileCheck {
 type FragileCheck struct{}
 
 func (c FragileCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: false}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: false,
+	}
 }
 
 func (c FragileCheck) String() string {

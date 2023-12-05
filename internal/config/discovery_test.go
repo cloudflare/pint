@@ -1,9 +1,11 @@
 package config
 
 import (
+	"log/slog"
 	"strconv"
 	"testing"
 
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
 )
 
@@ -356,6 +358,7 @@ func TestPrometheusTemplateRender(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
 			_, err := tc.template.Render(tc.data)
 			if tc.err == "" {
 				require.NoError(t, err)

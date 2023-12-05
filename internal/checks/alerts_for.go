@@ -22,7 +22,15 @@ func NewAlertsForCheck() AlertsForChecksFor {
 type AlertsForChecksFor struct{}
 
 func (c AlertsForChecksFor) Meta() CheckMeta {
-	return CheckMeta{IsOnline: false}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: false,
+	}
 }
 
 func (c AlertsForChecksFor) String() string {

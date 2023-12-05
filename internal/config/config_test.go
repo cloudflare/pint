@@ -13,6 +13,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -145,8 +146,7 @@ func TestGetChecksForRule(t *testing.T) {
 	type testCaseT struct {
 		title          string
 		config         string
-		path           string
-		rule           parser.Rule
+		entry          discovery.Entry
 		checks         []string
 		disabledChecks []string
 	}
@@ -155,8 +155,11 @@ func TestGetChecksForRule(t *testing.T) {
 		{
 			title:  "defaults",
 			config: "",
-			path:   "rules.yml",
-			rule:   newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -174,8 +177,11 @@ prometheus "prom" {
   timeout = "1s"
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -200,8 +206,11 @@ prometheus "prom" {
   timeout  = "1s"
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -232,8 +241,10 @@ checks {
   disabled = [ "alerts/template", "alerts/external_labels" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint disable promql/rate
 # pint disable promql/series
 # pint disable promql/vector_matching
@@ -243,6 +254,7 @@ checks {
 - record: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -260,8 +272,11 @@ prometheus "prom" {
   include = [ "foo.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -281,8 +296,11 @@ prometheus "prom" {
   exclude = [ "rules.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -301,8 +319,11 @@ prometheus "prom" {
   exclude = [ "rules.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -321,8 +342,11 @@ prometheus "prom" {
   include = [ "rules.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -352,8 +376,11 @@ prometheus "ignore" {
   include =[ "foo.+" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -372,8 +399,11 @@ prometheus "ignore" {
 		{
 			title:  "single empty rule",
 			config: "rule{}\n",
-			path:   "rules.yml",
-			rule:   newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -396,8 +426,11 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -422,12 +455,15 @@ rule {
 	strip    = ["instance", "rack"]
   }
 }`,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 - record: foo
   # pint disable promql/aggregate(instance:false)
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -448,8 +484,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -476,8 +515,10 @@ prometheus "prom2" {
   include =[ "rules.yml" ]
 }  
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint disable promql/series(prom1)
 # pint disable query/cost(prom2)
 - record: foo
@@ -488,6 +529,7 @@ prometheus "prom2" {
   # pint disable alerts/external_labels(prom2)
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -539,8 +581,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -584,8 +629,10 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint disable promql/series
 # pint disable promql/rate
 # pint disable promql/vector_matching(prom1)
@@ -599,6 +646,7 @@ rule {
   # pint disable promql/regexp
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -630,8 +678,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -661,8 +712,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -689,8 +743,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -717,8 +774,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -745,8 +805,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -773,8 +836,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -801,8 +867,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -829,8 +898,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -865,12 +937,15 @@ prometheus "prom1" {
   include =[ "rules.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 - record: foo
   expr: sum(foo)
   # pint disable promql/series
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -901,11 +976,14 @@ prometheus "prom1" {
   include =[ "rules.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 - record: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -944,11 +1022,14 @@ prometheus "prom1" {
   include =[ "rules.yml" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 - record: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertsCheckName + "(prom1)",
@@ -979,11 +1060,14 @@ checks {
   ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 - alert: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertsCheckName + "(prom1)",
@@ -1014,11 +1098,14 @@ checks {
   ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 - alert: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 			},
@@ -1035,8 +1122,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1059,8 +1149,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1082,8 +1175,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1106,8 +1202,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1129,8 +1228,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1152,8 +1254,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1175,8 +1280,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1199,8 +1307,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1222,8 +1333,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1248,8 +1362,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1275,8 +1392,10 @@ checks {
   disabled = [ "alerts/template", "alerts/external_labels" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # Some extra comment
 # pint disable promql/series
 # Some extra comment
@@ -1284,6 +1403,7 @@ checks {
 - record: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1308,8 +1428,10 @@ checks {
   disabled = [ "alerts/template", "promql/regexp" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint snooze 2099-11-AB labels/conflict
 # pint snooze 2099-11-28 labels/conflict won't work
 # pint snooze 2099-11-28
@@ -1321,6 +1443,7 @@ checks {
   expr: sum(foo)
 # pint file/disable promql/vector_matching
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1349,8 +1472,10 @@ checks {
   disabled = [ "alerts/template", "promql/regexp" ]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint snooze 2000-11-28 promql/series(prom1)
 # pint snooze 2000-11-28T10:24:18Z promql/range_query
 # pint snooze 2000-11-28 rule/duplicate
@@ -1359,6 +1484,7 @@ checks {
   expr: sum(foo)
 # pint file/disable promql/vector_matching
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1395,8 +1521,10 @@ prometheus "prom3" {
   tags = ["foo"]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint disable alerts/count(+disable)
 # pint disable alerts/external_labels(+disable)
 # pint disable labels/conflict(+disable)
@@ -1409,6 +1537,7 @@ prometheus "prom3" {
 - record: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1447,8 +1576,10 @@ prometheus "prom3" {
   tags = ["foo"]
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, `
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule: newRule(t, `
 # pint snooze 2099-11-28 alerts/count(+disable)
 # pint snooze 2099-11-28 alerts/external_labels(+disable)
 # pint snooze 2099-11-28 labels/conflict(+disable)
@@ -1461,6 +1592,7 @@ prometheus "prom3" {
 - record: foo
   expr: sum(foo)
 `),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1499,8 +1631,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1535,8 +1670,11 @@ rule {
   }
 }
 `,
-			path: "rules.yml",
-			rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			entry: discovery.Entry{
+				State:      discovery.Modified,
+				SourcePath: "rules.yml",
+				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
 			checks: []string{
 				checks.SyntaxCheckName,
 				checks.AlertForCheckName,
@@ -1572,7 +1710,7 @@ rule {
 			defer gen.Stop()
 			require.NoError(t, gen.GenerateStatic())
 
-			checks := cfg.GetChecksForRule(ctx, gen, tc.path, tc.rule, tc.disabledChecks)
+			checks := cfg.GetChecksForRule(ctx, gen, tc.entry, tc.disabledChecks)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())

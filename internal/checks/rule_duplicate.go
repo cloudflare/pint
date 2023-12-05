@@ -24,7 +24,15 @@ type RuleDuplicateCheck struct {
 }
 
 func (c RuleDuplicateCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: false,
+	}
 }
 
 func (c RuleDuplicateCheck) String() string {
@@ -48,10 +56,10 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 		if entry.Rule.RecordingRule == nil {
 			continue
 		}
-		if entry.ReportedPath == path && entry.Rule.LineRange()[0] == rule.LineRange()[0] {
+		if entry.SourcePath == path && entry.Rule.LineRange()[0] == rule.LineRange()[0] {
 			continue
 		}
-		if !c.prom.IsEnabledForPath(entry.ReportedPath) {
+		if !c.prom.IsEnabledForPath(entry.SourcePath) {
 			continue
 		}
 		if entry.Rule.RecordingRule.Record.Value.Value != rule.RecordingRule.Record.Value.Value {

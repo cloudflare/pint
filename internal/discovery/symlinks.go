@@ -69,6 +69,7 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 			if sl.to == entry.SourcePath {
 				slog.Debug("Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
 				nentries = append(nentries, Entry{
+					State:          entry.State,
 					ReportedPath:   sl.to,
 					SourcePath:     sl.from,
 					ModifiedLines:  entry.ModifiedLines,

@@ -26,7 +26,15 @@ type RangeQueryCheck struct {
 }
 
 func (c RangeQueryCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 func (c RangeQueryCheck) String() string {

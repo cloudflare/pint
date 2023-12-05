@@ -48,7 +48,7 @@ type RuleFinder interface {
 	Find() ([]Entry, error)
 }
 
-type ChangeType int
+type ChangeType uint8
 
 func (c ChangeType) String() string {
 	switch c {
@@ -64,6 +64,8 @@ func (c ChangeType) String() string {
 		return "removed"
 	case Moved:
 		return "moved"
+	case Excluded:
+		return "excluded"
 	default:
 		return "---"
 	}
@@ -80,6 +82,7 @@ const (
 	Modified
 	Removed
 	Moved
+	Excluded
 )
 
 type Entry struct {

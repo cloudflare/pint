@@ -41,7 +41,15 @@ type RateCheck struct {
 }
 
 func (c RateCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 func (c RateCheck) String() string {
