@@ -102,6 +102,12 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 	go func() {
 		for _, entry := range entries {
 			switch {
+			case entry.State == discovery.Excluded:
+				continue
+			case entry.PathError != nil && entry.State == discovery.Removed:
+				continue
+			case entry.Rule.Error.Err != nil && entry.State == discovery.Removed:
+				continue
 			case entry.PathError == nil && entry.Rule.Error.Err == nil:
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
@@ -120,7 +126,7 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 					)
 				}
 
-				checkList := cfg.GetChecksForRule(ctx, gen, entry.SourcePath, entry.Rule, entry.DisabledChecks)
+				checkList := cfg.GetChecksForRule(ctx, gen, entry, entry.DisabledChecks)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
 					check := check
@@ -174,8 +180,6 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			return
 		default:
 			switch {
-			case job.entry.State == discovery.Removed:
-				// FIXME check if it breaks any other rule?
 			case errors.Is(job.entry.PathError, discovery.ErrFileIsIgnored):
 				results <- reporter.Report{
 					ReportedPath:  job.entry.ReportedPath,
@@ -225,6 +229,15 @@ This usually means that it's missing some required fields.`,
 					Owner: job.entry.Owner,
 				}
 			default:
+				if job.entry.State == discovery.Unknown {
+					slog.Warn(
+						"Bug: unknown rule state",
+						slog.String("path", job.entry.ReportedPath),
+						slog.Int("line", job.entry.Rule.Lines()[0]),
+						slog.String("name", job.entry.Rule.Name()),
+					)
+				}
+
 				start := time.Now()
 				problems := job.check.Check(ctx, job.entry.ReportedPath, job.entry.Rule, job.allEntries)
 				checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())

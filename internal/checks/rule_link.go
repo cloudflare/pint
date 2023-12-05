@@ -41,7 +41,15 @@ type RuleLinkCheck struct {
 }
 
 func (c RuleLinkCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 func (c RuleLinkCheck) String() string {

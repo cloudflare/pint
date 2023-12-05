@@ -92,7 +92,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 
 		for _, me := range matchEntries(entriesBefore, entriesAfter) {
 			switch {
-			case me.before == nil && me.after != nil:
+			case !me.hasBefore && me.hasAfter:
 				me.after.State = Added
 				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
 				slog.Debug(
@@ -103,17 +103,18 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 					slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 				)
-				entries = append(entries, *me.after)
-			case me.before != nil && me.after != nil:
-				if me.isIdentical && !me.wasMoved {
+				entries = append(entries, me.after)
+			case me.hasBefore && me.hasAfter:
+				switch {
+				case me.isIdentical && !me.wasMoved:
 					slog.Debug(
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("lines", output.FormatLineRangeString(me.after.Rule.Lines())),
 					)
-					continue
-				}
-				if me.wasMoved {
+					me.after.State = Excluded
+					me.after.ModifiedLines = []int{}
+				case me.wasMoved:
 					slog.Debug(
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
@@ -121,7 +122,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 					)
 					me.after.State = Moved
 					me.after.ModifiedLines = git.CountLines(change.Body.After)
-				} else {
+				default:
 					slog.Debug(
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
@@ -133,8 +134,8 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 					me.after.State = Modified
 					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
 				}
-				entries = append(entries, *me.after)
-			case me.before != nil && me.after == nil:
+				entries = append(entries, me.after)
+			case me.hasBefore && !me.hasAfter:
 				me.before.State = Removed
 				slog.Debug(
 					"Rule removed on HEAD branch",
@@ -144,7 +145,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 					slog.String("ruleLines", output.FormatLineRangeString(me.before.Rule.Lines())),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
-				entries = append(entries, *me.before)
+				entries = append(entries, me.before)
 			default:
 				slog.Debug(
 					"Unknown rule",
@@ -152,7 +153,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 					slog.String("path", me.before.SourcePath),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
-				entries = append(entries, *me.after)
+				entries = append(entries, me.after)
 			}
 		}
 	}
@@ -232,26 +233,25 @@ func commonLines(a, b []int) (common []int) {
 }
 
 type matchedEntry struct {
-	before      *Entry
-	after       *Entry
+	before      Entry
+	after       Entry
+	hasBefore   bool
+	hasAfter    bool
 	isIdentical bool
 	wasMoved    bool
 }
 
 func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	for _, a := range after {
-		a := a
-
-		m := matchedEntry{after: &a}
+		m := matchedEntry{after: a, hasAfter: true}
 		beforeSwap := make([]Entry, 0, len(before))
 		var matches []Entry
 		var matched bool
 
 		for _, b := range before {
-			b := b
-
 			if !matched && a.Rule.Name() != "" && a.Rule.IsIdentical(b.Rule) {
-				m.before = &b
+				m.before = b
+				m.hasBefore = true
 				m.isIdentical = true
 				m.wasMoved = a.SourcePath != b.SourcePath
 				matched = true
@@ -266,7 +266,8 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 			switch len(matches) {
 			case 0:
 			case 1:
-				m.before = &matches[0]
+				m.before = matches[0]
+				m.hasBefore = true
 			default:
 				before = append(before, matches...)
 			}
@@ -277,7 +278,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 
 	for _, b := range before {
 		b := b
-		ml = append(ml, matchedEntry{before: &b})
+		ml = append(ml, matchedEntry{before: b, hasBefore: true})
 	}
 
 	return ml

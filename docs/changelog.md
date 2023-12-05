@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.51.0
+
+### Added
+
+- Added [rule/dependency](checks/rule/dependency.md) check.
+
 ## v0.50.1
 
 ### Fixed

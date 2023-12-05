@@ -41,7 +41,15 @@ type AlertsCheck struct {
 }
 
 func (c AlertsCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 func (c AlertsCheck) String() string {

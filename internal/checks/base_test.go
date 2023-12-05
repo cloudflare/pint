@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"regexp"
 	"strconv"
 	"sync"
 	"testing"
@@ -72,9 +73,9 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 		},
 		required,
 		"up",
-		nil,
-		nil,
-		nil,
+		[]*regexp.Regexp{},
+		[]*regexp.Regexp{},
+		[]string{},
 	)
 }
 
@@ -165,7 +166,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(t *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker(nil).Check(context.Background(), entry.SourcePath, entry.Rule, tc.entries)
+				_ = tc.checker(newSimpleProm("prom")).Check(context.Background(), entry.SourcePath, entry.Rule, tc.entries)
 			}
 		})
 	}

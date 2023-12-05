@@ -14,7 +14,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/discovery"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -80,7 +80,7 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, path string, r parser.Rule, disabledChecks []string) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry, disabledChecks []string) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	allChecks := []checkMeta{
@@ -110,7 +110,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 		},
 	}
 
-	proms := gen.ServersForPath(path)
+	proms := gen.ServersForPath(entry.SourcePath)
 
 	for _, p := range proms {
 		allChecks = append(allChecks, checkMeta{
@@ -148,20 +148,30 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			check: checks.NewAlertsExternalLabelsCheck(p),
 			tags:  p.Tags(),
 		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.RuleDependencyCheckName,
+			check: checks.NewRuleDependencyCheck(p),
+			tags:  p.Tags(),
+		})
 	}
 
 	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(ctx, path, r, proms)...)
+		allChecks = append(allChecks, rule.resolveChecks(ctx, entry.SourcePath, entry.Rule, proms)...)
 	}
 
 	for _, cm := range allChecks {
+		// Entry state is not what the check is for.
+		if !slices.Contains(cm.check.Meta().States, entry.State) {
+			continue
+		}
+
 		// check if check is disabled for specific rule
-		if !isEnabled(cfg.Checks.Enabled, disabledChecks, r, cm.name, cm.check, cm.tags) {
+		if !isEnabled(cfg.Checks.Enabled, disabledChecks, entry.Rule, cm.name, cm.check, cm.tags) {
 			continue
 		}
 
 		// check if rule was disabled
-		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, r, cm.name, cm.check, cm.tags) {
+		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, entry.Rule, cm.name, cm.check, cm.tags) {
 			continue
 		}
 		// check if rule was already enabled
@@ -181,13 +191,11 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 	for _, e := range enabled {
 		el = append(el, fmt.Sprintf("%v", e))
 	}
-	name := "unknown"
-	if r.AlertingRule != nil {
-		name = r.AlertingRule.Alert.Value.Value
-	} else if r.RecordingRule != nil {
-		name = r.RecordingRule.Record.Value.Value
-	}
-	slog.Debug("Configured checks for rule", slog.Any("enabled", el), slog.String("path", path), slog.String("rule", name))
+	slog.Debug("Configured checks for rule",
+		slog.Any("enabled", el),
+		slog.String("path", entry.SourcePath),
+		slog.String("rule", entry.Rule.Name()),
+	)
 
 	return enabled
 }

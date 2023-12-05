@@ -24,7 +24,15 @@ type AlertsExternalLabelsCheck struct {
 }
 
 func (c AlertsExternalLabelsCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 func (c AlertsExternalLabelsCheck) String() string {

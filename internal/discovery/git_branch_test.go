@@ -229,8 +229,16 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
-			entries: nil,
+			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, nil),
+			entries: []discovery.Entry{
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(4, "- record: up:count\n  expr: count(up == 1)\n"),
+				},
+			},
 		},
 		{
 			title: "rule changed - strict",
@@ -471,6 +479,13 @@ groups:
 					Rule:          mustParse(6, "- record: up:count:2a\n  expr: count(up)\n"),
 				},
 				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(8, "- record: up:count:3\n  expr: count(up)\n"),
+				},
+				{
 					State:         discovery.Added,
 					ReportedPath:  "rules.yml",
 					SourcePath:    "rules.yml",
@@ -518,6 +533,13 @@ groups:
 					ModifiedLines: []int{4},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
+				},
 			},
 		},
 		{
@@ -540,6 +562,13 @@ groups:
 			},
 			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(1, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+				},
 				{
 					State:         discovery.Removed,
 					ReportedPath:  "rules.yml",
@@ -569,6 +598,13 @@ groups:
 			},
 			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+				},
 				{
 					State:         discovery.Removed,
 					ReportedPath:  "rules.yml",
@@ -602,6 +638,20 @@ groups:
 			},
 			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(3, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+				},
 				{
 					State:         discovery.Removed,
 					ReportedPath:  "rules.yml",
@@ -685,6 +735,20 @@ groups:
 			},
 			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+				},
 				{
 					State:         discovery.Added,
 					ReportedPath:  "rules.yml",
@@ -786,6 +850,13 @@ groups:
 			},
 			finder: discovery.NewGitBranchFinder(git.RunGit, includeAll, nil, "main", 4, includeAll),
 			entries: []discovery.Entry{
+				{
+					State:         discovery.Excluded,
+					ReportedPath:  "rules.yml",
+					SourcePath:    "rules.yml",
+					ModifiedLines: []int{},
+					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
+				},
 				{
 					State:         discovery.Modified,
 					ReportedPath:  "rules.yml",

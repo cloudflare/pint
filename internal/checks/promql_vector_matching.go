@@ -33,7 +33,15 @@ type VectorMatchingCheck struct {
 }
 
 func (c VectorMatchingCheck) Meta() CheckMeta {
-	return CheckMeta{IsOnline: true}
+	return CheckMeta{
+		States: []discovery.ChangeType{
+			discovery.Noop,
+			discovery.Added,
+			discovery.Modified,
+			discovery.Moved,
+		},
+		IsOnline: true,
+	}
 }
 
 func (c VectorMatchingCheck) String() string {

@@ -33,6 +33,10 @@ format: $(GOBIN)/gofumpt $(GOBIN)/goimports
 	$(GOBIN)/gofumpt -extra -l -w .
 	$(GOBIN)/goimports -local github.com/cloudflare/pint -w .
 
+tidy:
+	go mod tidy
+	@for f in $(wildcard tools/*/go.mod) ; do echo ">>> $$f" && cd $(CURDIR)/`dirname "$$f"` && go mod tidy && cd $(CURDIR) ; done
+
 
 .PHONY: test
 test:
