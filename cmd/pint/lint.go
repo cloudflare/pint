@@ -60,7 +60,7 @@ func actionLint(c *cli.Context) error {
 		return fmt.Errorf("at least one file or directory required")
 	}
 
-	finder := discovery.NewGlobFinder(paths, meta.cfg.Parser.CompileRelaxed())
+	finder := discovery.NewGlobFinder(paths, discovery.NewPathFilter(nil, nil, meta.cfg.Parser.CompileRelaxed()))
 	entries, err := finder.Find()
 	if err != nil {
 		return err

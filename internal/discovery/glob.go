@@ -6,19 +6,18 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"regexp"
 )
 
-func NewGlobFinder(patterns []string, relaxed []*regexp.Regexp) GlobFinder {
+func NewGlobFinder(patterns []string, filter PathFilter) GlobFinder {
 	return GlobFinder{
 		patterns: patterns,
-		relaxed:  relaxed,
+		filter:   filter,
 	}
 }
 
 type GlobFinder struct {
 	patterns []string
-	relaxed  []*regexp.Regexp
+	filter   PathFilter
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
@@ -53,7 +52,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		if err != nil {
 			return nil, err
 		}
-		el, err := readRules(fp.target, fp.path, fd, !matchesAny(f.relaxed, fp.target))
+		el, err := readRules(fp.target, fp.path, fd, !f.filter.IsRelaxed(fp.target))
 		if err != nil {
 			fd.Close()
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
