@@ -34,8 +34,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 		{
 			description: "ignores alerting rules",
 			content:     "- alert: foo\n  expr: up == 0\n",
-			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck(prom)
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
@@ -43,8 +43,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
-			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck(prom)
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
@@ -52,8 +52,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 		{
 			description: "ignores alerts with expr errors",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck(prom)
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
@@ -65,8 +65,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 		{
 			description: "ignores alerts without dependencies",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck(prom)
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
@@ -76,10 +76,10 @@ func TestRuleDependencyCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "ignores alerts on other prometheus servers",
+			description: "includes alerts on other prometheus servers",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck(prom)
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: func(uri string) *promapi.FailoverGroup {
 				return promapi.NewFailoverGroup(
@@ -95,7 +95,18 @@ func TestRuleDependencyCheck(t *testing.T) {
 					[]string{},
 				)
 			},
-			problems: noProblems,
+			problems: func(s string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Fragment: "expr: foo == 0",
+						Lines:    []int{2},
+						Reporter: checks.RuleDependencyCheckName,
+						Text:     textDependencyRule("fake.yml", "foo"),
+						Details:  detailsDependencyRule("foo"),
+						Severity: checks.Warning,
+					},
+				}
+			},
 			entries: []discovery.Entry{
 				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml")[0],
 				parseWithState("- alert: foo\n  expr: foo == 0\n", discovery.Noop, "excluded.yaml")[0],
@@ -104,8 +115,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 		{
 			description: "warns about removed dependency",
 			content:     "- record: foo\n  expr: sum(foo)\n",
-			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleDependencyCheck(prom)
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
 			problems: func(s string) []checks.Problem {

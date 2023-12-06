@@ -108,6 +108,10 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			name:  checks.RegexpCheckName,
 			check: checks.NewRegexpCheck(),
 		},
+		{
+			name:  checks.RuleDependencyCheckName,
+			check: checks.NewRuleDependencyCheck(),
+		},
 	}
 
 	proms := gen.ServersForPath(entry.SourcePath)
@@ -146,11 +150,6 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.AlertsExternalLabelsCheckName,
 			check: checks.NewAlertsExternalLabelsCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.RuleDependencyCheckName,
-			check: checks.NewRuleDependencyCheck(p),
 			tags:  p.Tags(),
 		})
 	}

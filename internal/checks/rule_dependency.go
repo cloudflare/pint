@@ -7,20 +7,17 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
-	"github.com/cloudflare/pint/internal/promapi"
 )
 
 const (
 	RuleDependencyCheckName = "rule/dependency"
 )
 
-func NewRuleDependencyCheck(prom *promapi.FailoverGroup) RuleDependencyCheck {
-	return RuleDependencyCheck{prom: prom}
+func NewRuleDependencyCheck() RuleDependencyCheck {
+	return RuleDependencyCheck{}
 }
 
-type RuleDependencyCheck struct {
-	prom *promapi.FailoverGroup
-}
+type RuleDependencyCheck struct{}
 
 func (c RuleDependencyCheck) Meta() CheckMeta {
 	return CheckMeta{
@@ -32,7 +29,7 @@ func (c RuleDependencyCheck) Meta() CheckMeta {
 }
 
 func (c RuleDependencyCheck) String() string {
-	return fmt.Sprintf("%s(%s)", RuleDependencyCheckName, c.prom.Name())
+	return RuleDependencyCheckName
 }
 
 func (c RuleDependencyCheck) Reporter() string {
@@ -46,9 +43,6 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 
 	for _, entry := range entries {
 		if entry.State == discovery.Removed {
-			continue
-		}
-		if !c.prom.IsEnabledForPath(entry.SourcePath) {
 			continue
 		}
 		if c.usesVector(entry, rule.RecordingRule.Record.Value.Value) {
