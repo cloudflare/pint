@@ -88,10 +88,17 @@ func actionCI(c *cli.Context) error {
 		return nil
 	}
 
+	slog.Info("Finding all rules to check on current git branch", slog.String("base", baseBranch))
+
 	var entries []discovery.Entry
-	filter := discovery.NewPathFilter(includeRe, excludeRe, meta.cfg.Parser.CompileRelaxed())
-	finder := discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits)
-	entries, err = finder.Find()
+	filter := git.NewPathFilter(includeRe, excludeRe, meta.cfg.Parser.CompileRelaxed())
+
+	entries, err = discovery.NewGlobFinder([]string{"*"}, filter).Find()
+	if err != nil {
+		return err
+	}
+
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits).Find(entries)
 	if err != nil {
 		return err
 	}

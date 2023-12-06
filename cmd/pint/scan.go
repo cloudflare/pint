@@ -98,7 +98,7 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 		wg.Wait()
 	}()
 
-	var onlineChecksCount, offlineChecksCount atomic.Int64
+	var onlineChecksCount, offlineChecksCount, checkedEntriesCount atomic.Int64
 	go func() {
 		for _, entry := range entries {
 			switch {
@@ -126,6 +126,7 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 					)
 				}
 
+				checkedEntriesCount.Inc()
 				checkList := cfg.GetChecksForRule(ctx, gen, entry, entry.DisabledChecks)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
@@ -156,7 +157,8 @@ func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerato
 	}
 	summary.SortReports()
 	summary.Duration = time.Since(start)
-	summary.Entries = len(entries)
+	summary.TotalEntries = len(entries)
+	summary.CheckedEntries = checkedEntriesCount.Load()
 	summary.OnlineChecks = onlineChecksCount.Load()
 	summary.OfflineChecks = offlineChecksCount.Load()
 

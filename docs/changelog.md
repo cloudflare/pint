@@ -6,6 +6,18 @@
 
 - Added [rule/dependency](checks/rule/dependency.md) check.
 
+### Changed
+
+- When running `pint ci` pint will now first try to parse all files in current
+  working directory, before checking for files modified on current branch.
+  This is to have a full list of all rules, which is needed for checks like
+  newly added [rule/dependency](checks/rule/dependency.md).
+  This can slow `pint` runs if there's a lot of files in your repository.
+  If there are non-rule files these may fail to parse and result in check errors.
+  To avoid any errors or slowdowns from scanning unrelated files you might need
+  to add `ci` section to `.pint.hcl` with `include` and/or `exclude` options set.
+  See [examples/ci.hcl](examples/ci.hcl) for an example config.
+
 ## v0.50.1
 
 ### Fixed

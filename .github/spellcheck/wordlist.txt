@@ -2,6 +2,7 @@ APIs
 automaxprocs
 BitBucket
 bool
+ci
 changelog
 Changelog
 CLI
@@ -17,6 +18,7 @@ github
 GOGC
 golang
 GOMAXPROCS
+hcl
 HCL
 hoc
 hostname
@@ -50,5 +52,6 @@ uptime
 URI
 URIs
 validator
+VCS
 yaml
 YAML

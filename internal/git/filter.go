@@ -1,4 +1,4 @@
-package discovery
+package git
 
 import "regexp"
 

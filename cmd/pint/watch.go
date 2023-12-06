@@ -18,6 +18,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 
@@ -255,9 +256,9 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 }
 
 func (c *problemCollector) scan(ctx context.Context, workers int, gen *config.PrometheusGenerator) error {
-	finder := discovery.NewGlobFinder(c.paths, discovery.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed()))
+	slog.Info("Finding all rules to check", slog.Any("paths", c.paths))
 	// nolint: contextcheck
-	entries, err := finder.Find()
+	entries, err := discovery.NewGlobFinder(c.paths, git.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed())).Find()
 	if err != nil {
 		return err
 	}

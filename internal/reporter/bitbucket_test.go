@@ -64,6 +64,7 @@ func TestBitBucketReporter(t *testing.T) {
 		Link:     "https://cloudflare.github.io/pint/",
 		Result:   "PASS",
 		Data: []reporter.BitBucketReportData{
+			{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 			{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 			{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(0)},
 			{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -307,6 +308,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -549,6 +551,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -624,6 +627,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -725,6 +729,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -880,6 +885,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -1035,6 +1041,7 @@ func TestBitBucketReporter(t *testing.T) {
 						CommentAction: "ADDED",
 						CommentAnchor: reporter.BitBucketCommentAnchor{
 							Orphaned: true,
+							LineType: "CONTEXT",
 							DiffType: "EFFECTIVE",
 							Path:     "foo.txt",
 							Line:     3,
@@ -1061,6 +1068,26 @@ func TestBitBucketReporter(t *testing.T) {
 							ID:      1002,
 							Version: 1,
 							State:   "OPEN",
+							Author: reporter.BitBucketCommentAuthor{
+								Name: "pint_user",
+							},
+						},
+					},
+					{
+						Action:        "COMMENTED",
+						CommentAction: "ADDED",
+						CommentAnchor: reporter.BitBucketCommentAnchor{
+							Orphaned: true,
+							LineType: "REMOVED",
+							DiffType: "COMMIT",
+							Path:     "foo.txt",
+							Line:     14,
+						},
+						Comment: reporter.BitBucketPullRequestComment{
+							ID:       1003,
+							Version:  1,
+							State:    "OPEN",
+							Severity: "BLOCKER",
 							Author: reporter.BitBucketCommentAuthor{
 								Name: "pint_user",
 							},
@@ -1592,6 +1619,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(5)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},

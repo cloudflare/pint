@@ -43,10 +43,17 @@ There are three modes it works in:
 
 ### Pull Requests
 
-Run it with `pint ci`.
+Run it with `pint ci`. Git is currently the only supported VCS.
 
-It currently supports git for which it will find all commits on the current branch that are not
-present in the parent branch and scan all modified files included in those changes.
+When `pint ci` runs it will find all files in the current working directory and try to parse
+them as Prometheus rules. Then it will look for all commits on the current branch that are not
+present in the parent branch and to decide which rules were modified.
+Checks are run only on modified rules but they require the full list of all rules to find any
+cross-rule dependencies.
+
+Running `pint ci` doesn't require any configuration but it's recommended to add a pint config file
+with `ci` section containing at least the `include` option. This will ensure that pint validates
+only Prometheus rules and ignores other files.
 
 Results can optionally be reported using
 [BitBucket API](https://developer.atlassian.com/server/bitbucket/rest/)

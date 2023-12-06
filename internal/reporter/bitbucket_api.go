@@ -124,12 +124,10 @@ type BitBucketFileDiffs struct {
 }
 
 type bitBucketComment struct {
-	id       int
-	version  int
-	onCommit bool
-	text     string
-	path     string
-	line     int
+	id      int
+	version int
+	text    string
+	anchor  BitBucketCommentAnchor
 }
 
 type BitBucketCommentAuthor struct {
@@ -146,9 +144,26 @@ type BitBucketPullRequestComment struct {
 
 type BitBucketCommentAnchor struct {
 	Orphaned bool   `json:"orphaned"`
+	LineType string `json:"lineType"`
 	DiffType string `json:"diffType"`
 	Path     string `json:"path"`
 	Line     int    `json:"line"`
+}
+
+func (ba BitBucketCommentAnchor) isEqual(pa BitBucketPendingCommentAnchor) bool {
+	if ba.Path != pa.Path {
+		return false
+	}
+	if ba.Line != pa.Line {
+		return false
+	}
+	if ba.LineType != pa.LineType {
+		return false
+	}
+	if ba.DiffType != pa.DiffType {
+		return false
+	}
+	return true
 }
 
 type BitBucketPullRequestActivity struct {
@@ -166,9 +181,10 @@ type BitBucketPullRequestActivities struct {
 }
 
 type pendingComment struct {
-	text string
-	path string
-	line int
+	text   string
+	path   string
+	line   int
+	anchor checks.Anchor
 }
 
 func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBucketPendingComment {
@@ -184,7 +200,9 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 		Severity: "NORMAL",
 	}
 
-	if changes != nil {
+	if pc.anchor == checks.AnchorBefore {
+		c.Anchor.LineType = "REMOVED"
+	} else if changes != nil {
 		if lines, ok := changes.pathModifiedLines[pc.path]; ok && slices.Contains(lines, pc.line) {
 			c.Anchor.LineType = "ADDED"
 			c.Anchor.FileType = "TO"
@@ -315,7 +333,8 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 		Details:  BitBucketDescription,
 		Link:     "https://cloudflare.github.io/pint/",
 		Data: []BitBucketReportData{
-			{Title: "Number of rules checked", Type: NumberType, Value: summary.Entries},
+			{Title: "Number of rules parsed", Type: NumberType, Value: summary.TotalEntries},
+			{Title: "Number of rules checked", Type: NumberType, Value: summary.CheckedEntries},
 			{Title: "Number of problems found", Type: NumberType, Value: reportedProblems},
 			{Title: "Number of offline checks", Type: NumberType, Value: summary.OfflineChecks},
 			{Title: "Number of online checks", Type: NumberType, Value: summary.OnlineChecks},
@@ -519,12 +538,10 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 				act.Comment.Author.Name == username &&
 				!act.CommentAnchor.Orphaned {
 				comments = append(comments, bitBucketComment{
-					id:       act.Comment.ID,
-					version:  act.Comment.Version,
-					onCommit: act.CommentAnchor.DiffType == "COMMIT",
-					text:     act.Comment.Text,
-					path:     act.CommentAnchor.Path,
-					line:     act.CommentAnchor.Line,
+					id:      act.Comment.ID,
+					version: act.Comment.Version,
+					text:    act.Comment.Text,
+					anchor:  act.CommentAnchor,
 				})
 			}
 		}
@@ -546,16 +563,8 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		}
 
 		var buf strings.Builder
-		var icon string
-		switch reports[0].Problem.Severity {
-		case checks.Fatal, checks.Bug:
-			icon = ":stop_sign:"
-		case checks.Warning:
-			icon = ":warning:"
-		case checks.Information:
-			icon = ":information_source:"
-		}
-		buf.WriteString(icon)
+
+		buf.WriteString(problemIcon(reports[0].Problem.Severity))
 		buf.WriteString(" **")
 		buf.WriteString(reports[0].Problem.Severity.String())
 		buf.WriteString("** reported by [pint](https://cloudflare.github.io/pint/) **")
@@ -582,9 +591,10 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		buf.WriteString(".html).\n")
 
 		pending := pendingComment{
-			path: reports[0].ReportedPath,
-			line: reports[0].Problem.Lines[0],
-			text: buf.String(),
+			path:   reports[0].ReportedPath,
+			line:   reports[0].Problem.Lines[0],
+			text:   buf.String(),
+			anchor: reports[0].Problem.Anchor,
 		}
 		comments = append(comments, pending.toBitBucketComment(changes))
 	}
@@ -595,11 +605,11 @@ func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucke
 	for _, cur := range currentComments {
 		var keep bool
 		for _, pend := range pendingComments {
-			if cur.path == pend.Anchor.Path && cur.line == pend.Anchor.Line && cur.text == pend.Text {
+			if cur.anchor.isEqual(pend.Anchor) && cur.text == pend.Text {
 				keep = true
 				break
 			}
-			if cur.onCommit {
+			if cur.anchor.DiffType == "COMMIT" {
 				keep = false
 			}
 		}
@@ -607,8 +617,8 @@ func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucke
 			slog.Debug(
 				"Deleting stale comment",
 				slog.Int("id", cur.id),
-				slog.String("path", cur.path),
-				slog.Int("line", cur.line),
+				slog.String("path", cur.anchor.Path),
+				slog.Int("line", cur.anchor.Line),
 			)
 			_, err := bb.request(
 				http.MethodDelete,
@@ -635,10 +645,10 @@ func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketC
 	for _, pend := range pendingComments {
 		add := true
 		for _, cur := range currentComments {
-			if cur.path == pend.Anchor.Path && cur.line == pend.Anchor.Line && cur.text == pend.Text {
+			if cur.anchor.isEqual(pend.Anchor) && cur.text == pend.Text {
 				add = false
 			}
-			if cur.onCommit {
+			if cur.anchor.DiffType == "COMMIT" {
 				add = true
 			}
 		}
@@ -725,6 +735,9 @@ func dedupReports(src []Report) (dst [][]Report) {
 			if d[0].Problem.Lines[0] != report.Problem.Lines[0] {
 				continue
 			}
+			if d[0].Problem.Anchor != report.Problem.Anchor {
+				continue
+			}
 			index = i
 			break
 		}
@@ -735,4 +748,16 @@ func dedupReports(src []Report) (dst [][]Report) {
 		dst[index] = append(dst[index], report)
 	}
 	return dst
+}
+
+func problemIcon(s checks.Severity) string {
+	// nolint:exhaustive
+	switch s {
+	case checks.Warning:
+		return ":warning:"
+	case checks.Information:
+		return ":information_source:"
+	default:
+		return ":stop_sign:"
+	}
 }

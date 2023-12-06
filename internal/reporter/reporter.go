@@ -48,11 +48,12 @@ func (r Report) isEqual(nr Report) bool {
 }
 
 type Summary struct {
-	OfflineChecks int64
-	OnlineChecks  int64
-	Duration      time.Duration
-	Entries       int
-	reports       []Report
+	OfflineChecks  int64
+	OnlineChecks   int64
+	Duration       time.Duration
+	TotalEntries   int
+	CheckedEntries int64
+	reports        []Report
 }
 
 func NewSummary(reports []Report) Summary {

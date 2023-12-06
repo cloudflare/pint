@@ -7,7 +7,7 @@ require (
 	github.com/fatih/color v1.16.0
 	github.com/gkampitakis/go-snaps v0.4.12
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-github/v55 v55.0.0
+	github.com/google/go-github/v57 v57.0.0
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/klauspost/compress v1.17.4
 	github.com/neilotoole/slogt v1.1.0
@@ -33,14 +33,12 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.0 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230923063757-afb1ddc0824c // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/alecthomas/units v0.0.0-20211218093645-b94a6e3cc137 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/aws/aws-sdk-go v1.47.2 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/cloudflare/circl v1.3.6 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dennwc/varint v1.0.0 // indirect

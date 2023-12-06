@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v55/github"
+	"github.com/google/go-github/v57/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -137,13 +137,20 @@ func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) e
 
 		var found bool
 		for _, ec := range existingComments {
-			if ec.GetBody() == comment.GetBody() && ec.GetCommitID() == comment.GetCommitID() {
+			if ec.GetBody() == comment.GetBody() &&
+				ec.GetCommitID() == comment.GetCommitID() &&
+				ec.GetLine() == comment.GetLine() {
 				found = true
 				break
 			}
 		}
 		if found {
-			slog.Debug("Comment already exist", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
+			slog.Debug("Comment already exist",
+				slog.String("path", comment.GetPath()),
+				slog.Int("line", comment.GetLine()),
+				slog.String("commit", comment.GetCommitID()),
+				slog.String("body", comment.GetBody()),
+			)
 			continue
 		}
 
@@ -229,8 +236,12 @@ func formatGHReviewBody(version string, summary Summary) string {
 	b.WriteString(version)
 	b.WriteString(" |\n")
 
+	b.WriteString("| Number of rules parsed | ")
+	b.WriteString(strconv.Itoa(summary.TotalEntries))
+	b.WriteString(" |\n")
+
 	b.WriteString("| Number of rules checked | ")
-	b.WriteString(strconv.Itoa(summary.Entries))
+	b.WriteString(strconv.FormatInt(summary.CheckedEntries, 10))
 	b.WriteString(" |\n")
 
 	b.WriteString("| Number of problems found | ")
@@ -252,7 +263,7 @@ func formatGHReviewBody(version string, summary Summary) string {
 	b.WriteString("\n</p>\n</details>\n\n")
 
 	b.WriteString("<details><summary>Problems</summary>\n<p>\n\n")
-	if summary.Entries > 0 {
+	if len(summary.Reports()) > 0 {
 		buf := bytes.NewBuffer(nil)
 		cr := NewConsoleReporter(buf, checks.Information)
 		err := cr.Submit(summary)
@@ -281,11 +292,19 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 		msgSuffix = "\n\n" + rep.Problem.Details
 	}
 
+	var side string
+	if rep.Problem.Anchor == checks.AnchorBefore {
+		side = "LEFT"
+	} else {
+		side = "RIGHT"
+	}
+
 	c := github.PullRequestComment{
 		CommitID: github.String(headCommit),
 		Path:     github.String(rep.ReportedPath),
 		Body: github.String(fmt.Sprintf(
-			"[%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s%s",
+			"%s [%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s%s",
+			problemIcon(rep.Problem.Severity),
 			rep.Problem.Reporter,
 			rep.Problem.Reporter,
 			msgPrefix,
@@ -293,6 +312,7 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 			msgSuffix,
 		)),
 		Line: github.Int(reportLine),
+		Side: github.String(side),
 	}
 
 	return &c

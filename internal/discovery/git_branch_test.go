@@ -75,7 +75,7 @@ func TestGitBranchFinder(t *testing.T) {
 				func(args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				},
-				discovery.NewPathFilter(includeAll, nil, nil),
+				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				50,
 			),
@@ -89,7 +89,7 @@ func TestGitBranchFinder(t *testing.T) {
 				func(args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				},
-				discovery.NewPathFilter(includeAll, nil, nil),
+				git.NewPathFilter(includeAll, nil, nil),
 				"master",
 				50,
 			),
@@ -108,7 +108,7 @@ func TestGitBranchFinder(t *testing.T) {
 						return nil, fmt.Errorf("mock git error: %v", args)
 					}
 				},
-				discovery.NewPathFilter(includeAll, nil, nil),
+				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				3,
 			),
@@ -127,7 +127,7 @@ func TestGitBranchFinder(t *testing.T) {
 						return nil, fmt.Errorf("mock git error: %v", args)
 					}
 				},
-				discovery.NewPathFilter(includeAll, nil, nil),
+				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				4,
 			),
@@ -148,7 +148,7 @@ func TestGitBranchFinder(t *testing.T) {
 						return nil, fmt.Errorf("mock git error: %v", args)
 					}
 				},
-				discovery.NewPathFilter(includeAll, nil, nil),
+				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				4,
 			),
@@ -175,7 +175,7 @@ func TestGitBranchFinder(t *testing.T) {
 						return nil, fmt.Errorf("mock git error: %v", args)
 					}
 				},
-				discovery.NewPathFilter(includeAll, nil, nil),
+				git.NewPathFilter(includeAll, nil, nil),
 				"main",
 				4,
 			),
@@ -192,7 +192,7 @@ func TestGitBranchFinder(t *testing.T) {
 
 				commitFile(t, "rules.yml", "# v2\n", "v2")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: nil,
 		},
 		{
@@ -217,7 +217,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Excluded,
@@ -250,7 +250,7 @@ groups:
     expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -277,7 +277,7 @@ groups:
   expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -304,7 +304,7 @@ groups:
   expr: count(up == 1)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(nil, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(nil, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -339,7 +339,7 @@ groups:
 			},
 			finder: discovery.NewGitBranchFinder(
 				git.RunGit,
-				discovery.NewPathFilter([]*regexp.Regexp{regexp.MustCompile("^foo#")}, nil, nil),
+				git.NewPathFilter([]*regexp.Regexp{regexp.MustCompile("^foo#")}, nil, nil),
 				"main",
 				4,
 			),
@@ -367,7 +367,7 @@ groups:
     expr: count(up == 1)
 `, "v2\nskip this commit\n[skip ci]\n")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: nil,
 		},
 		{
@@ -392,7 +392,7 @@ groups:
     expr: count(up == 1)
 `, "v2\nskip this commit\n[no ci]\n")
 			},
-			finder:  discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: nil,
 		},
 		{
@@ -412,7 +412,7 @@ groups:
 				require.NoError(t, err, "git add")
 				gitCommit(t, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Added,
@@ -455,7 +455,7 @@ groups:
     expr: count(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -489,7 +489,7 @@ groups:
 					State:         discovery.Removed,
 					ReportedPath:  "rules.yml",
 					SourcePath:    "rules.yml",
-					ModifiedLines: []int{7, 8},
+					ModifiedLines: []int{7},
 					Rule:          mustParse(6, "- record: up:count:2\n  expr: count(up)\n"),
 				},
 			},
@@ -517,7 +517,7 @@ groups:
   for: 0s
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -553,7 +553,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Excluded,
@@ -589,7 +589,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Excluded,
@@ -629,7 +629,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Excluded,
@@ -677,7 +677,7 @@ groups:
     expr: count(up)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, nil), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Added,
@@ -690,7 +690,7 @@ groups:
 					State:         discovery.Removed,
 					ReportedPath:  "rules.yml",
 					SourcePath:    "rules.yml",
-					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7},
+					ModifiedLines: []int{3},
 					PathError: mustErr(`
 groups:
 - name: v2
@@ -726,7 +726,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Excluded,
@@ -780,7 +780,7 @@ groups:
   expr: sum(foo) by(job)
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Modified,
@@ -841,7 +841,7 @@ groups:
     foo: bar
 `, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Excluded,
@@ -875,7 +875,7 @@ groups:
 
 				gitCommit(t, "v2")
 			},
-			finder: discovery.NewGitBranchFinder(git.RunGit, discovery.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
 					State:         discovery.Moved,
@@ -898,7 +898,7 @@ groups:
 			require.NoError(t, err, "git init")
 
 			tc.setup(t)
-			entries, err := tc.finder.Find()
+			entries, err := tc.finder.Find(nil)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 			} else {
