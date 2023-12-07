@@ -17,6 +17,8 @@
   To avoid any errors or slowdowns from scanning unrelated files you might need
   to add `ci` section to `.pint.hcl` with `include` and/or `exclude` options set.
   See [examples/ci.hcl](examples/ci.hcl) for an example config.
+- `Bug` and `Fatal` severity problems are now reported as tasks when using
+  BitBucket.
 
 ## v0.50.1
 

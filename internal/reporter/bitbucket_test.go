@@ -896,7 +896,7 @@ func TestBitBucketReporter(t *testing.T) {
 			pullRequestComments: []reporter.BitBucketPendingComment{
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     1,
@@ -907,7 +907,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 				{
 					Text:     ":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     2,
@@ -918,7 +918,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text\n\nmock details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     2,
@@ -1630,7 +1630,7 @@ func TestBitBucketReporter(t *testing.T) {
 			pullRequestComments: []reporter.BitBucketPendingComment{
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     1,

@@ -22,9 +22,10 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 		{
 			description: "nil changes",
 			input: pendingComment{
-				text: "this is text",
-				path: "foo.yaml",
-				line: 5,
+				severity: "NORMAL",
+				text:     "this is text",
+				path:     "foo.yaml",
+				line:     5,
 			},
 			output: BitBucketPendingComment{
 				Text:     "this is text",
@@ -42,9 +43,10 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 		{
 			description: "path not found in changes",
 			input: pendingComment{
-				text: "this is text",
-				path: "foo.yaml",
-				line: 5,
+				severity: "NORMAL",
+				text:     "this is text",
+				path:     "foo.yaml",
+				line:     5,
 			},
 			output: BitBucketPendingComment{
 				Text:     "this is text",
@@ -65,9 +67,10 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 		{
 			description: "path found in changes",
 			input: pendingComment{
-				text: "this is text",
-				path: "foo.yaml",
-				line: 5,
+				severity: "NORMAL",
+				text:     "this is text",
+				path:     "foo.yaml",
+				line:     5,
 			},
 			output: BitBucketPendingComment{
 				Text:     "this is text",
