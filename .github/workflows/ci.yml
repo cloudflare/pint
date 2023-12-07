@@ -34,6 +34,6 @@ jobs:
         run: make build
 
       - name: Run pint ci
-        run: ./pint -c .github/pint/pint.hcl ci
+        run: ./pint -l debug -c .github/pint/pint.hcl ci
         env:
           GITHUB_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
