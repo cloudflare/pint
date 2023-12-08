@@ -18,7 +18,7 @@ jobs:
           show-progress: false
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache-dependency-path: tools/golangci-lint/go.sum
@@ -35,7 +35,7 @@ jobs:
           show-progress: false
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
           cache-dependency-path: tools/gofumpt/go.sum
