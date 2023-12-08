@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"log/slog"
-	"regexp"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -16,33 +15,29 @@ import (
 
 func NewGitBranchFinder(
 	gitCmd git.CommandRunner,
-	include []*regexp.Regexp,
-	exclude []*regexp.Regexp,
+	filter git.PathFilter,
 	baseBranch string,
 	maxCommits int,
-	relaxed []*regexp.Regexp,
 ) GitBranchFinder {
 	return GitBranchFinder{
 		gitCmd:     gitCmd,
-		include:    include,
-		exclude:    exclude,
+		filter:     filter,
 		baseBranch: baseBranch,
 		maxCommits: maxCommits,
-		relaxed:    relaxed,
 	}
 }
 
 type GitBranchFinder struct {
 	gitCmd     git.CommandRunner
-	include    []*regexp.Regexp
-	exclude    []*regexp.Regexp
+	filter     git.PathFilter
 	baseBranch string
 	maxCommits int
-	relaxed    []*regexp.Regexp
 }
 
-func (f GitBranchFinder) Find() (entries []Entry, err error) {
-	slog.Info("Finding all rules to check on current git branch", slog.String("base", f.baseBranch))
+func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
+	for i := range allEntries {
+		allEntries[i].State = Excluded
+	}
 
 	cr, err := git.CommitRange(f.gitCmd, f.baseBranch)
 	if err != nil {
@@ -54,7 +49,7 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(cr.Commits), f.maxCommits)
 	}
 
-	changes, err := git.Changes(f.gitCmd, cr)
+	changes, err := git.Changes(f.gitCmd, cr, f.filter)
 	if err != nil {
 		return nil, err
 	}
@@ -68,23 +63,18 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 	}
 
 	for _, change := range changes {
-		if !f.isPathAllowed(change.Path.After.Name) {
-			slog.Debug("Skipping file due to include/exclude rules", slog.String("path", change.Path.After.Name))
-			continue
-		}
-
 		var entriesBefore, entriesAfter []Entry
 		entriesBefore, _ = readRules(
 			change.Path.Before.EffectivePath(),
 			change.Path.Before.Name,
 			bytes.NewReader(change.Body.Before),
-			!matchesAny(f.relaxed, change.Path.Before.Name),
+			!f.filter.IsRelaxed(change.Path.Before.Name),
 		)
 		entriesAfter, err = readRules(
 			change.Path.After.EffectivePath(),
 			change.Path.After.Name,
 			bytes.NewReader(change.Body.After),
-			!matchesAny(f.relaxed, change.Path.After.Name),
+			!f.filter.IsRelaxed(change.Path.After.Name),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
@@ -137,6 +127,10 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 				entries = append(entries, me.after)
 			case me.hasBefore && !me.hasAfter:
 				me.before.State = Removed
+				ml := commonLines(change.Body.ModifiedLines, me.before.ModifiedLines)
+				if len(ml) > 0 {
+					me.before.ModifiedLines = ml
+				}
 				slog.Debug(
 					"Rule removed on HEAD branch",
 					slog.String("name", me.before.Rule.Name()),
@@ -164,32 +158,33 @@ func (f GitBranchFinder) Find() (entries []Entry, err error) {
 	}
 
 	for _, entry := range symlinks {
-		if f.isPathAllowed(entry.SourcePath) {
+		if f.filter.IsPathAllowed(entry.SourcePath) {
 			entries = append(entries, entry)
 		}
 	}
 
-	return entries, nil
-}
-
-func (f GitBranchFinder) isPathAllowed(path string) bool {
-	if len(f.include) == 0 && len(f.exclude) == 0 {
-		return true
-	}
-
-	for _, pattern := range f.exclude {
-		if pattern.MatchString(path) {
-			return false
+	var found bool
+	for _, entry := range entries {
+		found = false
+		if entry.State == Removed {
+			goto NEXT
+		}
+		for i, globEntry := range allEntries {
+			if entry.SourcePath == globEntry.SourcePath && entry.Rule.IsSame(globEntry.Rule) {
+				allEntries[i].State = entry.State
+				allEntries[i].ModifiedLines = entry.ModifiedLines
+				found = true
+				break
+			}
+		}
+	NEXT:
+		if !found {
+			allEntries = append(allEntries, entry)
 		}
 	}
 
-	for _, pattern := range f.include {
-		if pattern.MatchString(path) {
-			return true
-		}
-	}
-
-	return false
+	slog.Debug("Git branch finder completed", slog.Int("count", len(allEntries)))
+	return allEntries, nil
 }
 
 func (f GitBranchFinder) shouldSkipAllChecks(changes []*git.FileChange) (bool, error) {

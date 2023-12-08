@@ -6,6 +6,7 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=3
+level=DEBUG msg="Glob finder completed" count=3
 level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tags=[] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom uri=http://127.0.0.1 workers=16
 level=DEBUG msg="Generated all Prometheus servers" count=1

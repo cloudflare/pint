@@ -96,8 +96,16 @@ const (
 
 type SettingsKey string
 
+type Anchor uint8
+
+const (
+	AnchorAfter Anchor = iota
+	AnchorBefore
+)
+
 type Problem struct {
 	Fragment string
+	Anchor   Anchor
 	Lines    []int
 	Reporter string
 	Text     string

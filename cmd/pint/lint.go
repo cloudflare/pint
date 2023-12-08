@@ -10,6 +10,7 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/urfave/cli/v2"
@@ -60,7 +61,8 @@ func actionLint(c *cli.Context) error {
 		return fmt.Errorf("at least one file or directory required")
 	}
 
-	finder := discovery.NewGlobFinder(paths, meta.cfg.Parser.CompileRelaxed())
+	slog.Info("Finding all rules to check", slog.Any("paths", paths))
+	finder := discovery.NewGlobFinder(paths, git.NewPathFilter(nil, nil, meta.cfg.Parser.CompileRelaxed()))
 	entries, err := finder.Find()
 	if err != nil {
 		return err

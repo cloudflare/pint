@@ -126,10 +126,10 @@ type BitBucketFileDiffs struct {
 type bitBucketComment struct {
 	id       int
 	version  int
-	onCommit bool
 	text     string
-	path     string
-	line     int
+	severity string
+	anchor   BitBucketCommentAnchor
+	replies  int
 }
 
 type BitBucketCommentAuthor struct {
@@ -137,18 +137,37 @@ type BitBucketCommentAuthor struct {
 }
 
 type BitBucketPullRequestComment struct {
-	ID      int                    `json:"id"`
-	Version int                    `json:"version"`
-	State   string                 `json:"state"`
-	Author  BitBucketCommentAuthor `json:"author"`
-	Text    string                 `json:"text"`
+	ID       int                           `json:"id"`
+	Version  int                           `json:"version"`
+	State    string                        `json:"state"`
+	Author   BitBucketCommentAuthor        `json:"author"`
+	Text     string                        `json:"text"`
+	Severity string                        `json:"severity"`
+	Comments []BitBucketPullRequestComment `json:"comments"`
 }
 
 type BitBucketCommentAnchor struct {
 	Orphaned bool   `json:"orphaned"`
+	LineType string `json:"lineType"`
 	DiffType string `json:"diffType"`
 	Path     string `json:"path"`
 	Line     int    `json:"line"`
+}
+
+func (ba BitBucketCommentAnchor) isEqual(pa BitBucketPendingCommentAnchor) bool {
+	if ba.Path != pa.Path {
+		return false
+	}
+	if ba.Line != pa.Line {
+		return false
+	}
+	if ba.LineType != pa.LineType {
+		return false
+	}
+	if ba.DiffType != pa.DiffType {
+		return false
+	}
+	return true
 }
 
 type BitBucketPullRequestActivity struct {
@@ -166,9 +185,11 @@ type BitBucketPullRequestActivities struct {
 }
 
 type pendingComment struct {
-	text string
-	path string
-	line int
+	severity string
+	text     string
+	path     string
+	line     int
+	anchor   checks.Anchor
 }
 
 func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBucketPendingComment {
@@ -181,10 +202,12 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 			FileType: "FROM",
 		},
 		Text:     pc.text,
-		Severity: "NORMAL",
+		Severity: pc.severity,
 	}
 
-	if changes != nil {
+	if pc.anchor == checks.AnchorBefore {
+		c.Anchor.LineType = "REMOVED"
+	} else if changes != nil {
 		if lines, ok := changes.pathModifiedLines[pc.path]; ok && slices.Contains(lines, pc.line) {
 			c.Anchor.LineType = "ADDED"
 			c.Anchor.FileType = "TO"
@@ -213,6 +236,16 @@ type BitBucketPendingComment struct {
 	Text     string                        `json:"text"`
 	Severity string                        `json:"severity"`
 	Anchor   BitBucketPendingCommentAnchor `json:"anchor"`
+}
+
+type BitBucketCommentStateUpdate struct {
+	State   string `json:"state"`
+	Version int    `json:"version"`
+}
+
+type BitBucketCommentSeverityUpdate struct {
+	Severity string `json:"severity"`
+	Version  int    `json:"version"`
 }
 
 func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string) *bitBucketAPI {
@@ -315,7 +348,8 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 		Details:  BitBucketDescription,
 		Link:     "https://cloudflare.github.io/pint/",
 		Data: []BitBucketReportData{
-			{Title: "Number of rules checked", Type: NumberType, Value: summary.Entries},
+			{Title: "Number of rules parsed", Type: NumberType, Value: summary.TotalEntries},
+			{Title: "Number of rules checked", Type: NumberType, Value: summary.CheckedEntries},
 			{Title: "Number of problems found", Type: NumberType, Value: reportedProblems},
 			{Title: "Number of offline checks", Type: NumberType, Value: summary.OfflineChecks},
 			{Title: "Number of online checks", Type: NumberType, Value: summary.OnlineChecks},
@@ -521,10 +555,10 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 				comments = append(comments, bitBucketComment{
 					id:       act.Comment.ID,
 					version:  act.Comment.Version,
-					onCommit: act.CommentAnchor.DiffType == "COMMIT",
 					text:     act.Comment.Text,
-					path:     act.CommentAnchor.Path,
-					line:     act.CommentAnchor.Line,
+					anchor:   act.CommentAnchor,
+					severity: act.Comment.Severity,
+					replies:  len(act.Comment.Comments),
 				})
 			}
 		}
@@ -546,16 +580,8 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		}
 
 		var buf strings.Builder
-		var icon string
-		switch reports[0].Problem.Severity {
-		case checks.Fatal, checks.Bug:
-			icon = ":stop_sign:"
-		case checks.Warning:
-			icon = ":warning:"
-		case checks.Information:
-			icon = ":information_source:"
-		}
-		buf.WriteString(icon)
+
+		buf.WriteString(problemIcon(reports[0].Problem.Severity))
 		buf.WriteString(" **")
 		buf.WriteString(reports[0].Problem.Severity.String())
 		buf.WriteString("** reported by [pint](https://cloudflare.github.io/pint/) **")
@@ -581,10 +607,21 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString(".html).\n")
 
+		var severity string
+		// nolint:exhaustive
+		switch reports[0].Problem.Severity {
+		case checks.Bug, checks.Fatal:
+			severity = "BLOCKER"
+		default:
+			severity = "NORMAL"
+		}
+
 		pending := pendingComment{
-			path: reports[0].ReportedPath,
-			line: reports[0].Problem.Lines[0],
-			text: buf.String(),
+			severity: severity,
+			path:     reports[0].ReportedPath,
+			line:     reports[0].Problem.Lines[0],
+			text:     buf.String(),
+			anchor:   reports[0].Problem.Anchor,
 		}
 		comments = append(comments, pending.toBitBucketComment(changes))
 	}
@@ -595,38 +632,110 @@ func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucke
 	for _, cur := range currentComments {
 		var keep bool
 		for _, pend := range pendingComments {
-			if cur.path == pend.Anchor.Path && cur.line == pend.Anchor.Line && cur.text == pend.Text {
+			if cur.anchor.isEqual(pend.Anchor) && cur.text == pend.Text {
 				keep = true
 				break
 			}
-			if cur.onCommit {
+			if cur.anchor.DiffType == "COMMIT" {
 				keep = false
 			}
 		}
 		if !keep {
-			slog.Debug(
-				"Deleting stale comment",
-				slog.Int("id", cur.id),
-				slog.String("path", cur.path),
-				slog.Int("line", cur.line),
-			)
-			_, err := bb.request(
-				http.MethodDelete,
-				fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d?version=%d",
-					bb.project, bb.repo,
-					pr.ID,
-					cur.id, cur.version,
-				),
-				nil,
-			)
-			if err != nil {
-				slog.Error(
-					"Failed to delete stale BitBucket pull request comment",
-					slog.Int("id", cur.id),
-					slog.Any("err", err),
-				)
+			switch {
+			case cur.replies == 0:
+				bb.deleteComment(pr, cur)
+			case cur.severity == "BLOCKER":
+				bb.resolveTask(pr, cur)
+			default:
+				bb.updateSeverity(pr, cur, "BLOCKER")
+				bb.resolveTask(pr, cur)
 			}
 		}
+	}
+}
+
+func (bb bitBucketAPI) deleteComment(pr *bitBucketPR, cur bitBucketComment) {
+	slog.Debug(
+		"Deleting stale comment",
+		slog.Int("id", cur.id),
+		slog.String("path", cur.anchor.Path),
+		slog.Int("line", cur.anchor.Line),
+	)
+	_, err := bb.request(
+		http.MethodDelete,
+		fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d?version=%d",
+			bb.project, bb.repo,
+			pr.ID,
+			cur.id, cur.version,
+		),
+		nil,
+	)
+	if err != nil {
+		slog.Error(
+			"Failed to delete stale BitBucket pull request comment",
+			slog.Int("id", cur.id),
+			slog.Any("err", err),
+		)
+	}
+}
+
+func (bb bitBucketAPI) resolveTask(pr *bitBucketPR, cur bitBucketComment) {
+	slog.Debug(
+		"Resolving stale blocker comment",
+		slog.Int("id", cur.id),
+		slog.String("path", cur.anchor.Path),
+		slog.Int("line", cur.anchor.Line),
+	)
+	payload, _ := json.Marshal(BitBucketCommentStateUpdate{
+		State:   "RESOLVED",
+		Version: cur.version,
+	})
+	_, err := bb.request(
+		http.MethodPut,
+		fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d",
+			bb.project, bb.repo,
+			pr.ID,
+			cur.id,
+		),
+		bytes.NewReader(payload),
+	)
+	if err != nil {
+		slog.Error(
+			"Failed to resolve stale blocker BitBucket pull request comment",
+			slog.Int("id", cur.id),
+			slog.Any("err", err),
+		)
+	}
+}
+
+func (bb bitBucketAPI) updateSeverity(pr *bitBucketPR, cur bitBucketComment, severity string) {
+	slog.Debug(
+		"Updating comment severity",
+		slog.Int("id", cur.id),
+		slog.String("path", cur.anchor.Path),
+		slog.Int("line", cur.anchor.Line),
+		slog.String("from", cur.severity),
+		slog.String("to", severity),
+	)
+	payload, _ := json.Marshal(BitBucketCommentSeverityUpdate{
+		Severity: severity,
+		Version:  cur.version,
+	})
+	_, err := bb.request(
+		http.MethodPut,
+		fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/comments/%d",
+			bb.project, bb.repo,
+			pr.ID,
+			cur.id,
+		),
+		bytes.NewReader(payload),
+	)
+	if err != nil {
+		slog.Error(
+			"Failed to update BitBucket pull request comment severity",
+			slog.Int("id", cur.id),
+			slog.Any("err", err),
+		)
 	}
 }
 
@@ -635,10 +744,10 @@ func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketC
 	for _, pend := range pendingComments {
 		add := true
 		for _, cur := range currentComments {
-			if cur.path == pend.Anchor.Path && cur.line == pend.Anchor.Line && cur.text == pend.Text {
+			if cur.anchor.isEqual(pend.Anchor) && cur.text == pend.Text {
 				add = false
 			}
-			if cur.onCommit {
+			if cur.anchor.DiffType == "COMMIT" {
 				add = true
 			}
 		}
@@ -725,6 +834,9 @@ func dedupReports(src []Report) (dst [][]Report) {
 			if d[0].Problem.Lines[0] != report.Problem.Lines[0] {
 				continue
 			}
+			if d[0].Problem.Anchor != report.Problem.Anchor {
+				continue
+			}
 			index = i
 			break
 		}
@@ -735,4 +847,16 @@ func dedupReports(src []Report) (dst [][]Report) {
 		dst[index] = append(dst[index], report)
 	}
 	return dst
+}
+
+func problemIcon(s checks.Severity) string {
+	// nolint:exhaustive
+	switch s {
+	case checks.Warning:
+		return ":warning:"
+	case checks.Information:
+		return ":information_source:"
+	default:
+		return ":stop_sign:"
+	}
 }

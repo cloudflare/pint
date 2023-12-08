@@ -64,6 +64,7 @@ func TestBitBucketReporter(t *testing.T) {
 		Link:     "https://cloudflare.github.io/pint/",
 		Result:   "PASS",
 		Data: []reporter.BitBucketReportData{
+			{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 			{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 			{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(0)},
 			{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -307,6 +308,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -549,6 +551,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -624,6 +627,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -725,6 +729,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -880,6 +885,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -890,7 +896,7 @@ func TestBitBucketReporter(t *testing.T) {
 			pullRequestComments: []reporter.BitBucketPendingComment{
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     1,
@@ -901,7 +907,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 				{
 					Text:     ":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     2,
@@ -912,7 +918,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text\n\nmock details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     2,
@@ -1035,6 +1041,7 @@ func TestBitBucketReporter(t *testing.T) {
 						CommentAction: "ADDED",
 						CommentAnchor: reporter.BitBucketCommentAnchor{
 							Orphaned: true,
+							LineType: "CONTEXT",
 							DiffType: "EFFECTIVE",
 							Path:     "foo.txt",
 							Line:     3,
@@ -1061,6 +1068,26 @@ func TestBitBucketReporter(t *testing.T) {
 							ID:      1002,
 							Version: 1,
 							State:   "OPEN",
+							Author: reporter.BitBucketCommentAuthor{
+								Name: "pint_user",
+							},
+						},
+					},
+					{
+						Action:        "COMMENTED",
+						CommentAction: "ADDED",
+						CommentAnchor: reporter.BitBucketCommentAnchor{
+							Orphaned: true,
+							LineType: "REMOVED",
+							DiffType: "COMMIT",
+							Path:     "foo.txt",
+							Line:     14,
+						},
+						Comment: reporter.BitBucketPullRequestComment{
+							ID:       1003,
+							Version:  1,
+							State:    "OPEN",
+							Severity: "BLOCKER",
 							Author: reporter.BitBucketCommentAuthor{
 								Name: "pint_user",
 							},
@@ -1592,6 +1619,7 @@ func TestBitBucketReporter(t *testing.T) {
 				Link:     "https://cloudflare.github.io/pint/",
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
 					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(5)},
 					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
@@ -1602,7 +1630,7 @@ func TestBitBucketReporter(t *testing.T) {
 			pullRequestComments: []reporter.BitBucketPendingComment{
 				{
 					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
+					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
 						Line:     1,

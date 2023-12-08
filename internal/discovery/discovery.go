@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"log/slog"
-	"regexp"
 	"strings"
 	"time"
 
@@ -42,10 +41,6 @@ func isStrictIgnored(err error) bool {
 		}
 	}
 	return false
-}
-
-type RuleFinder interface {
-	Find() ([]Entry, error)
 }
 
 type ChangeType uint8
@@ -210,13 +205,4 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 
 	slog.Debug("File parsed", slog.String("path", sourcePath), slog.Int("rules", len(entries)))
 	return entries, nil
-}
-
-func matchesAny(re []*regexp.Regexp, s string) bool {
-	for _, r := range re {
-		if v := r.MatchString(s); v {
-			return true
-		}
-	}
-	return false
 }

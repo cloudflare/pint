@@ -24,7 +24,7 @@ type ConsoleReporter struct {
 	minSeverity checks.Severity
 }
 
-func (cr ConsoleReporter) Submit(summary Summary) error {
+func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 	reports := summary.Reports()
 	sort.Slice(reports, func(i, j int) bool {
 		if reports[i].SourcePath < reports[j].SourcePath {
@@ -58,9 +58,12 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 			perFile[report.SourcePath] = []string{}
 		}
 
-		content, err := readFile(report.SourcePath)
-		if err != nil {
-			return err
+		var content string
+		if report.Problem.Anchor == checks.AnchorAfter {
+			content, err = readFile(report.SourcePath)
+			if err != nil {
+				return err
+			}
 		}
 
 		msg := []string{}
@@ -71,8 +74,13 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 		if report.SourcePath != report.ReportedPath {
 			path = fmt.Sprintf("%s ~> %s", report.SourcePath, report.ReportedPath)
 		}
+		path = color.CyanString("%s:%s", path, printLineRange(firstLine, lastLine))
+		if report.Problem.Anchor == checks.AnchorBefore {
+			path += " " + color.RedString("(deleted)")
+		}
+		path += " "
 
-		msg = append(msg, color.CyanString("%s:%s ", path, printLineRange(firstLine, lastLine)))
+		msg = append(msg, path)
 		switch report.Problem.Severity {
 		case checks.Bug, checks.Fatal:
 			msg = append(msg, color.RedString("%s: %s", report.Problem.Severity, report.Problem.Text))
@@ -83,29 +91,32 @@ func (cr ConsoleReporter) Submit(summary Summary) error {
 		}
 		msg = append(msg, color.MagentaString(" (%s)\n", report.Problem.Reporter))
 
-		lines := strings.Split(content, "\n")
-		if lastLine > len(lines)-1 {
-			lastLine = len(lines) - 1
-			slog.Warn(
-				"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
-				slog.String("path", report.SourcePath),
-			)
-		}
+		if report.Problem.Anchor == checks.AnchorAfter {
+			lines := strings.Split(content, "\n")
+			if lastLine > len(lines)-1 {
+				lastLine = len(lines) - 1
+				slog.Warn(
+					"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
+					slog.String("path", report.SourcePath),
+				)
+			}
 
-		nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
-		var inPlaceholder bool
-		for i := firstLine; i <= lastLine; i++ {
-			switch {
-			case slices.Contains(report.Problem.Lines, i):
-				msg = append(msg, color.WhiteString(nrFmt+" | %s\n", i, lines[i-1]))
-				inPlaceholder = false
-			case inPlaceholder:
-				//
-			default:
-				msg = append(msg, color.WhiteString(" %s\n", strings.Repeat(".", countDigits(lastLine))))
-				inPlaceholder = true
+			nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
+			var inPlaceholder bool
+			for i := firstLine; i <= lastLine; i++ {
+				switch {
+				case slices.Contains(report.Problem.Lines, i):
+					msg = append(msg, color.WhiteString(nrFmt+" | %s\n", i, lines[i-1]))
+					inPlaceholder = false
+				case inPlaceholder:
+					//
+				default:
+					msg = append(msg, color.WhiteString(" %s\n", strings.Repeat(".", countDigits(lastLine))))
+					inPlaceholder = true
+				}
 			}
 		}
+
 		perFile[report.SourcePath] = append(perFile[report.SourcePath], strings.Join(msg, ""))
 	}
 

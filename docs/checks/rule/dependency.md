@@ -48,29 +48,7 @@ This check doesn't have any configuration options.
 
 ## How to enable it
 
-This check is enabled by default for all configured Prometheus servers.
-
-Example:
-
-```js
-prometheus "prod" {
-  uri     = "https://prometheus-prod.example.com"
-  timeout = "60s"
-  include = [
-    "rules/prod/.*",
-    "rules/common/.*",
-  ]
-}
-
-prometheus "dev" {
-  uri     = "https://prometheus-dev.example.com"
-  timeout = "30s"
-  include = [
-    "rules/dev/.*",
-    "rules/common/.*",
-  ]
-}
-```
+This check is enabled by default.
 
 ## How to disable it
 
@@ -93,21 +71,6 @@ Or you can disable it per rule by adding a comment to it. Example:
 
 ```yaml
 # pint disable rule/dependency
-```
-
-If you want to disable only individual instances of this check
-you can add a more specific comment.
-
-```yaml
-# pint disable rule/dependency($prometheus)
-```
-
-Where `$prometheus` is the name of Prometheus server to disable.
-
-Example:
-
-```yaml
-# pint disable rule/dependency(prod)
 ```
 
 ## How to snooze it

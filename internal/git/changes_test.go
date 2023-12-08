@@ -565,7 +565,7 @@ func TestChanges(t *testing.T) {
 			require.NoError(t, err, "chdir")
 
 			cmd, cr := tc.setup(t)
-			changes, err := git.Changes(cmd, cr)
+			changes, err := git.Changes(cmd, cr, git.NewPathFilter(nil, nil, nil))
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 				require.Nil(t, changes)

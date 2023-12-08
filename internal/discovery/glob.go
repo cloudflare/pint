@@ -6,32 +6,40 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
-	"regexp"
+
+	"github.com/cloudflare/pint/internal/git"
 )
 
-func NewGlobFinder(patterns []string, relaxed []*regexp.Regexp) GlobFinder {
+func NewGlobFinder(patterns []string, filter git.PathFilter) GlobFinder {
 	return GlobFinder{
 		patterns: patterns,
-		relaxed:  relaxed,
+		filter:   filter,
 	}
 }
 
 type GlobFinder struct {
 	patterns []string
-	relaxed  []*regexp.Regexp
+	filter   git.PathFilter
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
-	slog.Info("Finding all rules to check", slog.Any("paths", f.patterns))
-
 	paths := filePaths{}
 	for _, p := range f.patterns {
 		matches, err := filepath.Glob(p)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("failed to expand file path pattern %s: %w", p, err)
 		}
 
 		for _, path := range matches {
+			if path == ".git" && isDir(path) {
+				slog.Debug(
+					"Excluding git directory from glob results",
+					slog.String("path", path),
+					slog.String("glob", p),
+				)
+				continue
+			}
+
 			subpaths, err := findFiles(path)
 			if err != nil {
 				return nil, err
@@ -49,11 +57,15 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 	}
 
 	for _, fp := range paths {
+		if !f.filter.IsPathAllowed(fp.path) {
+			continue
+		}
+
 		fd, err := os.Open(fp.path)
 		if err != nil {
 			return nil, err
 		}
-		el, err := readRules(fp.target, fp.path, fd, !matchesAny(f.relaxed, fp.target))
+		el, err := readRules(fp.target, fp.path, fd, !f.filter.IsRelaxed(fp.target))
 		if err != nil {
 			fd.Close()
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
@@ -68,7 +80,16 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		}
 	}
 
+	slog.Debug("Glob finder completed", slog.Int("count", len(entries)))
 	return entries, nil
+}
+
+func isDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return info.IsDir()
 }
 
 type filePath struct {
@@ -88,6 +109,11 @@ func (fps filePaths) hasPath(p string) bool {
 }
 
 func findFiles(path string) (paths filePaths, err error) {
+	target, err := filepath.EvalSymlinks(path)
+	if err != nil {
+		return nil, fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
+	}
+
 	s, err := os.Stat(path)
 	if err != nil {
 		return nil, err
@@ -102,10 +128,6 @@ func findFiles(path string) (paths filePaths, err error) {
 		}
 		paths = append(paths, subpaths...)
 	default:
-		target, err := filepath.EvalSymlinks(path)
-		if err != nil {
-			return nil, err
-		}
 		paths = append(paths, filePath{path: path, target: target})
 	}
 
@@ -126,7 +148,7 @@ func walkDir(dirname string) (paths filePaths, err error) {
 			default:
 				dest, err := filepath.EvalSymlinks(path)
 				if err != nil {
-					return err
+					return fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
 				}
 
 				s, err := os.Stat(dest)

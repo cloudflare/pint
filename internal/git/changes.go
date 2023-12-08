@@ -67,7 +67,7 @@ type FileChange struct {
 	Body    BodyDiff
 }
 
-func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
+func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*FileChange, error) {
 	out, err := cmd("log", "--reverse", "--no-merges", "--format=%H", "--name-status", cr.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
@@ -96,6 +96,11 @@ func Changes(cmd CommandRunner, cr CommitRangeResults) ([]*FileChange, error) {
 		srcPath := parts[1]
 		dstPath := parts[len(parts)-1]
 		slog.Debug("Git file change", slog.String("change", parts[0]), slog.String("path", dstPath), slog.String("commit", commit))
+
+		if !filter.IsPathAllowed(dstPath) {
+			slog.Debug("Skipping file due to include/exclude rules", slog.String("path", dstPath))
+			continue
+		}
 
 		// ignore directories
 		// FIXME move all files instead?
