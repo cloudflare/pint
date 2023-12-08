@@ -19,6 +19,13 @@
   See [examples/ci.hcl](examples/ci.hcl) for an example config.
 - `Bug` and `Fatal` severity problems are now reported as tasks when using
   BitBucket.
+- [promql/regexp](checks/promql/regexp.md) will now check for more problems
+  with vector selectors.
+
+### Fixed
+
+- `pint` will no longer run dynamic Prometheus discovery when `--offline` flag
+  is passed.
 
 ## v0.50.1
 
