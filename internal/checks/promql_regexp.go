@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"regexp/syntax"
 
+	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -13,6 +14,8 @@ import (
 
 const (
 	RegexpCheckName = "promql/regexp"
+
+	RegexpCheckDetails = `See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.`
 )
 
 func NewRegexpCheck() RegexpCheck {
@@ -52,36 +55,54 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
+		var name string
+		for _, lm := range selector.LabelMatchers {
+			if lm.Name == model.MetricNameLabel && lm.Type == labels.MatchEqual {
+				name = lm.Value
+				break
+			}
+		}
 		done[selector.String()] = struct{}{}
 		for _, lm := range selector.LabelMatchers {
 			if lm.Type != labels.MatchRegexp && lm.Type != labels.MatchNotRegexp {
 				continue
 			}
 			re := lm.GetRegexString()
-			var isUseful bool
+			var hasFlags, isUseful, isWildcard, isLiteral bool
 			var beginText, endText int
 			r, _ := syntax.Parse(re, syntax.Perl)
 			for _, s := range r.Sub {
 				// If effective flags are different from default flags then we assume regexp is useful.
 				// It could be case sensitive match.
 				if s.Flags > 0 && s.Flags != syntax.Perl {
-					isUseful = true
+					hasFlags = true
 				}
 				// nolint: exhaustive
 				switch s.Op {
 				case syntax.OpBeginText:
 					beginText++
-					continue
 				case syntax.OpEndText:
 					endText++
-					continue
 				case syntax.OpLiteral:
-					continue
+					isLiteral = true
 				case syntax.OpEmptyMatch:
-					continue
+					// pass
+				case syntax.OpStar:
+					isWildcard = true
+				case syntax.OpPlus:
+					isWildcard = true
+					if !isUseful {
+						isUseful = lm.Type == labels.MatchRegexp
+					}
 				default:
 					isUseful = true
 				}
+			}
+			if hasFlags && !isWildcard {
+				isUseful = true
+			}
+			if isLiteral && isWildcard {
+				isUseful = true
 			}
 			if !isUseful {
 				var op labels.MatchType
@@ -92,10 +113,21 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 				case labels.MatchNotRegexp:
 					op = labels.MatchNotEqual
 				}
+				var text string
+				switch {
+				case isWildcard && op == labels.MatchEqual:
+					text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all `%s` values.", name, lm.Name)
+				case isWildcard && op == labels.MatchNotEqual:
+					text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s{%s=\"\"}` if you want to match on all time series for `%s` without the `%s` label.", name, lm.Name, name, lm.Name)
+				default:
+					text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.", lm, lm.Name, op, lm.Value)
+
+				}
 				problems = append(problems, Problem{
 					Lines:    expr.Lines(),
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.", lm, lm.Name, op, lm.Value),
+					Text:     text,
+					Details:  RegexpCheckDetails,
 					Severity: Bug,
 				})
 			}
@@ -106,6 +138,7 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 					Text: fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
 						lm, lm.Name, lm.Type, lm.Value,
 					),
+					Details:  RegexpCheckDetails,
 					Severity: Bug,
 				})
 			}

@@ -114,7 +114,7 @@ func actionCI(c *cli.Context) error {
 
 	slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
 
-	summary, err := checkRules(ctx, meta.workers, gen, meta.cfg, entries)
+	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, entries)
 	if err != nil {
 		return err
 	}
