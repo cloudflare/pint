@@ -25,7 +25,7 @@ import (
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
-// mock command that fails tests if error is returned
+// mock command that fails tests if error is returned.
 func mockMainShouldSucceed() int {
 	app := newApp()
 	err := app.Run(os.Args)
@@ -36,7 +36,7 @@ func mockMainShouldSucceed() int {
 	return 0
 }
 
-// mock command that fails tests if no error is returned
+// mock command that fails tests if no error is returned.
 func mockMainShouldFail() int {
 	app := newApp()
 	err := app.Run(os.Args)

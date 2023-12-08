@@ -14,19 +14,19 @@ linters:
     - promlinter
     - tenv
     - errorlint
+    - errname
     - exportloopref
     - predeclared
     - contextcheck
     - exhaustive
-    - exportloopref
     - gocritic
     - importas
     - maligned
     - nakedret
     - prealloc
-    - promlinter
     - unconvert
     - testifylint
+    - godot
 
 issues:
   max-same-issues: 0
