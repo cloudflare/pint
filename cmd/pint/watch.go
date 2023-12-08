@@ -159,7 +159,7 @@ func actionWatch(c *cli.Context) error {
 	// start timer to run every $interval
 	ack := make(chan bool, 1)
 	mainCtx, mainCancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
-	stop := startTimer(mainCtx, meta.workers, gen, interval, ack, collector)
+	stop := startTimer(mainCtx, meta.workers, meta.isOffline, gen, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -183,7 +183,7 @@ func actionWatch(c *cli.Context) error {
 	return nil
 }
 
-func startTimer(ctx context.Context, workers int, gen *config.PrometheusGenerator, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
+func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
 	ticker := time.NewTicker(time.Second)
 	stop := make(chan bool, 1)
 	wasBootstrapped := false
@@ -197,7 +197,7 @@ func startTimer(ctx context.Context, workers int, gen *config.PrometheusGenerato
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
-				if err := collector.scan(ctx, workers, gen); err != nil {
+				if err := collector.scan(ctx, workers, isOffline, gen); err != nil {
 					slog.Error("Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
@@ -255,7 +255,7 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 	}
 }
 
-func (c *problemCollector) scan(ctx context.Context, workers int, gen *config.PrometheusGenerator) error {
+func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator) error {
 	slog.Info("Finding all rules to check", slog.Any("paths", c.paths))
 	// nolint: contextcheck
 	entries, err := discovery.NewGlobFinder(c.paths, git.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed())).Find()
@@ -263,7 +263,7 @@ func (c *problemCollector) scan(ctx context.Context, workers int, gen *config.Pr
 		return err
 	}
 
-	s, err := checkRules(ctx, workers, gen, c.cfg, entries)
+	s, err := checkRules(ctx, workers, isOffline, gen, c.cfg, entries)
 	if err != nil {
 		return err
 	}

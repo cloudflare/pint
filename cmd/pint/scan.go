@@ -56,14 +56,18 @@ func tryDecodingYamlError(err error) (l int, s string) {
 	return 1, s
 }
 
-func checkRules(ctx context.Context, workers int, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
-	if len(entries) > 0 {
-		if err = gen.GenerateDynamic(ctx); err != nil {
-			return summary, err
-		}
-		slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
+func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
+	if isOffline {
+		slog.Info("Offline mode, skipping Prometheus discovery")
 	} else {
-		slog.Info("No rules found, skipping Prometheus discovery")
+		if len(entries) > 0 {
+			if err = gen.GenerateDynamic(ctx); err != nil {
+				return summary, err
+			}
+			slog.Debug("Generated all Prometheus servers", slog.Int("count", gen.Count()))
+		} else {
+			slog.Info("No rules found, skipping Prometheus discovery")
+		}
 	}
 
 	checkIterationChecks.Set(0)

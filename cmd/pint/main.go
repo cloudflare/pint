@@ -78,8 +78,9 @@ func newApp() *cli.App {
 }
 
 type actionMeta struct {
-	cfg     config.Config
-	workers int
+	cfg       config.Config
+	isOffline bool
+	workers   int
 }
 
 func actionSetup(c *cli.Context) (meta actionMeta, err error) {
@@ -105,6 +106,7 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 	}
 	meta.cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
 	if c.Bool(offlineFlag) {
+		meta.isOffline = true
 		meta.cfg.DisableOnlineChecks()
 	}
 
