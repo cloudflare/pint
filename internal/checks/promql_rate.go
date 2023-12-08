@@ -71,7 +71,6 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
-			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     text,
@@ -83,7 +82,6 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 	done := &completedList{}
 	for _, problem := range c.checkNode(ctx, expr.Query, entries, cfg, done) {
 		problems = append(problems, Problem{
-			Fragment: problem.expr,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     problem.text,

@@ -44,7 +44,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[1m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
@@ -112,7 +111,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "irate(foo[1m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "irate", "2", "1m"),
@@ -142,7 +140,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "deriv(foo[1m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "deriv", "2", "1m"),
@@ -318,7 +315,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(bar[1m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
@@ -348,7 +344,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
@@ -371,7 +366,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
@@ -394,7 +388,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text: checkErrorUnableToRun(checks.RateCheckName, "prom", uri,
@@ -420,7 +413,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
@@ -456,7 +448,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `rate(foo{job="xxx"}[1m])`,
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
@@ -464,7 +455,6 @@ func TestRateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
@@ -508,7 +498,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `rate(foo{job="xxx"}[1m])`,
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
@@ -516,7 +505,6 @@ func TestRateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
@@ -546,7 +534,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "bar_g",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "bar_g", "gauge"),
@@ -607,7 +594,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
@@ -641,7 +627,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(my:sum[5m])",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     rateSumText("my:sum[5m]", "sum(foo)"),
@@ -681,7 +666,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),

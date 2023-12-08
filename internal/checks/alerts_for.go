@@ -60,7 +60,6 @@ func (c AlertsForChecksFor) checkField(name, value string, lines []int) (problem
 	d, err := model.ParseDuration(value)
 	if err != nil {
 		problems = append(problems, Problem{
-			Fragment: value,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("invalid duration: %s", err),
@@ -72,7 +71,6 @@ func (c AlertsForChecksFor) checkField(name, value string, lines []int) (problem
 
 	if d == 0 {
 		problems = append(problems, Problem{
-			Fragment: value,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` is the default value of `%s`, consider removing this redundant line.", value, name),

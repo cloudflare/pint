@@ -74,7 +74,6 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "4m",
 						Lines:    []int{2},
 						Reporter: "rule/for",
 						Text:     forMin("for", "5m"),
@@ -93,7 +92,6 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "5m",
 						Lines:    []int{2},
 						Reporter: "rule/for",
 						Text:     forMax("for", "2m"),
@@ -130,7 +128,6 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "4m",
 						Lines:    []int{2},
 						Reporter: "rule/for",
 						Text:     forMin("keep_firing_for", "5m"),

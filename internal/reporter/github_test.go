@@ -76,7 +76,6 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "syntax error",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "syntax error",
@@ -108,7 +107,6 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "syntax error",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "syntax error",

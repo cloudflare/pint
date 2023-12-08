@@ -71,7 +71,6 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
-			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     text,
@@ -106,7 +105,6 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 	}
 
 	problems = append(problems, Problem{
-		Fragment: expr.Value.Value,
 		Lines:    expr.Lines(),
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s returned %d result(s)%s%s", promText(c.prom.Name(), qr.URI), series, estimate, above),
@@ -115,7 +113,6 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 
 	if c.maxTotalSamples > 0 && qr.Stats.Samples.TotalQueryableSamples > c.maxTotalSamples {
 		problems = append(problems, Problem{
-			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
@@ -125,7 +122,6 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 
 	if c.maxPeakSamples > 0 && qr.Stats.Samples.PeakSamples > c.maxPeakSamples {
 		problems = append(problems, Problem{
-			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
@@ -136,7 +132,6 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 	evalDur := time.Duration(qr.Stats.Timings.EvalTotalTime * float64(time.Second))
 	if c.maxEvaluationDuration > 0 && evalDur > c.maxEvaluationDuration {
 		problems = append(problems, Problem{
-			Fragment: expr.Value.Value,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),

@@ -58,7 +58,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 0) + ".",
@@ -88,7 +87,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", uri, "connection timeout"),
@@ -116,7 +114,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
@@ -146,7 +143,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
@@ -165,7 +161,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
@@ -204,7 +199,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
@@ -253,7 +247,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
@@ -302,7 +295,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
@@ -351,7 +343,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 6) + maxSeriesText(5) + ".",
@@ -395,7 +386,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + maxSeriesText(5) + ".",
@@ -443,7 +433,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `sum({__name__="foo"})`,
 						Lines:    []int{3},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
@@ -492,7 +481,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
@@ -538,28 +526,24 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     totalSamplesText("prom", uri, 200, 100),
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     peakSamplesText("prom", uri, 20, 10),
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     evalDurText("prom", uri, "5s100ms", "5s"),
@@ -609,28 +593,24 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     totalSamplesText("prom", uri, 200, 100),
 						Severity: checks.Information,
 					},
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     peakSamplesText("prom", uri, 20, 10),
 						Severity: checks.Information,
 					},
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: "query/cost",
 						Text:     evalDurText("prom", uri, "5s100ms", "5s"),

@@ -104,7 +104,6 @@ const (
 )
 
 type Problem struct {
-	Fragment string
 	Anchor   Anchor
 	Lines    []int
 	Reporter string

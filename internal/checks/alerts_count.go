@@ -75,7 +75,6 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
-			Fragment: rule.AlertingRule.Expr.Value.Value,
 			Lines:    rule.AlertingRule.Expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     text,
@@ -127,7 +126,6 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 
 	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
 	problems = append(problems, Problem{
-		Fragment: rule.AlertingRule.Expr.Value.Value,
 		Lines:    lines,
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),

@@ -93,7 +93,6 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "http://",
 						Lines:    []int{4},
 						Reporter: "rule/link",
 						Text:     `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
@@ -133,7 +132,6 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: fmt.Sprintf("%s/dashboard", srv.URL),
 						Lines:    []int{4},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
@@ -158,14 +156,12 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: fmt.Sprintf("%s/dashboard", srv.URL),
 						Lines:    []int{4},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: fmt.Sprintf("%s/graph", srv.URL),
 						Lines:    []int{5},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),

@@ -56,7 +56,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"}`,
 						Lines:    []int{2},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
@@ -91,7 +90,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m]) AND ON (instance) rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])`,
 						Lines:    []int{3},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
@@ -116,7 +114,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(error_count[5m]) > bool 5",
 						Lines:    []int{2},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
@@ -169,7 +166,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(foo > 0) or vector(0)`,
 						Lines:    []int{2},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
@@ -187,7 +183,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(foo > 0) or vector(0)`,
 						Lines:    []int{2},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
@@ -205,7 +200,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(foo > 0) or vector(0)`,
 						Lines:    []int{2},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",

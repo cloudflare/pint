@@ -103,7 +103,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "record: foo",
 						Anchor:   checks.AnchorBefore,
 						Lines:    []int{1, 2},
 						Reporter: checks.RuleDependencyCheckName,
@@ -128,7 +127,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "record: foo",
 						Anchor:   checks.AnchorBefore,
 						Lines:    []int{1, 2},
 						Reporter: checks.RuleDependencyCheckName,
@@ -183,7 +181,6 @@ func TestRuleDependencyCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "record: foo",
 						Anchor:   checks.AnchorBefore,
 						Lines:    []int{1, 2},
 						Reporter: checks.RuleDependencyCheckName,

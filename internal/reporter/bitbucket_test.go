@@ -241,7 +241,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
@@ -254,7 +253,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this should be ignored, file is not part of the diff",
@@ -267,7 +265,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "bad name",
@@ -280,7 +277,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up == 0",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text",
@@ -293,7 +289,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "errors",
 						Lines:    []int{4},
 						Reporter: "mock",
 						Text:     "mock text 2",
@@ -497,7 +492,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "line is not part of the diff",
@@ -510,7 +504,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "bad name",
@@ -523,7 +516,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up == 0",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text",
@@ -536,7 +528,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "errors",
 						Lines:    []int{4},
 						Reporter: "mock",
 						Text:     "mock text 2",
@@ -612,7 +603,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{3, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "syntax error",
 						Lines:    []int{1},
 						Reporter: "test/mock",
 						Text:     "syntax error",
@@ -675,7 +665,6 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this line is not part of the diff",
@@ -688,7 +677,6 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "bad name",
@@ -701,7 +689,6 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[0],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Fragment: "up == 0",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text",
@@ -714,7 +701,6 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Fragment: "errors",
 						Lines:    []int{4},
 						Reporter: "mock",
 						Text:     "mock text 2",
@@ -830,7 +816,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
@@ -843,7 +828,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "bad name",
@@ -856,7 +840,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up == 0",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text",
@@ -870,7 +853,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "errors",
 						Lines:    []int{4},
 						Reporter: "mock",
 						Text:     "mock text 2",
@@ -1390,7 +1372,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
@@ -1549,7 +1530,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
@@ -1562,7 +1542,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{1},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
@@ -1575,7 +1554,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "bad name",
@@ -1589,7 +1567,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up == 0",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text 1",
@@ -1603,7 +1580,6 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Fragment: "errors",
 						Lines:    []int{2},
 						Reporter: "mock",
 						Text:     "mock text 2",

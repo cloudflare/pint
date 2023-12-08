@@ -35,7 +35,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "abc",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "abc"`,
@@ -53,7 +52,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "-5m",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "-5m"`,
@@ -71,7 +69,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "0h",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     "`0h` is the default value of `for`, consider removing this redundant line.",
@@ -88,7 +85,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "abc",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "abc"`,
@@ -106,7 +102,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "-5m",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "-5m"`,
@@ -124,7 +119,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "0h",
 						Lines:    []int{3},
 						Reporter: "alerts/for",
 						Text:     "`0h` is the default value of `keep_firing_for`, consider removing this redundant line.",

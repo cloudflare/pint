@@ -33,7 +33,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: Instance {{ $label.instance }} down`,
 						Lines:    []int{4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `undefined variable \"$label\"`.",
@@ -51,7 +50,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ $value | xxx }}`,
 						Lines:    []int{4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `function \"xxx\" not defined`.",
@@ -76,7 +74,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: Instance {{ $label.instance }} down`,
 						Lines:    []int{4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `undefined variable \"$label\"`.",
@@ -94,7 +91,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ $value | xxx }}`,
 						Lines:    []int{4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `function \"xxx\" not defined`.",
@@ -119,7 +115,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "{{ $value}}: bar",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -136,7 +131,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "{{ $value }}: bar",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -153,7 +147,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: {{$value}}",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -170,14 +163,12 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo: {{ .Value }}",
 						Lines:    []int{4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: "baz: {{$value}}",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -194,7 +185,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: foo is {{  $value | humanizePercentage }}%\n",
 						Lines:    []int{5, 6},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -211,7 +201,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: foo is {{$value|humanizePercentage}}%\n",
 						Lines:    []int{5, 6},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -228,7 +217,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: value {{ .Value }}",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -245,7 +233,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: {{ .Value|humanize }}",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
@@ -262,7 +249,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: {{ $foo := $value }}{{ $foo }}",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
@@ -279,7 +265,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "baz: {{ $foo := .Value }}{{ $foo }}",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
@@ -296,7 +281,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ $labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -314,7 +298,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ .Labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -332,7 +315,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ $labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -350,7 +332,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ .Labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -368,7 +349,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ $labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -386,7 +366,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ .Labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -404,7 +383,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ .Labels.job }}`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
@@ -428,7 +406,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `help: {{ $labels.ixtance }}`,
 						Lines:    []int{3, 6},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `ixtance` label but the query removes it.",
@@ -482,7 +459,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "instance: {{ $labels.instance }}",
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but `absent()` is not passing it.",
@@ -490,7 +466,6 @@ func TestTemplateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
 						Lines:    []int{3, 7},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but `absent()` is not passing it.",
@@ -498,7 +473,6 @@ func TestTemplateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `summary: {{ $labels.instance }} on {{ .Labels.foo }} is missing`,
 						Lines:    []int{3, 7},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `foo` label but `absent()` is not passing it.",
@@ -506,7 +480,6 @@ func TestTemplateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: "help: {{ $labels.xxx }}",
 						Lines:    []int{3, 8},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `xxx` label but `absent()` is not passing it.",
@@ -541,7 +514,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ $labels.instance }} on {{ .Labels.job }} is missing`,
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query removes it.",
@@ -564,7 +536,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ .Labels.job }} is missing`,
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but `absent()` is not passing it.",
@@ -587,7 +558,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: {{ .Labels.job }} / {{$labels.job}} is missing`,
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but `absent()` is not passing it.",
@@ -595,7 +565,6 @@ func TestTemplateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `summary: {{ .Labels.job }} / {{$labels.job}} is missing`,
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but `absent()` is not passing it.",
@@ -678,7 +647,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(errors[2m])",
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
@@ -700,7 +668,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(errors[2m])",
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
@@ -722,7 +689,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "irate(errors[2m])",
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("irate(errors[2m])"),
@@ -744,7 +710,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "deriv(errors[2m])",
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("deriv(errors[2m])"),
@@ -865,7 +830,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "summary: {{ with printf \"sum({job='%s'}) by(\" .Labels.job | query }}\n{{ . | first | label \"instance\" }}\n{{ end }}\n",
 						Lines:    []int{5, 6, 7, 8},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `163: executing \"summary\" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.",
@@ -891,7 +855,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "summary: {{ with printf \"suz({job='%s'})\" .Labels.job | query }}\n{{ . | first | label \"instance\" }}\n{{ end }}\n",
 						Lines:    []int{5, 6, 7, 8},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `159: executing \"summary\" at <query>: error calling query: 1:1: parse error: unknown function with name \"suz\"`.",
@@ -914,7 +877,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "summary: {{ $value | first }} errors",
 						Lines:    []int{5},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `124: executing \"summary\" at <first>: wrong type for value; expected template.queryResult; got float64`.",
@@ -922,7 +884,6 @@ func TestTemplateCheck(t *testing.T) {
 						Details:  checks.TemplateCheckSyntaxDetails,
 					},
 					{
-						Fragment: "rate(errors[2m])",
 						Lines:    []int{3, 5},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
@@ -947,7 +908,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "summary: {{ range query \"up xxx\" }}\n{{ .Labels.instance }} {{ .Value }}\n{{ end }}\n",
 						Lines:    []int{5, 6, 7, 8},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `121: executing \"summary\" at <query \"up xxx\">: error calling query: 1:4: parse error: unexpected identifier \"xxx\"`.",
@@ -987,8 +947,7 @@ func TestTemplateCheck(t *testing.T) {
 						problems: func(uri string) []checks.Problem {
 							return []checks.Problem{
 								{
-									Fragment: `summary: |
-			    {{ with printf "sum({job='%s'})" .Labels.job | query }}
+												    {{ with printf "sum({job='%s'})" .Labels.job | query }}
 			    {{ . | first | label "instance" }}`,
 									Lines:    []int{5, 6, 7, 8},
 									Reporter: checks.TemplateCheckName,
@@ -1049,7 +1008,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: Deadmans switch on {{ $labels.instance }} is firing`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query doesn't produce any labels.",
@@ -1067,7 +1025,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: Deadmans switch on {{ $labels.instance }} is firing`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query doesn't produce any labels.",
@@ -1085,7 +1042,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `summary: Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query doesn't produce any labels.",
@@ -1093,7 +1049,6 @@ func TestTemplateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `summary: Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query doesn't produce any labels.",
@@ -1117,7 +1072,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `job: {{ $labels.job_name }}`,
 						Lines:    []int{2, 6},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job_name` label but the query uses `on(...)` without it being set there, this label will be missing from the query result.",
@@ -1125,7 +1079,6 @@ func TestTemplateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `summary: {{ $labels.app_type }} is using {{ $value }} fds.`,
 						Lines:    []int{2, 4},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `app_type` label but the query uses `on(...)` without it being set there, this label will be missing from the query result.",

@@ -220,7 +220,6 @@ If this file is a template that will be rendered into valid YAML then you can in
 					ModifiedLines: job.entry.ModifiedLines,
 					Rule:          job.entry.Rule,
 					Problem: checks.Problem{
-						Fragment: job.entry.Rule.Error.Fragment,
 						Lines:    []int{job.entry.Rule.Error.Line},
 						Reporter: yamlParseReporter,
 						Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", job.entry.Rule.Error.Err.Error()),

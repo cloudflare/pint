@@ -53,7 +53,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
@@ -81,7 +80,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     checkErrorUnableToRun(checks.AlertsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
@@ -98,7 +96,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 0, "1d"),
@@ -125,7 +122,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 7, "1d"),
@@ -211,7 +207,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
@@ -286,7 +281,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
@@ -361,7 +355,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
@@ -501,7 +494,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `{__name__="up", job="foo"} == 0`,
 						Lines:    []int{3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
@@ -559,7 +551,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `{__name__=~"(up|foo)", job="foo"} == 0`,
 						Lines:    []int{3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
@@ -615,7 +606,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
@@ -671,7 +661,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2, 3},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
@@ -744,7 +733,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="foo"} == 0`,
 						Lines:    []int{2, 3, 4},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 1, "1d"),

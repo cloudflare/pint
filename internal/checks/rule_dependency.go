@@ -107,7 +107,6 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 	}
 
 	problems = append(problems, Problem{
-		Fragment: fmt.Sprintf("%s: %s", rule.RecordingRule.Record.Key.Value, rule.RecordingRule.Record.Value.Value),
 		Anchor:   AnchorBefore,
 		Lines:    rule.Lines(),
 		Reporter: c.Reporter(),

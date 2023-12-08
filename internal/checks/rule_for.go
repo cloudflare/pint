@@ -90,7 +90,6 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 
 	if time.Duration(forDur) < c.minFor {
 		problems = append(problems, Problem{
-			Fragment: fragment,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
@@ -100,7 +99,6 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 
 	if c.maxFor > 0 && time.Duration(forDur) > c.maxFor {
 		problems = append(problems, Problem{
-			Fragment: fragment,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),

@@ -51,7 +51,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo_with_notfound / bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     differentLabelsText("instance, job, notfound", "instance, job"),
@@ -194,7 +193,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo / ignoring(xxx) app_registry",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     usingMismatchText(`ignoring(xxx)`, "instance, job", "app_name"),
@@ -252,7 +250,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo / on(notfound) bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(notfound)` won't produce any results because both sides of the query don't have this label.",
@@ -499,7 +496,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo / on(notfound) bar_with_notfound",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(notfound)` won't produce any results because the left hand side of the query doesn't have this label: `foo`.",
@@ -555,7 +551,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo_with_notfound / on(notfound) bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(notfound)` won't produce any results because the right hand side of the query doesn't have this label: `bar`.",
@@ -611,7 +606,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "(memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(app_name)` won't produce any results because the left hand side of the query doesn't have this label: `(memory_bytes / ignoring (job) (memory_limit > 0))`.",
@@ -800,7 +794,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.",
@@ -929,7 +922,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "(foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.",
@@ -1057,7 +1049,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "xxx/yyy",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
@@ -1076,7 +1067,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "xxx/yyy",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
@@ -1095,7 +1085,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "xxx/yyy",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
@@ -1130,7 +1119,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "xxx/yyy",
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
@@ -1177,7 +1165,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `up{job="a"} / up{job="b"}`,
 						Lines:    []int{2},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     differentFilters("job", "a", "b"),

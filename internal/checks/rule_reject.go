@@ -74,7 +74,6 @@ func (c Reject) Check(_ context.Context, _ string, rule parser.Rule, _ []discove
 func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string) (problems []Problem) {
 	if c.keyRe != nil && c.keyRe.MustExpand(rule).MatchString(label.Key.Value) {
 		problems = append(problems, Problem{
-			Fragment: label.Key.Value,
 			Lines:    label.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s key `%s` is not allowed to match `%s`.", kind, label.Key.Value, c.keyRe.anchored),
@@ -83,7 +82,6 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 	}
 	if c.valueRe != nil && c.valueRe.MustExpand(rule).MatchString(label.Value.Value) {
 		problems = append(problems, Problem{
-			Fragment: label.Value.Value,
 			Lines:    label.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s value `%s` is not allowed to match `%s`.", kind, label.Value.Value, c.valueRe.anchored),

@@ -35,7 +35,6 @@ func TestSyntaxCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(",
 						Lines:    []int{2},
 						Reporter: "promql/syntax",
 						Text:     "Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",
@@ -53,7 +52,6 @@ func TestSyntaxCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) by(",
 						Lines:    []int{2},
 						Reporter: "promql/syntax",
 						Text:     "Prometheus failed to parse the query with this PromQL error: unclosed left parenthesis.",

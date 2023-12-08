@@ -58,7 +58,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo / sum(bar) without(job)`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
@@ -75,7 +74,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `sum(foo) without(job) + sum(bar) without(job)`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
@@ -92,7 +90,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(sum without (job) (foo) + sum without (job) (bar))`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
@@ -109,7 +106,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo / sum without (job) (bar)`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
@@ -126,7 +122,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `(sum without (job) (foo) + sum(bar))`,
 						Lines:    []int{2},
 						Reporter: "promql/fragile",
 						Text:     text,
