@@ -75,7 +75,6 @@ func (c AggregationCheck) Check(_ context.Context, _ string, rule parser.Rule, _
 
 	for _, problem := range c.checkNode(expr.Query) {
 		problems = append(problems, Problem{
-			Fragment: problem.expr,
 			Lines:    expr.Lines(),
 			Reporter: c.Reporter(),
 			Text:     problem.text,

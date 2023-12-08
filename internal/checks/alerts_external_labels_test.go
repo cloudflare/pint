@@ -57,7 +57,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "alert: Foo Is Down",
 						Lines:    []int{2, 3, 4, 5, 6, 7, 8, 9, 10},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
@@ -82,7 +81,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "alert: Foo Is Down",
 						Lines:    []int{2, 3, 4, 5, 6, 7, 8, 9, 10},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     checkErrorUnableToRun(checks.AlertsExternalLabelsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
@@ -112,7 +110,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `cluster: {{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}`,
 						Lines:    []int{9},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
@@ -120,7 +117,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `{{ $externalLabels.cluster }}: {{ $externalLabels.cluster }}`,
 						Lines:    []int{10},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
@@ -128,7 +124,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `{{ $externalLabels.cluster }}: {{ $externalLabels.cluster }}`,
 						Lines:    []int{10},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
@@ -136,7 +131,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `{{.ExternalLabels.cluster}}: This is {{ .ExternalLabels.cluster }} cluster`,
 						Lines:    []int{6},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
@@ -144,7 +138,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `{{.ExternalLabels.cluster}}: This is {{ .ExternalLabels.cluster }} cluster`,
 						Lines:    []int{6},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),

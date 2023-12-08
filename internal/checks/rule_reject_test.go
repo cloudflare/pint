@@ -83,7 +83,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Label key `bad` is not allowed to match `^bad$`.",
@@ -102,7 +101,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Label value `bad` is not allowed to match `^bad$`.",
@@ -121,7 +119,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Label key `bad` is not allowed to match `^bad$`.",
@@ -140,7 +137,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Label value `bad` is not allowed to match `^bad$`.",
@@ -178,7 +174,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Annotation key `bad` is not allowed to match `^bad$`.",
@@ -197,7 +192,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `bad`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Annotation value `bad` is not allowed to match `^bad$`.",
@@ -225,7 +219,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo`,
 						Lines:    []int{4},
 						Reporter: "rule/reject",
 						Text:     "Annotation value `foo` is not allowed to match `^{{ $alert }}$`.",

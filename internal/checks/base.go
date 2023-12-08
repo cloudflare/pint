@@ -48,7 +48,7 @@ var (
 	}
 )
 
-// Severity of the problem reported
+// Severity of the problem reported.
 type Severity int
 
 func (s Severity) String() string {
@@ -81,16 +81,16 @@ func ParseSeverity(s string) (Severity, error) {
 }
 
 const (
-	// Information doesn't count as a problem, it's a comment
+	// Information doesn't count as a problem, it's a comment.
 	Information Severity = iota
 
-	// Warning is not consider an error
+	// Warning is not consider an error.
 	Warning
 
-	// Bug is an error that should be corrected
+	// Bug is an error that should be corrected.
 	Bug
 
-	// Fatal is a problem with linting content
+	// Fatal is a problem with linting content.
 	Fatal
 )
 
@@ -104,7 +104,6 @@ const (
 )
 
 type Problem struct {
-	Fragment string
 	Anchor   Anchor
 	Lines    []int
 	Reporter string

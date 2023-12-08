@@ -65,32 +65,21 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 	}
 
 	var forDur model.Duration
-	var fragment string
 	var lines []int
 
-	switch c.key {
-	case RuleForFor:
-		if rule.AlertingRule.For != nil {
-			forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
-			fragment = rule.AlertingRule.For.Value.Value
-			lines = rule.AlertingRule.For.Lines()
-		}
-	case RuleForKeepFiringFor:
-		if rule.AlertingRule.KeepFiringFor != nil {
-			forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value.Value)
-			fragment = rule.AlertingRule.KeepFiringFor.Value.Value
-			lines = rule.AlertingRule.KeepFiringFor.Lines()
-		}
-	}
-
-	if fragment == "" {
-		fragment = rule.AlertingRule.Alert.Value.Value
+	switch {
+	case c.key == RuleForFor && rule.AlertingRule.For != nil:
+		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
+		lines = rule.AlertingRule.For.Lines()
+	case c.key == RuleForKeepFiringFor && rule.AlertingRule.KeepFiringFor != nil:
+		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value.Value)
+		lines = rule.AlertingRule.KeepFiringFor.Lines()
+	default:
 		lines = rule.AlertingRule.Alert.Lines()
 	}
 
 	if time.Duration(forDur) < c.minFor {
 		problems = append(problems, Problem{
-			Fragment: fragment,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
@@ -100,7 +89,6 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 
 	if c.maxFor > 0 && time.Duration(forDur) > c.maxFor {
 		problems = append(problems, Problem{
-			Fragment: fragment,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),

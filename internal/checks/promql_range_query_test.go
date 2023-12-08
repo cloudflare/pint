@@ -34,7 +34,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[30d])",
 						Lines:    []int{2},
 						Reporter: "promql/range_query",
 						Text:     checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
@@ -57,14 +56,12 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "rate(foo[30d])",
 						Lines:    []int{2},
 						Reporter: "promql/range_query",
 						Text:     `Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"`,
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: "foo[30d]",
 						Lines:    []int{2},
 						Reporter: "promql/range_query",
 						Text:     retentionToLow("prom", uri, "foo[30d]", "30d", "15d"),
@@ -102,7 +99,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo[20d]",
 						Lines:    []int{2},
 						Reporter: "promql/range_query",
 						Text:     retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
@@ -140,7 +136,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo[11d1h]",
 						Lines:    []int{2},
 						Reporter: "promql/range_query",
 						Text:     retentionToLow("prom", uri, "foo[11d1h]", "11d1h", "11d"),

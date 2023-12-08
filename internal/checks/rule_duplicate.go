@@ -80,7 +80,6 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 
 	if rule.Expr.Value.Value == entry.Rule.RecordingRule.Expr.Value.Value {
 		problems = append(problems, Problem{
-			Fragment: fmt.Sprintf("%s: %s", rule.Record.Key.Value, rule.Record.Value.Value),
 			Lines:    rule.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.ReportedPath, entry.Rule.RecordingRule.Record.Key.Position.FirstLine()),

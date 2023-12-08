@@ -64,7 +64,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) without(instance, job)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -83,7 +82,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) without(instance, job)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -102,7 +100,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) without(instance)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label should be removed when aggregating `^.+$` rules, use `without(job, ...)`.",
@@ -139,7 +136,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum without (job) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -167,14 +163,12 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(sum(foo) without(foo)) without(bar)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, use `without(instance, ...)`.",
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: "sum without (foo) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, use `without(instance, ...)`.",
@@ -193,7 +187,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum without (job) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -221,7 +214,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "max without (job) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -249,7 +241,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum without (job) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -277,7 +268,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum without (job) (bar)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -333,7 +323,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) by(instance)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -352,7 +341,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) by(instance)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -371,7 +359,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) by(job)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label should be removed when aggregating `^.+$` rules, remove job from `by()`.",
@@ -399,7 +386,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum by (instance) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -427,7 +413,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "max by (instance) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -455,7 +440,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum by (type) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -483,7 +467,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum by (type) (bar)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -520,14 +503,12 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(sum(foo) by(instance)) without(job)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: "sum by (instance) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -546,7 +527,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(sum(foo) by(instance,job)) without(job)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
@@ -565,7 +545,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum by (instance) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -584,14 +563,12 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(sum(foo) by(instance)) without(job)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, use `without(instance, ...)`.",
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: "sum by (instance) (foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, remove instance from `by()`.",
@@ -610,7 +587,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo)",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -629,7 +605,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) by()",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
@@ -648,7 +623,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "sum(foo) without()",
 						Lines:    []int{2},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label should be removed when aggregating `^.+$` rules, use `without(job, ...)`.",

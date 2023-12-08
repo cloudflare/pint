@@ -56,7 +56,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job=~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
@@ -73,7 +72,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job!~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job!~\"bar\"`, use `job!=\"bar\"` instead.",
@@ -90,7 +88,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job=~""}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"\"`, use `job=\"\"` instead.",
@@ -107,7 +104,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job=~"^.+$"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"^.+$\"` will result in `job=~\"^^.+$$\"`, remove regexp anchors `^` and/or `$`.",
@@ -124,7 +120,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job=~"(foo|^.+)$"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"(foo|^.+)$\"` will result in `job=~\"^(foo|^.+)$$\"`, remove regexp anchors `^` and/or `$`.",
@@ -141,7 +136,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job=~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
@@ -158,14 +152,12 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `foo{job=~"bar"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Severity: checks.Bug,
 					},
 					{
-						Fragment: `foo{job=~"bar",level="total"}`,
 						Lines:    []int{2},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",

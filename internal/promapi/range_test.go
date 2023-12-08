@@ -62,17 +62,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "1m")
-				require.Equal(t, r.Form.Get("step"), "60")
+				require.Equal(t, "1m", r.Form.Get("query"))
+				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T00:00:00Z").Unix()), start, "invalid start")
+				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T00:01:00Z").Unix()), end, "invalid end")
+				require.InEpsilon(t, timeParse("2022-06-14T00:01:00Z").Unix(), end, 0.0001, "invalid end")
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, diff, time.Minute)
+				require.Equal(t, time.Minute, diff)
 
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
@@ -99,17 +99,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "5m")
-				require.Equal(t, r.Form.Get("step"), "300")
+				require.Equal(t, "5m", r.Form.Get("query"))
+				require.Equal(t, "300", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T03:00:00Z").Unix()), end, "invalid end for #1")
+					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
 
 				default:
 					t.Fatalf("unknown start: %.2f", start)
@@ -135,17 +135,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "1h")
-				require.Equal(t, r.Form.Get("step"), "60")
+				require.Equal(t, "1h", r.Form.Get("query"))
+				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T00:00:00Z").Unix()), start, "invalid start")
+				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T01:00:00Z").Unix()), end, "invalid end")
+				require.InEpsilon(t, timeParse("2022-06-14T01:00:00Z").Unix(), end, 0.0001, "invalid end")
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, diff, time.Hour)
+				require.Equal(t, time.Hour, diff)
 
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
@@ -164,17 +164,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "2h")
-				require.Equal(t, r.Form.Get("step"), "60")
+				require.Equal(t, "2h", r.Form.Get("query"))
+				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T00:00:00Z").Unix()), start, "invalid start")
+				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T02:00:00Z").Unix()), end, "invalid end")
+				require.InEpsilon(t, timeParse("2022-06-14T02:00:00Z").Unix(), end, 0.0001, "invalid end")
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, diff, time.Hour*2)
+				require.Equal(t, time.Hour*2, diff)
 
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
@@ -201,17 +201,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "2h1m")
-				require.Equal(t, r.Form.Get("step"), "60")
+				require.Equal(t, "2h1m", r.Form.Get("query"))
+				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(timeParse("2022-06-14T16:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T17:59:59Z").Unix()), end, "invalid end for #0")
+					require.InEpsilon(t, timeParse("2022-06-14T17:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
 				case float64(timeParse("2022-06-14T18:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T18:35:00Z").Unix()), end, "invalid end for #1")
+					require.InEpsilon(t, timeParse("2022-06-14T18:35:00Z").Unix(), end, 0.0001, "invalid end for #1")
 
 				default:
 					t.Fatalf("unknown start: %.2f", start)
@@ -257,17 +257,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "3h")
-				require.Equal(t, r.Form.Get("step"), "300")
+				require.Equal(t, "3h", r.Form.Get("query"))
+				require.Equal(t, "300", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T03:00:00Z").Unix()), end, "invalid end for #1")
+					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
 
 				default:
 					t.Fatalf("unknown start: %.2f", start)
@@ -311,15 +311,15 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "gap")
-				require.Equal(t, r.Form.Get("step"), "300")
+				require.Equal(t, "gap", r.Form.Get("query"))
+				require.Equal(t, "300", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(1677780240):
-					require.Equal(t, float64(1677786840), end, "invalid end for #0")
+					require.InEpsilon(t, float64(1677786840), end, 0.0001, "invalid end for #0")
 				default:
 					t.Fatalf("unknown start: %.2f", start)
 				}
@@ -386,21 +386,21 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "7h")
-				require.Equal(t, r.Form.Get("step"), "60")
+				require.Equal(t, "7h", r.Form.Get("query"))
+				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T03:59:59Z").Unix()), end, "invalid end for #1")
+					require.InEpsilon(t, timeParse("2022-06-14T03:59:59Z").Unix(), end, 0.0001, "invalid end for #1")
 				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T05:59:59Z").Unix()), end, "invalid end for #2")
+					require.InEpsilon(t, timeParse("2022-06-14T05:59:59Z").Unix(), end, 0.0001, "invalid end for #2")
 				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T07:00:00Z").Unix()), end, "invalid end for #3")
+					require.InEpsilon(t, timeParse("2022-06-14T07:00:00Z").Unix(), end, 0.0001, "invalid end for #3")
 				default:
 					t.Fatalf("unknown start: %.2f", start)
 				}
@@ -436,8 +436,8 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "7h30m")
-				require.Equal(t, r.Form.Get("step"), "300")
+				require.Equal(t, "7h30m", r.Form.Get("query"))
+				require.Equal(t, "300", r.Form.Get("step"))
 
 				start, _ := strconv.Atoi(r.Form.Get("start"))
 				end, _ := strconv.Atoi(r.Form.Get("end"))
@@ -478,15 +478,15 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "3h/timeout")
-				require.Equal(t, r.Form.Get("step"), "300")
+				require.Equal(t, "3h/timeout", r.Form.Get("query"))
+				require.Equal(t, "300", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
 					w.WriteHeader(200)
 					w.Header().Set("Content-Type", "application/json")
 					var values []string
@@ -497,7 +497,7 @@ func TestRange(t *testing.T) {
 						`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
 						strings.Join(values, ","))))
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T03:00:00Z").Unix()), end, "invalid end for #1")
+					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
 					w.WriteHeader(503)
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write([]byte(`{
@@ -522,17 +522,17 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "vector")
-				require.Equal(t, r.Form.Get("step"), "1")
+				require.Equal(t, "vector", r.Form.Get("query"))
+				require.Equal(t, "1", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T00:00:00Z").Unix()), start, "invalid start")
+				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.Equal(t, float64(timeParse("2022-06-14T00:05:00Z").Unix()), end, "invalid end")
+				require.InEpsilon(t, timeParse("2022-06-14T00:05:00Z").Unix(), end, 0.0001, "invalid end")
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
-				require.Equal(t, diff, time.Minute*5)
+				require.Equal(t, time.Minute*5, diff)
 
 				w.WriteHeader(200)
 				w.Header().Set("Content-Type", "application/json")
@@ -579,21 +579,21 @@ func TestRange(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				require.Equal(t, r.Form.Get("query"), "stats")
-				require.Equal(t, r.Form.Get("step"), "60")
+				require.Equal(t, "stats", r.Form.Get("query"))
+				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T03:59:59Z").Unix()), end, "invalid end for #1")
+					require.InEpsilon(t, timeParse("2022-06-14T03:59:59Z").Unix(), end, 0.0001, "invalid end for #1")
 				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T05:59:59Z").Unix()), end, "invalid end for #2")
+					require.InEpsilon(t, timeParse("2022-06-14T05:59:59Z").Unix(), end, 0.0001, "invalid end for #2")
 				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.Equal(t, float64(timeParse("2022-06-14T07:00:00Z").Unix()), end, "invalid end for #3")
+					require.InEpsilon(t, timeParse("2022-06-14T07:00:00Z").Unix(), end, 0.0001, "invalid end for #3")
 				default:
 					t.Fatalf("unknown start: %.2f", start)
 				}

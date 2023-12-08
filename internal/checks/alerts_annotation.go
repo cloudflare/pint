@@ -54,7 +54,6 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 	if rule.AlertingRule.Annotations == nil {
 		if c.isReguired {
 			problems = append(problems, Problem{
-				Fragment: fmt.Sprintf("%s: %s", rule.AlertingRule.Alert.Key.Value, rule.AlertingRule.Alert.Value.Value),
 				Lines:    rule.Lines(),
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
@@ -71,7 +70,6 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 			foundAnnotation = true
 			if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(annotation.Value.Value) {
 				problems = append(problems, Problem{
-					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 					Lines:    annotation.Value.Position.Lines,
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("`%s` annotation value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
@@ -84,7 +82,6 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 
 	if !foundAnnotation && c.isReguired {
 		problems = append(problems, Problem{
-			Fragment: fmt.Sprintf("%s:", rule.AlertingRule.Annotations.Key.Value),
 			Lines:    rule.AlertingRule.Annotations.Lines(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),

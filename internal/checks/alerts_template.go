@@ -149,7 +149,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 		for _, label := range rule.AlertingRule.Labels.Items {
 			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
-					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
@@ -160,7 +159,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			// check key
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Key.Value) {
 				problems = append(problems, Problem{
-					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
 					Reporter: c.Reporter(),
 					Text:     msg,
@@ -170,7 +168,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			// check value
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
 				problems = append(problems, Problem{
-					Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 					Lines:    label.Lines(),
 					Reporter: c.Reporter(),
 					Text:     msg,
@@ -181,7 +178,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			for _, aggr := range aggrs {
 				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
@@ -197,7 +193,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false, safeLabels) {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
@@ -210,7 +205,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
 				for _, msg := range checkMetricLabels(msgOn, label.Key.Value, label.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
@@ -224,7 +218,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if len(labelNames) > 0 && len(vectors) == 0 {
 				for _, name := range labelNames {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", label.Key.Value, label.Value.Value),
 						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
@@ -240,7 +233,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 		for _, annotation := range rule.AlertingRule.Annotations.Items {
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
-					Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 					Lines:    annotation.Lines(),
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
@@ -252,7 +244,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			for _, aggr := range aggrs {
 				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
@@ -275,7 +266,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false, safeLabels) {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
@@ -289,7 +279,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if len(labelNames) > 0 && len(vectors) == 0 {
 				for _, name := range labelNames {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
@@ -302,7 +291,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
 				for _, msg := range checkMetricLabels(msgOn, annotation.Key.Value, annotation.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
 					problems = append(problems, Problem{
-						Fragment: fmt.Sprintf("%s: %s", annotation.Key.Value, annotation.Value.Value),
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     msg,
@@ -315,7 +303,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
 				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr.Query) {
 					problems = append(problems, Problem{
-						Fragment: problem.expr,
 						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
 						Reporter: c.Reporter(),
 						Text:     problem.text,

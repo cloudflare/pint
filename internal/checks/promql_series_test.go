@@ -77,7 +77,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
@@ -102,7 +101,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127", `connection refused`),
@@ -119,7 +117,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
@@ -146,7 +143,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
@@ -173,7 +169,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
@@ -201,7 +196,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
@@ -229,7 +223,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
@@ -363,7 +356,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
@@ -386,7 +378,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
@@ -425,7 +416,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "3d"),
@@ -454,7 +444,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo:bar",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
@@ -496,7 +485,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo:bar",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
@@ -546,7 +534,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `ALERTS{alertname="myalert"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     alertMissing(`ALERTS{alertname="myalert"}`, "myalert"),
@@ -565,7 +552,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo:bar",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
@@ -606,7 +592,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
@@ -643,7 +628,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w") + " " + metricIgnored("notfound", checks.SeriesCheckName, "^not.+$"),
@@ -671,7 +655,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{job="foo",notfound="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noLabelKeyText("prom", uri, "found", "notfound", "1w"),
@@ -726,7 +709,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{notfound="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
@@ -773,7 +755,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{job="abc"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noLabelKeyText("prom", uri, "found", "job", "1w"),
@@ -830,7 +811,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, `found`, "1w", "5m"),
@@ -956,7 +936,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
@@ -1082,7 +1061,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
@@ -1279,7 +1257,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
@@ -1371,7 +1348,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
@@ -1580,7 +1556,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
@@ -1666,7 +1641,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found`,
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
@@ -1752,7 +1726,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `rule/set promql/series(found) min-age foo`,
 						Lines:    []int{2, 3, 4},
 						Reporter: checks.SeriesCheckName,
 						Text:     `Failed to parse pint comment as duration: not a valid duration string: "foo"`,
@@ -1760,7 +1733,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: `found`,
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
@@ -1852,7 +1824,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
@@ -1921,7 +1892,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w"),
@@ -1990,7 +1960,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{error="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
@@ -2044,7 +2013,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `sometimes{churn="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w"),
@@ -2182,7 +2150,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{removed="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
@@ -2259,7 +2226,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `rule/set promql/series(found) min-age 1e`,
 						Lines:    []int{3, 4},
 						Reporter: checks.SeriesCheckName,
 						Text:     `Failed to parse pint comment as duration: unknown unit "e" in duration "1e"`,
@@ -2267,7 +2233,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Fragment: `found{removed="xxx"}`,
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
@@ -2406,7 +2371,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{sometimes="xxx"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
@@ -2509,7 +2473,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `sometimes`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
@@ -2631,7 +2594,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `found{job="notfound"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "found", "job", `{job="notfound"}`, "1w"),
@@ -2686,7 +2648,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
@@ -2730,7 +2691,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `notfound`,
 						Lines:    []int{3},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
@@ -2885,7 +2845,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
@@ -2917,7 +2876,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "notfound",
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
@@ -2971,7 +2929,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `notfound`,
 						Lines:    []int{4},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
@@ -3013,7 +2970,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo:count",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:count", "1w"),
@@ -3021,7 +2977,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Information,
 					},
 					{
-						Fragment: "foo:sum",
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:sum", "1w"),
@@ -3077,7 +3032,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `{__name__=~"(foo|bar)_panics_total"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
@@ -3132,7 +3086,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `{__name__=~"(foo|bar)_panics_total",job="myjob"}`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
@@ -3196,7 +3149,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: `notfound`,
 						Lines:    []int{2},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),

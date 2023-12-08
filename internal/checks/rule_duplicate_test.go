@@ -130,7 +130,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "record: foo",
 						Lines:    []int{1, 2},
 						Reporter: checks.RuleDuplicateCheckName,
 						Text:     textDuplicateRule("fake.yml", 6),

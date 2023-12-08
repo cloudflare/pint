@@ -42,7 +42,6 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{5, 6},
 						Reporter: "mock",
 						Text:     "mock text",
@@ -69,7 +68,6 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{5, 6},
 						Reporter: "mock",
 						Text:     "mock text",
@@ -95,7 +93,6 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Fragment: "up",
 						Lines:    []int{5, 6},
 						Reporter: "mock",
 						Text: `mock text

@@ -50,7 +50,6 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "labels",
 						Lines:    []int{3, 4},
 						Reporter: checks.LabelsConflictCheckName,
 						Text:     checkErrorUnableToRun(checks.LabelsConflictCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
@@ -67,7 +66,6 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Fragment: "foo: bar",
 						Lines:    []int{4},
 						Reporter: checks.LabelsConflictCheckName,
 						Text:     textExternalLabels("prom", uri, "foo", "bob"),

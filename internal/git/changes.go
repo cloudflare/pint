@@ -257,7 +257,7 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 	return Missing
 }
 
-// recursively find the final target of a symlink
+// recursively find the final target of a symlink.
 func resolveSymlinkTarget(cmd CommandRunner, commit, fpath string, typ PathType) string {
 	if typ != Symlink {
 		return fpath

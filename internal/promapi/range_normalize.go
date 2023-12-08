@@ -238,7 +238,7 @@ func (str *SeriesTimeRanges) FindGaps(baseline SeriesTimeRanges, from, until tim
 	}
 }
 
-// merge [t1:t2] [t2:t3] together
+// merge [t1:t2] [t2:t3] together.
 func MergeRanges(source MetricTimeRanges, step time.Duration) (MetricTimeRanges, bool) {
 	merged := map[uint64]MetricTimeRanges{}
 	var ok, found, hadMerged bool
