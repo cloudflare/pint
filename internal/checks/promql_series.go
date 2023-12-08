@@ -198,7 +198,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()))
 		count, _, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
 		if err != nil {
-			problems = append(problems, c.queryProblem(err, selector.String(), expr))
+			problems = append(problems, c.queryProblem(err, expr))
 			continue
 		}
 		if count > 0 {
@@ -246,7 +246,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 		slog.Debug("Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
 		if err != nil {
-			problems = append(problems, c.queryProblem(err, bareSelector.String(), expr))
+			problems = append(problems, c.queryProblem(err, expr))
 			continue
 		}
 		trs.Series.FindGaps(promUptime.Series, trs.Series.From, trs.Series.Until)
@@ -304,7 +304,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			slog.Debug("Checking if base metric has historical series with required label", slog.String("check", c.Reporter()), slog.String("selector", (&l).String()), slog.String("label", name))
 			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), params)
 			if err != nil {
-				problems = append(problems, c.queryProblem(err, selector.String(), expr))
+				problems = append(problems, c.queryProblem(err, expr))
 				continue
 			}
 			trsLabelCount.Series.FindGaps(promUptime.Series, trsLabelCount.Series.From, trsLabelCount.Series.Until)
@@ -398,7 +398,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 
 			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
 			if err != nil {
-				problems = append(problems, c.queryProblem(err, labelSelector.String(), expr))
+				problems = append(problems, c.queryProblem(err, expr))
 				continue
 			}
 			trsLabel.Series.FindGaps(promUptime.Series, trsLabel.Series.From, trsLabel.Series.Until)
@@ -588,7 +588,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string) string 
 	return SeriesCheckCommonProblemDetails
 }
 
-func (c SeriesCheck) queryProblem(err error, selector string, expr parser.PromQLExpr) Problem {
+func (c SeriesCheck) queryProblem(err error, expr parser.PromQLExpr) Problem {
 	text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 	return Problem{
 		Lines:    expr.Lines(),
