@@ -26,6 +26,7 @@ linters:
     - prealloc
     - promlinter
     - unconvert
+    - testifylint
 
 issues:
   max-same-issues: 0
