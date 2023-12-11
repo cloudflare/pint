@@ -369,6 +369,31 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: "{# comment #} # pint ignore/line",
+			output: []comments.Comment{
+				{
+					Type: comments.IgnoreLineType,
+				},
+			},
+		},
+		{
+			input: "#pint # pint # pint boo # pint ignore/line",
+			output: []comments.Comment{
+				{
+					Type: comments.IgnoreLineType,
+				},
+			},
+		},
+		{
+			input: "{# comment #} # pint ignore/line # pint ignore/file",
+			output: []comments.Comment{
+				{
+					Type:  comments.InvalidComment,
+					Value: comments.Invalid{Err: fmt.Errorf(`unexpected comment suffix: "# pint ignore/file"`)},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

@@ -42,8 +42,6 @@ var (
 	FileSnoozeComment     = "file/snooze"
 	SnoozeComment         = "snooze"
 	RuleSetComment        = "rule/set"
-
-	EmptyComment Comment
 )
 
 type CommentValue interface {
@@ -192,7 +190,8 @@ func parseValue(typ Type, s string) (CommentValue, error) {
 }
 
 const (
-	needsPrefix int = iota
+	needsHash uint8 = iota
+	needsPrefix
 	readsPrefix
 	needsType
 	readsType
@@ -200,13 +199,22 @@ const (
 	readsValue
 )
 
-func parseComment(s string) (c Comment, err error) {
+func parseComment(s string) (parsed []Comment, err error) {
 	var buf strings.Builder
+	var c Comment
 
-	state := needsPrefix
+	state := needsHash
 	for _, r := range s + "\n" {
 	READRUNE:
 		switch state {
+		case needsHash:
+			if r != '#' {
+				goto NEXT
+			}
+			state = needsPrefix
+			buf.Reset()
+			c.Type = UnknownType
+			c.Value = nil
 		case needsPrefix:
 			if unicode.IsSpace(r) {
 				goto NEXT
@@ -221,15 +229,21 @@ func parseComment(s string) (c Comment, err error) {
 			if unicode.IsSpace(r) {
 				// Invalid comment prefix, ignore this comment.
 				if buf.String() != Prefix {
-					return EmptyComment, nil
+					buf.Reset()
+					state = needsHash
+					goto NEXT
 				}
 				buf.Reset()
 				state = needsType
 				goto NEXT
 			}
 			// Invalid character in the prefix, ignore this comment.
-			return EmptyComment, nil
+			state = needsHash
 		case needsType:
+			if r == '#' {
+				state = needsHash
+				goto READRUNE
+			}
 			if unicode.IsSpace(r) {
 				goto NEXT
 			}
@@ -243,11 +257,13 @@ func parseComment(s string) (c Comment, err error) {
 			if unicode.IsSpace(r) || r == '\n' {
 				c.Type = parseType(buf.String())
 				buf.Reset()
-				state = needsValue
-				goto NEXT
+				if c.Type == UnknownType {
+					state = needsHash
+				} else {
+					state = needsValue
+				}
+
 			}
-			// Invalid character in the type, ignore this comment.
-			return EmptyComment, nil
 		case needsValue:
 			if unicode.IsSpace(r) {
 				goto NEXT
@@ -263,29 +279,27 @@ func parseComment(s string) (c Comment, err error) {
 	NEXT:
 	}
 
-	c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()))
-	return c, err
+	if c.Type != UnknownType {
+		c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()))
+		parsed = append(parsed, c)
+	}
+
+	return parsed, err
 }
 
 func Parse(text string) (comments []Comment) {
 	sc := bufio.NewScanner(strings.NewReader(text))
 	for sc.Scan() {
-		elems := strings.SplitN(sc.Text(), "# ", 2)
-		if len(elems) != 2 {
-			continue
-		}
-		c, err := parseComment(elems[1])
-		switch {
-		case err != nil:
+		line := sc.Text()
+		parsed, err := parseComment(line)
+		if err != nil {
 			comments = append(comments, Comment{
 				Type:  InvalidComment,
 				Value: Invalid{Err: err},
 			})
-		case c == EmptyComment:
-			// pass
-		default:
-			comments = append(comments, c)
+			continue
 		}
+		comments = append(comments, parsed...)
 	}
 	return comments
 }

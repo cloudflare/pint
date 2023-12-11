@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.51.1
+
+### Fixed
+
+- Fixed a few bugs in control comment parsing code.
+
 ## v0.51.0
 
 ### Added
