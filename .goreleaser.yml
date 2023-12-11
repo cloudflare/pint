@@ -47,6 +47,7 @@ dockers:
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=Apache-2.0
     extra_files:
+      - .git
       - cmd
       - internal
       - go.mod
@@ -68,6 +69,7 @@ dockers:
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=Apache-2.0
     extra_files:
+      - .git
       - cmd
       - internal
       - go.mod
