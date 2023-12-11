@@ -138,6 +138,10 @@ func TestReadContent(t *testing.T) {
 			output: []byte("            # pint ignore/line\n"),
 		},
 		{
+			input:  []byte("{# comment #} # pint ignore/line\n"),
+			output: []byte(" # comment #} # pint ignore/line\n"),
+		},
+		{
 			input:  []byte("# pint file/owner bob\n# pint rule/set xxx\n# pint bamboozle xxx\n"),
 			output: []byte("# pint file/owner bob\n# pint rule/set xxx\n# pint bamboozle xxx\n"),
 			comments: []comments.Comment{
