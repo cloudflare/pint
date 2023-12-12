@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed a few bugs in control comment parsing code.
+- BitBucket tasks were not marked as resolved correctly.
 
 ## v0.51.0
 

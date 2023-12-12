@@ -144,6 +144,7 @@ type BitBucketPullRequestComment struct {
 	Text     string                        `json:"text"`
 	Severity string                        `json:"severity"`
 	Comments []BitBucketPullRequestComment `json:"comments"`
+	Resolved bool                          `json:"threadResolved"`
 }
 
 type BitBucketCommentAnchor struct {
@@ -547,20 +548,32 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 		}
 
 		for _, act := range acts.Values {
-			if act.Action == "COMMENTED" &&
-				act.CommentAction == "ADDED" &&
-				act.Comment.State == "OPEN" &&
-				act.Comment.Author.Name == username &&
-				!act.CommentAnchor.Orphaned {
-				comments = append(comments, bitBucketComment{
-					id:       act.Comment.ID,
-					version:  act.Comment.Version,
-					text:     act.Comment.Text,
-					anchor:   act.CommentAnchor,
-					severity: act.Comment.Severity,
-					replies:  len(act.Comment.Comments),
-				})
+			if act.Action != "COMMENTED" {
+				continue
 			}
+			if act.CommentAction != "ADDED" {
+				continue
+			}
+			if act.Comment.State != "OPEN" {
+				continue
+			}
+			if act.Comment.Author.Name != username {
+				continue
+			}
+			if act.Comment.Severity == "BLOCKER" && act.Comment.Resolved {
+				continue
+			}
+			if act.Comment.Severity == "NORMAL" && act.CommentAnchor.Orphaned {
+				continue
+			}
+			comments = append(comments, bitBucketComment{
+				id:       act.Comment.ID,
+				version:  act.Comment.Version,
+				text:     act.Comment.Text,
+				anchor:   act.CommentAnchor,
+				severity: act.Comment.Severity,
+				replies:  len(act.Comment.Comments),
+			})
 		}
 
 		if acts.IsLastPage || acts.NextPageStart == start {
