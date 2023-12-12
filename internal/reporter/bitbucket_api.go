@@ -643,6 +643,18 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 
 func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []BitBucketPendingComment) {
 	for _, cur := range currentComments {
+		slog.Debug(
+			"Existing comment",
+			slog.Int("id", cur.id),
+			slog.Int("version", cur.version),
+			slog.String("severity", cur.severity),
+			slog.String("path", cur.anchor.Path),
+			slog.Int("line", cur.anchor.Line),
+			slog.String("diffType", cur.anchor.DiffType),
+			slog.String("lineType", cur.anchor.LineType),
+			slog.Bool("orphaned", cur.anchor.Orphaned),
+			slog.Int("replies", cur.replies),
+		)
 		var keep bool
 		for _, pend := range pendingComments {
 			if cur.anchor.isEqual(pend.Anchor) && cur.text == pend.Text {
