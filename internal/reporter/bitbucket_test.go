@@ -1616,18 +1616,7 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\nbad name details\n\n------\n\nmock text 1\n\nmock details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
-					Severity: "NORMAL",
-					Anchor: reporter.BitBucketPendingCommentAnchor{
-						Path:     "foo.txt",
-						Line:     2,
-						LineType: "ADDED",
-						FileType: "TO",
-						DiffType: "EFFECTIVE",
-					},
-				},
-				{
-					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nmock text 2\n\nmock details\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Text:     ":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nbad name\n\nbad name details\n\n------\n\nmock text 1\n\nmock details\n\n------\n\nmock text 2\n\nmock details\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.txt`.\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
 					Severity: "NORMAL",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",
@@ -1916,6 +1905,8 @@ func TestBitBucketReporter(t *testing.T) {
 				t.Errorf("error check failure: %s", e)
 				return
 			}
+
+			require.Len(t, tc.pullRequestComments, commentIndex)
 		})
 	}
 }

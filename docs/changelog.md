@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.52.0
+
+### Changed
+
+- More reports will now be merged into a single comments when using BitBucket.
+
 ## v0.51.1
 
 ### Fixed
