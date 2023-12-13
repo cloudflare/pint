@@ -78,11 +78,11 @@ func (gr GithubReporter) Submit(summary Summary) error {
 	}
 	if review != nil {
 		if err = gr.updateReview(review, summary); err != nil {
-			return err
+			return fmt.Errorf("failed to update pull request review: %w", err)
 		}
 	} else {
 		if err = gr.createReview(headCommit, summary); err != nil {
-			return err
+			return fmt.Errorf("failed to create pull request review: %w", err)
 		}
 	}
 
@@ -198,7 +198,7 @@ func (gr GithubReporter) createReview(headCommit string, summary Summary) error 
 		},
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create review: %w", err)
+		return err
 	}
 	slog.Info("Pull request review created", slog.String("status", resp.Status))
 	return nil
