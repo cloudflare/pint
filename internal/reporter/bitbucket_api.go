@@ -853,9 +853,6 @@ func dedupReports(src []Report) (dst [][]Report) {
 			if d[0].ReportedPath != report.ReportedPath {
 				continue
 			}
-			if d[0].SourcePath != report.SourcePath {
-				continue
-			}
 			if d[0].Problem.Lines[0] != report.Problem.Lines[0] {
 				continue
 			}
