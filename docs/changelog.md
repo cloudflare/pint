@@ -2,9 +2,22 @@
 
 ## v0.52.0
 
+### Added
+
+- Both [alerts/annotation](checks/alerts/annotation.md) and [rule/label](checks/rule/label.md)
+  now support more advance validation of label and annotation values with extra `token` option.
+  In addition to the `value` regexp matching you can also validate values against a static
+  list of allowed values using new `values` option.
+  See both checks documentation for detail.
+
 ### Changed
 
 - More reports will now be merged into a single comments when using BitBucket.
+
+### Fixed
+
+- Fixed YAML anchor parsing.
+- Fixed regexp matching for label names in [rule/label](checks/rule/label.md).
 
 ## v0.51.1
 

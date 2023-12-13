@@ -19,8 +19,23 @@ func NewTemplatedRegexp(s string) (*TemplatedRegexp, error) {
 	return &tr, nil
 }
 
+func NewRawTemplatedRegexp(s string) (*TemplatedRegexp, error) {
+	tr := TemplatedRegexp{anchored: s, original: s}
+	_, err := tr.Expand(parser.Rule{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &tr, nil
+}
+
 func MustTemplatedRegexp(re string) *TemplatedRegexp {
 	tr, _ := NewTemplatedRegexp(re)
+	return tr
+}
+
+func MustRawTemplatedRegexp(re string) *TemplatedRegexp {
+	tr, _ := NewRawTemplatedRegexp(re)
 	return tr
 }
 

@@ -1416,6 +1416,129 @@ data:
 			},
 			shouldError: false,
 		},
+		{
+			content: []byte(string(`
+- alert: Template
+  expr: &expr up == 0
+  labels:
+    notify: &maybe_escalate_notify chat-alerts
+- alert: Service Down
+  expr: *expr
+  labels:
+    notify: *maybe_escalate_notify
+    summary: foo
+`)),
+			output: []parser.Rule{
+				{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{2}},
+								Value:    "alert",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{2}},
+								Value:    "Template",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{3}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{3}},
+								Value:    "up == 0",
+							},
+							Query: &parser.PromQLNode{
+								Expr: "up == 0",
+								Children: []*parser.PromQLNode{
+									{Expr: "up"},
+									{Expr: "0"},
+								},
+							},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{4}},
+								Value:    "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{5}},
+										Value:    "notify",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{5}},
+										Value:    "chat-alerts",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlKeyValue{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "alert",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{6}},
+								Value:    "Service Down",
+							},
+						},
+						Expr: parser.PromQLExpr{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{7}},
+								Value:    "expr",
+							},
+							Value: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{7}},
+								Value:    "up == 0",
+							},
+							Query: &parser.PromQLNode{
+								Expr: "up == 0",
+								Children: []*parser.PromQLNode{
+									{Expr: "up"},
+									{Expr: "0"},
+								},
+							},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Position: parser.FilePosition{Lines: []int{8}},
+								Value:    "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{9}},
+										Value:    "notify",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{9}},
+										Value:    "chat-alerts",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{10}},
+										Value:    "summary",
+									},
+									Value: &parser.YamlNode{
+										Position: parser.FilePosition{Lines: []int{10}},
+										Value:    "foo",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })

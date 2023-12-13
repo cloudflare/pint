@@ -96,10 +96,14 @@ type YamlNode struct {
 }
 
 func newYamlNode(node *yaml.Node, offset int) *YamlNode {
-	return &YamlNode{
+	n := YamlNode{
 		Position: NewFilePosition(nodeLines(node, offset)),
 		Value:    node.Value,
 	}
+	if node.Alias != nil {
+		n.Value = node.Alias.Value
+	}
+	return &n
 }
 
 func newYamlKeyValue(key, val *yaml.Node, offset int) *YamlKeyValue {
@@ -245,7 +249,7 @@ func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 		Value: newYamlNode(val, offset),
 	}
 
-	qlNode, err := DecodeExpr(val.Value)
+	qlNode, err := DecodeExpr(expr.Value.Value)
 	if err != nil {
 		expr.SyntaxError = err
 		return &expr
