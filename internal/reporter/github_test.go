@@ -22,7 +22,7 @@ func TestGithubReporter(t *testing.T) {
 		description string
 		reports     []reporter.Report
 		httpHandler http.Handler
-		error       string
+		error       func(uri string) string
 		gitCmd      git.CommandRunner
 
 		owner   string
@@ -69,7 +69,9 @@ filename %s
 				}
 				return nil, nil
 			},
-			error: "failed to list pull request reviews: context deadline exceeded",
+			error: func(_ string) string {
+				return "failed to list pull request reviews: context deadline exceeded"
+			},
 			reports: []reporter.Report{
 				{
 					SourcePath:    "foo.txt",
@@ -85,12 +87,12 @@ filename %s
 			},
 		},
 		{
-			description: "happy path",
+			description: "list reviews error",
 			owner:       "foo",
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
-			timeout:     1000 * time.Millisecond,
+			timeout:     time.Second,
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
 					return []byte("fake-commit-id"), nil
@@ -101,6 +103,182 @@ filename %s
 				}
 				return nil, nil
 			},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					w.WriteHeader(http.StatusBadRequest)
+					_, _ = w.Write([]byte("Error"))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			error: func(uri string) string {
+				return fmt.Sprintf("failed to list pull request reviews: GET %s/api/v3/repos/foo/bar/pulls/123/reviews: 400  []", uri)
+			},
+			reports: []reporter.Report{
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "happy path",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			timeout:     time.Second,
+			gitCmd: func(args ...string) ([]byte, error) {
+				if args[0] == "rev-parse" {
+					return []byte("fake-commit-id"), nil
+				}
+				if args[0] == "blame" {
+					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
+					return []byte(content), nil
+				}
+				return nil, nil
+			},
+			reports: []reporter.Report{
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "error crating review",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			timeout:     time.Second,
+			gitCmd: func(args ...string) ([]byte, error) {
+				if args[0] == "rev-parse" {
+					return []byte("fake-commit-id"), nil
+				}
+				if args[0] == "blame" {
+					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
+					return []byte(content), nil
+				}
+				return nil, nil
+			},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					w.WriteHeader(http.StatusBadGateway)
+					_, _ = w.Write([]byte("Error"))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			error: func(uri string) string {
+				return fmt.Sprintf("failed to create pull request review: POST %s/api/v3/repos/foo/bar/pulls/123/reviews: 502  []", uri)
+			},
+			reports: []reporter.Report{
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "error updating existing review",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			timeout:     time.Second,
+			gitCmd: func(args ...string) ([]byte, error) {
+				if args[0] == "rev-parse" {
+					return []byte("fake-commit-id"), nil
+				}
+				if args[0] == "blame" {
+					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
+					return []byte(content), nil
+				}
+				return nil, nil
+			},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodPut && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews/1" {
+					w.WriteHeader(http.StatusBadGateway)
+					_, _ = w.Write([]byte("Error"))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			error: func(uri string) string {
+				return fmt.Sprintf("failed to update pull request review: PUT %s/api/v3/repos/foo/bar/pulls/123/reviews/1: 502  []", uri)
+			},
+			reports: []reporter.Report{
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines:    []int{2},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "update existing review",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			timeout:     time.Second,
+			gitCmd: func(args ...string) ([]byte, error) {
+				if args[0] == "rev-parse" {
+					return []byte("fake-commit-id"), nil
+				}
+				if args[0] == "blame" {
+					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
+					return []byte(content), nil
+				}
+				return nil, nil
+			},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":1,"commit_id":"fake-commit-id","path":"foo.txt","line":2,"body":":stop_sign: [mock](https://cloudflare.github.io/pint/checks/mock.html): syntax error\n\nsyntax details"}]`))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
 			reports: []reporter.Report{
 				{
 					SourcePath:    "foo.txt",
@@ -144,7 +322,7 @@ filename %s
 			srv := httptest.NewServer(handler)
 			defer srv.Close()
 			r, err := reporter.NewGithubReporter(
-				"v0.999",
+				"v0.0.0",
 				srv.URL,
 				srv.URL,
 				tc.timeout,
@@ -157,10 +335,10 @@ filename %s
 			require.NoError(t, err)
 
 			err = r.Submit(reporter.NewSummary(tc.reports))
-			if tc.error == "" {
+			if tc.error == nil {
 				require.NoError(t, err)
 			} else {
-				require.EqualError(t, err, tc.error)
+				require.EqualError(t, err, tc.error(srv.URL))
 			}
 		})
 	}
