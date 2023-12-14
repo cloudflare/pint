@@ -136,7 +136,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			part.FootComment = node.FootComment
 		}
 		for _, s := range mergeComments(part) {
-			for _, c := range comments.Parse(s) {
+			for _, c := range comments.Parse(part.Line, s) {
 				if comments.IsRuleComment(c.Type) {
 					ruleComments = append(ruleComments, c)
 				}

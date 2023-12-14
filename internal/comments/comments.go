@@ -84,8 +84,17 @@ func parseType(s string) Type {
 	}
 }
 
+type CommentError struct {
+	Line int
+	Err  error
+}
+
+func (ce CommentError) Error() string {
+	return ce.Err.Error()
+}
+
 type Invalid struct {
-	Err error
+	Err CommentError
 }
 
 func (i Invalid) String() string {
@@ -287,19 +296,21 @@ func parseComment(s string) (parsed []Comment, err error) {
 	return parsed, err
 }
 
-func Parse(text string) (comments []Comment) {
+func Parse(lineno int, text string) (comments []Comment) {
 	sc := bufio.NewScanner(strings.NewReader(text))
+	var index int
 	for sc.Scan() {
 		line := sc.Text()
 		parsed, err := parseComment(line)
 		if err != nil {
 			comments = append(comments, Comment{
 				Type:  InvalidComment,
-				Value: Invalid{Err: err},
+				Value: Invalid{Err: CommentError{Line: lineno + index, Err: err}},
 			})
 			continue
 		}
 		comments = append(comments, parsed...)
+		index++
 	}
 	return comments
 }

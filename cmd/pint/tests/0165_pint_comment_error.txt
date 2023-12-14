@@ -1,0 +1,27 @@
+pint.ok --no-color lint --min-severity=info rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+rules/1.yml:4 Warning: This comment is not a valid pint control comment: unexpected comment suffix: "this line" (pint/comment)
+ 4 |   # pint ignore/line this line
+
+rules/2.yml:4 Information: This file was excluded from pint checks. (ignore/file)
+ 4 |   # pint ignore/file
+
+level=INFO msg="Problems found" Warning=1 Information=1
+-- rules/1.yml --
+groups:
+- name: g1
+  rules:
+  # pint ignore/line this line
+  - record: up:count
+    expr: count(up == 1)
+-- rules/2.yml --
+groups:
+- name: g1
+  rules:
+  # pint ignore/file
+  - record: up:count
+    expr: count(up == 1)

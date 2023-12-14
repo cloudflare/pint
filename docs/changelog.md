@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.53.0
+
+### Added
+
+- pint will now report any comment that looks like [pint control comment](./ignoring.md)
+  but cannot be parsed correctly.
+
 ## v0.52.0
 
 ### Added

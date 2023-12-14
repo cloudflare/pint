@@ -14,6 +14,7 @@ import (
 	"go.uber.org/atomic"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
@@ -29,8 +30,9 @@ var (
 )
 
 const (
-	yamlParseReporter  = "yaml/parse"
-	ignoreFileReporter = "ignore/file"
+	yamlParseReporter   = "yaml/parse"
+	ignoreFileReporter  = "ignore/file"
+	pintCommentReporter = "pint/comment"
 )
 
 func tryDecodingYamlError(err error) (l int, s string) {
@@ -185,17 +187,32 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 		case <-ctx.Done():
 			return
 		default:
+			var commentErr comments.CommentError
+			var ignoreErr discovery.FileIgnoreError
 			switch {
-			case errors.Is(job.entry.PathError, discovery.ErrFileIsIgnored):
+			case errors.As(job.entry.PathError, &ignoreErr):
 				results <- reporter.Report{
 					ReportedPath:  job.entry.ReportedPath,
 					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
-						Lines:    job.entry.ModifiedLines,
+						Lines:    []int{ignoreErr.Line},
 						Reporter: ignoreFileReporter,
-						Text:     "This file was excluded from pint checks.",
+						Text:     ignoreErr.Error(),
 						Severity: checks.Information,
+					},
+					Owner: job.entry.Owner,
+				}
+			case errors.As(job.entry.PathError, &commentErr):
+				results <- reporter.Report{
+					ReportedPath:  job.entry.ReportedPath,
+					SourcePath:    job.entry.SourcePath,
+					ModifiedLines: job.entry.ModifiedLines,
+					Problem: checks.Problem{
+						Lines:    []int{commentErr.Line},
+						Reporter: pintCommentReporter,
+						Text:     fmt.Sprintf("This comment is not a valid pint control comment: %s", commentErr.Error()),
+						Severity: checks.Warning,
 					},
 					Owner: job.entry.Owner,
 				}
