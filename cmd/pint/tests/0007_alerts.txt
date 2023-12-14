@@ -24,10 +24,10 @@ rules/0001.yml:9-10 Warning: `severity` label is required. (rule/label)
   9 | - alert: ServiceIsDown
  10 |   expr: up == 0
 
-rules/0001.yml:14 Warning: `severity` label value must match `^critical|warning|info$`. (rule/label)
+rules/0001.yml:14 Warning: `severity` label value `bad` must match `^critical|warning|info$`. (rule/label)
  14 |     severity: bad
 
-rules/0001.yml:16 Bug: `url` annotation value must match `^https://wiki.example.com/page/(.+).html$`. (alerts/annotation)
+rules/0001.yml:16 Bug: `url` annotation value `bad` must match `^https://wiki.example.com/page/(.+).html$`. (alerts/annotation)
  16 |     url: bad
 
 rules/0002.yml:5 Fatal: Template failed to parse with this error: `undefined variable "$label"`. (alerts/template)

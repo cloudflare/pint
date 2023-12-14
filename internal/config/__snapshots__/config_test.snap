@@ -813,6 +813,17 @@
           "severity": "bug"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "token": "\\w+",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ],
   "owners": {}
@@ -1050,64 +1061,6 @@
 }
 ---
 
-[TestGetChecksForRule/rule_with_label_match_/_label_match - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "label": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
 [TestGetChecksForRule/rule_with_annotation_match_/_no_annotation - 1]
 {
   "ci": {
@@ -1167,64 +1120,6 @@
 ---
 
 [TestGetChecksForRule/rule_with_annotation_match_/_annotation_mismatch - 1]
-{
-  "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "rules": [
-    {
-      "match": [
-        {
-          "kind": "alerting",
-          "annotation": {
-            "key": "cluster",
-            "value": "prod"
-          }
-        }
-      ],
-      "label": [
-        {
-          "key": "priority",
-          "value": "(1|2|3|4|5)",
-          "required": true,
-          "severity": "bug"
-        }
-      ]
-    }
-  ],
-  "owners": {}
-}
----
-
-[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 1]
 {
   "ci": {
     "maxCommits": 20,
@@ -2562,6 +2457,123 @@
 }
 ---
 
+[TestGetChecksForRule/rule_with_label_match_/_label_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "label": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
+[TestGetChecksForRule/rule_with_annotation_match_/_annotation_match - 1]
+{
+  "ci": {
+    "maxCommits": 20,
+    "baseBranch": "master"
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "alerting",
+          "annotation": {
+            "key": "cluster",
+            "value": "prod"
+          }
+        }
+      ],
+      "label": [
+        {
+          "key": "priority",
+          "token": "\\w+",
+          "value": "(1|2|3|4|5)",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
+    }
+  ],
+  "owners": {}
+}
+---
+
 [TestGetChecksForRule/defaults - 2]
 {
   "ci": {
@@ -3375,6 +3387,17 @@
           "severity": "bug"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "token": "\\w+",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ],
   "owners": {}
@@ -3915,6 +3938,7 @@
       "label": [
         {
           "key": "priority",
+          "token": "\\w+",
           "value": "(1|2|3|4|5)",
           "required": true,
           "severity": "bug"
@@ -5938,6 +5962,17 @@
           "severity": "bug"
         }
       ]
+    },
+    {
+      "annotation": [
+        {
+          "key": "summary",
+          "token": "\\w+",
+          "value": "foo.+",
+          "required": true,
+          "severity": "bug"
+        }
+      ]
     }
   ],
   "owners": {}
@@ -6478,6 +6513,7 @@
       "label": [
         {
           "key": "priority",
+          "token": "\\w+",
           "value": "(1|2|3|4|5)",
           "required": true,
           "severity": "bug"

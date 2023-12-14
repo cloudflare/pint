@@ -580,6 +580,14 @@ rule {
     required = true
   }
 }
+rule {
+	annotation "summary" {
+	  token    = "\\w+"
+	  value    = "foo.+"
+	  severity = "bug"
+	  required = true
+	}
+  }
 `,
 			entry: discovery.Entry{
 				State:      discovery.Modified,
@@ -816,7 +824,7 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.LabelCheckName + "(priority:true)",
+				checks.RegexpCheckName, checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
 			},
 		},
 		{
@@ -893,6 +901,7 @@ rule {
   }
   label "priority" {
     severity = "bug"
+	token    = "\\w+"
     value    = "(1|2|3|4|5)"
     required = true
   }
@@ -909,7 +918,7 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.LabelCheckName + "(priority:true)",
+				checks.RegexpCheckName, checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
 			},
 		},
 		{

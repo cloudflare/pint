@@ -7,10 +7,12 @@ import (
 )
 
 type AnnotationSettings struct {
-	Key      string `hcl:",label" json:"key"`
-	Value    string `hcl:"value,optional" json:"value,omitempty"`
-	Required bool   `hcl:"required,optional" json:"required,omitempty"`
-	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
+	Key      string   `hcl:",label" json:"key"`
+	Token    string   `hcl:"token,optional" json:"token,omitempty"`
+	Value    string   `hcl:"value,optional" json:"value,omitempty"`
+	Values   []string `hcl:"values,optional" json:"values,omitempty"`
+	Required bool     `hcl:"required,optional" json:"required,omitempty"`
+	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (as AnnotationSettings) validate() error {
@@ -19,6 +21,10 @@ func (as AnnotationSettings) validate() error {
 	}
 
 	if _, err := checks.NewTemplatedRegexp(as.Key); err != nil {
+		return err
+	}
+
+	if _, err := checks.NewRawTemplatedRegexp(as.Token); err != nil {
 		return err
 	}
 

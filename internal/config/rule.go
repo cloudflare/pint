@@ -155,28 +155,34 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 
 	if len(rule.Annotation) > 0 {
 		for _, ann := range rule.Annotation {
-			var valueRegex *checks.TemplatedRegexp
+			var tokenRegex, valueRegex *checks.TemplatedRegexp
+			if ann.Token != "" {
+				tokenRegex = checks.MustRawTemplatedRegexp(ann.Token)
+			}
 			if ann.Value != "" {
 				valueRegex = checks.MustTemplatedRegexp(ann.Value)
 			}
 			severity := ann.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
 				name:  checks.AnnotationCheckName,
-				check: checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), valueRegex, ann.Required, severity),
+				check: checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), tokenRegex, valueRegex, ann.Values, ann.Required, severity),
 			})
 		}
 	}
 
 	if len(rule.Label) > 0 {
 		for _, lab := range rule.Label {
-			var valueRegex *checks.TemplatedRegexp
+			var tokenRegex, valueRegex *checks.TemplatedRegexp
+			if lab.Token != "" {
+				tokenRegex = checks.MustRawTemplatedRegexp(lab.Token)
+			}
 			if lab.Value != "" {
 				valueRegex = checks.MustTemplatedRegexp(lab.Value)
 			}
 			severity := lab.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
 				name:  checks.LabelCheckName,
-				check: checks.NewLabelCheck(lab.Key, valueRegex, lab.Required, severity),
+				check: checks.NewLabelCheck(checks.MustTemplatedRegexp(lab.Key), tokenRegex, valueRegex, lab.Values, lab.Required, severity),
 			})
 		}
 	}

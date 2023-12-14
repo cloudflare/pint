@@ -32,6 +32,13 @@ func TestAnnotationSettings(t *testing.T) {
 		},
 		{
 			conf: AnnotationSettings{
+				Key:   "summary",
+				Token: ".++",
+			},
+			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
+		},
+		{
+			conf: AnnotationSettings{
 				Key:   ".+",
 				Value: ".++",
 			},
