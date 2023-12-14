@@ -38,12 +38,14 @@ func emptyLine(line string) (emptied string) {
 }
 
 type Content struct {
-	Body    []byte
-	Ignored bool
+	Body       []byte
+	Ignored    bool
+	IgnoreLine int
 }
 
 func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err error) {
 	reader := bufio.NewReader(r)
+	var lineno int
 	var line string
 	var found bool
 	var skip skipMode
@@ -53,6 +55,7 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 	var skipAll bool
 	var inBegin bool
 	for {
+		lineno++
 		line, err = reader.ReadString('\n')
 		if err != nil && !errors.Is(err, io.EOF) {
 			break
@@ -63,7 +66,7 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 		} else {
 			skip = skipNone
 			found = false
-			for _, comment := range comments.Parse(line) {
+			for _, comment := range comments.Parse(lineno, line) {
 				// nolint:exhaustive
 				switch comment.Type {
 				case comments.IgnoreFileType:
@@ -106,6 +109,7 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 					// no-op
 				case skipFile:
 					out.Ignored = true
+					out.IgnoreLine = lineno
 					out.Body = append(out.Body, []byte(emptyLine(line))...)
 					skipNext = true
 					autoReset = false

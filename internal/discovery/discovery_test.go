@@ -3,6 +3,7 @@ package discovery
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -110,7 +111,7 @@ func TestReadRules(t *testing.T) {
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
 			sourceFunc: func(t *testing.T) io.Reader {
-				return bytes.NewBuffer([]byte("\n\n   # pint file/disable   \n\n"))
+				return bytes.NewBuffer([]byte("\n\n   # pint file/disable xxx  \n\n"))
 			},
 			isStrict: false,
 		},
@@ -284,7 +285,7 @@ groups:
 					ReportedPath:  "rules.yml",
 					SourcePath:    "rules.yml",
 					ModifiedLines: []int{1, 2, 3, 4, 5},
-					PathError:     ErrFileIsIgnored,
+					PathError:     FileIgnoreError{Line: 2, Err: errors.New("file was ignored")},
 				},
 			},
 		},
@@ -310,7 +311,7 @@ groups:
 					ReportedPath:  "rules.yml",
 					SourcePath:    "rules.yml",
 					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7, 8},
-					PathError:     ErrFileIsIgnored,
+					PathError:     FileIgnoreError{Line: 2, Err: errors.New("file was ignored")},
 				},
 			},
 		},

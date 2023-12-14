@@ -31,7 +31,14 @@ var ignoredErrors = []string{
 	": template: __",
 }
 
-var ErrFileIsIgnored = errors.New("file was ignored")
+type FileIgnoreError struct {
+	Line int
+	Err  error
+}
+
+func (fe FileIgnoreError) Error() string {
+	return fe.Err.Error()
+}
 
 func isStrictIgnored(err error) bool {
 	s := err.Error()
@@ -131,14 +138,26 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 				slog.String("match", snooze.Match),
 				slog.Time("until", snooze.Until),
 			)
+		case comments.InvalidComment:
+			entries = append(entries, Entry{
+				ReportedPath:  reportedPath,
+				SourcePath:    sourcePath,
+				PathError:     comment.Value.(comments.Invalid).Err,
+				Owner:         fileOwner,
+				ModifiedLines: contentLines,
+			})
 		}
 	}
 
 	if content.Ignored {
 		entries = append(entries, Entry{
-			ReportedPath:  reportedPath,
-			SourcePath:    sourcePath,
-			PathError:     ErrFileIsIgnored,
+			ReportedPath: reportedPath,
+			SourcePath:   sourcePath,
+			PathError: FileIgnoreError{
+				Line: content.IgnoreLine,
+				// nolint:revive
+				Err: errors.New("This file was excluded from pint checks."),
+			},
 			Owner:         fileOwner,
 			ModifiedLines: contentLines,
 		})
