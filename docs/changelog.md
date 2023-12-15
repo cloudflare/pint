@@ -4,8 +4,12 @@
 
 ### Added
 
-- pint will now report any comment that looks like [pint control comment](./ignoring.md)
+- pint will now report any comment that looks like a [pint control comment](./ignoring.md)
   but cannot be parsed correctly.
+
+### Fixed
+
+- Fixed a crash when running `pint ci` and using `ignore/file` comments.
 
 ## v0.52.0
 
