@@ -74,7 +74,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		for _, e := range el {
 			e.State = Noop
 			if len(e.ModifiedLines) == 0 {
-				e.ModifiedLines = e.Rule.Lines()
+				e.ModifiedLines = e.Rule.Lines.Expand()
 			}
 			entries = append(entries, e)
 		}

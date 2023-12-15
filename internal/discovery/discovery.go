@@ -216,7 +216,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			ReportedPath:   reportedPath,
 			SourcePath:     sourcePath,
 			Rule:           rule,
-			ModifiedLines:  rule.Lines(),
+			ModifiedLines:  rule.Lines.Expand(),
 			Owner:          ruleOwner,
 			DisabledChecks: disabledChecks,
 		})

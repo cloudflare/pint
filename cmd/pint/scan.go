@@ -17,7 +17,6 @@ import (
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -120,7 +119,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					slog.Debug("Found recording rule",
 						slog.String("path", entry.SourcePath),
 						slog.String("record", entry.Rule.RecordingRule.Record.Value.Value),
-						slog.String("lines", output.FormatLineRangeString(entry.Rule.Lines())),
+						slog.String("lines", entry.Rule.Lines.String()),
 					)
 				}
 				if entry.Rule.AlertingRule != nil {
@@ -128,7 +127,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					slog.Debug("Found alerting rule",
 						slog.String("path", entry.SourcePath),
 						slog.String("alert", entry.Rule.AlertingRule.Alert.Value.Value),
-						slog.String("lines", output.FormatLineRangeString(entry.Rule.Lines())),
+						slog.String("lines", entry.Rule.Lines.String()),
 					)
 				}
 
@@ -148,7 +147,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				if entry.Rule.Error.Err != nil {
 					slog.Debug("Found invalid rule",
 						slog.String("path", entry.SourcePath),
-						slog.String("lines", output.FormatLineRangeString(entry.Rule.Lines())),
+						slog.String("lines", entry.Rule.Lines.String()),
 					)
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
 				}
@@ -255,7 +254,7 @@ This usually means that it's missing some required fields.`,
 					slog.Warn(
 						"Bug: unknown rule state",
 						slog.String("path", job.entry.ReportedPath),
-						slog.Int("line", job.entry.Rule.Lines()[0]),
+						slog.Int("line", job.entry.Rule.Lines.First),
 						slog.String("name", job.entry.Rule.Name()),
 					)
 				}

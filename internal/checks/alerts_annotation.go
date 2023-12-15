@@ -67,7 +67,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 	if rule.AlertingRule.Annotations == nil {
 		if c.isReguired {
 			problems = append(problems, Problem{
-				Lines:    rule.Lines(),
+				Lines:    rule.Lines.Expand(),
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 				Severity: c.severity,
@@ -86,7 +86,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 
 	if len(annotations) == 0 && c.isReguired {
 		problems = append(problems, Problem{
-			Lines:    rule.AlertingRule.Annotations.Lines(),
+			Lines:    rule.AlertingRule.Annotations.Lines.Expand(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 			Severity: c.severity,
@@ -97,10 +97,10 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 	for _, ann := range annotations {
 		if c.tokenRe != nil {
 			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(ann.Value.Value, -1) {
-				problems = append(problems, c.checkValue(rule, match, ann.Value.Position.Lines)...)
+				problems = append(problems, c.checkValue(rule, match, ann.Value.Lines.Expand())...)
 			}
 		} else {
-			problems = append(problems, c.checkValue(rule, ann.Value.Value, ann.Value.Position.Lines)...)
+			problems = append(problems, c.checkValue(rule, ann.Value.Value, ann.Value.Lines.Expand())...)
 		}
 	}
 

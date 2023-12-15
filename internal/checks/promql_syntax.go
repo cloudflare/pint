@@ -43,7 +43,7 @@ func (c SyntaxCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 	q := rule.Expr()
 	if q.SyntaxError != nil {
 		problems = append(problems, Problem{
-			Lines:    q.Value.Position.Lines,
+			Lines:    q.Value.Lines.Expand(),
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("Prometheus failed to parse the query with this PromQL error: %s.", q.SyntaxError),
 			Details:  SyntaxCheckDetails,

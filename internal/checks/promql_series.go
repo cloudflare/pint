@@ -629,7 +629,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelec
 			dur, err := model.ParseDuration(val)
 			if err != nil {
 				problems = append(problems, Problem{
-					Lines:    rule.LineRange(),
+					Lines:    rule.Lines.Expand(),
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Failed to parse pint comment as duration: %s", err),
 					Details:  SeriesCheckMinAgeDetails,

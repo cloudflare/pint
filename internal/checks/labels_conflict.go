@@ -54,7 +54,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
-			Lines:    rule.RecordingRule.Labels.Lines(),
+			Lines:    rule.RecordingRule.Labels.Lines.Expand(),
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
