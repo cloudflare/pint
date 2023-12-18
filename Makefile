@@ -74,11 +74,18 @@ coverhtml: test
 .PHONY: benchmark
 benchmark:
 	go test \
-		-v \
 		-count=10 \
 		-run=none \
 		-bench=. \
 		-benchmem \
-		-cpuprofile cpu.prof \
-		-memprofile mem.prof \
 		./cmd/pint
+
+$(GOBIN)/benchstat: tools/benchstat/go.mod tools/benchstat/go.sum
+	go install -modfile=tools/benchstat/go.mod golang.org/x/perf/cmd/benchstat
+.PHONY: benchmark-diff
+benchmark-diff: $(GOBIN)/benchstat
+	echo "Benchmark diff:" | tee benchstat.txt
+	echo "" | tee -a benchstat.txt
+	echo '```' | tee -a benchstat.txt
+	$(GOBIN)/benchstat old.txt new.txt | tee -a benchstat.txt
+	echo '```' | tee -a benchstat.txt
