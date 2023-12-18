@@ -32,11 +32,11 @@ func NewRuleLinkCheck(re *TemplatedRegexp, uriRewrite string, timeout time.Durat
 }
 
 type RuleLinkCheck struct {
-	scheme     []string
 	re         *TemplatedRegexp
-	uriRewrite string
-	timeout    time.Duration
 	headers    map[string]string
+	uriRewrite string
+	scheme     []string
+	timeout    time.Duration
 	severity   Severity
 }
 

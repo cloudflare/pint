@@ -29,14 +29,14 @@ var (
 )
 
 type Match struct {
+	Label         *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
+	Annotation    *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
+	Command       *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
 	Path          string             `hcl:"path,optional" json:"path,omitempty"`
 	Name          string             `hcl:"name,optional" json:"name,omitempty"`
 	Kind          string             `hcl:"kind,optional" json:"kind,omitempty"`
 	For           string             `hcl:"for,optional" json:"for,omitempty"`
 	KeepFiringFor string             `hcl:"keep_firing_for,optional" json:"keep_firing_for,omitempty"`
-	Label         *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
-	Annotation    *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
-	Command       *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {

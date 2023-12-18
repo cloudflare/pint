@@ -8,9 +8,9 @@ import (
 
 type AggregateSettings struct {
 	Name     string   `hcl:",label" json:"name"`
+	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
 	Keep     []string `hcl:"keep,optional" json:"keep,omitempty"`
 	Strip    []string `hcl:"strip,optional" json:"strip,omitempty"`
-	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (ag AggregateSettings) validate() error {

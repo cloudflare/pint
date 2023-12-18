@@ -36,18 +36,18 @@ const (
 )
 
 type BitBucketReportData struct {
+	Value any      `json:"value"`
 	Title string   `json:"title"`
 	Type  DataType `json:"type"`
-	Value any      `json:"value"`
 }
 
 type BitBucketAnnotation struct {
 	Path     string `json:"path"`
-	Line     int    `json:"line"`
 	Message  string `json:"message"`
 	Severity string `json:"severity"`
 	Type     string `json:"type"`
 	Link     string `json:"link"`
+	Line     int    `json:"line"`
 }
 
 type BitBucketAnnotations struct {
@@ -60,25 +60,25 @@ type BitBucketRef struct {
 }
 
 type BitBucketPullRequest struct {
-	ID      int          `json:"id"`
-	Open    bool         `json:"open"`
 	FromRef BitBucketRef `json:"fromRef"`
 	ToRef   BitBucketRef `json:"toRef"`
+	ID      int          `json:"id"`
+	Open    bool         `json:"open"`
 }
 
 type BitBucketPullRequests struct {
+	Values        []BitBucketPullRequest `json:"values"`
 	Start         int                    `json:"start"`
 	NextPageStart int                    `json:"nextPageStart"`
 	IsLastPage    bool                   `json:"isLastPage"`
-	Values        []BitBucketPullRequest `json:"values"`
 }
 
 type bitBucketPR struct {
-	ID        int
 	srcBranch string
 	srcHead   string
 	dstBranch string
 	dstHead   string
+	ID        int
 }
 
 type bitBucketPRChanges struct {
@@ -95,10 +95,10 @@ type BitBucketPullRequestChange struct {
 }
 
 type BitBucketPullRequestChanges struct {
+	Values        []BitBucketPullRequestChange `json:"values"`
 	Start         int                          `json:"start"`
 	NextPageStart int                          `json:"nextPageStart"`
 	IsLastPage    bool                         `json:"isLastPage"`
-	Values        []BitBucketPullRequestChange `json:"values"`
 }
 
 type BitBucketDiffLine struct {
@@ -124,11 +124,11 @@ type BitBucketFileDiffs struct {
 }
 
 type bitBucketComment struct {
-	id       int
-	version  int
 	text     string
 	severity string
 	anchor   BitBucketCommentAnchor
+	id       int
+	version  int
 	replies  int
 }
 
@@ -137,22 +137,22 @@ type BitBucketCommentAuthor struct {
 }
 
 type BitBucketPullRequestComment struct {
-	ID       int                           `json:"id"`
-	Version  int                           `json:"version"`
 	State    string                        `json:"state"`
 	Author   BitBucketCommentAuthor        `json:"author"`
 	Text     string                        `json:"text"`
 	Severity string                        `json:"severity"`
 	Comments []BitBucketPullRequestComment `json:"comments"`
+	ID       int                           `json:"id"`
+	Version  int                           `json:"version"`
 	Resolved bool                          `json:"threadResolved"`
 }
 
 type BitBucketCommentAnchor struct {
-	Orphaned bool   `json:"orphaned"`
 	LineType string `json:"lineType"`
 	DiffType string `json:"diffType"`
 	Path     string `json:"path"`
 	Line     int    `json:"line"`
+	Orphaned bool   `json:"orphaned"`
 }
 
 func (ba BitBucketCommentAnchor) isEqual(pa BitBucketPendingCommentAnchor) bool {
@@ -179,10 +179,10 @@ type BitBucketPullRequestActivity struct {
 }
 
 type BitBucketPullRequestActivities struct {
+	Values        []BitBucketPullRequestActivity `json:"values"`
 	Start         int                            `json:"start"`
 	NextPageStart int                            `json:"nextPageStart"`
 	IsLastPage    bool                           `json:"isLastPage"`
-	Values        []BitBucketPullRequestActivity `json:"values"`
 }
 
 type pendingComment struct {
@@ -227,10 +227,10 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 
 type BitBucketPendingCommentAnchor struct {
 	Path     string `json:"path"`
-	Line     int    `json:"line"`
 	LineType string `json:"lineType"`
 	FileType string `json:"fileType"`
 	DiffType string `json:"diffType"`
+	Line     int    `json:"line"`
 }
 
 type BitBucketPendingComment struct {
@@ -263,10 +263,10 @@ func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, proj
 type bitBucketAPI struct {
 	pintVersion string
 	uri         string
-	timeout     time.Duration
 	authToken   string
 	project     string
 	repo        string
+	timeout     time.Duration
 }
 
 func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, error) {

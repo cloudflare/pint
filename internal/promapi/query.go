@@ -25,10 +25,10 @@ type QueryResult struct {
 }
 
 type instantQuery struct {
-	prom      *Prometheus
-	ctx       context.Context
-	expr      string
 	timestamp time.Time
+	ctx       context.Context
+	prom      *Prometheus
+	expr      string
 }
 
 func (q instantQuery) Run() queryResult {

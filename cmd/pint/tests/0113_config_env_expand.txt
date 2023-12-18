@@ -9,28 +9,14 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 {
   "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
+    "baseBranch": "master",
+    "maxCommits": 20
   },
   "parser": {
     "relaxed": [
       ".*"
     ]
   },
-  "prometheus": [
-    {
-      "name": "prod",
-      "uri": "http://localhost",
-      "headers": {
-        "X-Auth": "1234"
-      },
-      "timeout": "2m0s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    }
-  ],
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -57,6 +43,21 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       "rule/reject"
     ]
   },
+  "owners": {},
+  "prometheus": [
+    {
+      "headers": {
+        "X-Auth": "1234"
+      },
+      "name": "prod",
+      "uri": "http://localhost",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ],
   "rules": [
     {
       "match": [
@@ -74,8 +75,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
         }
       ]
     }
-  ],
-  "owners": {}
+  ]
 }
 -- .pint.hcl --
 parser {

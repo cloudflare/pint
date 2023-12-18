@@ -21,10 +21,10 @@ type MetadataResult struct {
 }
 
 type metadataQuery struct {
-	prom      *Prometheus
-	ctx       context.Context
-	metric    string
 	timestamp time.Time
+	ctx       context.Context
+	prom      *Prometheus
+	metric    string
 }
 
 func (q metadataQuery) Run() queryResult {

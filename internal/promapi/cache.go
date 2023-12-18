@@ -30,11 +30,11 @@ func newQueryCache(maxStale time.Duration) *queryCache {
 }
 
 type queryCache struct {
-	mu        sync.Mutex
 	entries   map[uint64]*cacheEntry
 	stats     map[string]*endpointStats
 	maxStale  time.Duration
 	evictions int
+	mu        sync.Mutex
 }
 
 func (c *queryCache) endpointStats(endpoint string) *endpointStats {

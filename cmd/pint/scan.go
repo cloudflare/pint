@@ -174,9 +174,9 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 }
 
 type scanJob struct {
+	check      checks.RuleChecker
 	allEntries []discovery.Entry
 	entry      discovery.Entry
-	check      checks.RuleChecker
 }
 
 func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporter.Report) {

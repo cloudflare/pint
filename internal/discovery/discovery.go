@@ -32,8 +32,8 @@ var ignoredErrors = []string{
 }
 
 type FileIgnoreError struct {
-	Line int
 	Err  error
+	Line int
 }
 
 func (fe FileIgnoreError) Error() string {
@@ -88,14 +88,14 @@ const (
 )
 
 type Entry struct {
-	State          ChangeType
+	PathError      error
 	ReportedPath   string // symlink target
 	SourcePath     string // file path (can be symlink)
-	PathError      error
-	ModifiedLines  []int
-	Rule           parser.Rule
 	Owner          string
+	ModifiedLines  []int
 	DisabledChecks []string
+	Rule           parser.Rule
+	State          ChangeType
 }
 
 func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (entries []Entry, err error) {

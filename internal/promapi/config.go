@@ -16,10 +16,10 @@ import (
 )
 
 type ConfigSectionGlobal struct {
+	ExternalLabels     map[string]string `yaml:"external_labels"`
 	ScrapeInterval     time.Duration     `yaml:"scrape_interval"`
 	ScrapeTimeout      time.Duration     `yaml:"scrape_timeout"`
 	EvaluationInterval time.Duration     `yaml:"evaluation_interval"`
-	ExternalLabels     map[string]string `yaml:"external_labels"`
 }
 
 type PrometheusConfig struct {

@@ -215,16 +215,16 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 }
 
 type problemCollector struct {
-	lock             sync.Mutex
 	cfg              config.Config
-	paths            []string
 	fileOwners       map[string]string
 	summary          *reporter.Summary
 	problem          *prometheus.Desc
 	problems         *prometheus.Desc
 	fileOwnersMetric *prometheus.Desc
+	paths            []string
 	minSeverity      checks.Severity
 	maxProblems      int
+	lock             sync.Mutex
 }
 
 func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.Severity, maxProblems int) *problemCollector {

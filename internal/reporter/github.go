@@ -20,17 +20,17 @@ import (
 var reviewBody = "### This pull request was validated by [pint](https://github.com/cloudflare/pint).\n"
 
 type GithubReporter struct {
+	gitCmd git.CommandRunner
+
+	client    *github.Client
 	version   string
 	baseURL   string
 	uploadURL string
-	timeout   time.Duration
 	authToken string
 	owner     string
 	repo      string
+	timeout   time.Duration
 	prNum     int
-	gitCmd    git.CommandRunner
-
-	client *github.Client
 }
 
 // NewGithubReporter creates a new GitHub reporter that reports

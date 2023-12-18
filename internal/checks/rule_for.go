@@ -33,8 +33,8 @@ func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, severity Seve
 }
 
 type RuleForCheck struct {
-	severity Severity
 	key      RuleForKey
+	severity Severity
 	minFor   time.Duration
 	maxFor   time.Duration
 }

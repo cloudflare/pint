@@ -13,8 +13,8 @@ import (
 
 type LineBlame struct {
 	Filename string
-	Line     int
 	Commit   string
+	Line     int
 }
 
 type LineBlames []LineBlame

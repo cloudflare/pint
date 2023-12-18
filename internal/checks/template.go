@@ -108,12 +108,12 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 }
 
 type TemplateContext struct {
+	Labels      map[string]string
+	Annotations map[string]string
 	Alert       string
 	Record      string
 	Expr        string
 	For         string
-	Labels      map[string]string
-	Annotations map[string]string
 }
 
 func (tc TemplateContext) Aliases() string {

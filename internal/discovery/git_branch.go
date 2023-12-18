@@ -29,8 +29,8 @@ func NewGitBranchFinder(
 
 type GitBranchFinder struct {
 	gitCmd     git.CommandRunner
-	filter     git.PathFilter
 	baseBranch string
+	filter     git.PathFilter
 	maxCommits int
 }
 

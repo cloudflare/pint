@@ -85,8 +85,8 @@ func parseType(s string) Type {
 }
 
 type CommentError struct {
-	Line int
 	Err  error
+	Line int
 }
 
 func (ce CommentError) Error() string {

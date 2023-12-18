@@ -24,7 +24,7 @@ pint.ok --no-color -l debug ci
 ! stdout .
 stderr 'level=INFO msg="Problems found" Information=1'
 stderr 'result":"PASS"'
-stderr ',"line":3,'
+stderr ',"line":3}'
 stderr '"message":"Problem reported on unmodified line 1, annotation moved here: ignore/file: This file was excluded from pint checks."'
 stderr 'msg="Sending a request to BitBucket" method=PUT'
 stderr 'msg="BitBucket request completed" status=200'

@@ -7,11 +7,11 @@ import (
 )
 
 type CostSettings struct {
+	MaxEvaluationDuration string `hcl:"maxEvaluationDuration,optional" json:"maxEvaluationDuration,omitempty"`
+	Severity              string `hcl:"severity,optional" json:"severity,omitempty"`
 	MaxSeries             int    `hcl:"maxSeries,optional" json:"maxSeries,omitempty"`
 	MaxPeakSamples        int    `hcl:"maxPeakSamples,optional" json:"maxPeakSamples,omitempty"`
 	MaxTotalSamples       int    `hcl:"maxTotalSamples,optional" json:"maxTotalSamples,omitempty"`
-	MaxEvaluationDuration string `hcl:"maxEvaluationDuration,optional" json:"maxEvaluationDuration,omitempty"`
-	Severity              string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 
 func (cs CostSettings) validate() error {

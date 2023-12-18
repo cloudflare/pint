@@ -104,12 +104,12 @@ const (
 )
 
 type Problem struct {
-	Anchor   Anchor
-	Lines    parser.LineRange
 	Reporter string
 	Text     string
 	Details  string
+	Lines    parser.LineRange
 	Severity Severity
+	Anchor   Anchor
 }
 
 type CheckMeta struct {

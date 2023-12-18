@@ -68,8 +68,8 @@ func mergeComments(node *yaml.Node) (comments []string) {
 }
 
 type YamlNode struct {
-	Lines LineRange
 	Value string
+	Lines LineRange
 }
 
 func newYamlNode(node *yaml.Node, offset int) *YamlNode {
@@ -109,9 +109,9 @@ func (ykv *YamlKeyValue) IsIdentical(b *YamlKeyValue) bool {
 }
 
 type YamlMap struct {
-	Lines LineRange
 	Key   *YamlNode
 	Items []*YamlKeyValue
+	Lines LineRange
 }
 
 func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
@@ -289,8 +289,8 @@ func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
 }
 
 type ParseError struct {
-	Fragment string
 	Err      error
+	Fragment string
 	Line     int
 }
 
@@ -323,9 +323,9 @@ func (lr LineRange) Expand() []int {
 type Rule struct {
 	AlertingRule  *AlertingRule
 	RecordingRule *RecordingRule
-	Lines         LineRange
-	Comments      []comments.Comment
 	Error         ParseError
+	Comments      []comments.Comment
+	Lines         LineRange
 }
 
 func (r Rule) IsIdentical(b Rule) bool {

@@ -11,10 +11,10 @@ import (
 type Report struct {
 	ReportedPath  string
 	SourcePath    string
+	Owner         string
 	ModifiedLines []int
 	Rule          parser.Rule
 	Problem       checks.Problem
-	Owner         string
 }
 
 func (r Report) isEqual(nr Report) bool {
@@ -49,12 +49,12 @@ func (r Report) isEqual(nr Report) bool {
 }
 
 type Summary struct {
+	reports        []Report
 	OfflineChecks  int64
 	OnlineChecks   int64
 	Duration       time.Duration
 	TotalEntries   int
 	CheckedEntries int64
-	reports        []Report
 }
 
 func NewSummary(reports []Report) Summary {

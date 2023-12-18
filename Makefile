@@ -28,8 +28,11 @@ $(GOBIN)/gofumpt: tools/gofumpt/go.mod tools/gofumpt/go.sum
 	go install -modfile=tools/gofumpt/go.mod mvdan.cc/gofumpt
 $(GOBIN)/goimports: tools/goimports/go.mod tools/goimports/go.sum
 	go install -modfile=tools/goimports/go.mod golang.org/x/tools/cmd/goimports
+$(GOBIN)/betteralign: tools/betteralign/go.mod tools/betteralign/go.sum
+	go install -modfile=tools/betteralign/go.mod github.com/dkorunic/betteralign/cmd/betteralign
 .PHONY: format
-format: $(GOBIN)/gofumpt $(GOBIN)/goimports
+format: $(GOBIN)/betteralign $(GOBIN)/gofumpt $(GOBIN)/goimports
+	$(GOBIN)/betteralign -apply ./...
 	$(GOBIN)/gofumpt -extra -l -w .
 	$(GOBIN)/goimports -local github.com/cloudflare/pint -w .
 

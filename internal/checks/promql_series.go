@@ -22,12 +22,12 @@ import (
 )
 
 type PromqlSeriesSettings struct {
-	LookbackRange         string `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
-	lookbackRangeDuration time.Duration
-	LookbackStep          string `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
-	lookbackStepDuration  time.Duration
+	LookbackRange         string   `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
+	LookbackStep          string   `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
 	IgnoreMetrics         []string `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
 	ignoreMetricsRe       []*regexp.Regexp
+	lookbackRangeDuration time.Duration
+	lookbackStepDuration  time.Duration
 }
 
 func (c *PromqlSeriesSettings) Validate() error {
