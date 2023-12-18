@@ -15,8 +15,43 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/promapi"
 )
+
+func newAbsoluteRange(start, end time.Time, step time.Duration) absoluteRange {
+	return absoluteRange{start: start, end: end, step: step}
+}
+
+type absoluteRange struct {
+	start time.Time
+	end   time.Time
+	step  time.Duration
+}
+
+func (ar absoluteRange) Start() time.Time {
+	return ar.start
+}
+
+func (ar absoluteRange) End() time.Time {
+	return ar.end
+}
+
+func (ar absoluteRange) Dur() time.Duration {
+	return ar.end.Sub(ar.start)
+}
+
+func (ar absoluteRange) Step() time.Duration {
+	return ar.step
+}
+
+func (ar absoluteRange) String() string {
+	return fmt.Sprintf(
+		"%s-%s/%s",
+		ar.start.Format(time.RFC3339),
+		ar.end.Format(time.RFC3339),
+		output.HumanizeDuration(ar.step))
+}
 
 func TestRange(t *testing.T) {
 	type handlerFunc func(t *testing.T, w http.ResponseWriter, r *http.Request)
@@ -647,7 +682,7 @@ func TestRange(t *testing.T) {
 
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := fg.RangeQuery(context.Background(), tc.query, promapi.NewAbsoluteRange(tc.start, tc.end, tc.step))
+					qr, err := fg.RangeQuery(context.Background(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step))
 					if tc.err != "" {
 						require.EqualError(t, err, tc.err, tc)
 					} else {
