@@ -36,6 +36,7 @@ promql
 PromQL
 PRs
 prymitive
+samber
 SNI
 symlink
 symlinked

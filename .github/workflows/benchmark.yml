@@ -1,12 +1,12 @@
 name: Benchmark Go code
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+
+permissions:
+  pull-requests: write
 
 jobs:
   test-go:
@@ -22,11 +22,26 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Test
-        run: make benchmark
+      - name: Fetch test rules
+        run: make -C cmd/pint/bench fetch
 
-      - name: CPU
-        run: go tool pprof -top cpu.prof
+      - name: Benchmark PR branch
+        run: |
+          make benchmark | tee new.txt
 
-      - name: Memory
-        run: go tool pprof -top mem.prof
+      - name: Benchmark main branch
+        run: |
+          git fetch origin main
+          git reset --hard FETCH_HEAD
+          make benchmark | tee old.txt
+
+      - name: Diff benchmarks
+        run: |
+          git reset --hard ${GITHUB_SHA}
+          make benchmark-diff
+
+      - name: Report
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          filePath: benchstat.txt
+          comment_tag: benchstat
