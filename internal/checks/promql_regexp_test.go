@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -63,7 +64,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Details:  checks.RegexpCheckDetails,
@@ -80,7 +84,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job!~\"bar\"`, use `job!=\"bar\"` instead.",
 						Details:  checks.RegexpCheckDetails,
@@ -97,7 +104,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"\"`, use `job=\"\"` instead.",
 						Details:  checks.RegexpCheckDetails,
@@ -114,7 +124,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"^.+$\"` will result in `job=~\"^^.+$$\"`, remove regexp anchors `^` and/or `$`.",
 						Details:  checks.RegexpCheckDetails,
@@ -131,7 +144,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"(foo|^.+)$\"` will result in `job=~\"^(foo|^.+)$$\"`, remove regexp anchors `^` and/or `$`.",
 						Details:  checks.RegexpCheckDetails,
@@ -148,7 +164,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Details:  checks.RegexpCheckDetails,
@@ -165,14 +184,20 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 						Details:  checks.RegexpCheckDetails,
@@ -196,7 +221,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary wildcard regexp, simply use `foo` if you want to match on all `job` values.",
 						Details:  checks.RegexpCheckDetails,
@@ -220,7 +248,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary wildcard regexp, simply use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
 						Details:  checks.RegexpCheckDetails,
@@ -237,7 +268,10 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.RegexpCheckName,
 						Text:     "Unnecessary wildcard regexp, simply use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
 						Details:  checks.RegexpCheckDetails,

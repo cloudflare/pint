@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -93,7 +94,10 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/link",
 						Text:     `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
 						Severity: checks.Bug,
@@ -132,7 +136,10 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 						Severity: checks.Bug,
@@ -156,13 +163,19 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
 						Severity: checks.Warning,

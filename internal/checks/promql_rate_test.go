@@ -8,6 +8,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -44,7 +45,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
 						Details:  checks.RateCheckDetails,
@@ -111,7 +115,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "irate", "2", "1m"),
 						Details:  checks.RateCheckDetails,
@@ -140,7 +147,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "deriv", "2", "1m"),
 						Details:  checks.RateCheckDetails,
@@ -315,7 +325,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
 						Details:  checks.RateCheckDetails,
@@ -344,7 +357,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -366,7 +382,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
@@ -388,7 +407,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text: checkErrorUnableToRun(checks.RateCheckName, "prom", uri,
 							fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
@@ -413,7 +435,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Bug,
@@ -448,14 +473,20 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
 						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -498,14 +529,20 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
 						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
 						Details:  checks.RateCheckDetails,
@@ -534,7 +571,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "bar_g", "gauge"),
 						Details:  checks.RateCheckDetails,
@@ -594,7 +634,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
 						Details:  checks.RateCheckDetails,
@@ -627,7 +670,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     rateSumText("my:sum[5m]", "sum(foo)"),
 						Severity: checks.Bug,
@@ -666,7 +712,10 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/rate",
 						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,

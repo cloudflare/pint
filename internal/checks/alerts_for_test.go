@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -35,7 +36,10 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "abc"`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -52,7 +56,10 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "-5m"`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -69,7 +76,10 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/for",
 						Text:     "`0h` is the default value of `for`, consider removing this redundant line.",
 						Severity: checks.Information,
@@ -85,7 +95,10 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "abc"`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -102,7 +115,10 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/for",
 						Text:     `invalid duration: not a valid duration string: "-5m"`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -119,7 +135,10 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/for",
 						Text:     "`0h` is the default value of `keep_firing_for`, consider removing this redundant line.",
 						Severity: checks.Information,

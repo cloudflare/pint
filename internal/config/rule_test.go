@@ -70,10 +70,7 @@ func TestMatch(t *testing.T) {
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
-					Alert: parser.YamlKeyValue{
-						Key:   &parser.YamlNode{Value: "alert"},
-						Value: &parser.YamlNode{Value: "Foo"},
-					},
+					Alert: parser.YamlNode{Value: "Foo"},
 				},
 			},
 			match: config.Match{
@@ -86,10 +83,7 @@ func TestMatch(t *testing.T) {
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
-					Alert: parser.YamlKeyValue{
-						Key:   &parser.YamlNode{Value: "alert"},
-						Value: &parser.YamlNode{Value: "Foo"},
-					},
+					Alert: parser.YamlNode{Value: "Foo"},
 				},
 			},
 			match: config.Match{
@@ -103,10 +97,7 @@ func TestMatch(t *testing.T) {
 			path: "foo.yaml",
 			rule: parser.Rule{
 				AlertingRule: &parser.AlertingRule{
-					Alert: parser.YamlKeyValue{
-						Key:   &parser.YamlNode{Value: "alert"},
-						Value: &parser.YamlNode{Value: "Foo"},
-					},
+					Alert: parser.YamlNode{Value: "Foo"},
 				},
 			},
 			match: config.Match{
@@ -119,10 +110,7 @@ func TestMatch(t *testing.T) {
 			path: "foo.yaml",
 			rule: parser.Rule{
 				RecordingRule: &parser.RecordingRule{
-					Record: parser.YamlKeyValue{
-						Key:   &parser.YamlNode{Value: "record"},
-						Value: &parser.YamlNode{Value: "Foo"},
-					},
+					Record: parser.YamlNode{Value: "Foo"},
 				},
 			},
 			match: config.Match{

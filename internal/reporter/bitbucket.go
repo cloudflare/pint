@@ -68,7 +68,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 		if changes, err = r.api.getPullRequestChanges(pr); err != nil {
 			return fmt.Errorf("failed to get pull request changes from BitBucket: %w", err)
 		}
-		slog.Info("Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
+		slog.Debug("Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
 
 		var existingComments []bitBucketComment
 		if existingComments, err = r.api.getPullRequestComments(pr); err != nil {
@@ -120,7 +120,7 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 func moveReportedLine(report Report) (reported, original int) {
 	reported = -1
 	original = -1
-	for _, pl := range report.Problem.Lines {
+	for pl := report.Problem.Lines.First; pl <= report.Problem.Lines.Last; pl++ {
 		if original < 0 {
 			original = pl
 		}

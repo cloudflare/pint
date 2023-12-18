@@ -53,10 +53,10 @@ func (c AggregationCheck) Check(_ context.Context, _ string, rule parser.Rule, _
 	}
 
 	if c.nameRegex != nil {
-		if rule.RecordingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.RecordingRule.Record.Value.Value) {
+		if rule.RecordingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.RecordingRule.Record.Value) {
 			return nil
 		}
-		if rule.AlertingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.AlertingRule.Alert.Value.Value) {
+		if rule.AlertingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.AlertingRule.Alert.Value) {
 			return nil
 		}
 	}
@@ -75,7 +75,7 @@ func (c AggregationCheck) Check(_ context.Context, _ string, rule parser.Rule, _
 
 	for _, problem := range c.checkNode(expr.Query) {
 		problems = append(problems, Problem{
-			Lines:    expr.Lines(),
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Severity: c.severity,

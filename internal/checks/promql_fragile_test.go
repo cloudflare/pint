@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -58,7 +59,10 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/fragile",
 						Text:     text,
 						Severity: checks.Warning,
@@ -74,7 +78,10 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/fragile",
 						Text:     text,
 						Severity: checks.Warning,
@@ -90,7 +97,10 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/fragile",
 						Text:     text,
 						Severity: checks.Warning,
@@ -106,7 +116,10 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/fragile",
 						Text:     text,
 						Severity: checks.Warning,
@@ -122,7 +135,10 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/fragile",
 						Text:     text,
 						Severity: checks.Warning,

@@ -278,40 +278,6 @@ func (rr RelativeRange) String() string {
 	return fmt.Sprintf("%s/%s", output.HumanizeDuration(rr.lookback), output.HumanizeDuration(rr.step))
 }
 
-func NewAbsoluteRange(start, end time.Time, step time.Duration) AbsoluteRange {
-	return AbsoluteRange{start: start, end: end, step: step}
-}
-
-type AbsoluteRange struct {
-	start time.Time
-	end   time.Time
-	step  time.Duration
-}
-
-func (ar AbsoluteRange) Start() time.Time {
-	return ar.start
-}
-
-func (ar AbsoluteRange) End() time.Time {
-	return ar.end
-}
-
-func (ar AbsoluteRange) Dur() time.Duration {
-	return ar.end.Sub(ar.start)
-}
-
-func (ar AbsoluteRange) Step() time.Duration {
-	return ar.step
-}
-
-func (ar AbsoluteRange) String() string {
-	return fmt.Sprintf(
-		"%s-%s/%s",
-		ar.start.Format(time.RFC3339),
-		ar.end.Format(time.RFC3339),
-		output.HumanizeDuration(ar.step))
-}
-
 func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, stats QueryStats, err error) {
 	defer dummyReadAll(r)
 

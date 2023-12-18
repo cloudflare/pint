@@ -38,37 +38,55 @@ func TestParse(t *testing.T) {
 		{
 			content: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 6}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 6},
+					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 6},
+				},
 			},
 		},
 		{
 			content: []byte("- record: |\n    multiline\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 2}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 2},
+				},
 			},
 		},
 		{
 			content: []byte("- expr: foo\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 1},
+				},
 			},
 		},
 		{
 			content: []byte("- alert: foo\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+				},
 			},
 		},
 		{
 			content: []byte("- alert: foo\n  record: foo\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("got both record and alert keys in a single rule"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("got both record and alert keys in a single rule"), Line: 1},
+				},
 			},
 		},
 		{
 			content: []byte("- record: foo\n  labels:\n    foo: bar\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+				},
 			},
 		},
 		{
@@ -90,7 +108,10 @@ func TestParse(t *testing.T) {
   expr: bar
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 4}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 4},
+				},
 			},
 		},
 		{
@@ -100,7 +121,10 @@ func TestParse(t *testing.T) {
   record: bar
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated record key"), Line: 4}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated record key"), Line: 4},
+				},
 			},
 		},
 		{
@@ -110,7 +134,10 @@ func TestParse(t *testing.T) {
   expr: bar
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated alert key"), Line: 3}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated alert key"), Line: 3},
+				},
 			},
 		},
 		{
@@ -121,7 +148,10 @@ func TestParse(t *testing.T) {
   for: 1m
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated for key"), Line: 5}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated for key"), Line: 5},
+				},
 			},
 		},
 		{
@@ -132,7 +162,10 @@ func TestParse(t *testing.T) {
   keep_firing_for: 1m
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated keep_firing_for key"), Line: 5}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated keep_firing_for key"), Line: 5},
+				},
 			},
 		},
 		{
@@ -143,7 +176,10 @@ func TestParse(t *testing.T) {
   labels: {}
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5},
+				},
 			},
 		},
 		{
@@ -154,7 +190,10 @@ func TestParse(t *testing.T) {
   labels: {}
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5},
+				},
 			},
 		},
 		{
@@ -165,38 +204,35 @@ func TestParse(t *testing.T) {
   annotations: {}
 `),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("duplicated annotations key"), Line: 5}},
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated annotations key"), Line: 5},
+				},
 			},
 		},
 		{
 			content: []byte("- record: foo\n  expr: foo\n  extra: true\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("invalid key(s) found: extra"), Line: 3}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid key(s) found: extra"), Line: 3},
+				},
 			},
 		},
 		{
 			content: []byte("- record: foo\n  expr: foo offset 10m\n"),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 1, Last: 2},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "foo offset 10m",
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo offset 10m",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "foo offset 10m",
@@ -210,25 +246,16 @@ func TestParse(t *testing.T) {
 			content: []byte("- record: foo\n  expr: foo offset -10m\n"),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 1, Last: 2},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "foo offset -10m",
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo offset -10m",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "foo offset -10m",
@@ -253,6 +280,7 @@ func TestParse(t *testing.T) {
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 3, Last: 10},
 					Comments: []comments.Comment{
 						{
 							Type:  comments.DisableType,
@@ -284,53 +312,44 @@ func TestParse(t *testing.T) {
 						},
 					},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "foo offset 10m",
+								Lines: parser.LineRange{First: 4, Last: 4},
+								Value: "foo offset 10m",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "foo offset 10m",
 							},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 6, Last: 10},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "foo",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "foo",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "bar",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "bar",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{10}},
-										Value:    "bob",
+										Lines: parser.LineRange{First: 10, Last: 10},
+										Value: "bob",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{10}},
-										Value:    "alice",
+										Lines: parser.LineRange{First: 10, Last: 10},
+										Value: "alice",
 									},
 								},
 							},
@@ -343,25 +362,16 @@ func TestParse(t *testing.T) {
 			content: []byte("- record: foo\n  expr: foo[5m] offset 10m\n"),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 1, Last: 2},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "foo[5m] offset 10m",
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo[5m] offset 10m",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "foo[5m] offset 10m",
@@ -384,25 +394,16 @@ func TestParse(t *testing.T) {
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 2, Last: 6},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "name",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 2, Last: 2},
+							Value: "name",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "sum(foo)",
+								Lines: parser.LineRange{First: 3, Last: 3},
+								Value: "sum(foo)",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "sum(foo)",
@@ -412,29 +413,30 @@ func TestParse(t *testing.T) {
 							},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 4, Last: 6},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 4, Last: 4},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{5}},
-										Value:    "foo",
+										Lines: parser.LineRange{First: 5, Last: 5},
+										Value: "foo",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{5}},
-										Value:    "bar",
+										Lines: parser.LineRange{First: 5, Last: 5},
+										Value: "bar",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{6}},
-										Value:    "bob",
+										Lines: parser.LineRange{First: 6, Last: 6},
+										Value: "bob",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{6}},
-										Value:    "alice",
+										Lines: parser.LineRange{First: 6, Last: 6},
+										Value: "alice",
 									},
 								},
 							},
@@ -457,25 +459,16 @@ groups:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 5, Last: 9},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "name",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "name",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "sum(foo)",
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "sum(foo)",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "sum(foo)",
@@ -485,29 +478,30 @@ groups:
 							},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 7, Last: 9},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "foo",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "foo",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "bar",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "bar",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{9}},
-										Value:    "bob",
+										Lines: parser.LineRange{First: 9, Last: 9},
+										Value: "bob",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{9}},
-										Value:    "alice",
+										Lines: parser.LineRange{First: 9, Last: 9},
+										Value: "alice",
 									},
 								},
 							},
@@ -538,25 +532,16 @@ groups:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 1, Last: 9},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "Down",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "Down",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "up == 0\n",
+								Lines: parser.LineRange{First: 2, Last: 3},
+								Value: "up == 0\n",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "up == 0\n",
@@ -566,48 +551,44 @@ groups:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "for",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "11m\n",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 4, Last: 5},
+							Value: "11m\n",
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 6, Last: 7},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{7}},
-										Value:    "severity",
+										Lines: parser.LineRange{First: 7, Last: 7},
+										Value: "severity",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{7}},
-										Value:    "critical",
+										Lines: parser.LineRange{First: 7, Last: 7},
+										Value: "critical",
 									},
 								},
 							},
 						},
 						Annotations: &parser.YamlMap{
+							Lines: parser.LineRange{First: 8, Last: 9},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{8}},
-								Value:    "annotations",
+								Lines: parser.LineRange{First: 8, Last: 8},
+								Value: "annotations",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{9}},
-										Value:    "uri",
+										Lines: parser.LineRange{First: 9, Last: 9},
+										Value: "uri",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{9}},
-										Value:    "https://docs.example.com/down.html",
+										Lines: parser.LineRange{First: 9, Last: 9},
+										Value: "https://docs.example.com/down.html",
 									},
 								},
 							},
@@ -615,25 +596,16 @@ groups:
 					},
 				},
 				{
+					Lines: parser.LineRange{First: 11, Last: 17},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{11}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{12}},
-								Value:    "foo\n",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 11, Last: 12},
+							Value: "foo\n",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{13}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{14, 15, 16}},
-								Value:    "bar\n/\nbaz > 1",
+								Lines: parser.LineRange{First: 13, Last: 16},
+								Value: "bar\n/\nbaz > 1",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "bar\n/\nbaz > 1",
@@ -649,9 +621,10 @@ groups:
 							},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 17, Last: 17},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{17}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 17, Last: 17},
+								Value: "labels",
 							},
 						},
 					},
@@ -672,25 +645,16 @@ groups:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 1, Last: 9},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{1}},
-								Value:    "Foo",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "Foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3, 4, 5, 6, 7, 8}},
-								Value:    "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
+								Lines: parser.LineRange{First: 2, Last: 8},
+								Value: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
@@ -727,15 +691,9 @@ groups:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{9}},
-								Value:    "for",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{9}},
-								Value:    "30m",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 9, Last: 9},
+							Value: "30m",
 						},
 					},
 				},
@@ -768,25 +726,16 @@ data:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 13, Last: 20},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{13}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{13}},
-								Value:    "Example_Is_Down",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 13, Last: 13},
+							Value: "Example_Is_Down",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{14}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{14}},
-								Value:    `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
+								Lines: parser.LineRange{First: 14, Last: 14},
+								Value: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
 							},
 							Query: &parser.PromQLNode{
 								Expr: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
@@ -796,58 +745,54 @@ data:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{15}},
-								Value:    "for",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{15}},
-								Value:    "5m",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 15, Last: 15},
+							Value: "5m",
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 16, Last: 18},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{16}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 16, Last: 16},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{17}},
-										Value:    "priority",
+										Lines: parser.LineRange{First: 17, Last: 17},
+										Value: "priority",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{17}},
-										Value:    "2",
+										Lines: parser.LineRange{First: 17, Last: 17},
+										Value: "2",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{18}},
-										Value:    "environment",
+										Lines: parser.LineRange{First: 18, Last: 18},
+										Value: "environment",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{18}},
-										Value:    "production",
+										Lines: parser.LineRange{First: 18, Last: 18},
+										Value: "production",
 									},
 								},
 							},
 						},
 						Annotations: &parser.YamlMap{
+							Lines: parser.LineRange{First: 19, Last: 20},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{19}},
-								Value:    "annotations",
+								Lines: parser.LineRange{First: 19, Last: 19},
+								Value: "annotations",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{20}},
-										Value:    "summary",
+										Lines: parser.LineRange{First: 20, Last: 20},
+										Value: "summary",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{20}},
-										Value:    "No replicas for Example have been running for 5 minutes",
+										Lines: parser.LineRange{First: 20, Last: 20},
+										Value: "No replicas for Example have been running for 5 minutes",
 									},
 								},
 							},
@@ -855,25 +800,16 @@ data:
 					},
 				},
 				{
+					Lines: parser.LineRange{First: 22, Last: 23},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{22}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{22}},
-								Value:    "Example_High_Restart_Rate",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 22, Last: 22},
+							Value: "Example_High_Restart_Rate",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{23}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{23}},
-								Value:    `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+								Lines: parser.LineRange{First: 23, Last: 23},
+								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
 							},
 							Query: &parser.PromQLNode{
 								Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
@@ -928,25 +864,16 @@ data:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 4, Last: 13},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "HaproxyServerHealthcheckFailure",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 4, Last: 4},
+							Value: "HaproxyServerHealthcheckFailure",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "increase(haproxy_server_check_failures_total[15m]) > 100",
+								Lines: parser.LineRange{First: 5, Last: 5},
+								Value: "increase(haproxy_server_check_failures_total[15m]) > 100",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "increase(haproxy_server_check_failures_total[15m]) > 100",
@@ -968,59 +895,55 @@ data:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "for",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "5m",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "5m",
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 7, Last: 8},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "severity",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "severity",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "24x7",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "24x7",
 									},
 								},
 							},
 						},
 						Annotations: &parser.YamlMap{
+							Lines: parser.LineRange{First: 9, Last: 13},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{9}},
-								Value:    "annotations",
+								Lines: parser.LineRange{First: 9, Last: 9},
+								Value: "annotations",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{10}},
-										Value:    "summary",
+										Lines: parser.LineRange{First: 10, Last: 10},
+										Value: "summary",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{10}},
-										Value:    "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
+										Lines: parser.LineRange{First: 10, Last: 10},
+										Value: "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{11}},
-										Value:    "description",
+										Lines: parser.LineRange{First: 11, Last: 11},
+										Value: "description",
 									},
 									Value: &parser.YamlNode{
 										// FIXME https://github.com/cloudflare/pint/issues/20
 										// Should be Lines: [11]
-										Position: parser.FilePosition{Lines: []int{11, 12, 13}},
+										Lines: parser.LineRange{First: 11, Last: 13},
 										// Should be `Some ...` since \n should be escaped
 										Value: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}",
 									},
@@ -1046,6 +969,7 @@ data:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 6, Last: 7},
 					Comments: []comments.Comment{
 						{
 							Type:  comments.DisableType,
@@ -1069,24 +993,14 @@ data:
 						},
 					},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "expr1",
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "expr1",
 							},
 							Query: &parser.PromQLNode{Expr: "expr1"},
 						},
@@ -1107,25 +1021,16 @@ data:
 							Value: comments.Disable{Match: "name1"},
 						},
 					},
+					Lines: parser.LineRange{First: 6, Last: 10},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{10}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{10}},
-								Value:    "expr2",
+								Lines: parser.LineRange{First: 10, Last: 10},
+								Value: "expr2",
 							},
 							Query: &parser.PromQLNode{Expr: "expr2"},
 						},
@@ -1154,25 +1059,16 @@ data:
 							Value: comments.Disable{Match: "expr1"},
 						},
 					},
+					Lines: parser.LineRange{First: 6, Last: 7},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "expr1",
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "expr1",
 							},
 							Query: &parser.PromQLNode{Expr: "expr1"},
 						},
@@ -1196,52 +1092,44 @@ data:
 `),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 4, Last: 8},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 4, Last: 4},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{5}},
-								Value:    "expr1",
+								Lines: parser.LineRange{First: 5, Last: 5},
+								Value: "expr1",
 							},
 							Query: &parser.PromQLNode{Expr: "expr1"},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 6, Last: 8},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{7}},
-										Value:    "label1",
+										Lines: parser.LineRange{First: 7, Last: 7},
+										Value: "label1",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{7}},
-										Value:    "val1",
+										Lines: parser.LineRange{First: 7, Last: 7},
+										Value: "val1",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "label2",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "label2",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "val2",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "val2",
 									},
 								},
 							},
@@ -1255,52 +1143,44 @@ data:
 							Value: comments.Disable{Match: "foot comment"},
 						},
 					},
+					Lines: parser.LineRange{First: 9, Last: 11},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{9}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{9}},
-								Value:    "name2",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 9, Last: 9},
+							Value: "name2",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{10}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{10}},
-								Value:    "expr2",
+								Lines: parser.LineRange{First: 10, Last: 10},
+								Value: "expr2",
 							},
 							Query: &parser.PromQLNode{Expr: "expr2"},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 11, Last: 11},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{11}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 11, Last: 11},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{7}},
-										Value:    "label1",
+										Lines: parser.LineRange{First: 7, Last: 7},
+										Value: "label1",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{7}},
-										Value:    "val1",
+										Lines: parser.LineRange{First: 7, Last: 7},
+										Value: "val1",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "label2",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "label2",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{8}},
-										Value:    "val2",
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "val2",
 									},
 								},
 							},
@@ -1312,37 +1192,55 @@ data:
 		{
 			content: []byte("- alert:\n  expr: vector(1)\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("alert value cannot be empty"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("alert value cannot be empty"), Line: 1},
+				},
 			},
 		},
 		{
 			content: []byte("- alert: foo\n  expr:\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2},
+				},
 			},
 		},
 		{
 			content: []byte("- alert: foo\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+				},
 			},
 		},
 		{
 			content: []byte("- record:\n  expr:\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("record value cannot be empty"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("record value cannot be empty"), Line: 1},
+				},
 			},
 		},
 		{
 			content: []byte("- record: foo\n  expr:\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2},
+				},
 			},
 		},
 		{
 			content: []byte("- record: foo\n"),
 			output: []parser.Rule{
-				{Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1}},
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+				},
 			},
 		},
 		{
@@ -1364,50 +1262,32 @@ data:
 `)),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 7, Last: 8},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 7, Last: 7},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{8}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{8}},
-								Value:    "up",
+								Lines: parser.LineRange{First: 8, Last: 8},
+								Value: "up",
 							},
 							Query: &parser.PromQLNode{Expr: "up"},
 						},
 					},
 				},
 				{
+					Lines: parser.LineRange{First: 12, Last: 13},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{12}},
-								Value:    "record",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{12}},
-								Value:    "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 12, Last: 12},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{13}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{13}},
-								Value:    "up",
+								Lines: parser.LineRange{First: 13, Last: 13},
+								Value: "up",
 							},
 							Query: &parser.PromQLNode{Expr: "up"},
 						},
@@ -1430,25 +1310,16 @@ data:
 `)),
 			output: []parser.Rule{
 				{
+					Lines: parser.LineRange{First: 2, Last: 5},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{2}},
-								Value:    "Template",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 2, Last: 2},
+							Value: "Template",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{3}},
-								Value:    "up == 0",
+								Lines: parser.LineRange{First: 3, Last: 3},
+								Value: "up == 0",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "up == 0",
@@ -1459,19 +1330,20 @@ data:
 							},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 4, Last: 5},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{4}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 4, Last: 4},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{5}},
-										Value:    "notify",
+										Lines: parser.LineRange{First: 5, Last: 5},
+										Value: "notify",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{5}},
-										Value:    "chat-alerts",
+										Lines: parser.LineRange{First: 5, Last: 5},
+										Value: "chat-alerts",
 									},
 								},
 							},
@@ -1479,25 +1351,16 @@ data:
 					},
 				},
 				{
+					Lines: parser.LineRange{First: 6, Last: 10},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "alert",
-							},
-							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{6}},
-								Value:    "Service Down",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "Service Down",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "expr",
-							},
 							Value: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{7}},
-								Value:    "up == 0",
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "up == 0",
 							},
 							Query: &parser.PromQLNode{
 								Expr: "up == 0",
@@ -1508,29 +1371,30 @@ data:
 							},
 						},
 						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 8, Last: 10},
 							Key: &parser.YamlNode{
-								Position: parser.FilePosition{Lines: []int{8}},
-								Value:    "labels",
+								Lines: parser.LineRange{First: 8, Last: 8},
+								Value: "labels",
 							},
 							Items: []*parser.YamlKeyValue{
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{9}},
-										Value:    "notify",
+										Lines: parser.LineRange{First: 9, Last: 9},
+										Value: "notify",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{9}},
-										Value:    "chat-alerts",
+										Lines: parser.LineRange{First: 9, Last: 9},
+										Value: "chat-alerts",
 									},
 								},
 								{
 									Key: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{10}},
-										Value:    "summary",
+										Lines: parser.LineRange{First: 10, Last: 10},
+										Value: "summary",
 									},
 									Value: &parser.YamlNode{
-										Position: parser.FilePosition{Lines: []int{10}},
-										Value:    "foo",
+										Lines: parser.LineRange{First: 10, Last: 10},
+										Value: "foo",
 									},
 								},
 							},

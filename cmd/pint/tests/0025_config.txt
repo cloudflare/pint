@@ -8,92 +8,10 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 {
   "ci": {
-    "maxCommits": 20,
-    "baseBranch": "master"
+    "baseBranch": "master",
+    "maxCommits": 20
   },
   "parser": {},
-  "prometheus": [
-    {
-      "name": "prom",
-      "uri": "http://127.0.0.1",
-      "timeout": "2m",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": true
-    },
-    {
-      "name": "prom-with-failover",
-      "uri": "http://127.0.0.1",
-      "failover": [
-        "http://127.0.0.1",
-        "http://127.0.0.1"
-      ],
-      "timeout": "2m0s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    },
-    {
-      "name": "prom-with-tags",
-      "uri": "http://127.0.0.1",
-      "timeout": "2m0s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "tags": [
-        "a",
-        "@",
-        "1"
-      ],
-      "required": false
-    },
-    {
-      "name": "custom-concurrency",
-      "uri": "http://127.0.0.1",
-      "timeout": "2m0s",
-      "concurrency": 32,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false
-    },
-    {
-      "name": "custom-rateLimit",
-      "uri": "http://user:pass@127.0.0.1",
-      "timeout": "15s",
-      "concurrency": 16,
-      "rateLimit": 1,
-      "uptime": "up",
-      "required": false
-    },
-    {
-      "name": "tls-skipVerify",
-      "uri": "http://127.0.0.1",
-      "timeout": "15s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false,
-      "tls": {
-        "skipVerify": true
-      }
-    },
-    {
-      "name": "tls-ca",
-      "uri": "http://127.0.0.1",
-      "timeout": "15s",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "uptime": "up",
-      "required": false,
-      "tls": {
-        "caCert": "prom-ca.pem",
-        "clientCert": "prom.pem",
-        "clientKey": "prom.key"
-      }
-    }
-  ],
   "checks": {
     "enabled": [
       "alerts/annotation",
@@ -123,6 +41,89 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       "promql/fragile"
     ]
   },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://127.0.0.1",
+      "timeout": "2m",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": true
+    },
+    {
+      "name": "prom-with-failover",
+      "uri": "http://127.0.0.1",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "failover": [
+        "http://127.0.0.1",
+        "http://127.0.0.1"
+      ],
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom-with-tags",
+      "uri": "http://127.0.0.1",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "tags": [
+        "a",
+        "@",
+        "1"
+      ],
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "custom-concurrency",
+      "uri": "http://127.0.0.1",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "concurrency": 32,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "custom-rateLimit",
+      "uri": "http://user:pass@127.0.0.1",
+      "timeout": "15s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 1,
+      "required": false
+    },
+    {
+      "tls": {
+        "skipVerify": true
+      },
+      "name": "tls-skipVerify",
+      "uri": "http://127.0.0.1",
+      "timeout": "15s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "tls": {
+        "caCert": "prom-ca.pem",
+        "clientCert": "prom.pem",
+        "clientKey": "prom.key"
+      },
+      "name": "tls-ca",
+      "uri": "http://127.0.0.1",
+      "timeout": "15s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ],
   "check": [
     {
       "ignoreMetrics": [
@@ -158,11 +159,11 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       ],
       "ignore": [
         {
-          "kind": "alerting",
           "label": {
             "key": "notify",
             "value": "blackhole"
-          }
+          },
+          "kind": "alerting"
         },
         {
           "command": "watch"
@@ -171,8 +172,8 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       "annotation": [
         {
           "key": "summary",
-          "required": true,
-          "severity": "bug"
+          "severity": "bug",
+          "required": true
         }
       ],
       "alerts": {
@@ -204,8 +205,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       ],
       "cost": {}
     }
-  ],
-  "owners": {}
+  ]
 }
 -- .pint.hcl --
 prometheus "prom" {

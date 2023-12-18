@@ -79,20 +79,20 @@ func (t *TLSConfig) toHTTPConfig() (*tls.Config, error) {
 }
 
 type PrometheusConfig struct {
+	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
+	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitempty"`
 	Name        string            `hcl:",label" json:"name"`
 	URI         string            `hcl:"uri" json:"uri"`
 	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
-	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
-	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
 	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
-	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
-	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
 	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
+	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
 	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
 	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
 	Tags        []string          `hcl:"tags,optional" json:"tags,omitempty"`
+	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
+	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
 	Required    bool              `hcl:"required,optional" json:"required"`
-	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitempty"`
 }
 
 func (pc PrometheusConfig) validate() error {
@@ -194,9 +194,9 @@ func NewPrometheusGenerator(cfg Config, metricsRegistry *prometheus.Registry) *P
 }
 
 type PrometheusGenerator struct {
-	servers         []*promapi.FailoverGroup
-	metricsRegistry *prometheus.Registry
 	cfg             Config
+	metricsRegistry *prometheus.Registry
+	servers         []*promapi.FailoverGroup
 }
 
 func (pg *PrometheusGenerator) Servers() []*promapi.FailoverGroup {

@@ -25,12 +25,12 @@ type Config struct {
 	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
 	Parser     *Parser            `hcl:"parser,block" json:"parser,omitempty"`
 	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
-	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Discovery  *Discovery         `hcl:"discovery,block" json:"discovery,omitempty"`
 	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
+	Owners     *Owners            `hcl:"owners,block" json:"owners,omitempty"`
+	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
 	Check      []Check            `hcl:"check,block" json:"check,omitempty"`
 	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
-	Owners     *Owners            `hcl:"owners,block" json:"owners,omitempty"`
 }
 
 func (cfg *Config) DisableOnlineChecks() {

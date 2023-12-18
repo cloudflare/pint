@@ -79,10 +79,10 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 	c.Annotations = map[string]string{}
 
 	if rule.AlertingRule != nil {
-		c.Alert = rule.AlertingRule.Alert.Value.Value
+		c.Alert = rule.AlertingRule.Alert.Value
 		c.Expr = rule.AlertingRule.Expr.Value.Value
 		if rule.AlertingRule.For != nil {
-			c.For = rule.AlertingRule.For.Value.Value
+			c.For = rule.AlertingRule.For.Value
 		}
 		if rule.AlertingRule.Labels != nil {
 			for _, label := range rule.AlertingRule.Labels.Items {
@@ -96,7 +96,7 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 		}
 	}
 	if rule.RecordingRule != nil {
-		c.Record = rule.RecordingRule.Record.Value.Value
+		c.Record = rule.RecordingRule.Record.Value
 		c.Expr = rule.RecordingRule.Expr.Value.Value
 		if rule.RecordingRule.Labels != nil {
 			for _, label := range rule.RecordingRule.Labels.Items {
@@ -108,12 +108,12 @@ func newTemplateContext(rule parser.Rule) (c TemplateContext) {
 }
 
 type TemplateContext struct {
+	Labels      map[string]string
+	Annotations map[string]string
 	Alert       string
 	Record      string
 	Expr        string
 	For         string
-	Labels      map[string]string
-	Annotations map[string]string
 }
 
 func (tc TemplateContext) Aliases() string {

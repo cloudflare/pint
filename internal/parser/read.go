@@ -39,8 +39,9 @@ func emptyLine(line string) (emptied string) {
 
 type Content struct {
 	Body       []byte
-	Ignored    bool
+	TotalLines int
 	IgnoreLine int
+	Ignored    bool
 }
 
 func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err error) {
@@ -59,6 +60,9 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 		line, err = reader.ReadString('\n')
 		if err != nil && !errors.Is(err, io.EOF) {
 			break
+		}
+		if line != "" {
+			out.TotalLines++
 		}
 
 		if skipAll {

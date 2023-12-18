@@ -33,8 +33,8 @@ func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, severity Seve
 }
 
 type RuleForCheck struct {
-	severity Severity
 	key      RuleForKey
+	severity Severity
 	minFor   time.Duration
 	maxFor   time.Duration
 }
@@ -65,17 +65,17 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 	}
 
 	var forDur model.Duration
-	var lines []int
+	var lines parser.LineRange
 
 	switch {
 	case c.key == RuleForFor && rule.AlertingRule.For != nil:
-		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
-		lines = rule.AlertingRule.For.Lines()
+		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value)
+		lines = rule.AlertingRule.For.Lines
 	case c.key == RuleForKeepFiringFor && rule.AlertingRule.KeepFiringFor != nil:
-		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value.Value)
-		lines = rule.AlertingRule.KeepFiringFor.Lines()
+		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value)
+		lines = rule.AlertingRule.KeepFiringFor.Lines
 	default:
-		lines = rule.AlertingRule.Alert.Lines()
+		lines = rule.AlertingRule.Alert.Lines
 	}
 
 	if time.Duration(forDur) < c.minFor {

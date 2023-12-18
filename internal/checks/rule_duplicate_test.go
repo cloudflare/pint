@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -130,7 +131,10 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{1, 2},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  2,
+						},
 						Reporter: checks.RuleDuplicateCheckName,
 						Text:     textDuplicateRule("fake.yml", 6),
 						Severity: checks.Bug,

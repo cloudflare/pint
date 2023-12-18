@@ -241,7 +241,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
@@ -253,7 +256,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this should be ignored, file is not part of the diff",
 						Severity: checks.Bug,
@@ -265,7 +271,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "bad name",
 						Severity: checks.Fatal,
@@ -277,7 +286,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "mock text",
 						Severity: checks.Bug,
@@ -289,7 +301,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "mock",
 						Text:     "mock text 2",
 						Severity: checks.Warning,
@@ -492,7 +507,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "line is not part of the diff",
 						Severity: checks.Bug,
@@ -504,7 +522,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "bad name",
 						Severity: checks.Fatal,
@@ -516,7 +537,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "mock text",
 						Severity: checks.Bug,
@@ -528,7 +552,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "mock",
 						Text:     "mock text 2",
 						Severity: checks.Warning,
@@ -603,7 +630,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{3, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "test/mock",
 						Text:     "syntax error",
 						Severity: checks.Fatal,
@@ -665,7 +695,10 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this line is not part of the diff",
 						Severity: checks.Bug,
@@ -677,7 +710,10 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "bad name",
 						Severity: checks.Bug,
@@ -689,7 +725,10 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[0],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "mock text",
 						Severity: checks.Bug,
@@ -701,7 +740,10 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "mock",
 						Text:     "mock text 2",
 						Severity: checks.Warning,
@@ -816,7 +858,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
@@ -828,7 +873,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "bad name",
 						Severity: checks.Fatal,
@@ -840,7 +888,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "mock text",
 						Details:  "mock details",
@@ -853,7 +904,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "mock",
 						Text:     "mock text 2",
 						Severity: checks.Warning,
@@ -1372,7 +1426,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
@@ -1530,7 +1587,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
@@ -1542,7 +1602,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{1},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
 						Reporter: "mock",
 						Text:     "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
@@ -1554,7 +1617,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "bad name",
 						Details:  "bad name details",
@@ -1567,7 +1633,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "mock text 1",
 						Details:  "mock details",
@@ -1580,7 +1649,10 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "mock text 2",
 						Details:  "mock details",

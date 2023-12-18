@@ -60,7 +60,7 @@ func (c VectorMatchingCheck) Check(ctx context.Context, _ string, rule parser.Ru
 
 	for _, problem := range c.checkNode(ctx, expr.Query) {
 		problems = append(problems, Problem{
-			Lines:    expr.Lines(),
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Details:  problem.details,

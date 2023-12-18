@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -28,7 +29,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{1, 2},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  2,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`severity` annotation is required.",
 						Severity: checks.Warning,
@@ -46,7 +50,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{1, 2},
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  2,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`severity` annotation is required.",
 						Severity: checks.Warning,
@@ -73,7 +80,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 4},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`severity` annotation is required.",
 						Severity: checks.Warning,
@@ -100,7 +110,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`severity` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
@@ -118,7 +131,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`severity` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
@@ -163,7 +179,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`for` annotation value `4m` must match `^{{ $for }}$`.",
 						Severity: checks.Bug,
@@ -199,7 +218,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`annotation_.*` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
@@ -217,7 +239,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`annotation_.*` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
@@ -235,7 +260,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`components` annotation value `db` must match `^api|memcached$`.",
 						Severity: checks.Bug,
@@ -260,7 +288,10 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.AnnotationCheckName,
 						Text:     "`components` annotation value `db` is not one of valid values.",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).",

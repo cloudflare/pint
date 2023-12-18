@@ -124,7 +124,7 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 
 				}
 				problems = append(problems, Problem{
-					Lines:    expr.Lines(),
+					Lines:    expr.Value.Lines,
 					Reporter: c.Reporter(),
 					Text:     text,
 					Details:  RegexpCheckDetails,
@@ -133,7 +133,7 @@ func (c RegexpCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []di
 			}
 			if beginText > 1 || endText > 1 {
 				problems = append(problems, Problem{
-					Lines:    expr.Lines(),
+					Lines:    expr.Value.Lines,
 					Reporter: c.Reporter(),
 					Text: fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
 						lm, lm.Name, lm.Type, lm.Value,

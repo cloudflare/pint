@@ -59,7 +59,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 	if n := utils.HasOuterBinaryExpr(expr); n != nil && n.Op == promParser.LOR {
 		if (hasComparision(n.LHS) == nil || hasComparision(n.RHS) == nil) && !isAbsent(n.LHS) && !isAbsent(n.RHS) {
 			problems = append(problems, Problem{
-				Lines:    rule.AlertingRule.Expr.Lines(),
+				Lines:    rule.AlertingRule.Expr.Value.Lines,
 				Reporter: c.Reporter(),
 				Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
 				Details:  ComparisonCheckDetails,
@@ -71,7 +71,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 	if n := hasComparision(expr.Node); n != nil {
 		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
 			problems = append(problems, Problem{
-				Lines:    rule.AlertingRule.Expr.Lines(),
+				Lines:    rule.AlertingRule.Expr.Value.Lines,
 				Reporter: c.Reporter(),
 				Text:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
 				Details:  ComparisonCheckDetails,
@@ -86,7 +86,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 	}
 
 	problems = append(problems, Problem{
-		Lines:    rule.AlertingRule.Expr.Lines(),
+		Lines:    rule.AlertingRule.Expr.Value.Lines,
 		Reporter: c.Reporter(),
 		Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
 		Details:  ComparisonCheckDetails,

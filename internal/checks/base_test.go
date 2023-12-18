@@ -183,7 +183,7 @@ func parseContent(content string) (entries []discovery.Entry, err error) {
 		entries = append(entries, discovery.Entry{
 			SourcePath:    "fake.yml",
 			ReportedPath:  "fake.yml",
-			ModifiedLines: rule.Lines(),
+			ModifiedLines: rule.Lines.Expand(),
 			Rule:          rule,
 		})
 	}

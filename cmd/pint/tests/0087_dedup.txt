@@ -7,20 +7,14 @@ level=INFO msg="Finding all rules to check" paths=["rules"]
 rules/01.yml:5 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
 
-rules/01.yml:5-12 Bug: Template is using `cluster` label but the query removes it. (alerts/template)
-  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
- ..
+rules/01.yml:12 Bug: Template is using `cluster` label but the query removes it. (alerts/template)
  12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
 
-rules/01.yml:5-13 Bug: Template is using `cluster` label but the query removes it. (alerts/template)
-  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
- ..
+rules/01.yml:12 Bug: Template is using `instance` label but the query removes it. (alerts/template)
+ 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+
+rules/01.yml:13 Bug: Template is using `cluster` label but the query removes it. (alerts/template)
  13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
-
-rules/01.yml:5-12 Bug: Template is using `instance` label but the query removes it. (alerts/template)
-  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
- ..
- 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
 
 level=INFO msg="Problems found" Bug=3 Warning=1
 level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"

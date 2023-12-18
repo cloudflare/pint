@@ -11,8 +11,8 @@ import (
 )
 
 type Check struct {
-	Name string   `hcl:",label" json:"name"`
 	Body hcl.Body `hcl:",remain" json:"-"`
+	Name string   `hcl:",label" json:"name"`
 }
 
 func (c Check) MarshalJSON() ([]byte, error) {

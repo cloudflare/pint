@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -74,7 +75,10 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "rule/for",
 						Text:     forMin("for", "5m"),
 						Severity: checks.Warning,
@@ -92,7 +96,10 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "rule/for",
 						Text:     forMax("for", "2m"),
 						Severity: checks.Warning,
@@ -128,7 +135,10 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "rule/for",
 						Text:     forMin("keep_firing_for", "5m"),
 						Severity: checks.Warning,

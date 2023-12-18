@@ -45,8 +45,8 @@ type BodyDiff struct {
 
 type Path struct {
 	Name          string
-	Type          PathType
 	SymlinkTarget string
+	Type          PathType
 }
 
 func (p Path) EffectivePath() string {

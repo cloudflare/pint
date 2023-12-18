@@ -74,7 +74,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 	if rule.RecordingRule.Labels == nil {
 		if c.isReguired {
 			problems = append(problems, Problem{
-				Lines:    rule.Lines(),
+				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Severity: c.severity,
@@ -87,7 +87,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 	if val == nil {
 		if c.isReguired {
 			problems = append(problems, Problem{
-				Lines:    rule.RecordingRule.Labels.Lines(),
+				Lines:    rule.RecordingRule.Labels.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Severity: c.severity,
@@ -98,12 +98,12 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 
 	if c.tokenRe != nil {
 		for _, match := range c.tokenRe.MustExpand(rule).FindAllString(val.Value, -1) {
-			problems = append(problems, c.checkValue(rule, match, val.Position.Lines)...)
+			problems = append(problems, c.checkValue(rule, match, val.Lines)...)
 		}
 		return problems
 	}
 
-	problems = append(problems, c.checkValue(rule, val.Value, val.Position.Lines)...)
+	problems = append(problems, c.checkValue(rule, val.Value, val.Lines)...)
 	return problems
 }
 
@@ -111,7 +111,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule.Labels == nil {
 		if c.isReguired {
 			problems = append(problems, Problem{
-				Lines:    rule.Lines(),
+				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Severity: c.severity,
@@ -130,7 +130,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 
 	if len(labels) == 0 && c.isReguired {
 		problems = append(problems, Problem{
-			Lines:    rule.AlertingRule.Labels.Lines(),
+			Lines:    rule.AlertingRule.Labels.Lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 			Severity: c.severity,
@@ -141,17 +141,17 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 	for _, lab := range labels {
 		if c.tokenRe != nil {
 			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(lab.Value.Value, -1) {
-				problems = append(problems, c.checkValue(rule, match, lab.Value.Position.Lines)...)
+				problems = append(problems, c.checkValue(rule, match, lab.Value.Lines)...)
 			}
 		} else {
-			problems = append(problems, c.checkValue(rule, lab.Value.Value, lab.Value.Position.Lines)...)
+			problems = append(problems, c.checkValue(rule, lab.Value.Value, lab.Value.Lines)...)
 		}
 	}
 
 	return problems
 }
 
-func (c LabelCheck) checkValue(rule parser.Rule, value string, lines []int) (problems []Problem) {
+func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.LineRange) (problems []Problem) {
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
 			Lines:    lines,

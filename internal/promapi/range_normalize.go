@@ -60,10 +60,10 @@ type TimeRange struct {
 }
 
 type MetricTimeRange struct {
-	Fingerprint uint64
-	Labels      labels.Labels
 	Start       time.Time
 	End         time.Time
+	Labels      labels.Labels
+	Fingerprint uint64
 }
 
 func Overlaps(a, b MetricTimeRange, step time.Duration) (c TimeRange, ok bool) {
@@ -200,9 +200,9 @@ func (mtr MetricTimeRanges) Less(i, j int) bool {
 type SeriesTimeRanges struct {
 	From   time.Time
 	Until  time.Time
-	Step   time.Duration
 	Ranges MetricTimeRanges
 	Gaps   []TimeRange
+	Step   time.Duration
 }
 
 func (str SeriesTimeRanges) covers(ts time.Time) bool {

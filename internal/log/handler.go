@@ -22,12 +22,12 @@ const (
 )
 
 type handler struct {
-	mtx     sync.Mutex
-	dst     io.Writer
-	level   slog.Level
-	noColor bool
+	dst io.Writer
 
 	escaper *strings.Replacer
+	level   slog.Level
+	mtx     sync.Mutex
+	noColor bool
 }
 
 func newHandler(dst io.Writer, level slog.Level, noColor bool) *handler {

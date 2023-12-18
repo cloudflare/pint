@@ -6,10 +6,10 @@ import (
 )
 
 type CI struct {
+	BaseBranch string   `hcl:"baseBranch,optional" json:"baseBranch,omitempty"`
 	Include    []string `hcl:"include,optional" json:"include,omitempty"`
 	Exclude    []string `hcl:"exclude,optional" json:"exclude,omitempty"`
 	MaxCommits int      `hcl:"maxCommits,optional" json:"maxCommits,omitempty"`
-	BaseBranch string   `hcl:"baseBranch,optional" json:"baseBranch,omitempty"`
 }
 
 func (ci CI) validate() error {

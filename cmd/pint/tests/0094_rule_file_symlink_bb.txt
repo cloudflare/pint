@@ -58,8 +58,10 @@ stderr 'symlink.yml ~> rules.yml:7 Bug: Duration for `rate'
 stderr 'double.yml ~> rules.yml:5 Bug: Duration for `rate'
 stderr 'double.yml ~> rules.yml:7 Bug: Duration for `rate'
 
-stderr '{"path":"rules.yml","line":5,'
-stderr '{"path":"rules.yml","line":7,'
+stderr '{"path":"rules.yml","message":"Problem detected on symlinked file symlink.yml: .*","line":5}'
+stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double.yml: .*","line":5}'
+stderr '{"path":"rules.yml","message":"Problem detected on symlinked file symlink.yml: .*","line":7}'
+stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double.yml: .*","line":7}'
 ! stderr '{"path":"symlink.yml"'
 ! stderr '{"path":"double.yml"'
 

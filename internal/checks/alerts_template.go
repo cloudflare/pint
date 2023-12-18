@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"strings"
 	textTemplate "text/template"
 	"text/template/parse"
@@ -149,7 +148,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 		for _, label := range rule.AlertingRule.Labels.Items {
 			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
-					Lines:    label.Lines(),
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 					Details:  TemplateCheckSyntaxDetails,
@@ -159,7 +161,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			// check key
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Key.Value) {
 				problems = append(problems, Problem{
-					Lines:    label.Lines(),
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     msg,
 					Severity: Bug,
@@ -168,7 +173,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			// check value
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
 				problems = append(problems, Problem{
-					Lines:    label.Lines(),
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     msg,
 					Severity: Bug,
@@ -178,7 +186,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			for _, aggr := range aggrs {
 				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: label.Key.Lines.First,
+							Last:  label.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     msg,
 						Details:  TemplateCheckAggregationDetails,
@@ -193,7 +204,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false, safeLabels) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: label.Key.Lines.First,
+							Last:  label.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     msg,
 						Details:  TemplateCheckAbsentDetails,
@@ -205,7 +219,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
 				for _, msg := range checkMetricLabels(msgOn, label.Key.Value, label.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: label.Key.Lines.First,
+							Last:  label.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     msg,
 						Details:  TemplateCheckOnDetails,
@@ -218,7 +235,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if len(labelNames) > 0 && len(vectors) == 0 {
 				for _, name := range labelNames {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(label.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: label.Key.Lines.First,
+							Last:  label.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
 						Details:  TemplateCheckLabelsDetails,
@@ -233,7 +253,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 		for _, annotation := range rule.AlertingRule.Annotations.Items {
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
-					Lines:    annotation.Lines(),
+					Lines: parser.LineRange{
+						First: annotation.Key.Lines.First,
+						Last:  annotation.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 					Details:  TemplateCheckSyntaxDetails,
@@ -244,7 +267,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			for _, aggr := range aggrs {
 				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: annotation.Key.Lines.First,
+							Last:  annotation.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     msg,
 						Details:  TemplateCheckAggregationDetails,
@@ -266,7 +292,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				}
 				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false, safeLabels) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: annotation.Key.Lines.First,
+							Last:  annotation.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     msg,
 						Details:  TemplateCheckAbsentDetails,
@@ -279,7 +308,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if len(labelNames) > 0 && len(vectors) == 0 {
 				for _, name := range labelNames {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: annotation.Key.Lines.First,
+							Last:  annotation.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
 						Details:  TemplateCheckLabelsDetails,
@@ -291,7 +323,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
 				for _, msg := range checkMetricLabels(msgOn, annotation.Key.Value, annotation.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: annotation.Key.Lines.First,
+							Last:  annotation.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     msg,
 						Details:  TemplateCheckOnDetails,
@@ -303,7 +338,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
 				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr.Query) {
 					problems = append(problems, Problem{
-						Lines:    mergeLines(annotation.Lines(), rule.AlertingRule.Expr.Lines()),
+						Lines: parser.LineRange{
+							First: annotation.Key.Lines.First,
+							Last:  annotation.Value.Lines.Last,
+						},
 						Reporter: c.Reporter(),
 						Text:     problem.text,
 						Severity: problem.severity,
@@ -623,14 +661,6 @@ func absentLabels(f utils.PromQLFragment) []string {
 	}
 
 	return names
-}
-
-func mergeLines(a, b []int) []int {
-	l := make([]int, 0, len(a)+len(b))
-	l = append(l, a...)
-	l = append(l, b...)
-	sort.Ints(l)
-	return l
 }
 
 func binaryExprs(node *parser.PromQLNode) (be []*promParser.BinaryExpr) {

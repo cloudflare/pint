@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.54.0
+
+### Changed
+
+- A large part of rule parsing code was refactored and more problems will now be deduplicated.
+
 ## v0.53.0
 
 ### Added

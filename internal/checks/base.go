@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log/slog"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -105,25 +104,12 @@ const (
 )
 
 type Problem struct {
-	Anchor   Anchor
-	Lines    []int
 	Reporter string
 	Text     string
 	Details  string
+	Lines    parser.LineRange
 	Severity Severity
-}
-
-func (p Problem) LineRange() (int, int) {
-	if len(p.Lines) == 0 {
-		slog.Warn(
-			"Bug: empty line range",
-			slog.String("severity", p.Severity.String()),
-			slog.String("reporter", p.Reporter),
-			slog.String("problem", p.Text),
-		)
-		return 1, 1
-	}
-	return p.Lines[0], p.Lines[len(p.Lines)-1]
+	Anchor   Anchor
 }
 
 type CheckMeta struct {

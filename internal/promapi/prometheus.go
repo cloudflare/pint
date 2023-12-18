@@ -52,8 +52,8 @@ type queryRequest struct {
 
 type queryResult struct {
 	value any
-	stats QueryStats
 	err   error
+	stats QueryStats
 }
 
 type QueryTimings struct {
@@ -90,19 +90,19 @@ func sanitizeURI(s string) string {
 }
 
 type Prometheus struct {
+	rateLimiter ratelimit.Limiter
+	headers     map[string]string
+	cache       *queryCache
+	locker      *partitionLocker
+	queries     chan queryRequest
+	client      http.Client
 	name        string
 	unsafeURI   string
 	safeURI     string
 	publicURI   string
-	headers     map[string]string
+	wg          sync.WaitGroup
 	timeout     time.Duration
 	concurrency int
-	client      http.Client
-	cache       *queryCache
-	locker      *partitionLocker
-	rateLimiter ratelimit.Limiter
-	wg          sync.WaitGroup
-	queries     chan queryRequest
 }
 
 func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeout time.Duration, concurrency, rl int, tlsConf *tls.Config) *Prometheus {

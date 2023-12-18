@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -50,7 +51,10 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 4},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  4,
+						},
 						Reporter: checks.LabelsConflictCheckName,
 						Text:     checkErrorUnableToRun(checks.LabelsConflictCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Warning,
@@ -66,7 +70,10 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.LabelsConflictCheckName,
 						Text:     textExternalLabels("prom", uri, "foo", "bob"),
 						Details:  alertsExternalLabelsDetails("prom", uri),

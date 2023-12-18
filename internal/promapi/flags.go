@@ -15,9 +15,9 @@ import (
 )
 
 type FlagsResult struct {
+	Flags     v1.FlagsResult
 	URI       string
 	PublicURI string
-	Flags     v1.FlagsResult
 }
 
 type flagsQuery struct {

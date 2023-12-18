@@ -215,16 +215,16 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 }
 
 type problemCollector struct {
-	lock             sync.Mutex
 	cfg              config.Config
-	paths            []string
 	fileOwners       map[string]string
 	summary          *reporter.Summary
 	problem          *prometheus.Desc
 	problems         *prometheus.Desc
 	fileOwnersMetric *prometheus.Desc
+	paths            []string
 	minSeverity      checks.Severity
 	maxProblems      int
+	lock             sync.Mutex
 }
 
 func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.Severity, maxProblems int) *problemCollector {
@@ -313,11 +313,11 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 		name := "unknown"
 		if report.Rule.AlertingRule != nil {
 			kind = "alerting"
-			name = report.Rule.AlertingRule.Alert.Value.Value
+			name = report.Rule.AlertingRule.Alert.Value
 		}
 		if report.Rule.RecordingRule != nil {
 			kind = "recording"
-			name = report.Rule.RecordingRule.Record.Value.Value
+			name = report.Rule.RecordingRule.Record.Value
 		}
 		metric := prometheus.MustNewConstMetric(
 			c.problem,

@@ -111,21 +111,28 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 		return rule, true, err
 	}
 
-	var recordPart *YamlKeyValue
+	var recordPart *YamlNode
 	var exprPart *PromQLExpr
 	var labelsPart *YamlMap
 
-	var alertPart *YamlKeyValue
-	var forPart *YamlKeyValue
-	var keepFiringForPart *YamlKeyValue
+	var alertPart *YamlNode
+	var forPart *YamlNode
+	var keepFiringForPart *YamlNode
 	var annotationsPart *YamlMap
 
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
 
+	var lines LineRange
+
 	var ruleComments []comments.Comment
 
 	for i, part := range unpackNodes(node) {
+		if lines.First == 0 || part.Line+offset < lines.First {
+			lines.First = part.Line + offset
+		}
+		lines.Last = max(lines.Last, part.Line+offset)
+
 		if i == 0 && node.HeadComment != "" && part.HeadComment == "" {
 			part.HeadComment = node.HeadComment
 		}
@@ -149,68 +156,78 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			switch key.Value {
 			case recordKey:
 				if recordPart != nil {
-					return duplicatedKeyError(part.Line+offset, recordKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, recordKey, nil)
 				}
-				recordPart = newYamlKeyValue(key, part, offset)
+				recordPart = newYamlNodeWithKey(key, part, offset)
+				lines.Last = max(lines.Last, recordPart.Lines.Last)
 			case alertKey:
 				if alertPart != nil {
-					return duplicatedKeyError(part.Line+offset, alertKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, alertKey, nil)
 				}
-				alertPart = newYamlKeyValue(key, part, offset)
+				alertPart = newYamlNodeWithKey(key, part, offset)
+				lines.Last = max(lines.Last, alertPart.Lines.Last)
 			case exprKey:
 				if exprPart != nil {
-					return duplicatedKeyError(part.Line+offset, exprKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, exprKey, nil)
 				}
 				exprPart = newPromQLExpr(key, part, offset)
+				lines.Last = max(lines.Last, exprPart.Value.Lines.Last)
 			case forKey:
 				if forPart != nil {
-					return duplicatedKeyError(part.Line+offset, forKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, forKey, nil)
 				}
-				forPart = newYamlKeyValue(key, part, offset)
+				forPart = newYamlNodeWithKey(key, part, offset)
+				lines.Last = max(lines.Last, forPart.Lines.Last)
 			case labelsKey:
 				if labelsPart != nil {
-					return duplicatedKeyError(part.Line+offset, labelsKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, labelsKey, nil)
 				}
 				labelsPart = newYamlMap(key, part, offset)
+				lines.Last = max(lines.Last, labelsPart.Lines.Last)
 			case annotationsKey:
 				if annotationsPart != nil {
-					return duplicatedKeyError(part.Line+offset, annotationsKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, annotationsKey, nil)
 				}
 				annotationsPart = newYamlMap(key, part, offset)
+				lines.Last = max(lines.Last, annotationsPart.Lines.Last)
+
 			case keepFiringForKey:
 				if keepFiringForPart != nil {
-					return duplicatedKeyError(part.Line+offset, keepFiringForKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, keepFiringForKey, nil)
 				}
-				keepFiringForPart = newYamlKeyValue(key, part, offset)
+				keepFiringForPart = newYamlNodeWithKey(key, part, offset)
+				lines.Last = max(lines.Last, keepFiringForPart.Lines.Last)
 			default:
 				unknownKeys = append(unknownKeys, key)
 			}
 		}
 	}
 
-	if exprPart != nil && exprPart.Key.Position.FirstLine() != exprPart.Value.Position.FirstLine() {
+	if exprPart != nil && exprPart.Value.Lines.First != exprPart.Value.Lines.Last {
+		contentLines := strings.Split(string(content), "\n")
 		for {
-			start := exprPart.Value.Position.FirstLine() - 1
-			end := exprPart.Value.Position.LastLine()
-			if end > len(strings.Split(string(content), "\n")) {
+			start := exprPart.Value.Lines.First
+			end := exprPart.Value.Lines.Last
+			if end > len(contentLines) {
 				end--
 			}
-			input := strings.Join(strings.Split(string(content), "\n")[start:end], "")
+			input := strings.Join(contentLines[start:end], "")
 			input = strings.ReplaceAll(input, " ", "")
 			output := strings.ReplaceAll(exprPart.Value.Value, "\n", "")
 			output = strings.ReplaceAll(output, " ", "")
-			if end >= len(strings.Split(string(content), "\n")) {
+			if end >= len(contentLines) {
 				break
 			}
 			if input == output {
 				break
 			}
-			exprPart.Value.Position.Lines = append(exprPart.Value.Position.Lines, end+1)
+			exprPart.Value.Lines.Last = end + 1
 		}
 	}
 
 	if recordPart != nil && alertPart != nil {
 		rule = Rule{
+			Lines: lines,
 			Error: ParseError{
 				Line: node.Line + offset,
 				Err:  fmt.Errorf("got both %s and %s keys in a single rule", recordKey, alertKey),
@@ -220,17 +237,18 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 	}
 	if exprPart != nil && alertPart == nil && recordPart == nil {
 		rule = Rule{
+			Lines: lines,
 			Error: ParseError{
-				Line: exprPart.Key.Position.LastLine(),
+				Line: exprPart.Value.Lines.Last,
 				Err:  fmt.Errorf("incomplete rule, no %s or %s key", alertKey, recordKey),
 			},
 		}
 		return rule, false, err
 	}
-	if r, ok := ensureRequiredKeys(recordPart, exprPart); !ok {
+	if r, ok := ensureRequiredKeys(lines, recordKey, recordPart, exprPart); !ok {
 		return r, false, err
 	}
-	if r, ok := ensureRequiredKeys(alertPart, exprPart); !ok {
+	if r, ok := ensureRequiredKeys(lines, alertKey, alertPart, exprPart); !ok {
 		return r, false, err
 	}
 	if (recordPart != nil || alertPart != nil) && len(unknownKeys) > 0 {
@@ -239,6 +257,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			keys = append(keys, n.Value)
 		}
 		rule = Rule{
+			Lines: lines,
 			Error: ParseError{
 				Line: unknownKeys[0].Line + offset,
 				Err:  fmt.Errorf("invalid key(s) found: %s", strings.Join(keys, ", ")),
@@ -249,6 +268,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 
 	if recordPart != nil && exprPart != nil {
 		rule = Rule{
+			Lines: lines,
 			RecordingRule: &RecordingRule{
 				Record: *recordPart,
 				Expr:   *exprPart,
@@ -261,6 +281,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 
 	if alertPart != nil && exprPart != nil {
 		rule = Rule{
+			Lines: lines,
 			AlertingRule: &AlertingRule{
 				Alert:         *alertPart,
 				Expr:          *exprPart,
@@ -330,35 +351,38 @@ func hasValue(node *YamlNode) bool {
 	return node.Value != ""
 }
 
-func ensureRequiredKeys(key *YamlKeyValue, expr *PromQLExpr) (Rule, bool) {
-	if key == nil {
-		return Rule{}, true
+func ensureRequiredKeys(lines LineRange, key string, keyVal *YamlNode, expr *PromQLExpr) (Rule, bool) {
+	if keyVal == nil {
+		return Rule{Lines: lines}, true
 	}
-	if !hasValue(key.Value) {
+	if !hasValue(keyVal) {
 		return Rule{
+			Lines: lines,
 			Error: ParseError{
-				Line: key.Value.Position.LastLine(),
-				Err:  fmt.Errorf("%s value cannot be empty", key.Key.Value),
+				Line: keyVal.Lines.Last,
+				Err:  fmt.Errorf("%s value cannot be empty", key),
 			},
 		}, false
 	}
 	if expr == nil {
 		return Rule{
+			Lines: lines,
 			Error: ParseError{
-				Line: key.Value.Position.LastLine(),
+				Line: keyVal.Lines.Last,
 				Err:  fmt.Errorf("missing %s key", exprKey),
 			},
 		}, false
 	}
 	if !hasValue(expr.Value) {
 		return Rule{
+			Lines: lines,
 			Error: ParseError{
-				Line: expr.Value.Position.LastLine(),
+				Line: expr.Value.Lines.Last,
 				Err:  fmt.Errorf("%s value cannot be empty", exprKey),
 			},
 		}, false
 	}
-	return Rule{}, true
+	return Rule{Lines: lines}, true
 }
 
 func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
@@ -379,8 +403,9 @@ func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
 	return &node
 }
 
-func duplicatedKeyError(line int, key string, err error) (Rule, bool, error) {
+func duplicatedKeyError(lines LineRange, line int, key string, err error) (Rule, bool, error) {
 	rule := Rule{
+		Lines: lines,
 		Error: ParseError{
 			Line: line,
 			Err:  fmt.Errorf("duplicated %s key", key),

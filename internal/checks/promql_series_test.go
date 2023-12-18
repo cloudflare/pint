@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -77,7 +78,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
@@ -101,7 +105,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127", `connection refused`),
 						Severity: checks.Warning,
@@ -117,7 +124,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
 						Severity: checks.Warning,
@@ -143,7 +153,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
 						Severity: checks.Warning,
@@ -169,7 +182,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -196,7 +212,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -223,7 +242,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -356,7 +378,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -378,7 +403,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -416,7 +444,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "3d"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -444,7 +475,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
 						Details:  checks.SeriesCheckRuleDetails,
@@ -485,7 +519,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
 						Details:  checks.SeriesCheckRuleDetails,
@@ -534,7 +571,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     alertMissing(`ALERTS{alertname="myalert"}`, "myalert"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -552,7 +592,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
 						Details:  checks.SeriesCheckRuleDetails,
@@ -592,7 +635,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -628,7 +674,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w") + " " + metricIgnored("notfound", checks.SeriesCheckName, "^not.+$"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -655,7 +704,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noLabelKeyText("prom", uri, "found", "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -709,7 +761,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -755,7 +810,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noLabelKeyText("prom", uri, "found", "job", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -811,7 +869,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, `found`, "1w", "5m"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -936,7 +997,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1061,7 +1125,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1257,7 +1324,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1348,7 +1418,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1556,7 +1629,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1641,7 +1717,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1726,14 +1805,20 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3, 4},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     `Failed to parse pint comment as duration: not a valid duration string: "foo"`,
 						Details:  checks.SeriesCheckMinAgeDetails,
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1824,7 +1909,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1892,7 +1980,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -1960,7 +2051,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -2013,7 +2107,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2150,7 +2247,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2226,14 +2326,20 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 4},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     `Failed to parse pint comment as duration: unknown unit "e" in duration "1e"`,
 						Details:  checks.SeriesCheckMinAgeDetails,
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2371,7 +2477,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2473,7 +2582,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2594,7 +2706,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, "found", "job", `{job="notfound"}`, "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2648,7 +2763,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2691,7 +2809,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2845,7 +2966,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2876,7 +3000,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2929,7 +3056,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -2970,14 +3100,20 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:count", "1w"),
 						Details:  checks.SeriesCheckRuleDetails,
 						Severity: checks.Information,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noMetricRRText("prom", uri, "foo:sum", "1w"),
 						Details:  checks.SeriesCheckRuleDetails,
@@ -3032,7 +3168,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -3086,7 +3225,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
@@ -3149,7 +3291,10 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.SeriesCheckName,
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,

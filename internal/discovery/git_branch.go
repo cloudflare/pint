@@ -29,8 +29,8 @@ func NewGitBranchFinder(
 
 type GitBranchFinder struct {
 	gitCmd     git.CommandRunner
-	filter     git.PathFilter
 	baseBranch string
+	filter     git.PathFilter
 	maxCommits int
 }
 
@@ -90,7 +90,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
 					slog.String("path", me.after.SourcePath),
-					slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
+					slog.String("ruleLines", me.after.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 				)
 				entries = append(entries, me.after)
@@ -100,7 +100,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.Debug(
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
-						slog.String("lines", output.FormatLineRangeString(me.after.Rule.Lines())),
+						slog.String("lines", me.after.Rule.Lines.String()),
 					)
 					me.after.State = Excluded
 					me.after.ModifiedLines = []int{}
@@ -108,7 +108,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.Debug(
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
-						slog.String("lines", output.FormatLineRangeString(me.after.Rule.Lines())),
+						slog.String("lines", me.after.Rule.Lines.String()),
 					)
 					me.after.State = Moved
 					me.after.ModifiedLines = git.CountLines(change.Body.After)
@@ -118,7 +118,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
 						slog.String("path", me.after.SourcePath),
-						slog.String("ruleLines", output.FormatLineRangeString(me.after.Rule.Lines())),
+						slog.String("ruleLines", me.after.Rule.Lines.String()),
 						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 					)
 					me.after.State = Modified
@@ -136,7 +136,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.SourcePath),
-					slog.String("ruleLines", output.FormatLineRangeString(me.before.Rule.Lines())),
+					slog.String("ruleLines", me.before.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
 				entries = append(entries, me.before)
