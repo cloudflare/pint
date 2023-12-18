@@ -119,7 +119,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
 					slog.Debug("Found recording rule",
 						slog.String("path", entry.SourcePath),
-						slog.String("record", entry.Rule.RecordingRule.Record.Value.Value),
+						slog.String("record", entry.Rule.RecordingRule.Record.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
 					)
 				}
@@ -127,7 +127,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
 					slog.Debug("Found alerting rule",
 						slog.String("path", entry.SourcePath),
-						slog.String("alert", entry.Rule.AlertingRule.Alert.Value.Value),
+						slog.String("alert", entry.Rule.AlertingRule.Alert.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
 					)
 				}

@@ -40,15 +40,12 @@ func (c SyntaxCheck) Reporter() string {
 }
 
 func (c SyntaxCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	q := rule.Expr()
-	if q.SyntaxError != nil {
+	expr := rule.Expr()
+	if expr.SyntaxError != nil {
 		problems = append(problems, Problem{
-			Lines: parser.LineRange{
-				First: q.Key.Lines.First,
-				Last:  q.Value.Lines.Last,
-			},
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Prometheus failed to parse the query with this PromQL error: %s.", q.SyntaxError),
+			Text:     fmt.Sprintf("Prometheus failed to parse the query with this PromQL error: %s.", expr.SyntaxError),
 			Details:  SyntaxCheckDetails,
 			Severity: Fatal,
 		})

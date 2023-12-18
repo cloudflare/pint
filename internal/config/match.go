@@ -101,10 +101,10 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 
 	if m.Name != "" {
 		re := strictRegex(m.Name)
-		if r.AlertingRule != nil && !re.MatchString(r.AlertingRule.Alert.Value.Value) {
+		if r.AlertingRule != nil && !re.MatchString(r.AlertingRule.Alert.Value) {
 			return false
 		}
-		if r.RecordingRule != nil && !re.MatchString(r.RecordingRule.Record.Value.Value) {
+		if r.RecordingRule != nil && !re.MatchString(r.RecordingRule.Record.Value) {
 			return false
 		}
 	}
@@ -131,7 +131,7 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 	if m.For != "" {
 		if r.AlertingRule != nil && r.AlertingRule.For != nil {
 			dm, _ := parseDurationMatch(m.For)
-			if dur, err := parseDuration(r.AlertingRule.For.Value.Value); err == nil {
+			if dur, err := parseDuration(r.AlertingRule.For.Value); err == nil {
 				if !dm.isMatch(dur) {
 					return false
 				}
@@ -144,7 +144,7 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 	if m.KeepFiringFor != "" {
 		if r.AlertingRule != nil && r.AlertingRule.KeepFiringFor != nil {
 			dm, _ := parseDurationMatch(m.KeepFiringFor)
-			if dur, err := parseDuration(r.AlertingRule.KeepFiringFor.Value.Value); err == nil {
+			if dur, err := parseDuration(r.AlertingRule.KeepFiringFor.Value); err == nil {
 				if !dm.isMatch(dur) {
 					return false
 				}

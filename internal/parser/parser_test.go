@@ -48,7 +48,7 @@ func TestParse(t *testing.T) {
 			content: []byte("- record: |\n    multiline\n"),
 			output: []parser.Rule{
 				{
-					Lines: parser.LineRange{First: 1, Last: 1},
+					Lines: parser.LineRange{First: 1, Last: 2},
 					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 2},
 				},
 			},
@@ -225,21 +225,11 @@ func TestParse(t *testing.T) {
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo offset 10m",
@@ -258,21 +248,11 @@ func TestParse(t *testing.T) {
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo offset -10m",
@@ -332,21 +312,11 @@ func TestParse(t *testing.T) {
 						},
 					},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
-								Value: "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 4, Last: 4},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 4, Last: 4},
 								Value: "foo offset 10m",
@@ -394,21 +364,11 @@ func TestParse(t *testing.T) {
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo[5m] offset 10m",
@@ -436,21 +396,11 @@ func TestParse(t *testing.T) {
 				{
 					Lines: parser.LineRange{First: 2, Last: 6},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "name",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 2, Last: 2},
+							Value: "name",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 3, Last: 3},
 								Value: "sum(foo)",
@@ -511,21 +461,11 @@ groups:
 				{
 					Lines: parser.LineRange{First: 5, Last: 9},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 5, Last: 5},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 5, Last: 5},
-								Value: "name",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "name",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 6, Last: 6},
 								Value: "sum(foo)",
@@ -594,23 +534,13 @@ groups:
 				{
 					Lines: parser.LineRange{First: 1, Last: 9},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "Down",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "Down",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
+								Lines: parser.LineRange{First: 2, Last: 3},
 								Value: "up == 0\n",
 							},
 							Query: &parser.PromQLNode{
@@ -621,15 +551,9 @@ groups:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 4, Last: 4},
-								Value: "for",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 5, Last: 5},
-								Value: "11m\n",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 4, Last: 5},
+							Value: "11m\n",
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 6, Last: 7},
@@ -674,23 +598,13 @@ groups:
 				{
 					Lines: parser.LineRange{First: 11, Last: 17},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 11, Last: 11},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 12, Last: 12},
-								Value: "foo\n",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 11, Last: 12},
+							Value: "foo\n",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 13, Last: 13},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 14, Last: 16},
+								Lines: parser.LineRange{First: 13, Last: 16},
 								Value: "bar\n/\nbaz > 1",
 							},
 							Query: &parser.PromQLNode{
@@ -733,23 +647,13 @@ groups:
 				{
 					Lines: parser.LineRange{First: 1, Last: 9},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 1, Last: 1},
-								Value: "Foo",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 1, Last: 1},
+							Value: "Foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 8},
+								Lines: parser.LineRange{First: 2, Last: 8},
 								Value: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
 							},
 							Query: &parser.PromQLNode{
@@ -787,15 +691,9 @@ groups:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 9, Last: 9},
-								Value: "for",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 9, Last: 9},
-								Value: "30m",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 9, Last: 9},
+							Value: "30m",
 						},
 					},
 				},
@@ -830,21 +728,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 13, Last: 20},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 13, Last: 13},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 13, Last: 13},
-								Value: "Example_Is_Down",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 13, Last: 13},
+							Value: "Example_Is_Down",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 14, Last: 14},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 14, Last: 14},
 								Value: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
@@ -857,15 +745,9 @@ data:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 15, Last: 15},
-								Value: "for",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 15, Last: 15},
-								Value: "5m",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 15, Last: 15},
+							Value: "5m",
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 16, Last: 18},
@@ -920,21 +802,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 22, Last: 23},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 22, Last: 22},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 22, Last: 22},
-								Value: "Example_High_Restart_Rate",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 22, Last: 22},
+							Value: "Example_High_Restart_Rate",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 23, Last: 23},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 23, Last: 23},
 								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
@@ -994,21 +866,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 4, Last: 13},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 4, Last: 4},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 4, Last: 4},
-								Value: "HaproxyServerHealthcheckFailure",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 4, Last: 4},
+							Value: "HaproxyServerHealthcheckFailure",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 5, Last: 5},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 5, Last: 5},
 								Value: "increase(haproxy_server_check_failures_total[15m]) > 100",
@@ -1033,15 +895,9 @@ data:
 								},
 							},
 						},
-						For: &parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "for",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "5m",
-							},
+						For: &parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "5m",
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 7, Last: 8},
@@ -1137,21 +993,11 @@ data:
 						},
 					},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 7, Last: 7},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "expr1",
@@ -1177,21 +1023,11 @@ data:
 					},
 					Lines: parser.LineRange{First: 6, Last: 10},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 10, Last: 10},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 10, Last: 10},
 								Value: "expr2",
@@ -1225,21 +1061,11 @@ data:
 					},
 					Lines: parser.LineRange{First: 6, Last: 7},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 7, Last: 7},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "expr1",
@@ -1268,21 +1094,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 4, Last: 8},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 4, Last: 4},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 4, Last: 4},
-								Value: "name1",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 4, Last: 4},
+							Value: "name1",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 5, Last: 5},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 5, Last: 5},
 								Value: "expr1",
@@ -1329,21 +1145,11 @@ data:
 					},
 					Lines: parser.LineRange{First: 9, Last: 11},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 9, Last: 9},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 9, Last: 9},
-								Value: "name2",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 9, Last: 9},
+							Value: "name2",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 10, Last: 10},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 10, Last: 10},
 								Value: "expr2",
@@ -1458,21 +1264,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 7, Last: 8},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 7, Last: 7},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 7, Last: 7},
-								Value: "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 7, Last: 7},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 8, Last: 8},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 8, Last: 8},
 								Value: "up",
@@ -1484,21 +1280,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 12, Last: 13},
 					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 12, Last: 12},
-								Value: "record",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 12, Last: 12},
-								Value: "foo",
-							},
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 12, Last: 12},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 13, Last: 13},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 13, Last: 13},
 								Value: "up",
@@ -1526,21 +1312,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 2, Last: 2},
-								Value: "Template",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 2, Last: 2},
+							Value: "Template",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 3, Last: 3},
 								Value: "up == 0",
@@ -1577,21 +1353,11 @@ data:
 				{
 					Lines: parser.LineRange{First: 6, Last: 10},
 					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlKeyValue{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "alert",
-							},
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "Service Down",
-							},
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "Service Down",
 						},
 						Expr: parser.PromQLExpr{
-							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 7, Last: 7},
-								Value: "expr",
-							},
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "up == 0",

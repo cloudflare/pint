@@ -62,7 +62,7 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 		if !c.prom.IsEnabledForPath(entry.SourcePath) {
 			continue
 		}
-		if entry.Rule.RecordingRule.Record.Value.Value != rule.RecordingRule.Record.Value.Value {
+		if entry.Rule.RecordingRule.Record.Value != rule.RecordingRule.Record.Value {
 			continue
 		}
 		problems = append(problems, c.compareRules(ctx, rule.RecordingRule, entry, rule.Lines)...)
@@ -82,7 +82,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.ReportedPath, entry.Rule.RecordingRule.Record.Key.Lines.First),
+			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.ReportedPath, entry.Rule.RecordingRule.Record.Lines.First),
 			Severity: Bug,
 		})
 	}

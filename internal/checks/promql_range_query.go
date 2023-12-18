@@ -56,10 +56,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, 
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
-			Lines: parser.LineRange{
-				First: expr.Key.Lines.First,
-				Last:  expr.Value.Lines.Last,
-			},
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
@@ -74,10 +71,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, 
 		r, err := model.ParseDuration(v)
 		if err != nil {
 			problems = append(problems, Problem{
-				Lines: parser.LineRange{
-					First: expr.Key.Lines.First,
-					Last:  expr.Value.Lines.Last,
-				},
+				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
 				Severity: Warning,
@@ -89,10 +83,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, 
 
 	for _, problem := range c.checkNode(ctx, expr.Query, retention, flags.URI) {
 		problems = append(problems, Problem{
-			Lines: parser.LineRange{
-				First: expr.Key.Lines.First,
-				Last:  expr.Value.Lines.Last,
-			},
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Severity: problem.severity,

@@ -47,10 +47,10 @@ func (c AlertsForChecksFor) Check(_ context.Context, _ string, rule parser.Rule,
 	}
 
 	if rule.AlertingRule.For != nil {
-		problems = append(problems, c.checkField(rule.AlertingRule.For.Key.Value, rule.AlertingRule.For.Value.Value, rule.AlertingRule.For.Value.Lines)...)
+		problems = append(problems, c.checkField("for", rule.AlertingRule.For.Value, rule.AlertingRule.For.Lines)...)
 	}
 	if rule.AlertingRule.KeepFiringFor != nil {
-		problems = append(problems, c.checkField(rule.AlertingRule.KeepFiringFor.Key.Value, rule.AlertingRule.KeepFiringFor.Value.Value, rule.AlertingRule.KeepFiringFor.Value.Lines)...)
+		problems = append(problems, c.checkField("keep_firing_for", rule.AlertingRule.KeepFiringFor.Value, rule.AlertingRule.KeepFiringFor.Lines)...)
 	}
 
 	return problems

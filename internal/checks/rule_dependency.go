@@ -55,7 +55,7 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 		if entry.Rule.Error.Err != nil {
 			continue
 		}
-		if c.usesVector(entry, rule.RecordingRule.Record.Value.Value) {
+		if c.usesVector(entry, rule.RecordingRule.Record.Value) {
 			expr := entry.Rule.Expr()
 			dep := brokenDependency{
 				path: entry.ReportedPath,
@@ -91,10 +91,10 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 
 	var details strings.Builder
 	details.WriteString("If you remove the recording rule generating `")
-	details.WriteString(rule.RecordingRule.Record.Value.Value)
+	details.WriteString(rule.RecordingRule.Record.Value)
 	details.WriteString("`, and there is no other source of this metric, then any other rule depending on it will break.\n")
 	details.WriteString("List of found rules that are using `")
-	details.WriteString(rule.RecordingRule.Record.Value.Value)
+	details.WriteString(rule.RecordingRule.Record.Value)
 	details.WriteString("`:\n\n")
 	for _, b := range broken {
 		details.WriteString("- `")

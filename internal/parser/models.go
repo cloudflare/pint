@@ -14,41 +14,16 @@ import (
 )
 
 func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
-	// nolint: exhaustive
-	switch node.Style {
-	case yaml.LiteralStyle, yaml.FoldedStyle:
+	switch {
+	case node.Value == "":
+		lr.First = node.Line + offset
+	case node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle:
 		lr.First = node.Line + 1 + offset
 	default:
 		lr.First = node.Line + offset
 	}
 	lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
 	return lr
-}
-
-func NewFilePosition(l []int) FilePosition {
-	return FilePosition{Lines: l}
-}
-
-type FilePosition struct {
-	Lines []int
-}
-
-func (fp FilePosition) FirstLine() (line int) {
-	for _, l := range fp.Lines {
-		if line == 0 || l < line {
-			line = l
-		}
-	}
-	return line
-}
-
-func (fp FilePosition) LastLine() (line int) {
-	for _, l := range fp.Lines {
-		if l > line {
-			line = l
-		}
-	}
-	return line
 }
 
 func mergeComments(node *yaml.Node) (comments []string) {
@@ -72,6 +47,19 @@ type YamlNode struct {
 	Lines LineRange
 }
 
+func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
+	if (yn == nil) != (b == nil) {
+		return false
+	}
+	if yn == nil {
+		return true
+	}
+	if yn.Value != b.Value {
+		return false
+	}
+	return true
+}
+
 func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	n := YamlNode{
 		Lines: nodeLines(node, offset),
@@ -83,29 +71,25 @@ func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	return &n
 }
 
-func newYamlKeyValue(key, val *yaml.Node, offset int) *YamlKeyValue {
-	return &YamlKeyValue{
-		Key:   newYamlNode(key, offset),
-		Value: newYamlNode(val, offset),
+func newYamlNodeWithKey(key, node *yaml.Node, offset int) *YamlNode {
+	keyLines := nodeLines(key, offset)
+	valLines := nodeLines(node, offset)
+	n := YamlNode{
+		Lines: LineRange{
+			First: min(keyLines.First, valLines.First),
+			Last:  max(keyLines.Last, valLines.Last),
+		},
+		Value: node.Value,
 	}
+	if node.Alias != nil {
+		n.Value = node.Alias.Value
+	}
+	return &n
 }
 
 type YamlKeyValue struct {
 	Key   *YamlNode
 	Value *YamlNode
-}
-
-func (ykv *YamlKeyValue) IsIdentical(b *YamlKeyValue) bool {
-	if (ykv == nil) != (b == nil) {
-		return false
-	}
-	if ykv == nil {
-		return true
-	}
-	if ykv.Value.Value != b.Value.Value {
-		return false
-	}
-	return true
 }
 
 type YamlMap struct {
@@ -153,7 +137,6 @@ func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
 		},
 		Key: newYamlNode(key, offset),
 	}
-	// fmt.Printf("newYamlMap offset=%d %#v\n", offset, ym.Key)
 
 	var ckey *yaml.Node
 	for _, child := range value.Content {
@@ -165,7 +148,6 @@ func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
 			if kv.Value.Lines.Last > ym.Lines.Last {
 				ym.Lines.Last = kv.Value.Lines.Last
 			}
-			// fmt.Printf("KEY=%#v VALUE=%#v last=%d\n", kv.Key, kv.Value, ym.Lines.Last)
 			ym.Items = append(ym.Items, &kv)
 			ckey = nil
 		} else {
@@ -200,7 +182,6 @@ func (pqle PromQLError) Node() *PromQLNode {
 }
 
 type PromQLExpr struct {
-	Key         *YamlNode
 	Value       *YamlNode
 	SyntaxError error
 	Query       *PromQLNode
@@ -212,8 +193,7 @@ func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 
 func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 	expr := PromQLExpr{
-		Key:   newYamlNode(key, offset),
-		Value: newYamlNode(val, offset),
+		Value: newYamlNodeWithKey(key, val, offset),
 	}
 
 	qlNode, err := DecodeExpr(expr.Value.Value)
@@ -227,12 +207,12 @@ func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 }
 
 type AlertingRule struct {
-	Alert         YamlKeyValue
 	Expr          PromQLExpr
-	For           *YamlKeyValue
-	KeepFiringFor *YamlKeyValue
+	For           *YamlNode
+	KeepFiringFor *YamlNode
 	Labels        *YamlMap
 	Annotations   *YamlMap
+	Alert         YamlNode
 }
 
 func (ar *AlertingRule) IsIdentical(b *AlertingRule) bool {
@@ -264,9 +244,9 @@ func (ar *AlertingRule) IsIdentical(b *AlertingRule) bool {
 }
 
 type RecordingRule struct {
-	Record YamlKeyValue
 	Expr   PromQLExpr
 	Labels *YamlMap
+	Record YamlNode
 }
 
 func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
@@ -297,12 +277,6 @@ type ParseError struct {
 type LineRange struct {
 	First int
 	Last  int
-}
-
-func (lr LineRange) Merge(b LineRange) (out LineRange) {
-	out.First = min(lr.First, b.First)
-	out.Last = max(lr.Last, b.Last)
-	return out
 }
 
 func (lr LineRange) String() string {
@@ -375,10 +349,10 @@ func (r Rule) IsSame(nr Rule) bool {
 
 func (r Rule) Name() string {
 	if r.RecordingRule != nil {
-		return r.RecordingRule.Record.Value.Value
+		return r.RecordingRule.Record.Value
 	}
 	if r.AlertingRule != nil {
-		return r.AlertingRule.Alert.Value.Value
+		return r.AlertingRule.Alert.Value
 	}
 	return ""
 }

@@ -71,10 +71,7 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
-			Lines: parser.LineRange{
-				First: expr.Key.Lines.First,
-				Last:  expr.Value.Lines.Last,
-			},
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
@@ -85,10 +82,7 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 	done := &completedList{}
 	for _, problem := range c.checkNode(ctx, expr.Query, entries, cfg, done) {
 		problems = append(problems, Problem{
-			Lines: parser.LineRange{
-				First: expr.Key.Lines.First,
-				Last:  expr.Value.Lines.Last,
-			},
+			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Details:  problem.details,
@@ -153,7 +147,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 					if e.Rule.Error.Err != nil {
 						continue
 					}
-					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError == nil && e.Rule.RecordingRule.Record.Value.Value == s.Name {
+					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError == nil && e.Rule.RecordingRule.Record.Value == s.Name {
 						for _, sm := range utils.HasOuterSum(e.Rule.RecordingRule.Expr.Query) {
 							if sv, ok := sm.Expr.(*promParser.VectorSelector); ok {
 								metadata, err := c.prom.Metadata(ctx, sv.Name)
