@@ -56,7 +56,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule par
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
-			Lines:    rule.AlertingRule.Lines(),
+			Lines:    rule.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
@@ -68,7 +68,10 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule par
 		for _, label := range rule.AlertingRule.Labels.Items {
 			for _, name := range checkExternalLabels(label.Key.Value, label.Key.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
-					Lines:    label.Lines(),
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
@@ -77,7 +80,10 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule par
 			}
 			for _, name := range checkExternalLabels(label.Key.Value, label.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
-					Lines:    label.Lines(),
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)), Severity: Bug,
 					Details: fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
@@ -90,7 +96,10 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule par
 		for _, annotation := range rule.AlertingRule.Annotations.Items {
 			for _, name := range checkExternalLabels(annotation.Key.Value, annotation.Key.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
-					Lines:    annotation.Lines(),
+					Lines: parser.LineRange{
+						First: annotation.Key.Lines.First,
+						Last:  annotation.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
@@ -99,7 +108,10 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule par
 			}
 			for _, name := range checkExternalLabels(annotation.Key.Value, annotation.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
-					Lines:    annotation.Lines(),
+					Lines: parser.LineRange{
+						First: annotation.Key.Lines.First,
+						Last:  annotation.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),

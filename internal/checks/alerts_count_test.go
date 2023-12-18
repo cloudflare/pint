@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -53,7 +54,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "alerts/count",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
@@ -80,7 +84,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "alerts/count",
 						Text:     checkErrorUnableToRun(checks.AlertsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
 						Severity: checks.Warning,
@@ -96,7 +103,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 0, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -122,7 +132,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 7, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -207,7 +220,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -281,7 +297,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -355,7 +374,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -494,7 +516,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
 						Details:  alertsDetails(uri, `{__name__="up", job="foo"} == 0`, "1d"),
@@ -551,7 +576,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
 						Details:  alertsDetails(uri, `{__name__=~"(up|foo)", job="foo"} == 0`, "1d"),
@@ -606,7 +634,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 3, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -661,7 +692,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 2, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),
@@ -733,7 +767,10 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "alerts/count",
 						Text:     alertsText("prom", uri, 1, "1d"),
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d"),

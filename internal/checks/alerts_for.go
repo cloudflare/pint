@@ -47,16 +47,16 @@ func (c AlertsForChecksFor) Check(_ context.Context, _ string, rule parser.Rule,
 	}
 
 	if rule.AlertingRule.For != nil {
-		problems = append(problems, c.checkField(rule.AlertingRule.For.Key.Value, rule.AlertingRule.For.Value.Value, rule.AlertingRule.For.Lines())...)
+		problems = append(problems, c.checkField(rule.AlertingRule.For.Key.Value, rule.AlertingRule.For.Value.Value, rule.AlertingRule.For.Value.Lines)...)
 	}
 	if rule.AlertingRule.KeepFiringFor != nil {
-		problems = append(problems, c.checkField(rule.AlertingRule.KeepFiringFor.Key.Value, rule.AlertingRule.KeepFiringFor.Value.Value, rule.AlertingRule.KeepFiringFor.Lines())...)
+		problems = append(problems, c.checkField(rule.AlertingRule.KeepFiringFor.Key.Value, rule.AlertingRule.KeepFiringFor.Value.Value, rule.AlertingRule.KeepFiringFor.Value.Lines)...)
 	}
 
 	return problems
 }
 
-func (c AlertsForChecksFor) checkField(name, value string, lines []int) (problems []Problem) {
+func (c AlertsForChecksFor) checkField(name, value string, lines parser.LineRange) (problems []Problem) {
 	d, err := model.ParseDuration(value)
 	if err != nil {
 		problems = append(problems, Problem{

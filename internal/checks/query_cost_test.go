@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -58,7 +59,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 0) + ".",
 						Severity: checks.Information,
@@ -87,7 +91,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", uri, "connection timeout"),
 						Severity: checks.Bug,
@@ -114,7 +121,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
@@ -143,7 +153,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Warning,
@@ -161,7 +174,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
@@ -199,7 +215,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
 						Severity: checks.Information,
@@ -247,7 +266,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
 						Severity: checks.Information,
@@ -295,7 +317,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
 						Severity: checks.Bug,
@@ -343,7 +368,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 6) + maxSeriesText(5) + ".",
 						Severity: checks.Bug,
@@ -386,7 +414,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + maxSeriesText(5) + ".",
 						Severity: checks.Information,
@@ -433,7 +464,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
 						Severity: checks.Information,
@@ -481,7 +515,10 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
@@ -526,25 +563,37 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     totalSamplesText("prom", uri, 200, 100),
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     peakSamplesText("prom", uri, 20, 10),
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     evalDurText("prom", uri, "5s100ms", "5s"),
 						Severity: checks.Bug,
@@ -593,25 +642,37 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     totalSamplesText("prom", uri, 200, 100),
 						Severity: checks.Information,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     peakSamplesText("prom", uri, 20, 10),
 						Severity: checks.Information,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "query/cost",
 						Text:     evalDurText("prom", uri, "5s100ms", "5s"),
 						Severity: checks.Information,

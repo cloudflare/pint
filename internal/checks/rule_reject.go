@@ -55,26 +55,26 @@ func (c Reject) Reporter() string {
 func (c Reject) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if c.checkLabels && rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label, "Label")...)
+			problems = append(problems, c.reject(rule, label, "Label", label.Value.Lines)...)
 		}
 	}
 	if c.checkLabels && rule.RecordingRule != nil && rule.RecordingRule.Labels != nil {
 		for _, label := range rule.RecordingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label, "Label")...)
+			problems = append(problems, c.reject(rule, label, "Label", label.Value.Lines)...)
 		}
 	}
 	if c.checkAnnotations && rule.AlertingRule != nil && rule.AlertingRule.Annotations != nil {
 		for _, ann := range rule.AlertingRule.Annotations.Items {
-			problems = append(problems, c.reject(rule, ann, "Annotation")...)
+			problems = append(problems, c.reject(rule, ann, "Annotation", ann.Value.Lines)...)
 		}
 	}
 	return problems
 }
 
-func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string) (problems []Problem) {
+func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string, lines parser.LineRange) (problems []Problem) {
 	if c.keyRe != nil && c.keyRe.MustExpand(rule).MatchString(label.Key.Value) {
 		problems = append(problems, Problem{
-			Lines:    label.Lines(),
+			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s key `%s` is not allowed to match `%s`.", kind, label.Key.Value, c.keyRe.anchored),
 			Severity: c.severity,
@@ -82,7 +82,10 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 	}
 	if c.valueRe != nil && c.valueRe.MustExpand(rule).MatchString(label.Value.Value) {
 		problems = append(problems, Problem{
-			Lines:    label.Lines(),
+			Lines: parser.LineRange{
+				First: label.Key.Lines.First,
+				Last:  label.Value.Lines.Last,
+			},
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s value `%s` is not allowed to match `%s`.", kind, label.Value.Value, c.valueRe.anchored),
 			Severity: c.severity,

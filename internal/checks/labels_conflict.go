@@ -54,7 +54,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
-			Lines:    rule.RecordingRule.Labels.Lines.Expand(),
+			Lines:    rule.RecordingRule.Labels.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
@@ -66,7 +66,10 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 		for k, v := range cfg.Config.Global.ExternalLabels {
 			if label.Key.Value == k {
 				problems = append(problems, Problem{
-					Lines:    label.Lines(),
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.", promText(c.prom.Name(), cfg.URI), k, v),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),

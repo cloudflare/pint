@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
-	"sort"
 	"time"
 
 	"github.com/prometheus/common/model"
@@ -75,7 +74,10 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
-			Lines:    rule.AlertingRule.Expr.Lines(),
+			Lines: parser.LineRange{
+				First: rule.AlertingRule.Expr.Key.Lines.First,
+				Last:  rule.AlertingRule.Expr.Value.Lines.Last,
+			},
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
@@ -114,19 +116,12 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 		return problems
 	}
 
-	lines := []int{}
-	lines = append(lines, rule.AlertingRule.Expr.Lines()...)
-	if rule.AlertingRule.For != nil {
-		lines = append(lines, rule.AlertingRule.For.Lines()...)
-	}
-	if rule.AlertingRule.KeepFiringFor != nil {
-		lines = append(lines, rule.AlertingRule.KeepFiringFor.Lines()...)
-	}
-	sort.Ints(lines)
-
 	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
 	problems = append(problems, Problem{
-		Lines:    lines,
+		Lines: parser.LineRange{
+			First: rule.AlertingRule.Expr.Key.Lines.First,
+			Last:  rule.AlertingRule.Expr.Value.Lines.Last,
+		},
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
 		Details: fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=1&g0.range_input=%s).`,

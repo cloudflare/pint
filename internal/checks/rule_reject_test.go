@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -83,7 +84,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Label key `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
@@ -101,7 +105,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Label value `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Warning,
@@ -119,7 +126,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Label key `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
@@ -137,7 +147,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Label value `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
@@ -174,7 +187,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Annotation key `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Information,
@@ -192,7 +208,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Annotation value `bad` is not allowed to match `^bad$`.",
 						Severity: checks.Bug,
@@ -219,7 +238,10 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: "rule/reject",
 						Text:     "Annotation value `foo` is not allowed to match `^{{ $alert }}$`.",
 						Severity: checks.Bug,

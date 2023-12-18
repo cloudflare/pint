@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -51,7 +52,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     differentLabelsText("instance, job, notfound", "instance, job"),
 						Details:  checks.VectorMatchingCheckDetails,
@@ -193,7 +197,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     usingMismatchText(`ignoring(xxx)`, "instance, job", "app_name"),
 						Details:  checks.VectorMatchingCheckDetails,
@@ -250,7 +257,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(notfound)` won't produce any results because both sides of the query don't have this label.",
 						Details:  checks.VectorMatchingCheckDetails,
@@ -496,7 +506,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(notfound)` won't produce any results because the left hand side of the query doesn't have this label: `foo`.",
 						Details:  checks.VectorMatchingCheckDetails,
@@ -551,7 +564,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(notfound)` won't produce any results because the right hand side of the query doesn't have this label: `bar`.",
 						Details:  checks.VectorMatchingCheckDetails,
@@ -606,7 +622,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "Using `on(app_name)` won't produce any results because the left hand side of the query doesn't have this label: `(memory_bytes / ignoring (job) (memory_limit > 0))`.",
 						Details:  checks.VectorMatchingCheckDetails,
@@ -794,7 +813,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.",
 						Details:  checks.VectorMatchingCheckDetails,
@@ -922,7 +944,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.",
 						Details:  checks.VectorMatchingCheckDetails,
@@ -1049,7 +1074,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Bug,
@@ -1067,7 +1095,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Warning,
@@ -1085,7 +1116,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
 						Severity: checks.Bug,
@@ -1119,7 +1153,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
 						Severity: checks.Bug,
@@ -1165,7 +1202,10 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.VectorMatchingCheckName,
 						Text:     differentFilters("job", "a", "b"),
 						Details:  checks.VectorMatchingCheckDetails,

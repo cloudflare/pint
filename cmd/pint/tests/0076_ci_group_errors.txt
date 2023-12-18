@@ -237,11 +237,6 @@ rules.yml:25-30 Bug: `rule/owner` comments are required in all files, please add
  29 |     annotations:
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
-rules.yml:26-30 Bug: Template is using `instance` label but the query removes it. (alerts/template)
- 26 |     expr: sum(no_such_metric) by(foo) > 0
- ..
- 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-
 rules.yml:27-28 Bug: `component` label is required. (rule/label)
  27 |     labels:
  28 |       value: '{{ $value }}'
@@ -263,6 +258,9 @@ rules.yml:29-30 Bug: `link` annotation is required. (alerts/annotation)
 
 rules.yml:29-30 Bug: `summary` annotation is required. (alerts/annotation)
  29 |     annotations:
+ 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+
+rules.yml:30 Bug: Template is using `instance` label but the query removes it. (alerts/template)
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
 rules.yml:32-33 Bug: `link` annotation is required. (alerts/annotation)

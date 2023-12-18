@@ -17,6 +17,7 @@ import (
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -195,7 +196,10 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
-						Lines:    []int{ignoreErr.Line},
+						Lines: parser.LineRange{
+							First: ignoreErr.Line,
+							Last:  ignoreErr.Line,
+						},
 						Reporter: ignoreFileReporter,
 						Text:     ignoreErr.Error(),
 						Severity: checks.Information,
@@ -208,7 +212,10 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
-						Lines:    []int{commentErr.Line},
+						Lines: parser.LineRange{
+							First: commentErr.Line,
+							Last:  commentErr.Line,
+						},
 						Reporter: pintCommentReporter,
 						Text:     fmt.Sprintf("This comment is not a valid pint control comment: %s", commentErr.Error()),
 						Severity: checks.Warning,
@@ -222,7 +229,10 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					SourcePath:    job.entry.SourcePath,
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
-						Lines:    []int{line},
+						Lines: parser.LineRange{
+							First: line,
+							Last:  line,
+						},
 						Reporter: yamlParseReporter,
 						Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", e),
 						Details: `pint cannot read this file because YAML parser returned an error.
@@ -240,7 +250,10 @@ If this file is a template that will be rendered into valid YAML then you can in
 					ModifiedLines: job.entry.ModifiedLines,
 					Rule:          job.entry.Rule,
 					Problem: checks.Problem{
-						Lines:    []int{job.entry.Rule.Error.Line},
+						Lines: parser.LineRange{
+							First: job.entry.Rule.Error.Line,
+							Last:  job.entry.Rule.Error.Line,
+						},
 						Reporter: yamlParseReporter,
 						Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", job.entry.Rule.Error.Err.Error()),
 						Details: `This Prometheus rule is not valid.

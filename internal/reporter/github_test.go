@@ -78,7 +78,10 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "syntax error",
 						Severity: checks.Fatal,
@@ -120,7 +123,10 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "syntax error",
 						Details:  "syntax details",
@@ -152,7 +158,10 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "syntax error",
 						Details:  "syntax details",
@@ -195,7 +204,10 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "syntax error",
 						Details:  "syntax details",
@@ -242,7 +254,10 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "syntax error",
 						Details:  "syntax details",
@@ -285,7 +300,10 @@ filename %s
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "mock",
 						Text:     "syntax error",
 						Details:  "syntax details",

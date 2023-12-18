@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -35,7 +36,10 @@ func TestSyntaxCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/syntax",
 						Text:     "Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",
 						Details:  checks.SyntaxCheckDetails,
@@ -52,7 +56,10 @@ func TestSyntaxCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/syntax",
 						Text:     "Prometheus failed to parse the query with this PromQL error: unclosed left parenthesis.",
 						Details:  checks.SyntaxCheckDetails,

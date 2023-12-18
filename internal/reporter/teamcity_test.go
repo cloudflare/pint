@@ -42,7 +42,10 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{5, 6},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  6,
+						},
 						Reporter: "mock",
 						Text:     "mock text",
 						Details:  "mock details",
@@ -68,7 +71,10 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{5, 6},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  6,
+						},
 						Reporter: "mock",
 						Text:     "mock text",
 						Severity: checks.Bug,
@@ -93,7 +99,10 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines:    []int{5, 6},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  6,
+						},
 						Reporter: "mock",
 						Text: `mock text
 with [new lines] and pipe| chars that are 'quoted'

@@ -10,6 +10,7 @@ import (
 	"github.com/neilotoole/slogt"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestBitBucketMakeComments(t *testing.T) {
@@ -56,7 +57,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "first error",
 						Details:  "first details",
 						Reporter: "r1",
@@ -68,7 +72,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
-						Lines:    []int{3},
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
 						Text:     "second error",
 						Details:  "second details",
 						Reporter: "r1",
@@ -80,7 +87,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "third error",
 						Details:  "third details",
 						Reporter: "r2",
@@ -92,7 +102,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "fourth error",
 						Details:  "fourth details",
 						Reporter: "r2",
@@ -105,7 +118,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "fifth error",
 						Details:  "fifth details",
 						Reporter: "r2",
@@ -117,7 +133,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "sixth error",
 						Details:  "sixth details",
 						Reporter: "r2",
@@ -201,7 +220,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "first error",
 						Details:  "first details",
 						Reporter: "r1",
@@ -213,7 +235,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Text:     "second error",
 						Details:  "second details",
 						Reporter: "r1",

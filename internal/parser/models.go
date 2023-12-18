@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -11,16 +12,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/comments"
 )
-
-func appendLine(lines []int, newLines ...int) []int {
-	for _, nl := range newLines {
-		if !slices.Contains(lines, nl) {
-			lines = append(lines, nl)
-		}
-	}
-
-	return lines
-}
 
 func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
 	// nolint: exhaustive
@@ -102,12 +93,6 @@ func newYamlKeyValue(key, val *yaml.Node, offset int) *YamlKeyValue {
 type YamlKeyValue struct {
 	Key   *YamlNode
 	Value *YamlNode
-}
-
-func (ykv YamlKeyValue) Lines() (lines []int) {
-	lines = appendLine(lines, ykv.Key.Lines.Expand()...)
-	lines = appendLine(lines, ykv.Value.Lines.Expand()...)
-	return lines
 }
 
 func (ykv *YamlKeyValue) IsIdentical(b *YamlKeyValue) bool {
@@ -221,12 +206,6 @@ type PromQLExpr struct {
 	Query       *PromQLNode
 }
 
-func (pqle PromQLExpr) Lines() (lines []int) {
-	lines = appendLine(lines, pqle.Key.Lines.Expand()...)
-	lines = appendLine(lines, pqle.Value.Lines.Expand()...)
-	return lines
-}
-
 func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 	return pqle.Value.Value == b.Value.Value
 }
@@ -254,25 +233,6 @@ type AlertingRule struct {
 	KeepFiringFor *YamlKeyValue
 	Labels        *YamlMap
 	Annotations   *YamlMap
-}
-
-func (ar AlertingRule) Lines() (lines []int) {
-	lines = appendLine(lines, ar.Alert.Lines()...)
-	lines = appendLine(lines, ar.Expr.Lines()...)
-	if ar.For != nil {
-		lines = appendLine(lines, ar.For.Lines()...)
-	}
-	if ar.KeepFiringFor != nil {
-		lines = appendLine(lines, ar.KeepFiringFor.Lines()...)
-	}
-	if ar.Labels != nil {
-		lines = appendLine(lines, ar.Labels.Lines.Expand()...)
-	}
-	if ar.Annotations != nil {
-		lines = appendLine(lines, ar.Annotations.Lines.Expand()...)
-	}
-	slices.Sort(lines)
-	return lines
 }
 
 func (ar *AlertingRule) IsIdentical(b *AlertingRule) bool {
@@ -309,16 +269,6 @@ type RecordingRule struct {
 	Labels *YamlMap
 }
 
-func (rr RecordingRule) Lines() (lines []int) {
-	lines = appendLine(lines, rr.Record.Lines()...)
-	lines = appendLine(lines, rr.Expr.Lines()...)
-	if rr.Labels != nil {
-		lines = appendLine(lines, rr.Labels.Lines.Expand()...)
-	}
-	slices.Sort(lines)
-	return lines
-}
-
 func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
 	if (rr == nil) != (b == nil) {
 		return false
@@ -349,7 +299,16 @@ type LineRange struct {
 	Last  int
 }
 
+func (lr LineRange) Merge(b LineRange) (out LineRange) {
+	out.First = min(lr.First, b.First)
+	out.Last = max(lr.Last, b.Last)
+	return out
+}
+
 func (lr LineRange) String() string {
+	if lr.First == lr.Last {
+		return strconv.Itoa(lr.First)
+	}
 	return fmt.Sprintf("%d-%d", lr.First, lr.Last)
 }
 

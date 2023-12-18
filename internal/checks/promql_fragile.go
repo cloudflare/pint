@@ -48,7 +48,10 @@ func (c FragileCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 
 	for _, problem := range c.checkNode(expr.Query) {
 		problems = append(problems, Problem{
-			Lines:    expr.Lines(),
+			Lines: parser.LineRange{
+				First: expr.Key.Lines.First,
+				Last:  expr.Value.Lines.Last,
+			},
 			Reporter: c.Reporter(),
 			Text:     problem.text,
 			Severity: Warning,

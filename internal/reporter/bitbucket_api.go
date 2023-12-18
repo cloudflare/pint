@@ -632,7 +632,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		pending := pendingComment{
 			severity: severity,
 			path:     reports[0].ReportedPath,
-			line:     reports[0].Problem.Lines[0],
+			line:     reports[0].Problem.Lines.First,
 			text:     buf.String(),
 			anchor:   reports[0].Problem.Anchor,
 		}
@@ -853,7 +853,7 @@ func dedupReports(src []Report) (dst [][]Report) {
 			if d[0].ReportedPath != report.ReportedPath {
 				continue
 			}
-			if d[0].Problem.Lines[0] != report.Problem.Lines[0] {
+			if d[0].Problem.Lines.First != report.Problem.Lines.First {
 				continue
 			}
 			if d[0].Problem.Anchor != report.Problem.Anchor {

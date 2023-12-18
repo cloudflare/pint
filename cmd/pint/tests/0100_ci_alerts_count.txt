@@ -30,7 +30,7 @@ env BITBUCKET_AUTH_TOKEN="12345"
 pint.ok -l debug --no-color ci
 ! stdout .
 stderr '{"path":"rules.yml","line":3,"message":"alerts/count: '
-stderr '{"path":"rules.yml","line":8,"message":"alerts/count: '
+stderr '{"path":"rules.yml","line":7,"message":"alerts/count: '
 
 -- src/v1.yml --
 - alert: alert1

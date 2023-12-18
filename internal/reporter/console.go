@@ -6,11 +6,9 @@ import (
 	"log/slog"
 	"os"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/fatih/color"
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
@@ -33,10 +31,10 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 		if reports[i].SourcePath > reports[j].SourcePath {
 			return false
 		}
-		if reports[i].Problem.Lines[0] < reports[j].Problem.Lines[0] {
+		if reports[i].Problem.Lines.First < reports[j].Problem.Lines.First {
 			return true
 		}
-		if reports[i].Problem.Lines[0] > reports[j].Problem.Lines[0] {
+		if reports[i].Problem.Lines.First > reports[j].Problem.Lines.First {
 			return false
 		}
 		if reports[i].Problem.Reporter < reports[j].Problem.Reporter {
@@ -66,21 +64,17 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			}
 		}
 
-		msg := []string{}
-
-		firstLine, lastLine := report.Problem.LineRange()
-
 		path := report.SourcePath
 		if report.SourcePath != report.ReportedPath {
 			path = fmt.Sprintf("%s ~> %s", report.SourcePath, report.ReportedPath)
 		}
-		path = color.CyanString("%s:%s", path, printLineRange(firstLine, lastLine))
+		path = color.CyanString("%s:%s", path, report.Problem.Lines)
 		if report.Problem.Anchor == checks.AnchorBefore {
 			path += " " + color.RedString("(deleted)")
 		}
 		path += " "
 
-		msg = append(msg, path)
+		msg := []string{path}
 		switch report.Problem.Severity {
 		case checks.Bug, checks.Fatal:
 			msg = append(msg, color.RedString("%s: %s", report.Problem.Severity, report.Problem.Text))
@@ -93,6 +87,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 
 		if report.Problem.Anchor == checks.AnchorAfter {
 			lines := strings.Split(content, "\n")
+			lastLine := report.Problem.Lines.Last
 			if lastLine > len(lines)-1 {
 				lastLine = len(lines) - 1
 				slog.Warn(
@@ -102,18 +97,8 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			}
 
 			nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
-			var inPlaceholder bool
-			for i := firstLine; i <= lastLine; i++ {
-				switch {
-				case slices.Contains(report.Problem.Lines, i):
-					msg = append(msg, color.WhiteString(nrFmt+" | %s\n", i, lines[i-1]))
-					inPlaceholder = false
-				case inPlaceholder:
-					//
-				default:
-					msg = append(msg, color.WhiteString(" %s\n", strings.Repeat(".", countDigits(lastLine))))
-					inPlaceholder = true
-				}
+			for i := report.Problem.Lines.First; i <= lastLine; i++ {
+				msg = append(msg, color.WhiteString(nrFmt+" | %s\n", i, lines[i-1]))
 			}
 		}
 
@@ -149,13 +134,6 @@ func readFile(path string) (string, error) {
 	}
 
 	return string(content), nil
-}
-
-func printLineRange(s, e int) string {
-	if s == e {
-		return strconv.Itoa(s)
-	}
-	return fmt.Sprintf("%d-%d", s, e)
 }
 
 func countDigits(n int) (c int) {

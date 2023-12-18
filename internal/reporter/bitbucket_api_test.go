@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestPendingCommentToBitBucketComment(t *testing.T) {
@@ -114,7 +115,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "foo.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{5},
+					Lines: parser.LineRange{
+						First: 5,
+						Last:  5,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Details:  "mock details",
@@ -137,7 +141,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "foo.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{5},
+					Lines: parser.LineRange{
+						First: 5,
+						Last:  5,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Severity: checks.Bug,
@@ -159,7 +166,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "foo.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{5},
+					Lines: parser.LineRange{
+						First: 5,
+						Last:  5,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Severity: checks.Warning,
@@ -181,7 +191,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "foo.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{5},
+					Lines: parser.LineRange{
+						First: 5,
+						Last:  5,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Severity: checks.Information,
@@ -203,7 +216,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "bar.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{5},
+					Lines: parser.LineRange{
+						First: 5,
+						Last:  5,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Severity: checks.Fatal,
@@ -225,7 +241,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "bar.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{7},
+					Lines: parser.LineRange{
+						First: 7,
+						Last:  7,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Severity: checks.Fatal,
@@ -247,7 +266,10 @@ func TestReportToAnnotation(t *testing.T) {
 				SourcePath:    "foo.yaml",
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines:    []int{1},
+					Lines: parser.LineRange{
+						First: 1,
+						Last:  1,
+					},
 					Reporter: "mock",
 					Text:     "report text",
 					Severity: checks.Information,

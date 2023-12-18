@@ -148,7 +148,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 				ModifiedLines: entry.ModifiedLines,
 				Rule:          entry.Rule,
 				Problem: checks.Problem{
-					Lines:    entry.Rule.Lines.Expand(),
+					Lines:    entry.Rule.Lines,
 					Reporter: discovery.RuleOwnerComment,
 					Text: fmt.Sprintf("`%s` comments are required in all files, please add a `# pint %s $owner` somewhere in this file and/or `# pint %s $owner` on top of each rule.",
 						discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
@@ -168,7 +168,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 			ModifiedLines: entry.ModifiedLines,
 			Rule:          entry.Rule,
 			Problem: checks.Problem{
-				Lines:    entry.Rule.Lines.Expand(),
+				Lines:    entry.Rule.Lines,
 				Reporter: discovery.RuleOwnerComment,
 				Text:     fmt.Sprintf("This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", entry.Owner, entry.Owner),
 				Severity: checks.Bug,

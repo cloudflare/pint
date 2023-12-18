@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -34,7 +35,10 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/range_query",
 						Text:     checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
@@ -56,13 +60,19 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/range_query",
 						Text:     `Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"`,
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/range_query",
 						Text:     retentionToLow("prom", uri, "foo[30d]", "30d", "15d"),
 						Severity: checks.Warning,
@@ -99,7 +109,10 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/range_query",
 						Text:     retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
 						Severity: checks.Warning,
@@ -136,7 +149,10 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: "promql/range_query",
 						Text:     retentionToLow("prom", uri, "foo[11d1h]", "11d1h", "11d"),
 						Severity: checks.Warning,

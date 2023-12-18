@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -33,7 +34,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `undefined variable \"$label\"`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -50,7 +54,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `function \"xxx\" not defined`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -74,7 +81,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `undefined variable \"$label\"`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -91,7 +101,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `function \"xxx\" not defined`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -115,7 +128,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -131,7 +147,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -147,7 +166,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -163,13 +185,19 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -185,7 +213,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5, 6},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  6,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -201,7 +232,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5, 6},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  6,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -217,7 +251,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -233,7 +270,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -249,7 +289,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -265,7 +308,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
 						Severity: checks.Bug,
@@ -281,7 +327,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -298,7 +347,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -315,7 +367,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -332,7 +387,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -349,7 +407,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -366,7 +427,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -383,7 +447,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -406,7 +473,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 6},
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  6,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `ixtance` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -459,28 +529,40 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{3, 7},
+						Lines: parser.LineRange{
+							First: 7,
+							Last:  7,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{3, 7},
+						Lines: parser.LineRange{
+							First: 7,
+							Last:  7,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `foo` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{3, 8},
+						Lines: parser.LineRange{
+							First: 8,
+							Last:  8,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `xxx` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
@@ -514,7 +596,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query removes it.",
 						Details:  checks.TemplateCheckAggregationDetails,
@@ -536,7 +621,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
@@ -558,14 +646,20 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but `absent()` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
@@ -647,7 +741,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
 						Severity: checks.Information,
@@ -668,7 +765,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
 						Severity: checks.Information,
@@ -689,7 +789,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("irate(errors[2m])"),
 						Severity: checks.Information,
@@ -710,7 +813,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("deriv(errors[2m])"),
 						Severity: checks.Information,
@@ -830,7 +936,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5, 6, 7, 8},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  8,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `163: executing \"summary\" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -855,7 +964,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5, 6, 7, 8},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  8,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `159: executing \"summary\" at <query>: error calling query: 1:1: parse error: unknown function with name \"suz\"`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -877,14 +989,20 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `124: executing \"summary\" at <first>: wrong type for value; expected template.queryResult; got float64`.",
 						Severity: checks.Fatal,
 						Details:  checks.TemplateCheckSyntaxDetails,
 					},
 					{
-						Lines:    []int{3, 5},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     humanizeText("rate(errors[2m])"),
 						Severity: checks.Information,
@@ -908,7 +1026,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{5, 6, 7, 8},
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  8,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template failed to parse with this error: `121: executing \"summary\" at <query \"up xxx\">: error calling query: 1:4: parse error: unexpected identifier \"xxx\"`.",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -949,7 +1070,10 @@ func TestTemplateCheck(t *testing.T) {
 								{
 												    {{ with printf "sum({job='%s'})" .Labels.job | query }}
 			    {{ . | first | label "instance" }}`,
-									Lines:    []int{5, 6, 7, 8},
+									Lines: parser.LineRange{
+						First: 5,
+						Last:  8,
+					},
 									Reporter: checks.TemplateCheckName,
 									Text:     `"summary" annotation template sends a query that is using "instance" label but that query removes it`,
 									Severity: checks.Bug,
@@ -1008,7 +1132,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query doesn't produce any labels.",
 						Details:  checks.TemplateCheckLabelsDetails,
@@ -1025,7 +1152,10 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query doesn't produce any labels.",
 						Details:  checks.TemplateCheckLabelsDetails,
@@ -1042,14 +1172,20 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query doesn't produce any labels.",
 						Details:  checks.TemplateCheckLabelsDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query doesn't produce any labels.",
 						Details:  checks.TemplateCheckLabelsDetails,
@@ -1072,14 +1208,20 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 6},
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  6,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job_name` label but the query uses `on(...)` without it being set there, this label will be missing from the query result.",
 						Details:  checks.TemplateCheckOnDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{2, 4},
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `app_type` label but the query uses `on(...)` without it being set there, this label will be missing from the query result.",
 						Details:  checks.TemplateCheckOnDetails,

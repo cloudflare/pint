@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -57,7 +58,10 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3, 4, 5, 6, 7, 8, 9, 10},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  10,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
@@ -81,7 +85,10 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2, 3, 4, 5, 6, 7, 8, 9, 10},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  10,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     checkErrorUnableToRun(checks.AlertsExternalLabelsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
 						Severity: checks.Warning,
@@ -110,35 +117,50 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{9},
+						Lines: parser.LineRange{
+							First: 9,
+							Last:  9,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{10},
+						Lines: parser.LineRange{
+							First: 10,
+							Last:  10,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{10},
+						Lines: parser.LineRange{
+							First: 10,
+							Last:  10,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{6},
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  6,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
 					},
 					{
-						Lines:    []int{6},
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  6,
+						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
 						Details:  alertsExternalLabelsDetails("prom", uri),

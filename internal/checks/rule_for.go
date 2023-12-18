@@ -65,17 +65,17 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 	}
 
 	var forDur model.Duration
-	var lines []int
+	var lines parser.LineRange
 
 	switch {
 	case c.key == RuleForFor && rule.AlertingRule.For != nil:
 		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value.Value)
-		lines = rule.AlertingRule.For.Lines()
+		lines = rule.AlertingRule.For.Value.Lines
 	case c.key == RuleForKeepFiringFor && rule.AlertingRule.KeepFiringFor != nil:
 		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value.Value)
-		lines = rule.AlertingRule.KeepFiringFor.Lines()
+		lines = rule.AlertingRule.KeepFiringFor.Value.Lines
 	default:
-		lines = rule.AlertingRule.Alert.Lines()
+		lines = rule.AlertingRule.Alert.Value.Lines
 	}
 
 	if time.Duration(forDur) < c.minFor {

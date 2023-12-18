@@ -65,12 +65,12 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 		if entry.Rule.RecordingRule.Record.Value.Value != rule.RecordingRule.Record.Value.Value {
 			continue
 		}
-		problems = append(problems, c.compareRules(ctx, rule.RecordingRule, entry)...)
+		problems = append(problems, c.compareRules(ctx, rule.RecordingRule, entry, rule.Lines)...)
 	}
 	return problems
 }
 
-func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry) (problems []Problem) {
+func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines parser.LineRange) (problems []Problem) {
 	ruleALabels := buildRuleLabels(rule)
 	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule)
 
@@ -80,7 +80,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 
 	if rule.Expr.Value.Value == entry.Rule.RecordingRule.Expr.Value.Value {
 		problems = append(problems, Problem{
-			Lines:    rule.Lines(),
+			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.ReportedPath, entry.Rule.RecordingRule.Record.Key.Lines.First),
 			Severity: Bug,

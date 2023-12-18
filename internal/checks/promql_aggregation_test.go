@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -64,7 +65,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -82,7 +86,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Bug,
@@ -100,7 +107,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label should be removed when aggregating `^.+$` rules, use `without(job, ...)`.",
 						Severity: checks.Warning,
@@ -136,7 +146,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -163,13 +176,19 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, use `without(instance, ...)`.",
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, use `without(instance, ...)`.",
 						Severity: checks.Warning,
@@ -187,7 +206,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -214,7 +236,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -241,7 +266,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -268,7 +296,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -323,7 +354,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -341,7 +375,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Bug,
@@ -359,7 +396,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label should be removed when aggregating `^.+$` rules, remove job from `by()`.",
 						Severity: checks.Warning,
@@ -386,7 +426,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -413,7 +456,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -440,7 +486,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -467,7 +516,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -503,13 +555,19 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -527,7 +585,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
 						Severity: checks.Warning,
@@ -545,7 +606,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -563,13 +627,19 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, use `without(instance, ...)`.",
 						Severity: checks.Warning,
 					},
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`instance` label should be removed when aggregating `^.+$` rules, remove instance from `by()`.",
 						Severity: checks.Warning,
@@ -587,7 +657,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -605,7 +678,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
 						Severity: checks.Warning,
@@ -623,7 +699,10 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines:    []int{2},
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
 						Reporter: checks.AggregationCheckName,
 						Text:     "`job` label should be removed when aggregating `^.+$` rules, use `without(job, ...)`.",
 						Severity: checks.Warning,

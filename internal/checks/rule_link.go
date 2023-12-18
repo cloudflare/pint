@@ -107,7 +107,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			problems = append(problems, Problem{
-				Lines:    ann.Lines(),
+				Lines: parser.LineRange{
+					First: ann.Key.Lines.First,
+					Last:  ann.Value.Lines.Last,
+				},
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
 				Severity: c.severity,
@@ -120,7 +123,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 
 		if resp.StatusCode != http.StatusOK {
 			problems = append(problems, Problem{
-				Lines:    ann.Lines(),
+				Lines: parser.LineRange{
+					First: ann.Key.Lines.First,
+					Last:  ann.Value.Lines.Last,
+				},
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
 				Severity: c.severity,

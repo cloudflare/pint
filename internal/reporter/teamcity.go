@@ -30,7 +30,7 @@ type TeamCityReporter struct {
 }
 
 func (tc TeamCityReporter) name(report Report) string {
-	return fmt.Sprintf("%s:%d", report.ReportedPath, report.Problem.Lines[0])
+	return fmt.Sprintf("%s:%d", report.ReportedPath, report.Problem.Lines.First)
 }
 
 func (tc TeamCityReporter) escape(s string) string {
@@ -69,7 +69,7 @@ func (tc TeamCityReporter) Submit(summary Summary) error {
 		buf.WriteString("##teamcity[testFinished name='")
 		buf.WriteString(report.ReportedPath)
 		buf.WriteRune(':')
-		buf.WriteString(strconv.Itoa(report.Problem.Lines[0]))
+		buf.WriteString(strconv.Itoa(report.Problem.Lines.First))
 		buf.WriteString("']\n")
 
 		buf.WriteString("##teamcity[testSuiteFinished name='")

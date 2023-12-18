@@ -4,8 +4,6 @@ import (
 	"sort"
 	"time"
 
-	"golang.org/x/exp/slices"
-
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -29,7 +27,10 @@ func (r Report) isEqual(nr Report) bool {
 	if nr.Owner != r.Owner {
 		return false
 	}
-	if !slices.Equal(r.Problem.Lines, nr.Problem.Lines) {
+	if r.Problem.Lines.First != nr.Problem.Lines.First {
+		return false
+	}
+	if r.Problem.Lines.Last != nr.Rule.Lines.Last {
 		return false
 	}
 	if !nr.Rule.IsSame(r.Rule) {
@@ -85,8 +86,8 @@ func (s *Summary) SortReports() {
 		if s.reports[i].SourcePath != s.reports[j].SourcePath {
 			return s.reports[i].SourcePath < s.reports[j].SourcePath
 		}
-		if s.reports[i].Problem.Lines[0] != s.reports[j].Problem.Lines[0] {
-			return s.reports[i].Problem.Lines[0] < s.reports[j].Problem.Lines[0]
+		if s.reports[i].Problem.Lines.First != s.reports[j].Problem.Lines.First {
+			return s.reports[i].Problem.Lines.First < s.reports[j].Problem.Lines.First
 		}
 		if s.reports[i].Problem.Reporter != s.reports[j].Problem.Reporter {
 			return s.reports[i].Problem.Reporter < s.reports[j].Problem.Reporter
