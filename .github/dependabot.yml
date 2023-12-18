@@ -9,6 +9,14 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "gomod"
+    directory: "/tools/benchstat"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gomod"
+    directory: "/tools/betteralign"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "gomod"
     directory: "/tools/gofumpt"
     schedule:
       interval: "weekly"
