@@ -12,7 +12,6 @@ import (
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/comments"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -106,9 +105,9 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 		return nil, err
 	}
 
-	contentLines := []int{}
-	for i := 1; i <= strings.Count(string(content.Body), "\n"); i++ {
-		contentLines = append(contentLines, i)
+	contentLines := parser.LineRange{
+		First: min(content.TotalLines, 1),
+		Last:  content.TotalLines,
 	}
 
 	var fileOwner string
@@ -144,7 +143,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 				SourcePath:    sourcePath,
 				PathError:     comment.Value.(comments.Invalid).Err,
 				Owner:         fileOwner,
-				ModifiedLines: contentLines,
+				ModifiedLines: contentLines.Expand(),
 			})
 		}
 	}
@@ -159,7 +158,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 				Err: errors.New("This file was excluded from pint checks."),
 			},
 			Owner:         fileOwner,
-			ModifiedLines: contentLines,
+			ModifiedLines: contentLines.Expand(),
 		})
 		return entries, nil
 	}
@@ -180,7 +179,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 					SourcePath:    sourcePath,
 					PathError:     err,
 					Owner:         fileOwner,
-					ModifiedLines: contentLines,
+					ModifiedLines: contentLines.Expand(),
 				})
 			}
 			if len(entries) > 0 {
@@ -195,14 +194,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			"Failed to parse file content",
 			slog.Any("err", err),
 			slog.String("path", sourcePath),
-			slog.String("lines", output.FormatLineRangeString(contentLines)),
+			slog.String("lines", contentLines.String()),
 		)
 		entries = append(entries, Entry{
 			ReportedPath:  reportedPath,
 			SourcePath:    sourcePath,
 			PathError:     err,
 			Owner:         fileOwner,
-			ModifiedLines: contentLines,
+			ModifiedLines: contentLines.Expand(),
 		})
 		return entries, nil
 	}
