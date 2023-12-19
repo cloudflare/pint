@@ -29,8 +29,8 @@ exec git commit -am 'v2'
 env BITBUCKET_AUTH_TOKEN="12345"
 pint.ok -l debug --no-color ci
 ! stdout .
-stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":3}'
-stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":7}'
+stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":4}'
+stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":11}'
 
 -- src/v1.yml --
 - alert: alert1
@@ -44,11 +44,15 @@ stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":7}'
 -- src/v2.yml --
 - alert: alert1
   # pint disable promql/series(prom)
-  expr: up{job="foo"} == 0
+  expr: |
+    up{job="foo"} == 0
   for: 5m
 - alert: alert2
   # pint disable promql/series(prom)
-  expr: up{job="foo"} == 0
+  expr: |
+    up{job="foo"}
+    ==
+    0
   for: 1m
 
 -- src/.pint.hcl --
