@@ -1,7 +1,8 @@
+# This Dockerfile is used by goreleaser when releasing a new version.
 FROM debian:stable-20231218
 RUN apt-get update --yes && \
     apt-get install --no-install-recommends --yes git ca-certificates && \
     rm -rf /var/lib/apt/lists/*
-COPY pint-linux-amd64 /usr/local/bin/pint
+COPY pint-linux-arm64 /usr/local/bin/pint
 WORKDIR /code
 CMD ["/usr/local/bin/pint"]
