@@ -1,4 +1,4 @@
-FROM debian:stable-20231120
+FROM debian:stable-20231218
 RUN apt-get update --yes && \
     apt-get install --no-install-recommends --yes git ca-certificates && \
     rm -rf /var/lib/apt/lists/*
