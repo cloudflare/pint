@@ -38,11 +38,12 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compile binaries
+      - name: Test releasing binaries
+        if: github.event_name == 'pull_request'
         uses: goreleaser/goreleaser-action@v5
         with:
           version: v1.21.2
-          args: build --snapshot --clean --single-target
+          args: release --clean --skip=validate --skip=sign --skip=sbom --skip=publish --snapshot
 
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
@@ -52,10 +53,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Test releasing binaries
-        if: github.event_name == 'pull_request'
-        uses: goreleaser/goreleaser-action@v5
-        with:
-          version: v1.21.2
-          args: release --clean --skip=validate --skip=sign --skip=sbom --skip=publish --snapshot
