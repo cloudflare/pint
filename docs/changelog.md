@@ -5,6 +5,7 @@
 ### Changed
 
 - A large part of rule parsing code was refactored and more problems will now be deduplicated.
+- Improved validation of labels and annotations.
 
 ## v0.53.0
 

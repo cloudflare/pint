@@ -28,11 +28,11 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
   expr: up{job="foo"} == 0
   annotations:
     summary: "{{ $labels.job }} is down"
-    "{{.ExternalLabels.cluster}}": "This is {{ .ExternalLabels.cluster }} cluster"
+    cluster: "This is {{ .ExternalLabels.cluster }} cluster"
   labels:
     job: "{{ $labels.job }}"
-    cluster: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
-    "{{ $externalLabels.cluster }}": "{{ $externalLabels.cluster }}"
+    twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+    cluster: "{{ $externalLabels.cluster }}"
 `
 
 	testCases := []checkTest{
@@ -130,26 +130,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Lines: parser.LineRange{
 							First: 10,
 							Last:  10,
-						},
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
-						Details:  alertsExternalLabelsDetails("prom", uri),
-						Severity: checks.Bug,
-					},
-					{
-						Lines: parser.LineRange{
-							First: 10,
-							Last:  10,
-						},
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
-						Details:  alertsExternalLabelsDetails("prom", uri),
-						Severity: checks.Bug,
-					},
-					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
 						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Text:     alertsExternalLabelsText("prom", uri, "cluster"),

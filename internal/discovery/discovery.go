@@ -28,6 +28,9 @@ var ignoredErrors = []string{
 	"could not parse expression: ",
 	"cannot unmarshal !!seq into rulefmt.ruleGroups",
 	": template: __",
+	"invalid label name: ",
+	"invalid annotation name: ",
+	"invalid recording rule name: ",
 }
 
 type FileIgnoreError struct {

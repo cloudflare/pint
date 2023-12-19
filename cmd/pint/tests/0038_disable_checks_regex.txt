@@ -14,7 +14,7 @@ level=INFO msg="Problems found" Warning=1
   expr: foo > 1
   for: 0m
 
-- record: sum-job
+- record: sum:job
   expr: sum(foo)
 
 - alert: no-comparison

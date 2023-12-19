@@ -7,6 +7,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/comments"
 )
 
@@ -245,6 +247,36 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 		}
 		return rule, false, err
 	}
+	if recordPart != nil && forPart != nil {
+		rule = Rule{
+			Lines: lines,
+			Error: ParseError{
+				Line: forPart.Lines.First,
+				Err:  fmt.Errorf("invalid field '%s' in recording rule", forKey),
+			},
+		}
+		return rule, false, err
+	}
+	if recordPart != nil && keepFiringForPart != nil {
+		rule = Rule{
+			Lines: lines,
+			Error: ParseError{
+				Line: keepFiringForPart.Lines.First,
+				Err:  fmt.Errorf("invalid field '%s' in recording rule", keepFiringForKey),
+			},
+		}
+		return rule, false, err
+	}
+	if recordPart != nil && annotationsPart != nil {
+		rule = Rule{
+			Lines: lines,
+			Error: ParseError{
+				Line: annotationsPart.Lines.First,
+				Err:  fmt.Errorf("invalid field '%s' in recording rule", annotationsKey),
+			},
+		}
+		return rule, false, err
+	}
 	if r, ok := ensureRequiredKeys(lines, recordKey, recordPart, exprPart); !ok {
 		return r, false, err
 	}
@@ -264,6 +296,53 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			},
 		}
 		return rule, false, err
+	}
+
+	if recordPart != nil && !model.IsValidMetricName(model.LabelValue(recordPart.Value)) {
+		return Rule{
+			Lines: lines,
+			Error: ParseError{
+				Line: recordPart.Lines.First,
+				Err:  fmt.Errorf("invalid recording rule name: %s", recordPart.Value),
+			},
+		}, false, err
+	}
+
+	if (recordPart != nil || alertPart != nil) && labelsPart != nil {
+		for _, lab := range labelsPart.Items {
+			if !model.LabelName(lab.Key.Value).IsValid() || lab.Key.Value == model.MetricNameLabel {
+				return Rule{
+					Lines: lines,
+					Error: ParseError{
+						Line: lab.Key.Lines.First,
+						Err:  fmt.Errorf("invalid label name: %s", lab.Key.Value),
+					},
+				}, false, err
+			}
+			if !model.LabelValue(lab.Value.Value).IsValid() {
+				return Rule{
+					Lines: lines,
+					Error: ParseError{
+						Line: lab.Key.Lines.First,
+						Err:  fmt.Errorf("invalid label value: %s", lab.Value.Value),
+					},
+				}, false, err
+			}
+		}
+	}
+
+	if alertPart != nil && annotationsPart != nil {
+		for _, ann := range annotationsPart.Items {
+			if !model.LabelName(ann.Key.Value).IsValid() {
+				return Rule{
+					Lines: lines,
+					Error: ParseError{
+						Line: ann.Key.Lines.First,
+						Err:  fmt.Errorf("invalid annotation name: %s", ann.Key.Value),
+					},
+				}, false, err
+			}
+		}
 	}
 
 	if recordPart != nil && exprPart != nil {

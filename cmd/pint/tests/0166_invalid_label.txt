@@ -1,0 +1,26 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+rules/1.yaml:7 Fatal: This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`. (yaml/parse)
+ 7 |       "{{ $value }}": "down"
+
+rules/1.yaml:11 Fatal: This rule is not a valid Prometheus rule: `invalid label name: {{ $value }}`. (yaml/parse)
+ 11 |       "{{ $value }}": "down"
+
+level=INFO msg="Problems found" Fatal=2
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yaml --
+groups:
+- name: g1
+  rules:
+  - alert: Service Down
+    expr: up == 0
+    annotations:
+      "{{ $value }}": "down"
+  - alert: Service Down
+    expr: up == 0
+    labels:
+      "{{ $value }}": "down"

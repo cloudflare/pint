@@ -158,19 +158,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 					Severity: Fatal,
 				})
 			}
-			// check key
-			for _, msg := range checkForValueInLabels(label.Key.Value, label.Key.Value) {
-				problems = append(problems, Problem{
-					Lines: parser.LineRange{
-						First: label.Key.Lines.First,
-						Last:  label.Value.Lines.Last,
-					},
-					Reporter: c.Reporter(),
-					Text:     msg,
-					Severity: Bug,
-				})
-			}
-			// check value
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
 				problems = append(problems, Problem{
 					Lines: parser.LineRange{

@@ -121,44 +121,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems:    noProblems,
 		},
 		{
-			description: "{{ $value}} in label key",
-			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value}}': bar\n",
-			checker:     newTemplateCheck,
-			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
-						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
-						Severity: checks.Bug,
-					},
-				}
-			},
-		},
-		{
-			description: "{{ $value }} in label key",
-			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value }}': bar\n",
-			checker:     newTemplateCheck,
-			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
-						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
-						Severity: checks.Bug,
-					},
-				}
-			},
-		},
-		{
 			description: "{{$value}} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
