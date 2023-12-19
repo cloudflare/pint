@@ -3,11 +3,7 @@ updates:
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
-  - package-ecosystem: "docker"
-    directory: "/.github"
-    schedule:
-      interval: "weekly"
+      interval: "daily"
     groups:
       debian:
         patterns:
@@ -19,24 +15,24 @@ updates:
   - package-ecosystem: "gomod"
     directory: "/tools/benchstat"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "gomod"
     directory: "/tools/betteralign"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "gomod"
     directory: "/tools/gofumpt"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "gomod"
     directory: "/tools/goimports"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "gomod"
     directory: "/tools/golangci-lint"
     schedule:
-      interval: "weekly"
+      interval: "daily"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
