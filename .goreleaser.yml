@@ -15,6 +15,7 @@ builds:
         goarch: arm64
     no_unique_dist_dir: true
     binary: "{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}"
+
 archives:
   - name_template: "{{ .ProjectName }}-{{ .Version }}-{{ .Os }}-{{ .Arch }}"
 checksum:
@@ -25,16 +26,18 @@ release:
   extra_files:
     - glob: ./README.md
     - glob: ./docs/changelog.md
+
 changelog:
   use: github
   sort: asc
   filters:
     exclude:
       - "^Merge pull request "
+
 dockers:
   - image_templates:
       ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-amd64"]
-    dockerfile: Dockerfile
+    dockerfile: .github/Dockerfile.amd64
     use: buildx
     build_flag_templates:
       - --platform=linux/amd64
@@ -46,17 +49,11 @@ dockers:
       - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=Apache-2.0
-    extra_files:
-      - .git
-      - cmd
-      - internal
-      - go.mod
-      - go.sum
-      - Makefile
+
   - image_templates:
       ["ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}-arm64"]
     goarch: arm64
-    dockerfile: Dockerfile
+    dockerfile: .github/Dockerfile.arm64
     use: buildx
     build_flag_templates:
       - --platform=linux/arm64
@@ -68,13 +65,7 @@ dockers:
       - --label=org.opencontainers.image.created={{ time "2006-01-02T15:04:05Z07:00" }}
       - --label=org.opencontainers.image.revision={{ .FullCommit }}
       - --label=org.opencontainers.image.licenses=Apache-2.0
-    extra_files:
-      - .git
-      - cmd
-      - internal
-      - go.mod
-      - go.sum
-      - Makefile
+
 docker_manifests:
   - name_template: ghcr.io/cloudflare/{{ .ProjectName }}:{{ .Version }}
     image_templates:

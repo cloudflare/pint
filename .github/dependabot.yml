@@ -4,6 +4,14 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "docker"
+    directory: "/.github"
+    schedule:
+      interval: "weekly"
+    groups:
+      debian:
+        patterns:
+        - "debian"
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
