@@ -12,21 +12,32 @@ func TestRuleLabelValueTypeCheck(t *testing.T) {
 	testCases := []checkTest{
 		{
 			description: "label is not a string in recording rule / required",
-			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: true\n",
+			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: true\n    bar: 1\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLabelValueTypeCheck()
 			},
 			prometheus: noProm,
 			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{{
-					Lines: parser.LineRange{
-						First: 4,
-						Last:  4,
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.RuleLabelValueTypeName,
+						Text:     "recording rule `foo` has label `foo` with non-string value, got `!!bool`.",
+						Severity: checks.Bug,
 					},
-					Reporter: checks.RuleLabelValueTypeName,
-					Text:     "recording rule `foo` has label `foo` with non-string value, got `!!bool`.",
-					Severity: checks.Bug,
-				}}
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.RuleLabelValueTypeName,
+						Text:     "recording rule `foo` has label `bar` with non-string value, got `!!int`.",
+						Severity: checks.Bug,
+					},
+				}
 			},
 		},
 		{

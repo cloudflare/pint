@@ -68,7 +68,7 @@ func (c RuleLabelValueTypeCheck) checkAlertingRule(rule parser.Rule) (problems [
 
 func (c RuleLabelValueTypeCheck) checkRuleLabelsValueType(ruleName, ruleType string, labels *parser.YamlMap, problems []Problem) []Problem {
 	for _, label := range labels.Items {
-		if label.Value.Tag == "!!bool" {
+		if label.Value.Tag != "!!str" {
 			problems = append(problems, Problem{
 				Lines:    label.Value.Lines,
 				Reporter: c.Reporter(),
