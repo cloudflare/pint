@@ -96,6 +96,15 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 		return problems
 	}
 
+	if val.Tag == "!!bool" {
+		problems = append(problems, Problem{
+			Lines:    val.Lines,
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("`%s` label value must be a string.", c.keyRe.original),
+			Severity: c.severity,
+		})
+	}
+
 	if c.tokenRe != nil {
 		for _, match := range c.tokenRe.MustExpand(rule).FindAllString(val.Value, -1) {
 			problems = append(problems, c.checkValue(rule, match, val.Lines)...)

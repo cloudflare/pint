@@ -44,6 +44,7 @@ func mergeComments(node *yaml.Node) (comments []string) {
 
 type YamlNode struct {
 	Value string
+	Tag   string
 	Lines LineRange
 }
 
@@ -64,6 +65,7 @@ func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	n := YamlNode{
 		Lines: nodeLines(node, offset),
 		Value: node.Value,
+		Tag:   node.ShortTag(),
 	}
 	if node.Alias != nil {
 		n.Value = node.Alias.Value
