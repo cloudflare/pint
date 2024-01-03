@@ -112,6 +112,10 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			name:  checks.RuleDependencyCheckName,
 			check: checks.NewRuleDependencyCheck(),
 		},
+		{
+			name:  checks.RuleLabelValueTypeName,
+			check: checks.NewRuleLabelValueTypeCheck(),
+		},
 	}
 
 	proms := gen.ServersForPath(entry.SourcePath)

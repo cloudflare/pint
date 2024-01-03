@@ -90,32 +90,6 @@ func TestLabelCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "label is not a string in recording rule / required",
-			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: true\n",
-			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(
-					checks.MustTemplatedRegexp("foo"),
-					checks.MustRawTemplatedRegexp("\\w+"),
-					checks.MustTemplatedRegexp(".*"),
-					nil,
-					true,
-					checks.Bug,
-				)
-			},
-			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{{
-					Lines: parser.LineRange{
-						First: 4,
-						Last:  4,
-					},
-					Reporter: checks.LabelCheckName,
-					Text:     "`foo` label value must be a string.",
-					Severity: checks.Bug,
-				}}
-			},
-		},
-		{
 			description: "missing label in recording rule / not required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {

@@ -1,0 +1,34 @@
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+rules/1.yaml:7 Bug: alerting rule `colo:test1:alert` has label `job` with non-string value, got `!!bool`. (rule/label/value_type)
+ 7 |       job: true
+
+rules/1.yaml:11 Bug: recording rule `colo:test1` has label `job` with non-string value, got `!!bool`. (rule/label/value_type)
+ 11 |       job: true
+
+level=INFO msg="Problems found" Bug=2
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yaml --
+groups:
+- name: foo
+  rules:
+  - alert: "colo:test1:alert"
+    expr: sum(foo) > 0
+    labels:
+      job: true
+  - record: "colo:test1"
+    expr: sum(foo)
+    labels:
+      job: true
+  - record: "colo:test2"
+    expr: sum(foo)
+    labels:
+      job: "true"
+  - alert: "colo:test2:alert"
+    expr: sum(foo) > 0
+    labels:
+      job: "true"

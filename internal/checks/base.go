@@ -32,6 +32,7 @@ var (
 		RuleDuplicateCheckName,
 		RuleForCheckName,
 		LabelCheckName,
+		RuleLabelValueTypeName,
 		RuleLinkCheckName,
 		RejectCheckName,
 	}
