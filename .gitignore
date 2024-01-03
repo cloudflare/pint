@@ -3,3 +3,4 @@
 /dist/
 /.vscode/
 /cmd/pint/bench/rules
+/.idea
