@@ -30,7 +30,7 @@ Checks might use various Prometheus
 extra information, for example Prometheus configuration or metrics metadata.
 If you run pint against a different service, like [Thanos](https://thanos.io/) some checks
 might return problems due to API call errors, since not all Prometheus HTTP APIs are supported by it.
-In that case you might want to disable failing checks in pint configuration file.
+In that case, you might want to disable failing checks in pint configuration file.
 
 ## Usage
 
@@ -171,7 +171,7 @@ Available metrics:
 
 - `pint_problem` - exported for every problem detected by pint.
   To avoid exposing too many metrics at once pass `--max-problems` flag to watch command.
-  When this flag is set pint will expose only up to `--max-problems` value number of
+  When this flag is set, pint will expose only up to `--max-problems` value number of
   `pint_problem` metrics.
 - `pint_problems` - this metric is the total number of all problems detected by pint,
   including those not exported due to the `--max-problems` flag.
@@ -272,7 +272,7 @@ Steps:
    ./pint lint /etc/prometheus/*.rules.yml
    ```
 
-3. Configuration file is optional, but without it pint will only run very basic
+3. Configuration file is optional, but without it, pint will only run very basic
    syntax checks. See [configuration](configuration.md) for details on
    config syntax.
    By default pint will try to load configuration from `.pint.hcl`, you can

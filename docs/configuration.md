@@ -17,7 +17,7 @@ nav_order: 2
 ## Environment variables
 
 Environment variables can be expanded inside pint configuration file as `ENV_*` HCL
-variables. To use a variable named `FOO` reference it as `${ENV_FOO}`.
+variables. To use a variable named `FOO`, reference it as `${ENV_FOO}`.
 
 Examples:
 
@@ -103,7 +103,7 @@ owners {
 ```
 
 - `allowed` - list of allowed owner names, this option accepts regexp rules.
-  When set all owners set via comments must much at least one entry on this list.
+  When set, all owners set via comments must much at least one entry on this list.
 
 If there's no `owners:allowed` configuration block, or if it's empty, then any
 owner name is accepted.
@@ -127,11 +127,11 @@ ci {
   matching those regexp rules will be checked, other modified files will be ignored.
 - `exclude` - list of file patterns to ignore when running checks.
   This option takes precedence over `include`, so if a file path matches both
-  `include` & `exclude` patterns it will be excluded.
+  `include` & `exclude` patterns, it will be excluded.
 - `maxCommits` - by default pint will try to find all commits on the current branch,
   this requires full git history to be present, if we have a shallow clone this
   might fail to find only current branch commits and give us a huge list.
-  If the number of commits returned by branch discovery is more than `maxCommits`
+  If the number of commits returned by branch discovery is more than `maxCommits`,
   then pint will fail to run.
 - `baseBranch` - base branch to compare `HEAD` commit with when calculating the list
   of commits to check.
@@ -149,8 +149,8 @@ to be set. It should contain a personal access token used to authenticate with t
 to be set to a personal access key that can access your repository.
 
 **NOTE** Pull request number must be known to pint so it can add comments if it detects any problems.
-If pint is run as part of GitHub actions workflow then this number will be detected from `GITHUB_REF`
-environment variable. For other use cases `GITHUB_PULL_REQUEST_NUMBER` environment variable must be set
+If pint is run as part of GitHub actions workflow, then this number will be detected from `GITHUB_REF`
+environment variable. For other use cases, `GITHUB_PULL_REQUEST_NUMBER` environment variable must be set
 with the pull request number.
 
 Syntax:
@@ -185,17 +185,17 @@ repository {
 ```
 
 - `github:baseuri` - base URI of GitHub or GitHub enterprise, will be used for HTTP requests to the GitHub API.
-  If not set `pint` will try to use `GITHUB_API_URL` environment variable instead (if set).
+  If not set, `pint` will try to use `GITHUB_API_URL` environment variable instead (if set).
 - `github:uploaduri` - upload URI of GitHub or GitHub enterprise, will be used for HTTP requests to the GitHub API.
-  If not set `pint` will try to use `GITHUB_API_URL` environment variable instead (if set).
+  If not set, `pint` will try to use `GITHUB_API_URL` environment variable instead (if set).
 
-If `github:baseuri` _or_ `github:uploaduri` are not specified then [GitHub](https://github.com) will be used.
+If `github:baseuri` _or_ `github:uploaduri` are not specified, then [GitHub](https://github.com) will be used.
 
 - `github:timeout` - timeout to be used for API requests, defaults to 1 minute.
 - `github:owner` - name of the GitHub owner i.e. the first part that comes before the repository's name in the URI.
-  If not set `pint` will try to use `GITHUB_REPOSITORY` environment variable instead (if set).
+  If not set, `pint` will try to use `GITHUB_REPOSITORY` environment variable instead (if set).
 - `github:repo` - name of the GitHub repository (e.g. `monitoring`).
-  If not set `pint` will try to use `GITHUB_REPOSITORY` environment variable instead (if set).
+  If not set, `pint` will try to use `GITHUB_REPOSITORY` environment variable instead (if set).
 
 Most GitHub settings can be detected from environment variables that are set inside GitHub Actions
 environment. The only exception is `GITHUB_AUTH_TOKEN` environment variable that must be set
@@ -204,7 +204,7 @@ manually.
 ## Prometheus servers
 
 Some checks work by querying a running Prometheus instance to verify if
-metrics used in rules are present. If you want to use those checks then you
+metrics used in rules are present. If you want to use those checks, then you
 first need to define one or more Prometheus servers.
 
 Syntax:
@@ -238,7 +238,7 @@ prometheus "$name" {
 - `publicURI` - optional URI to use instead of `uri` in problems reported to users.
   Set it if Prometheus links used by pint in comments submitted to BitBucket or GitHub
   should use different URIs then the one used by pint when querying Prometheus.
-  If not set `uri` will be used instead.
+  If not set, `uri` will be used instead.
 - `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
   to requests or returns an error. This allows to configure fail-over Prometheus servers
   to avoid CI failures in case main Prometheus server is unreachable.
@@ -267,15 +267,15 @@ prometheus "$name" {
   for details.
   Uptime gap detection works by running a range query `count(up)` and checking for any gaps
   in the response.
-  Since `up` metric can have a lot of time series `count(up)` might be slow and expensive.
+  Since `up` metric can have a lot of time series, `count(up)` might be slow and expensive.
   An alternative is to use one of metrics exposed by Prometheus itself, like `prometheus_build_info`, but
   those metrics are only present if Prometheus is configured to scrape itself, so `up` is used by default
   since it's guaranteed to work in every setup.
-  If your Prometheus has a lot of time series and it's configured to scrape itself then
+  If your Prometheus has a lot of time series and it's configured to scrape itself, then
   it is recommended to set `uptime` field to `prometheus_build_info`.
 - `required` - decides how pint will report errors if it's unable to get a valid response
   from this Prometheus server. If `required` is `true` and all API calls to this Prometheus
-  fail pint will report those as `bug` level problem. If it's set to `false` pint will
+  fail, pint will report those as `bug` level problem. If it's set to `false`, pint will
   report those with `warning` level.
   Default value for `required` is `false`. Set it to `true` if you want to hard fail
   in case of remote Prometheus issues. Note that setting it to `true` might block
@@ -289,11 +289,11 @@ prometheus "$name" {
 - `tls:serverName` - server name (SNI) for TLS handshakes. Optional, default is unset.
 - `tls:caCert` - path for CA certificate to use. Optional, default is unset.
 - `tls:clientCert` - path for client certificate to use. Optional, default is unset.
-  If set `clientKey` must also be set.
+  If set, `clientKey` must also be set.
 - `tls:clientKey` - path for client key file to use. Optional, default is unset.
-  If set `clientCert` must also be set.
+  If set, `clientCert` must also be set.
 - `tls:skipVerify` - if `true` all TLS certificate checks will be skipped.
-  Enabling this option can be a security risk, use only for testing.
+  Enabling this option can be a security risk; use only for testing.
   Optional, default is false.
 
 Example:
@@ -521,7 +521,7 @@ rule {
 - `match:label` - optional annotation filter, only rules with at least one label
   matching this pattern will be checked by this rule. For recording rules only static
   labels set on the recording rule are considered.
-- `match:for` - optional alerting rule `for` filter. If set only alerting rules with `for`
+- `match:for` - optional alerting rule `for` filter. If set, only alerting rules with `for`
   field present and matching provided value will be checked by this rule. Recording rules
   will never match it as they don't have `for` field.
   Syntax is `OP DURATION` where `OP` can be any of `=`, `!=`, `>`, `>=`, `<`, `<=`.
