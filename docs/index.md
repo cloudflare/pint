@@ -30,7 +30,7 @@ Checks might use various Prometheus
 extra information, for example Prometheus configuration or metrics metadata.
 If you run pint against a different service, like [Thanos](https://thanos.io/) some checks
 might return problems due to API call errors, since not all Prometheus HTTP APIs are supported by it.
-In that case, you might want to disable failing checks in pint configuration file.
+In that case, you might want to disable failing checks in the pint configuration file.
 
 ## Usage
 
@@ -176,7 +176,7 @@ Available metrics:
 - `pint_problems` - this metric is the total number of all problems detected by pint,
   including those not exported due to the `--max-problems` flag.
 
-`pint problem` metric can include `owner` label for each rule. This is useful
+The `pint problem` metric can include the `owner` label for each rule. This is useful
 to route alerts based on metrics to the right team.
 To set a rule owner add a `# pint file/owner $owner` comment in a file, to set
 an owner for all rules in that file. You can also set an owner per rule, by adding

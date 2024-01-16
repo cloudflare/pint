@@ -16,7 +16,7 @@ nav_order: 2
 
 ## Environment variables
 
-Environment variables can be expanded inside pint configuration file as `ENV_*` HCL
+Environment variables can be expanded inside the pint configuration file as `ENV_*` HCL
 variables. To use a variable named `FOO`, reference it as `${ENV_FOO}`.
 
 Examples:
@@ -148,9 +148,9 @@ to be set. It should contain a personal access token used to authenticate with t
 **NOTE**: GitHub integration requires `GITHUB_AUTH_TOKEN` environment variable
 to be set to a personal access key that can access your repository.
 
-**NOTE** Pull request number must be known to pint so it can add comments if it detects any problems.
+**NOTE** The pull request number must be known to pint so it can add comments if it detects any problems.
 If pint is run as part of GitHub actions workflow, then this number will be detected from `GITHUB_REF`
-environment variable. For other use cases, `GITHUB_PULL_REQUEST_NUMBER` environment variable must be set
+environment variable. For other use cases, the `GITHUB_PULL_REQUEST_NUMBER` environment variable must be set
 with the pull request number.
 
 Syntax:
@@ -185,17 +185,17 @@ repository {
 ```
 
 - `github:baseuri` - base URI of GitHub or GitHub enterprise, will be used for HTTP requests to the GitHub API.
-  If not set, `pint` will try to use `GITHUB_API_URL` environment variable instead (if set).
+  If not set, `pint` will try to use the `GITHUB_API_URL` environment variable instead (if set).
 - `github:uploaduri` - upload URI of GitHub or GitHub enterprise, will be used for HTTP requests to the GitHub API.
-  If not set, `pint` will try to use `GITHUB_API_URL` environment variable instead (if set).
+  If not set, `pint` will try to use the `GITHUB_API_URL` environment variable instead (if set).
 
 If `github:baseuri` _or_ `github:uploaduri` are not specified, then [GitHub](https://github.com) will be used.
 
 - `github:timeout` - timeout to be used for API requests, defaults to 1 minute.
 - `github:owner` - name of the GitHub owner i.e. the first part that comes before the repository's name in the URI.
-  If not set, `pint` will try to use `GITHUB_REPOSITORY` environment variable instead (if set).
+  If not set, `pint` will try to use the `GITHUB_REPOSITORY` environment variable instead (if set).
 - `github:repo` - name of the GitHub repository (e.g. `monitoring`).
-  If not set, `pint` will try to use `GITHUB_REPOSITORY` environment variable instead (if set).
+  If not set, `pint` will try to use the `GITHUB_REPOSITORY` environment variable instead (if set).
 
 Most GitHub settings can be detected from environment variables that are set inside GitHub Actions
 environment. The only exception is `GITHUB_AUTH_TOKEN` environment variable that must be set
@@ -241,7 +241,7 @@ prometheus "$name" {
   If not set, `uri` will be used instead.
 - `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
   to requests or returns an error. This allows to configure fail-over Prometheus servers
-  to avoid CI failures in case main Prometheus server is unreachable.
+  to avoid CI failures in case the main Prometheus server is unreachable.
   Fail over URIs are not used if Prometheus returns an error caused by the query, like
   `many-to-many matching not allowed`.
   It's highly recommended that all URIs point to Prometheus servers with identical
@@ -267,16 +267,16 @@ prometheus "$name" {
   for details.
   Uptime gap detection works by running a range query `count(up)` and checking for any gaps
   in the response.
-  Since `up` metric can have a lot of time series, `count(up)` might be slow and expensive.
+  Since the `up` metric can have a lot of time series, `count(up)` might be slow and expensive.
   An alternative is to use one of metrics exposed by Prometheus itself, like `prometheus_build_info`, but
   those metrics are only present if Prometheus is configured to scrape itself, so `up` is used by default
   since it's guaranteed to work in every setup.
   If your Prometheus has a lot of time series and it's configured to scrape itself, then
-  it is recommended to set `uptime` field to `prometheus_build_info`.
+  it is recommended to set the `uptime` field to `prometheus_build_info`.
 - `required` - decides how pint will report errors if it's unable to get a valid response
   from this Prometheus server. If `required` is `true` and all API calls to this Prometheus
   fail, pint will report those as `bug` level problem. If it's set to `false`, pint will
-  report those with `warning` level.
+  report those with the `warning` level.
   Default value for `required` is `false`. Set it to `true` if you want to hard fail
   in case of remote Prometheus issues. Note that setting it to `true` might block
   PRs when running `pint ci` until pint is able to talk to Prometheus again.
@@ -356,7 +356,7 @@ filepath {
 
 - `directory` - the base directory to scan for paths.
 - `match` - a regexp expression to match. Any named capture group defined here
-  will be accessible when rendering Prometheus template.
+  will be accessible when rendering Prometheus the template.
 - `ignore` - a list of regexp rules, any path matching any of these rules will
   be ignored.
 - `template` - a template for generating Prometheus server definitions.
@@ -381,7 +381,7 @@ prometheusQuery {
 }
 ```
 
-- `uri` - Prometheus server base URI. This is when discovery query will be send.
+- `uri` - Prometheus server base URI. This is when the discovery query will be send.
 - `headers` - optional list of headers to set on Prometheus query requests.
 - `timeout` - Prometheus request timeout. Defaults to 2 minutes.
 - `tls` - optional TLS configuration for Prometheus requests, see `prometheus` block
@@ -391,12 +391,12 @@ prometheusQuery {
   `template` definition. You can set multiple `template` blocks for each discovery block, each
   returned time series will generate a single Prometheus server for each `template` block.
   You can use labels on returned time series as [Go text/template](https://pkg.go.dev/text/template)
-  variables named `$name`. Example: `instance` label will be available as `$instance` variable.
+  variables named `$name`. Example: `instance` label will be available as the `$instance` variable.
 
 ### Prometheus template
 
-`template` block is nearly identical to `prometheus` configuration block, except that
-the `name` is explicit field inside the block.
+The `template` block is nearly identical to the `prometheus` configuration block, except that
+`name` is an explicit field inside the block.
 
 You can use [Go text/template](https://pkg.go.dev/text/template) to render some of the
 fields using variables from either regexp capture groups (when using `filepath` discovery)
@@ -443,7 +443,7 @@ Servers must have identical `name`, `tags`, `include` and `exclude` fields to be
 ### Examples
 
 Each Prometheus server has a sub-directory inside `/etc/prometheus/clusters`
-folder. This directory is named after Prometheus cluster it's part of.
+folder. This directory is named after the Prometheus cluster it's part of.
 All rules are stored in `/etc/prometheus/clusters/<cluster>/.*.yaml` or
 `/etc/prometheus/clusters/<cluster>/.*.yml` files.
 Each Prometheus cluster is accessible under `https://<cluster>.prometheus.example.com` URI.
@@ -521,9 +521,9 @@ rule {
 - `match:label` - optional annotation filter, only rules with at least one label
   matching this pattern will be checked by this rule. For recording rules only static
   labels set on the recording rule are considered.
-- `match:for` - optional alerting rule `for` filter. If set, only alerting rules with `for`
-  field present and matching provided value will be checked by this rule. Recording rules
-  will never match it as they don't have `for` field.
+- `match:for` - optional alerting rule `for` filter. If set, only alerting rules with the `for`
+  field present and matching the provided value will be checked by this rule. Recording rules
+  will never match it as they don't have the `for` field.
   Syntax is `OP DURATION` where `OP` can be any of `=`, `!=`, `>`, `>=`, `<`, `<=`.
 - `match:keep_firing_for` - optional alerting rule `keep_firing_for` filter. Works the same
   way as `for` match filter.
