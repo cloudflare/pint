@@ -68,7 +68,7 @@ parser {
 }
 ```
 
-- `relaxed` - by default pint will now parse all files in strict mode, where
+- `relaxed` - by default, pint will now parse all files in strict mode, where
   all rule files must have the exact syntax Prometheus expects:
 
   ```yaml
@@ -128,7 +128,7 @@ ci {
 - `exclude` - list of file patterns to ignore when running checks.
   This option takes precedence over `include`, so if a file path matches both
   `include` & `exclude` patterns, it will be excluded.
-- `maxCommits` - by default pint will try to find all commits on the current branch,
+- `maxCommits` - by default, pint will try to find all commits on the current branch,
   this requires full git history to be present, if we have a shallow clone this
   might fail to find only current branch commits and give us a huge list.
   If the number of commits returned by branch discovery is more than `maxCommits`,
@@ -240,7 +240,7 @@ prometheus "$name" {
   should use different URIs than the one used by pint when querying Prometheus.
   If not set, `uri` will be used instead.
 - `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
-  to requests or returns an error. This allows to configure fail-over Prometheus servers
+  to requests or returns an error. This allows one to configure fail-over Prometheus servers
   to avoid CI failures in case the main Prometheus server is unreachable.
   Fail over URIs are not used if Prometheus returns an error caused by the query, like
   `many-to-many matching not allowed`.
@@ -253,7 +253,7 @@ prometheus "$name" {
 - `headers` - a list of HTTP headers that will be set on all requests for this Prometheus
   server.
 - `timeout` - timeout to be used for API requests. Defaults to 2 minutes.
-- `concurrency` - how many concurrent requests can pint send to this Prometheus server.
+- `concurrency` - how many concurrent requests pint can send to this Prometheus server.
   Optional, defaults to 16.
 - `rateLimit` - per second rate limit for all API requests sent to this Prometheus server.
   Setting it to `1000` would allow for up to 1000 requests per each wall clock second.
@@ -275,7 +275,7 @@ prometheus "$name" {
   it is recommended to set the `uptime` field to `prometheus_build_info`.
 - `required` - decides how pint will report errors if it's unable to get a valid response
   from this Prometheus server. If `required` is `true` and all API calls to this Prometheus
-  fail, pint will report those as `bug` level problem. If it's set to `false`, pint will
+  fail, pint will report those as `bug` level problems. If it's set to `false`, pint will
   report those with the `warning` level.
   Default value for `required` is `false`. Set it to `true` if you want to hard fail
   in case of remote Prometheus issues. Note that setting it to `true` might block

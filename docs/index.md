@@ -222,7 +222,7 @@ There is a number of comments you can add to your rule files in order to change
 pint behaviour, some of them allow you to exclude selected files or line, see
 [docs here](./ignoring.md) for details.
 
-There are a few requirement for any comment to be recognized by pint:
+There are a few requirements for any comment to be recognized by pint:
 
 - All comments must have a `pint` prefix.
 - All comments must have at least one space between `#` symbol and `pint` prefix.
