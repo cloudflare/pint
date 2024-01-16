@@ -103,7 +103,7 @@ owners {
 ```
 
 - `allowed` - list of allowed owner names, this option accepts regexp rules.
-  When set, all owners set via comments must much at least one entry on this list.
+  When set, all owners set via comments must match at least one entry on this list.
 
 If there's no `owners:allowed` configuration block, or if it's empty, then any
 owner name is accepted.
@@ -237,7 +237,7 @@ prometheus "$name" {
 - `uri` - base URI of this Prometheus server, used for API requests and queries.
 - `publicURI` - optional URI to use instead of `uri` in problems reported to users.
   Set it if Prometheus links used by pint in comments submitted to BitBucket or GitHub
-  should use different URIs then the one used by pint when querying Prometheus.
+  should use different URIs than the one used by pint when querying Prometheus.
   If not set, `uri` will be used instead.
 - `failover` - list of URIs to try (in order they are specified) if `uri` doesn't respond
   to requests or returns an error. This allows to configure fail-over Prometheus servers
@@ -255,7 +255,7 @@ prometheus "$name" {
 - `timeout` - timeout to be used for API requests. Defaults to 2 minutes.
 - `concurrency` - how many concurrent requests can pint send to this Prometheus server.
   Optional, defaults to 16.
-- `rateLimit` - per second rate limit for all API requests send to this Prometheus server.
+- `rateLimit` - per second rate limit for all API requests sent to this Prometheus server.
   Setting it to `1000` would allow for up to 1000 requests per each wall clock second.
   Optional, default to 100 requests per second.
 - `uptime` - metric selector used to detect gaps in Prometheus uptime.
@@ -341,7 +341,7 @@ instances is needed. This can be configured using `discovery` config blocks.
 ### File path discovery
 
 File path discovery allows to generate Prometheus server definitions used by pint
-based on path patters on disk.
+based on path patterns on disk.
 Syntax:
 
 ```js
@@ -381,7 +381,7 @@ prometheusQuery {
 }
 ```
 
-- `uri` - Prometheus server base URI. This is when the discovery query will be send.
+- `uri` - Prometheus server base URI. This is where the discovery query will be sent.
 - `headers` - optional list of headers to set on Prometheus query requests.
 - `timeout` - Prometheus request timeout. Defaults to 2 minutes.
 - `tls` - optional TLS configuration for Prometheus requests, see `prometheus` block
