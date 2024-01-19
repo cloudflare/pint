@@ -30,7 +30,7 @@ Checks might use various Prometheus
 extra information, for example Prometheus configuration or metrics metadata.
 If you run pint against a different service, like [Thanos](https://thanos.io/) some checks
 might return problems due to API call errors, since not all Prometheus HTTP APIs are supported by it.
-In that case you might want to disable failing checks in pint configuration file.
+In that case, you might want to disable failing checks in the pint configuration file.
 
 ## Usage
 
@@ -171,12 +171,12 @@ Available metrics:
 
 - `pint_problem` - exported for every problem detected by pint.
   To avoid exposing too many metrics at once pass `--max-problems` flag to watch command.
-  When this flag is set pint will expose only up to `--max-problems` value number of
+  When this flag is set, pint will expose only up to `--max-problems` value number of
   `pint_problem` metrics.
 - `pint_problems` - this metric is the total number of all problems detected by pint,
   including those not exported due to the `--max-problems` flag.
 
-`pint problem` metric can include `owner` label for each rule. This is useful
+The `pint problem` metric can include the `owner` label for each rule. This is useful
 to route alerts based on metrics to the right team.
 To set a rule owner add a `# pint file/owner $owner` comment in a file, to set
 an owner for all rules in that file. You can also set an owner per rule, by adding
@@ -222,7 +222,7 @@ There is a number of comments you can add to your rule files in order to change
 pint behaviour, some of them allow you to exclude selected files or line, see
 [docs here](./ignoring.md) for details.
 
-There are a few requirement for any comment to be recognized by pint:
+There are a few requirements for any comment to be recognized by pint:
 
 - All comments must have a `pint` prefix.
 - All comments must have at least one space between `#` symbol and `pint` prefix.
@@ -272,7 +272,7 @@ Steps:
    ./pint lint /etc/prometheus/*.rules.yml
    ```
 
-3. Configuration file is optional, but without it pint will only run very basic
+3. Configuration file is optional, but without it, pint will only run very basic
    syntax checks. See [configuration](configuration.md) for details on
    config syntax.
    By default pint will try to load configuration from `.pint.hcl`, you can
