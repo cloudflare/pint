@@ -123,7 +123,7 @@ Example:
 Example:
 
 ```yaml
-# pint disable promql/aggregate(instance:true)
+# pint disable promql/aggregate(instance:false)
 ```
 
 ## How to snooze it
