@@ -9,8 +9,8 @@ github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSV
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dkorunic/betteralign v0.3.4 h1:XPOmXBoD2I5+5AQiRdUtOdVPFyg09VJwYl3uWuPYbyE=
-github.com/dkorunic/betteralign v0.3.4/go.mod h1:V2BgnuywH4URoLfIx4HrmtzJ8vns8dOhF2cJfiYB8Tc=
+github.com/dkorunic/betteralign v0.4.0 h1:lrsFQWUtdMMiuYrOS9w4Y5pnlqNbNUfAk75Q8fVsc/8=
+github.com/dkorunic/betteralign v0.4.0/go.mod h1:V2BgnuywH4URoLfIx4HrmtzJ8vns8dOhF2cJfiYB8Tc=
 github.com/docker/go-units v0.5.0 h1:69rxXcBk27SvSaaxTtLh/8llcHD8vYHT7WSdRZ/jvr4=
 github.com/docker/go-units v0.5.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/frankban/quicktest v1.14.5 h1:dfYrrRyLtiqT9GyKXgdh+k4inNeTvmGbuSgZ3lx3GhA=
