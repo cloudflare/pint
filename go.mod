@@ -5,7 +5,7 @@ go 1.21.4
 require (
 	github.com/cespare/xxhash/v2 v2.2.0
 	github.com/fatih/color v1.16.0
-	github.com/gkampitakis/go-snaps v0.5.0
+	github.com/gkampitakis/go-snaps v0.5.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v57 v57.0.0
 	github.com/hashicorp/hcl/v2 v2.19.1
