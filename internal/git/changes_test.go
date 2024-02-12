@@ -57,7 +57,7 @@ func TestChanges(t *testing.T) {
 				return cmd, cr
 			},
 			changes: nil,
-			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --format=%H --name-status a^..b]",
+			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status a^..b]",
 		},
 		{
 			title: "chmod",

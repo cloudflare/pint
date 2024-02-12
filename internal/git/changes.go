@@ -68,7 +68,7 @@ type FileChange struct {
 }
 
 func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*FileChange, error) {
-	out, err := cmd("log", "--reverse", "--no-merges", "--format=%H", "--name-status", cr.String())
+	out, err := cmd("log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", cr.String())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
 	}
