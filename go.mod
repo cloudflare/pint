@@ -12,7 +12,7 @@ require (
 	github.com/klauspost/compress v1.17.6
 	github.com/neilotoole/slogt v1.1.0
 	github.com/prometheus/client_golang v1.18.0
-	github.com/prometheus/client_model v0.5.0
+	github.com/prometheus/client_model v0.6.0
 	github.com/prometheus/common v0.47.0
 	github.com/prometheus/prometheus v0.49.1
 	github.com/prymitive/current v0.1.0
