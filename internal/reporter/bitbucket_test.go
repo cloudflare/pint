@@ -120,7 +120,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Problem:       checks.Problem{},
 				},
 			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(400)
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
@@ -144,7 +144,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Problem:       checks.Problem{},
 				},
 			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				time.Sleep(time.Second * 2)
 				w.WriteHeader(400)
 				_, _ = w.Write([]byte("Bad Request"))
@@ -169,7 +169,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Problem:       checks.Problem{},
 				},
 			},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				w.WriteHeader(400)
 				time.Sleep(time.Second * 2)
 				_, _ = w.Write([]byte("Bad Request"))

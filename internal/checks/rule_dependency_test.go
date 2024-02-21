@@ -101,7 +101,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 					[]string{},
 				)
 			},
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Anchor: checks.AnchorBefore,
@@ -128,7 +128,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Anchor: checks.AnchorBefore,
@@ -185,7 +185,7 @@ func TestRuleDependencyCheck(t *testing.T) {
 				return checks.NewRuleDependencyCheck()
 			},
 			prometheus: newSimpleProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Anchor: checks.AnchorBefore,

@@ -49,7 +49,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -194,7 +194,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / ignoring(xxx) app_registry\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -254,7 +254,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / on(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -503,7 +503,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / on(notfound) bar_with_notfound\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -561,7 +561,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / on(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -619,7 +619,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -810,7 +810,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -941,7 +941,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1071,7 +1071,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, true)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1092,7 +1092,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, false)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1199,7 +1199,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: up{job=\"a\"} / up{job=\"b\"}\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

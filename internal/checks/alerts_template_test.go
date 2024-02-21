@@ -31,7 +31,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -51,7 +51,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -78,7 +78,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -98,7 +98,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -125,7 +125,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value}}': bar\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -144,7 +144,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    '{{ $value }}': bar\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -163,7 +163,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -182,7 +182,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: '{{ .Value }}'\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -210,7 +210,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{  $value | humanizePercentage }}%\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -229,7 +229,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{$value|humanizePercentage}}%\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -248,7 +248,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: 'value {{ .Value }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -267,7 +267,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ .Value|humanize }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -286,7 +286,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := $value }}{{ $foo }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -305,7 +305,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := .Value }}{{ $foo }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -324,7 +324,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -344,7 +344,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -364,7 +364,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -384,7 +384,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -404,7 +404,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  labels:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -424,7 +424,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) by(job) or sum(bar)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -444,7 +444,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -470,7 +470,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -526,7 +526,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -593,7 +593,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -618,7 +618,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -643,7 +643,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -738,7 +738,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -762,7 +762,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -786,7 +786,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -810,7 +810,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -933,7 +933,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -961,7 +961,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -986,7 +986,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1023,7 +1023,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1065,7 +1065,7 @@ func TestTemplateCheck(t *testing.T) {
 			`,
 						checker:    newTemplateCheck,
 						prometheus: noProm,
-						problems: func(uri string) []checks.Problem {
+						problems: func(_ string) []checks.Problem {
 							return []checks.Problem{
 								{
 												    {{ with printf "sum({job='%s'})" .Labels.job | query }}
@@ -1129,7 +1129,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: DeadMansSwitch\n  expr: vector(1)\n  annotations:\n    summary: 'Deadmans switch on {{ $labels.instance }} is firing'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1149,7 +1149,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: DeadMansSwitch\n  expr: vector(1)\n  labels:\n    summary: 'Deadmans switch on {{ $labels.instance }} is firing'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1169,7 +1169,7 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- alert: DeadMansSwitch\n  expr: 1 > bool 0\n  annotations:\n    summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -1205,7 +1205,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

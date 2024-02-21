@@ -107,13 +107,13 @@ func tryDecodingAPIError(resp *http.Response) error {
 
 	var status, errType, errText string
 	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, isNil bool) {
+		current.Key("status", current.Value(func(s string, _ bool) {
 			status = s
 		})),
-		current.Key("error", current.Value(func(s string, isNil bool) {
+		current.Key("error", current.Value(func(s string, _ bool) {
 			errText = s
 		})),
-		current.Key("errorType", current.Value(func(s string, isNil bool) {
+		current.Key("errorType", current.Value(func(s string, _ bool) {
 			errType = s
 		})),
 	)

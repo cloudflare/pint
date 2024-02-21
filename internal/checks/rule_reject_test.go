@@ -81,7 +81,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -102,7 +102,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -123,7 +123,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -144,7 +144,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -184,7 +184,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Information)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -205,7 +205,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -235,7 +235,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

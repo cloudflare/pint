@@ -33,7 +33,7 @@ func TestSyntaxCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(\n",
 			checker:     newSyntaxCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -53,7 +53,7 @@ func TestSyntaxCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo) by(",
 			checker:     newSyntaxCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

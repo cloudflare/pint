@@ -79,10 +79,10 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			description: "connection refused / upstream not required / warning",
 			content:     content,
 			checker:     newAlertsExternalLabelsCheck,
-			prometheus: func(s string) *promapi.FailoverGroup {
+			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

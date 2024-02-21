@@ -33,7 +33,7 @@ func TestAlertsForCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: foo\n  for: abc\n",
 			checker:     newAlertsForCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -53,7 +53,7 @@ func TestAlertsForCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: foo\n  for: -5m\n",
 			checker:     newAlertsForCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -73,7 +73,7 @@ func TestAlertsForCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: foo\n  for: 0h\n",
 			checker:     newAlertsForCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -92,7 +92,7 @@ func TestAlertsForCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: abc\n",
 			checker:     newAlertsForCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -112,7 +112,7 @@ func TestAlertsForCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: -5m\n",
 			checker:     newAlertsForCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -132,7 +132,7 @@ func TestAlertsForCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: foo\n  keep_firing_for: 0h\n",
 			checker:     newAlertsForCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

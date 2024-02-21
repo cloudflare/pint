@@ -164,7 +164,7 @@ func runTests(t *testing.T, testCases []checkTest) {
   expr: 'foo{}{}'
 `)
 		require.NoError(t, err, "cannot parse rule content")
-		t.Run(tc.description+" (bogus rules)", func(t *testing.T) {
+		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
 				_ = tc.checker(newSimpleProm("prom")).Check(context.Background(), entry.SourcePath, entry.Rule, tc.entries)
 			}

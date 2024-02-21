@@ -72,7 +72,7 @@ func TestRuleForCheck(t *testing.T) {
 				return checks.NewRuleForCheck(checks.RuleForFor, time.Minute*5, time.Minute*10, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -93,7 +93,7 @@ func TestRuleForCheck(t *testing.T) {
 				return checks.NewRuleForCheck(checks.RuleForFor, time.Second, time.Minute*2, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -132,7 +132,7 @@ func TestRuleForCheck(t *testing.T) {
 				return checks.NewRuleForCheck(checks.RuleForKeepFiringFor, time.Minute*5, time.Minute*10, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

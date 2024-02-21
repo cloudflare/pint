@@ -70,7 +70,7 @@ func TestGitBranchFinder(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			title: "git list PR commits error - main",
-			setup: func(t *testing.T) {},
+			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
@@ -84,7 +84,7 @@ func TestGitBranchFinder(t *testing.T) {
 		},
 		{
 			title: "git list PR commits error - master",
-			setup: func(t *testing.T) {},
+			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
@@ -98,7 +98,7 @@ func TestGitBranchFinder(t *testing.T) {
 		},
 		{
 			title: "too many commits",
-			setup: func(t *testing.T) {},
+			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
@@ -117,7 +117,7 @@ func TestGitBranchFinder(t *testing.T) {
 		},
 		{
 			title: "git list modified files error",
-			setup: func(t *testing.T) {},
+			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
@@ -136,7 +136,7 @@ func TestGitBranchFinder(t *testing.T) {
 		},
 		{
 			title: "git get commit message error",
-			setup: func(t *testing.T) {},
+			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
@@ -157,7 +157,7 @@ func TestGitBranchFinder(t *testing.T) {
 		},
 		{
 			title: "git blame error",
-			setup: func(t *testing.T) {},
+			setup: func(_ *testing.T) {},
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {

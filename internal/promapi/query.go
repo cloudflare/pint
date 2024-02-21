@@ -120,17 +120,17 @@ func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) 
 	samples = []Sample{}
 	var sample model.Sample
 	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, isNil bool) {
+		current.Key("status", current.Value(func(s string, _ bool) {
 			status = s
 		})),
-		current.Key("error", current.Value(func(s string, isNil bool) {
+		current.Key("error", current.Value(func(s string, _ bool) {
 			errText = s
 		})),
-		current.Key("errorType", current.Value(func(s string, isNil bool) {
+		current.Key("errorType", current.Value(func(s string, _ bool) {
 			errType = s
 		})),
 		current.Key("data", current.Object(
-			current.Key("resultType", current.Value(func(s string, isNil bool) {
+			current.Key("resultType", current.Value(func(s string, _ bool) {
 				resultType = s
 			})),
 			current.Key("result", current.Array(
@@ -145,30 +145,30 @@ func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) 
 			)),
 			current.Key("stats", current.Object(
 				current.Key("timings", current.Object(
-					current.Key("evalTotalTime", current.Value(func(v float64, isNil bool) {
+					current.Key("evalTotalTime", current.Value(func(v float64, _ bool) {
 						stats.Timings.EvalTotalTime = v
 					})),
-					current.Key("resultSortTime", current.Value(func(v float64, isNil bool) {
+					current.Key("resultSortTime", current.Value(func(v float64, _ bool) {
 						stats.Timings.ResultSortTime = v
 					})),
-					current.Key("queryPreparationTime", current.Value(func(v float64, isNil bool) {
+					current.Key("queryPreparationTime", current.Value(func(v float64, _ bool) {
 						stats.Timings.QueryPreparationTime = v
 					})),
-					current.Key("innerEvalTime", current.Value(func(v float64, isNil bool) {
+					current.Key("innerEvalTime", current.Value(func(v float64, _ bool) {
 						stats.Timings.InnerEvalTime = v
 					})),
-					current.Key("execQueueTime", current.Value(func(v float64, isNil bool) {
+					current.Key("execQueueTime", current.Value(func(v float64, _ bool) {
 						stats.Timings.ExecQueueTime = v
 					})),
-					current.Key("execTotalTime", current.Value(func(v float64, isNil bool) {
+					current.Key("execTotalTime", current.Value(func(v float64, _ bool) {
 						stats.Timings.ExecTotalTime = v
 					})),
 				)),
 				current.Key("samples", current.Object(
-					current.Key("totalQueryableSamples", current.Value(func(v float64, isNil bool) {
+					current.Key("totalQueryableSamples", current.Value(func(v float64, _ bool) {
 						stats.Samples.TotalQueryableSamples = int(math.Round(v))
 					})),
-					current.Key("peakSamples", current.Value(func(v float64, isNil bool) {
+					current.Key("peakSamples", current.Value(func(v float64, _ bool) {
 						stats.Samples.PeakSamples = int(math.Round(v))
 					})),
 				)),

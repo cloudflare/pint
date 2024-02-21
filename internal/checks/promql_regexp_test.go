@@ -61,7 +61,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\"bar\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -81,7 +81,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job!~\"bar\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -101,7 +101,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\"\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -121,7 +121,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\"^.+$\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -141,7 +141,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\"(foo|^.+)$\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -161,7 +161,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\"bar\"} / foo{job=~\"bar\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -181,7 +181,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\"bar\"} / foo{job=~\"bar\", level=\"total\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -218,7 +218,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job=~\".*\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -245,7 +245,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job!~\".*\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -265,7 +265,7 @@ func TestRegexpCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo{job!~\".+\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

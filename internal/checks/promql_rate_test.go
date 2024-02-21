@@ -432,7 +432,7 @@ func TestRateCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, true)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -667,7 +667,7 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

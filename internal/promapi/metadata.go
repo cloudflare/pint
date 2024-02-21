@@ -107,13 +107,13 @@ func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 	var status, errType, errText string
 	meta = map[string][]v1.Metadata{}
 	decoder := current.Object(
-		current.Key("status", current.Value(func(s string, isNil bool) {
+		current.Key("status", current.Value(func(s string, _ bool) {
 			status = s
 		})),
-		current.Key("error", current.Value(func(s string, isNil bool) {
+		current.Key("error", current.Value(func(s string, _ bool) {
 			errText = s
 		})),
-		current.Key("errorType", current.Value(func(s string, isNil bool) {
+		current.Key("errorType", current.Value(func(s string, _ bool) {
 			errType = s
 		})),
 		current.Key("data", current.Map(func(k string, v []v1.Metadata) {

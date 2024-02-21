@@ -54,7 +54,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				time.Sleep(1 * time.Second)
 				_, _ = w.Write([]byte("OK"))
 			}),

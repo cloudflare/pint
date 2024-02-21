@@ -56,7 +56,7 @@ func TestFragileCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / sum(bar) without(job)\n",
 			checker:     newFragileCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -75,7 +75,7 @@ func TestFragileCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo) without(job) + sum(bar) without(job)\n",
 			checker:     newFragileCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -94,7 +94,7 @@ func TestFragileCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (sum(foo) without(job) + sum(bar) without(job)) > 1\n",
 			checker:     newFragileCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -113,7 +113,7 @@ func TestFragileCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (foo / sum(bar) without(job)) > 1\n",
 			checker:     newFragileCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -132,7 +132,7 @@ func TestFragileCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (sum(foo) without(job) + sum(bar)) > 1 unless sum(bob) without(job) < 10\n",
 			checker:     newFragileCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
