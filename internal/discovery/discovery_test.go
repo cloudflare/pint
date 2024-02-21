@@ -50,7 +50,7 @@ func TestReadRules(t *testing.T) {
 			title:        "nil input",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer(nil)
 			},
 			isStrict: false,
@@ -59,7 +59,7 @@ func TestReadRules(t *testing.T) {
 			title:        "nil input",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer(nil)
 			},
 			isStrict: true,
@@ -68,7 +68,7 @@ func TestReadRules(t *testing.T) {
 			title:        "empty input",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte("     "))
 			},
 			isStrict: false,
@@ -77,7 +77,7 @@ func TestReadRules(t *testing.T) {
 			title:        "empty input",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte("     "))
 			},
 			isStrict: true,
@@ -86,7 +86,7 @@ func TestReadRules(t *testing.T) {
 			title:        "reader error",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return failingReader{
 					err: io.ErrClosedPipe,
 				}
@@ -98,7 +98,7 @@ func TestReadRules(t *testing.T) {
 			title:        "reader error",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return failingReader{
 					err: io.ErrClosedPipe,
 				}
@@ -110,7 +110,7 @@ func TestReadRules(t *testing.T) {
 			title:        "no rules, just a comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte("\n\n   # pint file/disable xxx  \n\n"))
 			},
 			isStrict: false,
@@ -119,7 +119,7 @@ func TestReadRules(t *testing.T) {
 			title:        "file/disable comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint file/disable promql/series
 
@@ -143,7 +143,7 @@ func TestReadRules(t *testing.T) {
 			title:        "file/disable comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint file/disable promql/series
 
@@ -170,7 +170,7 @@ groups:
 			title:        "single expired snooze comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint file/snooze 2000-01-01T00:00:00Z promql/series
 
@@ -193,7 +193,7 @@ groups:
 			title:        "single expired snooze comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint file/snooze 2000-01-01T00:00:00Z promql/series
 
@@ -219,7 +219,7 @@ groups:
 			title:        "single valid snooze comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint file/snooze 2099-01-01T00:00:00Z promql/series
 
@@ -243,7 +243,7 @@ groups:
 			title:        "single valid snooze comment",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint file/snooze 2099-01-01T00:00:00Z promql/series
 
@@ -270,7 +270,7 @@ groups:
 			title:        "ignore/file",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint ignore/file
 
@@ -293,7 +293,7 @@ groups:
 			title:        "ignore/file",
 			reportedPath: "rules.yml",
 			sourcePath:   "rules.yml",
-			sourceFunc: func(t *testing.T) io.Reader {
+			sourceFunc: func(_ *testing.T) io.Reader {
 				return bytes.NewBuffer([]byte(`
 # pint ignore/file
 

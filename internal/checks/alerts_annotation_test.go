@@ -26,7 +26,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -47,7 +47,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -77,7 +77,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -107,7 +107,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -128,7 +128,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -176,7 +176,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("{{ $for }}"), nil, true, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -215,7 +215,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -236,7 +236,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), nil, checks.MustTemplatedRegexp("critical"), nil, false, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -257,7 +257,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -285,7 +285,7 @@ func TestAnnotationCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

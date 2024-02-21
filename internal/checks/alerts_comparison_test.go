@@ -54,7 +54,7 @@ func TestComparisonCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"}\n",
 			checker:     newComparisonCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -91,7 +91,7 @@ func TestComparisonCheck(t *testing.T) {
 `,
 			checker:    newComparisonCheck,
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -118,7 +118,7 @@ func TestComparisonCheck(t *testing.T) {
 			content:     "- alert: Error rate is high\n  expr: rate(error_count[5m]) > bool 5\n",
 			checker:     newComparisonCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -173,7 +173,7 @@ func TestComparisonCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: (foo > 0) or vector(0)\n",
 			checker:     newComparisonCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -193,7 +193,7 @@ func TestComparisonCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: (foo > 0) or vector(0)\n",
 			checker:     newComparisonCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -213,7 +213,7 @@ func TestComparisonCheck(t *testing.T) {
 			content:     "- alert: Foo Is Down\n  expr: (foo > 0) or vector(0)\n",
 			checker:     newComparisonCheck,
 			prometheus:  noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

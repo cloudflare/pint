@@ -313,7 +313,7 @@ func (fp FilePath) Discover(_ context.Context) ([]*promapi.FailoverGroup, error)
 		slog.String("match", re.String()),
 	)
 	err := filepath.WalkDir(fp.Directory,
-		func(path string, d fs.DirEntry, err error) error {
+		func(path string, _ fs.DirEntry, err error) error {
 			if err != nil {
 				return fmt.Errorf("filepath discovery error: %w", err)
 			}

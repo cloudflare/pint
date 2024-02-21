@@ -48,7 +48,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, false)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

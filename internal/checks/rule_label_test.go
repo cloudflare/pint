@@ -17,7 +17,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -38,7 +38,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -75,7 +75,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -105,7 +105,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -126,7 +126,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -154,7 +154,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -182,7 +182,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -203,7 +203,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -233,7 +233,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -263,7 +263,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -284,7 +284,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -350,7 +350,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("must wait {{$for}} to fire"), nil, true, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -371,7 +371,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -399,7 +399,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -421,7 +421,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -449,7 +449,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

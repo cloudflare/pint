@@ -40,20 +40,20 @@ func TestGitBlame(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return nil, nil
 			},
 			path:   "foo.txt",
 			output: nil,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return nil, errors.New("mock error")
 			},
 			shouldError: true,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, "foo.txt", "")
 				return []byte(content), nil
 			},
@@ -67,7 +67,7 @@ func TestGitBlame(t *testing.T) {
 			},
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, "foo.txt", "") +
 					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 2, "foo.txt", "") +
 					blameLine("82987dec74ba8e434ba393d83491ace784473291", 3, "foo.txt", "") +
@@ -111,21 +111,21 @@ func TestCommitRange(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return nil, fmt.Errorf("mock error")
 			},
 			output:      git.CommitRangeResults{Commits: []string{}},
 			shouldError: true,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte(""), nil
 			},
 			output:      git.CommitRangeResults{Commits: []string{}},
 			shouldError: true,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("commit1\n"), nil
 			},
 			output: git.CommitRangeResults{
@@ -135,7 +135,7 @@ func TestCommitRange(t *testing.T) {
 			},
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("commit1\ncommit2\ncommit3\n"), nil
 			},
 			output: git.CommitRangeResults{
@@ -145,7 +145,7 @@ func TestCommitRange(t *testing.T) {
 			},
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("commit2\ncommit1"), nil
 			},
 			output: git.CommitRangeResults{
@@ -155,7 +155,7 @@ func TestCommitRange(t *testing.T) {
 			},
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("commit2\ncommit1\n"), nil
 			},
 			output: git.CommitRangeResults{
@@ -190,27 +190,27 @@ func TestCurrentBranch(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return nil, fmt.Errorf("mock error")
 			},
 			output:      "",
 			shouldError: true,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte(""), nil
 			},
 			output:      "",
 			shouldError: false,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("foo"), nil
 			},
 			output: "foo",
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("foo bar\n"), nil
 			},
 			output: "foo bar",
@@ -272,27 +272,27 @@ func TestCommitMessage(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return nil, fmt.Errorf("mock error")
 			},
 			output:      "",
 			shouldError: true,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte(""), nil
 			},
 			output:      "",
 			shouldError: false,
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("foo"), nil
 			},
 			output: "foo",
 		},
 		{
-			mock: func(args ...string) ([]byte, error) {
+			mock: func(_ ...string) ([]byte, error) {
 				return []byte("foo bar\n"), nil
 			},
 			output: "foo bar\n",

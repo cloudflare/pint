@@ -128,7 +128,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

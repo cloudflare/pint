@@ -49,7 +49,7 @@ func TestChanges(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			title: "git log error",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(_ *testing.T) (git.CommandRunner, git.CommitRangeResults) {
 				cmd := func(args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				}

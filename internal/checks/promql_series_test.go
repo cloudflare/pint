@@ -99,10 +99,10 @@ func TestSeriesCheck(t *testing.T) {
 			description: "bad uri",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker:     newSeriesCheck,
-			prometheus: func(s string) *promapi.FailoverGroup {
+			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.127.127.127", time.Second*5, false)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -568,7 +568,7 @@ func TestSeriesCheck(t *testing.T) {
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
 			entries:     mustParseContent("- alert: notmyalert\n  expr: sum(foo) == 0\n"),
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

@@ -147,10 +147,10 @@ func TestCostCheck(t *testing.T) {
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, checks.Bug)
 			},
-			prometheus: func(s string) *promapi.FailoverGroup {
+			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false)
 			},
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{

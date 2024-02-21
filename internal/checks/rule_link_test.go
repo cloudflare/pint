@@ -91,7 +91,7 @@ func TestRuleLinkCheck(t *testing.T) {
 				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -133,7 +133,7 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -160,7 +160,7 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(s string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
