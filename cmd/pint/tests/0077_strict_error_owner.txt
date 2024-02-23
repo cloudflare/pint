@@ -4,19 +4,22 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/strict.yml:4 Fatal: YAML parser returned an error when reading this file: `"foo bar": invalid field 'annotations' in recording rule`. (yaml/parse)
- 4 |   - record: foo bar
+rules/strict.yml:4-7 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+ 4 |   - alert: foo bar
+ 5 |     expr: 0
+ 6 |     annotations:
+ 7 |       foo: bar
 
-rules/strict.yml:4 Fatal: YAML parser returned an error when reading this file: `"foo bar": invalid recording rule name: foo bar`. (yaml/parse)
- 4 |   - record: foo bar
+rules/strict.yml:5 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+ 5 |     expr: 0
 
-level=INFO msg="Problems found" Fatal=2
+level=INFO msg="Problems found" Bug=1 Warning=1
 level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 groups:
 - name: foo
   rules:
-  - record: foo bar
+  - alert: foo bar
     expr: 0
     annotations:
       foo: bar

@@ -522,8 +522,7 @@ groups:
   annotations:
     uri: https://docs.example.com/down.html
 
-- record: >
-    foo
+- record: foo
   expr: |-
     bar
     /
@@ -596,15 +595,15 @@ groups:
 					},
 				},
 				{
-					Lines: parser.LineRange{First: 11, Last: 17},
+					Lines: parser.LineRange{First: 11, Last: 16},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlNode{
-							Lines: parser.LineRange{First: 11, Last: 12},
-							Value: "foo\n",
+							Lines: parser.LineRange{First: 11, Last: 11},
+							Value: "foo",
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 13, Last: 16},
+								Lines: parser.LineRange{First: 12, Last: 15},
 								Value: "bar\n/\nbaz > 1",
 							},
 							Query: &parser.PromQLNode{
@@ -621,9 +620,9 @@ groups:
 							},
 						},
 						Labels: &parser.YamlMap{
-							Lines: parser.LineRange{First: 17, Last: 17},
+							Lines: parser.LineRange{First: 16, Last: 16},
 							Key: &parser.YamlNode{
-								Lines: parser.LineRange{First: 17, Last: 17},
+								Lines: parser.LineRange{First: 16, Last: 16},
 								Value: "labels",
 							},
 						},
@@ -1400,6 +1399,138 @@ data:
 							},
 						},
 					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: invalid metric name
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid recording rule name: invalid metric name"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels:
+    "foo bar": yes
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid label name: foo bar"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  labels:
+    "foo bar": yes
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid label name: foo bar"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  labels:
+    "{{ $value }}": yes
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid label name: {{ $value }}"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  annotations:
+    "foo bar": yes
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid annotation name: foo bar"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  labels:
+    foo: ` + string("\xed\xbf\xbf")),
+			// Label values are invalid only if they aren't valid UTF-8 strings
+			// which also makes them unparsable by YAML.
+			shouldError: true,
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  annotations:
+    "{{ $value }}": yes
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid annotation name: {{ $value }}"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  keep_firing_for: 5m
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid field 'keep_firing_for' in recording rule"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  for: 5m
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid field 'for' in recording rule"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  annotations:
+    foo: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid field 'annotations' in recording rule"), Line: 4},
 				},
 			},
 		},
