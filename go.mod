@@ -11,9 +11,9 @@ require (
 	github.com/hashicorp/hcl/v2 v2.19.1
 	github.com/klauspost/compress v1.17.7
 	github.com/neilotoole/slogt v1.1.0
-	github.com/prometheus/client_golang v1.18.0
+	github.com/prometheus/client_golang v1.19.0
 	github.com/prometheus/client_model v0.6.0
-	github.com/prometheus/common v0.47.0
+	github.com/prometheus/common v0.48.0
 	github.com/prometheus/prometheus v0.50.1
 	github.com/prymitive/current v0.1.0
 	github.com/rogpeppe/go-internal v1.12.0
