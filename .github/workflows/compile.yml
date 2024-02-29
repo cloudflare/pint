@@ -42,14 +42,12 @@ jobs:
         if: github.event_name == 'pull_request'
         uses: goreleaser/goreleaser-action@v5
         with:
-          version: v1.21.2
           args: release --clean --skip=validate --skip=sign --skip=sbom --skip=publish --snapshot
 
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v5
         with:
-          version: v1.21.2
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

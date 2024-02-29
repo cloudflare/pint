@@ -1,6 +1,6 @@
 module _
 
-go 1.21.4
+go 1.22.0
 
 require github.com/dkorunic/betteralign v0.4.0
 
