@@ -132,7 +132,7 @@ func TestGitBranchFinder(t *testing.T) {
 				4,
 			),
 			entries: nil,
-			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --format=%H --name-status c1^..c4]",
+			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4]",
 		},
 		{
 			title: "git get commit message error",
@@ -142,7 +142,7 @@ func TestGitBranchFinder(t *testing.T) {
 					switch strings.Join(args, " ") {
 					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
 						return []byte("c1\nc2\nc3\nc4\n"), nil
-					case "log --reverse --no-merges --format=%H --name-status c1^..c4":
+					case "log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4":
 						return []byte("c1\nA\trules.yml\n"), nil
 					default:
 						return nil, fmt.Errorf("mock git error: %v", args)
@@ -163,7 +163,7 @@ func TestGitBranchFinder(t *testing.T) {
 					switch strings.Join(args, " ") {
 					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
 						return []byte("c1\nc2\nc3\nc4\n"), nil
-					case "log --reverse --no-merges --format=%H --name-status c1^..c4":
+					case "log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4":
 						return []byte("c1\nA\trules.yml\n"), nil
 					case "ls-tree --format=%(objectmode) %(objecttype) %(path) c1^ rules.yml":
 						return []byte("100644 blob rules.yml"), nil
