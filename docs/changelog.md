@@ -2,6 +2,12 @@
 
 ## v0.54.0
 
+### Added
+
+- [rule/dependency](checks/rule/dependency.md) check will now warn if an alerting rule
+  that's being removed in a pull request is being used inside `ALERTS{alertname="..."}`
+  or  `ALERTS_FOR_STATE{alertname="..."}` queries.
+
 ### Changed
 
 - A large part of rule parsing code was refactored and more problems will now be deduplicated.
