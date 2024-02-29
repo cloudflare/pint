@@ -10,6 +10,8 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
+
+	"github.com/prometheus/prometheus/model/labels"
 )
 
 const (
@@ -39,12 +41,9 @@ func (c RuleDependencyCheck) Reporter() string {
 	return RuleDependencyCheckName
 }
 
-func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
-	if rule.RecordingRule == nil {
-		return problems
-	}
-
-	var broken []brokenDependency
+func (c RuleDependencyCheck) Check(_ context.Context, _ string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+	var broken []*brokenDependency
+	var dep *brokenDependency
 	for _, entry := range entries {
 		if entry.State == discovery.Removed {
 			continue
@@ -55,16 +54,16 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 		if entry.Rule.Error.Err != nil {
 			continue
 		}
-		if c.usesVector(entry, rule.RecordingRule.Record.Value) {
-			expr := entry.Rule.Expr()
-			dep := brokenDependency{
-				path: entry.ReportedPath,
-				line: expr.Value.Lines.First,
-				name: entry.Rule.Name(),
-			}
+		if rule.RecordingRule != nil {
+			dep = c.usesVector(entry, rule.RecordingRule.Record.Value)
+		}
+		if rule.AlertingRule != nil {
+			dep = c.usesAlert(entry, rule.AlertingRule.Alert.Value)
+		}
+		if dep != nil {
 			var found bool
 			for _, b := range broken {
-				if b.path == dep.path && b.line == dep.line && b.name == dep.name {
+				if b.kind == dep.kind && b.path == dep.path && b.line == dep.line && b.name == dep.name {
 					found = true
 					break
 				}
@@ -90,11 +89,13 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 	})
 
 	var details strings.Builder
-	details.WriteString("If you remove the recording rule generating `")
-	details.WriteString(rule.RecordingRule.Record.Value)
+	details.WriteString("If you remove the ")
+	details.WriteString(dep.kind)
+	details.WriteString(" rule generating `")
+	details.WriteString(dep.metric)
 	details.WriteString("`, and there is no other source of this metric, then any other rule depending on it will break.\n")
 	details.WriteString("List of found rules that are using `")
-	details.WriteString(rule.RecordingRule.Record.Value)
+	details.WriteString(dep.metric)
 	details.WriteString("`:\n\n")
 	for _, b := range broken {
 		details.WriteString("- `")
@@ -118,23 +119,57 @@ func (c RuleDependencyCheck) Check(_ context.Context, path string, rule parser.R
 	return problems
 }
 
-func (c RuleDependencyCheck) usesVector(entry discovery.Entry, name string) bool {
+func (c RuleDependencyCheck) usesVector(entry discovery.Entry, name string) *brokenDependency {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
-		return false
+		return nil
 	}
 
 	for _, vs := range utils.HasVectorSelector(expr.Query) {
 		if vs.Name == name {
-			return true
+			return &brokenDependency{
+				kind:   "recording",
+				metric: name,
+				path:   entry.ReportedPath,
+				line:   expr.Value.Lines.First,
+				name:   entry.Rule.Name(),
+			}
 		}
 	}
 
-	return false
+	return nil
+}
+
+func (c RuleDependencyCheck) usesAlert(entry discovery.Entry, name string) *brokenDependency {
+	expr := entry.Rule.Expr()
+	if expr.SyntaxError != nil {
+		return nil
+	}
+
+	for _, vs := range utils.HasVectorSelector(expr.Query) {
+		if vs.Name != "ALERTS" && vs.Name != "ALERTS_FOR_STATE" {
+			continue
+		}
+		for _, lm := range vs.LabelMatchers {
+			if lm.Name == "alertname" && lm.Type == labels.MatchEqual && lm.Value == name {
+				return &brokenDependency{
+					kind:   "alerting",
+					metric: vs.String(),
+					path:   entry.ReportedPath,
+					line:   expr.Value.Lines.First,
+					name:   entry.Rule.Name(),
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 type brokenDependency struct {
-	path string
-	name string
-	line int
+	kind   string
+	metric string
+	path   string
+	name   string
+	line   int
 }
