@@ -7,6 +7,27 @@
 - [rule/dependency](checks/rule/dependency.md) check will now warn if an alerting rule
   that's being removed in a pull request is being used inside `ALERTS{alertname="..."}`
   or  `ALERTS_FOR_STATE{alertname="..."}` queries.
+- pint will now perform extra validation of YAML files to ensure that all values
+  are mappings and strings.
+  This will error on rules where, for example, label value is unquoted number:
+
+  Bad rule:
+
+  ```yaml
+  - alert: DeadMansSwitch
+    expr: vector(1)
+    labels:
+      priority: 5
+  ```
+
+  Good rule:
+
+  ```yaml
+  - alert: DeadMansSwitch
+    expr: vector(1)
+    labels:
+      priority: "5"
+  ```
 
 ### Changed
 

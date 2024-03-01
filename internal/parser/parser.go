@@ -122,6 +122,16 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 	var keepFiringForPart *YamlNode
 	var annotationsPart *YamlMap
 
+	var recordNode *yaml.Node
+	var alertNode *yaml.Node
+	var exprNode *yaml.Node
+	var forNode *yaml.Node
+	var keepFiringForNode *yaml.Node
+	var labelsNode *yaml.Node
+	var annotationsNode *yaml.Node
+	labelsNodes := map[*yaml.Node]*yaml.Node{}
+	annotationsNodes := map[*yaml.Node]*yaml.Node{}
+
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
 
@@ -158,47 +168,55 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			switch key.Value {
 			case recordKey:
 				if recordPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, recordKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, recordKey)
 				}
+				recordNode = part
 				recordPart = newYamlNodeWithKey(key, part, offset)
 				lines.Last = max(lines.Last, recordPart.Lines.Last)
 			case alertKey:
 				if alertPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, alertKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, alertKey)
 				}
+				alertNode = part
 				alertPart = newYamlNodeWithKey(key, part, offset)
 				lines.Last = max(lines.Last, alertPart.Lines.Last)
 			case exprKey:
 				if exprPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, exprKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, exprKey)
 				}
+				exprNode = part
 				exprPart = newPromQLExpr(key, part, offset)
 				lines.Last = max(lines.Last, exprPart.Value.Lines.Last)
 			case forKey:
 				if forPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, forKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, forKey)
 				}
+				forNode = part
 				forPart = newYamlNodeWithKey(key, part, offset)
 				lines.Last = max(lines.Last, forPart.Lines.Last)
+			case keepFiringForKey:
+				if keepFiringForPart != nil {
+					return duplicatedKeyError(lines, part.Line+offset, keepFiringForKey)
+				}
+				keepFiringForNode = part
+				keepFiringForPart = newYamlNodeWithKey(key, part, offset)
+				lines.Last = max(lines.Last, keepFiringForPart.Lines.Last)
 			case labelsKey:
 				if labelsPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, labelsKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, labelsKey)
 				}
+				labelsNode = part
+				labelsNodes = mappingNodes(part)
 				labelsPart = newYamlMap(key, part, offset)
 				lines.Last = max(lines.Last, labelsPart.Lines.Last)
 			case annotationsKey:
 				if annotationsPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, annotationsKey, nil)
+					return duplicatedKeyError(lines, part.Line+offset, annotationsKey)
 				}
+				annotationsNode = part
+				annotationsNodes = mappingNodes(part)
 				annotationsPart = newYamlMap(key, part, offset)
 				lines.Last = max(lines.Last, annotationsPart.Lines.Last)
-
-			case keepFiringForKey:
-				if keepFiringForPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, keepFiringForKey, nil)
-				}
-				keepFiringForPart = newYamlNodeWithKey(key, part, offset)
-				lines.Last = max(lines.Last, keepFiringForPart.Lines.Last)
 			default:
 				unknownKeys = append(unknownKeys, key)
 			}
@@ -345,6 +363,37 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 		}
 	}
 
+	for key, part := range map[string]*yaml.Node{
+		recordKey:        recordNode,
+		alertKey:         alertNode,
+		exprKey:          exprNode,
+		forKey:           forNode,
+		keepFiringForKey: keepFiringForNode,
+	} {
+		if part != nil && !isTag(part.ShortTag(), "!!str") {
+			return invalidValueError(lines, part.Line+offset, key, "string", describeTag(part.ShortTag()))
+		}
+	}
+	for key, part := range map[string]*yaml.Node{
+		labelsKey:      labelsNode,
+		annotationsKey: annotationsNode,
+	} {
+		if part != nil && !isTag(part.ShortTag(), "!!map") {
+			return invalidValueError(lines, part.Line+offset, key, "mapping", describeTag(part.ShortTag()))
+		}
+	}
+
+	for section, parts := range map[string]map[*yaml.Node]*yaml.Node{
+		labelsKey:      labelsNodes,
+		annotationsKey: annotationsNodes,
+	} {
+		for key, value := range parts {
+			if !isTag(value.ShortTag(), "!!str") {
+				return invalidValueError(lines, value.Line+offset, fmt.Sprintf("%s %s", section, nodeValue(key)), "string", describeTag(value.ShortTag()))
+			}
+		}
+	}
+
 	if recordPart != nil && exprPart != nil {
 		rule = Rule{
 			Lines: lines,
@@ -381,7 +430,7 @@ func unpackNodes(node *yaml.Node) []*yaml.Node {
 	nodes := make([]*yaml.Node, 0, len(node.Content))
 	var isMerge bool
 	for _, part := range node.Content {
-		if part.Tag == "!!merge" && part.Value == "<<" {
+		if part.ShortTag() == "!!merge" && part.Value == "<<" {
 			isMerge = true
 		}
 
@@ -482,7 +531,7 @@ func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
 	return &node
 }
 
-func duplicatedKeyError(lines LineRange, line int, key string, err error) (Rule, bool, error) {
+func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool, error) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
@@ -490,5 +539,56 @@ func duplicatedKeyError(lines LineRange, line int, key string, err error) (Rule,
 			Err:  fmt.Errorf("duplicated %s key", key),
 		},
 	}
-	return rule, false, err
+	return rule, false, nil
+}
+
+func invalidValueError(lines LineRange, line int, key, expectedKind, gotKind string) (Rule, bool, error) {
+	rule := Rule{
+		Lines: lines,
+		Error: ParseError{
+			Line: line,
+			Err:  fmt.Errorf("%s value must be a YAML %s, got %s instead", key, expectedKind, gotKind),
+		},
+	}
+	return rule, false, nil
+}
+
+func isTag(tag, expected string) bool {
+	if tag == "!!null" {
+		return true
+	}
+	return tag == expected
+}
+
+func describeTag(tag string) string {
+	switch tag {
+	case "":
+		return "unknown type"
+	case "!!str":
+		return "string"
+	case "!!int":
+		return "integer"
+	case "!!seq":
+		return "list"
+	case "!!map":
+		return "mapping"
+	case "!!binary":
+		return "binary data"
+	default:
+		return strings.TrimLeft(tag, "!")
+	}
+}
+
+func mappingNodes(node *yaml.Node) map[*yaml.Node]*yaml.Node {
+	m := make(map[*yaml.Node]*yaml.Node, len(node.Content))
+	var key *yaml.Node
+	for _, child := range node.Content {
+		if key != nil {
+			m[key] = child
+			key = nil
+		} else {
+			key = child
+		}
+	}
+	return m
 }
