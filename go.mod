@@ -8,7 +8,7 @@ require (
 	github.com/gkampitakis/go-snaps v0.5.2
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v57 v57.0.0
-	github.com/hashicorp/hcl/v2 v2.19.1
+	github.com/hashicorp/hcl/v2 v2.20.0
 	github.com/klauspost/compress v1.17.7
 	github.com/neilotoole/slogt v1.1.0
 	github.com/prometheus/client_golang v1.19.0
@@ -87,6 +87,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.22.0 // indirect
 	go.uber.org/goleak v1.3.0 // indirect
 	golang.org/x/crypto v0.19.0 // indirect
+	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
