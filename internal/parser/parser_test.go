@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"
 
@@ -14,26 +16,24 @@ import (
 
 func TestParse(t *testing.T) {
 	type testCaseT struct {
-		content     []byte
-		output      []parser.Rule
-		shouldError bool
+		content []byte
+		output  []parser.Rule
+		err     string
 	}
 
 	testCases := []testCaseT{
 		{
-			content:     nil,
-			output:      nil,
-			shouldError: false,
+			content: nil,
+			output:  nil,
 		},
 		{
-			content:     []byte{},
-			output:      nil,
-			shouldError: false,
+			content: []byte{},
+			output:  nil,
 		},
 		{
-			content:     []byte(string("! !00 \xf6")),
-			output:      nil,
-			shouldError: true,
+			content: []byte(string("! !00 \xf6")),
+			output:  nil,
+			err:     "yaml: incomplete UTF-8 octet sequence",
 		},
 		{
 			content: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
@@ -90,16 +90,16 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			content:     []byte("- record: - foo\n"),
-			shouldError: true,
+			content: []byte("- record: - foo\n"),
+			err:     "yaml: block sequence entries are not allowed in this context",
 		},
 		{
-			content:     []byte("- record: foo  expr: sum(\n"),
-			shouldError: true,
+			content: []byte("- record: foo  expr: sum(\n"),
+			err:     "yaml: mapping values are not allowed in this context",
 		},
 		{
-			content:     []byte("- record\n\texpr: foo\n"),
-			shouldError: true,
+			content: []byte("- record\n\texpr: foo\n"),
+			err:     "yaml: line 2: found a tab character that violates indentation",
 		},
 		{
 			content: []byte(`
@@ -444,7 +444,6 @@ func TestParse(t *testing.T) {
 					},
 				},
 			},
-			shouldError: false,
 		},
 		{
 			content: []byte(`
@@ -509,7 +508,6 @@ groups:
 					},
 				},
 			},
-			shouldError: false,
 		},
 		{
 			content: []byte(`- alert: Down
@@ -629,7 +627,6 @@ groups:
 					},
 				},
 			},
-			shouldError: false,
 		},
 		{
 			content: []byte(`- alert: Foo
@@ -1293,7 +1290,6 @@ data:
 					},
 				},
 			},
-			shouldError: false,
 		},
 		{
 			content: []byte(string(`
@@ -1478,7 +1474,7 @@ data:
     foo: ` + string("\xed\xbf\xbf")),
 			// Label values are invalid only if they aren't valid UTF-8 strings
 			// which also makes them unparsable by YAML.
-			shouldError: true,
+			err: "yaml: invalid Unicode character",
 		},
 		{
 			content: []byte(`
@@ -1534,6 +1530,155 @@ data:
 				},
 			},
 		},
+		// Tag tests
+		{
+			content: []byte(`
+- record: 5
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("invalid recording rule name: 5"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: 5
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("alert value must be a YAML string, got integer instead"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: 5
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("expr value must be a YAML string, got integer instead"), Line: 3},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  for: 5
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("for value must be a YAML string, got integer instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  keep_firing_for: 5
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("keep_firing_for value must be a YAML string, got integer instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: []
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got list instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  labels: {}
+  annotations: []
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("annotations value must be a YAML mapping, got list instead"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  labels:
+    foo: 3
+  annotations:
+    bar: "5"
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 7},
+					Error: parser.ParseError{Err: fmt.Errorf("labels foo value must be a YAML string, got integer instead"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  labels: {}
+  annotations:
+    foo: "3"
+    bar: 5
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 7},
+					Error: parser.ParseError{Err: fmt.Errorf("annotations bar value must be a YAML string, got integer instead"), Line: 7},
+				},
+			},
+		},
+		// Multi-document tests
+		{
+			content: []byte("---\n- expr: foo\n  record: foo\n---\n- expr: bar\n"),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+							Query: &parser.PromQLNode{Expr: "foo"},
+						},
+					},
+				},
+				// FIXME
+				// {
+				//	Lines: parser.LineRange{First: 2, Last: 2},
+				//	Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 2},
+				// },
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
@@ -1556,13 +1701,15 @@ data:
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
+			t.Logf("--- Content ---%s--- END ---", tc.content)
+
 			p := parser.NewParser()
 			output, err := p.Parse(tc.content)
 
-			hadError := err != nil
-			if hadError != tc.shouldError {
-				t.Errorf("Parse() returned err=%v, expected=%v", err, tc.shouldError)
-				return
+			if tc.err != "" {
+				require.EqualError(t, err, tc.err)
+			} else {
+				require.NoError(t, err)
 			}
 
 			if diff := cmp.Diff(tc.output, output, ignorePrometheusExpr, sameErrorText); diff != "" {

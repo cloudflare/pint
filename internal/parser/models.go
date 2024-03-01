@@ -26,6 +26,13 @@ func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
 	return lr
 }
 
+func nodeValue(node *yaml.Node) string {
+	if node.Alias != nil {
+		return node.Alias.Value
+	}
+	return node.Value
+}
+
 func mergeComments(node *yaml.Node) (comments []string) {
 	if node.HeadComment != "" {
 		comments = append(comments, node.HeadComment)
@@ -63,10 +70,7 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 func newYamlNode(node *yaml.Node, offset int) *YamlNode {
 	n := YamlNode{
 		Lines: nodeLines(node, offset),
-		Value: node.Value,
-	}
-	if node.Alias != nil {
-		n.Value = node.Alias.Value
+		Value: nodeValue(node),
 	}
 	return &n
 }
@@ -79,10 +83,7 @@ func newYamlNodeWithKey(key, node *yaml.Node, offset int) *YamlNode {
 			First: min(keyLines.First, valLines.First),
 			Last:  max(keyLines.Last, valLines.Last),
 		},
-		Value: node.Value,
-	}
-	if node.Alias != nil {
-		n.Value = node.Alias.Value
+		Value: nodeValue(node),
 	}
 	return &n
 }
