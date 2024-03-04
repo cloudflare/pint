@@ -295,6 +295,38 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 		}
 		return rule, false, err
 	}
+	for key, part := range map[string]*yaml.Node{
+		recordKey:        recordNode,
+		alertKey:         alertNode,
+		exprKey:          exprNode,
+		forKey:           forNode,
+		keepFiringForKey: keepFiringForNode,
+	} {
+		if part != nil && !isTag(part.ShortTag(), "!!str") {
+			return invalidValueError(lines, part.Line+offset, key, "string", describeTag(part.ShortTag()))
+		}
+	}
+
+	for key, part := range map[string]*yaml.Node{
+		labelsKey:      labelsNode,
+		annotationsKey: annotationsNode,
+	} {
+		if part != nil && !isTag(part.ShortTag(), "!!map") {
+			return invalidValueError(lines, part.Line+offset, key, "mapping", describeTag(part.ShortTag()))
+		}
+	}
+
+	for section, parts := range map[string]map[*yaml.Node]*yaml.Node{
+		labelsKey:      labelsNodes,
+		annotationsKey: annotationsNodes,
+	} {
+		for key, value := range parts {
+			if !isTag(value.ShortTag(), "!!str") {
+				return invalidValueError(lines, value.Line+offset, fmt.Sprintf("%s %s", section, nodeValue(key)), "string", describeTag(value.ShortTag()))
+			}
+		}
+	}
+
 	if r, ok := ensureRequiredKeys(lines, recordKey, recordPart, exprPart); !ok {
 		return r, false, err
 	}
@@ -359,37 +391,6 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 						Err:  fmt.Errorf("invalid annotation name: %s", ann.Key.Value),
 					},
 				}, false, err
-			}
-		}
-	}
-
-	for key, part := range map[string]*yaml.Node{
-		recordKey:        recordNode,
-		alertKey:         alertNode,
-		exprKey:          exprNode,
-		forKey:           forNode,
-		keepFiringForKey: keepFiringForNode,
-	} {
-		if part != nil && !isTag(part.ShortTag(), "!!str") {
-			return invalidValueError(lines, part.Line+offset, key, "string", describeTag(part.ShortTag()))
-		}
-	}
-	for key, part := range map[string]*yaml.Node{
-		labelsKey:      labelsNode,
-		annotationsKey: annotationsNode,
-	} {
-		if part != nil && !isTag(part.ShortTag(), "!!map") {
-			return invalidValueError(lines, part.Line+offset, key, "mapping", describeTag(part.ShortTag()))
-		}
-	}
-
-	for section, parts := range map[string]map[*yaml.Node]*yaml.Node{
-		labelsKey:      labelsNodes,
-		annotationsKey: annotationsNodes,
-	} {
-		for key, value := range parts {
-			if !isTag(value.ShortTag(), "!!str") {
-				return invalidValueError(lines, value.Line+offset, fmt.Sprintf("%s %s", section, nodeValue(key)), "string", describeTag(value.ShortTag()))
 			}
 		}
 	}
