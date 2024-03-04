@@ -1539,7 +1539,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid recording rule name: 5"), Line: 2},
+					Error: parser.ParseError{Err: fmt.Errorf("record value must be a YAML string, got integer instead"), Line: 2},
 				},
 			},
 		},
@@ -1649,6 +1649,162 @@ data:
 				{
 					Lines: parser.LineRange{First: 2, Last: 7},
 					Error: parser.ParseError{Err: fmt.Errorf("annotations bar value must be a YAML string, got integer instead"), Line: 7},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: 4
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got integer instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: true
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got bool instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: null
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 2, Last: 2},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 3, Last: 3},
+								Value: "bar",
+							},
+							Query: &parser.PromQLNode{Expr: "bar"},
+						},
+						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 4, Last: 4},
+							Key: &parser.YamlNode{
+								Lines: parser.LineRange{First: 4, Last: 4},
+								Value: "labels",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: true
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{Err: fmt.Errorf("record value must be a YAML string, got bool instead"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record:
+    query: foo
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("record value must be a YAML string, got mapping instead"), Line: 3},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: some
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got string instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got binary data instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- alert: foo
+  expr: bar
+  for: 1.23
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("for value must be a YAML string, got float instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: !!garbage "SGVsbG8sIFdvcmxkIQ=="
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got garbage instead"), Line: 4},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: foo
+  expr: bar
+  labels: !! "SGVsbG8sIFdvcmxkIQ=="
+`),
+			err: "yaml: line 4: did not find expected tag URI",
+		},
+		{
+			content: []byte(`
+- record: &foo foo
+  expr: bar
+  labels: *foo
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got string instead"), Line: 4},
 				},
 			},
 		},
