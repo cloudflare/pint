@@ -1,8 +1,10 @@
 package parser
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -41,13 +43,29 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		}
 	}()
 
-	var node yaml.Node
-	err = yaml.Unmarshal(content, &node)
-	if err != nil {
-		return nil, err
+	var documents []yaml.Node
+	dec := yaml.NewDecoder(bytes.NewReader(content))
+	for {
+		var doc yaml.Node
+		decodeErr := dec.Decode(&doc)
+		if errors.Is(decodeErr, io.EOF) {
+			break
+		}
+		if decodeErr != nil {
+			return nil, decodeErr
+		}
+		documents = append(documents, doc)
 	}
 
-	rules, err = parseNode(content, &node, 0)
+	for _, doc := range documents {
+		docRules, docErr := parseNode(content, &doc, 0)
+		if docErr != nil {
+			err = docErr
+			break
+		}
+		rules = append(rules, docRules...)
+
+	}
 	return rules, err
 }
 
