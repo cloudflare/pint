@@ -41,6 +41,7 @@ jobs:
           make benchmark-diff
 
       - name: Report
+        if: ${{ github.event.pull_request.head.repo.full_name == 'cloudflare/pint' }}
         uses: thollander/actions-comment-pull-request@v2
         with:
           filePath: benchstat.txt
