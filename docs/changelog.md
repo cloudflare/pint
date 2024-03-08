@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.55.0
+
+### Fixed
+
+- Fixed false positive reports from [rule/duplicate](checks/rule/duplicate.md) when
+  using symlinks.
+
 ## v0.54.0
 
 ### Added
