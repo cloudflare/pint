@@ -6,6 +6,7 @@
 
 - Fixed false positive reports from [rule/duplicate](checks/rule/duplicate.md) when
   using symlinks.
+- Fixed support for multi-document YAML files when using relaxed parsed mode - #746.
 
 ## v0.54.0
 
