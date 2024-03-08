@@ -708,6 +708,98 @@ data:
     groups:
       - name: example-app-alerts
         rules:
+          - alert: Example_High_Restart_Rate
+            expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: other
+  labels:
+  app: other
+data:
+  alerts: |
+    groups:
+      - name: other alerts
+        rules:
+          - alert: Example_High_Restart_Rate
+            expr: "1"
+
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 13, Last: 14},
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 13, Last: 13},
+							Value: "Example_High_Restart_Rate",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 14, Last: 14},
+								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+							},
+							Query: &parser.PromQLNode{
+								Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+								Children: []*parser.PromQLNode{
+									{
+										Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]))`,
+										Children: []*parser.PromQLNode{
+											{
+												Expr: `rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])`,
+												Children: []*parser.PromQLNode{
+													{
+														Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}[5m]`,
+														Children: []*parser.PromQLNode{
+															{Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}`},
+														},
+													},
+												},
+											},
+										},
+									},
+									{
+										Expr: "(3 / 60)",
+										Children: []*parser.PromQLNode{
+											{
+												Expr: "3 / 60",
+												Children: []*parser.PromQLNode{
+													{Expr: "3"},
+													{Expr: "60"},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 27, Last: 28},
+					AlertingRule: &parser.AlertingRule{
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{Value: "1", Lines: parser.LineRange{First: 28, Last: 28}},
+							Query: &parser.PromQLNode{Expr: "1"},
+						},
+						Alert: parser.YamlNode{Value: "Example_High_Restart_Rate", Lines: parser.LineRange{First: 27, Last: 27}},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: example-app-alerts
+  labels:
+  app: example-app
+data:
+  alerts: |
+    groups:
+      - name: example-app-alerts
+        rules:
           - alert: Example_Is_Down
             expr: kube_deployment_status_replicas_available{namespace="example-app"} < 1
             for: 5m
@@ -1810,7 +1902,12 @@ data:
 		},
 		// Multi-document tests
 		{
-			content: []byte("---\n- expr: foo\n  record: foo\n---\n- expr: bar\n"),
+			content: []byte(`---
+- expr: foo
+  record: foo
+---
+- expr: bar
+`),
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
@@ -1828,11 +1925,85 @@ data:
 						},
 					},
 				},
-				// FIXME
-				// {
-				//	Lines: parser.LineRange{First: 2, Last: 2},
-				//	Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 2},
-				// },
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`---
+- expr: foo
+  record: foo
+---
+- expr: bar
+  record: bar
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+							Query: &parser.PromQLNode{Expr: "foo"},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 7},
+				},
+			},
+		},
+		{
+			content: []byte(`---
+- expr: foo
+  record: foo
+---
+- expr: bar
+  alert: foo
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+							Query: &parser.PromQLNode{Expr: "foo"},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 5, Last: 6},
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 5, Last: 5},
+								Value: "bar",
+							},
+							Query: &parser.PromQLNode{Expr: "bar"},
+						},
+					},
+				},
 			},
 		},
 	}
