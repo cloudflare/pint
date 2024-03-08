@@ -59,6 +59,9 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 		if entry.SourcePath == path && entry.Rule.Lines.First == rule.Lines.First {
 			continue
 		}
+		if !c.prom.IsEnabledForPath(path) {
+			continue
+		}
 		if !c.prom.IsEnabledForPath(entry.SourcePath) {
 			continue
 		}
