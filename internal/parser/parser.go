@@ -58,77 +58,51 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 	}
 
 	for _, doc := range documents {
-		docRules, docErr := parseNode(content, &doc, 0)
-		if docErr != nil {
-			err = docErr
-			break
-		}
-		rules = append(rules, docRules...)
-
+		rules = append(rules, parseNode(content, &doc, 0)...)
 	}
 	return rules, err
 }
 
-func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule, err error) {
-	ret, isEmpty, err := parseRule(content, node, offset)
-	if err != nil {
-		return nil, err
-	}
+func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule) {
+	ret, isEmpty := parseRule(content, node, offset)
 	if !isEmpty {
 		rules = append(rules, ret)
-		return rules, nil
+		return rules
 	}
 
-	var rl []Rule
 	var rule Rule
 	for _, root := range node.Content {
 		// nolint: exhaustive
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
-				rl, err = parseNode(content, n, offset)
-				if err != nil {
-					return nil, err
-				}
-				rules = append(rules, rl...)
+				rules = append(rules, parseNode(content, n, offset)...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty, err = parseRule(content, root, offset)
-			if err != nil {
-				return nil, err
-			}
+			rule, isEmpty = parseRule(content, root, offset)
 			if !isEmpty {
 				rules = append(rules, rule)
 			} else {
 				for _, n := range root.Content {
-					rl, err = parseNode(content, n, offset)
-					if err != nil {
-						return nil, err
-					}
-					rules = append(rules, rl...)
+					rules = append(rules, parseNode(content, n, offset)...)
 				}
 			}
 		case yaml.ScalarNode:
 			if root.Value != string(content) {
 				c := []byte(root.Value)
 				var n yaml.Node
-				err = yaml.Unmarshal(c, &n)
-				if err == nil {
-					ret, err := parseNode(c, &n, offset+root.Line)
-					if err != nil {
-						return nil, err
-					}
-					rules = append(rules, ret...)
+				if err := yaml.Unmarshal(c, &n); err == nil {
+					rules = append(rules, parseNode(c, &n, offset+root.Line)...)
 				}
 			}
 		}
 	}
-	return rules, nil
+	return rules
 }
 
-func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, err error) {
+func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) {
 	if node.Kind != yaml.MappingNode {
-		return rule, true, err
+		return rule, true
 	}
 
 	var recordPart *YamlNode
@@ -271,7 +245,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Err:  fmt.Errorf("got both %s and %s keys in a single rule", recordKey, alertKey),
 			},
 		}
-		return rule, false, err
+		return rule, false
 	}
 	if exprPart != nil && alertPart == nil && recordPart == nil {
 		rule = Rule{
@@ -281,7 +255,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Err:  fmt.Errorf("incomplete rule, no %s or %s key", alertKey, recordKey),
 			},
 		}
-		return rule, false, err
+		return rule, false
 	}
 	if recordPart != nil && forPart != nil {
 		rule = Rule{
@@ -291,7 +265,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", forKey),
 			},
 		}
-		return rule, false, err
+		return rule, false
 	}
 	if recordPart != nil && keepFiringForPart != nil {
 		rule = Rule{
@@ -301,7 +275,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", keepFiringForKey),
 			},
 		}
-		return rule, false, err
+		return rule, false
 	}
 	if recordPart != nil && annotationsPart != nil {
 		rule = Rule{
@@ -311,7 +285,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", annotationsKey),
 			},
 		}
-		return rule, false, err
+		return rule, false
 	}
 	for key, part := range map[string]*yaml.Node{
 		recordKey:        recordNode,
@@ -346,10 +320,10 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 	}
 
 	if r, ok := ensureRequiredKeys(lines, recordKey, recordPart, exprPart); !ok {
-		return r, false, err
+		return r, false
 	}
 	if r, ok := ensureRequiredKeys(lines, alertKey, alertPart, exprPart); !ok {
-		return r, false, err
+		return r, false
 	}
 	if (recordPart != nil || alertPart != nil) && len(unknownKeys) > 0 {
 		var keys []string
@@ -363,7 +337,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Err:  fmt.Errorf("invalid key(s) found: %s", strings.Join(keys, ", ")),
 			},
 		}
-		return rule, false, err
+		return rule, false
 	}
 
 	if recordPart != nil && !model.IsValidMetricName(model.LabelValue(recordPart.Value)) {
@@ -373,7 +347,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 				Line: recordPart.Lines.First,
 				Err:  fmt.Errorf("invalid recording rule name: %s", recordPart.Value),
 			},
-		}, false, err
+		}, false
 	}
 
 	if (recordPart != nil || alertPart != nil) && labelsPart != nil {
@@ -385,7 +359,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 						Line: lab.Key.Lines.First,
 						Err:  fmt.Errorf("invalid label name: %s", lab.Key.Value),
 					},
-				}, false, err
+				}, false
 			}
 			if !model.LabelValue(lab.Value.Value).IsValid() {
 				return Rule{
@@ -394,7 +368,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 						Line: lab.Key.Lines.First,
 						Err:  fmt.Errorf("invalid label value: %s", lab.Value.Value),
 					},
-				}, false, err
+				}, false
 			}
 		}
 	}
@@ -408,7 +382,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 						Line: ann.Key.Lines.First,
 						Err:  fmt.Errorf("invalid annotation name: %s", ann.Key.Value),
 					},
-				}, false, err
+				}, false
 			}
 		}
 	}
@@ -423,7 +397,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			},
 			Comments: ruleComments,
 		}
-		return rule, false, err
+		return rule, false
 	}
 
 	if alertPart != nil && exprPart != nil {
@@ -439,10 +413,10 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool, 
 			},
 			Comments: ruleComments,
 		}
-		return rule, false, err
+		return rule, false
 	}
 
-	return rule, true, err
+	return rule, true
 }
 
 func unpackNodes(node *yaml.Node) []*yaml.Node {
@@ -550,7 +524,7 @@ func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
 	return &node
 }
 
-func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool, error) {
+func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
@@ -558,10 +532,10 @@ func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool, erro
 			Err:  fmt.Errorf("duplicated %s key", key),
 		},
 	}
-	return rule, false, nil
+	return rule, false
 }
 
-func invalidValueError(lines LineRange, line int, key, expectedKind, gotKind string) (Rule, bool, error) {
+func invalidValueError(lines LineRange, line int, key, expectedKind, gotKind string) (Rule, bool) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
@@ -569,7 +543,7 @@ func invalidValueError(lines LineRange, line int, key, expectedKind, gotKind str
 			Err:  fmt.Errorf("%s value must be a YAML %s, got %s instead", key, expectedKind, gotKind),
 		},
 	}
-	return rule, false, nil
+	return rule, false
 }
 
 func isTag(tag, expected string) bool {

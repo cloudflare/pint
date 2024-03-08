@@ -1907,6 +1907,68 @@ data:
   record: foo
 ---
 - expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+							Query: &parser.PromQLNode{Expr: "foo"},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 5},
+				},
+			},
+		},
+		{
+			content: []byte(`---
+- expr: foo
+  record: foo
+---
+- expr: bar
+  record: bar
+  expr: bar
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+							Query: &parser.PromQLNode{Expr: "foo"},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 7},
+				},
+			},
+		},
+		{
+			content: []byte(`---
+- expr: foo
+  record: foo
+---
+- expr: bar
   alert: foo
 `),
 			output: []parser.Rule{
