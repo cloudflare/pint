@@ -2,6 +2,11 @@
 
 ## v0.55.0
 
+### Added
+
+- [labels/conflict](checks/labels/conflict.md) check will now warn if alerting
+  rule is setting labels that are already configured as external labels.
+
 ### Fixed
 
 - Fixed false positive reports from [rule/duplicate](checks/rule/duplicate.md) when
