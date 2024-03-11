@@ -38,38 +38,44 @@ const (
 )
 
 var watchCmd = &cli.Command{
-	Name:   "watch",
-	Usage:  "Continuously lint specified files",
-	Action: actionWatch,
+	Name:  "watch",
+	Usage: "Run in the foreground and continuesly check specified rules.",
+	Subcommands: []*cli.Command{
+		{
+			Name:   "glob",
+			Usage:  "Check a list of files or directories (can be a glob).",
+			Action: actionWatch,
+		},
+	},
 	Flags: []cli.Flag{
 		&cli.DurationFlag{
 			Name:    intervalFlag,
 			Aliases: []string{"i"},
 			Value:   time.Minute * 10,
-			Usage:   "How often to run all checks",
+			Usage:   "How often to run all checks.",
 		},
 		&cli.StringFlag{
 			Name:    listenFlag,
 			Aliases: []string{"s"},
 			Value:   ":8080",
-			Usage:   "Listen address for HTTP web server exposing metrics",
+			Usage:   "Listen address for HTTP web server exposing metrics.",
 		},
 		&cli.StringFlag{
 			Name:    pidfileFlag,
 			Aliases: []string{"p"},
-			Usage:   "Write pid file to this path",
+			Usage:   "Write pid file to this path.",
 		},
 		&cli.IntFlag{
 			Name:    maxProblemsFlag,
 			Aliases: []string{"m"},
 			Value:   0,
-			Usage:   "Maximum number of problems to report on metrics, 0 - no limit",
+			Usage:   "Maximum number of problems to report on metrics, 0 - no limit.",
 		},
 		&cli.StringFlag{
 			Name:    minSeverityFlag,
 			Aliases: []string{"n"},
 			Value:   strings.ToLower(checks.Bug.String()),
-			Usage:   "Set minimum severity for problems reported via metrics",
+			Usage:   "Set minimum severity for problems reported via metrics.",
 		},
 	},
 }
@@ -257,7 +263,6 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 
 func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator) error {
 	slog.Info("Finding all rules to check", slog.Any("paths", c.paths))
-	// nolint: contextcheck
 	entries, err := discovery.NewGlobFinder(c.paths, git.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed())).Find()
 	if err != nil {
 		return err

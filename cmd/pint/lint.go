@@ -20,32 +20,32 @@ var requireOwnerFlag = "require-owner"
 
 var lintCmd = &cli.Command{
 	Name:   "lint",
-	Usage:  "Lint specified files",
+	Usage:  "Check specified files or directories (can be a glob).",
 	Action: actionLint,
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:    requireOwnerFlag,
 			Aliases: []string{"r"},
 			Value:   false,
-			Usage:   "Require all rules to have an owner set via comment",
+			Usage:   "Require all rules to have an owner set via comment.",
 		},
 		&cli.StringFlag{
 			Name:    minSeverityFlag,
 			Aliases: []string{"n"},
 			Value:   "warning",
-			Usage:   "Set minimum severity for reported problems",
+			Usage:   "Set minimum severity for reported problems.",
 		},
 		&cli.StringFlag{
 			Name:    failOnFlag,
 			Aliases: []string{"w"},
 			Value:   "bug",
-			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected",
+			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected.",
 		},
 		&cli.BoolFlag{
 			Name:    teamCityFlag,
 			Aliases: []string{"t"},
 			Value:   false,
-			Usage:   "Report problems using TeamCity Service Messages",
+			Usage:   "Report problems using TeamCity Service Messages.",
 		},
 	},
 }

@@ -8,7 +8,7 @@ import (
 
 var versionCmd = &cli.Command{
 	Name:   "version",
-	Usage:  "Print version and exit",
+	Usage:  "Print version and exit.",
 	Action: actionVersion,
 }
 

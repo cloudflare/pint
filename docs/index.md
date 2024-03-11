@@ -120,7 +120,9 @@ it will pass `workdir` option to `pint lint`, which means that all files inside
 
 ### Ad-hoc
 
-Lint specified files and report any found issue.
+Check specified files and report any found issue.
+You can pass directory paths and use [glob](https://pkg.go.dev/path/filepath#Match)
+patterns as arguments to select files for checking.
 
 You can lint selected files:
 
@@ -140,13 +142,67 @@ or both:
 pint lint path/to/dir file.yml path/file.yml path/dir
 ```
 
-### Watch mode
-
-Run pint as a daemon in watch mode:
+Using glob patterns:
 
 ```shell
-pint watch rules.yml
+pint lint path/*.yml path/*.yaml
 ```
+
+### Watch mode
+
+Run pint as a daemon in watch mode where it continuously checks
+all rules found in selected files and exposes metrics about
+found problems.
+
+#### Manually selecting files and directories
+
+You can tell it to continuously test specific files or directories:
+
+```shell
+pint watch glob $GLOB_1 $GLOB_2 ... $GLOB_N
+```
+
+Example:
+
+```shell
+pint watch glob /etc/prometheus/rules-*.yml /etc/prometheus/rules.d
+```
+
+If provide a config file for pint with some Prometheus server definitions
+then pint will also run "online" checks for it to, for example, ensure all
+time series used inside your alerting rules are still present.
+Example config:
+
+```json
+prometheus "local" {
+  uri      = "http://localhost:9090"
+}
+```
+
+#### Getting list of files to check from Prometheus
+
+You can also point pint directly at a Prometheus server from the config file.
+This will make pint query Prometheus API to get the current value of `rule_files`
+Prometheus config option and then run checks on all matching files.
+This way if you test your rules against a running Prometheus instance then you don't
+need to manually specify any paths or directories.
+
+Usage:
+
+```shell
+pint watch rule_files $prometheus
+```
+
+Where `$prometheus` is the name of `prometheus` configuration block from pint
+config file.
+
+Example:
+
+```shell
+pint watch rule_files local
+```
+
+#### Accessing watch mode metrics
 
 By default it will start a HTTP server on port `8080` and run all checks every
 10 minutes. This can be customised by passing extra flags to the `watch` command.

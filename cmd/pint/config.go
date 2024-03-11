@@ -11,7 +11,7 @@ import (
 
 var configCmd = &cli.Command{
 	Name:   "config",
-	Usage:  "Parse and print used config",
+	Usage:  "Parse and print used config.",
 	Action: actionConfig,
 }
 
