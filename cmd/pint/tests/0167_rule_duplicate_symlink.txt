@@ -33,7 +33,6 @@ level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 uptime=up ta
 -- stderrV2.txt --
 -- src/v0.yml --
 groups:
-groups:
 - name: g1
   rules:
   - alert: DownAlert

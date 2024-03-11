@@ -1,0 +1,69 @@
+http response prometheus /api/v1/status/config 500 {"status":"error"}
+http start prometheus 127.0.0.1:7170
+
+exec bash -x ./test.sh &
+
+pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6170 --pidfile=pint.pid rule_files prom
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tags=[] include=[] exclude=[]
+level=DEBUG msg="Starting query workers" name=prom uri=http://localhost:7170 workers=16
+level=DEBUG msg="Starting rule_fules watch" name=prom
+level=INFO msg="Pidfile created" path=pint.pid
+level=INFO msg="Started HTTP server" address=127.0.0.1:6170
+level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tags=[] include=[] exclude=[]
+level=DEBUG msg="Starting query workers" name=prom uri=http://localhost:7170 workers=16
+level=INFO msg="Will continuously run checks until terminated" interval=5s
+level=DEBUG msg="Running checks"
+level=DEBUG msg="Scheduling Prometheus configuration query" uri=http://localhost:7170
+level=DEBUG msg="Getting prometheus configuration" uri=http://localhost:7170
+level=DEBUG msg="Trying to parse Prometheus error response" code=500
+level=ERROR msg="Query returned an error" err= uri=http://localhost:7170 query=/api/v1/status/config
+level=ERROR msg="Got an error when running checks" err="failed to get the list of paths to check: failed to query \"prom\" Prometheus configuration: unknown: "
+level=DEBUG msg="Running checks"
+level=DEBUG msg="Scheduling Prometheus configuration query" uri=http://localhost:7170
+level=DEBUG msg="Getting prometheus configuration" uri=http://localhost:7170
+level=DEBUG msg="Trying to parse Prometheus error response" code=500
+level=ERROR msg="Query returned an error" err= uri=http://localhost:7170 query=/api/v1/status/config
+level=ERROR msg="Got an error when running checks" err="failed to get the list of paths to check: failed to query \"prom\" Prometheus configuration: unknown: "
+level=DEBUG msg="Running checks"
+level=DEBUG msg="Scheduling Prometheus configuration query" uri=http://localhost:7170
+level=DEBUG msg="Getting prometheus configuration" uri=http://localhost:7170
+level=DEBUG msg="Trying to parse Prometheus error response" code=500
+level=ERROR msg="Query returned an error" err= uri=http://localhost:7170 query=/api/v1/status/config
+level=ERROR msg="Got an error when running checks" err="failed to get the list of paths to check: failed to query \"prom\" Prometheus configuration: unknown: "
+level=INFO msg="Shutting down"
+level=INFO msg="Waiting for all background tasks to finish"
+level=INFO msg="Background worker finished"
+level=DEBUG msg="Stopping query workers" name=prom uri=http://localhost:7170
+level=INFO msg="Pidfile removed" path=pint.pid
+-- test.sh --
+sleep 7
+mv more/*.yaml rules/
+sleep 7
+cat pint.pid | xargs kill
+
+-- rules/1.yaml --
+groups:
+- name: g1
+  rules:
+  - alert: DownAlert1
+    expr: up == 0
+-- rules/2.yaml --
+groups:
+- name: g2
+  rules:
+  - alert: DownAlert2
+    expr: up == 0
+-- more/3.yaml --
+groups:
+- name: g2
+  rules:
+  - alert: DownAlert2
+    expr: up == 0
+-- .pint.hcl --
+prometheus "prom" {
+    uri = "http://localhost:7170"
+}

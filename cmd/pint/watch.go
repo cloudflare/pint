@@ -42,9 +42,59 @@ var watchCmd = &cli.Command{
 	Usage: "Run in the foreground and continuesly check specified rules.",
 	Subcommands: []*cli.Command{
 		{
-			Name:   "glob",
-			Usage:  "Check a list of files or directories (can be a glob).",
-			Action: actionWatch,
+			Name:  "glob",
+			Usage: "Check a list of files or directories (can be a glob).",
+			Action: func(c *cli.Context) error {
+				meta, err := actionSetup(c)
+				if err != nil {
+					return err
+				}
+
+				paths := c.Args().Slice()
+				if len(paths) == 0 {
+					return fmt.Errorf("at least one file or directory required")
+				}
+
+				slog.Debug("Starting glob watch", slog.Any("paths", paths))
+				return actionWatch(c, meta, func(_ context.Context) ([]string, error) {
+					return paths, nil
+				})
+			},
+		},
+		{
+			Name:  "rule_files",
+			Usage: "Check the list of rule files from paths loaded by Prometheus.",
+			Action: func(c *cli.Context) error {
+				meta, err := actionSetup(c)
+				if err != nil {
+					return err
+				}
+
+				args := c.Args().Slice()
+				if len(args) != 1 {
+					return fmt.Errorf("exactly one argument required with the URI of Prometheus server to query")
+				}
+
+				gen := config.NewPrometheusGenerator(meta.cfg, prometheus.NewRegistry())
+				if err = gen.GenerateStatic(); err != nil {
+					return err
+				}
+
+				prom := gen.ServerWithName(args[0])
+				if prom == nil {
+					return fmt.Errorf("no Prometheus named %q configured in pint", args[0])
+				}
+
+				slog.Debug("Starting rule_fules watch", slog.String("name", args[0]))
+
+				return actionWatch(c, meta, func(ctx context.Context) ([]string, error) {
+					cfg, err := prom.Config(ctx, time.Millisecond)
+					if err != nil {
+						return nil, fmt.Errorf("failed to query %q Prometheus configuration: %w", prom.Name(), err)
+					}
+					return cfg.Config.RuleFiles, nil
+				})
+			},
 		},
 	},
 	Flags: []cli.Flag{
@@ -80,17 +130,7 @@ var watchCmd = &cli.Command{
 	},
 }
 
-func actionWatch(c *cli.Context) error {
-	meta, err := actionSetup(c)
-	if err != nil {
-		return err
-	}
-
-	paths := c.Args().Slice()
-	if len(paths) == 0 {
-		return fmt.Errorf("at least one file or directory required")
-	}
-
+func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
 	if err != nil {
 		return fmt.Errorf("invalid --%s value: %w", minSeverityFlag, err)
@@ -114,7 +154,7 @@ func actionWatch(c *cli.Context) error {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(meta.cfg, paths, minSeverity, c.Int(maxProblemsFlag))
+	collector := newProblemCollector(meta.cfg, f, minSeverity, c.Int(maxProblemsFlag))
 	// register all metrics
 	metricsRegistry.MustRegister(collector)
 	metricsRegistry.MustRegister(checkDuration)
@@ -221,22 +261,22 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 }
 
 type problemCollector struct {
-	cfg              config.Config
+	finder           pathFinderFunc
 	fileOwners       map[string]string
 	summary          *reporter.Summary
 	problem          *prometheus.Desc
 	problems         *prometheus.Desc
 	fileOwnersMetric *prometheus.Desc
-	paths            []string
+	cfg              config.Config
 	minSeverity      checks.Severity
 	maxProblems      int
 	lock             sync.Mutex
 }
 
-func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.Severity, maxProblems int) *problemCollector {
+func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks.Severity, maxProblems int) *problemCollector {
 	return &problemCollector{
+		finder:     f,
 		cfg:        cfg,
-		paths:      paths,
 		fileOwners: map[string]string{},
 		problem: prometheus.NewDesc(
 			"pint_problem",
@@ -262,8 +302,13 @@ func newProblemCollector(cfg config.Config, paths []string, minSeverity checks.S
 }
 
 func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator) error {
-	slog.Info("Finding all rules to check", slog.Any("paths", c.paths))
-	entries, err := discovery.NewGlobFinder(c.paths, git.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed())).Find()
+	paths, err := c.finder(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get the list of paths to check: %w", err)
+	}
+
+	slog.Info("Finding all rules to check", slog.Any("paths", paths))
+	entries, err := discovery.NewGlobFinder(paths, git.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed())).Find()
 	if err != nil {
 		return err
 	}
@@ -310,7 +355,11 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, report := range c.summary.Reports() {
 		if report.Problem.Severity < c.minSeverity {
-			slog.Debug("Skipping report", slog.String("severity", report.Problem.Severity.String()))
+			slog.Debug(
+				"Skipping report with severity lower than minimum configured",
+				slog.String("severity", report.Problem.Severity.String()),
+				slog.String("minimum", c.minSeverity.String()),
+			)
 			continue
 		}
 
@@ -363,3 +412,5 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 		}
 	}
 }
+
+type pathFinderFunc func(ctx context.Context) ([]string, error)

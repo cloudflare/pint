@@ -52,7 +52,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule par
 		return problems
 	}
 
-	cfg, err := c.prom.Config(ctx)
+	cfg, err := c.prom.Config(ctx, 0)
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{

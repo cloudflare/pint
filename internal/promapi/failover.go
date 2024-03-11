@@ -182,11 +182,11 @@ func (fg *FailoverGroup) CleanCache() {
 	}
 }
 
-func (fg *FailoverGroup) Config(ctx context.Context) (cfg *ConfigResult, err error) {
+func (fg *FailoverGroup) Config(ctx context.Context, cacheTTL time.Duration) (cfg *ConfigResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
 		uri = prom.safeURI
-		cfg, err = prom.Config(ctx)
+		cfg, err = prom.Config(ctx, cacheTTL)
 		if err == nil {
 			return cfg, nil
 		}

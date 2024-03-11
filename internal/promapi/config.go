@@ -23,7 +23,8 @@ type ConfigSectionGlobal struct {
 }
 
 type PrometheusConfig struct {
-	Global ConfigSectionGlobal `yaml:"global"`
+	RuleFiles []string            `yaml:"rule_files"`
+	Global    ConfigSectionGlobal `yaml:"global"`
 }
 
 type ConfigResult struct {
@@ -36,6 +37,7 @@ type configQuery struct {
 	prom      *Prometheus
 	ctx       context.Context
 	timestamp time.Time
+	cacheTTL  time.Duration
 }
 
 func (q configQuery) Run() queryResult {
@@ -80,19 +82,23 @@ func (q configQuery) CacheKey() uint64 {
 }
 
 func (q configQuery) CacheTTL() time.Duration {
-	return time.Minute * 10
+	return q.cacheTTL
 }
 
-func (p *Prometheus) Config(ctx context.Context) (*ConfigResult, error) {
+func (p *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*ConfigResult, error) {
 	slog.Debug("Scheduling Prometheus configuration query", slog.String("uri", p.safeURI))
 
 	key := "/api/v1/status/config"
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 
+	if cacheTTL == 0 {
+		cacheTTL = time.Minute
+	}
+
 	resultChan := make(chan queryResult)
 	p.queries <- queryRequest{
-		query:  configQuery{prom: p, ctx: ctx, timestamp: time.Now()},
+		query:  configQuery{prom: p, ctx: ctx, timestamp: time.Now(), cacheTTL: cacheTTL},
 		result: resultChan,
 	}
 

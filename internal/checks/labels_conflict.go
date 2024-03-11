@@ -53,7 +53,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 		return problems
 	}
 
-	cfg, err := c.prom.Config(ctx)
+	cfg, err := c.prom.Config(ctx, 0)
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{

@@ -173,17 +173,18 @@ then pint will also run "online" checks for it to, for example, ensure all
 time series used inside your alerting rules are still present.
 Example config:
 
-```json
+```js
 prometheus "local" {
-  uri      = "http://localhost:9090"
+  uri = "http://localhost:9090"
 }
 ```
 
 #### Getting list of files to check from Prometheus
 
 You can also point pint directly at a Prometheus server from the config file.
-This will make pint query Prometheus API to get the current value of `rule_files`
-Prometheus config option and then run checks on all matching files.
+On every iteration, before starting any checks, pint will query Prometheus API
+to get the current value of `rule_files` Prometheus config option and then run
+checks on all matching files.
 This way if you test your rules against a running Prometheus instance then you don't
 need to manually specify any paths or directories.
 
@@ -271,6 +272,48 @@ Here's an example alert you can use for problems detected by pint:
 ```
 
 {% endraw %}
+
+## YAML parser
+
+By default pint will expect all Prometheus rule files to be following the exact
+syntax Prometheus expects for YAML files containing [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
+rules.
+If you have Prometheus rules stored in YAML files with different YAML tree, but still
+retain the same set of fields, for example:
+
+```yaml
+# Flat rule list
+- alert: AlertName
+  expr: up == 0
+- record: sum:up
+  expr: count(up == 1)
+```
+
+```yaml
+# Rules nested under custom tree
+service:
+  prometheus:
+    rules:
+      - alert: AlertName
+        expr: up == 0
+      - record: sum:up
+        expr: count(up == 1)
+```
+
+You can still check these rules using pint, but you need to switch pint YAML
+parser into "relaxed" mode by adding this section to pint config file:
+
+```js
+parser {
+  relaxed = [ "my/files/*.yml" ]
+}
+```
+
+See [parser](configuration.md#parser) documentation for more details.
+"Relaxed" parser mode will load anything that can be parsed as Prometheus rule,
+while "strict" parser mode will fail if it reads a file that wouldn't load
+cleanly as Prometheus config file.
 
 ## Control comments
 
