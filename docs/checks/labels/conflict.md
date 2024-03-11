@@ -11,10 +11,52 @@ Below is the list of conflicts it looks for.
 
 ## External labels
 
-If recording rules are manually setting some labels that are
+### Recording rules
+
+If any recording rules are manually setting some labels that are
 already present in `external_labels` Prometheus configuration option
-then both labels might conflict when metrics are federated or when sending
-alerts.
+then both labels might conflict when metrics are ingested to another
+Prometheus via federation or remote read/write.
+
+Example:
+
+Consider this recording rule:
+
+```yaml
+groups:
+  name: recording rules
+  rules:
+  - record: prometheus_http_requests_total:rate2m
+    expr: rate(prometheus_http_requests_total[2m])
+    labels:
+      cluster: dev
+```
+
+If this rule is deployed to Prometheus server with this configuration:
+
+```yaml
+global:
+  external_labels:
+    site: site01
+    cluster: staging
+```
+
+Then making a `/federate` request will return time series with `cluster="staging"` label,
+except for `prometheus_http_requests_total:rate2m` time series which will have `cluster="dev"`
+label from the recording rule, which might cause unexpected inconsistencies.
+
+If both the recording rule and `external_labels` config section uses same label value for the
+`cluster` label then this effectively makes `cluster` label redundant, so in both cases it's
+best to avoid setting labels used in `external_labels` on individual rules.
+
+### Alerting rules
+
+Same problem exists for alerting rules, with the only difference being how the label is
+being used.
+Any label listed in `external_labels` will be added to all firing alerts.
+Setting `cluster` label on alerting rule will override `external_labels` and
+can cause confusion when alert sent from `cluster="staging"` Prometheus has `cluster="dev"`
+label set.
 
 ## Configuration
 

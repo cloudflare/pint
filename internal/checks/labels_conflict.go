@@ -42,19 +42,22 @@ func (c LabelsConflictCheck) Reporter() string {
 }
 
 func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.RecordingRule == nil || rule.RecordingRule.Expr.SyntaxError != nil {
-		return nil
+	var labels *parser.YamlMap
+	if rule.AlertingRule != nil && rule.AlertingRule.Expr.SyntaxError == nil && rule.AlertingRule.Labels != nil {
+		labels = rule.AlertingRule.Labels
 	}
-
-	if rule.RecordingRule.Labels == nil {
-		return nil
+	if rule.RecordingRule != nil && rule.RecordingRule.Expr.SyntaxError == nil && rule.RecordingRule.Labels != nil {
+		labels = rule.RecordingRule.Labels
+	}
+	if labels == nil {
+		return problems
 	}
 
 	cfg, err := c.prom.Config(ctx)
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
-			Lines:    rule.RecordingRule.Labels.Lines,
+			Lines:    labels.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
 			Severity: severity,
@@ -62,7 +65,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 		return problems
 	}
 
-	for _, label := range rule.RecordingRule.Labels.Items {
+	for _, label := range labels.Items {
 		for k, v := range cfg.Config.Global.ExternalLabels {
 			if label.Key.Value == k {
 				problems = append(problems, Problem{
@@ -71,7 +74,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.", promText(c.prom.Name(), cfg.URI), k, v),
+					Text:     c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
 					Severity: Warning,
 				})
@@ -80,4 +83,11 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Ru
 	}
 
 	return problems
+}
+
+func (c LabelsConflictCheck) formatText(k, lv, ev string, kind parser.RuleType, cfg *promapi.ConfigResult) string {
+	if (lv == ev) && kind == parser.AlertingRuleType {
+		return fmt.Sprintf("This label is redundant. %s external_labels already has %s=%q label set and it will be automatically added to all alerts, there's no need to set it manually.", promText(c.prom.Name(), cfg.URI), k, ev)
+	}
+	return fmt.Sprintf("%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.", promText(c.prom.Name(), cfg.URI), k, ev)
 }
