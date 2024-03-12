@@ -224,6 +224,15 @@ func (pg *PrometheusGenerator) ServersForPath(path string) []*promapi.FailoverGr
 	return servers
 }
 
+func (pg *PrometheusGenerator) ServerWithName(name string) *promapi.FailoverGroup {
+	for _, server := range pg.servers {
+		if server.Name() == name {
+			return server
+		}
+	}
+	return nil
+}
+
 func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
 	for _, s := range pg.servers {
 		if s.Name() == server.Name() {

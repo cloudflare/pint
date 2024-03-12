@@ -12,7 +12,7 @@ const levelStep = 2
 
 var parseCmd = &cli.Command{
 	Name:   "parse",
-	Usage:  "Parse a query and print AST, use for debugging or understanding query details",
+	Usage:  "Parse a query and print AST, use it for debugging or understanding query details.",
 	Action: actionParse,
 }
 

@@ -7,6 +7,11 @@
 - [labels/conflict](checks/labels/conflict.md) check will now warn if alerting
   rule is setting labels that are already configured as external labels.
 
+### Changed
+
+- `pint watch` command now has two sub-commands: `pint watch glob` and `pint watch rule_files`.
+  See [watch mode](index.md#watch-mode) docs for details.
+
 ### Fixed
 
 - Fixed false positive reports from [rule/duplicate](checks/rule/duplicate.md) when

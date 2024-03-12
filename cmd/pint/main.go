@@ -27,43 +27,43 @@ var (
 
 func newApp() *cli.App {
 	return &cli.App{
-		Usage: "Prometheus rule linter",
+		Usage: "Prometheus rule linter/validator.",
 		Flags: []cli.Flag{
 			&cli.PathFlag{
 				Name:    configFlag,
 				Aliases: []string{"c"},
 				Value:   ".pint.hcl",
-				Usage:   "Configuration file to use",
+				Usage:   "Configuration file to use.",
 			},
 			&cli.IntFlag{
 				Name:    workersFlag,
 				Aliases: []string{"w"},
 				Value:   10,
-				Usage:   "Number of worker threads for running checks",
+				Usage:   "Number of worker threads for running checks.",
 			},
 			&cli.StringFlag{
 				Name:    logLevelFlag,
 				Aliases: []string{"l"},
 				Value:   slog.LevelInfo.String(),
-				Usage:   "Log level",
+				Usage:   "Log level.",
 			},
 			&cli.BoolFlag{
 				Name:    noColorFlag,
 				Aliases: []string{"n"},
 				Value:   false,
-				Usage:   "Disable output colouring",
+				Usage:   "Disable output colouring.",
 			},
 			&cli.StringSliceFlag{
 				Name:    disabledFlag,
 				Aliases: []string{"d"},
 				Value:   cli.NewStringSlice(),
-				Usage:   "List of checks to disable (example: promql/cost)",
+				Usage:   "List of checks to disable (example: promql/cost).",
 			},
 			&cli.BoolFlag{
 				Name:    offlineFlag,
 				Aliases: []string{"o"},
 				Value:   false,
-				Usage:   "Disable all check that send live queries to Prometheus servers",
+				Usage:   "Disable all check that send live queries to Prometheus servers.",
 			},
 		},
 		Commands: []*cli.Command{

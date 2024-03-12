@@ -27,32 +27,32 @@ var (
 
 var ciCmd = &cli.Command{
 	Name:   "ci",
-	Usage:  "Lint CI changes",
+	Usage:  "Run checks on all git changes.",
 	Action: actionCI,
 	Flags: []cli.Flag{
 		&cli.BoolFlag{
 			Name:    requireOwnerFlag,
 			Aliases: []string{"r"},
 			Value:   false,
-			Usage:   "Require all rules to have an owner set via comment",
+			Usage:   "Require all rules to have an owner set via comment.",
 		},
 		&cli.StringFlag{
 			Name:    baseBranchFlag,
 			Aliases: []string{"b"},
 			Value:   "",
-			Usage:   "Set base branch to use for PR checks (main, master, ...)",
+			Usage:   "Set base branch to use for PR checks (main, master, ...).",
 		},
 		&cli.StringFlag{
 			Name:    failOnFlag,
 			Aliases: []string{"w"},
 			Value:   "bug",
-			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected",
+			Usage:   "Exit with non-zero code if there are problems with given severity (or higher) detected.",
 		},
 		&cli.BoolFlag{
 			Name:    teamCityFlag,
 			Aliases: []string{"t"},
 			Value:   false,
-			Usage:   "Report problems using TeamCity Service Messages",
+			Usage:   "Print found problems using TeamCity Service Messages format.",
 		},
 	},
 }

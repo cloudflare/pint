@@ -3,7 +3,7 @@ http start github 127.0.0.1:7043
 
 exec bash -x ./test.sh &
 
-pint.ok --no-color watch --interval=1h --listen=127.0.0.1:6043 --pidfile=pint.pid rules
+pint.ok --no-color watch --interval=1h --listen=127.0.0.1:6043 --pidfile=pint.pid glob rules
 ! stdout .
 stderr 'level=INFO msg="Shutting down"'
 stderr 'level=INFO msg="Waiting for all background tasks to finish"'

@@ -1,0 +1,43 @@
+http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"rule_files:\n  - rules/*\n"}}
+http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
+http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http response prometheus /api/v1/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1666873962.795,"1"]}]}}
+http start prometheus 127.0.0.1:7168
+
+exec bash -x ./test.sh &
+
+pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6168 --pidfile=pint.pid rule_files prom
+! stdout .
+
+stderr 'level=DEBUG msg="Glob finder completed" count=2'
+stderr 'level=DEBUG msg="Glob finder completed" count=3'
+
+-- test.sh --
+sleep 7
+mv more/*.yaml rules/
+sleep 7
+cat pint.pid | xargs kill
+
+-- rules/1.yaml --
+groups:
+- name: g1
+  rules:
+  - alert: DownAlert1
+    expr: up == 0
+-- rules/2.yaml --
+groups:
+- name: g2
+  rules:
+  - alert: DownAlert2
+    expr: up == 0
+-- more/3.yaml --
+groups:
+- name: g2
+  rules:
+  - alert: DownAlert2
+    expr: up == 0
+-- .pint.hcl --
+prometheus "prom" {
+    uri = "http://localhost:7168"
+}

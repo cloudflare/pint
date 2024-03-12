@@ -1,0 +1,37 @@
+pint.error --no-color -l debug watch --interval=5s --listen=127.0.0.1:6169 --pidfile=pint.pid rule_files prom
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Configured new Prometheus server" name=foo uris=1 uptime=up tags=[] include=[] exclude=[]
+level=DEBUG msg="Starting query workers" name=foo uri=http://localhost:7169 workers=16
+level=ERROR msg="Fatal error" err="no Prometheus named \"prom\" configured in pint"
+-- test.sh --
+sleep 7
+mv more/*.yaml rules/
+sleep 7
+cat pint.pid | xargs kill
+
+-- rules/1.yaml --
+groups:
+- name: g1
+  rules:
+  - alert: DownAlert1
+    expr: up == 0
+-- rules/2.yaml --
+groups:
+- name: g2
+  rules:
+  - alert: DownAlert2
+    expr: up == 0
+-- more/3.yaml --
+groups:
+- name: g2
+  rules:
+  - alert: DownAlert2
+    expr: up == 0
+-- .pint.hcl --
+prometheus "foo" {
+    uri = "http://localhost:7169"
+}
