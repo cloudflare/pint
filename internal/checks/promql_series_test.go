@@ -3326,6 +3326,41 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "metric with fallback / 1",
+			content:     "- record: foo\n  expr: sum(sometimes{foo!=\"bar\"} or vector(0))\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+		},
+		{
+			description: "metric with fallback / 2",
+			content: `
+- alert: foo
+  expr: |
+    (sum(sometimes{foo!=\"bar\"} or vector(0)))
+    or
+    (bob > 10)
+    or
+    vector(1)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "metric with fallback / 3",
+			content: `
+- alert: foo
+  expr: |
+    (sum(sometimes{foo!=\"bar\"} or vector(0)))
+    or
+    ((bob > 10) or sum(foo) or vector(1))
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
 	}
 	runTests(t, testCases)
 }

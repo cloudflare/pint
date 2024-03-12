@@ -21,6 +21,16 @@ to determine why, by checking if:
 - `my_metric` has any series with `foo` label
 - `my_metric` has any series matching `foo="bar"`
 
+Metrics that are wrapped in `... or vector(0)` won't be checked, since
+the intention of adding `or vector(0)` is to provide a fallback value
+when there are no matching time series.
+Example:
+
+```yaml
+- alert: Foo
+  expr: sum(my_metric or vector(0)) > 1
+```
+
 ## Common problems
 
 If you see this check complaining about some metric it's might due to a number
@@ -75,7 +85,7 @@ problems like label mismatch.
 - Service exporting your metric is not working or no longer being scraped.
 - You are querying wrong Prometheus server.
 - You are trying to filter a metric that exists using a label key that is
-    never present on that metric.
+  never present on that metric.
 - You are using label value as a filter, but that value is never present.
 
 If that's the case you need to fix you query. Make sure your metric is present
@@ -357,6 +367,6 @@ You can disable this check until given time by adding a comment to it. Example:
 ```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
-formatted  or `YYYY-MM-DD`.
-Adding this comment will disable `promql/series` *until* `$TIMESTAMP`, after that
+formatted or `YYYY-MM-DD`.
+Adding this comment will disable `promql/series` _until_ `$TIMESTAMP`, after that
 check will be re-enabled.

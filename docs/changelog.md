@@ -11,6 +11,16 @@
 
 - `pint watch` command now has two sub-commands: `pint watch glob` and `pint watch rule_files`.
   See [watch mode](index.md#watch-mode) docs for details.
+- [promql/series](checks/promql/series.md) check will now ignore missing metrics if the
+  query uses a fallback with `or vector(1)`. This will reduce the number of reported
+  missing metrics for queries where the intention is to accept and ignore missing
+  metrics.
+  Example of a rule that will no longer report problems:
+
+  ```yaml
+  - alert: Foo
+    expr: sum(my_metric or vector(0)) > 1
+  ```
 
 ### Fixed
 
