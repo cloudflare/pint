@@ -14,6 +14,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
@@ -676,19 +677,32 @@ func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text 
 }
 
 func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) {
-	if node, ok := n.Node.(*promParser.VectorSelector); ok {
+	tree := utils.Tree(n.Node, nil)
+OUTER:
+	for _, vs := range utils.WalkDown[*promParser.VectorSelector](&tree) {
+		for _, bin := range utils.WalkUp[*promParser.BinaryExpr](vs.Parent) {
+			if binExp := bin.Expr.(*promParser.BinaryExpr); binExp.Op != promParser.LOR {
+				continue
+			}
+			for _, vec := range utils.WalkDown[*promParser.Call](bin) {
+				if vecCall := vec.Expr.(*promParser.Call); vecCall.Func.Name == "vector" {
+					// vector seletor is under (...) OR vector()
+					// ignore it
+					slog.Debug(
+						"Metric uses vector() fallback value, ignore",
+						slog.String("selector", (vs.Expr.String())),
+					)
+					continue OUTER
+				}
+			}
+		}
 		// copy node without offset
 		nc := promParser.VectorSelector{
-			Name:          node.Name,
-			LabelMatchers: node.LabelMatchers,
+			Name:          vs.Expr.(*promParser.VectorSelector).Name,
+			LabelMatchers: vs.Expr.(*promParser.VectorSelector).LabelMatchers,
 		}
 		selectors = append(selectors, nc)
 	}
-
-	for _, child := range n.Children {
-		selectors = append(selectors, getSelectors(child)...)
-	}
-
 	return selectors
 }
 
