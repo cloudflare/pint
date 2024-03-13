@@ -285,6 +285,34 @@ func TestRuleDependencyCheck(t *testing.T) {
 `, discovery.Noop, "foo.yaml", "foo.yaml")[0],
 			},
 		},
+		{
+			description: "warns about removed dependency without crashing if it is not the last rule",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDependencyCheck()
+			},
+			prometheus: newSimpleProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Anchor: checks.AnchorBefore,
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  2,
+						},
+						Reporter: checks.RuleDependencyCheckName,
+						Text:     textDependencyRule(1),
+						Details:  detailsDependencyRule("recording", "foo", "- `alert` at `foo.yaml:2`\n"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			entries: []discovery.Entry{
+				parseWithState("- record: foo\n  expr: sum(foo)\n", discovery.Removed, "foo.yaml", "foo.yaml")[0],
+				parseWithState("- alert: alert\n  expr: foo == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
+				parseWithState("- record: bar\n  expr: vector(0)\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
+			},
+		},
 	}
 
 	runTests(t, testCases)

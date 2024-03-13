@@ -90,12 +90,12 @@ func (c RuleDependencyCheck) Check(_ context.Context, _ string, rule parser.Rule
 
 	var details strings.Builder
 	details.WriteString("If you remove the ")
-	details.WriteString(dep.kind)
+	details.WriteString(broken[0].kind)
 	details.WriteString(" rule generating `")
-	details.WriteString(dep.metric)
+	details.WriteString(broken[0].metric)
 	details.WriteString("`, and there is no other source of this metric, then any other rule depending on it will break.\n")
 	details.WriteString("List of found rules that are using `")
-	details.WriteString(dep.metric)
+	details.WriteString(broken[0].metric)
 	details.WriteString("`:\n\n")
 	for _, b := range broken {
 		details.WriteString("- `")
