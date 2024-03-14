@@ -11,6 +11,7 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.head.repo.full_name == 'cloudflare/pint' }}
     steps:
       - name: Check out code
         uses: actions/checkout@v4
@@ -29,6 +30,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+          cache: false
 
       - name: Compile pint
         run: make build

@@ -3338,7 +3338,7 @@ func TestSeriesCheck(t *testing.T) {
 			content: `
 - alert: foo
   expr: |
-    (sum(sometimes{foo!=\"bar\"} or vector(0)))
+    (sum(sometimes{foo!="bar"} or vector(0)))
     or
     (bob > 10)
     or
@@ -3353,13 +3353,75 @@ func TestSeriesCheck(t *testing.T) {
 			content: `
 - alert: foo
   expr: |
-    (sum(sometimes{foo!=\"bar\"} or vector(0)))
+    (sum(sometimes{foo!="bar"} or vector(0)))
     or
     ((bob > 10) or sum(foo) or vector(1))
 `,
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
 			problems:   noProblems,
+		},
+		{
+			description: "metric with fallback / 4",
+			content: `
+- alert: foo
+  expr: |
+    (
+      sum(sometimes{foo!="bar"})
+      or
+      vector(1)
+    ) and (
+      ((bob > 10) or sum(bar))
+      or
+      notfound > 0
+    )
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  12,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "bob", "1w"),
+						Details:  checks.SeriesCheckCommonProblemDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  12,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "bar", "1w"),
+						Details:  checks.SeriesCheckCommonProblemDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  12,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Details:  checks.SeriesCheckCommonProblemDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
 		},
 	}
 	runTests(t, testCases)
