@@ -23,7 +23,7 @@ func alertsText(name, uri string, count int, since string) string {
 
 func alertsDetails(uri, query, since string) string {
 	return fmt.Sprintf(
-		`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=1&g0.range_input=%s).`,
+		`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
 		uri, url.QueryEscape(query), since,
 	)
 }
