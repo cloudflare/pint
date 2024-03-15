@@ -19,19 +19,21 @@ const (
 	AlertsCheckName = "alerts/count"
 )
 
-func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Duration, minCount int, severity Severity) AlertsCheck {
+func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Duration, minCount int, comment string, severity Severity) AlertsCheck {
 	return AlertsCheck{
 		prom:     prom,
 		lookBack: lookBack,
 		step:     step,
 		resolve:  resolve,
 		minCount: minCount,
+		comment:  comment,
 		severity: severity,
 	}
 }
 
 type AlertsCheck struct {
 	prom     *promapi.FailoverGroup
+	comment  string
 	lookBack time.Duration
 	step     time.Duration
 	resolve  time.Duration
@@ -77,6 +79,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
+			Details:  maybeComment(c.comment),
 			Severity: severity,
 		})
 		return problems
@@ -114,13 +117,18 @@ func (c AlertsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []
 	}
 
 	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
+	details := fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
+		qr.PublicURI, url.QueryEscape(rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
+	)
+	if c.comment != "" {
+		details = fmt.Sprintf("%s\n%s", details, maybeComment(c.comment))
+	}
+
 	problems = append(problems, Problem{
 		Lines:    rule.AlertingRule.Expr.Value.Lines,
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
-		Details: fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
-			qr.PublicURI, url.QueryEscape(rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
-		),
+		Details:  details,
 		Severity: c.severity,
 	})
 	return problems

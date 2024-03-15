@@ -15,6 +15,7 @@ Syntax:
 
 ```js
 reject "$pattern" {
+  comment           = "..."
   severity          = "bug|warning|info"
   label_keys        = true|false
   label_values      = true|false
@@ -25,7 +26,8 @@ reject "$pattern" {
 
 - `$pattern` - regexp pattern to reject, this can be templated
   to reference checked rule fields, see [Configuration](../../configuration.md)
-  for details
+  for details.
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a bug.
 - `label_keys` - if true label keys for recording and alerting rules will
   be checked.
@@ -52,7 +54,8 @@ rule {
   }
 
   reject "https?://.+" {
-    label_keys = true
+    comment      = "Don't use URIs as alert labels, pass them as annotations instead"
+    label_keys   = true
     label_values = true
   }
 }

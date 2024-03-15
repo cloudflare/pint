@@ -9,6 +9,7 @@ type RuleLinkSettings struct {
 	URI      string            `hcl:"uri,optional" json:"uri,omitempty"`
 	Timeout  string            `hcl:"timeout,optional" json:"timeout,omitempty"`
 	Headers  map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
+	Comment  string            `hcl:"comment,optional" json:"comment,omitempty"`
 	Severity string            `hcl:"severity,optional" json:"severity,omitempty"`
 }
 

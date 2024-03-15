@@ -6,6 +6,7 @@ import (
 
 type RejectSettings struct {
 	Regex            string `hcl:",label" json:"key,omitempty"`
+	Comment          string `hcl:"comment,optional" json:"comment,omitempty"`
 	Severity         string `hcl:"severity,optional" json:"severity,omitempty"`
 	LabelKeys        bool   `hcl:"label_keys,optional" json:"label_keys,omitempty"`
 	LabelValues      bool   `hcl:"label_values,optional" json:"label_values,omitempty"`

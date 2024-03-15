@@ -15,13 +15,14 @@ const (
 	LabelCheckName = "rule/label"
 )
 
-func NewLabelCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isReguired bool, severity Severity) LabelCheck {
+func NewLabelCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isReguired bool, comment string, severity Severity) LabelCheck {
 	return LabelCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
 		valueRe:    valueRe,
 		values:     values,
 		isReguired: isReguired,
+		comment:    comment,
 		severity:   severity,
 	}
 }
@@ -30,9 +31,10 @@ type LabelCheck struct {
 	keyRe      *TemplatedRegexp
 	tokenRe    *TemplatedRegexp
 	valueRe    *TemplatedRegexp
+	comment    string
 	values     []string
-	isReguired bool
 	severity   Severity
+	isReguired bool
 }
 
 func (c LabelCheck) Meta() CheckMeta {
@@ -77,6 +79,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
 		}
@@ -90,6 +93,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Lines:    rule.RecordingRule.Labels.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
 		}
@@ -114,6 +118,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
 		}
@@ -133,6 +138,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 			Lines:    rule.AlertingRule.Labels.Lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 		return problems
@@ -157,6 +163,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.Line
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}
@@ -174,6 +181,11 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.Line
 					details.WriteString(" other value(s).")
 					break
 				}
+			}
+			if c.comment != "" {
+				details.WriteRune('\n')
+				details.WriteString("Rule comment: ")
+				details.WriteString(c.comment)
 			}
 			problems = append(problems, Problem{
 				Lines:    lines,

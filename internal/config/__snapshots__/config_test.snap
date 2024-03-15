@@ -680,6 +680,7 @@
         },
         {
           "name": ".+",
+          "comment": "this is rule comment",
           "severity": "bug",
           "strip": [
             "instance",
@@ -729,6 +730,7 @@
   "rules": [
     {
       "cost": {
+        "comment": "this is rule comment",
         "severity": "warning",
         "maxSeries": 10000
       }
@@ -801,6 +803,7 @@
       "label": [
         {
           "key": "team",
+          "comment": "this is rule comment",
           "severity": "warning"
         }
       ]
@@ -810,6 +813,7 @@
         {
           "key": "summary",
           "value": "foo.+",
+          "comment": "this is rule comment",
           "severity": "bug",
           "required": true
         }
@@ -874,10 +878,12 @@
         },
         {
           "key": ".* +.*",
+          "comment": "this is rule comment",
           "label_keys": true,
           "annotation_keys": true
         },
         {
+          "comment": "this is rule comment",
           "severity": "bug",
           "annotation_values": true
         }
@@ -1273,6 +1279,7 @@
       "annotation": [
         {
           "key": "summary",
+          "comment": "this is rule comment",
           "required": true
         }
       ]
@@ -1585,6 +1592,7 @@
       "annotation": [
         {
           "key": "summary",
+          "comment": "this is rule comment",
           "required": true
         }
       ]
@@ -1689,6 +1697,7 @@
           "headers": {
             "X-Auth": "xxx"
           },
+          "comment": "this is rule comment",
           "severity": "bug"
         }
       ]
@@ -1805,6 +1814,7 @@
         "range": "1d",
         "step": "1m",
         "resolve": "5m",
+        "comment": "this is rule comment",
         "severity": "bug",
         "minCount": 100
       }
@@ -2100,6 +2110,7 @@
   "rules": [
     {
       "cost": {
+        "comment": "this is rule comment",
         "severity": "info"
       }
     },
@@ -2565,6 +2576,7 @@
           "key": "priority",
           "token": "\\w+",
           "value": "(1|2|3|4|5)",
+          "comment": "this is rule comment",
           "severity": "bug",
           "required": true
         }

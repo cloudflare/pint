@@ -16,6 +16,7 @@ Syntax:
 
 ```js
 link "$pattern" {
+  comment  = "..."
   severity = "bug|warning|info"
   uri      = "..."
   timeout  = "1m"
@@ -28,6 +29,7 @@ link "$pattern" {
   rule fields, see [Configuration](../../configuration.md) for details.
 - `uri` - optional URI rewrite rule, this will be used as the URI for all
   requests if specified, regexp capture groups can be referenced here.
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a bug.
 - `timeout` - timeout to be used for all request, defaults to 1 minute.
 - `headers` - a list of HTTP headers to set on all requests.
@@ -61,7 +63,9 @@ Only validate specific hostname.
 
 ```js
 rule {
-  link "https?://runbooks.example.com/.+" {}
+  link "https?://runbooks.example.com/.+" {
+    comment = "Please link every alert to a run-book"
+  }
 }
 ```
 

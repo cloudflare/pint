@@ -8,6 +8,7 @@ import (
 
 type AggregateSettings struct {
 	Name     string   `hcl:",label" json:"name"`
+	Comment  string   `hcl:"comment,optional" json:"comment,omitempty"`
 	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
 	Keep     []string `hcl:"keep,optional" json:"keep,omitempty"`
 	Strip    []string `hcl:"strip,optional" json:"strip,omitempty"`

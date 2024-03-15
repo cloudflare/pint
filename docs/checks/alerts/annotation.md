@@ -14,6 +14,7 @@ Syntax:
 
 ```js
 annotation "$pattern" {
+  comment  = "..."
   severity = "bug|warning|info"
   token    = "(.*)"
   value    = "(.*)"
@@ -25,6 +26,7 @@ annotation "$pattern" {
 - `$pattern` - regexp pattern to match annotation name on, this can be templated
   to reference checked rule fields, see [Configuration](../../configuration.md)
   for details.
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a warning.
 - `token` - optional regexp to tokenize annotation value before validating it.
   By default the whole annotation value is validated against `value` regexp or
@@ -33,7 +35,7 @@ annotation "$pattern" {
   to a regexp that captures a single sub-string.
 - `value` - optional value regexp to enforce, if not set only pint will only
   check if the annotation exists.
-- `values` - optional list of allowed values - this is alternative to using
+- `values` - optional list of allowed values - this is alternative to using.
   `value` regexp. Set this to the list of all possible valid annotation values.
 - `required` - if `true` pint will require every rule to have this annotation set,
   if `false` it will only check values where annotation is set.
@@ -63,6 +65,7 @@ rule {
 
   annotation "dashboard" {
     severity = "bug"
+    comment  = "You must add a link do a Grafana dashboard showing impact of this alert"
     value    = "https://grafana\.example\.com/.+"
   }
 }

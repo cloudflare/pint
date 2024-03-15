@@ -451,6 +451,7 @@ rule {
 	keep     = ["job"]
   }
   aggregate ".+" {
+	comment  = "this is rule comment"
     severity = "bug"
 	strip    = ["instance", "rack"]
   }
@@ -480,6 +481,7 @@ rule {
 rule {
   cost {
 	maxSeries = 10000
+	comment   = "this is rule comment"
 	severity  = "warning"
   }
 }
@@ -566,6 +568,7 @@ rule {
 rule {
   label "team" {
     severity = "warning"
+	comment  = "this is rule comment"
     required = false
   }
   annotation "summary" {
@@ -577,6 +580,7 @@ rule {
   annotation "summary" {
     value    = "foo.+"
     severity = "bug"
+	comment  = "this is rule comment"
     required = true
   }
 }
@@ -621,6 +625,7 @@ prometheus "prom2" {
 }
 rule {
   cost {
+	comment  = "this is rule comment"
     severity  = "info"
   }
 }
@@ -677,10 +682,12 @@ rule {
     label_values = true
   }
   reject ".* +.*" {
+	comment  = "this is rule comment"
     annotation_keys = true
     label_keys = true
   }
   reject "" {
+	comment  = "this is rule comment"
     annotation_values = true
 	severity = "bug"
   }
@@ -900,6 +907,7 @@ rule {
     }
   }
   label "priority" {
+	comment  = "this is rule comment"
     severity = "bug"
 	token    = "\\w+"
     value    = "(1|2|3|4|5)"
@@ -1155,6 +1163,7 @@ rule {
   }
   annotation "summary" {
     required = true
+	comment  = "this is rule comment"
   }
 }
 `,
@@ -1313,6 +1322,7 @@ rule {
   }
   annotation "summary" {
     required = true
+	comment  = "this is rule comment"
   }
 }
 `,
@@ -1367,6 +1377,7 @@ rule {
 	headers = {
 		X-Auth = "xxx"
 	}
+	comment  = "this is rule comment"
 	severity = "bug"
   }
 }
@@ -1675,6 +1686,7 @@ rule {
     step     = "1m"
     resolve  = "5m"
 	minCount = 100
+	comment  = "this is rule comment"
 	severity = "bug"
   }
 }
