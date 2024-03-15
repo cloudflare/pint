@@ -2,7 +2,7 @@ module _
 
 go 1.22.1
 
-require github.com/dkorunic/betteralign v0.4.1
+require github.com/dkorunic/betteralign v0.4.2
 
 require (
 	github.com/KimMachineGun/automemlimit v0.5.0 // indirect
@@ -17,9 +17,9 @@ require (
 	github.com/sirkon/dst v0.26.4 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	go.uber.org/automaxprocs v1.5.3 // indirect
-	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
-	golang.org/x/mod v0.15.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
-	golang.org/x/tools v0.18.0 // indirect
+	golang.org/x/exp v0.0.0-20240314144324-c7f7c6466f7f // indirect
+	golang.org/x/mod v0.16.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/tools v0.19.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 )
