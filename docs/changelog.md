@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.56.0
+
+### Added
+
+- Check using custom rules now accept an optional `comment` option for adding
+  a text comment to all reported problems.
+  Checks supporting `comment` option:
+  - [alerts/annotation](checks/alerts/annotation.md)
+  - [alerts/count](checks/alerts/count.md)
+  - [promql/aggregate](checks/promql/aggregate.md)
+  - [query/cost](checks/query/cost.md)
+  - [rule/for](checks/rule/for.md)
+  - [rule/label](checks/rule/label.md)
+  - [rule/link](checks/rule/link.md)
+  - [rule/reject](checks/rule/reject.md)
+  Example:
+
+  ```js
+  for {
+    comment  = "All alert rules must have `for: 5m` (or more) to avoid flaky alerts."
+    severity = "bug"
+    min      = "5m"
+  }
+  ```
+
 ## v0.55.0
 
 ### Added

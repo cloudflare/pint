@@ -23,13 +23,21 @@ blocks, depending on which alerting rule field you want to enforce.
 Syntax:
 
 ```js
-for|keep_firing_for {
+for {
+  comment  = "comment"
+  severity = "bug|warning|info"
+  min      = "5m"
+  max      = "10m"
+}
+keep_firing_for {
+  comment  = "comment"
   severity = "bug|warning|info"
   min      = "5m"
   max      = "10m"
 }
 ```
 
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a bug.
 - `min` - minimum required `for` value for matching alerting rules.
   If not set minimum `for` duration won't be enforced.
@@ -42,9 +50,9 @@ Enforce that all alerts have `for` fields of `5m` or more:
 
 ```js
 for {
+  comment  = "All alert rules must have for:5m (or more) to avoid flaky alerts"
   severity = "bug"
   min      = "5m"
-  max      = "10m"
 }
 ```
 

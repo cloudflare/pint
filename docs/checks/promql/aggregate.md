@@ -16,18 +16,20 @@ Syntax:
 
 ```js
 aggregate "$pattern" {
+  comment  = "..."
   severity = "bug|warning|info"
-  keep = [ "...", ... ]
-  strip = [ "...", ... ]
+  keep     = [ "...", ... ]
+  strip    = [ "...", ... ]
 }
 ```
 
 - `$pattern` - regexp pattern to match rule name on, this can be templated
   to reference checked rule fields, see [Configuration](../../configuration.md)
-  for details
-- `severity` - set custom severity for reported issues, defaults to a warning
-- `keep` - list of label names that must be preserved
-- `strip` - list of label names that must be stripped
+  for details.
+- `comment` - set a custom comment that will be added to reported problems.
+- `severity` - set custom severity for reported issues, defaults to a warning.
+- `keep` - list of label names that must be preserved.
+- `strip` - list of label names that must be stripped.
 
 ## How to enable it
 
@@ -46,7 +48,8 @@ rule {
     kind = "recording"
   }
   aggregate ".+" {
-    keep = ["job"]
+    keep    = ["job"]
+    comment = "`job` label must be kept on all aggregated metrics so we can link it with a scrape job"
   }
 }
 ```

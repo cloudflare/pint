@@ -20,13 +20,14 @@ const (
 	RuleLinkCheckName = "rule/link"
 )
 
-func NewRuleLinkCheck(re *TemplatedRegexp, uriRewrite string, timeout time.Duration, headers map[string]string, s Severity) RuleLinkCheck {
+func NewRuleLinkCheck(re *TemplatedRegexp, uriRewrite string, timeout time.Duration, headers map[string]string, comment string, s Severity) RuleLinkCheck {
 	return RuleLinkCheck{
 		scheme:     []string{"http", "https"},
 		re:         re,
 		uriRewrite: uriRewrite,
 		timeout:    timeout,
 		headers:    headers,
+		comment:    comment,
 		severity:   s,
 	}
 }
@@ -35,6 +36,7 @@ type RuleLinkCheck struct {
 	re         *TemplatedRegexp
 	headers    map[string]string
 	uriRewrite string
+	comment    string
 	scheme     []string
 	timeout    time.Duration
 	severity   Severity
@@ -113,6 +115,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				},
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
@@ -129,6 +132,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ 
 				},
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))

@@ -16,19 +16,21 @@ const (
 	BytesPerSampleQuery = "avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))"
 )
 
-func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPeakSamples int, maxEvaluationDuration time.Duration, severity Severity) CostCheck {
+func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPeakSamples int, maxEvaluationDuration time.Duration, comment string, severity Severity) CostCheck {
 	return CostCheck{
 		prom:                  prom,
 		maxSeries:             maxSeries,
 		maxTotalSamples:       maxTotalSamples,
 		maxPeakSamples:        maxPeakSamples,
 		maxEvaluationDuration: maxEvaluationDuration,
+		comment:               comment,
 		severity:              severity,
 	}
 }
 
 type CostCheck struct {
 	prom                  *promapi.FailoverGroup
+	comment               string
 	maxSeries             int
 	maxTotalSamples       int
 	maxPeakSamples        int
@@ -74,6 +76,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
+			Details:  maybeComment(c.comment),
 			Severity: severity,
 		})
 		return problems
@@ -108,6 +111,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 		Lines:    expr.Value.Lines,
 		Reporter: c.Reporter(),
 		Text:     fmt.Sprintf("%s returned %d result(s)%s%s", promText(c.prom.Name(), qr.URI), series, estimate, above),
+		Details:  maybeComment(c.comment),
 		Severity: severity,
 	})
 
@@ -116,6 +120,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}
@@ -125,6 +130,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}
@@ -135,6 +141,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}

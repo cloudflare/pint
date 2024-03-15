@@ -129,13 +129,13 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 			for _, label := range aggr.Keep {
 				enabled = append(enabled, checkMeta{
 					name:  checks.AggregationCheckName,
-					check: checks.NewAggregationCheck(nameRegex, label, true, severity),
+					check: checks.NewAggregationCheck(nameRegex, label, true, aggr.Comment, severity),
 				})
 			}
 			for _, label := range aggr.Strip {
 				enabled = append(enabled, checkMeta{
 					name:  checks.AggregationCheckName,
-					check: checks.NewAggregationCheck(nameRegex, label, false, severity),
+					check: checks.NewAggregationCheck(nameRegex, label, false, aggr.Comment, severity),
 				})
 			}
 		}
@@ -147,7 +147,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		for _, prom := range prometheusServers {
 			enabled = append(enabled, checkMeta{
 				name:  checks.CostCheckName,
-				check: checks.NewCostCheck(prom, rule.Cost.MaxSeries, rule.Cost.MaxTotalSamples, rule.Cost.MaxPeakSamples, evalDur, severity),
+				check: checks.NewCostCheck(prom, rule.Cost.MaxSeries, rule.Cost.MaxTotalSamples, rule.Cost.MaxPeakSamples, evalDur, rule.Cost.Comment, severity),
 				tags:  prom.Tags(),
 			})
 		}
@@ -165,7 +165,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 			severity := ann.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
 				name:  checks.AnnotationCheckName,
-				check: checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), tokenRegex, valueRegex, ann.Values, ann.Required, severity),
+				check: checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), tokenRegex, valueRegex, ann.Values, ann.Required, ann.Comment, severity),
 			})
 		}
 	}
@@ -182,7 +182,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 			severity := lab.getSeverity(checks.Warning)
 			enabled = append(enabled, checkMeta{
 				name:  checks.LabelCheckName,
-				check: checks.NewLabelCheck(checks.MustTemplatedRegexp(lab.Key), tokenRegex, valueRegex, lab.Values, lab.Required, severity),
+				check: checks.NewLabelCheck(checks.MustTemplatedRegexp(lab.Key), tokenRegex, valueRegex, lab.Values, lab.Required, lab.Comment, severity),
 			})
 		}
 	}
@@ -204,7 +204,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		for _, prom := range prometheusServers {
 			enabled = append(enabled, checkMeta{
 				name:  checks.AlertsCheckName,
-				check: checks.NewAlertsCheck(prom, qRange, qStep, qResolve, rule.Alerts.MinCount, severity),
+				check: checks.NewAlertsCheck(prom, qRange, qStep, qResolve, rule.Alerts.MinCount, rule.Alerts.Comment, severity),
 				tags:  prom.Tags(),
 			})
 		}
@@ -252,7 +252,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		}
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleLinkCheckName,
-			check: checks.NewRuleLinkCheck(re, link.URI, timeout, link.Headers, severity),
+			check: checks.NewRuleLinkCheck(re, link.URI, timeout, link.Headers, link.Comment, severity),
 		})
 	}
 
@@ -260,7 +260,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		severity, minFor, maxFor := rule.For.resolve()
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleForCheckName,
-			check: checks.NewRuleForCheck(checks.RuleForFor, minFor, maxFor, severity),
+			check: checks.NewRuleForCheck(checks.RuleForFor, minFor, maxFor, rule.For.Comment, severity),
 		})
 	}
 
@@ -268,7 +268,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		severity, minFor, maxFor := rule.KeepFiringFor.resolve()
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleForCheckName,
-			check: checks.NewRuleForCheck(checks.RuleForKeepFiringFor, minFor, maxFor, severity),
+			check: checks.NewRuleForCheck(checks.RuleForKeepFiringFor, minFor, maxFor, rule.KeepFiringFor.Comment, severity),
 		})
 	}
 

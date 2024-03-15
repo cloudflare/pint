@@ -15,15 +15,22 @@ const (
 	AggregationCheckName = "promql/aggregate"
 )
 
-func NewAggregationCheck(nameRegex *TemplatedRegexp, label string, keep bool, severity Severity) AggregationCheck {
-	return AggregationCheck{nameRegex: nameRegex, label: label, keep: keep, severity: severity}
+func NewAggregationCheck(nameRegex *TemplatedRegexp, label string, keep bool, comment string, severity Severity) AggregationCheck {
+	return AggregationCheck{
+		nameRegex: nameRegex,
+		label:     label,
+		keep:      keep,
+		comment:   comment,
+		severity:  severity,
+	}
 }
 
 type AggregationCheck struct {
 	nameRegex *TemplatedRegexp
 	label     string
-	keep      bool
+	comment   string
 	severity  Severity
+	keep      bool
 }
 
 func (c AggregationCheck) Meta() CheckMeta {
@@ -78,6 +85,7 @@ func (c AggregationCheck) Check(_ context.Context, _ string, rule parser.Rule, _
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     problem.text,
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}

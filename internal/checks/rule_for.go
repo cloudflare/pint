@@ -23,17 +23,19 @@ const (
 	RuleForKeepFiringFor RuleForKey = "keep_firing_for"
 )
 
-func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, severity Severity) RuleForCheck {
+func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, comment string, severity Severity) RuleForCheck {
 	return RuleForCheck{
 		key:      key,
 		minFor:   minFor,
 		maxFor:   maxFor,
+		comment:  comment,
 		severity: severity,
 	}
 }
 
 type RuleForCheck struct {
 	key      RuleForKey
+	comment  string
 	severity Severity
 	minFor   time.Duration
 	maxFor   time.Duration
@@ -83,6 +85,7 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}
@@ -92,6 +95,7 @@ func (c RuleForCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []d
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}

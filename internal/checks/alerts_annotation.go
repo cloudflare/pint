@@ -16,13 +16,14 @@ const (
 	AnnotationCheckName = "alerts/annotation"
 )
 
-func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isReguired bool, severity Severity) AnnotationCheck {
+func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isReguired bool, comment string, severity Severity) AnnotationCheck {
 	return AnnotationCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
 		valueRe:    valueRe,
 		values:     values,
 		isReguired: isReguired,
+		comment:    comment,
 		severity:   severity,
 	}
 }
@@ -31,9 +32,10 @@ type AnnotationCheck struct {
 	keyRe      *TemplatedRegexp
 	tokenRe    *TemplatedRegexp
 	valueRe    *TemplatedRegexp
+	comment    string
 	values     []string
-	isReguired bool
 	severity   Severity
+	isReguired bool
 }
 
 func (c AnnotationCheck) Meta() CheckMeta {
@@ -70,6 +72,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
 		}
@@ -89,6 +92,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 			Lines:    rule.AlertingRule.Annotations.Lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 		return problems
@@ -113,6 +117,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Text:     fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
 	}
@@ -131,6 +136,11 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 					break
 				}
 			}
+			if c.comment != "" {
+				details.WriteRune('\n')
+				details.WriteString("Rule comment: ")
+				details.WriteString(c.comment)
+			}
 			problems = append(problems, Problem{
 				Lines:    lines,
 				Reporter: c.Reporter(),
@@ -141,4 +151,11 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 		}
 	}
 	return problems
+}
+
+func maybeComment(c string) string {
+	if c != "" {
+		return fmt.Sprintf("Rule comment: %s", c)
+	}
+	return ""
 }

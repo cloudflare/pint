@@ -52,7 +52,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores recording rules",
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, checks.Bug)
+				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -61,7 +61,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores unparsable link annotations",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: \"%gh&%ij\"",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, checks.Bug)
+				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -70,7 +70,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores non link annotations",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: not a link",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, checks.Bug)
+				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -79,7 +79,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores links without regexp match",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: http://foo.example.com",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp("ftp://xxx.com"), "", time.Second, nil, checks.Bug)
+				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp("ftp://xxx.com"), "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
 			problems:   noProblems,
@@ -88,7 +88,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "link with no host",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: http://",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, checks.Bug)
+				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, "some text", checks.Bug)
 			},
 			prometheus: noProm,
 			problems: func(_ string) []checks.Problem {
@@ -100,6 +100,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						},
 						Reporter: "rule/link",
 						Text:     `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
+						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
 					},
 				}
@@ -114,6 +115,7 @@ func TestRuleLinkCheck(t *testing.T) {
 					"",
 					time.Second,
 					map[string]string{"X-Host": "200.example.com"},
+					"",
 					checks.Bug,
 				)
 			},
@@ -129,6 +131,7 @@ func TestRuleLinkCheck(t *testing.T) {
 					"",
 					time.Second,
 					map[string]string{"X-Host": "400.example.com"},
+					"some text",
 					checks.Bug,
 				)
 			},
@@ -142,6 +145,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						},
 						Reporter: "rule/link",
 						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
 					},
 				}
@@ -156,6 +160,7 @@ func TestRuleLinkCheck(t *testing.T) {
 					"",
 					time.Second,
 					map[string]string{"X-Host": "400.example.com"},
+					"",
 					checks.Warning,
 				)
 			},
@@ -192,6 +197,7 @@ func TestRuleLinkCheck(t *testing.T) {
 					"",
 					time.Second,
 					map[string]string{"X-Host": "headers.example.com", "X-Auth": "mykey"},
+					"",
 					checks.Bug,
 				)
 			},
@@ -207,6 +213,7 @@ func TestRuleLinkCheck(t *testing.T) {
 					fmt.Sprintf(srv.URL+"/rewrite"),
 					time.Second,
 					map[string]string{"X-Host": "rewrite.example.com"},
+					"",
 					checks.Information,
 				)
 			},
@@ -222,6 +229,7 @@ func TestRuleLinkCheck(t *testing.T) {
 					"",
 					time.Second,
 					map[string]string{},
+					"",
 					checks.Bug,
 				)
 			},

@@ -62,6 +62,7 @@ Syntax:
 
 ```js
 cost {
+  comment               = "..."
   severity              = "bug|warning|info"
   maxSeries             = 5000
   maxPeakSamples        = 10000
@@ -70,6 +71,7 @@ cost {
 }
 ```
 
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a warning.
   This is only used when query result series exceed `maxSeries` value (if set).
   If `maxSeries` is not set or when results count is below it pint will still
@@ -122,6 +124,7 @@ rule {
     maxPeakSamples        = 300000
     maxEvaluationDuration = "30s"
     severity              = "bug"
+    comment               = "This query is too expensive to run" 
   }
 }
 ```

@@ -21,6 +21,7 @@ alerts {
   step       = "1m"
   resolve    = "5m"
   minCount   = 0
+  comment    = "..."
   severity   = "bug|warning|info"
 }
 ```
@@ -35,6 +36,7 @@ alerts {
 - `minCount` - minimal number of alerts for this check to report it. Default to `0`.
   Set this to a no-zero value if you want this check to report only if the estimated
   number of alerts is high enough.
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to `info`.
   This can be only set when `minCount` is set to a non-zero value.
 
@@ -76,6 +78,7 @@ rule {
     step       = "1m"
     resolve    = "5m"
     minCount   = 50
+    comment    = "You cannot add an rule that would immediately fire 50+ alerts, fix the problem first"
     severity   = "bug"
   }
 }

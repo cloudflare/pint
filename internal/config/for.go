@@ -10,6 +10,7 @@ import (
 type ForSettings struct {
 	Min      string `hcl:"min,optional" json:"min,omitempty"`
 	Max      string `hcl:"max,optional" json:"max,omitempty"`
+	Comment  string `hcl:"comment,optional" json:"comment,omitempty"`
 	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 

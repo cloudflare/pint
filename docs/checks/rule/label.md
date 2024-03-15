@@ -17,6 +17,7 @@ Syntax:
 
 ```js
 label "$pattern" {
+  comment  = "..."
   severity = "bug|warning|info"
   token    = "(.*)"
   value    = "(.*)"
@@ -28,6 +29,7 @@ label "$pattern" {
 - `$pattern` - regexp pattern to match label name on, this can be templated
   to reference checked rule fields, see [Configuration](../../configuration.md)
   for details.
+- `comment` - set a custom comment that will be added to reported problems.
 - `severity` - set custom severity for reported issues, defaults to a warning.
 - `token` - optional regexp to tokenize label value before validating it.
   By default the whole label value is validated against `value` regexp or
@@ -58,6 +60,7 @@ rule {
   }
 
   label "severity" {
+    comment  = "You must set a `severity` label on all alert rules"
     value    = "(warning|critical)"
     required = true
   }
