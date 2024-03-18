@@ -7,23 +7,6 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
-type PromQLError struct {
-	node *PromQLNode
-	Err  error
-}
-
-func (pqle PromQLError) Error() string {
-	return pqle.Err.Error()
-}
-
-func (pqle *PromQLError) Unwrap() error {
-	return pqle.Err
-}
-
-func (pqle PromQLError) Node() *PromQLNode {
-	return pqle.node
-}
-
 type PromQLExpr struct {
 	Value       *YamlNode
 	SyntaxError error
@@ -111,18 +94,15 @@ func WalkUpParent[T promParser.Node](node *PromQLNode) (nodes []*PromQLNode) {
 
 func DecodeExpr(expr string) (*PromQLNode, error) {
 	node, err := promParser.ParseExpr(expr)
-	if err != nil {
-		pqe := PromQLError{Err: err}
-		pqe.node = &PromQLNode{
-			Expr: node,
-		}
-		var perrs promParser.ParseErrors
-		if ok := errors.As(err, &perrs); ok {
-			for _, perr := range perrs {
-				pqe.Err = perr.Err
-			}
-		}
-		return nil, pqe
+	if err == nil {
+		return tree(node, nil), nil
 	}
-	return tree(node, nil), nil
+
+	var perrs promParser.ParseErrors
+	if ok := errors.As(err, &perrs); ok {
+		for _, perr := range perrs {
+			err = perr.Err
+		}
+	}
+	return nil, err
 }
