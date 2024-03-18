@@ -89,7 +89,7 @@ func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 		}
 		if len(series) >= 2 {
 			p := exprProblem{
-				expr:     node.Expr,
+				expr:     node.Expr.String(),
 				text:     "Aggregation using `without()` can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using `by()` to ensure consistent labels.",
 				severity: Warning,
 			}

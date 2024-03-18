@@ -94,7 +94,7 @@ func (c RateCheck) Check(ctx context.Context, _ string, rule parser.Rule, entrie
 }
 
 func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entries []discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
+	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
 			if !ok {
@@ -102,7 +102,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 			}
 			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
 				p := exprProblem{
-					expr: node.Expr,
+					expr: node.Expr.String(),
 					text: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
 						n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 					details:  RateCheckDetails,
@@ -163,7 +163,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 								for _, m := range metadata.Metadata {
 									if m.Type == v1.MetricTypeCounter {
 										problems = append(problems, exprProblem{
-											expr: node.Expr,
+											expr: node.Expr.String(),
 											text: fmt.Sprintf("`rate(sum(counter))` chain detected, `%s` is called here on results of `%s`, calling `rate()` on `sum()` results will return bogus results, always `sum(rate(counter))`, never `rate(sum(counter))`.",
 												node.Expr, sm),
 											severity: Bug,

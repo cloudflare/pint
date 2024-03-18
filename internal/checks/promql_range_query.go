@@ -94,10 +94,10 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ string, rule parser.Rule, 
 }
 
 func (c RangeQueryCheck) checkNode(ctx context.Context, node *parser.PromQLNode, retention time.Duration, uri string) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.MatrixSelector); ok {
+	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
 			problems = append(problems, exprProblem{
-				expr: node.Expr,
+				expr: node.Expr.String(),
 				text: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s is configured to only keep %s of metrics history.",
 					node.Expr, model.Duration(n.Range), promText(c.prom.Name(), uri), model.Duration(retention)),
 				severity: Warning,

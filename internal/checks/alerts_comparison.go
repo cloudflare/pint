@@ -68,7 +68,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ string, rule parser.Rule, _ 
 		}
 	}
 
-	if n := hasComparision(expr.Node); n != nil {
+	if n := hasComparision(expr.Expr); n != nil {
 		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
 			problems = append(problems, Problem{
 				Lines:    rule.AlertingRule.Expr.Value.Lines,
@@ -130,7 +130,7 @@ func isAbsent(node promParser.Node) bool {
 }
 
 func hasAbsent(n *parser.PromQLNode) bool {
-	if isAbsent(n.Node) {
+	if isAbsent(n.Expr) {
 		return true
 	}
 	for _, child := range n.Children {

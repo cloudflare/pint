@@ -14,12 +14,12 @@ type PromQLFragment struct {
 }
 
 func HasOuterAbsent(node *parser.PromQLNode) (calls []PromQLFragment) {
-	if n, ok := node.Node.(*promParser.Call); ok && n.Func.Name == "absent" {
+	if n, ok := node.Expr.(*promParser.Call); ok && n.Func.Name == "absent" {
 		calls = append(calls, PromQLFragment{Fragment: node})
 		return calls
 	}
 
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+	if n, ok := node.Expr.(*promParser.BinaryExpr); ok {
 		if n.VectorMatching != nil {
 			switch n.VectorMatching.Card {
 			// bar / absent(foo)

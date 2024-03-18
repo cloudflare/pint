@@ -7,7 +7,7 @@ import (
 )
 
 func HasOuterBinaryExpr(node *parser.PromQLNode) *promParser.BinaryExpr {
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+	if n, ok := node.Expr.(*promParser.BinaryExpr); ok {
 		return n
 	}
 

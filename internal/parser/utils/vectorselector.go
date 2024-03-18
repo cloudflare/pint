@@ -7,7 +7,7 @@ import (
 )
 
 func HasVectorSelector(node *parser.PromQLNode) (vs []*promParser.VectorSelector) {
-	if n, ok := node.Node.(*promParser.VectorSelector); ok {
+	if n, ok := node.Expr.(*promParser.VectorSelector); ok {
 		vs = append(vs, n)
 	}
 

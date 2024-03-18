@@ -9,7 +9,7 @@ import (
 )
 
 func HasOuterRate(node *parser.PromQLNode) (calls []*promParser.Call) {
-	if n, ok := node.Node.(*promParser.Call); ok {
+	if n, ok := node.Expr.(*promParser.Call); ok {
 		switch n.Func.Name {
 		case "rate", "irate", "deriv":
 			calls = append(calls, n)
@@ -19,7 +19,7 @@ func HasOuterRate(node *parser.PromQLNode) (calls []*promParser.Call) {
 		}
 	}
 
-	if n, ok := node.Node.(*promParser.AggregateExpr); ok {
+	if n, ok := node.Expr.(*promParser.AggregateExpr); ok {
 		switch n.Op {
 		case promParser.COUNT:
 			return nil
@@ -28,7 +28,7 @@ func HasOuterRate(node *parser.PromQLNode) (calls []*promParser.Call) {
 		}
 	}
 
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+	if n, ok := node.Expr.(*promParser.BinaryExpr); ok {
 		if n.VectorMatching != nil {
 			switch n.VectorMatching.Card {
 			case promParser.CardOneToOne:

@@ -94,7 +94,7 @@ func (c AggregationCheck) Check(_ context.Context, _ string, rule parser.Rule, _
 }
 
 func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
-	if n, ok := node.Node.(*promParser.AggregateExpr); ok {
+	if n, ok := node.Expr.(*promParser.AggregateExpr); ok {
 		switch n.Op {
 		case promParser.SUM:
 		case promParser.MIN:
@@ -131,14 +131,14 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 		if n.Without {
 			if found && c.keep {
 				problems = append(problems, exprProblem{
-					expr: node.Expr,
+					expr: node.Expr.String(),
 					text: fmt.Sprintf("`%s` label is required and should be preserved when aggregating `%s` rules, remove %s from `without()`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
 			if !found && !c.keep {
 				problems = append(problems, exprProblem{
-					expr: node.Expr,
+					expr: node.Expr.String(),
 					text: fmt.Sprintf("`%s` label should be removed when aggregating `%s` rules, use `without(%s, ...)`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
@@ -151,14 +151,14 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 		} else {
 			if found && !c.keep {
 				problems = append(problems, exprProblem{
-					expr: node.Expr,
+					expr: node.Expr.String(),
 					text: fmt.Sprintf("`%s` label should be removed when aggregating `%s` rules, remove %s from `by()`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
 
 			if !found && c.keep {
 				problems = append(problems, exprProblem{
-					expr: node.Expr,
+					expr: node.Expr.String(),
 					text: fmt.Sprintf("`%s` label is required and should be preserved when aggregating `%s` rules, use `by(%s, ...)`.", c.label, c.nameRegex.anchored, c.label),
 				})
 			}
@@ -172,7 +172,7 @@ func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprPro
 	}
 
 NEXT:
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok && n.VectorMatching != nil {
+	if n, ok := node.Expr.(*promParser.BinaryExpr); ok && n.VectorMatching != nil {
 		switch n.VectorMatching.Card {
 		case promParser.CardOneToOne:
 			// sum() + sum()

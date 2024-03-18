@@ -136,7 +136,7 @@ func TestHasOuterAbsent(t *testing.T) {
 				for _, a := range calls {
 					var c callT
 					if a.Fragment != nil {
-						c.call = a.Fragment.Node.String()
+						c.call = a.Fragment.Expr.String()
 					}
 					if a.BinExpr != nil {
 						c.binExpr = a.BinExpr.String()

@@ -11,7 +11,6 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 
 	"github.com/google/go-cmp/cmp"
-	promparser "github.com/prometheus/prometheus/promql/parser"
 )
 
 func TestParse(t *testing.T) {
@@ -234,9 +233,6 @@ func TestParse(t *testing.T) {
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo offset 10m",
 							},
-							Query: &parser.PromQLNode{
-								Expr: "foo offset 10m",
-							},
 						},
 					},
 				},
@@ -256,9 +252,6 @@ func TestParse(t *testing.T) {
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo offset -10m",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "foo offset -10m",
 							},
 						},
 					},
@@ -321,9 +314,6 @@ func TestParse(t *testing.T) {
 								Lines: parser.LineRange{First: 4, Last: 4},
 								Value: "foo offset 10m",
 							},
-							Query: &parser.PromQLNode{
-								Expr: "foo offset 10m",
-							},
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 6, Last: 10},
@@ -373,12 +363,6 @@ func TestParse(t *testing.T) {
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo[5m] offset 10m",
 							},
-							Query: &parser.PromQLNode{
-								Expr: "foo[5m] offset 10m",
-								Children: []*parser.PromQLNode{
-									{Expr: "foo offset 10m"},
-								},
-							},
 						},
 					},
 				},
@@ -404,12 +388,6 @@ func TestParse(t *testing.T) {
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 3, Last: 3},
 								Value: "sum(foo)",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "sum(foo)",
-								Children: []*parser.PromQLNode{
-									{Expr: "foo"},
-								},
 							},
 						},
 						Labels: &parser.YamlMap{
@@ -468,12 +446,6 @@ groups:
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 6, Last: 6},
 								Value: "sum(foo)",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "sum(foo)",
-								Children: []*parser.PromQLNode{
-									{Expr: "foo"},
-								},
 							},
 						},
 						Labels: &parser.YamlMap{
@@ -540,13 +512,6 @@ groups:
 								Lines: parser.LineRange{First: 2, Last: 3},
 								Value: "up == 0\n",
 							},
-							Query: &parser.PromQLNode{
-								Expr: "up == 0\n",
-								Children: []*parser.PromQLNode{
-									{Expr: "up"},
-									{Expr: "0"},
-								},
-							},
 						},
 						For: &parser.YamlNode{
 							Lines: parser.LineRange{First: 4, Last: 5},
@@ -604,18 +569,6 @@ groups:
 								Lines: parser.LineRange{First: 12, Last: 15},
 								Value: "bar\n/\nbaz > 1",
 							},
-							Query: &parser.PromQLNode{
-								Expr: "bar\n/\nbaz > 1",
-								Children: []*parser.PromQLNode{
-									{
-										Expr: "bar / baz", Children: []*parser.PromQLNode{
-											{Expr: "bar"},
-											{Expr: "baz"},
-										},
-									},
-									{Expr: "1"},
-								},
-							},
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 16, Last: 16},
@@ -651,40 +604,6 @@ groups:
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 2, Last: 8},
 								Value: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
-								Children: []*parser.PromQLNode{
-									{
-										Expr: "(xxx - yyy) * bar > 0",
-										Children: []*parser.PromQLNode{
-											{
-												Expr: "(xxx - yyy) * bar",
-												Children: []*parser.PromQLNode{
-													{
-														Expr: "(xxx - yyy)",
-														Children: []*parser.PromQLNode{
-															{
-																Expr: "xxx - yyy",
-																Children: []*parser.PromQLNode{
-																	{Expr: "xxx"},
-																	{Expr: "yyy"},
-																},
-															},
-														},
-													},
-													{
-														Expr: "bar",
-													},
-												},
-											},
-											{
-												Expr: "0",
-											},
-										},
-									},
-									{Expr: "baz"},
-								},
 							},
 						},
 						For: &parser.YamlNode{
@@ -739,39 +658,6 @@ data:
 								Lines: parser.LineRange{First: 14, Last: 14},
 								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
 							},
-							Query: &parser.PromQLNode{
-								Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
-								Children: []*parser.PromQLNode{
-									{
-										Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]))`,
-										Children: []*parser.PromQLNode{
-											{
-												Expr: `rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])`,
-												Children: []*parser.PromQLNode{
-													{
-														Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}[5m]`,
-														Children: []*parser.PromQLNode{
-															{Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}`},
-														},
-													},
-												},
-											},
-										},
-									},
-									{
-										Expr: "(3 / 60)",
-										Children: []*parser.PromQLNode{
-											{
-												Expr: "3 / 60",
-												Children: []*parser.PromQLNode{
-													{Expr: "3"},
-													{Expr: "60"},
-												},
-											},
-										},
-									},
-								},
-							},
 						},
 					},
 				},
@@ -780,7 +666,6 @@ data:
 					AlertingRule: &parser.AlertingRule{
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{Value: "1", Lines: parser.LineRange{First: 28, Last: 28}},
-							Query: &parser.PromQLNode{Expr: "1"},
 						},
 						Alert: parser.YamlNode{Value: "Example_High_Restart_Rate", Lines: parser.LineRange{First: 27, Last: 27}},
 					},
@@ -824,13 +709,6 @@ data:
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 14, Last: 14},
 								Value: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
-							},
-							Query: &parser.PromQLNode{
-								Expr: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
-								Children: []*parser.PromQLNode{
-									{Expr: `kube_deployment_status_replicas_available{namespace="example-app"}`},
-									{Expr: "1"},
-								},
 							},
 						},
 						For: &parser.YamlNode{
@@ -899,39 +777,6 @@ data:
 								Lines: parser.LineRange{First: 23, Last: 23},
 								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
 							},
-							Query: &parser.PromQLNode{
-								Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
-								Children: []*parser.PromQLNode{
-									{
-										Expr: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]))`,
-										Children: []*parser.PromQLNode{
-											{
-												Expr: `rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])`,
-												Children: []*parser.PromQLNode{
-													{
-														Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}[5m]`,
-														Children: []*parser.PromQLNode{
-															{Expr: `kube_pod_container_status_restarts_total{namespace="example-app"}`},
-														},
-													},
-												},
-											},
-										},
-									},
-									{
-										Expr: "(3 / 60)",
-										Children: []*parser.PromQLNode{
-											{
-												Expr: "3 / 60",
-												Children: []*parser.PromQLNode{
-													{Expr: "3"},
-													{Expr: "60"},
-												},
-											},
-										},
-									},
-								},
-							},
 						},
 					},
 				},
@@ -962,25 +807,6 @@ data:
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 5, Last: 5},
 								Value: "increase(haproxy_server_check_failures_total[15m]) > 100",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "increase(haproxy_server_check_failures_total[15m]) > 100",
-								Children: []*parser.PromQLNode{
-									{
-										Expr: "increase(haproxy_server_check_failures_total[15m])",
-										Children: []*parser.PromQLNode{
-											{
-												Expr: "haproxy_server_check_failures_total[15m]",
-												Children: []*parser.PromQLNode{
-													{
-														Expr: "haproxy_server_check_failures_total",
-													},
-												},
-											},
-										},
-									},
-									{Expr: "100"},
-								},
 							},
 						},
 						For: &parser.YamlNode{
@@ -1090,7 +916,6 @@ data:
 								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "expr1",
 							},
-							Query: &parser.PromQLNode{Expr: "expr1"},
 						},
 					},
 				},
@@ -1120,7 +945,6 @@ data:
 								Lines: parser.LineRange{First: 10, Last: 10},
 								Value: "expr2",
 							},
-							Query: &parser.PromQLNode{Expr: "expr2"},
 						},
 					},
 				},
@@ -1158,7 +982,6 @@ data:
 								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "expr1",
 							},
-							Query: &parser.PromQLNode{Expr: "expr1"},
 						},
 					},
 				},
@@ -1191,7 +1014,6 @@ data:
 								Lines: parser.LineRange{First: 5, Last: 5},
 								Value: "expr1",
 							},
-							Query: &parser.PromQLNode{Expr: "expr1"},
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 6, Last: 8},
@@ -1242,7 +1064,6 @@ data:
 								Lines: parser.LineRange{First: 10, Last: 10},
 								Value: "expr2",
 							},
-							Query: &parser.PromQLNode{Expr: "expr2"},
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 11, Last: 11},
@@ -1361,7 +1182,6 @@ data:
 								Lines: parser.LineRange{First: 8, Last: 8},
 								Value: "up",
 							},
-							Query: &parser.PromQLNode{Expr: "up"},
 						},
 					},
 				},
@@ -1377,7 +1197,6 @@ data:
 								Lines: parser.LineRange{First: 13, Last: 13},
 								Value: "up",
 							},
-							Query: &parser.PromQLNode{Expr: "up"},
 						},
 					},
 				},
@@ -1407,13 +1226,6 @@ data:
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 3, Last: 3},
 								Value: "up == 0",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "up == 0",
-								Children: []*parser.PromQLNode{
-									{Expr: "up"},
-									{Expr: "0"},
-								},
 							},
 						},
 						Labels: &parser.YamlMap{
@@ -1448,13 +1260,6 @@ data:
 							Value: &parser.YamlNode{
 								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "up == 0",
-							},
-							Query: &parser.PromQLNode{
-								Expr: "up == 0",
-								Children: []*parser.PromQLNode{
-									{Expr: "up"},
-									{Expr: "0"},
-								},
 							},
 						},
 						Labels: &parser.YamlMap{
@@ -1789,7 +1594,6 @@ data:
 								Lines: parser.LineRange{First: 3, Last: 3},
 								Value: "bar",
 							},
-							Query: &parser.PromQLNode{Expr: "bar"},
 						},
 						Labels: &parser.YamlMap{
 							Lines: parser.LineRange{First: 4, Last: 4},
@@ -1921,7 +1725,6 @@ data:
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo",
 							},
-							Query: &parser.PromQLNode{Expr: "foo"},
 						},
 					},
 				},
@@ -1953,7 +1756,6 @@ data:
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo",
 							},
-							Query: &parser.PromQLNode{Expr: "foo"},
 						},
 					},
 				},
@@ -1984,7 +1786,6 @@ data:
 								Lines: parser.LineRange{First: 2, Last: 2},
 								Value: "foo",
 							},
-							Query: &parser.PromQLNode{Expr: "foo"},
 						},
 					},
 				},
@@ -2000,7 +1801,6 @@ data:
 								Lines: parser.LineRange{First: 5, Last: 5},
 								Value: "bar",
 							},
-							Query: &parser.PromQLNode{Expr: "bar"},
 						},
 					},
 				},
@@ -2010,8 +1810,8 @@ data:
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
 	ignorePrometheusExpr := cmp.FilterValues(func(x, y interface{}) bool {
-		_, xe := x.(promparser.Expr)
-		_, ye := y.(promparser.Expr)
+		_, xe := x.(*parser.PromQLNode)
+		_, ye := y.(*parser.PromQLNode)
 		return xe || ye
 	}, alwaysEqual)
 

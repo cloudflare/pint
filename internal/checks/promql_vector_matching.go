@@ -72,7 +72,7 @@ func (c VectorMatchingCheck) Check(ctx context.Context, _ string, rule parser.Ru
 }
 
 func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLNode) (problems []exprProblem) {
-	if n, ok := utils.RemoveConditions(node.Node.String()).(*promParser.BinaryExpr); ok &&
+	if n, ok := utils.RemoveConditions(node.Expr.String()).(*promParser.BinaryExpr); ok &&
 		n.VectorMatching != nil &&
 		n.Op != promParser.LOR &&
 		n.Op != promParser.LUNLESS {
@@ -82,7 +82,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
-				expr:     node.Expr,
+				expr:     node.Expr.String(),
 				text:     text,
 				severity: severity,
 			})
@@ -125,7 +125,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			for k, lv := range lhsMatchers {
 				if rv, ok := rhsMatchers[k]; ok && rv != lv {
 					problems = append(problems, exprProblem{
-						expr:     node.Expr,
+						expr:     node.Expr.String(),
 						text:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
@@ -139,7 +139,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
-				expr:     node.Expr,
+				expr:     node.Expr.String(),
 				text:     text,
 				severity: severity,
 			})
@@ -153,7 +153,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
-				expr:     node.Expr,
+				expr:     node.Expr.String(),
 				text:     text,
 				severity: severity,
 			})
@@ -167,23 +167,23 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
-						expr:     node.Expr,
-						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because the left hand side of the query doesn't have this label: `%s`.", name, node.Node.(*promParser.BinaryExpr).LHS),
+						expr:     node.Expr.String(),
+						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because the left hand side of the query doesn't have this label: `%s`.", name, node.Expr.(*promParser.BinaryExpr).LHS),
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
 					})
 				}
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
-						expr:     node.Expr,
-						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because the right hand side of the query doesn't have this label: `%s`.", name, node.Node.(*promParser.BinaryExpr).RHS),
+						expr:     node.Expr.String(),
+						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because the right hand side of the query doesn't have this label: `%s`.", name, node.Expr.(*promParser.BinaryExpr).RHS),
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
-						expr:     node.Expr,
+						expr:     node.Expr.String(),
 						text:     fmt.Sprintf("Using `on(%s)` won't produce any results because both sides of the query don't have this label.", name),
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
@@ -194,14 +194,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			l, r := leftLabels.getFirstNonOverlap(rightLabels)
 			if len(n.VectorMatching.MatchingLabels) == 0 {
 				problems = append(problems, exprProblem{
-					expr:     node.Expr,
+					expr:     node.Expr.String(),
 					text:     fmt.Sprintf("This query will never return anything because the right and the left hand side have different labels: `%s` != `%s`.", l, r),
 					details:  VectorMatchingCheckDetails,
 					severity: Bug,
 				})
 			} else {
 				problems = append(problems, exprProblem{
-					expr:     node.Expr,
+					expr:     node.Expr.String(),
 					text:     fmt.Sprintf("Using `ignoring(%s)` won't produce any results because both sides of the query have different labels: `%s` != `%s`.", strings.Join(n.VectorMatching.MatchingLabels, ","), l, r),
 					details:  VectorMatchingCheckDetails,
 					severity: Bug,

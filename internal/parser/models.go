@@ -8,8 +8,6 @@ import (
 	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 
-	promparser "github.com/prometheus/prometheus/promql/parser"
-
 	"github.com/cloudflare/pint/internal/comments"
 )
 
@@ -157,35 +155,6 @@ func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
 	}
 
 	return &ym
-}
-
-type PromQLNode struct {
-	Expr     string
-	Node     promparser.Expr
-	Children []*PromQLNode
-}
-
-type PromQLError struct {
-	node *PromQLNode
-	Err  error
-}
-
-func (pqle PromQLError) Error() string {
-	return pqle.Err.Error()
-}
-
-func (pqle *PromQLError) Unwrap() error {
-	return pqle.Err
-}
-
-func (pqle PromQLError) Node() *PromQLNode {
-	return pqle.node
-}
-
-type PromQLExpr struct {
-	Value       *YamlNode
-	SyntaxError error
-	Query       *PromQLNode
 }
 
 func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
