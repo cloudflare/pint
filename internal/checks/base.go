@@ -27,6 +27,7 @@ var (
 		SyntaxCheckName,
 		VectorMatchingCheckName,
 		CostCheckName,
+		CounterCheckName,
 		SeriesCheckName,
 		RuleDependencyCheckName,
 		RuleDuplicateCheckName,
@@ -43,6 +44,7 @@ var (
 		RateCheckName,
 		VectorMatchingCheckName,
 		CostCheckName,
+		CounterCheckName,
 		SeriesCheckName,
 		RuleLinkCheckName,
 	}

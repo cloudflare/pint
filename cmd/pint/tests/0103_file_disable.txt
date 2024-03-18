@@ -27,6 +27,8 @@ level=DEBUG msg="Stopping query workers" name=prom uri=http://127.0.0.1:7103
 
 # pint file/disable rule/duplicate
 
+# pint file/disable promql/counter
+
 -- .pint.hcl --
 prometheus "prom" {
   uri      = "http://127.0.0.1:7103"
