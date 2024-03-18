@@ -1,15 +1,10 @@
 # Changelog
 
-## v0.57.0
-
-### Added
-
-- Added [promql/counter](checks/promql/counter.md) check - #655.
-
 ## v0.56.0
 
 ### Added
 
+- Added [promql/counter](checks/promql/counter.md) check - #655.
 - Check using custom rules now accept an optional `comment` option for adding
   a text comment to all reported problems.
   Checks supporting `comment` option:
