@@ -1,4 +1,4 @@
-pint.ok -l debug --no-color -d alerts/for -d alerts/comparison -d promql/rate(prom) -d promql/series(prom) -d promql/aggregate(prom) -d promql/range_query lint rules
+pint.ok -l debug --no-color -d promql/counter -d alerts/for -d alerts/comparison -d promql/rate(prom) -d promql/series(prom) -d promql/aggregate(prom) -d promql/range_query lint rules
 ! stdout .
 cmp stderr stderr.txt
 

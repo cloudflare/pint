@@ -1,3 +1,4 @@
+http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
 http response prometheus / 502 Bad Gateway
 http start prometheus 127.0.0.1:7104
 

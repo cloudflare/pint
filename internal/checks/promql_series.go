@@ -678,13 +678,13 @@ func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text 
 
 func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) {
 	tree := utils.Tree(n.Node, nil)
-OUTER:
-	for _, vs := range utils.WalkDown[*promParser.VectorSelector](&tree) {
-		for _, bin := range utils.WalkUp[*promParser.BinaryExpr](vs.Parent) {
+LOOP:
+	for _, vs := range utils.WalkDownExpr[*promParser.VectorSelector](&tree) {
+		for _, bin := range utils.WalkUpExpr[*promParser.BinaryExpr](vs.Parent) {
 			if binExp := bin.Expr.(*promParser.BinaryExpr); binExp.Op != promParser.LOR {
 				continue
 			}
-			for _, vec := range utils.WalkDown[*promParser.Call](bin) {
+			for _, vec := range utils.WalkDownExpr[*promParser.Call](bin) {
 				if vecCall := vec.Expr.(*promParser.Call); vecCall.Func.Name == "vector" {
 					// vector seletor is under (...) OR vector()
 					// ignore it
@@ -692,7 +692,7 @@ OUTER:
 						"Metric uses vector() fallback value, ignore",
 						slog.String("selector", (vs.Expr.String())),
 					)
-					continue OUTER
+					continue LOOP
 				}
 			}
 		}

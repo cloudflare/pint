@@ -50,6 +50,8 @@ pint_check_duration_seconds_sum{check="alerts/template"}
 pint_check_duration_seconds_count{check="alerts/template"}
 pint_check_duration_seconds_sum{check="labels/conflict"}
 pint_check_duration_seconds_count{check="labels/conflict"}
+pint_check_duration_seconds_sum{check="promql/counter"}
+pint_check_duration_seconds_count{check="promql/counter"}
 pint_check_duration_seconds_sum{check="promql/fragile"}
 pint_check_duration_seconds_count{check="promql/fragile"}
 pint_check_duration_seconds_sum{check="promql/range_query"}
@@ -85,6 +87,7 @@ pint_last_run_time_seconds
 # TYPE pint_problem gauge
 pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",owner="",problem="`prom1` Prometheus server at http://127.0.0.1:7057 failed with: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="`prom1` Prometheus server at http://127.0.0.1:7057 failed with: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
+pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="`prom1` Prometheus server at http://127.0.0.1:7057 failed with: `client_error: client error: 404`.",reporter="promql/counter",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
@@ -95,6 +98,8 @@ pint_prometheus_cache_evictions_total{name="prom1"}
 pint_prometheus_cache_evictions_total{name="prom2"}
 # HELP pint_prometheus_cache_hits_total Total number of query cache hits
 # TYPE pint_prometheus_cache_hits_total counter
+pint_prometheus_cache_hits_total{endpoint="/api/v1/metadata",name="prom1"}
+pint_prometheus_cache_hits_total{endpoint="/api/v1/metadata",name="prom2"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/query",name="prom2"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/status/config",name="prom1"}
@@ -103,6 +108,8 @@ pint_prometheus_cache_hits_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_cache_hits_total{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_cache_miss_total Total number of query cache misses
 # TYPE pint_prometheus_cache_miss_total counter
+pint_prometheus_cache_miss_total{endpoint="/api/v1/metadata",name="prom1"}
+pint_prometheus_cache_miss_total{endpoint="/api/v1/metadata",name="prom2"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/query",name="prom2"}
 pint_prometheus_cache_miss_total{endpoint="/api/v1/status/config",name="prom1"}
@@ -115,6 +122,8 @@ pint_prometheus_cache_size{name="prom1"}
 pint_prometheus_cache_size{name="prom2"}
 # HELP pint_prometheus_queries_running Total number of in-flight prometheus queries
 # TYPE pint_prometheus_queries_running gauge
+pint_prometheus_queries_running{endpoint="/api/v1/metadata",name="prom1"}
+pint_prometheus_queries_running{endpoint="/api/v1/metadata",name="prom2"}
 pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/query",name="prom2"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/config",name="prom1"}
@@ -123,6 +132,8 @@ pint_prometheus_queries_running{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_queries_running{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_queries_total Total number of all prometheus queries
 # TYPE pint_prometheus_queries_total counter
+pint_prometheus_queries_total{endpoint="/api/v1/metadata",name="prom1"}
+pint_prometheus_queries_total{endpoint="/api/v1/metadata",name="prom2"}
 pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/query",name="prom2"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/config",name="prom1"}
@@ -131,6 +142,8 @@ pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom1"}
 pint_prometheus_queries_total{endpoint="/api/v1/status/flags",name="prom2"}
 # HELP pint_prometheus_query_errors_total Total number of failed prometheus queries
 # TYPE pint_prometheus_query_errors_total counter
+pint_prometheus_query_errors_total{endpoint="/api/v1/metadata",name="prom1",reason="api/client_error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/metadata",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason="api/bad_data"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}

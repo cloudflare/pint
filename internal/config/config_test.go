@@ -195,6 +195,7 @@ prometheus "prom" {
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
 			},
 		},
 		{
@@ -224,6 +225,7 @@ prometheus "prom" {
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
 			},
 		},
 		{
@@ -245,6 +247,7 @@ checks {
 				State:      discovery.Modified,
 				SourcePath: "rules.yml",
 				Rule: newRule(t, `
+# pint disable promql/counter
 # pint disable promql/rate
 # pint disable promql/series
 # pint disable promql/vector_matching
@@ -360,6 +363,7 @@ prometheus "prom" {
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
 			},
 		},
 		{
@@ -394,6 +398,7 @@ prometheus "ignore" {
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
 			},
 		},
 		{
@@ -529,6 +534,7 @@ prometheus "prom2" {
   # pint disable rule/duplicate(prom1)
   # pint disable labels/conflict(prom2)
   # pint disable alerts/external_labels(prom2)
+  # pint disable promql/counter(prom1)
   expr: sum(foo)
 `),
 			},
@@ -547,6 +553,7 @@ prometheus "prom2" {
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
 				checks.RuleDuplicateCheckName + "(prom2)",
+				checks.CounterCheckName + "(prom2)",
 				checks.CostCheckName + "(prom1)",
 			},
 		},
@@ -646,6 +653,7 @@ rule {
 				State:      discovery.Modified,
 				SourcePath: "rules.yml",
 				Rule: newRule(t, `
+# pint disable promql/counter
 # pint disable promql/series
 # pint disable promql/rate
 # pint disable promql/vector_matching(prom1)
@@ -941,6 +949,7 @@ rule {
 }
 checks {
   disabled = [
+	"promql/counter",
     "promql/rate",
 	"promql/vector_matching",
 	"promql/range_query",
@@ -1007,13 +1016,15 @@ prometheus "prom1" {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RateCheckName + "(prom1)",
+				checks.RegexpCheckName,
+				checks.RateCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom1)",
 				checks.VectorMatchingCheckName + "(prom1)",
 				checks.RangeQueryCheckName + "(prom1)",
 				checks.RuleDuplicateCheckName + "(prom1)",
 				checks.LabelsConflictCheckName + "(prom1)",
 				checks.AlertsExternalLabelsCheckName + "(prom1)",
+				checks.CounterCheckName + "(prom1)",
 				checks.AlertsCheckName + "(prom1)",
 			},
 		},
@@ -1431,7 +1442,7 @@ checks {
 				checks.FragileCheckName,
 				checks.RegexpCheckName,
 			},
-			disabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict"},
+			disabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict", "promql/counter"},
 		},
 		{
 			title: "two prometheus servers / snoozed checks via comment",
@@ -1459,6 +1470,7 @@ checks {
 # pint snooze 2099-11-28T10:24:18Z promql/range_query
 # pint snooze 2099-11-28 rule/duplicate
 # pint snooze 2099-11-28T00:00:00+00:00 promql/vector_matching
+# pint snooze 2099-11-28 promql/counter
 - record: foo
   expr: sum(foo)
 # pint file/disable promql/vector_matching
@@ -1516,12 +1528,14 @@ checks {
 				checks.RuleDuplicateCheckName + "(prom1)",
 				checks.LabelsConflictCheckName + "(prom1)",
 				checks.AlertsExternalLabelsCheckName + "(prom1)",
+				checks.CounterCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
+				checks.CounterCheckName + "(prom2)",
 			},
 			disabledChecks: []string{"promql/rate"},
 		},
@@ -1548,6 +1562,7 @@ prometheus "prom3" {
 # pint disable alerts/count(+disable)
 # pint disable alerts/external_labels(+disable)
 # pint disable labels/conflict(+disable)
+# pint disable promql/counter(+disable)
 # pint disable promql/range_query(+disable)
 # pint disable promql/regexp(+disable)
 # pint disable promql/series(+disable)
@@ -1571,6 +1586,7 @@ prometheus "prom3" {
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
+				checks.CounterCheckName + "(prom2)",
 				checks.RateCheckName + "(prom3)",
 				checks.SeriesCheckName + "(prom3)",
 				checks.VectorMatchingCheckName + "(prom3)",
@@ -1578,6 +1594,7 @@ prometheus "prom3" {
 				checks.RuleDuplicateCheckName + "(prom3)",
 				checks.LabelsConflictCheckName + "(prom3)",
 				checks.AlertsExternalLabelsCheckName + "(prom3)",
+				checks.CounterCheckName + "(prom3)",
 			},
 		},
 		{
@@ -1605,6 +1622,7 @@ prometheus "prom3" {
 # pint snooze 2099-11-28 labels/conflict(+disable)
 # pint snooze 2099-11-28 promql/range_query(+disable)
 # pint snooze 2099-11-28 promql/regexp(+disable)
+# pint snooze 2099-11-28 promql/counter(+disable)
 # pint snooze 2099-11-28 promql/series(+disable)
 # pint snooze 2099-11-28 promql/rate(+disable)
 # pint snooze 2099-11-28 promql/vector_matching(+disable)
@@ -1626,6 +1644,7 @@ prometheus "prom3" {
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
+				checks.CounterCheckName + "(prom2)",
 				checks.RateCheckName + "(prom3)",
 				checks.SeriesCheckName + "(prom3)",
 				checks.VectorMatchingCheckName + "(prom3)",
@@ -1633,6 +1652,7 @@ prometheus "prom3" {
 				checks.RuleDuplicateCheckName + "(prom3)",
 				checks.LabelsConflictCheckName + "(prom3)",
 				checks.AlertsExternalLabelsCheckName + "(prom3)",
+				checks.CounterCheckName + "(prom3)",
 			},
 		},
 		{
@@ -1669,6 +1689,7 @@ rule {
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
 				checks.AlertsCheckName + "(prom)",
 			},
 		},
@@ -1709,6 +1730,7 @@ rule {
 				checks.RuleDuplicateCheckName + "(prom)",
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
 				checks.AlertsCheckName + "(prom)",
 			},
 		},

@@ -29,6 +29,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       "promql/syntax",
       "promql/vector_matching",
       "query/cost",
+      "promql/counter",
       "promql/series",
       "rule/dependency",
       "rule/duplicate",
