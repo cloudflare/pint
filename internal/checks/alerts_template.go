@@ -651,7 +651,7 @@ func absentLabels(f utils.PromQLFragment) []string {
 }
 
 func binaryExprs(node *parser.PromQLNode) (be []*promParser.BinaryExpr) {
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+	if n, ok := node.Expr.(*promParser.BinaryExpr); ok {
 		be = append(be, n)
 	}
 
@@ -663,7 +663,7 @@ func binaryExprs(node *parser.PromQLNode) (be []*promParser.BinaryExpr) {
 }
 
 func calls(node *parser.PromQLNode, name string) (cl []*promParser.Call) {
-	if n, ok := node.Node.(*promParser.Call); ok && n.Func.Name == name {
+	if n, ok := node.Expr.(*promParser.Call); ok && n.Func.Name == name {
 		cl = append(cl, n)
 	}
 

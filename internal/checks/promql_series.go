@@ -14,7 +14,6 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
@@ -677,14 +676,13 @@ func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text 
 }
 
 func getSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) {
-	tree := utils.Tree(n.Node, nil)
 LOOP:
-	for _, vs := range utils.WalkDownExpr[*promParser.VectorSelector](&tree) {
-		for _, bin := range utils.WalkUpExpr[*promParser.BinaryExpr](vs.Parent) {
+	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](n) {
+		for _, bin := range parser.WalkUpExpr[*promParser.BinaryExpr](vs.Parent) {
 			if binExp := bin.Expr.(*promParser.BinaryExpr); binExp.Op != promParser.LOR {
 				continue
 			}
-			for _, vec := range utils.WalkDownExpr[*promParser.Call](bin) {
+			for _, vec := range parser.WalkDownExpr[*promParser.Call](bin) {
 				if vecCall := vec.Expr.(*promParser.Call); vecCall.Func.Name == "vector" {
 					// vector seletor is under (...) OR vector()
 					// ignore it

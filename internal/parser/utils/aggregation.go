@@ -9,7 +9,7 @@ import (
 )
 
 func HasOuterAggregation(node *parser.PromQLNode) (aggs []*promParser.AggregateExpr) {
-	if n, ok := node.Node.(*promParser.AggregateExpr); ok {
+	if n, ok := node.Expr.(*promParser.AggregateExpr); ok {
 		switch n.Op {
 		case promParser.SUM:
 		case promParser.MIN:
@@ -33,7 +33,7 @@ func HasOuterAggregation(node *parser.PromQLNode) (aggs []*promParser.AggregateE
 	}
 
 NEXT:
-	if n, ok := node.Node.(*promParser.BinaryExpr); ok {
+	if n, ok := node.Expr.(*promParser.BinaryExpr); ok {
 		if n.VectorMatching != nil {
 			switch n.VectorMatching.Card {
 			case promParser.CardOneToOne:

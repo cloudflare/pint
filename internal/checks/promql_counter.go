@@ -9,7 +9,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
-	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -58,16 +57,15 @@ func (c CounterCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ [
 
 	done := map[string]struct{}{}
 
-	tree := utils.Tree(expr.Query.Node, nil)
 LOOP:
-	for _, vs := range utils.WalkDownExpr[*promParser.VectorSelector](&tree) {
+	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](expr.Query) {
 		if vs.Parent == nil {
 			// This might be a counter but there's no parent so we have something like `expr: foo`.
 			// We're only testing for the existence of foo in alerts OR copying it via recording rules.
 			continue LOOP
 		}
 
-		for _, call := range utils.WalkUpExpr[*promParser.Call](vs.Parent) {
+		for _, call := range parser.WalkUpExpr[*promParser.Call](vs.Parent) {
 			if fn := call.Expr.(*promParser.Call); c.isSafeFunc(fn.Func.Name) {
 				// This might be a counter but it's wrapped in one of the functions that make it
 				// safe to use.
@@ -75,14 +73,14 @@ LOOP:
 			}
 		}
 
-		for _, aggr := range utils.WalkUpExpr[*promParser.AggregateExpr](vs.Parent) {
+		for _, aggr := range parser.WalkUpExpr[*promParser.AggregateExpr](vs.Parent) {
 			if ag := aggr.Expr.(*promParser.AggregateExpr); ag.Op == promParser.COUNT || ag.Op == promParser.GROUP {
 				// This might be a counter but it's wrapped in count() or group() call so it's safe to use.
 				continue LOOP
 			}
 		}
 
-		for _, binSide := range utils.WalkUpParent[*promParser.BinaryExpr](vs) {
+		for _, binSide := range parser.WalkUpParent[*promParser.BinaryExpr](vs) {
 			if binExp := binSide.Parent.Expr.(*promParser.BinaryExpr); binExp.Op == promParser.LUNLESS {
 				// We're inside a binary expression with `foo unless bar`.
 				// Check which side we're at, if it's the RHS then it's safe to use counters directly.
