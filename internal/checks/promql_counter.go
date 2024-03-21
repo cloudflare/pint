@@ -105,22 +105,28 @@ LOOP:
 				Text:     text,
 				Severity: severity,
 			})
-			continue
+			continue LOOP
+		}
+		if len(metadata.Metadata) == 0 {
+			// No metadata so we don't know what type it uses.
+			continue LOOP
 		}
 		for _, m := range metadata.Metadata {
-			if m.Type == v1.MetricTypeCounter {
-				problems = append(problems, Problem{
-					Lines:    expr.Value.Lines,
-					Reporter: c.Reporter(),
-					Text: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, you can't use its value directly.",
-						selector.Name,
-						promText(c.prom.Name(), metadata.URI),
-					),
-					Details:  CounterCheckDetails,
-					Severity: Bug,
-				})
+			if m.Type != v1.MetricTypeCounter {
+				// There's metadata with non-counter type, so it's not always a counter.
+				continue LOOP
 			}
 		}
+		problems = append(problems, Problem{
+			Lines:    expr.Value.Lines,
+			Reporter: c.Reporter(),
+			Text: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, you can't use its value directly.",
+				selector.Name,
+				promText(c.prom.Name(), metadata.URI),
+			),
+			Details:  CounterCheckDetails,
+			Severity: Bug,
+		})
 
 		done[selector.Name] = struct{}{}
 	}

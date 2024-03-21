@@ -368,6 +368,24 @@ func TestCounterCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "counter > 1 / mixed metadata",
+			content: `
+- alert: my alert
+  expr:  http_requests_total{cluster="prod"} > 1
+`,
+			checker:    newCounterCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{
+						"http_requests_total": {{Type: "counter"}, {Type: "gauge"}, {Type: "counter"}},
+					}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
