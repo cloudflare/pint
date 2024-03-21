@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.56.1
+
+### Fixed
+
+- [promql/counter](checks/promql/counter.md) check will now consider a metric
+  to be a counter only if all metadata entries for it use `TYPE counter`.
+  Previously it would check for at least one metadata entry with `TYPE counter`.
+
 ## v0.56.0
 
 ### Added
