@@ -1677,7 +1677,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			pullRequestComments: []reporter.BitBucketPendingComment{
 				{
-					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nthis should be ignored, line is not part of the diff\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
 					Severity: "BLOCKER",
 					Anchor: reporter.BitBucketPendingCommentAnchor{
 						Path:     "foo.txt",

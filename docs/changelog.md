@@ -6,6 +6,7 @@
 
 - [query/cost](checks/query/cost.md) will now only create reports if a query is more
   expensive than any of the configured limits.
+- Fixed duplicated reports when using BitBucket reporter.
 
 ## v0.56.1
 

@@ -267,6 +267,62 @@ func TestBitBucketMakeComments(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "dedup identical reports",
+			summary: Summary{reports: []Report{
+				{
+					ReportedPath:  "rule.yaml",
+					SourcePath:    "rule.yaml",
+					ModifiedLines: []int{2, 3},
+					Problem: checks.Problem{
+						Severity: checks.Bug,
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Text:     "my error",
+						Details:  "my details",
+						Reporter: "r1",
+					},
+				},
+				{
+					ReportedPath:  "rule.yaml",
+					SourcePath:    "rule.yaml",
+					ModifiedLines: []int{2, 3},
+					Problem: checks.Problem{
+						Severity: checks.Bug,
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Text:     "my error",
+						Details:  "my details",
+						Reporter: "r1",
+					},
+				},
+			}},
+			changes: &bitBucketPRChanges{
+				pathModifiedLines: map[string][]int{
+					"rule.yaml": {2, 3},
+				},
+				pathLineMapping: map[string]map[int]int{
+					"rule.yaml": {2: 2, 3: 3},
+				},
+			},
+			comments: []BitBucketPendingComment{
+				{
+					Text:     commentBody("stop_sign", "Bug", "r1", "my error\n\nmy details"),
+					Severity: "BLOCKER",
+					Anchor: BitBucketPendingCommentAnchor{
+						Path:     "rule.yaml",
+						Line:     2,
+						LineType: "ADDED",
+						FileType: "TO",
+						DiffType: "EFFECTIVE",
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

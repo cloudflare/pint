@@ -869,6 +869,10 @@ func dedupReports(src []Report) (dst [][]Report) {
 			dst = append(dst, []Report{report})
 			continue
 		}
+		// Skip this report if we have exact same message already
+		if dst[index][0].Problem.Text == report.Problem.Text && dst[index][0].Problem.Details == report.Problem.Details {
+			continue
+		}
 		dst[index] = append(dst[index], report)
 	}
 	return dst
