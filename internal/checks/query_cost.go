@@ -98,22 +98,16 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 		}
 	}
 
-	var above string
-	severity := Information
 	if c.maxSeries > 0 && series > c.maxSeries {
-		severity = c.severity
-		above = fmt.Sprintf(", maximum allowed series is %d.", c.maxSeries)
-	} else {
-		estimate += "."
+		problems = append(problems, Problem{
+			Lines:    expr.Value.Lines,
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
+			Details:  maybeComment(c.comment),
+			Severity: c.severity,
+		})
+		return problems
 	}
-
-	problems = append(problems, Problem{
-		Lines:    expr.Value.Lines,
-		Reporter: c.Reporter(),
-		Text:     fmt.Sprintf("%s returned %d result(s)%s%s", promText(c.prom.Name(), qr.URI), series, estimate, above),
-		Details:  maybeComment(c.comment),
-		Severity: severity,
-	})
 
 	if c.maxTotalSamples > 0 && qr.Stats.Samples.TotalQueryableSamples > c.maxTotalSamples {
 		problems = append(problems, Problem{
@@ -123,6 +117,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
+		return problems
 	}
 
 	if c.maxPeakSamples > 0 && qr.Stats.Samples.PeakSamples > c.maxPeakSamples {
@@ -133,6 +128,7 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
+		return problems
 	}
 
 	evalDur := time.Duration(qr.Stats.Timings.EvalTotalTime * float64(time.Second))
@@ -143,6 +139,17 @@ func (c CostCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []di
 			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+		})
+		return problems
+	}
+
+	if series > 0 && c.maxSeries == 0 && c.maxTotalSamples == 0 && c.maxPeakSamples == 0 && c.maxEvaluationDuration == 0 {
+		problems = append(problems, Problem{
+			Lines:    expr.Value.Lines,
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
+			Details:  maybeComment(c.comment),
+			Severity: Information,
 		})
 	}
 
