@@ -44,10 +44,19 @@ jobs:
         with:
           args: release --clean --skip=validate --skip=sign --skip=sbom --skip=publish --snapshot
 
+      - name: Extract release changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        id: changelog
+        uses: sean0x42/markdown-extract@v2
+        with:
+          file: docs/changelog.md
+          pattern: "${{  github.ref_name }}"
+          no-print-matched-heading: true
+
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --clean --release-notes docs/changelog.md
+          args: release --clean --release-notes <(printf "${{ steps.changelog.outputs.markdown }}")
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
