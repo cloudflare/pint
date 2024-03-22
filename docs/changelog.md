@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.56.2
+
+### Fixed
+
+- [query/cost](checks/query/cost.md) will now only create reports if a query is more
+  expensive than any of the configured limits.
+
 ## v0.56.1
 
 ### Fixed
