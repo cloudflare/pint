@@ -67,6 +67,16 @@ func TestBitBucketSettings(t *testing.T) {
 			},
 			err: errors.New(`not a valid duration string: "abc"`),
 		},
+		{
+			conf: BitBucket{
+				URI:         "http://localhost",
+				Timeout:     "5m",
+				MaxComments: -1,
+				Project:     "foo",
+				Repository:  "bar",
+			},
+			err: errors.New("maxComments cannot be negative"),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -164,6 +174,15 @@ func TestGitHubSettings(t *testing.T) {
 			conf: GitHub{},
 			env:  map[string]string{"GITHUB_REPOSITORY": "foo/"},
 			err:  errors.New("repo cannot be empty"),
+		},
+		{
+			conf: GitHub{
+				Owner:       "bob",
+				Repo:        "foo",
+				Timeout:     "5m",
+				MaxComments: -1,
+			},
+			err: errors.New("maxComments cannot be negative"),
 		},
 	}
 

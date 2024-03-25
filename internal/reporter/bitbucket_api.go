@@ -226,11 +226,11 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 }
 
 type BitBucketPendingCommentAnchor struct {
-	Path     string `json:"path"`
-	LineType string `json:"lineType"`
-	FileType string `json:"fileType"`
+	Path     string `json:"path,omitempty"`
+	LineType string `json:"lineType,omitempty"`
+	FileType string `json:"fileType,omitempty"`
 	DiffType string `json:"diffType"`
-	Line     int    `json:"line"`
+	Line     int    `json:"line,omitempty"`
 }
 
 type BitBucketPendingComment struct {
@@ -249,7 +249,7 @@ type BitBucketCommentSeverityUpdate struct {
 	Version  int    `json:"version"`
 }
 
-func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string) *bitBucketAPI {
+func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string, maxComments int) *bitBucketAPI {
 	return &bitBucketAPI{
 		pintVersion: pintVersion,
 		uri:         uri,
@@ -257,6 +257,7 @@ func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, proj
 		authToken:   token,
 		project:     project,
 		repo:        repo,
+		maxComments: maxComments,
 	}
 }
 
@@ -647,6 +648,22 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		}
 		comments = append(comments, pending.toBitBucketComment(changes))
 	}
+	return comments
+}
+
+func (bb bitBucketAPI) limitComments(src []BitBucketPendingComment) []BitBucketPendingComment {
+	if len(src) <= bb.maxComments {
+		return src
+	}
+	comments := src[:bb.maxComments]
+	comments = append(comments, BitBucketPendingComment{
+		Text: fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
+%d comments were skipped and won't be visibile on this PR.`, len(src), bb.maxComments, len(src)-bb.maxComments),
+		Severity: "NORMAL",
+		Anchor: BitBucketPendingCommentAnchor{
+			DiffType: "EFFECTIVE",
+		},
+	})
 	return comments
 }
 

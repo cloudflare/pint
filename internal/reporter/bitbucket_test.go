@@ -1969,6 +1969,7 @@ func TestBitBucketReporter(t *testing.T) {
 				"token",
 				"proj",
 				"repo",
+				50,
 				tc.gitCmd)
 			summary := reporter.NewSummary(tc.reports)
 			err := r.Submit(summary)

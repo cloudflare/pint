@@ -145,6 +145,7 @@ func actionCI(c *cli.Context) error {
 			token,
 			meta.cfg.Repository.BitBucket.Project,
 			meta.cfg.Repository.BitBucket.Repository,
+			meta.cfg.Repository.BitBucket.MaxComments,
 			git.RunGit,
 		)
 		reps = append(reps, br)
@@ -178,6 +179,7 @@ func actionCI(c *cli.Context) error {
 			meta.cfg.Repository.GitHub.Owner,
 			meta.cfg.Repository.GitHub.Repo,
 			prNum,
+			meta.cfg.Repository.GitHub.MaxComments,
 			git.RunGit,
 		); err != nil {
 			return err

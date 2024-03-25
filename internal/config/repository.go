@@ -8,10 +8,11 @@ import (
 )
 
 type BitBucket struct {
-	URI        string `hcl:"uri"`
-	Timeout    string `hcl:"timeout,optional"`
-	Project    string `hcl:"project"`
-	Repository string `hcl:"repository"`
+	URI         string `hcl:"uri"`
+	Timeout     string `hcl:"timeout,optional"`
+	Project     string `hcl:"project"`
+	Repository  string `hcl:"repository"`
+	MaxComments int    `hcl:"maxComments,optional"`
 }
 
 func (bb BitBucket) validate() error {
@@ -27,15 +28,19 @@ func (bb BitBucket) validate() error {
 	if bb.URI == "" {
 		return fmt.Errorf("uri cannot be empty")
 	}
+	if bb.MaxComments < 0 {
+		return fmt.Errorf("maxComments cannot be negative")
+	}
 	return nil
 }
 
 type GitHub struct {
-	BaseURI   string `hcl:"baseuri,optional"`
-	UploadURI string `hcl:"uploaduri,optional"`
-	Timeout   string `hcl:"timeout,optional"`
-	Owner     string `hcl:"owner,optional"`
-	Repo      string `hcl:"repo,optional"`
+	BaseURI     string `hcl:"baseuri,optional"`
+	UploadURI   string `hcl:"uploaduri,optional"`
+	Timeout     string `hcl:"timeout,optional"`
+	Owner       string `hcl:"owner,optional"`
+	Repo        string `hcl:"repo,optional"`
+	MaxComments int    `hcl:"maxComments,optional"`
 }
 
 func (gh GitHub) validate() error {
@@ -73,7 +78,9 @@ func (gh GitHub) validate() error {
 			return fmt.Errorf("invalid uploaduri: %w", err)
 		}
 	}
-
+	if gh.MaxComments < 0 {
+		return fmt.Errorf("maxComments cannot be negative")
+	}
 	return nil
 }
 

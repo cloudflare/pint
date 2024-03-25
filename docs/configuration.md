@@ -158,10 +158,11 @@ Syntax:
 ```js
 repository {
   bitbucket {
-    uri        = "https://..."
-    timeout    = "1m"
-    project    = "..."
-    repository = "..."
+    uri         = "https://..."
+    timeout     = "1m"
+    project     = "..."
+    repository  = "..."
+    maxComments = 50
   }
 }
 ```
@@ -171,15 +172,18 @@ repository {
 - `bitbucket:timeout` - timeout to be used for API requests, defaults to 1 minute.
 - `bitbucket:project` - name of the BitBucket project for this repository.
 - `bitbucket:repository` - name of the BitBucket repository.
+- `bitbucket:maxComments` - the maximum number of comments pint can create on a single
+  pull request. Default is 50.
 
 ```js
 repository {
   github {
-    baseuri    = "https://..."
-    uploaduri  = "https://..."
-    timeout    = "1m"
-    owner      = "..."
-    repo       = "..."
+    baseuri     = "https://..."
+    uploaduri   = "https://..."
+    timeout     = "1m"
+    owner       = "..."
+    repo        = "..."
+    maxComments = 50
   }
 }
 ```
@@ -196,6 +200,7 @@ If `github:baseuri` _or_ `github:uploaduri` are not specified, then [GitHub](htt
   If not set, `pint` will try to use the `GITHUB_REPOSITORY` environment variable instead (if set).
 - `github:repo` - name of the GitHub repository (e.g. `monitoring`).
   If not set, `pint` will try to use the `GITHUB_REPOSITORY` environment variable instead (if set).
+- `github:maxComments` - the maximum number of comments pint can create on a single pull request. Default is 50.
 
 Most GitHub settings can be detected from environment variables that are set inside GitHub Actions
 environment. The only exception is `GITHUB_AUTH_TOKEN` environment variable that must be set

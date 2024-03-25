@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.57.0
+
+### Added
+
+- GitHub and BitBucket reporters now supports `maxComments` option to limit the number
+  of comments pint can create on a single pull request.
+  Default value of `maxComments` is `50`.
+
 ## v0.56.2
 
 ### Fixed
