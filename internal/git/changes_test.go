@@ -40,10 +40,10 @@ func gitCommit(t *testing.T, message string) {
 
 func TestChanges(t *testing.T) {
 	type testCaseT struct {
-		title   string
 		setup   func(t *testing.T) (git.CommandRunner, git.CommitRangeResults)
-		changes []*git.FileChange
+		title   string
 		err     string
+		changes []*git.FileChange
 	}
 
 	testCases := []testCaseT{

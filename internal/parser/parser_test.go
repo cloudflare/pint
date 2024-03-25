@@ -15,9 +15,9 @@ import (
 
 func TestParse(t *testing.T) {
 	type testCaseT struct {
+		err     string
 		content []byte
 		output  []parser.Rule
-		err     string
 	}
 
 	testCases := []testCaseT{

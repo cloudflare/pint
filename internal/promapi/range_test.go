@@ -57,15 +57,15 @@ func TestRange(t *testing.T) {
 	type handlerFunc func(t *testing.T, w http.ResponseWriter, r *http.Request)
 
 	type testCaseT struct {
-		query   string
 		start   time.Time
 		end     time.Time
-		step    time.Duration
-		timeout time.Duration
+		handler handlerFunc
+		query   string
+		err     string
 		out     promapi.SeriesTimeRanges
 		stats   promapi.QueryStats
-		err     string
-		handler handlerFunc
+		step    time.Duration
+		timeout time.Duration
 	}
 
 	timeParse := func(s string) time.Time {

@@ -19,8 +19,8 @@ func TestAppendSampleToRanges(t *testing.T) {
 	type testCaseT struct {
 		in      promapi.MetricTimeRanges
 		samples []model.SampleStream
-		step    time.Duration
 		out     promapi.MetricTimeRanges
+		step    time.Duration
 	}
 
 	timeParse := func(s string) time.Time {
@@ -548,11 +548,11 @@ func TestMergeRanges(t *testing.T) {
 
 func TestMetricTimeRangeOverlaps(t *testing.T) {
 	type testCaseT struct {
+		out  promapi.TimeRange
 		desc string
 		a    promapi.MetricTimeRange
 		b    promapi.MetricTimeRange
 		step time.Duration
-		out  promapi.TimeRange
 		ok   bool
 	}
 

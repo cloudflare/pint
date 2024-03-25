@@ -152,7 +152,6 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			var arEntry *discovery.Entry
 			if alertname != "" {
 				for _, entry := range entries {
-					entry := entry
 					if entry.Rule.AlertingRule != nil &&
 						entry.Rule.Error.Err == nil &&
 						entry.Rule.AlertingRule.Alert.Value == alertname {
@@ -254,7 +253,6 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			// Check if we have recording rule that provides this metric before we give up
 			var rrEntry *discovery.Entry
 			for _, entry := range entries {
-				entry := entry
 				if entry.Rule.RecordingRule != nil &&
 					entry.Rule.Error.Err == nil &&
 					entry.Rule.RecordingRule.Record.Value == bareSelector.String() {

@@ -134,9 +134,9 @@ func TestQuery(t *testing.T) {
 
 	type testCaseT struct {
 		query   string
-		timeout time.Duration
-		result  promapi.QueryResult
 		err     string
+		result  promapi.QueryResult
+		timeout time.Duration
 	}
 
 	testCases := []testCaseT{

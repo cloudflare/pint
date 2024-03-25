@@ -10,8 +10,8 @@ import (
 
 func TestRuleLinkSettings(t *testing.T) {
 	type testCaseT struct {
-		conf RuleLinkSettings
 		err  error
+		conf RuleLinkSettings
 	}
 
 	testCases := []testCaseT{

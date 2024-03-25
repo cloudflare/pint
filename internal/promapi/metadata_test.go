@@ -61,9 +61,9 @@ func TestMetadata(t *testing.T) {
 
 	type testCaseT struct {
 		metric   string
-		timeout  time.Duration
-		metadata promapi.MetadataResult
 		err      string
+		metadata promapi.MetadataResult
+		timeout  time.Duration
 	}
 
 	testCases := []testCaseT{

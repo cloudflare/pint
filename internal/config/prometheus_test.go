@@ -10,8 +10,8 @@ import (
 
 func TestPrometheusConfig(t *testing.T) {
 	type testCaseT struct {
-		conf PrometheusConfig
 		err  error
+		conf PrometheusConfig
 	}
 
 	testCases := []testCaseT{

@@ -10,8 +10,8 @@ import (
 
 func TestChecksSettings(t *testing.T) {
 	type testCaseT struct {
-		conf Checks
 		err  error
+		conf Checks
 	}
 
 	testCases := []testCaseT{

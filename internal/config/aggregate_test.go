@@ -10,8 +10,8 @@ import (
 
 func TestAggregateSettings(t *testing.T) {
 	type testCaseT struct {
-		conf AggregateSettings
 		err  error
+		conf AggregateSettings
 	}
 
 	testCases := []testCaseT{

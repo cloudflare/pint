@@ -15,10 +15,10 @@ import (
 
 func TestBitBucketMakeComments(t *testing.T) {
 	type testCaseT struct {
-		description string
-		summary     Summary
 		changes     *bitBucketPRChanges
+		description string
 		comments    []BitBucketPendingComment
+		summary     Summary
 		maxComments int
 	}
 

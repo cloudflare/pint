@@ -51,10 +51,10 @@ func TestFlags(t *testing.T) {
 	defer srv.Close()
 
 	type testCaseT struct {
-		prefix  string
-		timeout time.Duration
 		flags   promapi.FlagsResult
+		prefix  string
 		err     string
+		timeout time.Duration
 	}
 
 	testCases := []testCaseT{

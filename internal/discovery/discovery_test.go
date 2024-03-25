@@ -36,13 +36,13 @@ func TestReadRules(t *testing.T) {
 	}
 
 	type testCaseT struct {
+		sourceFunc   func(t *testing.T) io.Reader
 		title        string
 		reportedPath string
 		sourcePath   string
-		sourceFunc   func(t *testing.T) io.Reader
-		isStrict     bool
-		entries      []Entry
 		err          string
+		entries      []Entry
+		isStrict     bool
 	}
 
 	testCases := []testCaseT{

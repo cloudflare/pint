@@ -234,9 +234,9 @@ func TestCurrentBranch(t *testing.T) {
 
 func TestRunGit(t *testing.T) {
 	type testCaseT struct {
-		args   []string
 		output *regexp.Regexp
 		err    string
+		args   []string
 	}
 
 	testCases := []testCaseT{

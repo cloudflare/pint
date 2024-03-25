@@ -49,7 +49,6 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 	}
 
 	for _, entry := range entries {
-		entry := entry
 		if entry.Rule.Error.Err != nil {
 			continue
 		}

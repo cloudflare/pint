@@ -12,9 +12,9 @@ import (
 func TestTemplatedRegexpExpand(t *testing.T) {
 	type testCaseT struct {
 		input  string
-		rule   parser.Rule
 		output string
 		err    string
+		rule   parser.Rule
 	}
 
 	testCases := []testCaseT{

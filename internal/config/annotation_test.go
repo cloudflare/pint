@@ -10,8 +10,8 @@ import (
 
 func TestAnnotationSettings(t *testing.T) {
 	type testCaseT struct {
-		conf AnnotationSettings
 		err  error
+		conf AnnotationSettings
 	}
 
 	testCases := []testCaseT{

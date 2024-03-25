@@ -212,10 +212,10 @@ type responseWriter interface {
 }
 
 type prometheusMock struct {
-	conds []requestCondition
 	resp  responseWriter
-	used  bool
+	conds []requestCondition
 	mu    sync.Mutex
+	used  bool
 }
 
 func (pm *prometheusMock) maybeApply(w http.ResponseWriter, r *http.Request) bool {
@@ -277,9 +277,9 @@ var (
 )
 
 type promError struct {
-	code      int
 	errorType v1.ErrorType
 	err       string
+	code      int
 }
 
 func (pe promError) respond(w http.ResponseWriter, _ *http.Request) {
@@ -417,8 +417,8 @@ func (fg flagsResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	w.WriteHeader(200)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
-		Status string         `json:"status"`
 		Data   v1.FlagsResult `json:"data"`
+		Status string         `json:"status"`
 	}{
 		Status: "success",
 		Data:   fg.flags,
@@ -439,8 +439,8 @@ func (mr metadataResponse) respond(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	// _, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
 	result := struct {
-		Status string                   `json:"status"`
 		Data   map[string][]v1.Metadata `json:"data"`
+		Status string                   `json:"status"`
 	}{
 		Status: "success",
 		Data:   mr.metadata,

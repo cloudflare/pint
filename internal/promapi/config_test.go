@@ -57,9 +57,9 @@ func TestConfig(t *testing.T) {
 
 	type testCaseT struct {
 		prefix  string
-		timeout time.Duration
-		cfg     promapi.ConfigResult
 		err     string
+		cfg     promapi.ConfigResult
+		timeout time.Duration
 	}
 
 	defaults := promapi.PrometheusConfig{

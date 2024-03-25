@@ -16,9 +16,9 @@ import (
 func TestTeamCityReporter(t *testing.T) {
 	type testCaseT struct {
 		description string
-		summary     reporter.Summary
 		output      string
 		err         string
+		summary     reporter.Summary
 	}
 
 	p := parser.NewParser()

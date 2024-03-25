@@ -14,9 +14,9 @@ func TestSliceRange(t *testing.T) {
 	type testCaseT struct {
 		start      time.Time
 		end        time.Time
+		output     []TimeRange
 		resolution time.Duration
 		sliceSize  time.Duration
-		output     []TimeRange
 	}
 
 	timeParse := func(s string) time.Time {

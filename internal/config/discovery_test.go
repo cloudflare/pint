@@ -11,8 +11,8 @@ import (
 
 func TestDiscoveryConfig(t *testing.T) {
 	type testCaseT struct {
-		conf Discovery
 		err  string
+		conf Discovery
 	}
 
 	testCases := []testCaseT{
@@ -236,9 +236,9 @@ func TestDiscoveryConfig(t *testing.T) {
 
 func TestPrometheusTemplateRender(t *testing.T) {
 	type testCaseT struct {
-		template PrometheusTemplate
 		data     map[string]string
 		err      string
+		template PrometheusTemplate
 	}
 
 	testCases := []testCaseT{

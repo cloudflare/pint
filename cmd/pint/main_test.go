@@ -229,13 +229,13 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 
 type httpMock struct {
 	pattern *regexp.Regexp
-	method  string
 	handler func(http.ResponseWriter, *http.Request)
+	method  string
 }
 
 type httpMocks struct {
-	mtx   sync.Mutex
 	resps map[string][]httpMock
+	mtx   sync.Mutex
 }
 
 func (m *httpMocks) add(name string, mock httpMock) {

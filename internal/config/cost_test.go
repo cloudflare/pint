@@ -10,8 +10,8 @@ import (
 
 func TestCostSettings(t *testing.T) {
 	type testCaseT struct {
-		conf CostSettings
 		err  error
+		conf CostSettings
 	}
 
 	testCases := []testCaseT{

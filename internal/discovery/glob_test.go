@@ -22,9 +22,9 @@ func TestGlobPathFinder(t *testing.T) {
 	type testCaseT struct {
 		files    map[string]string
 		symlinks map[string]string
+		err      string
 		finder   discovery.GlobFinder
 		entries  []discovery.Entry
-		err      string
 	}
 
 	p := parser.NewParser()

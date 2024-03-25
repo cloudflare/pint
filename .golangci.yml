@@ -1,5 +1,6 @@
 run:
-  deadline: 5m
+  timeout: 5m
+  tests: true
 
 output:
   sort-results: true
@@ -15,18 +16,17 @@ linters:
     - tenv
     - errorlint
     - errname
-    - exportloopref
     - predeclared
     - contextcheck
     - exhaustive
     - gocritic
     - importas
-    - maligned
     - nakedret
     - prealloc
     - unconvert
     - testifylint
     - godot
+    - copyloopvar
 
 issues:
   max-same-issues: 0
@@ -47,6 +47,6 @@ linters-settings:
   gofumpt:
     extra-rules: true
   govet:
-    check-shadowing: true
+    enable-all: true
   nakedret:
     max-func-lines: 0
