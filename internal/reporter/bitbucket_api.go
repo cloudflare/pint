@@ -226,11 +226,11 @@ func (pc pendingComment) toBitBucketComment(changes *bitBucketPRChanges) BitBuck
 }
 
 type BitBucketPendingCommentAnchor struct {
-	Path     string `json:"path"`
-	LineType string `json:"lineType"`
-	FileType string `json:"fileType"`
+	Path     string `json:"path,omitempty"`
+	LineType string `json:"lineType,omitempty"`
+	FileType string `json:"fileType,omitempty"`
 	DiffType string `json:"diffType"`
-	Line     int    `json:"line"`
+	Line     int    `json:"line,omitempty"`
 }
 
 type BitBucketPendingComment struct {
@@ -249,7 +249,7 @@ type BitBucketCommentSeverityUpdate struct {
 	Version  int    `json:"version"`
 }
 
-func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string) *bitBucketAPI {
+func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string, maxComments int) *bitBucketAPI {
 	return &bitBucketAPI{
 		pintVersion: pintVersion,
 		uri:         uri,
@@ -257,6 +257,7 @@ func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, proj
 		authToken:   token,
 		project:     project,
 		repo:        repo,
+		maxComments: maxComments,
 	}
 }
 
@@ -267,6 +268,7 @@ type bitBucketAPI struct {
 	project     string
 	repo        string
 	timeout     time.Duration
+	maxComments int
 }
 
 func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, error) {
@@ -586,13 +588,16 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 }
 
 func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
+	var buf strings.Builder
 	comments := []BitBucketPendingComment{}
 	for _, reports := range dedupReports(summary.reports) {
 		if _, ok := changes.pathModifiedLines[reports[0].ReportedPath]; !ok {
 			continue
 		}
 
-		var buf strings.Builder
+		mergeDetails := identicalDetails(reports)
+
+		buf.Reset()
 
 		buf.WriteString(problemIcon(reports[0].Problem.Severity))
 		buf.WriteString(" **")
@@ -604,7 +609,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			buf.WriteString("------\n\n")
 			buf.WriteString(report.Problem.Text)
 			buf.WriteString("\n\n")
-			if report.Problem.Details != "" {
+			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
 				buf.WriteString("\n\n")
 			}
@@ -614,6 +619,11 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 				buf.WriteString(report.SourcePath)
 				buf.WriteString("`.\n\n")
 			}
+		}
+		if mergeDetails && reports[0].Problem.Details != "" {
+			buf.WriteString("------\n\n")
+			buf.WriteString(reports[0].Problem.Details)
+			buf.WriteString("\n\n")
 		}
 		buf.WriteString("------\n\n")
 		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
@@ -638,6 +648,22 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		}
 		comments = append(comments, pending.toBitBucketComment(changes))
 	}
+	return comments
+}
+
+func (bb bitBucketAPI) limitComments(src []BitBucketPendingComment) []BitBucketPendingComment {
+	if len(src) <= bb.maxComments {
+		return src
+	}
+	comments := src[:bb.maxComments]
+	comments = append(comments, BitBucketPendingComment{
+		Text: fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
+%d comments were skipped and won't be visibile on this PR.`, len(src), bb.maxComments, len(src)-bb.maxComments),
+		Severity: "NORMAL",
+		Anchor: BitBucketPendingCommentAnchor{
+			DiffType: "EFFECTIVE",
+		},
+	})
 	return comments
 }
 
@@ -876,6 +902,23 @@ func dedupReports(src []Report) (dst [][]Report) {
 		dst[index] = append(dst[index], report)
 	}
 	return dst
+}
+
+func identicalDetails(src []Report) bool {
+	if len(src) <= 1 {
+		return false
+	}
+	var details string
+	for _, report := range src {
+		if details == "" {
+			details = report.Problem.Details
+			continue
+		}
+		if details != report.Problem.Details {
+			return false
+		}
+	}
+	return true
 }
 
 func problemIcon(s checks.Severity) string {

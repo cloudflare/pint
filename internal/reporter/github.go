@@ -22,30 +22,32 @@ var reviewBody = "### This pull request was validated by [pint](https://github.c
 type GithubReporter struct {
 	gitCmd git.CommandRunner
 
-	client    *github.Client
-	version   string
-	baseURL   string
-	uploadURL string
-	authToken string
-	owner     string
-	repo      string
-	timeout   time.Duration
-	prNum     int
+	client      *github.Client
+	version     string
+	baseURL     string
+	uploadURL   string
+	authToken   string
+	owner       string
+	repo        string
+	timeout     time.Duration
+	prNum       int
+	maxComments int
 }
 
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
-func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum int, gitCmd git.CommandRunner) (_ GithubReporter, err error) {
+func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, gitCmd git.CommandRunner) (_ GithubReporter, err error) {
 	gr := GithubReporter{
-		version:   version,
-		baseURL:   baseURL,
-		uploadURL: uploadURL,
-		timeout:   timeout,
-		authToken: token,
-		owner:     owner,
-		repo:      repo,
-		prNum:     prNum,
-		gitCmd:    gitCmd,
+		version:     version,
+		baseURL:     baseURL,
+		uploadURL:   uploadURL,
+		timeout:     timeout,
+		authToken:   token,
+		owner:       owner,
+		repo:        repo,
+		prNum:       prNum,
+		maxComments: maxComments,
+		gitCmd:      gitCmd,
 	}
 
 	ts := oauth2.StaticTokenSource(
@@ -132,6 +134,7 @@ func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) e
 		return err
 	}
 
+	var added int
 	for _, rep := range summary.Reports() {
 		comment := reportToGitHubComment(headCommit, rep)
 
@@ -156,6 +159,11 @@ func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) e
 
 		if err := gr.createComment(comment); err != nil {
 			return err
+		}
+		added++
+
+		if added >= gr.maxComments {
+			return gr.tooManyComments(headCommit, len(summary.Reports()))
 		}
 	}
 
@@ -316,4 +324,13 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 	}
 
 	return &c
+}
+
+func (gr GithubReporter) tooManyComments(headCommit string, nrComments int) error {
+	comment := github.PullRequestComment{
+		CommitID: github.String(headCommit),
+		Body: github.String(fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
+%d comments were skipped and won't be visibile on this PR.`, nrComments, gr.maxComments, nrComments-gr.maxComments)),
+	}
+	return gr.createComment(&comment)
 }

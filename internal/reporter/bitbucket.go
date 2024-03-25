@@ -14,9 +14,9 @@ const (
 		"Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server)."
 )
 
-func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, gitCmd git.CommandRunner) BitBucketReporter {
+func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, gitCmd git.CommandRunner) BitBucketReporter {
 	return BitBucketReporter{
-		api:    newBitBucketAPI(version, uri, timeout, token, project, repo),
+		api:    newBitBucketAPI(version, uri, timeout, token, project, repo, maxComments),
 		gitCmd: gitCmd,
 	}
 }
@@ -78,6 +78,12 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 
 		pendingComments := r.api.makeComments(summary, changes)
 		slog.Info("Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
+
+		pendingComments = r.api.limitComments(pendingComments)
+		slog.Info("Will add comments to BitBucket",
+			slog.Int("count", len(pendingComments)),
+			slog.Int("limit", r.api.maxComments),
+		)
 
 		slog.Info("Deleting stale comments from BitBucket")
 		r.api.pruneComments(pr, existingComments, pendingComments)

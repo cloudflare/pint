@@ -2,9 +2,11 @@ package reporter_test
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -25,11 +27,12 @@ func TestGithubReporter(t *testing.T) {
 		error       func(uri string) string
 		gitCmd      git.CommandRunner
 
-		owner   string
-		repo    string
-		token   string
-		prNum   int
-		timeout time.Duration
+		owner       string
+		repo        string
+		token       string
+		prNum       int
+		maxComments int
+		timeout     time.Duration
 	}
 
 	p := parser.NewParser()
@@ -54,6 +57,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
+			maxComments: 50,
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				time.Sleep(1 * time.Second)
 				_, _ = w.Write([]byte("OK"))
@@ -95,6 +99,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
+			maxComments: 50,
 			timeout:     time.Second,
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
@@ -141,6 +146,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
+			maxComments: 50,
 			timeout:     time.Second,
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
@@ -176,6 +182,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
+			maxComments: 50,
 			timeout:     time.Second,
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
@@ -222,6 +229,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
+			maxComments: 50,
 			timeout:     time.Second,
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
@@ -272,6 +280,7 @@ filename %s
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
+			maxComments: 50,
 			timeout:     time.Second,
 			gitCmd: func(args ...string) ([]byte, error) {
 				if args[0] == "rev-parse" {
@@ -307,6 +316,109 @@ filename %s
 						Reporter: "mock",
 						Text:     "syntax error",
 						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "maxComments 2",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 2,
+			timeout:     time.Second,
+			gitCmd: func(args ...string) ([]byte, error) {
+				if args[0] == "rev-parse" {
+					return []byte("fake-commit-id"), nil
+				}
+				if args[0] == "blame" {
+					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
+					return []byte(content), nil
+				}
+				return nil, nil
+			},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":1,"commit_id":"fake-commit-id","path":"foo.txt","line":2,"body":":stop_sign: [mock](https://cloudflare.github.io/pint/checks/mock.html): syntax error\n\nsyntax details"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					switch b {
+					case `{"body":":stop_sign: [mock1](https://cloudflare.github.io/pint/checks/mock1.html): syntax error1\n\nsyntax details1","path":"","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
+					case `{"body":":stop_sign: [mock2](https://cloudflare.github.io/pint/checks/mock2.html): syntax error2\n\nsyntax details2","path":"","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
+					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visibile on this PR.","commit_id":"fake-commit-id"}`:
+					default:
+						t.Errorf("Unexpected comment: %s", b)
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			reports: []reporter.Report{
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock1",
+						Text:     "syntax error1",
+						Details:  "syntax details1",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock2",
+						Text:     "syntax error2",
+						Details:  "syntax details2",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock3",
+						Text:     "syntax error3",
+						Details:  "syntax details3",
+						Severity: checks.Fatal,
+					},
+				},
+				{
+					SourcePath:    "foo.txt",
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock4",
+						Text:     "syntax error4",
+						Details:  "syntax details4",
 						Severity: checks.Fatal,
 					},
 				},
@@ -348,6 +460,7 @@ filename %s
 				tc.owner,
 				tc.repo,
 				tc.prNum,
+				tc.maxComments,
 				tc.gitCmd,
 			)
 			require.NoError(t, err)

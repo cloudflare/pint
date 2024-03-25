@@ -262,6 +262,9 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 		if cfg.Repository.BitBucket.Timeout == "" {
 			cfg.Repository.BitBucket.Timeout = time.Minute.String()
 		}
+		if cfg.Repository.BitBucket.MaxComments == 0 {
+			cfg.Repository.BitBucket.MaxComments = 50
+		}
 		if err = cfg.Repository.BitBucket.validate(); err != nil {
 			return cfg, err
 		}
@@ -270,6 +273,9 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 	if cfg.Repository != nil && cfg.Repository.GitHub != nil {
 		if cfg.Repository.GitHub.Timeout == "" {
 			cfg.Repository.GitHub.Timeout = time.Minute.String()
+		}
+		if cfg.Repository.GitHub.MaxComments == 0 {
+			cfg.Repository.GitHub.MaxComments = 50
 		}
 		if err = cfg.Repository.GitHub.validate(); err != nil {
 			return cfg, err
