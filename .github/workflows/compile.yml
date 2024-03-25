@@ -53,10 +53,16 @@ jobs:
           pattern: "${{  github.ref_name }}"
           no-print-matched-heading: true
 
+      - name: Write changelog
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mkdir .tmp
+          printf '${{ steps.changelog.outputs.markdown }}' > .tmp/changelog.txt
+
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --clean --release-notes <(printf "${{ steps.changelog.outputs.markdown }}")
+          args: release --clean --release-notes <(cat .tmp/changelog.txt)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
