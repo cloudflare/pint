@@ -267,6 +267,7 @@ type bitBucketAPI struct {
 	project     string
 	repo        string
 	timeout     time.Duration
+	maxComments int
 }
 
 func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, error) {
@@ -586,13 +587,16 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 }
 
 func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
+	var buf strings.Builder
 	comments := []BitBucketPendingComment{}
 	for _, reports := range dedupReports(summary.reports) {
 		if _, ok := changes.pathModifiedLines[reports[0].ReportedPath]; !ok {
 			continue
 		}
 
-		var buf strings.Builder
+		mergeDetails := identicalDetails(reports)
+
+		buf.Reset()
 
 		buf.WriteString(problemIcon(reports[0].Problem.Severity))
 		buf.WriteString(" **")
@@ -604,7 +608,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			buf.WriteString("------\n\n")
 			buf.WriteString(report.Problem.Text)
 			buf.WriteString("\n\n")
-			if report.Problem.Details != "" {
+			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
 				buf.WriteString("\n\n")
 			}
@@ -614,6 +618,11 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 				buf.WriteString(report.SourcePath)
 				buf.WriteString("`.\n\n")
 			}
+		}
+		if mergeDetails && reports[0].Problem.Details != "" {
+			buf.WriteString("------\n\n")
+			buf.WriteString(reports[0].Problem.Details)
+			buf.WriteString("\n\n")
 		}
 		buf.WriteString("------\n\n")
 		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
@@ -876,6 +885,23 @@ func dedupReports(src []Report) (dst [][]Report) {
 		dst[index] = append(dst[index], report)
 	}
 	return dst
+}
+
+func identicalDetails(src []Report) bool {
+	if len(src) <= 1 {
+		return false
+	}
+	var details string
+	for _, report := range src {
+		if details == "" {
+			details = report.Problem.Details
+			continue
+		}
+		if details != report.Problem.Details {
+			return false
+		}
+	}
+	return true
 }
 
 func problemIcon(s checks.Severity) string {
