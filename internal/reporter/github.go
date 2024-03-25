@@ -294,7 +294,7 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 	var msgPrefix, msgSuffix string
 	reportLine, srcLine := moveReportedLine(rep)
 	if reportLine != srcLine {
-		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
+		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, comment moved here: ", srcLine)
 	}
 	if rep.Problem.Details != "" {
 		msgSuffix = "\n\n" + rep.Problem.Details
