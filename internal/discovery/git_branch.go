@@ -272,7 +272,6 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	}
 
 	for _, b := range before {
-		b := b
 		ml = append(ml, matchedEntry{before: b, hasBefore: true})
 	}
 

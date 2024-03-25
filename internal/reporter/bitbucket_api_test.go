@@ -13,10 +13,10 @@ import (
 
 func TestPendingCommentToBitBucketComment(t *testing.T) {
 	type testCaseT struct {
-		description string
-		input       pendingComment
-		output      BitBucketPendingComment
 		changes     *bitBucketPRChanges
+		description string
+		output      BitBucketPendingComment
+		input       pendingComment
 	}
 
 	testCases := []testCaseT{
@@ -103,8 +103,8 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 func TestReportToAnnotation(t *testing.T) {
 	type testCaseT struct {
 		description string
-		input       Report
 		output      BitBucketAnnotation
+		input       Report
 	}
 
 	testCases := []testCaseT{

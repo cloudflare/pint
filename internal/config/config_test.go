@@ -146,9 +146,9 @@ func TestGetChecksForRule(t *testing.T) {
 	type testCaseT struct {
 		title          string
 		config         string
-		entry          discovery.Entry
 		checks         []string
 		disabledChecks []string
+		entry          discovery.Entry
 	}
 
 	testCases := []testCaseT{

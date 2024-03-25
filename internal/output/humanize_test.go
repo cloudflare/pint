@@ -12,8 +12,8 @@ import (
 
 func TestHumanizeDuration(t *testing.T) {
 	type testCaseT struct {
-		input  time.Duration
 		output string
+		input  time.Duration
 	}
 
 	testCases := []testCaseT{
@@ -69,8 +69,8 @@ func TestHumanizeDuration(t *testing.T) {
 
 func TestHumanizeBytes(t *testing.T) {
 	type testCaseT struct {
-		input  int
 		output string
+		input  int
 	}
 
 	testCases := []testCaseT{

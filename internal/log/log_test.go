@@ -12,8 +12,8 @@ import (
 func TestParseLevel(t *testing.T) {
 	type testCaseT struct {
 		s     string
-		level slog.Level
 		err   string
+		level slog.Level
 	}
 
 	testCases := []testCaseT{

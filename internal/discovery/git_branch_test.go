@@ -60,11 +60,11 @@ func TestGitBranchFinder(t *testing.T) {
 	type setupFn func(t *testing.T)
 
 	type testCaseT struct {
-		title   string
 		setup   setupFn
-		finder  discovery.GitBranchFinder
-		entries []discovery.Entry
+		title   string
 		err     string
+		entries []discovery.Entry
+		finder  discovery.GitBranchFinder
 	}
 
 	testCases := []testCaseT{

@@ -10,8 +10,8 @@ import (
 func TestDurationMatch(t *testing.T) {
 	type testCaseT struct {
 		input  string
-		output durationMatch
 		err    string
+		output durationMatch
 	}
 
 	testCases := []testCaseT{

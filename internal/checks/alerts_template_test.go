@@ -973,7 +973,7 @@ func TestTemplateCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "template query with with bogus range",
+			description: "template query with bogus range",
 			content: `
 - alert: Foo
   expr: up == 0

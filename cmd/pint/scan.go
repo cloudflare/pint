@@ -136,7 +136,6 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				checkList := cfg.GetChecksForRule(ctx, gen, entry, entry.DisabledChecks)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
-					check := check
 					if check.Meta().IsOnline {
 						onlineChecksCount.Inc()
 					} else {
@@ -181,8 +180,6 @@ type scanJob struct {
 
 func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporter.Report) {
 	for job := range jobs {
-		job := job
-
 		select {
 		case <-ctx.Done():
 			return

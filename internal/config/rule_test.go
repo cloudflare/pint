@@ -13,10 +13,10 @@ import (
 
 func TestMatch(t *testing.T) {
 	type testCaseT struct {
+		match   config.Match
 		cmd     config.ContextCommandVal
 		path    string
 		rule    parser.Rule
-		match   config.Match
 		isMatch bool
 	}
 

@@ -10,8 +10,8 @@ import (
 
 func TestCISettings(t *testing.T) {
 	type testCaseT struct {
-		conf CI
 		err  error
+		conf CI
 	}
 
 	testCases := []testCaseT{

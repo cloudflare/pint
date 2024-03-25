@@ -32,7 +32,7 @@ $(GOBIN)/betteralign: tools/betteralign/go.mod tools/betteralign/go.sum
 	go install -modfile=tools/betteralign/go.mod github.com/dkorunic/betteralign/cmd/betteralign
 .PHONY: format
 format: $(GOBIN)/betteralign $(GOBIN)/gofumpt $(GOBIN)/goimports
-	$(GOBIN)/betteralign -apply ./...
+	$(GOBIN)/betteralign -test_files -apply ./...
 	$(GOBIN)/gofumpt -extra -l -w .
 	$(GOBIN)/goimports -local github.com/cloudflare/pint -w .
 

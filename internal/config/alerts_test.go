@@ -10,8 +10,8 @@ import (
 
 func TestAlertsSettings(t *testing.T) {
 	type testCaseT struct {
-		conf AlertsSettings
 		err  error
+		conf AlertsSettings
 	}
 
 	testCases := []testCaseT{

@@ -10,8 +10,8 @@ import (
 
 func TestBitBucketSettings(t *testing.T) {
 	type testCaseT struct {
-		conf BitBucket
 		err  error
+		conf BitBucket
 	}
 
 	testCases := []testCaseT{
@@ -93,9 +93,9 @@ func TestBitBucketSettings(t *testing.T) {
 
 func TestGitHubSettings(t *testing.T) {
 	type testCaseT struct {
-		conf GitHub
-		env  map[string]string
 		err  error
+		env  map[string]string
+		conf GitHub
 	}
 
 	testCases := []testCaseT{

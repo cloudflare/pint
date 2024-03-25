@@ -10,8 +10,8 @@ import (
 
 func TestParserSettings(t *testing.T) {
 	type testCaseT struct {
-		conf Parser
 		err  error
+		conf Parser
 	}
 
 	testCases := []testCaseT{

@@ -11,8 +11,8 @@ import (
 
 func TestFormatLineRangeString(t *testing.T) {
 	type testCaseT struct {
-		lines  []int
 		output string
+		lines  []int
 	}
 
 	testCases := []testCaseT{

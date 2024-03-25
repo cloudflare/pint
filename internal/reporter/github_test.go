@@ -21,15 +21,16 @@ import (
 
 func TestGithubReporter(t *testing.T) {
 	type testCaseT struct {
-		description string
-		reports     []reporter.Report
 		httpHandler http.Handler
 		error       func(uri string) string
 		gitCmd      git.CommandRunner
 
+		description string
+
 		owner       string
 		repo        string
 		token       string
+		reports     []reporter.Report
 		prNum       int
 		maxComments int
 		timeout     time.Duration

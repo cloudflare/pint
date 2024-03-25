@@ -25,18 +25,18 @@ func TestBitBucketReporter(t *testing.T) {
 	type errorCheck func(err error) error
 
 	type testCaseT struct {
-		description           string
-		gitCmd                git.CommandRunner
-		reports               []reporter.Report
 		httpHandler           http.Handler
+		gitCmd                git.CommandRunner
+		pullRequestFileDiffs  map[string]reporter.BitBucketFileDiffs
+		errorHandler          errorCheck
+		description           string
 		report                reporter.BitBucketReport
+		reports               []reporter.Report
 		annotations           reporter.BitBucketAnnotations
+		pullRequestComments   []reporter.BitBucketPendingComment
 		pullRequests          reporter.BitBucketPullRequests
 		pullRequestChanges    reporter.BitBucketPullRequestChanges
 		pullRequestActivities reporter.BitBucketPullRequestActivities
-		pullRequestFileDiffs  map[string]reporter.BitBucketFileDiffs
-		pullRequestComments   []reporter.BitBucketPendingComment
-		errorHandler          errorCheck
 	}
 
 	p := parser.NewParser()
