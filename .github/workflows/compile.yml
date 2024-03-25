@@ -63,6 +63,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: goreleaser/goreleaser-action@v5
         with:
-          args: release --clean --release-notes <(cat .tmp/changelog.txt)
+          args: release --clean --release-notes=.tmp/changelog.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
