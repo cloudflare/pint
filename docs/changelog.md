@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.57.1
+
+### Fixed
+
+- Fixed release workflow on GitHub actions.
+
 ## v0.57.0
 
 ### Added
