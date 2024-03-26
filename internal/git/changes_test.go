@@ -2,10 +2,12 @@ package git_test
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/git"
@@ -560,6 +562,8 @@ func TestChanges(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+
 			dir := t.TempDir()
 			err := os.Chdir(dir)
 			require.NoError(t, err, "chdir")
