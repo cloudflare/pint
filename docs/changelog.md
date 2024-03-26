@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.57.3
+
+### Fixed
+
+- Fixed compatibility with older git releases.
+
 ## v0.57.2
 
 ### Fixed

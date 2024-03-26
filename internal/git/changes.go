@@ -218,7 +218,7 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 }
 
 func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
-	args := []string{"ls-tree", "--format=%(objectmode) %(objecttype) %(path)", commit, fpath}
+	args := []string{"ls-tree", commit, fpath}
 	out, err := cmd(args...)
 	if err != nil {
 		slog.Debug("git command returned an error", slog.Any("err", err), slog.String("args", fmt.Sprint(args)))
@@ -233,7 +233,17 @@ func getTypeForPath(cmd CommandRunner, commit, fpath string) PathType {
 		}
 		objmode := parts[0]
 		objtype := parts[1]
-		objpath := parts[2]
+
+		parts = strings.SplitN(parts[2], "\t", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		objpath := parts[1]
+		slog.Debug("ls-tree line",
+			slog.String("mode", objmode),
+			slog.String("type", objtype),
+			slog.String("path", objpath),
+		)
 
 		// not our file
 		if objpath != fpath {

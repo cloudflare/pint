@@ -165,10 +165,10 @@ func TestGitBranchFinder(t *testing.T) {
 						return []byte("c1\nc2\nc3\nc4\n"), nil
 					case "log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4":
 						return []byte("c1\nA\trules.yml\n"), nil
-					case "ls-tree --format=%(objectmode) %(objecttype) %(path) c1^ rules.yml":
-						return []byte("100644 blob rules.yml"), nil
-					case "ls-tree --format=%(objectmode) %(objecttype) %(path) c1 rules.yml":
-						return []byte("100644 blob rules.yml"), nil
+					case "ls-tree c1^ rules.yml":
+						return []byte("100644 blob c0\trules.yml"), nil
+					case "ls-tree c1 rules.yml":
+						return []byte("100644 blob c1\trules.yml"), nil
 					case "show -s --format=%B c1":
 						return []byte(""), nil
 					default:
