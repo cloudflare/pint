@@ -7,7 +7,7 @@ require (
 	github.com/fatih/color v1.16.0
 	github.com/gkampitakis/go-snaps v0.5.2
 	github.com/google/go-cmp v0.6.0
-	github.com/google/go-github/v57 v57.0.0
+	github.com/google/go-github/v60 v60.0.0
 	github.com/hashicorp/hcl/v2 v2.20.0
 	github.com/klauspost/compress v1.17.7
 	github.com/neilotoole/slogt v1.1.0

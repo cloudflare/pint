@@ -6,6 +6,7 @@
 
 - Fixed compatibility with older git releases.
 - Fixed `maxComments` defaulting to zero when using GitHub reporter.
+- Fixed `maxComments` comment creation on GitHub - #935.
 
 ## v0.57.2
 

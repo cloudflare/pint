@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v57/github"
+	"github.com/google/go-github/v60/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -173,7 +173,7 @@ func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) e
 		added++
 
 		if added >= gr.maxComments {
-			return gr.tooManyComments(headCommit, len(summary.Reports()))
+			return gr.tooManyComments(len(summary.Reports()))
 		}
 	}
 
@@ -336,11 +336,17 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 	return &c
 }
 
-func (gr GithubReporter) tooManyComments(headCommit string, nrComments int) error {
-	comment := github.PullRequestComment{
-		CommitID: github.String(headCommit),
+func (gr GithubReporter) tooManyComments(nrComments int) error {
+	comment := github.IssueComment{
 		Body: github.String(fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
 %d comments were skipped and won't be visibile on this PR.`, nrComments, gr.maxComments, nrComments-gr.maxComments)),
 	}
-	return gr.createComment(&comment)
+
+	slog.Debug("Creating PR comment", slog.String("body", comment.GetBody()))
+
+	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
+	defer cancel()
+
+	_, _, err := gr.client.Issues.CreateComment(ctx, gr.owner, gr.repo, gr.prNum, &comment)
+	return err
 }

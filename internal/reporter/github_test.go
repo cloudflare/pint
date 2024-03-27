@@ -355,7 +355,7 @@ filename %s
 					switch b {
 					case `{"body":":stop_sign: [mock1](https://cloudflare.github.io/pint/checks/mock1.html): syntax error1\n\nsyntax details1","path":"","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
 					case `{"body":":stop_sign: [mock2](https://cloudflare.github.io/pint/checks/mock2.html): syntax error2\n\nsyntax details2","path":"","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
-					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visibile on this PR.","commit_id":"fake-commit-id"}`:
+					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visibile on this PR."}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
 					}
