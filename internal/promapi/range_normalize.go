@@ -10,30 +10,31 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 )
 
-func labelValue(ls labels.Labels, name string) (string, bool) {
-	for _, l := range ls {
+func labelValue(ls labels.Labels, name string) (val string, ok bool) {
+	ls.Range(func(l labels.Label) {
 		if l.Name == name {
-			return l.Value, true
+			val = l.Value
+			ok = true
 		}
-	}
-	return "", false
+	})
+	return val, ok
 }
 
 func labelsBefore(ls, o labels.Labels) bool {
-	if len(ls) < len(o) {
+	if ls.Len() < o.Len() {
 		return true
 	}
-	if len(ls) > len(o) {
+	if ls.Len() > o.Len() {
 		return false
 	}
 
-	lns := make([]string, 0, len(ls)+len(o))
-	for _, ln := range ls {
-		lns = append(lns, ln.Name)
-	}
-	for _, ln := range o {
-		lns = append(lns, ln.Name)
-	}
+	lns := make([]string, 0, ls.Len()+o.Len())
+	ls.Range(func(l labels.Label) {
+		lns = append(lns, l.Name)
+	})
+	o.Range(func(l labels.Label) {
+		lns = append(lns, l.Name)
+	})
 	sort.Strings(lns)
 	for _, ln := range lns {
 		mlv, ok := labelValue(ls, ln)

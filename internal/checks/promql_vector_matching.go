@@ -242,9 +242,9 @@ func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ign
 	var lsets labelSets
 	for _, s := range qr.Series {
 		var ls labelSet
-		for _, lm := range s.Labels {
-			ls.add(lm.Name)
-		}
+		s.Labels.Range(func(l labels.Label) {
+			ls.add(l.Name)
+		})
 		if len(ls.names) > 1 {
 			sort.Strings(ls.names)
 		}

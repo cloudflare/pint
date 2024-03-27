@@ -9,6 +9,8 @@ ifeq ($(GOBIN),)
 GOBIN = $(shell go env GOPATH)/bin
 endif
 
+GOFLAGS := -tags stringlabels
+
 COVER_DIR     = .cover
 COVER_PROFILE = $(COVER_DIR)/coverage.out
 
@@ -16,7 +18,11 @@ COVER_PROFILE = $(COVER_DIR)/coverage.out
 build: $(PINT_BIN)
 
 $(PINT_BIN): $(PINT_SRC) go.mod go.sum
-	CGO_ENABLED=0 go build -trimpath -ldflags='-X main.version=$(PINT_VERSION) -X main.commit=$(PINT_COMMIT) -s -w' ./cmd/pint
+	CGO_ENABLED=0 go build \
+	    $(GOFLAGS) \
+		-trimpath \
+		-ldflags='-X main.version=$(PINT_VERSION) -X main.commit=$(PINT_COMMIT) -s -w' \
+		./cmd/pint
 
 $(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
 	go install -modfile=tools/golangci-lint/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint
@@ -46,6 +52,7 @@ test:
 	mkdir -p $(COVER_DIR)
 	echo 'mode: atomic' > $(COVER_PROFILE)
 	go test \
+		$(GOFLAGS) \
 		-covermode=atomic \
 		-coverprofile=$(COVER_PROFILE) \
 		-coverpkg=./... \
@@ -74,6 +81,7 @@ coverhtml: test
 .PHONY: benchmark
 benchmark:
 	go test \
+	    $(GOFLAGS) \
 		-count=10 \
 		-run=none \
 		-bench=. \

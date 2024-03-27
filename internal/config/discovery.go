@@ -403,12 +403,8 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 
 	servers := []*promapi.FailoverGroup{}
 	for _, s := range res.Series {
-		data := make(map[string]string, len(s.Labels))
-		for _, l := range s.Labels {
-			data[l.Name] = l.Value
-		}
 		for _, t := range pq.Template {
-			server, err := t.Render(data)
+			server, err := t.Render(s.Labels.Map())
 			if err != nil {
 				return nil, fmt.Errorf("prometheusQuery discovery  failed to generate Prometheus config from a template: %w", err)
 			}

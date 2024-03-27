@@ -97,9 +97,9 @@ func buildRuleLabels(rule *parser.RecordingRule) labels.Labels {
 		return labels.EmptyLabels()
 	}
 
-	ls := make(labels.Labels, 0, len(rule.Labels.Items))
+	pairs := make([]string, 0, len(rule.Labels.Items))
 	for _, l := range rule.Labels.Items {
-		ls = append(ls, labels.FromStrings(l.Key.Value, l.Value.Value)...)
+		pairs = append(pairs, l.Key.Value, l.Value.Value)
 	}
-	return ls
+	return labels.FromStrings(pairs...)
 }
