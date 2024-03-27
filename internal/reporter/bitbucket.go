@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/git"
+	"github.com/cloudflare/pint/internal/output"
 )
 
 const (
@@ -15,6 +16,14 @@ const (
 )
 
 func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, gitCmd git.CommandRunner) BitBucketReporter {
+	slog.Info(
+		"Will report problems to BitBucket",
+		slog.String("uri", uri),
+		slog.String("timeout", output.HumanizeDuration(timeout)),
+		slog.String("project", project),
+		slog.String("repo", repo),
+		slog.Int("maxComments", maxComments),
+	)
 	return BitBucketReporter{
 		api:    newBitBucketAPI(version, uri, timeout, token, project, repo, maxComments),
 		gitCmd: gitCmd,

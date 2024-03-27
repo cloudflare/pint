@@ -37,6 +37,16 @@ type GithubReporter struct {
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
 func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, gitCmd git.CommandRunner) (_ GithubReporter, err error) {
+	slog.Info(
+		"Will report problems to GitHub",
+		slog.String("baseURL", baseURL),
+		slog.String("uploadURL", uploadURL),
+		slog.String("timeout", output.HumanizeDuration(timeout)),
+		slog.String("owner", owner),
+		slog.String("repo", repo),
+		slog.Int("pr", prNum),
+		slog.Int("maxComments", maxComments),
+	)
 	gr := GithubReporter{
 		version:     version,
 		baseURL:     baseURL,
