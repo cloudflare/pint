@@ -257,6 +257,10 @@ func detectRepository(cfg *config.Repository) *config.Repository {
 		cfg.GitHub = detectGithubActions(cfg.GitHub)
 	}
 
+	if cfg != nil && cfg.GitHub != nil && cfg.GitHub.MaxComments == 0 {
+		cfg.GitHub.MaxComments = 50
+	}
+
 	if isNil && !isDirty {
 		return nil
 	}

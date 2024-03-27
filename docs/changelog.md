@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed compatibility with older git releases.
+- Fixed `maxComments` defaulting to zero when using GitHub reporter.
 
 ## v0.57.2
 
