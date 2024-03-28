@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.58.0
+
+### Fixed
+
+- Fixed false positives from [rule/duplicate](checks/rule/duplicate.md) check
+  when running `pint ci` on files that are both edited and renamed in the same PR.
+
 ## v0.57.3
 
 ### Fixed

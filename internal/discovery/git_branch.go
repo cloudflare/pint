@@ -141,8 +141,8 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 				)
 				entries = append(entries, me.before)
 			default:
-				slog.Debug(
-					"Unknown rule",
+				slog.Warn(
+					"Unknown rule state",
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.SourcePath),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
@@ -238,6 +238,13 @@ type matchedEntry struct {
 
 func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	for _, a := range after {
+		slog.Debug(
+			"Matching HEAD rule",
+			slog.String("path", a.SourcePath),
+			slog.String("source", a.ReportedPath),
+			slog.String("name", a.Rule.Name()),
+		)
+
 		m := matchedEntry{after: a, hasAfter: true}
 		beforeSwap := make([]Entry, 0, len(before))
 		var matches []Entry
@@ -250,6 +257,11 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 				m.isIdentical = true
 				m.wasMoved = a.SourcePath != b.SourcePath
 				matched = true
+				slog.Debug(
+					"Found identical rule on before & after",
+					slog.Bool("identical", m.isIdentical),
+					slog.Bool("moved", m.wasMoved),
+				)
 			} else {
 				beforeSwap = append(beforeSwap, b)
 			}
@@ -263,7 +275,13 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 			case 1:
 				m.before = matches[0]
 				m.hasBefore = true
+				m.wasMoved = a.SourcePath != matches[0].SourcePath
+				slog.Debug("Found rule with same name on before & after")
 			default:
+				slog.Debug(
+					"Found multiple rules with same name on before & after",
+					slog.Int("matches", len(matches)),
+				)
 				before = append(before, matches...)
 			}
 		}

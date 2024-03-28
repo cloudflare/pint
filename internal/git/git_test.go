@@ -13,7 +13,7 @@ import (
 	"github.com/cloudflare/pint/internal/git"
 )
 
-func blameLine(sha string, line int, filename, content string) string {
+func blameLine(sha string, line, prevLine int, filename, content string) string {
 	return fmt.Sprintf(`%s %d %d 1
 author Alice Mock
 author-mail <alice@example.com>
@@ -27,7 +27,7 @@ summary Mock commit title
 boundary
 filename %s
 	%s
-`, sha, line, line, filename, content)
+`, sha, prevLine, line, filename, content)
 }
 
 func TestGitBlame(t *testing.T) {
@@ -54,7 +54,7 @@ func TestGitBlame(t *testing.T) {
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, "foo.txt", "")
+				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 1, "foo.txt", "")
 				return []byte(content), nil
 			},
 			path: "foo.txt",
@@ -62,16 +62,14 @@ func TestGitBlame(t *testing.T) {
 				{
 					Filename: "foo.txt",
 					Line:     1,
+					PrevLine: 1,
 					Commit:   "b33a88cea35abc47f9973983626e1c6f3f3abc44",
 				},
 			},
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, "foo.txt", "") +
-					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 2, "foo.txt", "") +
-					blameLine("82987dec74ba8e434ba393d83491ace784473291", 3, "foo.txt", "") +
-					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 4, "bar.txt", "")
+				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 5, "foo.txt", "")
 				return []byte(content), nil
 			},
 			path: "foo.txt",
@@ -79,10 +77,45 @@ func TestGitBlame(t *testing.T) {
 				{
 					Filename: "foo.txt",
 					Line:     1,
+					PrevLine: 5,
 					Commit:   "b33a88cea35abc47f9973983626e1c6f3f3abc44",
 				},
-				{Filename: "foo.txt", Line: 2, Commit: "b33a88cea35abc47f9973983626e1c6f3f3abc44"},
-				{Filename: "foo.txt", Line: 3, Commit: "82987dec74ba8e434ba393d83491ace784473291"},
+			},
+		},
+		{
+			mock: func(_ ...string) ([]byte, error) {
+				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 1, "foo.txt", "") +
+					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 2, 2, "foo.txt", "") +
+					blameLine("82987dec74ba8e434ba393d83491ace784473291", 3, 3, "foo.txt", "") +
+					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 4, 4, "bar.txt", "")
+				return []byte(content), nil
+			},
+			path: "foo.txt",
+			output: git.LineBlames{
+				{
+					Filename: "foo.txt",
+					Line:     1,
+					PrevLine: 1,
+					Commit:   "b33a88cea35abc47f9973983626e1c6f3f3abc44",
+				},
+				{
+					Filename: "foo.txt",
+					Line:     2,
+					PrevLine: 2,
+					Commit:   "b33a88cea35abc47f9973983626e1c6f3f3abc44",
+				},
+				{
+					Filename: "foo.txt",
+					Line:     3,
+					PrevLine: 3,
+					Commit:   "82987dec74ba8e434ba393d83491ace784473291",
+				},
+				{
+					Filename: "bar.txt",
+					Line:     4,
+					PrevLine: 4,
+					Commit:   "b33a88cea35abc47f9973983626e1c6f3f3abc44",
+				},
 			},
 		},
 	}

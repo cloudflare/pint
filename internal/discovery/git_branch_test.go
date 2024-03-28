@@ -807,7 +807,7 @@ groups:
 					State:         discovery.Added,
 					ReportedPath:  "rules.yml",
 					SourcePath:    "rules.yml",
-					ModifiedLines: []int{8},
+					ModifiedLines: []int{8, 9},
 					Rule:          mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 			},
@@ -874,6 +874,39 @@ groups:
 				require.NoError(t, err, "git mv")
 
 				gitCommit(t, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			entries: []discovery.Entry{
+				{
+					State:         discovery.Moved,
+					ReportedPath:  "b.yml",
+					SourcePath:    "b.yml",
+					ModifiedLines: []int{1, 2, 3},
+					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+				},
+			},
+		},
+		{
+			title: "rule modified then the file renamed",
+			setup: func(t *testing.T) {
+				commitFile(t, "a.yml", `
+- alert: rule
+  # pint disable promql/series
+  expr: up == 0
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "a.yml", `
+- alert: rule
+  expr: up == 0
+`, "v2")
+
+				_, err = git.RunGit("mv", "a.yml", "b.yml")
+				require.NoError(t, err, "git mv")
+
+				gitCommit(t, "v3")
 			},
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{

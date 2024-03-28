@@ -14,6 +14,7 @@ import (
 type LineBlame struct {
 	Filename string
 	Commit   string
+	PrevLine int
 	Line     int
 }
 
@@ -66,17 +67,18 @@ func Blame(cmd CommandRunner, path, commit string) (lines LineBlames, err error)
 		case strings.HasPrefix(line, "boundary"):
 			continue
 		case strings.HasPrefix(line, "\t"):
-			if cl.Filename == path {
-				lines = append(lines, cl)
-			}
+			lines = append(lines, cl)
+			cl.PrevLine = 0
 		default:
 			parts := strings.Split(line, " ")
 			if len(parts) < 3 {
 				return nil, fmt.Errorf("failed to parse line number from line: %q", line)
 			}
 			cl.Commit = parts[0]
-			cl.Line, err = strconv.Atoi(parts[2])
-			if err != nil {
+			if cl.PrevLine, err = strconv.Atoi(parts[1]); err != nil {
+				return nil, fmt.Errorf("failed to parse line number from %q: %w", line, err)
+			}
+			if cl.Line, err = strconv.Atoi(parts[2]); err != nil {
 				return nil, fmt.Errorf("failed to parse line number from %q: %w", line, err)
 			}
 		}
