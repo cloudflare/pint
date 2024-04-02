@@ -41,7 +41,12 @@ func (c RuleDependencyCheck) Reporter() string {
 	return RuleDependencyCheckName
 }
 
-func (c RuleDependencyCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+	if path.Name != path.SymlinkTarget {
+		// Don't reported symlinks that are being removed.
+		return problems
+	}
+
 	var broken []*brokenDependency
 	var dep *brokenDependency
 	for _, entry := range entries {

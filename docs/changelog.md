@@ -6,6 +6,7 @@
 
 - Fixed false positives from [rule/duplicate](checks/rule/duplicate.md) check
   when running `pint ci` on files that are both edited and renamed in the same PR.
+- [rule/dependency](checks/rule/dependency.md) will no longer report removed symlinks.
 
 ## v0.57.3
 
