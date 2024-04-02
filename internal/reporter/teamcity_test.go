@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -37,8 +38,10 @@ func TestTeamCityReporter(t *testing.T) {
 			description: "info report",
 			summary: reporter.NewSummary([]reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -66,8 +69,10 @@ func TestTeamCityReporter(t *testing.T) {
 			description: "bug report",
 			summary: reporter.NewSummary([]reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -94,8 +99,10 @@ func TestTeamCityReporter(t *testing.T) {
 			description: "escaping characters",
 			summary: reporter.NewSummary([]reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{

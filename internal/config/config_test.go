@@ -156,9 +156,12 @@ func TestGetChecksForRule(t *testing.T) {
 			title:  "defaults",
 			config: "",
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -178,9 +181,12 @@ prometheus "prom" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -208,9 +214,12 @@ prometheus "prom" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -244,8 +253,11 @@ checks {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint disable promql/counter
 # pint disable promql/rate
@@ -276,9 +288,12 @@ prometheus "prom" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -300,9 +315,12 @@ prometheus "prom" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -323,9 +341,12 @@ prometheus "prom" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -346,9 +367,12 @@ prometheus "prom" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -381,9 +405,12 @@ prometheus "ignore" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -405,9 +432,12 @@ prometheus "ignore" {
 			title:  "single empty rule",
 			config: "rule{}\n",
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -432,9 +462,12 @@ rule {
   }
 }`,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -462,8 +495,11 @@ rule {
   }
 }`,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 - record: foo
   # pint disable promql/aggregate(instance:false)
@@ -492,9 +528,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -523,8 +562,11 @@ prometheus "prom2" {
 }  
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint disable promql/series(prom1)
 # pint disable query/cost(prom2)
@@ -601,9 +643,12 @@ rule {
   }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -650,8 +695,11 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint disable promql/counter
 # pint disable promql/series
@@ -702,9 +750,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -736,9 +787,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -767,9 +821,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -798,9 +855,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -829,9 +889,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -860,9 +923,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -891,9 +957,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -924,9 +993,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -964,8 +1036,11 @@ prometheus "prom1" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 - record: foo
   expr: sum(foo)
@@ -1003,8 +1078,11 @@ prometheus "prom1" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 - record: foo
   expr: sum(foo)
@@ -1051,8 +1129,11 @@ prometheus "prom1" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 - record: foo
   expr: sum(foo)
@@ -1089,8 +1170,11 @@ checks {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 - alert: foo
   expr: sum(foo)
@@ -1127,8 +1211,11 @@ checks {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 - alert: foo
   expr: sum(foo)
@@ -1151,9 +1238,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1179,9 +1269,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1205,9 +1298,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1232,9 +1328,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1258,9 +1357,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1284,9 +1386,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1310,9 +1415,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1338,9 +1446,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1364,9 +1475,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1394,9 +1508,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1424,8 +1541,11 @@ checks {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # Some extra comment
 # pint disable promql/series
@@ -1460,8 +1580,11 @@ checks {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint snooze 2099-11-AB labels/conflict
 # pint snooze 2099-11-28 labels/conflict won't work
@@ -1505,8 +1628,11 @@ checks {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint snooze 2000-11-28 promql/series(prom1)
 # pint snooze 2000-11-28T10:24:18Z promql/range_query
@@ -1556,8 +1682,11 @@ prometheus "prom3" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint disable alerts/count(+disable)
 # pint disable alerts/external_labels(+disable)
@@ -1614,8 +1743,11 @@ prometheus "prom3" {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
 				Rule: newRule(t, `
 # pint snooze 2099-11-28 alerts/count(+disable)
 # pint snooze 2099-11-28 alerts/external_labels(+disable)
@@ -1672,9 +1804,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1713,9 +1848,12 @@ rule {
 }
 `,
 			entry: discovery.Entry{
-				State:      discovery.Modified,
-				SourcePath: "rules.yml",
-				Rule:       newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,

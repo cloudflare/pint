@@ -40,7 +40,7 @@ func (c FragileCheck) Reporter() string {
 	return FragileCheckName
 }
 
-func (c FragileCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil

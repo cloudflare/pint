@@ -100,7 +100,7 @@ func (c SeriesCheck) Reporter() string {
 	return SeriesCheckName
 }
 
-func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	var settings *PromqlSeriesSettings
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
 		settings = s.(*PromqlSeriesSettings)
@@ -163,7 +163,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 					slog.Debug(
 						"Metric is provided by alerting rule",
 						slog.String("selector", (&selector).String()),
-						slog.String("path", arEntry.SourcePath),
+						slog.String("path", arEntry.Path.Name),
 					)
 				} else {
 					problems = append(problems, Problem{
@@ -262,7 +262,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ string, rule parser.Rule, entr
 			}
 			if rrEntry != nil {
 				// Validate recording rule instead
-				slog.Debug("Metric is provided by recording rule", slog.String("selector", (&bareSelector).String()), slog.String("path", rrEntry.SourcePath))
+				slog.Debug("Metric is provided by recording rule", slog.String("selector", (&bareSelector).String()), slog.String("path", rrEntry.Path.Name))
 				problems = append(problems, Problem{
 					Lines:    expr.Value.Lines,
 					Reporter: c.Reporter(),

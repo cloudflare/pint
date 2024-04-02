@@ -18,7 +18,7 @@ func textDuplicateRule(path string, line int) string {
 func TestRuleDuplicateCheck(t *testing.T) {
 	xxxEntries := mustParseContent("- record: foo\n  expr: up == 0\n")
 	for i := range xxxEntries {
-		xxxEntries[i].ReportedPath = "xxx.yml"
+		xxxEntries[i].Path.SymlinkTarget = "xxx.yml"
 	}
 
 	testCases := []checkTest{

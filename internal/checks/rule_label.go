@@ -60,7 +60,7 @@ func (c LabelCheck) Reporter() string {
 	return LabelCheckName
 }
 
-func (c LabelCheck) Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c LabelCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.RecordingRule != nil {
 		problems = append(problems, c.checkRecordingRule(rule)...)
 	}

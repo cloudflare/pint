@@ -14,6 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -79,7 +80,11 @@ filename %s
 			},
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "$1",
+						SymlinkTarget: "$1",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -125,7 +130,11 @@ filename %s
 			},
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -161,7 +170,11 @@ filename %s
 			},
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -208,7 +221,11 @@ filename %s
 			},
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -259,7 +276,11 @@ filename %s
 			},
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -306,7 +327,11 @@ filename %s
 			}),
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -353,8 +378,8 @@ filename %s
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
-					case `{"body":":stop_sign: [mock1](https://cloudflare.github.io/pint/checks/mock1.html): syntax error1\n\nsyntax details1","path":"","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
-					case `{"body":":stop_sign: [mock2](https://cloudflare.github.io/pint/checks/mock2.html): syntax error2\n\nsyntax details2","path":"","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
+					case `{"body":":stop_sign: [mock1](https://cloudflare.github.io/pint/checks/mock1.html): syntax error1\n\nsyntax details1","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
+					case `{"body":":stop_sign: [mock2](https://cloudflare.github.io/pint/checks/mock2.html): syntax error2\n\nsyntax details2","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
 					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visibile on this PR."}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
@@ -364,7 +389,11 @@ filename %s
 			}),
 			reports: []reporter.Report{
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -379,7 +408,11 @@ filename %s
 					},
 				},
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -394,7 +427,11 @@ filename %s
 					},
 				},
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -409,7 +446,11 @@ filename %s
 					},
 				},
 				{
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
 					ModifiedLines: []int{2},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{

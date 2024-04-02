@@ -25,10 +25,10 @@ type ConsoleReporter struct {
 func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 	reports := summary.Reports()
 	sort.Slice(reports, func(i, j int) bool {
-		if reports[i].SourcePath < reports[j].SourcePath {
+		if reports[i].Path.Name < reports[j].Path.Name {
 			return true
 		}
-		if reports[i].SourcePath > reports[j].SourcePath {
+		if reports[i].Path.Name > reports[j].Path.Name {
 			return false
 		}
 		if reports[i].Problem.Lines.First < reports[j].Problem.Lines.First {
@@ -52,21 +52,21 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			continue
 		}
 
-		if _, ok := perFile[report.SourcePath]; !ok {
-			perFile[report.SourcePath] = []string{}
+		if _, ok := perFile[report.Path.Name]; !ok {
+			perFile[report.Path.Name] = []string{}
 		}
 
 		var content string
 		if report.Problem.Anchor == checks.AnchorAfter {
-			content, err = readFile(report.SourcePath)
+			content, err = readFile(report.Path.Name)
 			if err != nil {
 				return err
 			}
 		}
 
-		path := report.SourcePath
-		if report.SourcePath != report.ReportedPath {
-			path = fmt.Sprintf("%s ~> %s", report.SourcePath, report.ReportedPath)
+		path := report.Path.Name
+		if report.Path.Name != report.Path.SymlinkTarget {
+			path = fmt.Sprintf("%s ~> %s", report.Path.Name, report.Path.SymlinkTarget)
 		}
 		path = color.CyanString("%s:%s", path, report.Problem.Lines)
 		if report.Problem.Anchor == checks.AnchorBefore {
@@ -92,7 +92,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 				lastLine = len(lines) - 1
 				slog.Warn(
 					"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
-					slog.String("path", report.SourcePath),
+					slog.String("path", report.Path.Name),
 				)
 			}
 
@@ -102,7 +102,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			}
 		}
 
-		perFile[report.SourcePath] = append(perFile[report.SourcePath], strings.Join(msg, ""))
+		perFile[report.Path.Name] = append(perFile[report.Path.Name], strings.Join(msg, ""))
 	}
 
 	paths := []string{}

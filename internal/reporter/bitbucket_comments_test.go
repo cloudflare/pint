@@ -10,6 +10,7 @@ import (
 	"github.com/neilotoole/slogt"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -40,8 +41,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			maxComments: 50,
 			summary: Summary{reports: []Report{
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -56,8 +59,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			maxComments: 50,
 			summary: Summary{reports: []Report{
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -71,8 +76,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
@@ -86,8 +93,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -101,8 +110,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "symlink.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "symlink.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -116,8 +127,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "second.yaml",
-					SourcePath:    "second.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "second.yaml",
+						Name:          "second.yaml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
@@ -132,8 +145,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "second.yaml",
-					SourcePath:    "second.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "second.yaml",
+						Name:          "second.yaml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -220,8 +235,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			maxComments: 50,
 			summary: Summary{reports: []Report{
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -235,8 +252,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -277,8 +296,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			maxComments: 50,
 			summary: Summary{reports: []Report{
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -292,8 +313,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -334,8 +357,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			maxComments: 50,
 			summary: Summary{reports: []Report{
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -349,8 +374,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -391,8 +418,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			maxComments: 2,
 			summary: Summary{reports: []Report{
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -406,8 +435,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
@@ -421,8 +452,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "rule.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -436,8 +469,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "rule.yaml",
-					SourcePath:    "symlink.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "symlink.yaml",
+					},
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
@@ -451,8 +486,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "second.yaml",
-					SourcePath:    "second.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "second.yaml",
+						Name:          "second.yaml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
@@ -467,8 +504,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "second.yaml",
-					SourcePath:    "second.yaml",
+					Path: discovery.Path{
+						SymlinkTarget: "second.yaml",
+						Name:          "second.yaml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,

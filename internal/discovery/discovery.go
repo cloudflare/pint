@@ -3,6 +3,7 @@ package discovery
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"strings"
@@ -89,10 +90,21 @@ const (
 	Excluded
 )
 
+type Path struct {
+	Name          string // file path, it can be symlink
+	SymlinkTarget string // symlink target, or the same as name if not a symlink
+}
+
+func (p Path) String() string {
+	if p.Name == p.SymlinkTarget {
+		return p.Name
+	}
+	return fmt.Sprintf("%s ~> %s", p.Name, p.SymlinkTarget)
+}
+
 type Entry struct {
 	PathError      error
-	ReportedPath   string // symlink target
-	SourcePath     string // file path (can be symlink)
+	Path           Path
 	Owner          string
 	ModifiedLines  []int
 	DisabledChecks []string
@@ -142,8 +154,10 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			)
 		case comments.InvalidComment:
 			entries = append(entries, Entry{
-				ReportedPath:  reportedPath,
-				SourcePath:    sourcePath,
+				Path: Path{
+					Name:          sourcePath,
+					SymlinkTarget: reportedPath,
+				},
 				PathError:     comment.Value.(comments.Invalid).Err,
 				Owner:         fileOwner,
 				ModifiedLines: contentLines.Expand(),
@@ -153,8 +167,10 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 
 	if content.Ignored {
 		entries = append(entries, Entry{
-			ReportedPath: reportedPath,
-			SourcePath:   sourcePath,
+			Path: Path{
+				Name:          sourcePath,
+				SymlinkTarget: reportedPath,
+			},
 			PathError: FileIgnoreError{
 				Line: content.IgnoreLine,
 				// nolint:revive
@@ -178,8 +194,10 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 				}
 				seen[err.Error()] = struct{}{}
 				entries = append(entries, Entry{
-					ReportedPath:  reportedPath,
-					SourcePath:    sourcePath,
+					Path: Path{
+						Name:          sourcePath,
+						SymlinkTarget: reportedPath,
+					},
 					PathError:     err,
 					Owner:         fileOwner,
 					ModifiedLines: contentLines.Expand(),
@@ -200,8 +218,10 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			slog.String("lines", contentLines.String()),
 		)
 		entries = append(entries, Entry{
-			ReportedPath:  reportedPath,
-			SourcePath:    sourcePath,
+			Path: Path{
+				Name:          sourcePath,
+				SymlinkTarget: reportedPath,
+			},
 			PathError:     err,
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
@@ -215,8 +235,10 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 			ruleOwner = owner.Name
 		}
 		entries = append(entries, Entry{
-			ReportedPath:   reportedPath,
-			SourcePath:     sourcePath,
+			Path: Path{
+				Name:          sourcePath,
+				SymlinkTarget: reportedPath,
+			},
 			Rule:           rule,
 			ModifiedLines:  rule.Lines.Expand(),
 			Owner:          ruleOwner,

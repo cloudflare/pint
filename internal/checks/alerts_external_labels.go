@@ -43,7 +43,7 @@ func (c AlertsExternalLabelsCheck) Reporter() string {
 	return AlertsExternalLabelsCheckName
 }
 
-func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return problems
 	}

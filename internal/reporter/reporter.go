@@ -5,12 +5,12 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
 type Report struct {
-	ReportedPath  string
-	SourcePath    string
+	Path          discovery.Path
 	Owner         string
 	ModifiedLines []int
 	Rule          parser.Rule
@@ -18,10 +18,10 @@ type Report struct {
 }
 
 func (r Report) isEqual(nr Report) bool {
-	if nr.ReportedPath != r.ReportedPath {
+	if nr.Path.SymlinkTarget != r.Path.SymlinkTarget {
 		return false
 	}
-	if nr.SourcePath != r.SourcePath {
+	if nr.Path.Name != r.Path.Name {
 		return false
 	}
 	if nr.Owner != r.Owner {
@@ -80,11 +80,11 @@ func (s Summary) hasReport(r Report) bool {
 
 func (s *Summary) SortReports() {
 	sort.SliceStable(s.reports, func(i, j int) bool {
-		if s.reports[i].ReportedPath != s.reports[j].ReportedPath {
-			return s.reports[i].ReportedPath < s.reports[j].ReportedPath
+		if s.reports[i].Path.SymlinkTarget != s.reports[j].Path.SymlinkTarget {
+			return s.reports[i].Path.SymlinkTarget < s.reports[j].Path.SymlinkTarget
 		}
-		if s.reports[i].SourcePath != s.reports[j].SourcePath {
-			return s.reports[i].SourcePath < s.reports[j].SourcePath
+		if s.reports[i].Path.Name != s.reports[j].Path.Name {
+			return s.reports[i].Path.Name < s.reports[j].Path.Name
 		}
 		if s.reports[i].Problem.Lines.First != s.reports[j].Problem.Lines.First {
 			return s.reports[i].Problem.Lines.First < s.reports[j].Problem.Lines.First

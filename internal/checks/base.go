@@ -123,7 +123,7 @@ type RuleChecker interface {
 	String() string
 	Reporter() string
 	Meta() CheckMeta
-	Check(_ context.Context, _ string, rule parser.Rule, _ []discovery.Entry) []Problem
+	Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) []Problem
 }
 
 type exprProblem struct {

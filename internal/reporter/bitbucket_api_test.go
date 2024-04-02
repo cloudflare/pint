@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -111,8 +112,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "fatal report on modified line",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "foo.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "foo.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{
@@ -137,8 +140,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "bug report on modified line",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "foo.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "foo.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{
@@ -162,8 +167,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "warning report on modified line",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "foo.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "foo.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{
@@ -187,8 +194,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "information report on modified line",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "foo.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "foo.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{
@@ -212,8 +221,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "fatal report on symlinked file",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "bar.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "bar.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{
@@ -237,8 +248,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "fatal report on symlinked file on unmodified line",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "bar.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "bar.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{
@@ -262,8 +275,10 @@ func TestReportToAnnotation(t *testing.T) {
 		{
 			description: "information report on unmodified line",
 			input: Report{
-				ReportedPath:  "foo.yaml",
-				SourcePath:    "foo.yaml",
+				Path: discovery.Path{
+					SymlinkTarget: "foo.yaml",
+					Name:          "foo.yaml",
+				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
 					Lines: parser.LineRange{

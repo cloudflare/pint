@@ -319,7 +319,7 @@ func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestCom
 
 	c := github.PullRequestComment{
 		CommitID: github.String(headCommit),
-		Path:     github.String(rep.ReportedPath),
+		Path:     github.String(rep.Path.SymlinkTarget),
 		Body: github.String(fmt.Sprintf(
 			"%s [%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s%s",
 			problemIcon(rep.Problem.Severity),

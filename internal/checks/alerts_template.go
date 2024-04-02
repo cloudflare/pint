@@ -110,7 +110,7 @@ func (c TemplateCheck) Reporter() string {
 	return TemplateCheckName
 }
 
-func (c TemplateCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule == nil {
 		return nil
 	}

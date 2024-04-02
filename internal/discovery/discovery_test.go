@@ -130,9 +130,11 @@ func TestReadRules(t *testing.T) {
 			isStrict: false,
 			entries: []Entry{
 				{
-					State:          Unknown,
-					ReportedPath:   "rules.yml",
-					SourcePath:     "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines:  []int{4, 5},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
@@ -157,9 +159,11 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State:          Unknown,
-					ReportedPath:   "rules.yml",
-					SourcePath:     "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines:  []int{7, 8},
 					Rule:           mustParse(6, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
@@ -181,9 +185,11 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State:         Unknown,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{4, 5},
 					Rule:          mustParse(3, "- record: foo\n  expr: bar\n"),
 				},
@@ -207,9 +213,11 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State:         Unknown,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{7, 8},
 					Rule:          mustParse(6, "- record: foo\n  expr: bar\n"),
 				},
@@ -230,9 +238,11 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State:          Unknown,
-					ReportedPath:   "rules.yml",
-					SourcePath:     "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines:  []int{4, 5},
 					Rule:           mustParse(3, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
@@ -257,9 +267,11 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State:          Unknown,
-					ReportedPath:   "rules.yml",
-					SourcePath:     "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines:  []int{7, 8},
 					Rule:           mustParse(6, "- record: foo\n  expr: bar\n"),
 					DisabledChecks: []string{"promql/series"},
@@ -281,9 +293,11 @@ groups:
 			isStrict: false,
 			entries: []Entry{
 				{
-					State:         Unknown,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{1, 2, 3, 4, 5},
 					PathError:     FileIgnoreError{Line: 2, Err: errors.New("file was ignored")},
 				},
@@ -307,9 +321,11 @@ groups:
 			isStrict: true,
 			entries: []Entry{
 				{
-					State:         Unknown,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: Unknown,
+					Path: Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7, 8},
 					PathError:     FileIgnoreError{Line: 2, Err: errors.New("file was ignored")},
 				},

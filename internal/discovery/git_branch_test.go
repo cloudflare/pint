@@ -220,9 +220,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(4, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
@@ -253,9 +255,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{6},
 					Rule:          mustParse(4, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
@@ -280,9 +284,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{3},
 					Rule:          mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
@@ -307,9 +313,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(nil, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{3},
 					Rule:          mustParse(1, "- record: up:count\n  expr: count(up == 1)\n"),
 				},
@@ -415,9 +423,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "symlink.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "symlink.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{2, 3},
 					Rule:          mustParse(1, "- record: up:count\n  expr: count(up)\n"),
 				},
@@ -458,37 +468,47 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{6},
 					Rule:          mustParse(4, "- record: up:count:1\n  expr: count(up == 1)\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{7},
 					Rule:          mustParse(6, "- record: up:count:2a\n  expr: count(up)\n"),
 				},
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(8, "- record: up:count:3\n  expr: count(up)\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{11, 12},
 					Rule:          mustParse(10, "- record: up:count:4\n  expr: count(up)\n"),
 				},
 				{
-					State:         discovery.Removed,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{7},
 					Rule:          mustParse(6, "- record: up:count:2\n  expr: count(up)\n"),
 				},
@@ -520,16 +540,20 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{4},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
@@ -556,16 +580,20 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(1, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Removed,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{2, 3},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
@@ -592,16 +620,20 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Removed,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{4, 5},
 					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
@@ -632,23 +664,29 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(3, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Removed,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{4, 5},
 					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
@@ -680,16 +718,20 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: nil,
 					Rule:          mustParse(4, "- record: up:count\n  expr: count(up)\n"),
 				},
 				{
-					State:         discovery.Removed,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{3},
 					PathError: mustErr(`
 groups:
@@ -729,30 +771,38 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{6, 7},
 					Rule:          mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{8, 9},
 					Rule:          mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
@@ -783,30 +833,38 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{3},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: up == 0\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{4, 5},
 					Rule:          mustParse(3, "- alert: rule1\n  expr: up == 1\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{6, 7},
 					Rule:          mustParse(5, "- alert: rule1\n  expr: up != 0\n"),
 				},
 				{
-					State:         discovery.Added,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{8, 9},
 					Rule:          mustParse(7, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
 				},
@@ -844,16 +902,20 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Excluded,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Excluded,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{},
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 1s\n"),
 				},
 				{
-					State:         discovery.Modified,
-					ReportedPath:  "rules.yml",
-					SourcePath:    "rules.yml",
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
 					ModifiedLines: []int{7, 8, 9, 10, 11, 12},
 					Rule:          mustParse(4, "- alert: rule2\n  expr: sum(foo) by(job)\n  keep_firing_for: 5m\n  for: 0s\n  annotations:\n    foo: bar\n  labels:\n    foo: bar\n"),
 				},
@@ -878,9 +940,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Moved,
-					ReportedPath:  "b.yml",
-					SourcePath:    "b.yml",
+					State: discovery.Moved,
+					Path: discovery.Path{
+						Name:          "b.yml",
+						SymlinkTarget: "b.yml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
@@ -911,9 +975,11 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Moved,
-					ReportedPath:  "b.yml",
-					SourcePath:    "b.yml",
+					State: discovery.Moved,
+					Path: discovery.Path{
+						Name:          "b.yml",
+						SymlinkTarget: "b.yml",
+					},
 					ModifiedLines: []int{1, 2, 3},
 					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
 				},
