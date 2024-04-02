@@ -48,7 +48,7 @@ func (c CounterCheck) Reporter() string {
 	return CounterCheckName
 }
 
-func (c CounterCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c CounterCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 
 	if expr.SyntaxError != nil {

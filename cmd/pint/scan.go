@@ -118,7 +118,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
 					slog.Debug("Found recording rule",
-						slog.String("path", entry.SourcePath),
+						slog.String("path", entry.Path.Name),
 						slog.String("record", entry.Rule.RecordingRule.Record.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
 					)
@@ -126,7 +126,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				if entry.Rule.AlertingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.AlertingRuleType).Inc()
 					slog.Debug("Found alerting rule",
-						slog.String("path", entry.SourcePath),
+						slog.String("path", entry.Path.Name),
 						slog.String("alert", entry.Rule.AlertingRule.Alert.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
 					)
@@ -146,7 +146,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 			default:
 				if entry.Rule.Error.Err != nil {
 					slog.Debug("Found invalid rule",
-						slog.String("path", entry.SourcePath),
+						slog.String("path", entry.Path.Name),
 						slog.String("lines", entry.Rule.Lines.String()),
 					)
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
@@ -189,8 +189,10 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			switch {
 			case errors.As(job.entry.PathError, &ignoreErr):
 				results <- reporter.Report{
-					ReportedPath:  job.entry.ReportedPath,
-					SourcePath:    job.entry.SourcePath,
+					Path: discovery.Path{
+						Name:          job.entry.Path.Name,
+						SymlinkTarget: job.entry.Path.SymlinkTarget,
+					},
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
 						Lines: parser.LineRange{
@@ -205,8 +207,10 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 				}
 			case errors.As(job.entry.PathError, &commentErr):
 				results <- reporter.Report{
-					ReportedPath:  job.entry.ReportedPath,
-					SourcePath:    job.entry.SourcePath,
+					Path: discovery.Path{
+						Name:          job.entry.Path.Name,
+						SymlinkTarget: job.entry.Path.SymlinkTarget,
+					},
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
 						Lines: parser.LineRange{
@@ -222,8 +226,10 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			case job.entry.PathError != nil:
 				line, e := tryDecodingYamlError(job.entry.PathError)
 				results <- reporter.Report{
-					ReportedPath:  job.entry.ReportedPath,
-					SourcePath:    job.entry.SourcePath,
+					Path: discovery.Path{
+						Name:          job.entry.Path.Name,
+						SymlinkTarget: job.entry.Path.SymlinkTarget,
+					},
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
 						Lines: parser.LineRange{
@@ -242,8 +248,10 @@ If this file is a template that will be rendered into valid YAML then you can in
 				}
 			case job.entry.Rule.Error.Err != nil:
 				results <- reporter.Report{
-					ReportedPath:  job.entry.ReportedPath,
-					SourcePath:    job.entry.SourcePath,
+					Path: discovery.Path{
+						Name:          job.entry.Path.Name,
+						SymlinkTarget: job.entry.Path.SymlinkTarget,
+					},
 					ModifiedLines: job.entry.ModifiedLines,
 					Rule:          job.entry.Rule,
 					Problem: checks.Problem{
@@ -263,19 +271,21 @@ This usually means that it's missing some required fields.`,
 				if job.entry.State == discovery.Unknown {
 					slog.Warn(
 						"Bug: unknown rule state",
-						slog.String("path", job.entry.ReportedPath),
+						slog.String("path", job.entry.Path.String()),
 						slog.Int("line", job.entry.Rule.Lines.First),
 						slog.String("name", job.entry.Rule.Name()),
 					)
 				}
 
 				start := time.Now()
-				problems := job.check.Check(ctx, job.entry.ReportedPath, job.entry.Rule, job.allEntries)
+				problems := job.check.Check(ctx, job.entry.Path, job.entry.Rule, job.allEntries)
 				checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
 				for _, problem := range problems {
 					results <- reporter.Report{
-						ReportedPath:  job.entry.ReportedPath,
-						SourcePath:    job.entry.SourcePath,
+						Path: discovery.Path{
+							Name:          job.entry.Path.Name,
+							SymlinkTarget: job.entry.Path.SymlinkTarget,
+						},
 						ModifiedLines: job.entry.ModifiedLines,
 						Rule:          job.entry.Rule,
 						Problem:       problem,

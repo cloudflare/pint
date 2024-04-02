@@ -89,7 +89,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					"Rule added on HEAD branch",
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
-					slog.String("path", me.after.SourcePath),
+					slog.String("path", me.after.Path.Name),
 					slog.String("ruleLines", me.after.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 				)
@@ -117,7 +117,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
-						slog.String("path", me.after.SourcePath),
+						slog.String("path", me.after.Path.Name),
 						slog.String("ruleLines", me.after.Rule.Lines.String()),
 						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 					)
@@ -135,16 +135,16 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					"Rule removed on HEAD branch",
 					slog.String("name", me.before.Rule.Name()),
 					slog.String("state", me.before.State.String()),
-					slog.String("path", me.before.SourcePath),
+					slog.String("path", me.before.Path.Name),
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
 				entries = append(entries, me.before)
 			default:
-				slog.Debug(
-					"Unknown rule",
+				slog.Warn(
+					"Unknown rule state",
 					slog.String("state", me.before.State.String()),
-					slog.String("path", me.before.SourcePath),
+					slog.String("path", me.before.Path.Name),
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
 				entries = append(entries, me.after)
@@ -158,7 +158,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 	}
 
 	for _, entry := range symlinks {
-		if f.filter.IsPathAllowed(entry.SourcePath) {
+		if f.filter.IsPathAllowed(entry.Path.Name) {
 			entries = append(entries, entry)
 		}
 	}
@@ -170,7 +170,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			goto NEXT
 		}
 		for i, globEntry := range allEntries {
-			if entry.SourcePath == globEntry.SourcePath && entry.Rule.IsSame(globEntry.Rule) {
+			if entry.Path.Name == globEntry.Path.Name && entry.Rule.IsSame(globEntry.Rule) {
 				allEntries[i].State = entry.State
 				allEntries[i].ModifiedLines = entry.ModifiedLines
 				found = true
@@ -238,6 +238,13 @@ type matchedEntry struct {
 
 func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	for _, a := range after {
+		slog.Debug(
+			"Matching HEAD rule",
+			slog.String("path", a.Path.Name),
+			slog.String("source", a.Path.SymlinkTarget),
+			slog.String("name", a.Rule.Name()),
+		)
+
 		m := matchedEntry{after: a, hasAfter: true}
 		beforeSwap := make([]Entry, 0, len(before))
 		var matches []Entry
@@ -248,8 +255,13 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 				m.before = b
 				m.hasBefore = true
 				m.isIdentical = true
-				m.wasMoved = a.SourcePath != b.SourcePath
+				m.wasMoved = a.Path.Name != b.Path.Name
 				matched = true
+				slog.Debug(
+					"Found identical rule on before & after",
+					slog.Bool("identical", m.isIdentical),
+					slog.Bool("moved", m.wasMoved),
+				)
 			} else {
 				beforeSwap = append(beforeSwap, b)
 			}
@@ -263,7 +275,13 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 			case 1:
 				m.before = matches[0]
 				m.hasBefore = true
+				m.wasMoved = a.Path.Name != matches[0].Path.Name
+				slog.Debug("Found rule with same name on before & after")
 			default:
+				slog.Debug(
+					"Found multiple rules with same name on before & after",
+					slog.Int("matches", len(matches)),
+				)
 				before = append(before, matches...)
 			}
 		}

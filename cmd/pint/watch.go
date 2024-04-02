@@ -326,7 +326,7 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 	fileOwners := map[string]string{}
 	for _, entry := range entries {
 		if entry.Owner != "" {
-			fileOwners[entry.ReportedPath] = entry.Owner
+			fileOwners[entry.Path.SymlinkTarget] = entry.Owner
 		}
 	}
 	c.fileOwners = fileOwners
@@ -377,7 +377,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			c.problem,
 			prometheus.GaugeValue,
 			1,
-			report.SourcePath,
+			report.Path.Name,
 			kind,
 			name,
 			strings.ToLower(report.Problem.Severity.String()),

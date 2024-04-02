@@ -71,9 +71,11 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")})),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "bar.yml",
-					SourcePath:    "bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
 					Rule:          testRules[0],
 					ModifiedLines: testRules[0].Lines.Expand(),
 					Owner:         "bob",
@@ -85,9 +87,11 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")})),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "foo/bar.yml",
-					SourcePath:    "foo/bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "foo/bar.yml",
+						SymlinkTarget: "foo/bar.yml",
+					},
 					Rule:          testRules[0],
 					ModifiedLines: testRules[0].Lines.Expand(),
 					Owner:         "alice",
@@ -99,9 +103,11 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil)),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "bar.yml",
-					SourcePath:    "bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
@@ -113,9 +119,11 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")})),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "bar.yml",
-					SourcePath:    "bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
 					PathError:     errors.New("yaml: line 2: mapping values are not allowed in this context"),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
@@ -128,17 +136,21 @@ func TestGlobPathFinder(t *testing.T) {
 			finder:   discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil)),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "bar.yml",
-					SourcePath:    "bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "bar.yml",
+						SymlinkTarget: "bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "bar.yml",
-					SourcePath:    "link.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "link.yml",
+						SymlinkTarget: "bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
@@ -154,25 +166,31 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil)),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "a/bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "a/bar.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "b/c/link.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "b/c/link.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "b/link.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "b/link.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
@@ -203,17 +221,21 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil)),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "a/bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "a/bar.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr("xxx:\nyyy:\n"),
 					ModifiedLines: []int{1, 2},
 					Owner:         "",
 				},
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "b/c/link.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "b/c/link.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr("xxx:\nyyy:\n"),
 					ModifiedLines: []int{1, 2},
 					Owner:         "",
@@ -242,17 +264,21 @@ func TestGlobPathFinder(t *testing.T) {
 			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil)),
 			entries: []discovery.Entry{
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "a/bar.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "a/bar.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
 				{
-					State:         discovery.Noop,
-					ReportedPath:  "a/bar.yml",
-					SourcePath:    "b/c/link.yml",
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "b/c/link.yml",
+						SymlinkTarget: "a/bar.yml",
+					},
 					PathError:     parseErr(testRuleBody),
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",

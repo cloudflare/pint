@@ -10,17 +10,15 @@ env GIT_COMMITTER_EMAIL=pint@example.com
 exec git add .
 exec git commit -am 'import rules and config'
 
-exec git checkout -b v1
+exec git checkout -b pr
 cp ../src/a.yml a.yml
 exec git add a.yml
 exec git commit -am 'v1'
 
-exec git checkout -b v2
 cp ../src/b.yml b.yml
 exec git add b.yml
 exec git commit -am 'v2'
 
-exec git checkout -b v3
 exec git rm a.yml
 exec git commit -am 'v3'
 

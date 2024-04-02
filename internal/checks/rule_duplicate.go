@@ -43,7 +43,7 @@ func (c RuleDuplicateCheck) Reporter() string {
 	return RuleDuplicateCheckName
 }
 
-func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c RuleDuplicateCheck) Check(ctx context.Context, path discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
 	if rule.RecordingRule == nil || rule.RecordingRule.Expr.SyntaxError != nil {
 		return nil
 	}
@@ -55,13 +55,13 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path string, rule parser.
 		if entry.Rule.RecordingRule == nil {
 			continue
 		}
-		if entry.SourcePath == path && entry.Rule.Lines.First == rule.Lines.First {
+		if entry.Path.Name == path.Name && entry.Rule.Lines.First == rule.Lines.First {
 			continue
 		}
-		if !c.prom.IsEnabledForPath(path) {
+		if !c.prom.IsEnabledForPath(path.Name) {
 			continue
 		}
-		if !c.prom.IsEnabledForPath(entry.SourcePath) {
+		if !c.prom.IsEnabledForPath(entry.Path.Name) {
 			continue
 		}
 		if entry.Rule.RecordingRule.Record.Value != rule.RecordingRule.Record.Value {
@@ -84,7 +84,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.ReportedPath, entry.Rule.RecordingRule.Record.Lines.First),
+			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
 			Severity: Bug,
 		})
 	}

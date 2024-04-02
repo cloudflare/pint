@@ -80,6 +80,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -120,6 +121,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -137,6 +139,7 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt/.keep",
@@ -157,7 +160,7 @@ func TestChanges(t *testing.T) {
 			err: "",
 		},
 		{
-			title: "add file, delete and re-add",
+			title: "delete and re-add",
 			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
@@ -178,6 +181,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1", "2"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -219,6 +223,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "second file.txt",
@@ -259,6 +264,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -299,6 +305,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1", "2"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "index.txt",
@@ -339,9 +346,10 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
-							Name: "second.txt",
+							Name: "",
 							Type: git.Missing,
 						},
 						After: git.Path{
@@ -355,9 +363,10 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
-							Name: "third.txt",
+							Name: "",
 							Type: git.Missing,
 						},
 						After: git.Path{
@@ -394,6 +403,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name: "second.txt",
@@ -433,6 +443,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "second.txt",
@@ -475,6 +486,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "dir/first.txt",
@@ -492,6 +504,7 @@ func TestChanges(t *testing.T) {
 					},
 				},
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "dir/second.txt",
@@ -537,6 +550,7 @@ func TestChanges(t *testing.T) {
 			},
 			changes: []*git.FileChange{
 				{
+					Commits: []string{"1"},
 					Path: git.PathDiff{
 						Before: git.Path{
 							Name:          "dir/second.txt",
@@ -553,6 +567,48 @@ func TestChanges(t *testing.T) {
 						Before:        []byte("bar\n1\n"),
 						After:         []byte("foo\n1\n"),
 						ModifiedLines: []int{1, 2},
+					},
+				},
+			},
+			err: "",
+		},
+		{
+			title: "rule modified then file renamed",
+			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+				mustRun(t, "init", "--initial-branch=main", ".")
+				require.NoError(t, os.WriteFile("main.txt", []byte("l1\nl2\nl3\n"), 0o644))
+				mustRun(t, "add", "main.txt")
+				gitCommit(t, "init")
+
+				mustRun(t, "checkout", "-b", "v2")
+				require.NoError(t, os.WriteFile("main.txt", []byte("l1\nl3\n"), 0o644))
+				mustRun(t, "add", "main.txt")
+				gitCommit(t, "edit")
+
+				mustRun(t, "mv", "main.txt", "pr.txt")
+				gitCommit(t, "rename")
+
+				cr, err := git.CommitRange(debugGitRun(t), "main")
+				require.NoError(t, err)
+				return debugGitRun(t), cr
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1", "2"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "main.txt",
+							Type: git.File,
+						},
+						After: git.Path{
+							Name: "pr.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        []byte("l1\nl2\nl3\n"),
+						After:         []byte("l1\nl3\n"),
+						ModifiedLines: []int{2},
 					},
 				},
 			},
@@ -575,11 +631,12 @@ func TestChanges(t *testing.T) {
 				require.Nil(t, changes)
 			} else {
 				require.NoError(t, err)
-				require.Len(t, changes, len(tc.changes))
 				for i := range tc.changes {
+					require.Len(t, changes[i].Commits, len(tc.changes[i].Commits), "changes[%d].Commits", i)
 					require.Equal(t, tc.changes[i].Path, changes[i].Path, "changes[%d].Path", i)
 					require.Equal(t, tc.changes[i].Body, changes[i].Body, "changes[%d].Body", i)
 				}
+				require.Len(t, changes, len(tc.changes))
 			}
 		})
 	}

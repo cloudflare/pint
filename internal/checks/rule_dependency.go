@@ -41,7 +41,12 @@ func (c RuleDependencyCheck) Reporter() string {
 	return RuleDependencyCheckName
 }
 
-func (c RuleDependencyCheck) Check(_ context.Context, _ string, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+	if path.Name != path.SymlinkTarget {
+		// Don't reported symlinks that are being removed.
+		return problems
+	}
+
 	var broken []*brokenDependency
 	var dep *brokenDependency
 	for _, entry := range entries {
@@ -130,7 +135,7 @@ func (c RuleDependencyCheck) usesVector(entry discovery.Entry, name string) *bro
 			return &brokenDependency{
 				kind:   "recording",
 				metric: name,
-				path:   entry.ReportedPath,
+				path:   entry.Path.SymlinkTarget,
 				line:   expr.Value.Lines.First,
 				name:   entry.Rule.Name(),
 			}
@@ -155,7 +160,7 @@ func (c RuleDependencyCheck) usesAlert(entry discovery.Entry, name string) *brok
 				return &brokenDependency{
 					kind:   "alerting",
 					metric: vs.String(),
-					path:   entry.ReportedPath,
+					path:   entry.Path.SymlinkTarget,
 					line:   expr.Value.Lines.First,
 					name:   entry.Rule.Name(),
 				}

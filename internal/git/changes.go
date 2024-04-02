@@ -62,9 +62,10 @@ type PathDiff struct {
 }
 
 type FileChange struct {
-	Commits []string
 	Path    PathDiff
 	Body    BodyDiff
+	Commits []string
+	Status  FileStatus
 }
 
 func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*FileChange, error) {
@@ -109,54 +110,96 @@ func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*Fi
 			continue
 		}
 
-		change := getChangeByPath(changes, dstPath)
-		if change == nil {
-			beforeType := getTypeForPath(cmd, commit+"^", srcPath)
-			change = &FileChange{
-				Path: PathDiff{
-					Before: Path{
-						Name:          srcPath,
-						Type:          beforeType,
-						SymlinkTarget: resolveSymlinkTarget(cmd, commit+"^", srcPath, beforeType),
-					},
-					After: Path{
-						Name: dstPath,
-					},
+		// Rest is populated inside the next loop.
+		change := &FileChange{
+			Status: status,
+			Path: PathDiff{
+				After: Path{
+					Name: dstPath,
 				},
-			}
-			switch status {
-			case FileAdded:
-				// newly added file, there's no "BEFORE" version
-			case FileCopied:
-				// file copied from other location, there's no "BEFORE" version
-			case FileDeleted:
-				// delete file, there's no "AFTER" version
-				change.Body.Before = getContentAtCommit(cmd, commit+"^", change.Path.Before.SymlinkTarget)
-			case FileModified:
-				// modified file, there's both "BEFORE" and "AFTER"
-				change.Body.Before = getContentAtCommit(cmd, commit+"^", change.Path.Before.SymlinkTarget)
-			case FileRenamed:
-				// rename could be only partial so there's both "BEFORE" and "AFTER"
-				change.Body.Before = getContentAtCommit(cmd, commit+"^", change.Path.Before.SymlinkTarget)
-			case FileTypeChanged:
-				// type change, could be file -> dir or symlink -> file
-				// so there's both "BEFORE" and "AFTER"
-				change.Body.Before = getContentAtCommit(cmd, commit+"^", change.Path.Before.SymlinkTarget)
-			default:
-				slog.Debug("Unknown git change", slog.String("path", dstPath), slog.String("commit", commit), slog.String("change", parts[0]))
-			}
-			changes = append(changes, change)
+			},
 		}
+
+		prev := getChangeByPath(changes, srcPath)
+		slog.Debug("Looking for previous changes",
+			slog.String("src", srcPath),
+			slog.String("dst", dstPath),
+			slog.String("commit", commit),
+		)
+		if prev != nil {
+			slog.Debug("Found a previous change",
+				slog.Any("commits", prev.Commits),
+				slog.String("status", string(prev.Status)),
+				slog.String("path", prev.Path.Before.Name),
+				slog.String("target", prev.Path.Before.SymlinkTarget),
+				slog.Any("type", prev.Path.Before.Type),
+			)
+			change.Commits = append(change.Commits, prev.Commits...)
+			change.Path.Before = prev.Path.Before
+			// Remove any changes for "BEFORE" path we might already have
+			changes = changesWithout(changes, srcPath)
+		} else {
+			slog.Debug("No previous change found")
+			switch change.Status {
+			case FileAdded, FileCopied:
+				change.Path.Before.Name = ""
+				change.Path.Before.SymlinkTarget = ""
+				// If a path changed type we'll see A but we can still query for old type.
+				change.Path.Before.Type = getTypeForPath(cmd, commit+"^", srcPath)
+				if change.Path.Before.Type != Missing {
+					// If it was a type change then
+					change.Path.Before.Name = srcPath
+					change.Path.Before.Type = getTypeForPath(cmd, commit+"^", srcPath)
+				}
+			case FileDeleted, FileRenamed, FileModified, FileTypeChanged:
+				change.Path.Before.Name = srcPath
+				change.Path.Before.Type = getTypeForPath(cmd, commit+"^", srcPath)
+				change.Path.Before.SymlinkTarget = resolveSymlinkTarget(cmd, commit+"^", srcPath, change.Path.Before.Type)
+			}
+		}
+
 		change.Commits = append(change.Commits, commit)
+
+		changes = append(changes, change)
 	}
+
 	slog.Debug("Parsed git log", slog.Int("changes", len(changes)))
 
 	for _, change := range changes {
-		lastCommit := change.Commits[len(change.Commits)-1]
+		slog.Debug(
+			"File change",
+			slog.Any("commits", change.Commits),
+			slog.String("status", string(change.Status)),
+			slog.String("before", change.Path.Before.Name),
+			slog.String("after", change.Path.After.Name),
+		)
 
-		change.Path.After.Type = getTypeForPath(cmd, lastCommit, change.Path.After.Name)
-		change.Path.After.SymlinkTarget = resolveSymlinkTarget(cmd, lastCommit, change.Path.After.Name, change.Path.After.Type)
-		change.Body.After = getContentAtCommit(cmd, lastCommit, change.Path.After.EffectivePath())
+		if change.Path.Before.Name != "" {
+			change.Path.Before.Type = getTypeForPath(cmd, change.Commits[0]+"^", change.Path.Before.Name)
+			change.Path.Before.SymlinkTarget = resolveSymlinkTarget(cmd, change.Commits[0]+"^", change.Path.Before.Name, change.Path.Before.Type)
+			change.Body.Before = getContentAtCommit(cmd, change.Commits[0]+"^", change.Path.Before.EffectivePath())
+		}
+
+		lastCommit := change.Commits[len(change.Commits)-1]
+		if change.Path.After.Name != "" && change.Status != FileDeleted {
+			change.Path.After.Type = getTypeForPath(cmd, lastCommit, change.Path.After.Name)
+			change.Path.After.SymlinkTarget = resolveSymlinkTarget(cmd, lastCommit, change.Path.After.Name, change.Path.After.Type)
+			change.Body.After = getContentAtCommit(cmd, lastCommit, change.Path.After.EffectivePath())
+		}
+
+		slog.Debug(
+			"Updated file change",
+			slog.Any("commits", change.Commits),
+			slog.String("before.path", change.Path.Before.Name),
+			slog.String("before.target", change.Path.Before.SymlinkTarget),
+			slog.Any("before.type", change.Path.Before.Type),
+			slog.String("before.body", string(change.Body.Before)),
+			slog.String("after.path", change.Path.After.Name),
+			slog.String("after.target", change.Path.After.SymlinkTarget),
+			slog.Any("after.type", change.Path.After.Type),
+			slog.String("after.body", string(change.Body.After)),
+			slog.Any("modifiedLines", change.Body.ModifiedLines),
+		)
 
 		switch {
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Symlink:
@@ -176,8 +219,11 @@ func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*Fi
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Missing:
 			// new file body is empty, meaning that every line was modified
 			change.Body.ModifiedLines = CountLines(change.Body.Before)
+		case change.Path.Before.Type == Missing && change.Path.After.Type == Missing:
+			// file was added and then removed
+			change.Body.ModifiedLines = []int{}
 		default:
-			slog.Debug("Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
+			slog.Warn("Unhandled change", slog.String("change", fmt.Sprintf("+%v", change)))
 		}
 
 		if change.Path.Before.Name == change.Path.Before.SymlinkTarget {
@@ -191,6 +237,12 @@ func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*Fi
 	return changes, nil
 }
 
+func changesWithout(changes []*FileChange, fpath string) []*FileChange {
+	return slices.DeleteFunc(changes, func(e *FileChange) bool {
+		return e.Path.After.Name == fpath
+	})
+}
+
 func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 	for _, c := range changes {
 		if c.Path.After.Name == fpath {
@@ -201,7 +253,10 @@ func getChangeByPath(changes []*FileChange, fpath string) *FileChange {
 }
 
 func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit string) ([]int, error) {
-	slog.Debug("Getting list of modified lines", slog.String("commits", fmt.Sprint(commits)), slog.String("path", fpath))
+	slog.Debug("Getting list of modified lines",
+		slog.Any("commits", commits),
+		slog.String("path", fpath),
+	)
 	lines, err := Blame(cmd, fpath, atCommit)
 	if err != nil {
 		return nil, err
@@ -209,7 +264,7 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 
 	modLines := make([]int, 0, len(lines))
 	for _, line := range lines {
-		if !slices.Contains(commits, line.Commit) {
+		if !slices.Contains(commits, line.Commit) && line.Line == line.PrevLine {
 			continue
 		}
 		modLines = append(modLines, line.Line)

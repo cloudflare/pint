@@ -143,7 +143,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 				if tc.ctx != nil {
 					ctx = tc.ctx()
 				}
-				problems := tc.checker(prom).Check(ctx, entry.SourcePath, entry.Rule, tc.entries)
+				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
 
@@ -166,7 +166,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker(newSimpleProm("prom")).Check(context.Background(), entry.SourcePath, entry.Rule, tc.entries)
+				_ = tc.checker(newSimpleProm("prom")).Check(context.Background(), entry.Path, entry.Rule, tc.entries)
 			}
 		})
 	}
@@ -181,8 +181,10 @@ func parseContent(content string) (entries []discovery.Entry, err error) {
 
 	for _, rule := range rules {
 		entries = append(entries, discovery.Entry{
-			SourcePath:    "fake.yml",
-			ReportedPath:  "fake.yml",
+			Path: discovery.Path{
+				Name:          "fake.yml",
+				SymlinkTarget: "fake.yml",
+			},
 			ModifiedLines: rule.Lines.Expand(),
 			Rule:          rule,
 		})

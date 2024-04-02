@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -113,8 +114,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2},
 					Rule:          mockRules[0],
 					Problem:       checks.Problem{},
@@ -137,8 +140,10 @@ func TestBitBucketReporter(t *testing.T) {
 			report:      emptyReport,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2},
 					Rule:          mockRules[0],
 					Problem:       checks.Problem{},
@@ -162,8 +167,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2},
 					Rule:          mockRules[0],
 					Problem:       checks.Problem{},
@@ -236,8 +243,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -251,8 +260,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "bar.txt",
-					SourcePath:    "bar.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "bar.txt",
+						Name:          "bar.txt",
+					},
 					ModifiedLines: []int{},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -266,8 +277,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -281,8 +294,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -296,8 +311,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -502,8 +519,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -517,8 +536,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -532,8 +553,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -547,8 +570,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -625,8 +650,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{3, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -690,8 +717,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
@@ -705,8 +734,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
@@ -720,8 +751,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					Rule:          mockRules[0],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
@@ -735,8 +768,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
@@ -853,8 +888,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -868,8 +905,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -883,8 +922,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -899,8 +940,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "symlink.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "symlink.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -1421,8 +1464,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "index.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "index.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -1582,8 +1627,10 @@ func TestBitBucketReporter(t *testing.T) {
 			gitCmd:      fakeGit,
 			reports: []reporter.Report{
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -1597,8 +1644,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -1612,8 +1661,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
@@ -1628,8 +1679,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "foo.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
@@ -1644,8 +1697,10 @@ func TestBitBucketReporter(t *testing.T) {
 					},
 				},
 				{
-					ReportedPath:  "foo.txt",
-					SourcePath:    "symlink.txt",
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "symlink.txt",
+					},
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{

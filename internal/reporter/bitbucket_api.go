@@ -591,7 +591,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 	var buf strings.Builder
 	comments := []BitBucketPendingComment{}
 	for _, reports := range dedupReports(summary.reports) {
-		if _, ok := changes.pathModifiedLines[reports[0].ReportedPath]; !ok {
+		if _, ok := changes.pathModifiedLines[reports[0].Path.SymlinkTarget]; !ok {
 			continue
 		}
 
@@ -613,10 +613,10 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 				buf.WriteString(report.Problem.Details)
 				buf.WriteString("\n\n")
 			}
-			if report.ReportedPath != report.SourcePath {
+			if report.Path.SymlinkTarget != report.Path.Name {
 				buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
 				buf.WriteRune('`')
-				buf.WriteString(report.SourcePath)
+				buf.WriteString(report.Path.Name)
 				buf.WriteString("`.\n\n")
 			}
 		}
@@ -641,7 +641,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 
 		pending := pendingComment{
 			severity: severity,
-			path:     reports[0].ReportedPath,
+			path:     reports[0].Path.SymlinkTarget,
 			line:     reports[0].Problem.Lines.Last,
 			text:     buf.String(),
 			anchor:   reports[0].Problem.Anchor,
@@ -836,11 +836,11 @@ func reportToAnnotation(report Report) BitBucketAnnotation {
 	if reportLine != srcLine {
 		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
 	}
-	if report.ReportedPath != report.SourcePath {
+	if report.Path.SymlinkTarget != report.Path.Name {
 		if msgPrefix == "" {
-			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s: ", report.SourcePath)
+			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s: ", report.Path.Name)
 		} else {
-			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s. %s", report.SourcePath, msgPrefix)
+			msgPrefix = fmt.Sprintf("Problem detected on symlinked file %s. %s", report.Path.Name, msgPrefix)
 		}
 	}
 
@@ -857,7 +857,7 @@ func reportToAnnotation(report Report) BitBucketAnnotation {
 	}
 
 	return BitBucketAnnotation{
-		Path:     report.ReportedPath,
+		Path:     report.Path.SymlinkTarget,
 		Line:     reportLine,
 		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Text),
 		Severity: severity,
@@ -876,7 +876,7 @@ func dedupReports(src []Report) (dst [][]Report) {
 			if d[0].Problem.Reporter != report.Problem.Reporter {
 				continue
 			}
-			if d[0].ReportedPath != report.ReportedPath {
+			if d[0].Path.SymlinkTarget != report.Path.SymlinkTarget {
 				continue
 			}
 			if d[0].Problem.Lines.First != report.Problem.Lines.First {

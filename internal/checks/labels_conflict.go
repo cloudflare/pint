@@ -41,7 +41,7 @@ func (c LabelsConflictCheck) Reporter() string {
 	return LabelsConflictCheckName
 }
 
-func (c LabelsConflictCheck) Check(ctx context.Context, _ string, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	var labels *parser.YamlMap
 	if rule.AlertingRule != nil && rule.AlertingRule.Expr.SyntaxError == nil && rule.AlertingRule.Labels != nil {
 		labels = rule.AlertingRule.Labels

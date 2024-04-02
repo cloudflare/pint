@@ -114,7 +114,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 		},
 	}
 
-	proms := gen.ServersForPath(entry.SourcePath)
+	proms := gen.ServersForPath(entry.Path.Name)
 
 	for _, p := range proms {
 		allChecks = append(allChecks, checkMeta{
@@ -160,7 +160,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 	}
 
 	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(ctx, entry.SourcePath, entry.Rule, proms)...)
+		allChecks = append(allChecks, rule.resolveChecks(ctx, entry.Path.Name, entry.Rule, proms)...)
 	}
 
 	for _, cm := range allChecks {
@@ -197,7 +197,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 	}
 	slog.Debug("Configured checks for rule",
 		slog.Any("enabled", el),
-		slog.String("path", entry.SourcePath),
+		slog.String("path", entry.Path.Name),
 		slog.String("rule", entry.Rule.Name()),
 	)
 

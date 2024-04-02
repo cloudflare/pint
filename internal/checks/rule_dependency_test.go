@@ -29,8 +29,8 @@ func TestRuleDependencyCheck(t *testing.T) {
 		entries := mustParseContent(input)
 		for i := range entries {
 			entries[i].State = state
-			entries[i].SourcePath = sp
-			entries[i].ReportedPath = rp
+			entries[i].Path.Name = sp
+			entries[i].Path.SymlinkTarget = rp
 
 		}
 		return entries
@@ -158,9 +158,11 @@ func TestRuleDependencyCheck(t *testing.T) {
 			problems:   noProblems,
 			entries: []discovery.Entry{
 				{
-					ReportedPath: "broken.yaml",
-					SourcePath:   "broken.yaml",
-					PathError:    errors.New("bad file"),
+					Path: discovery.Path{
+						Name:          "broken.yaml",
+						SymlinkTarget: "broken.yaml",
+					},
+					PathError: errors.New("bad file"),
 				},
 				parseWithState("- alert: foo\n  expr: up == 0\n", discovery.Noop, "foo.yaml", "foo.yaml")[0],
 			},
