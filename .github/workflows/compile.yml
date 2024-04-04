@@ -26,7 +26,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: go.mod
+          go-version-file: go.ver
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
