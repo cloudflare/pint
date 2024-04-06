@@ -56,17 +56,37 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	paths := c.Args().Slice()
-	if len(paths) == 0 {
-		return fmt.Errorf("at least one file or directory required")
+	// If there's includes and excludes in the config file make sure to get those
+	includeRe := []*regexp.Regexp{}
+	for _, pattern := range meta.cfg.Lint.Include {
+		includeRe = append(includeRe, regexp.MustCompile("^"+pattern+"$"))
 	}
 
-	slog.Info("Finding all rules to check", slog.Any("paths", paths))
-	finder := discovery.NewGlobFinder(paths, git.NewPathFilter(nil, nil, meta.cfg.Parser.CompileRelaxed()))
-	entries, err := finder.Find()
-	if err != nil {
-		return err
+	excludeRe := []*regexp.Regexp{}
+	for _, pattern := range meta.cfg.Lint.Exclude {
+		excludeRe = append(excludeRe, regexp.MustCompile("^"+pattern+"$"))
 	}
+
+	// Get any paths form the command line
+	cliPaths := c.Args().Slice()
+
+	// check to see we have at least something specified
+	if len(cliPaths) == 0 && len(meta.cfg.Lint.Include) == 0 {
+		return fmt.Errorf("at least one file or directory must be specified as a cli argument or in the configuration file")
+	}
+
+	// Find all matches from the include/exclude from the config file
+	var cfgEntries []discovery.Entry
+	filter := git.NewPathFilter(includeRe, excludeRe, meta.cfg.Parser.CompileRelaxed())
+
+	cfgEntries, cfgErr := discovery.NewGlobFinder([]string{"*"}, filter).Find()
+
+	cliEntries, cliErr := discovery.NewGlobFinder(cliPaths, filter).Find()
+	if cliErr != nil && cfgErr != nil {
+		return fmt.Errorf("error finding rules: %w %w", cliErr, cfgErr)
+	}
+
+	cfgEntries = append(cfgEntries, cliEntries...)
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
 
@@ -77,13 +97,13 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, entries)
+	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, cfgEntries)
 	if err != nil {
 		return err
 	}
 
 	if c.Bool(requireOwnerFlag) {
-		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)
+		summary.Report(verifyOwners(cfgEntries, meta.cfg.Owners.CompileAllowed())...)
 	}
 
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))

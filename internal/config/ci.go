@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"regexp"
 )
 
 type CI struct {
@@ -17,18 +16,12 @@ func (ci CI) validate() error {
 		return errors.New("maxCommits cannot be <= 0")
 	}
 
-	for _, pattern := range ci.Include {
-		_, err := regexp.Compile(pattern)
-		if err != nil {
-			return err
-		}
+	if err := ValidatePaths(ci.Include); err != nil {
+		return err
+	}
+	if err := ValidatePaths(ci.Exclude); err != nil {
+		return err
 	}
 
-	for _, pattern := range ci.Exclude {
-		_, err := regexp.Compile(pattern)
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }

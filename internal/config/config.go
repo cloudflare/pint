@@ -23,6 +23,7 @@ import (
 
 type Config struct {
 	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
+	Lint       *Lint              `hcl:"lint,block" json:"lint,omitempty"`
 	Parser     *Parser            `hcl:"parser,block" json:"parser,omitempty"`
 	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
 	Discovery  *Discovery         `hcl:"discovery,block" json:"discovery,omitempty"`
@@ -220,6 +221,7 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 			MaxCommits: 20,
 			BaseBranch: "master",
 		},
+		Lint:   &Lint{},
 		Parser: &Parser{},
 		Checks: &Checks{
 			Enabled:  checks.CheckNames,

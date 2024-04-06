@@ -108,6 +108,25 @@ owners {
 If there's no `owners:allowed` configuration block, or if it's empty, then any
 owner name is accepted.
 
+## Lint
+
+Check rules defined as cli arguments or matching a pattern specified in the hcl config file
+
+Syntax:
+
+```js
+lint {
+  include = [ "(.*)", ... ]
+  exclude = [ "(.*)", ... ]
+}
+```
+
+- `include` - list of file patterns to check when running checks. Only files
+  matching those regexp rules will be checked.
+- `exclude` - list of file patterns to ignore when running linting.
+  This option takes precedence over `include`, so if a file path matches both
+  `include` & `exclude` patterns, it will be excluded.
+
 ## CI
 
 Configure continuous integration environments.
