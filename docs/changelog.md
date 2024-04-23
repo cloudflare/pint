@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.58.1
+
+### Fixed
+
+- Correctly handle default Prometheus retention value in [promql/range_query](checks/promql/range_query.md)
+  check - #958.
+
 ## v0.58.0
 
 ### Fixed

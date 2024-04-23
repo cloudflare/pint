@@ -64,9 +64,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		return problems
 	}
 
-	// Default Prometheus retention
-	// https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects
-	retention := time.Hour * 24 * 15
+	var retention time.Duration
 	if v, ok := flags.Flags["storage.tsdb.retention.time"]; ok {
 		r, err := model.ParseDuration(v)
 		if err != nil {
@@ -79,6 +77,11 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		} else {
 			retention = time.Duration(r)
 		}
+	}
+	if retention <= 0 {
+		// Default Prometheus retention
+		// https://prometheus.io/docs/prometheus/latest/storage/#operational-aspects
+		retention = time.Hour * 24 * 15
 	}
 
 	for _, problem := range c.checkNode(ctx, expr.Query, retention, flags.URI) {
