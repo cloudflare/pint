@@ -168,6 +168,52 @@ func TestRangeQueryCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "flag with 0s, 20d",
+			content:     "- record: foo\n  expr: rate(foo[20d])\n",
+			checker:     newRangeQueryCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "promql/range_query",
+						Text:     retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"storage.tsdb.retention":      "0s",
+						"storage.tsdb.retention.size": "0B",
+						"storage.tsdb.retention.time": "0s",
+					}},
+				},
+			},
+		},
+		{
+			description: "flag with 0s, 10d",
+			content:     "- record: foo\n  expr: rate(foo[10d])\n",
+			checker:     newRangeQueryCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp: flagsResponse{flags: map[string]string{
+						"storage.tsdb.retention":      "0s",
+						"storage.tsdb.retention.size": "0B",
+						"storage.tsdb.retention.time": "0s",
+					}},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
