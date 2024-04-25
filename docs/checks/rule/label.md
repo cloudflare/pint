@@ -142,23 +142,25 @@ Or you can disable it per rule by adding a comment to it. Example:
 If you want to disable only individual instances of this check
 you can add a more specific comment.
 
+If `value` is set:
+
+```yaml
+# pint disable rule/label($label:$required:$value)
+```
+
+If `value` is NOT set:
+
 ```yaml
 # pint disable rule/label($label:$required)
 ```
 
-Where `$label` is the label name and `$required` is the configure value
-of `required` option.
+Where:
 
-```yaml
-groups:
-  - name: ...
-    rules:
-    # pint disable rule/label($pattern:$required)
-    - record: ...
-      expr: ...
-```
+- `$label` is the label name.
+- `$required` is the configured value of the `required` option.
+- `$value` is the _anchored_ value of the `value` option (if set).
 
-Example rule:
+Example pint rule:
 
 ```js
 label "severity" {
@@ -170,7 +172,7 @@ label "severity" {
 Example comment disabling that rule:
 
 ```yaml
-# pint disable rule/label(severity:true)
+# pint disable rule/label(severity:true:^(warning|critical)$)
 ```
 
 ## How to snooze it
@@ -182,6 +184,6 @@ You can disable this check until given time by adding a comment to it. Example:
 ```
 
 Where `$TIMESTAMP` is either use [RFC3339](https://www.rfc-editor.org/rfc/rfc3339)
-formatted  or `YYYY-MM-DD`.
-Adding this comment will disable `rule/label` *until* `$TIMESTAMP`, after that
+formatted or `YYYY-MM-DD`.
+Adding this comment will disable `rule/label` _until_ `$TIMESTAMP`, after that
 check will be re-enabled.
