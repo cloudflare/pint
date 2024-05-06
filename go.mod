@@ -24,7 +24,7 @@ require (
 	go.uber.org/automaxprocs v1.5.3
 	go.uber.org/ratelimit v0.3.1
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
-	golang.org/x/oauth2 v0.19.0
+	golang.org/x/oauth2 v0.20.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
