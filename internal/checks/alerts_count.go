@@ -79,7 +79,6 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
-			Details:  maybeComment(c.comment),
 			Severity: severity,
 		})
 		return problems
