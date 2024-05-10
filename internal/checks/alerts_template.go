@@ -142,7 +142,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		}
 	}
 
-	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", 0)
+	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
 	if rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {

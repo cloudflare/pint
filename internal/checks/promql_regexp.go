@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"regexp/syntax"
 
 	"github.com/prometheus/common/model"
@@ -67,7 +68,15 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 			if lm.Type != labels.MatchRegexp && lm.Type != labels.MatchNotRegexp {
 				continue
 			}
+
+			// We follow Prometheus FastRegexMatcher logic here.
+			// If the matcher string is a literal match then we keep it as is.
+			// If it's not then it's a regexp match and we need to wrap it in ^...$.
 			re := lm.GetRegexString()
+			if regexp.QuoteMeta(re) != re {
+				re = "^(?:" + re + ")$"
+			}
+
 			var hasFlags, isUseful, isWildcard, isLiteral bool
 			var beginText, endText int
 			r, _ := syntax.Parse(re, syntax.Perl)
