@@ -16,7 +16,7 @@ func newCounterCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 }
 
 func counterText(name, uri, metric string) string {
-	return fmt.Sprintf("`%s` is a counter according to metrics metadata from `%s` Prometheus server at %s, you can't use its value directly.", metric, name, uri)
+	return fmt.Sprintf("`%s` is a counter according to metrics metadata from `%s` Prometheus server at %s, it can be dangarous to use its value directly.", metric, name, uri)
 }
 
 func TestCounterCheck(t *testing.T) {

@@ -120,7 +120,7 @@ LOOP:
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, you can't use its value directly.",
+			Text: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, it can be dangarous to use its value directly.",
 				selector.Name,
 				promText(c.prom.Name(), metadata.URI),
 			),
