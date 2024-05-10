@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.59.0
+
+### Changed
+
+- Reduced severity of problems reported by [promql/counter](checks/promql/counter.md) due
+  to high number of false positives. It will now report warnings instead of errors.
+
 ## v0.58.1
 
 ### Fixed

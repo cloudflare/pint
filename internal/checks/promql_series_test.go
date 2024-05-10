@@ -100,7 +100,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker:     newSeriesCheck,
 			prometheus: func(_ string) *promapi.FailoverGroup {
-				return simpleProm("prom", "http://127.127.127.127", time.Second*5, false)
+				return simpleProm("prom", "http://127.127.127.127:9999", time.Second*5, false)
 			},
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
@@ -110,7 +110,7 @@ func TestSeriesCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127", `connection refused`),
+						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127:9999", `connection refused`),
 						Severity: checks.Warning,
 					},
 				}
