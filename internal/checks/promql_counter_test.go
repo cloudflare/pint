@@ -67,7 +67,7 @@ func TestCounterCheck(t *testing.T) {
 						},
 						Reporter: "promql/counter",
 						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -197,7 +197,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Text:     counterText("prom", uri, "http_requests_total"),
 						Details:  checks.CounterCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -225,7 +225,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Text:     counterText("prom", uri, "http_requests_total"),
 						Details:  checks.CounterCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -255,7 +255,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Text:     counterText("prom", uri, "http_requests_total"),
 						Details:  checks.CounterCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -283,7 +283,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Text:     counterText("prom", uri, "http_requests_total"),
 						Details:  checks.CounterCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -311,7 +311,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Text:     counterText("prom", uri, "http_requests_total"),
 						Details:  checks.CounterCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -339,7 +339,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Text:     counterText("prom", uri, "http_requests_total"),
 						Details:  checks.CounterCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 					},
 				}
 			},

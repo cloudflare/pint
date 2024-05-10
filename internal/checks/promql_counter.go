@@ -98,7 +98,7 @@ LOOP:
 
 		metadata, err := c.prom.Metadata(ctx, selector.Name)
 		if err != nil {
-			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
+			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 			problems = append(problems, Problem{
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
@@ -125,7 +125,7 @@ LOOP:
 				promText(c.prom.Name(), metadata.URI),
 			),
 			Details:  CounterCheckDetails,
-			Severity: Bug,
+			Severity: Warning,
 		})
 
 		done[selector.Name] = struct{}{}
