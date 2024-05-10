@@ -76,7 +76,6 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     text,
-			Details:  maybeComment(c.comment),
 			Severity: severity,
 		})
 		return problems
