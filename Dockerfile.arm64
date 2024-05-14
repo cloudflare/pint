@@ -1,5 +1,5 @@
 # This Dockerfile is used by goreleaser when releasing a new version.
-FROM debian:stable-20240423
+FROM debian:stable-20240513
 RUN apt-get update --yes && \
     apt-get install --no-install-recommends --yes git ca-certificates && \
     rm -rf /var/lib/apt/lists/*
