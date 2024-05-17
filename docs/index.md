@@ -55,9 +55,11 @@ Running `pint ci` doesn't require any configuration but it's recommended to add 
 with `ci` section containing at least the `include` option. This will ensure that pint validates
 only Prometheus rules and ignores other files.
 
-Results can optionally be reported using
-[BitBucket API](https://developer.atlassian.com/server/bitbucket/rest/)
-or [GitHub API](https://docs.github.com/en/rest) to generate a report with any found issues.
+Results can optionally be reported as comments on a pull request when using one of supported platforms:
+
+- [BitBucket API](https://developer.atlassian.com/server/bitbucket/rest/)
+- [GitHub API](https://docs.github.com/en/rest)
+- [GitLab API](https://docs.gitlab.com/ee/api/rest/)
 
 Exit code will be one (1) if any issues were detected with severity `Bug` or higher. This permits running
 `pint` in your CI system whilst at the same you will get detailed reports on your source control system.

@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"time"
 )
 
 type BitBucket struct {
@@ -84,7 +85,65 @@ func (gh GitHub) validate() error {
 	return nil
 }
 
+type GitLab struct {
+	URI         string `hcl:"uri,optional"`
+	Timeout     string `hcl:"timeout,optional"`
+	Project     int    `hcl:"project"`
+	MaxComments int    `hcl:"maxComments,optional"`
+}
+
+func (gl GitLab) validate() error {
+	if gl.Project <= 0 {
+		return fmt.Errorf("project must be set")
+	}
+	if gl.MaxComments < 0 {
+		return fmt.Errorf("maxComments cannot be negative")
+	}
+	return nil
+}
+
 type Repository struct {
 	BitBucket *BitBucket `hcl:"bitbucket,block" json:"bitbucket,omitempty"`
 	GitHub    *GitHub    `hcl:"github,block" json:"github,omitempty"`
+	GitLab    *GitLab    `hcl:"gitlab,block" json:"gitlab,omitempty"`
+}
+
+func (r *Repository) validate() (err error) {
+	if r.BitBucket != nil {
+		if r.BitBucket.Timeout == "" {
+			r.BitBucket.Timeout = time.Minute.String()
+		}
+		if r.BitBucket.MaxComments == 0 {
+			r.BitBucket.MaxComments = 50
+		}
+		if err = r.BitBucket.validate(); err != nil {
+			return err
+		}
+	}
+
+	if r.GitHub != nil {
+		if r.GitHub.Timeout == "" {
+			r.GitHub.Timeout = time.Minute.String()
+		}
+		if r.GitHub.MaxComments == 0 {
+			r.GitHub.MaxComments = 50
+		}
+		if err = r.GitHub.validate(); err != nil {
+			return err
+		}
+	}
+
+	if r.GitLab != nil {
+		if r.GitLab.Timeout == "" {
+			r.GitLab.Timeout = time.Minute.String()
+		}
+		if r.GitLab.MaxComments == 0 {
+			r.GitLab.MaxComments = 50
+		}
+		if err = r.GitLab.validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

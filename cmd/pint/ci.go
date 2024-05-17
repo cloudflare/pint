@@ -151,6 +151,28 @@ func actionCI(c *cli.Context) error {
 		reps = append(reps, br)
 	}
 
+	if meta.cfg.Repository != nil && meta.cfg.Repository.GitLab != nil {
+		token, ok := os.LookupEnv("GITLAB_AUTH_TOKEN")
+		if !ok {
+			return fmt.Errorf("GITLAB_AUTH_TOKEN env variable is required when reporting to GitLab")
+		}
+
+		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitLab.Timeout)
+		var gl reporter.GitLabReporter
+		if gl, err = reporter.NewGitLabReporter(
+			version,
+			currentBranch,
+			meta.cfg.Repository.GitLab.URI,
+			timeout,
+			token,
+			meta.cfg.Repository.GitLab.Project,
+			meta.cfg.Repository.GitLab.MaxComments,
+		); err != nil {
+			return err
+		}
+		reps = append(reps, gl)
+	}
+
 	meta.cfg.Repository = detectRepository(meta.cfg.Repository)
 	if meta.cfg.Repository != nil && meta.cfg.Repository.GitHub != nil {
 		token, ok := os.LookupEnv("GITHUB_AUTH_TOKEN")
@@ -204,8 +226,11 @@ func actionCI(c *cli.Context) error {
 		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
 	}
 
-	if err := submitReports(reps, summary); err != nil {
-		return fmt.Errorf("submitting reports: %w", err)
+	for _, rep := range reps {
+		err = rep.Submit(summary)
+		if err != nil {
+			return fmt.Errorf("submitting reports: %w", err)
+		}
 	}
 
 	if problemsFound {

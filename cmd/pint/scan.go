@@ -298,13 +298,3 @@ This usually means that it's missing some required fields.`,
 		checkIterationChecksDone.Inc()
 	}
 }
-
-func submitReports(reps []reporter.Reporter, summary reporter.Summary) (err error) {
-	for _, rep := range reps {
-		err = rep.Submit(summary)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
