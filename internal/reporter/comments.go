@@ -2,6 +2,7 @@ package reporter
 
 import (
 	"context"
+	"slices"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -24,11 +25,11 @@ type ExistingCommentV2 struct {
 type Commenter interface {
 	Describe() string
 	Destinations(context.Context) ([]any, error)
-	Summary(context.Context, any, Summary) error
+	Summary(context.Context, any, Summary, []error) error
 	List(context.Context, any) ([]ExistingCommentV2, error)
 	Create(context.Context, any, PendingCommentV2) error
 	Delete(context.Context, any, ExistingCommentV2) error
-	CanCreate(int) bool
+	CanCreate(int) (bool, error)
 	IsEqual(ExistingCommentV2, PendingCommentV2) bool
 }
 
@@ -70,10 +71,18 @@ func makeComments(summary Summary) (comments []PendingCommentV2) {
 		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString(".html).\n")
 
+		line := reports[0].Problem.Lines.Last
+		for i := reports[0].Problem.Lines.Last; i >= reports[0].Problem.Lines.First; i-- {
+			if slices.Contains(reports[0].ModifiedLines, i) {
+				line = i
+				break
+			}
+		}
+
 		comments = append(comments, PendingCommentV2{
 			anchor: reports[0].Problem.Anchor,
 			path:   reports[0].Path.SymlinkTarget,
-			line:   reports[0].Problem.Lines.Last,
+			line:   line,
 			text:   buf.String(),
 		})
 	}

@@ -143,19 +143,6 @@ func Submit(ctx context.Context, s Summary, c Commenter) error {
 }
 
 func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) error {
-	slog.Info("Creating report summary",
-		slog.String("reporter", c.Describe()),
-		slog.Int("reports", len(s.reports)),
-		slog.Int("online", int(s.OnlineChecks)),
-		slog.Int("offline", int(s.OnlineChecks)),
-		slog.String("duration", output.HumanizeDuration(s.Duration)),
-		slog.Int("entries", s.TotalEntries),
-		slog.Int("checked", int(s.CheckedEntries)),
-	)
-	if err := c.Summary(ctx, dst, s); err != nil {
-		return err
-	}
-
 	slog.Info("Listing existing comments", slog.String("reporter", c.Describe()))
 	existingComments, err := c.List(ctx, dst)
 	if err != nil {
@@ -163,6 +150,8 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) err
 	}
 
 	var created int
+	var ok bool
+	var errs []error
 	pendingComments := makeComments(s)
 	for _, pending := range pendingComments {
 		for _, existing := range existingComments {
@@ -175,9 +164,25 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) err
 				goto NEXTCreate
 			}
 		}
-		if !c.CanCreate(created) {
+		slog.Debug("Comment doesn't exist yet",
+			slog.String("reporter", c.Describe()),
+			slog.String("path", pending.path),
+			slog.Int("line", pending.line),
+		)
+
+		ok, err = c.CanCreate(created)
+		if err != nil {
+			errs = append(errs, err)
+		}
+		if !ok {
+			slog.Debug("Cannot create new comment",
+				slog.String("reporter", c.Describe()),
+				slog.String("path", pending.path),
+				slog.Int("line", pending.line),
+			)
 			goto NEXTCreate
 		}
+
 		if err := c.Create(ctx, dst, pending); err != nil {
 			slog.Error("Failed to create a new comment",
 				slog.String("reporter", c.Describe()),
@@ -204,8 +209,22 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) err
 				slog.Int("line", existing.line),
 				slog.Any("err", err),
 			)
+			errs = append(errs, err)
 		}
 	NEXTDelete:
+	}
+
+	slog.Info("Creating report summary",
+		slog.String("reporter", c.Describe()),
+		slog.Int("reports", len(s.reports)),
+		slog.Int("online", int(s.OnlineChecks)),
+		slog.Int("offline", int(s.OnlineChecks)),
+		slog.String("duration", output.HumanizeDuration(s.Duration)),
+		slog.Int("entries", s.TotalEntries),
+		slog.Int("checked", int(s.CheckedEntries)),
+	)
+	if err := c.Summary(ctx, dst, s, errs); err != nil {
+		return err
 	}
 
 	return nil

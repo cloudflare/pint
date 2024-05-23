@@ -138,10 +138,24 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 	return dsts, nil
 }
 
-func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary) error {
+func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs []error) error {
 	mr := dst.(gitlabMR)
 	if gl.maxComments > 0 && len(s.reports) > gl.maxComments {
-		if err := gl.tooManyComments(ctx, mr.mrID, len(s.reports)); err != nil {
+		if err := gl.generalComment(ctx, mr.mrID, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
+			return err
+		}
+	}
+	if len(errs) > 0 {
+		var buf strings.Builder
+		buf.WriteString("There were some errors when pint was reporting problems via GitLab APIs.\n")
+		buf.WriteString("Some review comments might be outdated or missing.\n")
+		buf.WriteString("List of all errors:\n\n")
+		for _, err := range errs {
+			buf.WriteString("- `")
+			buf.WriteString(err.Error())
+			buf.WriteString("`\n")
+		}
+		if err := gl.generalComment(ctx, mr.mrID, buf.String()); err != nil {
 			return err
 		}
 	}
@@ -239,8 +253,11 @@ func (gl GitLabReporter) IsEqual(existing ExistingCommentV2, pending PendingComm
 	return strings.Trim(existing.text, "\n") == strings.Trim(pending.text, "\n")
 }
 
-func (gl GitLabReporter) CanCreate(done int) bool {
-	return done < gl.maxComments
+func (gl GitLabReporter) CanCreate(done int) (bool, error) {
+	if done >= gl.maxComments {
+		return false, fmt.Errorf(tooManyCommentsMsg(done, gl.maxComments))
+	}
+	return true, nil
 }
 
 func (gl *GitLabReporter) getUserID(ctx context.Context) (int, error) {
@@ -304,18 +321,14 @@ func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int) (*gitlab.M
 	return vers[0], nil
 }
 
-func (gl GitLabReporter) tooManyComments(ctx context.Context, mrNum, nrComments int) error {
-	msg := fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
-	%d comments were skipped and won't be visibile on this PR.`, nrComments, gl.maxComments, nrComments-gl.maxComments)
+func (gl GitLabReporter) generalComment(ctx context.Context, mrNum int, msg string) error {
 	opt := gitlab.CreateMergeRequestDiscussionOptions{
 		Body: gitlab.Ptr(msg),
 	}
-
 	slog.Debug("Creating a PR comment", slog.String("body", msg))
 
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
-
 	_, _, err := gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mrNum, &opt, gitlab.WithContext(reqCtx))
 	return err
 }
@@ -463,4 +476,9 @@ func loggifyDiscussion(opt *gitlab.CreateMergeRequestDiscussionOptions) (attrs [
 
 func (gl GitLabReporter) Submit(summary Summary) (err error) {
 	return Submit(context.Background(), summary, gl)
+}
+
+func tooManyCommentsMsg(nr, max int) string {
+	return fmt.Sprintf(`This pint run would create %d comment(s), which is more than the limit configured for pint (%d).
+	%d comment(s) were skipped and won't be visibile on this PR.`, nr, max, nr-max)
 }
