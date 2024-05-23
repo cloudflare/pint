@@ -7,6 +7,11 @@
 - Reduced severity of problems reported by [promql/counter](checks/promql/counter.md) due
   to high number of false positives. It will now report warnings instead of errors.
 
+### Fixed
+
+- Fixed false positive reports from [rule/duplicate](checks/rule/duplicate.md) when a rule file
+  is being deleted and the rules are moved to a different file.
+
 ## v0.58.1
 
 ### Fixed

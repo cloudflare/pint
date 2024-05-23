@@ -49,6 +49,9 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path discovery.Path, rule
 	}
 
 	for _, entry := range entries {
+		if entry.State == discovery.Removed {
+			continue
+		}
 		if entry.Rule.Error.Err != nil {
 			continue
 		}
