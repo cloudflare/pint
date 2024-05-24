@@ -5,6 +5,13 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
+rules/0001.yml:2 Warning: usage of topk or bottomk in recording rules is discouraged and creates churn (rule/topk)
+ 2 |   expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[5m])) BY (zoneId,job))
+
+rules/0001.yml:4 Warning: usage of topk or bottomk in recording rules is discouraged and creates churn (rule/topk)
+ 4 |   expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[10m])) without (instance))
+
+level=INFO msg="Problems found" Warning=2
 -- rules/0001.yml --
 - record: "colo:test1"
   expr: topk(6, sum(rate(edgeworker_subrequest_errorCount{cordon="free"}[5m])) BY (zoneId,job))

@@ -13,7 +13,7 @@ level=DEBUG msg="File parsed" path=rules/src/rule.yaml rules=1
 level=DEBUG msg="Glob finder completed" count=1
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/src/rule.yaml record=down lines=4-5
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/src/rule.yaml rule=down
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/topk"] path=rules/src/rule.yaml rule=down
 -- rules/src/rule.yaml --
 groups:
 - name: foo

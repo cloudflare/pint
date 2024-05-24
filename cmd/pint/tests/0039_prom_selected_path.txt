@@ -11,11 +11,11 @@ level=INFO msg="Configured new Prometheus server" name=disabled uris=1 uptime=up
 level=DEBUG msg="Starting query workers" name=disabled uri=http://127.0.0.1:123 workers=16
 level=DEBUG msg="Generated all Prometheus servers" count=1
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=first lines=1-3
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=first
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/topk"] path=rules/0001.yml rule=first
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=second lines=5-6
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/topk","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=third lines=8-9
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=third
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","rule/topk"] path=rules/0001.yml rule=third
 rules/0001.yml:6 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
  6 |   expr: sum(bar)
 

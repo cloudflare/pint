@@ -70,6 +70,8 @@ pint_check_duration_seconds_sum{check="promql/vector_matching"}
 pint_check_duration_seconds_count{check="promql/vector_matching"}
 pint_check_duration_seconds_sum{check="rule/duplicate"}
 pint_check_duration_seconds_count{check="rule/duplicate"}
+pint_check_duration_seconds_sum{check="rule/topk"}
+pint_check_duration_seconds_count{check="rule/topk"}
 # HELP pint_check_iterations_total Total number of completed check iterations since pint start
 # TYPE pint_check_iterations_total counter
 pint_check_iterations_total
