@@ -2,6 +2,10 @@
 
 ## v0.59.0
 
+### Added
+
+- Added GitLab support when running `pint ci`.
+
 ### Changed
 
 - Reduced severity of problems reported by [promql/counter](checks/promql/counter.md) due

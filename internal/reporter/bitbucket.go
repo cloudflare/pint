@@ -37,28 +37,28 @@ type BitBucketReporter struct {
 	gitCmd git.CommandRunner
 }
 
-func (r BitBucketReporter) Submit(summary Summary) (err error) {
+func (bb BitBucketReporter) Submit(summary Summary) (err error) {
 	var headCommit string
-	if headCommit, err = git.HeadCommit(r.gitCmd); err != nil {
+	if headCommit, err = git.HeadCommit(bb.gitCmd); err != nil {
 		return fmt.Errorf("failed to get HEAD commit: %w", err)
 	}
 	slog.Info("Got HEAD commit from git", slog.String("commit", headCommit))
 
-	if err = r.api.deleteReport(headCommit); err != nil {
+	if err = bb.api.deleteReport(headCommit); err != nil {
 		slog.Error("Failed to delete old BitBucket report", slog.Any("err", err))
 	}
 
-	if err = r.api.createReport(summary, headCommit); err != nil {
+	if err = bb.api.createReport(summary, headCommit); err != nil {
 		return fmt.Errorf("failed to create BitBucket report: %w", err)
 	}
 
 	var headBranch string
-	if headBranch, err = git.CurrentBranch(r.gitCmd); err != nil {
+	if headBranch, err = git.CurrentBranch(bb.gitCmd); err != nil {
 		return fmt.Errorf("failed to get current branch: %w", err)
 	}
 
 	var pr *bitBucketPR
-	if pr, err = r.api.findPullRequestForBranch(headBranch, headCommit); err != nil {
+	if pr, err = bb.api.findPullRequestForBranch(headBranch, headCommit); err != nil {
 		return fmt.Errorf("failed to get open pull requests from BitBucket: %w", err)
 	}
 
@@ -74,31 +74,31 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 
 		slog.Info("Getting pull request changes from BitBucket")
 		var changes *bitBucketPRChanges
-		if changes, err = r.api.getPullRequestChanges(pr); err != nil {
+		if changes, err = bb.api.getPullRequestChanges(pr); err != nil {
 			return fmt.Errorf("failed to get pull request changes from BitBucket: %w", err)
 		}
 		slog.Debug("Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
 
 		var existingComments []bitBucketComment
-		if existingComments, err = r.api.getPullRequestComments(pr); err != nil {
+		if existingComments, err = bb.api.getPullRequestComments(pr); err != nil {
 			return fmt.Errorf("failed to get pull request comments from BitBucket: %w", err)
 		}
 		slog.Info("Got existing pull request comments from BitBucket", slog.Int("count", len(existingComments)))
 
-		pendingComments := r.api.makeComments(summary, changes)
+		pendingComments := bb.api.makeComments(summary, changes)
 		slog.Info("Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))
 
-		pendingComments = r.api.limitComments(pendingComments)
+		pendingComments = bb.api.limitComments(pendingComments)
 		slog.Info("Will add comments to BitBucket",
 			slog.Int("count", len(pendingComments)),
-			slog.Int("limit", r.api.maxComments),
+			slog.Int("limit", bb.api.maxComments),
 		)
 
 		slog.Info("Deleting stale comments from BitBucket")
-		r.api.pruneComments(pr, existingComments, pendingComments)
+		bb.api.pruneComments(pr, existingComments, pendingComments)
 
 		slog.Info("Adding missing comments to BitBucket")
-		if err = r.api.addComments(pr, existingComments, pendingComments); err != nil {
+		if err = bb.api.addComments(pr, existingComments, pendingComments); err != nil {
 			return fmt.Errorf("failed to create BitBucket pull request comments: %w", err)
 		}
 
@@ -109,11 +109,11 @@ func (r BitBucketReporter) Submit(summary Summary) (err error) {
 			slog.String("commit", headCommit),
 		)
 
-		if err = r.api.deleteAnnotations(headCommit); err != nil {
+		if err = bb.api.deleteAnnotations(headCommit); err != nil {
 			return fmt.Errorf("failed to delete existing BitBucket code insight annotations: %w", err)
 		}
 
-		if err = r.api.createAnnotations(summary, headCommit); err != nil {
+		if err = bb.api.createAnnotations(summary, headCommit); err != nil {
 			return fmt.Errorf("failed to create BitBucket code insight annotations: %w", err)
 		}
 	}

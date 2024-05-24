@@ -140,7 +140,11 @@ ci {
 
 Configure supported code hosting repository, used for reporting PR checks from CI
 back to the repository, to be displayed in the PR UI.
-Currently it only supports [BitBucket](https://bitbucket.org/) and [GitHub](https://github.com/).
+Currently supported platforms are:
+
+- [BitBucket](https://bitbucket.org)
+- [GitHub](https://github.com)
+- [GitLab](https://gitlab.com)
 
 **NOTE**: BitBucket integration requires `BITBUCKET_AUTH_TOKEN` environment variable
 to be set. It should contain a personal access token used to authenticate with the API.
@@ -148,10 +152,25 @@ to be set. It should contain a personal access token used to authenticate with t
 **NOTE**: GitHub integration requires `GITHUB_AUTH_TOKEN` environment variable
 to be set to a personal access key that can access your repository.
 
+**NOTE**: GitLab integration requires `GITLAB_AUTH_TOKEN` environment variable
+to be set to a personal access key that can access your repository.
+
 **NOTE** The pull request number must be known to pint so it can add comments if it detects any problems.
 If pint is run as part of GitHub actions workflow, then this number will be detected from `GITHUB_REF`
 environment variable. For other use cases, the `GITHUB_PULL_REQUEST_NUMBER` environment variable must be set
 with the pull request number.
+
+Syntax:
+
+```js
+repository {
+  bitbucket { ... }
+  github { ... }
+  gitlab { ... }
+}
+```
+
+### BitBucket options
 
 Syntax:
 
@@ -174,6 +193,8 @@ repository {
 - `bitbucket:repository` - name of the BitBucket repository.
 - `bitbucket:maxComments` - the maximum number of comments pint can create on a single
   pull request. Default is 50.
+
+### GitHub options
 
 ```js
 repository {
@@ -205,6 +226,25 @@ If `github:baseuri` _or_ `github:uploaduri` are not specified, then [GitHub](htt
 Most GitHub settings can be detected from environment variables that are set inside GitHub Actions
 environment. The only exception is `GITHUB_AUTH_TOKEN` environment variable that must be set
 manually.
+
+### GitLab options
+
+```js
+repository {
+  gitlab {
+    uri         = "https://..."
+    timeout     = "1m"
+    project     = "..."
+    maxComments = 50
+  }
+}
+```
+
+- `gitlab:uri` - optional base URI for GitLab API calls when using self hosted setup.
+  You don't need to set it if you use repositories hosted on [gitlab.com](https://gitlab.com/).
+- `gitlab:timeout` - timeout to be used for API requests, defaults to 1 minute.
+- `gitlab:project` - ID of the GitLab repository.
+- `gitlab:maxComments` - the maximum number of comments pint can create on a single pull request. Default is 50.
 
 ## Prometheus servers
 
