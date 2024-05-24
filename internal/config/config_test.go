@@ -1994,7 +1994,7 @@ func TestConfigErrors(t *testing.T) {
 	severity = "bug"
   }
 }`,
-			err: `cannot set serverity to "bug" when minCount is 0`,
+			err: `cannot set severity to "bug" when minCount is 0`,
 		},
 		{
 			config: `rule {
@@ -2208,7 +2208,7 @@ func TestConfigErrors(t *testing.T) {
 	}
 }
 
-func TestDuplicatedPrometeusName(t *testing.T) {
+func TestDuplicatedPrometheusName(t *testing.T) {
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")
 	err := os.WriteFile(path, []byte(`
