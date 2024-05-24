@@ -1095,6 +1095,7 @@ prometheus "prom1" {
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
 				checks.RegexpCheckName,
+				checks.RuleTopkCheckName,
 				checks.RateCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom1)",
 				checks.VectorMatchingCheckName + "(prom1)",
