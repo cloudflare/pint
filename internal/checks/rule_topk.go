@@ -2,7 +2,8 @@ package checks
 
 import (
 	"context"
-	"strings"
+	"log/slog"
+	"regexp"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -53,7 +54,14 @@ func (c RuleTopkCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 }
 
 func (c RuleTopkCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
-	if strings.Contains(rule.RecordingRule.Expr.Value.Value, "topk") || strings.Contains(rule.RecordingRule.Expr.Value.Value, "bottomk") {
+	// regex for topk( or bottomk( pattern, with any amount of space in between
+	regexPattern := `\b(topk|bottomk)\s*\(`
+	matched, err := regexp.MatchString(regexPattern, rule.RecordingRule.Expr.Value.Value)
+	if err != nil {
+		slog.Error("Error matching topk/bottomk regex", slog.Any("err", err))
+		return problems
+	}
+	if matched {
 		problems = append(problems, Problem{
 			Lines:    rule.RecordingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
