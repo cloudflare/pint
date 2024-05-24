@@ -2,7 +2,6 @@ package checks
 
 import (
 	"context"
-	"log/slog"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -48,7 +47,6 @@ func (c RuleTopkCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 	}
 
 	if rule.RecordingRule != nil {
-		slog.Debug("found recording rule, trying check", slog.String("rule", "topk"))
 		problems = append(problems, c.checkRecordingRule(rule)...)
 	}
 
@@ -58,7 +56,6 @@ func (c RuleTopkCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 func (c RuleTopkCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 
 	if strings.Contains(rule.RecordingRule.Expr.Value.Value, "topk") || strings.Contains(rule.RecordingRule.Expr.Value.Value, "bottomk") {
-		slog.Debug("check triggered, problem  found", slog.String("rule", "topk"))
 		problems = append(problems, Problem{
 			Lines:    rule.RecordingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
@@ -66,8 +63,6 @@ func (c RuleTopkCheck) checkRecordingRule(rule parser.Rule) (problems []Problem)
 			Details:  TopkCheckRuleDetails,
 			Severity: Warning,
 		})
-	} else {
-		slog.Debug("no problem found", slog.String("rule", "topk"))
 	}
 	return problems
 }
