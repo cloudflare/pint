@@ -41,7 +41,6 @@ func (c RuleTopkCheck) Reporter() string {
 }
 
 func (c RuleTopkCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-
 	if rule.RecordingRule == nil || rule.RecordingRule.Expr.SyntaxError != nil {
 		return nil
 	}
@@ -54,7 +53,6 @@ func (c RuleTopkCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 }
 
 func (c RuleTopkCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
-
 	if strings.Contains(rule.RecordingRule.Expr.Value.Value, "topk") || strings.Contains(rule.RecordingRule.Expr.Value.Value, "bottomk") {
 		problems = append(problems, Problem{
 			Lines:    rule.RecordingRule.Expr.Value.Lines,
