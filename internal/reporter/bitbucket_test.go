@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/neilotoole/slogt"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -222,10 +223,10 @@ func TestBitBucketReporter(t *testing.T) {
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequest{},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					return
 				}
 				w.WriteHeader(500)
@@ -381,10 +382,10 @@ func TestBitBucketReporter(t *testing.T) {
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequest{},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					return
 				}
 				if r.Method == http.MethodDelete {
@@ -443,10 +444,10 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if strings.HasSuffix(r.URL.Path, "/changes") {
 					w.WriteHeader(500)
@@ -485,20 +486,20 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequestChange{},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
 					w.WriteHeader(500)
@@ -1240,10 +1241,10 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
@@ -1256,10 +1257,10 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestActivities{
@@ -1303,7 +1304,7 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, _ = w.Write(data)
 					return
@@ -1334,7 +1335,7 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, _ = w.Write(data)
 					return
@@ -1380,10 +1381,10 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
@@ -1396,17 +1397,17 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestActivities{
 						IsLastPage: true,
 						Values:     []reporter.BitBucketPullRequestActivity{},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, _ = w.Write(data)
 					return
@@ -1437,7 +1438,7 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, _ = w.Write(data)
 					return
@@ -1501,10 +1502,10 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestChanges{
@@ -1517,10 +1518,10 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, err = w.Write(data)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
 					data, err := json.Marshal(reporter.BitBucketPullRequestActivities{
@@ -1564,7 +1565,7 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, _ = w.Write(data)
 					return
@@ -1595,7 +1596,7 @@ func TestBitBucketReporter(t *testing.T) {
 							},
 						},
 					})
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					w.WriteHeader(200)
 					_, _ = w.Write(data)
 					return
@@ -1952,15 +1953,15 @@ func TestBitBucketReporter(t *testing.T) {
 
 					if strings.HasPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/") {
 						filename := strings.TrimPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/")
-						require.NotNil(t, tc.pullRequestFileDiffs)
+						assert.NotNil(t, tc.pullRequestFileDiffs)
 						v, ok := tc.pullRequestFileDiffs[filename]
-						require.True(t, ok, "file is missing from pullRequestFileDiffs: %s", filename)
+						assert.True(t, ok, "file is missing from pullRequestFileDiffs: %s", filename)
 
 						data, err := json.Marshal(v)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 						w.WriteHeader(200)
 						_, err = w.Write(data)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 						return
 					}
 
@@ -1970,42 +1971,42 @@ func TestBitBucketReporter(t *testing.T) {
 						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
 							t.Errorf("JSON decode error: %v", err)
 						}
-						require.Equal(t, tc.report, resp, "Got wrong bitbucket report body")
+						assert.Equal(t, tc.report, resp, "Got wrong bitbucket report body")
 					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations":
 						var resp reporter.BitBucketAnnotations
 						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
 							t.Errorf("JSON decode error: %s", err)
 						}
-						require.Equal(t, tc.annotations, resp, "Got wrong bitbucket annotations")
+						assert.Equal(t, tc.annotations, resp, "Got wrong bitbucket annotations")
 					case "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests":
 						data, err := json.Marshal(tc.pullRequests)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 						w.WriteHeader(200)
 						_, err = w.Write(data)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes":
 						data, err := json.Marshal(tc.pullRequestChanges)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 						w.WriteHeader(200)
 						_, err = w.Write(data)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 					case "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities":
 						data, err := json.Marshal(tc.pullRequestActivities)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 						w.WriteHeader(200)
 						_, err = w.Write(data)
-						require.NoError(t, err)
+						assert.NoError(t, err)
 					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments":
 						var comment reporter.BitBucketPendingComment
 						if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
 							t.Errorf("JSON decode error: %s", err)
 						}
-						require.Equal(t, tc.pullRequestComments[commentIndex], comment)
+						assert.Equal(t, tc.pullRequestComments[commentIndex], comment)
 						commentIndex++
 					case "/plugins/servlet/applinks/whoami":
 						w.WriteHeader(200)
 						_, err := w.Write([]byte("pint_user"))
-						require.NoError(t, err)
+						assert.NoError(t, err)
 					default:
 						w.WriteHeader(500)
 						_, _ = w.Write([]byte(fmt.Sprintf("Unhandled path: %s", r.URL.Path)))
