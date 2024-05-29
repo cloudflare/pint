@@ -16,13 +16,13 @@ const (
 	AnnotationCheckName = "alerts/annotation"
 )
 
-func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isReguired bool, comment string, severity Severity) AnnotationCheck {
+func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isRequired bool, comment string, severity Severity) AnnotationCheck {
 	return AnnotationCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
 		valueRe:    valueRe,
 		values:     values,
-		isReguired: isReguired,
+		isRequired: isRequired,
 		comment:    comment,
 		severity:   severity,
 	}
@@ -35,7 +35,7 @@ type AnnotationCheck struct {
 	comment    string
 	values     []string
 	severity   Severity
-	isReguired bool
+	isRequired bool
 }
 
 func (c AnnotationCheck) Meta() CheckMeta {
@@ -52,9 +52,9 @@ func (c AnnotationCheck) Meta() CheckMeta {
 
 func (c AnnotationCheck) String() string {
 	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.keyRe.original, c.valueRe.anchored, c.isReguired)
+		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.keyRe.original, c.valueRe.anchored, c.isRequired)
 	}
-	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.keyRe.original, c.isReguired)
+	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.keyRe.original, c.isRequired)
 }
 
 func (c AnnotationCheck) Reporter() string {
@@ -67,7 +67,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	}
 
 	if rule.AlertingRule.Annotations == nil || len(rule.AlertingRule.Annotations.Items) == 0 {
-		if c.isReguired {
+		if c.isRequired {
 			problems = append(problems, Problem{
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
@@ -87,7 +87,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		}
 	}
 
-	if len(annotations) == 0 && c.isReguired {
+	if len(annotations) == 0 && c.isRequired {
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Annotations.Lines,
 			Reporter: c.Reporter(),
@@ -99,6 +99,16 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	}
 
 	for _, ann := range annotations {
+		if ann.Value.Value == "" && c.isRequired {
+			problems = append(problems, Problem{
+				Lines:    rule.AlertingRule.Annotations.Lines,
+				Reporter: c.Reporter(),
+				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				Details:  maybeComment(c.comment),
+				Severity: c.severity,
+			})
+			return problems
+		}
 		if c.tokenRe != nil {
 			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(ann.Value.Value, -1) {
 				problems = append(problems, c.checkValue(rule, match, ann.Value.Lines)...)

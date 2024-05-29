@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.60.0
+
+### Fixed
+
+- [alerts/annotations](checks/alerts/annotation.md) and [rule/label](checks/rule/label.md) will
+  now report when a label or annotation is required but set to an empty value.
+
 ## v0.59.0
 
 ### Added

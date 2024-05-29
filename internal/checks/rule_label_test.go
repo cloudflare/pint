@@ -54,6 +54,34 @@ func TestLabelCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "empty label in recording rule / required",
+			content: `
+- record: foo
+  expr: rate(foo[1m])
+  labels:
+    foo: bar
+    severity:
+    level: warning
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  7,
+						},
+						Reporter: checks.LabelCheckName,
+						Text:     "`severity` label is required.",
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
 			description: "no labels in recording rule / not required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
@@ -214,6 +242,34 @@ func TestLabelCheck(t *testing.T) {
 						Lines: parser.LineRange{
 							First: 1,
 							Last:  2,
+						},
+						Reporter: checks.LabelCheckName,
+						Text:     "`severity` label is required.",
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "empty label in alerting rule / required",
+			content: `
+- alert: foo
+  expr: rate(foo[1m])
+  labels:
+    foo: bar
+    severity:
+    level: warning
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  7,
 						},
 						Reporter: checks.LabelCheckName,
 						Text:     "`severity` label is required.",
