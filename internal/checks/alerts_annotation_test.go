@@ -62,6 +62,34 @@ func TestAnnotationCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "empty annotations / required",
+			content: `
+- alert: foo
+  expr: sum(foo)
+  annotations:
+    foo: bar
+    severity:
+    level: warning
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Bug)
+			},
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  7,
+						},
+						Reporter: checks.AnnotationCheckName,
+						Text:     "`severity` annotation is required.",
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
 			description: "no annotations / not required",
 			content:     "- alert: foo\n  expr: sum(foo)\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
