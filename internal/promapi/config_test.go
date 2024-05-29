@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/promapi"
@@ -168,9 +169,9 @@ func TestConfigHeaders(t *testing.T) {
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				for k, v := range tc.request {
 					if tc.shouldFail {
-						require.NotEqual(t, r.Header.Get(k), v)
+						assert.NotEqual(t, r.Header.Get(k), v)
 					} else {
-						require.Equal(t, r.Header.Get(k), v)
+						assert.Equal(t, r.Header.Get(k), v)
 					}
 				}
 				w.WriteHeader(200)
