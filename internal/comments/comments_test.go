@@ -388,8 +388,9 @@ func TestParse(t *testing.T) {
 			input: "code # pint disable xxx  \ncode # alice\n",
 			output: []comments.Comment{
 				{
-					Type:  comments.DisableType,
-					Value: comments.Disable{Match: "xxx"},
+					Type:   comments.DisableType,
+					Value:  comments.Disable{Match: "xxx"},
+					Offset: len("code "),
 				},
 			},
 		},
@@ -397,12 +398,14 @@ func TestParse(t *testing.T) {
 			input: "code # pint disable xxx yyy \n # pint\tfile/owner bob",
 			output: []comments.Comment{
 				{
-					Type:  comments.DisableType,
-					Value: comments.Disable{Match: "xxx yyy"},
+					Type:   comments.DisableType,
+					Value:  comments.Disable{Match: "xxx yyy"},
+					Offset: len("code "),
 				},
 				{
-					Type:  comments.FileOwnerType,
-					Value: comments.Owner{Name: "bob"},
+					Type:   comments.FileOwnerType,
+					Value:  comments.Owner{Name: "bob"},
+					Offset: 1,
 				},
 			},
 		},
@@ -419,7 +422,8 @@ func TestParse(t *testing.T) {
 			input: "{#- comment #} # pint ignore/line",
 			output: []comments.Comment{
 				{
-					Type: comments.IgnoreLineType,
+					Type:   comments.IgnoreLineType,
+					Offset: len("{#- comment #} "),
 				},
 			},
 		},
@@ -427,7 +431,8 @@ func TestParse(t *testing.T) {
 			input: "{# comment #} # pint ignore/line",
 			output: []comments.Comment{
 				{
-					Type: comments.IgnoreLineType,
+					Type:   comments.IgnoreLineType,
+					Offset: len("{# comment #} "),
 				},
 			},
 		},
@@ -435,7 +440,8 @@ func TestParse(t *testing.T) {
 			input: "#pint # pint # pint boo # pint ignore/line",
 			output: []comments.Comment{
 				{
-					Type: comments.IgnoreLineType,
+					Type:   comments.IgnoreLineType,
+					Offset: len("#pint # pint # pint boo "),
 				},
 			},
 		},
@@ -448,6 +454,15 @@ func TestParse(t *testing.T) {
 						Line: 1,
 						Err:  fmt.Errorf(`unexpected comment suffix: "# pint ignore/file"`),
 					}},
+				},
+			},
+		},
+		{
+			input: "{#- JIRA-12345: foo<->bar example comment ' -#} # pint ignore/line",
+			output: []comments.Comment{
+				{
+					Type:   comments.IgnoreLineType,
+					Offset: len("{#- JIRA-12345: foo<->bar example comment ' -#} "),
 				},
 			},
 		},

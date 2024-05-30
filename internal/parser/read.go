@@ -20,21 +20,26 @@ const (
 	skipFile
 )
 
-func emptyLine(line string) (emptied string) {
-	preComment := strings.TrimSuffix(line, "\n")
-	var comment string
-	if commentStart := strings.IndexRune(line, '#'); commentStart >= 0 {
-		comment = preComment[commentStart:]
-		preComment = preComment[:commentStart]
+func emptyLine(line string, comments []comments.Comment) string {
+	offset := len(line)
+	for _, c := range comments {
+		offset = c.Offset
+		break
 	}
 
-	emptied = strings.Repeat(" ", len(preComment)) + comment
-
-	if strings.HasSuffix(line, "\n") {
-		emptied += "\n"
+	var buf strings.Builder
+	for i, r := range line {
+		switch {
+		case r == '\n':
+			buf.WriteRune(r)
+		case i < offset:
+			buf.WriteRune(' ')
+		default:
+			buf.WriteRune(r)
+		}
 	}
 
-	return emptied
+	return buf.String()
 }
 
 type Content struct {
@@ -46,15 +51,19 @@ type Content struct {
 
 func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err error) {
 	reader := bufio.NewReader(r)
-	var lineno int
-	var line string
-	var found bool
-	var skip skipMode
+	var (
+		lineno       int
+		line         string
+		lineComments []comments.Comment
+		found        bool
+		skip         skipMode
 
-	var skipNext bool
-	var autoReset bool
-	var skipAll bool
-	var inBegin bool
+		skipNext  bool
+		autoReset bool
+		skipAll   bool
+		inBegin   bool
+	)
+
 	for {
 		lineno++
 		line, err = reader.ReadString('\n')
@@ -65,12 +74,14 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 			out.TotalLines++
 		}
 
+		lineComments = comments.Parse(lineno, line)
+
 		if skipAll {
-			out.Body = append(out.Body, []byte(emptyLine(line))...)
+			out.Body = append(out.Body, []byte(emptyLine(line, lineComments))...)
 		} else {
 			skip = skipNone
 			found = false
-			for _, comment := range comments.Parse(lineno, line) {
+			for _, comment := range lineComments {
 				// nolint:exhaustive
 				switch comment.Type {
 				case comments.IgnoreFileType:
@@ -114,12 +125,12 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 				case skipFile:
 					out.Ignored = true
 					out.IgnoreLine = lineno
-					out.Body = append(out.Body, []byte(emptyLine(line))...)
+					out.Body = append(out.Body, []byte(emptyLine(line, lineComments))...)
 					skipNext = true
 					autoReset = false
 					skipAll = true
 				case skipCurrentLine:
-					out.Body = append(out.Body, []byte(emptyLine(line))...)
+					out.Body = append(out.Body, []byte(emptyLine(line, lineComments))...)
 					if !inBegin {
 						skipNext = false
 						autoReset = true
@@ -140,7 +151,7 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 					inBegin = false
 				}
 			case skipNext:
-				out.Body = append(out.Body, []byte(emptyLine(line))...)
+				out.Body = append(out.Body, []byte(emptyLine(line, lineComments))...)
 				if autoReset {
 					skipNext = false
 				}
