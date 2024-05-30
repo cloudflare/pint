@@ -49,8 +49,9 @@ type CommentValue interface {
 }
 
 type Comment struct {
-	Value CommentValue
-	Type  Type
+	Value  CommentValue
+	Type   Type
+	Offset int
 }
 
 func parseType(s string) Type {
@@ -213,7 +214,7 @@ func parseComment(s string) (parsed []Comment, err error) {
 	var c Comment
 
 	state := needsHash
-	for _, r := range s + "\n" {
+	for i, r := range s + "\n" {
 	READRUNE:
 		switch state {
 		case needsHash:
@@ -224,6 +225,7 @@ func parseComment(s string) (parsed []Comment, err error) {
 			buf.Reset()
 			c.Type = UnknownType
 			c.Value = nil
+			c.Offset = i
 		case needsPrefix:
 			if unicode.IsSpace(r) {
 				goto NEXT

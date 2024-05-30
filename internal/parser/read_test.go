@@ -96,6 +96,10 @@ func TestReadContent(t *testing.T) {
 			output: []byte("# pint ignore/begin\n   \n   \n"),
 		},
 		{
+			input:  []byte("prefix # pint ignore/begin\nfoo\nbar\n"),
+			output: []byte("prefix # pint ignore/begin\n   \n   \n"),
+		},
+		{
 			input:  []byte("# pint ignore/begin\nfoo\nbar\n# pint ignore/begin"),
 			output: []byte("# pint ignore/begin\n   \n   \n# pint ignore/begin"),
 		},
@@ -121,7 +125,7 @@ func TestReadContent(t *testing.T) {
 		},
 		{
 			input:  []byte("{#- comment #} # pint ignore/line\n"),
-			output: []byte(" #- comment #} # pint ignore/line\n"),
+			output: []byte("               # pint ignore/line\n"),
 		},
 		{
 			input:   []byte("# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
@@ -139,7 +143,7 @@ func TestReadContent(t *testing.T) {
 		},
 		{
 			input:  []byte("{# comment #} # pint ignore/line\n"),
-			output: []byte(" # comment #} # pint ignore/line\n"),
+			output: []byte("              # pint ignore/line\n"),
 		},
 		{
 			input:  []byte("# pint file/owner bob\n# pint rule/set xxx\n# pint bamboozle xxx\n"),
@@ -150,6 +154,10 @@ func TestReadContent(t *testing.T) {
 					Value: comments.Owner{Name: "bob"},
 				},
 			},
+		},
+		{
+			input:  []byte("{#- hide this comment -#} # pint ignore/line\n"),
+			output: []byte("                          # pint ignore/line\n"),
 		},
 	}
 

@@ -6,6 +6,7 @@
 
 - [alerts/annotations](checks/alerts/annotation.md) and [rule/label](checks/rule/label.md) will
   now report when a label or annotation is required but set to an empty value.
+- Fixed handling of `# pint ignore/line` comments on line including multiple `#` characters.
 
 ## v0.59.0
 
