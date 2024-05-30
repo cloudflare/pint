@@ -203,23 +203,34 @@ func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*Fi
 
 		switch {
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Symlink:
-			// file was turned into a symlink, every source line is modification
+			slog.Debug("File was turned into a symlink", slog.String("path", change.Path.After.Name))
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type != Missing && change.Path.After.Type != Symlink:
 			change.Body.ModifiedLines, err = getModifiedLines(cmd, change.Commits, change.Path.After.EffectivePath(), lastCommit)
 			if err != nil {
 				return nil, fmt.Errorf("failed to run git blame for %s: %w", change.Path.After.EffectivePath(), err)
 			}
+			if len(change.Body.ModifiedLines) == 0 && change.Path.Before.EffectivePath() != change.Path.After.EffectivePath() {
+				// File was moved or renamed. Mark it all as modified.
+				change.Body.ModifiedLines = CountLines(change.Body.After)
+				slog.Debug("File was moved or renamed", slog.String("path", change.Path.After.Name))
+			} else {
+				slog.Debug("File was modified", slog.String("path", change.Path.After.Name), slog.Any("lines", change.Body.ModifiedLines))
+			}
 		case change.Path.Before.Type == Symlink && change.Path.After.Type == Symlink:
+			slog.Debug("Symlink was modified", slog.String("path", change.Path.After.Name))
 			// symlink was modified, every source line is modification
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type == Missing && change.Path.After.Type != Missing:
+			slog.Debug("File was added", slog.String("path", change.Path.After.Name))
 			// old file body is empty, meaning that every line was modified
 			change.Body.ModifiedLines = CountLines(change.Body.After)
 		case change.Path.Before.Type != Missing && change.Path.After.Type == Missing:
+			slog.Debug("File was removed", slog.String("path", change.Path.After.Name))
 			// new file body is empty, meaning that every line was modified
 			change.Body.ModifiedLines = CountLines(change.Body.Before)
 		case change.Path.Before.Type == Missing && change.Path.After.Type == Missing:
+			slog.Debug("File was added and removed", slog.String("path", change.Path.After.Name))
 			// file was added and then removed
 			change.Body.ModifiedLines = []int{}
 		default:
@@ -269,6 +280,11 @@ func getModifiedLines(cmd CommandRunner, commits []string, fpath, atCommit strin
 		}
 		modLines = append(modLines, line.Line)
 	}
+	slog.Debug("List of modified lines",
+		slog.Any("commits", commits),
+		slog.String("path", fpath),
+		slog.Any("lines", modLines),
+	)
 	return modLines, nil
 }
 

@@ -64,12 +64,15 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 
 	for _, change := range changes {
 		var entriesBefore, entriesAfter []Entry
-		entriesBefore, _ = readRules(
+		entriesBefore, err = readRules(
 			change.Path.Before.EffectivePath(),
 			change.Path.Before.Name,
 			bytes.NewReader(change.Body.Before),
 			!f.filter.IsRelaxed(change.Path.Before.Name),
 		)
+		if err != nil {
+			slog.Debug("Cannot read before rules", slog.String("path", change.Path.Before.Name), slog.Any("err", err))
+		}
 		entriesAfter, err = readRules(
 			change.Path.After.EffectivePath(),
 			change.Path.After.Name,
@@ -79,7 +82,19 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
 		}
-
+		slog.Debug(
+			"Parsing git file change",
+			slog.Any("commits", change.Commits),
+			slog.String("before.path", change.Path.Before.Name),
+			slog.String("before.target", change.Path.Before.SymlinkTarget),
+			slog.Any("before.type", change.Path.Before.Type),
+			slog.Int("before.entries", len(entriesBefore)),
+			slog.String("after.path", change.Path.After.Name),
+			slog.String("after.target", change.Path.After.SymlinkTarget),
+			slog.Any("after.type", change.Path.After.Type),
+			slog.Int("after.entries", len(entriesAfter)),
+			slog.Any("modifiedLines", change.Body.ModifiedLines),
+		)
 		for _, me := range matchEntries(entriesBefore, entriesAfter) {
 			switch {
 			case !me.hasBefore && me.hasAfter:
