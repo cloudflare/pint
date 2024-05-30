@@ -985,6 +985,53 @@ groups:
 				},
 			},
 		},
+		{
+			title: "rule file with symlink moved",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+- alert: rule
+  expr: up == 0
+`, "v1")
+
+				err := os.Symlink("rules.yml", "symlink.yml")
+				require.NoError(t, err, "symlink")
+				_, err = git.RunGit("add", "symlink.yml")
+				require.NoError(t, err, "git add")
+				gitCommit(t, "v1")
+
+				_, err = git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				_, err = git.RunGit("mv", "rules.yml", "new.yml")
+				require.NoError(t, err, "git mv")
+
+				_, err = git.RunGit("rm", "-f", "symlink.yml")
+				require.NoError(t, err, "git rm symlink")
+
+				gitCommit(t, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			entries: []discovery.Entry{
+				{
+					State: discovery.Moved,
+					Path: discovery.Path{
+						Name:          "new.yml",
+						SymlinkTarget: "new.yml",
+					},
+					ModifiedLines: []int{1, 2, 3},
+					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+				},
+				{
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "symlink.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{2, 3},
+					Rule:          mustParse(1, "- alert: rule\n  expr: up == 0\n"),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
