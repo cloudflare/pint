@@ -18,6 +18,6 @@ jobs:
           show-progress: false
 
       - name: Check config
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v6
         with:
           args: check -f .goreleaser.yml
