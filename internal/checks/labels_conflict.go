@@ -75,7 +75,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 					},
 					Reporter: c.Reporter(),
 					Text:     c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
-					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
+					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Warning,
 				})
 			}

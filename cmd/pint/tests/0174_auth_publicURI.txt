@@ -1,0 +1,24 @@
+http auth-response prometheus /api/v1/status/flags admin pass 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http auth-response prometheus /api/v1/status/config admin pass 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}
+http auth-response prometheus /api/v1/query_range admin pass 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http auth-response prometheus /api/v1/query admin pass 200 {"status":"success","data":{"resultType":"vector","result":[]}}
+http start prometheus 127.0.0.1:7174
+
+pint.error -l debug --no-color lint rules
+! stdout .
+! stderr 'admin:pass'
+stderr 'http://admin@127.0.0.1:7174'
+-- rules/1.yml --
+- record: aggregate
+  expr: sum(foo) without(job)
+-- .pint.hcl --
+prometheus "prom" {
+  uri       = "http://admin:pass@127.0.0.1:7174"
+  publicURI = "http://admin@127.0.0.1:7174"
+  failover  = []
+  timeout   = "5s"
+  required  = true
+}
+parser {
+  relaxed = [".*"]
+}

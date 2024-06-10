@@ -195,7 +195,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 		// 1. If foo{bar, baz} is there -> GOOD
 		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()))
-		count, _, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
+		count, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, expr))
 			continue
@@ -563,7 +563,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string) string 
 			series += int(s.Value)
 		}
 
-		uri := prom.PublicURI()
+		uri := prom.URI()
 
 		if series > 0 {
 			matches++
@@ -596,10 +596,10 @@ func (c SeriesCheck) queryProblem(err error, expr parser.PromQLExpr) Problem {
 	}
 }
 
-func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int, string, error) {
+func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int, error) {
 	qr, err := c.prom.Query(ctx, query)
 	if err != nil {
-		return 0, "", err
+		return 0, err
 	}
 
 	var series int
@@ -607,7 +607,7 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 		series += int(s.Value)
 	}
 
-	return series, qr.URI, nil
+	return series, nil
 }
 
 func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelector) (minAge time.Duration, problems []Problem) {

@@ -28,9 +28,8 @@ type PrometheusConfig struct {
 }
 
 type ConfigResult struct {
-	URI       string
-	PublicURI string
-	Config    PrometheusConfig
+	URI    string
+	Config PrometheusConfig
 }
 
 type configQuery struct {
@@ -108,9 +107,8 @@ func (p *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*Confi
 	}
 
 	r := ConfigResult{
-		URI:       p.safeURI,
-		PublicURI: p.publicURI,
-		Config:    result.value.(PrometheusConfig),
+		URI:    p.publicURI,
+		Config: result.value.(PrometheusConfig),
 	}
 
 	return &r, nil

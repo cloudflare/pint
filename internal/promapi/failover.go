@@ -45,7 +45,7 @@ func cacheCleaner(cache *queryCache, interval time.Duration, quit chan bool) {
 
 type FailoverGroup struct {
 	name           string
-	publicURI      string
+	uri            string
 	servers        []*Prometheus
 	uptimeMetric   string
 	cacheCollector *cacheCollector
@@ -58,10 +58,10 @@ type FailoverGroup struct {
 	strictErrors bool
 }
 
-func NewFailoverGroup(name, publicURI string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
+func NewFailoverGroup(name, uri string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
 	return &FailoverGroup{
 		name:         name,
-		publicURI:    publicURI,
+		uri:          uri,
 		servers:      servers,
 		strictErrors: strictErrors,
 		uptimeMetric: uptimeMetric,
@@ -75,8 +75,8 @@ func (fg *FailoverGroup) Name() string {
 	return fg.name
 }
 
-func (fg *FailoverGroup) PublicURI() string {
-	return fg.publicURI
+func (fg *FailoverGroup) URI() string {
+	return fg.uri
 }
 
 func (fg *FailoverGroup) Include() []string {
