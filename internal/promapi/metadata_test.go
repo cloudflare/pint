@@ -71,26 +71,23 @@ func TestMetadata(t *testing.T) {
 			metric:  "gauge",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:       srv.URL,
-				PublicURI: srv.URL,
-				Metadata:  []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+				URI:      srv.URL,
+				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
 		},
 		{
 			metric:  "counter",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:       srv.URL,
-				PublicURI: srv.URL,
-				Metadata:  []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
+				URI:      srv.URL,
+				Metadata: []v1.Metadata{{Type: "counter", Help: "Text", Unit: ""}},
 			},
 		},
 		{
 			metric:  "mixed",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:       srv.URL,
-				PublicURI: srv.URL,
+				URI: srv.URL,
 				Metadata: []v1.Metadata{
 					{Type: "gauge", Help: "Text1", Unit: "abc"},
 					{Type: "counter", Help: "Text2", Unit: ""},
@@ -111,9 +108,8 @@ func TestMetadata(t *testing.T) {
 			metric:  "once",
 			timeout: time.Second,
 			metadata: promapi.MetadataResult{
-				URI:       srv.URL,
-				PublicURI: srv.URL,
-				Metadata:  []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
+				URI:      srv.URL,
+				Metadata: []v1.Metadata{{Type: "gauge", Help: "Text", Unit: ""}},
 			},
 		},
 	}

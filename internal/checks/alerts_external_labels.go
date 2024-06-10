@@ -74,7 +74,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
-					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
+					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
 				})
 			}
@@ -86,7 +86,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)), Severity: Bug,
-					Details: fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
+					Details: fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 				})
 			}
 		}
@@ -102,7 +102,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
-					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
+					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
 				})
 			}
@@ -114,7 +114,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 					},
 					Reporter: c.Reporter(),
 					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
-					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.PublicURI, c.prom.Name()),
+					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
 				})
 			}

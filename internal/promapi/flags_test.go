@@ -62,18 +62,16 @@ func TestFlags(t *testing.T) {
 			prefix:  "/default",
 			timeout: time.Second,
 			flags: promapi.FlagsResult{
-				URI:       srv.URL + "/default",
-				PublicURI: srv.URL + "/default",
-				Flags:     v1.FlagsResult{},
+				URI:   srv.URL + "/default",
+				Flags: v1.FlagsResult{},
 			},
 		},
 		{
 			prefix:  "/foo",
 			timeout: time.Second,
 			flags: promapi.FlagsResult{
-				URI:       srv.URL + "/foo",
-				PublicURI: srv.URL + "/foo",
-				Flags:     v1.FlagsResult{"foo": "bar"},
+				URI:   srv.URL + "/foo",
+				Flags: v1.FlagsResult{"foo": "bar"},
 			},
 		},
 		{

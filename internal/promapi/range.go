@@ -23,10 +23,9 @@ import (
 )
 
 type RangeQueryResult struct {
-	URI       string
-	PublicURI string
-	Series    SeriesTimeRanges
-	Stats     QueryStats
+	URI    string
+	Series SeriesTimeRanges
+	Stats  QueryStats
 }
 
 type rangeQuery struct {
@@ -163,8 +162,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	}()
 
 	merged := RangeQueryResult{
-		URI:       p.safeURI,
-		PublicURI: p.publicURI,
+		URI: p.publicURI,
 		Series: SeriesTimeRanges{
 			From:  start,
 			Until: end,

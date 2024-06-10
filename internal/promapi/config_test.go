@@ -77,26 +77,23 @@ func TestConfig(t *testing.T) {
 			prefix:  "/default",
 			timeout: time.Second,
 			cfg: promapi.ConfigResult{
-				URI:       srv.URL + "/default",
-				PublicURI: srv.URL + "/default",
-				Config:    defaults,
+				URI:    srv.URL + "/default",
+				Config: defaults,
 			},
 		},
 		{
 			prefix:  "/1m",
 			timeout: time.Second,
 			cfg: promapi.ConfigResult{
-				URI:       srv.URL + "/1m",
-				PublicURI: srv.URL + "/1m",
-				Config:    defaults,
+				URI:    srv.URL + "/1m",
+				Config: defaults,
 			},
 		},
 		{
 			prefix:  "/30s",
 			timeout: time.Second,
 			cfg: promapi.ConfigResult{
-				URI:       srv.URL + "/30s",
-				PublicURI: srv.URL + "/30s",
+				URI: srv.URL + "/30s",
 				Config: promapi.PrometheusConfig{
 					Global: promapi.ConfigSectionGlobal{
 						ScrapeInterval:     time.Second * 30,

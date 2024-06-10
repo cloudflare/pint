@@ -97,9 +97,9 @@ type Prometheus struct {
 	queries     chan queryRequest
 	client      http.Client
 	name        string
-	unsafeURI   string
-	safeURI     string
-	publicURI   string
+	unsafeURI   string // raw prometheus URI, for queries
+	safeURI     string // prometheus URI but with auth info stripped, for logging
+	publicURI   string // either set explicitly by user in the config or same as safeURI, this ends up as URI in query responses
 	wg          sync.WaitGroup
 	timeout     time.Duration
 	concurrency int
@@ -111,17 +111,18 @@ func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeo
 		transport.TLSClientConfig = tlsConf
 	}
 
-	uri = strings.TrimSuffix(uri, "/")
+	unsafeURI := strings.TrimSuffix(uri, "/")
+	safeURI := sanitizeURI(unsafeURI)
 	publicURI = strings.TrimSuffix(publicURI, "/")
 	if publicURI == "" {
-		publicURI = uri
+		publicURI = safeURI
 	}
 
 	prom := Prometheus{
 		name:        name,
 		unsafeURI:   uri,
+		safeURI:     safeURI,
 		publicURI:   publicURI,
-		safeURI:     sanitizeURI(uri),
 		headers:     headers,
 		timeout:     timeout,
 		client:      http.Client{Transport: gzhttp.Transport(transport)},
