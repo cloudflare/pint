@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.61.0
+
+### Fixed
+
+- Don't suggest using `humanize` when alert template is already using printf on format the `$value`.
+
 ## v0.60.0
 
 ### Fixed

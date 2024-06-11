@@ -470,13 +470,10 @@ func hasHumanize(name, text string) bool {
 			continue
 		}
 		if n, ok := node.(*parse.ActionNode); ok {
-			if len(n.Pipe.Cmds) <= 1 {
-				continue
-			}
 			for _, cmd := range n.Pipe.Cmds {
 				for _, arg := range cmd.Args {
 					if m, ok := arg.(*parse.IdentifierNode); ok {
-						for _, f := range []string{"humanize", "humanize1024", "humanizePercentage", "humanizeDuration"} {
+						for _, f := range []string{"humanize", "humanize1024", "humanizePercentage", "humanizeDuration", "printf"} {
 							for _, a := range aliases.varAliases(f) {
 								if m.Ident == a {
 									return true

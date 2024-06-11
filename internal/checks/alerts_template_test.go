@@ -871,6 +871,54 @@ func TestTemplateCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
+			description: "humanize not needed on wjen using printf %.2f",
+			content: `
+- alert: Foo
+  expr: rate(errors_total[5m]) > 0
+  annotations:
+    summary: Seeing {{ printf "%.2f" $value }} instances with errors
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanize not needed on wjen using printf %f",
+			content: `
+- alert: Foo
+  expr: rate(errors_total[5m]) > 0
+  annotations:
+    summary: Seeing {{ printf "%f" $value }} instances with errors
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "humanize still needed for printf on another value",
+			content: `
+- alert: Foo
+  expr: rate(errors_total[5m]) > 0
+  annotations:
+    summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     humanizeText("rate(errors_total[5m])"),
+						Severity: checks.Information,
+					},
+				}
+			},
+		},
+		{
 			description: "toTime",
 			content: `
 - alert: Foo
