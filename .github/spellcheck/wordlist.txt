@@ -33,6 +33,7 @@ matcher
 matchers
 md
 nav
+printf
 prometheus
 promql
 PromQL
