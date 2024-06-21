@@ -5,6 +5,7 @@
 ### Fixed
 
 - Don't suggest using `humanize` when alert template is already using printf on format the `$value`.
+- Fixed git history parsing when running `pint ci` on a branch that include merge commits.
 
 ## v0.60.0
 

@@ -68,8 +68,8 @@ type FileChange struct {
 	Status  FileStatus
 }
 
-func Changes(cmd CommandRunner, cr CommitRangeResults, filter PathFilter) ([]*FileChange, error) {
-	out, err := cmd("log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", cr.String())
+func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileChange, error) {
+	out, err := cmd("log", "--reverse", "--no-merges", "--first-parent", "--format=%H", "--name-status", fmt.Sprintf("%s..HEAD", baseBranch))
 	if err != nil {
 		return nil, fmt.Errorf("failed to get the list of modified files from git: %w", err)
 	}

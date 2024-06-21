@@ -42,7 +42,7 @@ func gitCommit(t *testing.T, message string) {
 
 func TestChanges(t *testing.T) {
 	type testCaseT struct {
-		setup   func(t *testing.T) (git.CommandRunner, git.CommitRangeResults)
+		setup   func(t *testing.T) git.CommandRunner
 		title   string
 		err     string
 		changes []*git.FileChange
@@ -51,19 +51,18 @@ func TestChanges(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			title: "git log error",
-			setup: func(_ *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(_ *testing.T) git.CommandRunner {
 				cmd := func(args ...string) ([]byte, error) {
 					return nil, fmt.Errorf("mock git error: %v", args)
 				}
-				cr := git.CommitRangeResults{From: "a", To: "b"}
-				return cmd, cr
+				return cmd
 			},
 			changes: nil,
-			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status a^..b]",
+			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD]",
 		},
 		{
 			title: "chmod",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -74,9 +73,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "index.txt")
 				gitCommit(t, "chmod")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -102,7 +99,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "dir -> file",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.Mkdir("index.txt", 0o755))
 				require.NoError(t, os.WriteFile("index.txt/.keep", []byte("keep"), 0o644))
@@ -115,9 +112,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "index.txt")
 				gitCommit(t, "chmod")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -161,7 +156,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "delete and re-add",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -175,9 +170,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "index.txt")
 				gitCommit(t, "add")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -203,7 +196,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "file -> symlink",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo\n1\n"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -217,9 +210,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "second file.txt")
 				gitCommit(t, "symlink")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -246,7 +237,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "rename partial",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -258,9 +249,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "second.txt")
 				gitCommit(t, "mv")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -286,7 +275,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "rename 100% and edit",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -299,9 +288,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "second.txt")
 				gitCommit(t, "edit")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -327,7 +314,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "add file, add another",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -340,9 +327,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "third.txt")
 				gitCommit(t, "add two more")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -384,7 +369,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "delete file",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -397,9 +382,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "second.txt")
 				gitCommit(t, "rm second")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -424,7 +407,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "delete symlink",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -437,9 +420,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "second.txt")
 				gitCommit(t, "rm second")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -465,7 +446,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "delete directory with symlinks",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -480,9 +461,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "dir")
 				gitCommit(t, "rm dir")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -526,7 +505,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "symlink target changed",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("index.txt", []byte("foo\n1\n"), 0o644))
 				mustRun(t, "add", "index.txt")
@@ -544,9 +523,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "add", "dir")
 				gitCommit(t, "symlink change")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -574,7 +551,7 @@ func TestChanges(t *testing.T) {
 		},
 		{
 			title: "rule modified then file renamed",
-			setup: func(t *testing.T) (git.CommandRunner, git.CommitRangeResults) {
+			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.WriteFile("main.txt", []byte("l1\nl2\nl3\n"), 0o644))
 				mustRun(t, "add", "main.txt")
@@ -588,9 +565,7 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "mv", "main.txt", "pr.txt")
 				gitCommit(t, "rename")
 
-				cr, err := git.CommitRange(debugGitRun(t), "main")
-				require.NoError(t, err)
-				return debugGitRun(t), cr
+				return debugGitRun(t)
 			},
 			changes: []*git.FileChange{
 				{
@@ -624,13 +599,14 @@ func TestChanges(t *testing.T) {
 			err := os.Chdir(dir)
 			require.NoError(t, err, "chdir")
 
-			cmd, cr := tc.setup(t)
-			changes, err := git.Changes(cmd, cr, git.NewPathFilter(nil, nil, nil))
+			cmd := tc.setup(t)
+			changes, err := git.Changes(cmd, "main", git.NewPathFilter(nil, nil, nil))
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)
 				require.Nil(t, changes)
 			} else {
 				require.NoError(t, err)
+				require.Len(t, changes, len(tc.changes))
 				for i := range tc.changes {
 					require.Len(t, changes[i].Commits, len(tc.changes[i].Commits), "changes[%d].Commits", i)
 					require.Equal(t, tc.changes[i].Path, changes[i].Path, "changes[%d].Path", i)
