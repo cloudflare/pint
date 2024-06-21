@@ -28,8 +28,8 @@ level=DEBUG msg="Excluding git directory from glob results" path=.git glob=*
 level=DEBUG msg="File parsed" path=.pint.hcl rules=0
 level=DEBUG msg="File parsed" path=rules.yml rules=1
 level=DEBUG msg="Glob finder completed" count=1
-level=DEBUG msg="Running git command" args=["log","--format=%H","--no-abbrev-commit","--reverse","origin/main..HEAD"]
-level=ERROR msg="Fatal error" err="failed to get the list of commits to scan: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+level=DEBUG msg="Running git command" args=["log","--reverse","--no-merges","--first-parent","--format=%H","--name-status","origin/main..HEAD"]
+level=ERROR msg="Fatal error" err="failed to get the list of modified files from git: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

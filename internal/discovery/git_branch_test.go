@@ -80,7 +80,7 @@ func TestGitBranchFinder(t *testing.T) {
 				50,
 			),
 			entries: nil,
-			err:     "failed to get the list of commits to scan: mock git error: [log --format=%H --no-abbrev-commit --reverse main..HEAD]",
+			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD]",
 		},
 		{
 			title: "git list PR commits error - master",
@@ -94,24 +94,22 @@ func TestGitBranchFinder(t *testing.T) {
 				50,
 			),
 			entries: nil,
-			err:     "failed to get the list of commits to scan: mock git error: [log --format=%H --no-abbrev-commit --reverse master..HEAD]",
+			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status master..HEAD]",
 		},
 		{
 			title: "too many commits",
-			setup: func(_ *testing.T) {},
-			finder: discovery.NewGitBranchFinder(
-				func(args ...string) ([]byte, error) {
-					switch strings.Join(args, " ") {
-					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
-						return []byte("c1\nc2\nc3\nc4\n"), nil
-					default:
-						return nil, fmt.Errorf("mock git error: %v", args)
-					}
-				},
-				git.NewPathFilter(includeAll, nil, nil),
-				"main",
-				3,
-			),
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", "# v1\n", "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", "# v2-1\n", "v2-1")
+				commitFile(t, "rules.yml", "# v2-2\n", "v2-2")
+				commitFile(t, "rules.yml", "# v2-3\n", "v2-3")
+				commitFile(t, "rules.yml", "# v2-4\n", "v2-4")
+			},
+			finder:  discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 3),
 			entries: nil,
 			err:     "number of commits to check (4) is higher than maxCommits (3), exiting",
 		},
@@ -132,7 +130,7 @@ func TestGitBranchFinder(t *testing.T) {
 				4,
 			),
 			entries: nil,
-			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4]",
+			err:     "failed to get the list of modified files from git: mock git error: [log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD]",
 		},
 		{
 			title: "git get commit message error",
@@ -140,9 +138,7 @@ func TestGitBranchFinder(t *testing.T) {
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
-					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
-						return []byte("c1\nc2\nc3\nc4\n"), nil
-					case "log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4":
+					case "log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD":
 						return []byte("c1\nA\trules.yml\n"), nil
 					default:
 						return nil, fmt.Errorf("mock git error: %v", args)
@@ -161,9 +157,7 @@ func TestGitBranchFinder(t *testing.T) {
 			finder: discovery.NewGitBranchFinder(
 				func(args ...string) ([]byte, error) {
 					switch strings.Join(args, " ") {
-					case "log --format=%H --no-abbrev-commit --reverse main..HEAD":
-						return []byte("c1\nc2\nc3\nc4\n"), nil
-					case "log --reverse --no-merges --first-parent --format=%H --name-status c1^..c4":
+					case "log --reverse --no-merges --first-parent --format=%H --name-status main..HEAD":
 						return []byte("c1\nA\trules.yml\n"), nil
 					case "ls-tree c1^ rules.yml":
 						return []byte("100644 blob c0\trules.yml"), nil

@@ -98,42 +98,6 @@ func HeadCommit(cmd CommandRunner) (string, error) {
 	return strings.Trim(string(commit), "\n"), nil
 }
 
-type CommitRangeResults struct {
-	From    string
-	To      string
-	Commits []string
-}
-
-func (gcr CommitRangeResults) String() string {
-	return fmt.Sprintf("%s^..%s", gcr.From, gcr.To)
-}
-
-func CommitRange(cmd CommandRunner, baseBranch string) (CommitRangeResults, error) {
-	cr := CommitRangeResults{Commits: []string{}}
-
-	out, err := cmd("log", "--format=%H", "--no-abbrev-commit", "--reverse", fmt.Sprintf("%s..HEAD", baseBranch))
-	if err != nil {
-		return cr, err
-	}
-
-	for _, line := range strings.Split(strings.TrimSuffix(string(out), "\n"), "\n") {
-		if line != "" {
-			cr.Commits = append(cr.Commits, line)
-			if cr.From == "" {
-				cr.From = line
-			}
-			cr.To = line
-			slog.Debug("Found commit to scan", slog.String("commit", line))
-		}
-	}
-
-	if len(cr.Commits) == 0 {
-		return cr, fmt.Errorf("empty commit range")
-	}
-
-	return cr, nil
-}
-
 func CurrentBranch(cmd CommandRunner) (string, error) {
 	commit, err := cmd("rev-parse", "--abbrev-ref", "HEAD")
 	if err != nil {

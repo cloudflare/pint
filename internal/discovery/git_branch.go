@@ -39,19 +39,13 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 		allEntries[i].State = Excluded
 	}
 
-	cr, err := git.CommitRange(f.gitCmd, f.baseBranch)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get the list of commits to scan: %w", err)
-	}
-	slog.Debug("Got commit range from git", slog.String("from", cr.From), slog.String("to", cr.To))
-
-	if len(cr.Commits) > f.maxCommits {
-		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", len(cr.Commits), f.maxCommits)
-	}
-
-	changes, err := git.Changes(f.gitCmd, cr, f.filter)
+	changes, err := git.Changes(f.gitCmd, f.baseBranch, f.filter)
 	if err != nil {
 		return nil, err
+	}
+
+	if totalCommits := countCommits(changes); totalCommits > f.maxCommits {
+		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", totalCommits, f.maxCommits)
 	}
 
 	shouldSkip, err := f.shouldSkipAllChecks(changes)
@@ -320,4 +314,14 @@ func findRulesByName(entries []Entry, name string, typ parser.RuleType) (nomatch
 		}
 	}
 	return nomatch, match
+}
+
+func countCommits(changes []*git.FileChange) int {
+	commits := map[string]struct{}{}
+	for _, change := range changes {
+		for _, commit := range change.Commits {
+			commits[commit] = struct{}{}
+		}
+	}
+	return len(commits)
 }
