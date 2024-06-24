@@ -218,7 +218,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 							Last:  commentErr.Line,
 						},
 						Reporter: pintCommentReporter,
-						Text:     fmt.Sprintf("This comment is not a valid pint control comment: %s", commentErr.Error()),
+						Text:     "This comment is not a valid pint control comment: " + commentErr.Error(),
 						Severity: checks.Warning,
 					},
 					Owner: job.entry.Owner,

@@ -23,6 +23,7 @@ linters:
     - testifylint
     - godot
     - copyloopvar
+    - perfsprint
 
 issues:
   max-same-issues: 0

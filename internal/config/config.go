@@ -208,7 +208,7 @@ func getContext() *hcl.EvalContext {
 	vars := map[string]cty.Value{}
 	for _, e := range os.Environ() {
 		if k, v, ok := strings.Cut(e, "="); ok {
-			vars[fmt.Sprintf("ENV_%s", k)] = cty.StringVal(v)
+			vars["ENV_"+k] = cty.StringVal(v)
 		}
 	}
 	return &hcl.EvalContext{Variables: vars}

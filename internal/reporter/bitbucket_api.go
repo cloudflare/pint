@@ -285,7 +285,7 @@ func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, err
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", bb.authToken))
+	req.Header.Set("Authorization", "Bearer "+bb.authToken)
 
 	netClient := &http.Client{
 		Timeout: bb.timeout,
@@ -345,7 +345,7 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 	}
 
 	payload, _ := json.Marshal(BitBucketReport{
-		Title:    fmt.Sprintf("pint %s", bb.pintVersion),
+		Title:    "pint " + bb.pintVersion,
 		Result:   result,
 		Reporter: "Prometheus rule linter",
 		Details:  BitBucketDescription,

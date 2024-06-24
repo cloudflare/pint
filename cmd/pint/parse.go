@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -123,7 +124,7 @@ func actionParse(c *cli.Context) (err error) {
 
 	parts := c.Args().Slice()
 	if len(parts) == 0 {
-		return fmt.Errorf("a query string is required")
+		return errors.New("a query string is required")
 	}
 	query := strings.Join(parts, " ")
 	return parseQuery(query)

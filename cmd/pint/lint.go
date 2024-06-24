@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -58,7 +59,7 @@ func actionLint(c *cli.Context) error {
 
 	paths := c.Args().Slice()
 	if len(paths) == 0 {
-		return fmt.Errorf("at least one file or directory required")
+		return errors.New("at least one file or directory required")
 	}
 
 	slog.Info("Finding all rules to check", slog.Any("paths", paths))

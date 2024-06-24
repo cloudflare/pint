@@ -1,6 +1,7 @@
 package reporter
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -119,7 +120,7 @@ func (bb BitBucketReporter) Submit(summary Summary) (err error) {
 	}
 
 	if summary.HasFatalProblems() {
-		return fmt.Errorf("fatal error(s) reported")
+		return errors.New("fatal error(s) reported")
 	}
 
 	return nil

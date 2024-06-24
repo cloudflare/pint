@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -80,7 +81,7 @@ func actionCI(c *cli.Context) error {
 	}
 	currentBranch, err := git.CurrentBranch(git.RunGit)
 	if err != nil {
-		return fmt.Errorf("failed to get the name of current branch")
+		return errors.New("failed to get the name of current branch")
 	}
 	slog.Debug("Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
 	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
@@ -134,7 +135,7 @@ func actionCI(c *cli.Context) error {
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {
 		token, ok := os.LookupEnv("BITBUCKET_AUTH_TOKEN")
 		if !ok {
-			return fmt.Errorf("BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket")
+			return errors.New("BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket")
 		}
 
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.BitBucket.Timeout)
@@ -154,7 +155,7 @@ func actionCI(c *cli.Context) error {
 	if meta.cfg.Repository != nil && meta.cfg.Repository.GitLab != nil {
 		token, ok := os.LookupEnv("GITLAB_AUTH_TOKEN")
 		if !ok {
-			return fmt.Errorf("GITLAB_AUTH_TOKEN env variable is required when reporting to GitLab")
+			return errors.New("GITLAB_AUTH_TOKEN env variable is required when reporting to GitLab")
 		}
 
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitLab.Timeout)
@@ -177,12 +178,12 @@ func actionCI(c *cli.Context) error {
 	if meta.cfg.Repository != nil && meta.cfg.Repository.GitHub != nil {
 		token, ok := os.LookupEnv("GITHUB_AUTH_TOKEN")
 		if !ok {
-			return fmt.Errorf("GITHUB_AUTH_TOKEN env variable is required when reporting to GitHub")
+			return errors.New("GITHUB_AUTH_TOKEN env variable is required when reporting to GitHub")
 		}
 
 		prVal, ok := os.LookupEnv("GITHUB_PULL_REQUEST_NUMBER")
 		if !ok {
-			return fmt.Errorf("GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub")
+			return errors.New("GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub")
 		}
 
 		var prNum int
@@ -234,7 +235,7 @@ func actionCI(c *cli.Context) error {
 	}
 
 	if problemsFound {
-		return fmt.Errorf("problems found")
+		return errors.New("problems found")
 	}
 
 	return nil

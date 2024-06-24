@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/cloudflare/pint/internal/checks"
 )
@@ -22,13 +22,13 @@ func (cs CostSettings) validate() error {
 		}
 	}
 	if cs.MaxSeries < 0 {
-		return fmt.Errorf("maxSeries value must be >= 0")
+		return errors.New("maxSeries value must be >= 0")
 	}
 	if cs.MaxTotalSamples < 0 {
-		return fmt.Errorf("maxTotalSamples value must be >= 0")
+		return errors.New("maxTotalSamples value must be >= 0")
 	}
 	if cs.MaxPeakSamples < 0 {
-		return fmt.Errorf("maxPeakSamples value must be >= 0")
+		return errors.New("maxPeakSamples value must be >= 0")
 	}
 	if cs.MaxEvaluationDuration != "" {
 		if _, err := parseDuration(cs.MaxEvaluationDuration); err != nil {
