@@ -103,6 +103,7 @@ func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 	defer dummyReadAll(r)
 
 	var status, errType, errText string
+	errText = "empty response object"
 	meta = map[string][]v1.Metadata{}
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, _ bool) {

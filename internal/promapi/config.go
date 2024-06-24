@@ -118,6 +118,7 @@ func streamConfig(r io.Reader) (cfg PrometheusConfig, err error) {
 	defer dummyReadAll(r)
 
 	var yamlBody, status, errType, errText string
+	errText = "empty response object"
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, _ bool) {
 			status = s

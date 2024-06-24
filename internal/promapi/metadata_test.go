@@ -48,6 +48,10 @@ func TestMetadata(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
+		case "empty":
+			w.WriteHeader(200)
+			w.Header().Set("Content-Type", "application/json")
+			_, _ = w.Write([]byte(`{}`))
 		case "error":
 			w.WriteHeader(500)
 			_, _ = w.Write([]byte("fake error\n"))
@@ -98,6 +102,11 @@ func TestMetadata(t *testing.T) {
 			metric:  "slow",
 			timeout: time.Millisecond * 10,
 			err:     "connection timeout",
+		},
+		{
+			metric:  "empty",
+			timeout: time.Second,
+			err:     "unknown: empty response object",
 		},
 		{
 			metric:  "error",

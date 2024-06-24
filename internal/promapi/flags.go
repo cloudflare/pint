@@ -97,6 +97,7 @@ func streamFlags(r io.Reader) (flags v1.FlagsResult, err error) {
 	defer dummyReadAll(r)
 
 	var status, errType, errText string
+	errText = "empty response object"
 	flags = v1.FlagsResult{}
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, _ bool) {

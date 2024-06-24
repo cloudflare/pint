@@ -115,6 +115,7 @@ func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) 
 	defer dummyReadAll(r)
 
 	var status, resultType, errType, errText string
+	errText = "empty response object"
 	samples = []Sample{}
 	var sample model.Sample
 	decoder := current.Object(

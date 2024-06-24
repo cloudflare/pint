@@ -280,6 +280,7 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 	defer dummyReadAll(r)
 
 	var status, errType, errText, resultType string
+	errText = "empty response object"
 	var sample model.SampleStream
 	decoder := current.Object(
 		current.Key("status", current.Value(func(s string, _ bool) {
