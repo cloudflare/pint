@@ -103,8 +103,7 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 			continue
 		}
 
-		// ignore directories
-		// FIXME move all files instead?
+		// This should never really happen since git doesn't track directories, only files.
 		if isDir, _ := isDirectoryPath(dstPath); isDir {
 			slog.Debug("Skipping directory entry change", slog.String("path", dstPath))
 			continue

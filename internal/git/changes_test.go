@@ -589,6 +589,63 @@ func TestChanges(t *testing.T) {
 			},
 			err: "",
 		},
+		{
+			title: "directory_renamed",
+			setup: func(t *testing.T) git.CommandRunner {
+				mustRun(t, "init", "--initial-branch=main", ".")
+				require.NoError(t, os.Mkdir("dir1", 0o755))
+				require.NoError(t, os.Mkdir("dir1/rules", 0o755))
+				require.NoError(t, os.WriteFile("dir1/rules/file1.txt", []byte("a1\na2\na3\n"), 0o644))
+				require.NoError(t, os.WriteFile("dir1/rules/file2.txt", []byte("b1\nb2"), 0o644))
+				mustRun(t, "add", "dir1")
+				gitCommit(t, "init")
+
+				mustRun(t, "checkout", "-b", "v1")
+				mustRun(t, "mv", "dir1", "dir2")
+				gitCommit(t, "rename")
+
+				return debugGitRun(t)
+			},
+			changes: []*git.FileChange{
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "dir1/rules/file1.txt",
+							Type: git.File,
+						},
+						After: git.Path{
+							Name: "dir2/rules/file1.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        []byte("a1\na2\na3\n"),
+						After:         []byte("a1\na2\na3\n"),
+						ModifiedLines: []int{1, 2, 3},
+					},
+				},
+				{
+					Commits: []string{"1"},
+					Path: git.PathDiff{
+						Before: git.Path{
+							Name: "dir1/rules/file2.txt",
+							Type: git.File,
+						},
+						After: git.Path{
+							Name: "dir2/rules/file2.txt",
+							Type: git.File,
+						},
+					},
+					Body: git.BodyDiff{
+						Before:        []byte("b1\nb2"),
+						After:         []byte("b1\nb2"),
+						ModifiedLines: []int{1, 2},
+					},
+				},
+			},
+			err: "",
+		},
 	}
 
 	for _, tc := range testCases {
