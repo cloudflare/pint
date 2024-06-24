@@ -484,7 +484,7 @@ filename %s
 						return
 					}
 					token := auth[0]
-					if token != fmt.Sprintf("Bearer %s", tc.token) {
+					if token != "Bearer "+tc.token {
 						w.WriteHeader(500)
 						_, _ = w.Write([]byte("Invalid token"))
 						t.Fatalf("got a request with invalid token (got %s)", token)

@@ -614,7 +614,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelec
 	minAge = time.Hour * 2
 	bareSelector := stripLabels(selector)
 	prefixes := []string{
-		fmt.Sprintf("%s min-age ", c.Reporter()),
+		c.Reporter() + " min-age ",
 		fmt.Sprintf("%s(%s) min-age ", c.Reporter(), bareSelector.String()),
 		fmt.Sprintf("%s(%s) min-age ", c.Reporter(), selector.String()),
 	}

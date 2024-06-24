@@ -1,7 +1,7 @@
 package parser_test
 
 import (
-	"fmt"
+	"errors"
 	"strconv"
 	"testing"
 
@@ -39,7 +39,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 6},
-					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 6},
+					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 6},
 				},
 			},
 		},
@@ -48,7 +48,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 2},
 				},
 			},
 		},
@@ -57,7 +57,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 1},
 				},
 			},
 		},
@@ -66,7 +66,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
 				},
 			},
 		},
@@ -75,7 +75,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: fmt.Errorf("got both record and alert keys in a single rule"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("got both record and alert keys in a single rule"), Line: 1},
 				},
 			},
 		},
@@ -84,7 +84,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
 				},
 			},
 		},
@@ -109,7 +109,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 4},
 				},
 			},
 		},
@@ -122,7 +122,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated record key"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("duplicated record key"), Line: 4},
 				},
 			},
 		},
@@ -135,7 +135,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated alert key"), Line: 3},
+					Error: parser.ParseError{Err: errors.New("duplicated alert key"), Line: 3},
 				},
 			},
 		},
@@ -149,7 +149,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated for key"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("duplicated for key"), Line: 5},
 				},
 			},
 		},
@@ -163,7 +163,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated keep_firing_for key"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("duplicated keep_firing_for key"), Line: 5},
 				},
 			},
 		},
@@ -177,7 +177,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
 				},
 			},
 		},
@@ -191,7 +191,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated labels key"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
 				},
 			},
 		},
@@ -205,7 +205,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated annotations key"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("duplicated annotations key"), Line: 5},
 				},
 			},
 		},
@@ -214,7 +214,7 @@ func TestParse(t *testing.T) {
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid key(s) found: extra"), Line: 3},
+					Error: parser.ParseError{Err: errors.New("invalid key(s) found: extra"), Line: 3},
 				},
 			},
 		},
@@ -1103,7 +1103,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: fmt.Errorf("alert value cannot be empty"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("alert value cannot be empty"), Line: 1},
 				},
 			},
 		},
@@ -1112,7 +1112,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
 				},
 			},
 		},
@@ -1121,7 +1121,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
 				},
 			},
 		},
@@ -1130,7 +1130,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: fmt.Errorf("record value cannot be empty"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("record value cannot be empty"), Line: 1},
 				},
 			},
 		},
@@ -1139,7 +1139,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: fmt.Errorf("expr value cannot be empty"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
 				},
 			},
 		},
@@ -1148,7 +1148,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: fmt.Errorf("missing expr key"), Line: 1},
+					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
 				},
 			},
 		},
@@ -1303,7 +1303,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid recording rule name: invalid metric name"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("invalid recording rule name: invalid metric name"), Line: 2},
 				},
 			},
 		},
@@ -1317,7 +1317,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid label name: foo bar"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
 				},
 			},
 		},
@@ -1331,7 +1331,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid label name: foo bar"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
 				},
 			},
 		},
@@ -1345,7 +1345,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid label name: {{ $value }}"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("invalid label name: {{ $value }}"), Line: 5},
 				},
 			},
 		},
@@ -1359,7 +1359,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid annotation name: foo bar"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("invalid annotation name: foo bar"), Line: 5},
 				},
 			},
 		},
@@ -1383,7 +1383,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid annotation name: {{ $value }}"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("invalid annotation name: {{ $value }}"), Line: 5},
 				},
 			},
 		},
@@ -1396,7 +1396,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid field 'keep_firing_for' in recording rule"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("invalid field 'keep_firing_for' in recording rule"), Line: 4},
 				},
 			},
 		},
@@ -1409,7 +1409,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid field 'for' in recording rule"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("invalid field 'for' in recording rule"), Line: 4},
 				},
 			},
 		},
@@ -1423,7 +1423,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("invalid field 'annotations' in recording rule"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("invalid field 'annotations' in recording rule"), Line: 4},
 				},
 			},
 		},
@@ -1436,7 +1436,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("record value must be a YAML string, got integer instead"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("record value must be a YAML string, got integer instead"), Line: 2},
 				},
 			},
 		},
@@ -1448,7 +1448,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("alert value must be a YAML string, got integer instead"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("alert value must be a YAML string, got integer instead"), Line: 2},
 				},
 			},
 		},
@@ -1460,7 +1460,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("expr value must be a YAML string, got integer instead"), Line: 3},
+					Error: parser.ParseError{Err: errors.New("expr value must be a YAML string, got integer instead"), Line: 3},
 				},
 			},
 		},
@@ -1473,7 +1473,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("for value must be a YAML string, got integer instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("for value must be a YAML string, got integer instead"), Line: 4},
 				},
 			},
 		},
@@ -1486,7 +1486,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("keep_firing_for value must be a YAML string, got integer instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("keep_firing_for value must be a YAML string, got integer instead"), Line: 4},
 				},
 			},
 		},
@@ -1499,7 +1499,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got list instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got list instead"), Line: 4},
 				},
 			},
 		},
@@ -1513,7 +1513,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("annotations value must be a YAML mapping, got list instead"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("annotations value must be a YAML mapping, got list instead"), Line: 5},
 				},
 			},
 		},
@@ -1529,7 +1529,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 7},
-					Error: parser.ParseError{Err: fmt.Errorf("labels foo value must be a YAML string, got integer instead"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("labels foo value must be a YAML string, got integer instead"), Line: 5},
 				},
 			},
 		},
@@ -1545,7 +1545,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 7},
-					Error: parser.ParseError{Err: fmt.Errorf("annotations bar value must be a YAML string, got integer instead"), Line: 7},
+					Error: parser.ParseError{Err: errors.New("annotations bar value must be a YAML string, got integer instead"), Line: 7},
 				},
 			},
 		},
@@ -1558,7 +1558,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got integer instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got integer instead"), Line: 4},
 				},
 			},
 		},
@@ -1571,7 +1571,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got bool instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got bool instead"), Line: 4},
 				},
 			},
 		},
@@ -1614,7 +1614,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: fmt.Errorf("record value must be a YAML string, got bool instead"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("record value must be a YAML string, got bool instead"), Line: 2},
 				},
 			},
 		},
@@ -1627,7 +1627,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("record value must be a YAML string, got mapping instead"), Line: 3},
+					Error: parser.ParseError{Err: errors.New("record value must be a YAML string, got mapping instead"), Line: 3},
 				},
 			},
 		},
@@ -1640,7 +1640,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got string instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got string instead"), Line: 4},
 				},
 			},
 		},
@@ -1653,7 +1653,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got binary data instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got binary data instead"), Line: 4},
 				},
 			},
 		},
@@ -1666,7 +1666,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("for value must be a YAML string, got float instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("for value must be a YAML string, got float instead"), Line: 4},
 				},
 			},
 		},
@@ -1679,7 +1679,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got garbage instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got garbage instead"), Line: 4},
 				},
 			},
 		},
@@ -1700,7 +1700,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: fmt.Errorf("labels value must be a YAML mapping, got string instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got string instead"), Line: 4},
 				},
 			},
 		},
@@ -1730,7 +1730,7 @@ data:
 				},
 				{
 					Lines: parser.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{Err: fmt.Errorf("incomplete rule, no alert or record key"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
 				},
 			},
 		},
@@ -1761,7 +1761,7 @@ data:
 				},
 				{
 					Lines: parser.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{Err: fmt.Errorf("duplicated expr key"), Line: 7},
+					Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 7},
 				},
 			},
 		},

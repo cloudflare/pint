@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -76,7 +77,7 @@ func (m Match) validate(allowEmpty bool) error {
 	}
 
 	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil && m.Command == nil && m.For == "" {
-		return fmt.Errorf("ignore block must have at least one condition")
+		return errors.New("ignore block must have at least one condition")
 	}
 
 	return nil

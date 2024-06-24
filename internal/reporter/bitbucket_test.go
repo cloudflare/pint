@@ -2009,7 +2009,7 @@ func TestBitBucketReporter(t *testing.T) {
 						assert.NoError(t, err)
 					default:
 						w.WriteHeader(500)
-						_, _ = w.Write([]byte(fmt.Sprintf("Unhandled path: %s", r.URL.Path)))
+						_, _ = w.Write([]byte("Unhandled path: " + r.URL.Path))
 						t.Errorf("Unhandled path: %s", r.URL.Path)
 					}
 				}))

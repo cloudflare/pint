@@ -255,7 +255,7 @@ func (gl GitLabReporter) IsEqual(existing ExistingCommentV2, pending PendingComm
 
 func (gl GitLabReporter) CanCreate(done int) (bool, error) {
 	if done >= gl.maxComments {
-		return false, fmt.Errorf(tooManyCommentsMsg(done, gl.maxComments))
+		return false, errors.New(tooManyCommentsMsg(done, gl.maxComments))
 	}
 	return true, nil
 }

@@ -81,7 +81,7 @@ func (q instantQuery) CacheTTL() time.Duration {
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
 	slog.Debug("Scheduling prometheus query", slog.String("uri", p.safeURI), slog.String("query", expr))
 
-	key := fmt.Sprintf("/api/v1/query/%s", expr)
+	key := "/api/v1/query/" + expr
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 
@@ -184,7 +184,7 @@ func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) 
 	}
 
 	if resultType != "vector" {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected vector, got %s", resultType)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected vector, got " + resultType}
 	}
 
 	return samples, stats, nil

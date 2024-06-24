@@ -1,6 +1,7 @@
 package discovery
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"log/slog"
@@ -53,7 +54,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 	}
 
 	if len(paths) == 0 {
-		return nil, fmt.Errorf("no matching files")
+		return nil, errors.New("no matching files")
 	}
 
 	for _, fp := range paths {

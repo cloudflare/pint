@@ -76,7 +76,7 @@ func (q metadataQuery) CacheTTL() time.Duration {
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
 	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", p.safeURI), slog.String("metric", metric))
 
-	key := fmt.Sprintf("/api/v1/metadata/%s", metric)
+	key := "/api/v1/metadata/" + metric
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 

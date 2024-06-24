@@ -347,7 +347,7 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 	}
 
 	if resultType != "matrix" {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("invalid result type, expected matrix, got %s", resultType)}
+		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected matrix, got " + resultType}
 	}
 
 	return dst, stats, nil

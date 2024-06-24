@@ -29,7 +29,7 @@ type TLSConfig struct {
 
 func (t TLSConfig) validate() error {
 	if (t.ClientCert != "") != (t.ClientKey != "") {
-		return fmt.Errorf("clientCert and clientKey must be set together")
+		return errors.New("clientCert and clientKey must be set together")
 	}
 	return nil
 }

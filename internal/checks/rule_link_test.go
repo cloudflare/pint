@@ -210,7 +210,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLinkCheck(
 					checks.MustTemplatedRegexp("http://(.*)"),
-					fmt.Sprintf(srv.URL+"/rewrite"),
+					srv.URL+"/rewrite",
 					time.Second,
 					map[string]string{"X-Host": "rewrite.example.com"},
 					"",

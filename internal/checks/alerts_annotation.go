@@ -165,7 +165,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 
 func maybeComment(c string) string {
 	if c != "" {
-		return fmt.Sprintf("Rule comment: %s", c)
+		return "Rule comment: " + c
 	}
 	return ""
 }

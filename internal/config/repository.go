@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -21,16 +22,16 @@ func (bb BitBucket) validate() error {
 		return err
 	}
 	if bb.Project == "" {
-		return fmt.Errorf("project cannot be empty")
+		return errors.New("project cannot be empty")
 	}
 	if bb.Repository == "" {
-		return fmt.Errorf("repository cannot be empty")
+		return errors.New("repository cannot be empty")
 	}
 	if bb.URI == "" {
-		return fmt.Errorf("uri cannot be empty")
+		return errors.New("uri cannot be empty")
 	}
 	if bb.MaxComments < 0 {
-		return fmt.Errorf("maxComments cannot be negative")
+		return errors.New("maxComments cannot be negative")
 	}
 	return nil
 }
@@ -51,17 +52,17 @@ func (gh GitHub) validate() error {
 			return fmt.Errorf("GITHUB_REPOSITORY is set, but with an invalid repository format: %s", repo)
 		}
 		if gh.Repo == "" && parts[1] == "" {
-			return fmt.Errorf("repo cannot be empty")
+			return errors.New("repo cannot be empty")
 		}
 		if gh.Owner == "" && parts[0] == "" {
-			return fmt.Errorf("owner cannot be empty")
+			return errors.New("owner cannot be empty")
 		}
 	} else {
 		if gh.Repo == "" {
-			return fmt.Errorf("repo cannot be empty")
+			return errors.New("repo cannot be empty")
 		}
 		if gh.Owner == "" {
-			return fmt.Errorf("owner cannot be empty")
+			return errors.New("owner cannot be empty")
 		}
 	}
 	if _, err := parseDuration(gh.Timeout); err != nil {
@@ -80,7 +81,7 @@ func (gh GitHub) validate() error {
 		}
 	}
 	if gh.MaxComments < 0 {
-		return fmt.Errorf("maxComments cannot be negative")
+		return errors.New("maxComments cannot be negative")
 	}
 	return nil
 }
@@ -94,10 +95,10 @@ type GitLab struct {
 
 func (gl GitLab) validate() error {
 	if gl.Project <= 0 {
-		return fmt.Errorf("project must be set")
+		return errors.New("project must be set")
 	}
 	if gl.MaxComments < 0 {
-		return fmt.Errorf("maxComments cannot be negative")
+		return errors.New("maxComments cannot be negative")
 	}
 	return nil
 }

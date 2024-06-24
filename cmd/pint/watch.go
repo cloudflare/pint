@@ -52,7 +52,7 @@ var watchCmd = &cli.Command{
 
 				paths := c.Args().Slice()
 				if len(paths) == 0 {
-					return fmt.Errorf("at least one file or directory required")
+					return errors.New("at least one file or directory required")
 				}
 
 				slog.Debug("Starting glob watch", slog.Any("paths", paths))
@@ -72,7 +72,7 @@ var watchCmd = &cli.Command{
 
 				args := c.Args().Slice()
 				if len(args) != 1 {
-					return fmt.Errorf("exactly one argument required with the URI of Prometheus server to query")
+					return errors.New("exactly one argument required with the URI of Prometheus server to query")
 				}
 
 				gen := config.NewPrometheusGenerator(meta.cfg, prometheus.NewRegistry())

@@ -55,7 +55,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`unexpected comment suffix: "this file"`),
+						Err:  errors.New(`unexpected comment suffix: "this file"`),
 					}},
 				},
 			},
@@ -73,7 +73,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`unexpected comment suffix: "this line"`),
+						Err:  errors.New(`unexpected comment suffix: "this line"`),
 					}},
 				},
 			},
@@ -91,7 +91,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`unexpected comment suffix: "here"`),
+						Err:  errors.New(`unexpected comment suffix: "here"`),
 					}},
 				},
 			},
@@ -109,7 +109,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`unexpected comment suffix: "here"`),
+						Err:  errors.New(`unexpected comment suffix: "here"`),
 					}},
 				},
 			},
@@ -127,7 +127,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`unexpected comment suffix: "here"`),
+						Err:  errors.New(`unexpected comment suffix: "here"`),
 					}},
 				},
 			},
@@ -145,7 +145,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing file/owner value"),
+						Err:  errors.New("missing file/owner value"),
 					}},
 				},
 			},
@@ -166,7 +166,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing rule/owner value"),
+						Err:  errors.New("missing rule/owner value"),
 					}},
 				},
 			},
@@ -187,7 +187,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing file/disable value"),
+						Err:  errors.New("missing file/disable value"),
 					}},
 				},
 			},
@@ -208,7 +208,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing disable value"),
+						Err:  errors.New("missing disable value"),
 					}},
 				},
 			},
@@ -238,7 +238,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing file/snooze value"),
+						Err:  errors.New("missing file/snooze value"),
 					}},
 				},
 			},
@@ -250,7 +250,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`),
+						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`),
 					}},
 				},
 			},
@@ -262,7 +262,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`invalid snooze comment, expected '$TIME $MATCH' got "abc"`),
+						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "abc"`),
 					}},
 				},
 			},
@@ -298,7 +298,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing snooze value"),
+						Err:  errors.New("missing snooze value"),
 					}},
 				},
 			},
@@ -310,7 +310,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`),
+						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`),
 					}},
 				},
 			},
@@ -322,7 +322,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`invalid snooze comment, expected '$TIME $MATCH' got "abc"`),
+						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "abc"`),
 					}},
 				},
 			},
@@ -370,7 +370,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf("missing rule/set value"),
+						Err:  errors.New("missing rule/set value"),
 					}},
 				},
 			},
@@ -452,7 +452,7 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Line: 1,
-						Err:  fmt.Errorf(`unexpected comment suffix: "# pint ignore/file"`),
+						Err:  errors.New(`unexpected comment suffix: "# pint ignore/file"`),
 					}},
 				},
 			},

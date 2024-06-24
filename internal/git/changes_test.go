@@ -37,7 +37,7 @@ func gitCommit(t *testing.T, message string) {
 	t.Setenv("GIT_AUTHOR_EMAIL", "pint@example.com")
 	t.Setenv("GIT_COMMITTER_NAME", "pint")
 	t.Setenv("GIT_COMMITTER_EMAIL", "pint")
-	mustRun(t, "commit", "-am", fmt.Sprintf("commit %s", message))
+	mustRun(t, "commit", "-am", "commit "+message)
 }
 
 func TestChanges(t *testing.T) {

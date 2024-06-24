@@ -22,7 +22,7 @@ func gitCommit(t *testing.T, message string) {
 	t.Setenv("GIT_AUTHOR_EMAIL", "pint@example.com")
 	t.Setenv("GIT_COMMITTER_NAME", "pint")
 	t.Setenv("GIT_COMMITTER_EMAIL", "pint")
-	_, err := git.RunGit("commit", "-am", fmt.Sprintf("commit %s", message))
+	_, err := git.RunGit("commit", "-am", "commit "+message)
 	require.NoError(t, err, "git commit %s", message)
 }
 

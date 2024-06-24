@@ -145,7 +145,7 @@ func TestCurrentBranch(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				return nil, fmt.Errorf("mock error")
+				return nil, errors.New("mock error")
 			},
 			output:      "",
 			shouldError: true,
@@ -227,7 +227,7 @@ func TestCommitMessage(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				return nil, fmt.Errorf("mock error")
+				return nil, errors.New("mock error")
 			},
 			output:      "",
 			shouldError: true,
