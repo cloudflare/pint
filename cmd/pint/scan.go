@@ -5,12 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
-	"regexp"
-	"strconv"
 	"sync"
 	"time"
 
-	"github.com/prometheus/prometheus/model/rulefmt"
 	"go.uber.org/atomic"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -22,41 +19,11 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-var (
-	yamlErrRe          = regexp.MustCompile("^yaml: line (.+): (.+)")
-	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
-	rulefmtGroupRe     = regexp.MustCompile("^([0-9]+):[0-9]+: group \".+\", rule [0-9]+, (.+)")
-	rulefmtGroupnameRe = regexp.MustCompile("^([0-9]+):[0-9]+: (groupname: .+)")
-)
-
 const (
 	yamlParseReporter   = "yaml/parse"
 	ignoreFileReporter  = "ignore/file"
 	pintCommentReporter = "pint/comment"
 )
-
-func tryDecodingYamlError(err error) (l int, s string) {
-	s = err.Error()
-
-	werr := &rulefmt.WrappedError{}
-	if errors.As(err, &werr) {
-		if uerr := werr.Unwrap(); uerr != nil {
-			s = uerr.Error()
-		}
-	}
-
-	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe, rulefmtGroupRe, rulefmtGroupnameRe} {
-		parts := re.FindStringSubmatch(err.Error())
-		if len(parts) > 2 {
-			line, err2 := strconv.Atoi(parts[1])
-			if err2 != nil || line <= 0 {
-				return 1, s
-			}
-			return line, parts[2]
-		}
-	}
-	return 1, s
-}
 
 func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
 	if isOffline {
@@ -186,7 +153,27 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 		default:
 			var commentErr comments.CommentError
 			var ignoreErr discovery.FileIgnoreError
+			var strictErr parser.StrictError
 			switch {
+			case errors.As(job.entry.PathError, &strictErr):
+				results <- reporter.Report{
+					Path: discovery.Path{
+						Name:          job.entry.Path.Name,
+						SymlinkTarget: job.entry.Path.SymlinkTarget,
+					},
+					ModifiedLines: job.entry.ModifiedLines,
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: strictErr.Line,
+							Last:  strictErr.Line,
+						},
+						Reporter: yamlParseReporter,
+						Text:     strictErr.Err.Error(),
+						Details:  strictErr.Details,
+						Severity: checks.Fatal,
+					},
+					Owner: job.entry.Owner,
+				}
 			case errors.As(job.entry.PathError, &ignoreErr):
 				results <- reporter.Report{
 					Path: discovery.Path{
@@ -224,7 +211,6 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					Owner: job.entry.Owner,
 				}
 			case job.entry.PathError != nil:
-				line, e := tryDecodingYamlError(job.entry.PathError)
 				results <- reporter.Report{
 					Path: discovery.Path{
 						Name:          job.entry.Path.Name,
@@ -233,11 +219,11 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					ModifiedLines: job.entry.ModifiedLines,
 					Problem: checks.Problem{
 						Lines: parser.LineRange{
-							First: line,
-							Last:  line,
+							First: 1,
+							Last:  1,
 						},
 						Reporter: yamlParseReporter,
-						Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", e),
+						Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", job.entry.PathError),
 						Details: `pint cannot read this file because YAML parser returned an error.
 This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).

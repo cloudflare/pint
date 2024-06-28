@@ -7,6 +7,10 @@
 - Don't suggest using `humanize` when alert template is already using printf on format the `$value`.
 - Fixed git history parsing when running `pint ci` on a branch that include merge commits.
 
+### Changed
+
+- Refactored YAML syntax checks to avoid using [rulefmt.Parse](https://pkg.go.dev/github.com/prometheus/prometheus@v0.53.0/model/rulefmt#Parse) and effectively parsing rules twice. Some error messages will have different formatting.
+
 ## v0.60.0
 
 ### Fixed

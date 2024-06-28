@@ -4,7 +4,8 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/strict.yml:4 Fatal: YAML parser returned an error when reading this file: `groupname: "foo" is repeated in the same file`. (yaml/parse)
+level=WARN msg="Failed to parse file content" err="YAML syntax error at line 4: duplicated group name `name`" path=rules/strict.yml lines=1-5
+rules/strict.yml:4 Fatal: duplicated group name `name` (yaml/parse)
  4 | - name: foo
 
 level=INFO msg="Problems found" Fatal=1

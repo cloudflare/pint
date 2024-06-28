@@ -65,6 +65,7 @@ owners {
 }
 ci {
   baseBranch = "main"
+  include    = [".+.yml"]
 }
 repository {
   bitbucket {

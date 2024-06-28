@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -26,11 +28,15 @@ const (
 
 var ErrRuleCommentOnFile = errors.New("this comment is only valid when attached to a rule")
 
-func NewParser() Parser {
-	return Parser{}
+func NewParser(isStrict bool) Parser {
+	return Parser{
+		isStrict: isStrict,
+	}
 }
 
-type Parser struct{}
+type Parser struct {
+	isStrict bool
+}
 
 func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 	if len(content) == 0 {
@@ -43,8 +49,8 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		}
 	}()
 
-	var documents []yaml.Node
 	dec := yaml.NewDecoder(bytes.NewReader(content))
+	var index int
 	for {
 		var doc yaml.Node
 		decodeErr := dec.Decode(&doc)
@@ -52,14 +58,25 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 			break
 		}
 		if decodeErr != nil {
-			return nil, decodeErr
+			return nil, tryDecodingYamlError(decodeErr)
 		}
-		documents = append(documents, doc)
+		index++
+		if p.isStrict {
+			if err = validateRuleFile(&doc); err != nil {
+				return nil, err
+			}
+		}
+		rules = append(rules, parseNode(content, &doc, 0)...)
+		if index > 1 && p.isStrict {
+			return nil, StrictError{
+				Err: errors.New("multi-document YAML files are not allowed"),
+				Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
+				Line: doc.Line,
+			}
+		}
 	}
 
-	for _, doc := range documents {
-		rules = append(rules, parseNode(content, &doc, 0)...)
-	}
 	return rules, err
 }
 
@@ -584,4 +601,26 @@ func mappingNodes(node *yaml.Node) map[*yaml.Node]*yaml.Node {
 		}
 	}
 	return m
+}
+
+var (
+	yamlErrRe          = regexp.MustCompile("^yaml: line (.+): (.+)")
+	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
+)
+
+func tryDecodingYamlError(err error) error {
+	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe} {
+		parts := re.FindStringSubmatch(err.Error())
+		if len(parts) > 2 {
+			line, err2 := strconv.Atoi(parts[1])
+			if err2 != nil || line <= 0 {
+				return err
+			}
+			return StrictError{
+				Line: line,
+				Err:  errors.New(parts[2]),
+			}
+		}
+	}
+	return err
 }

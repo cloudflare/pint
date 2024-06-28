@@ -24,7 +24,7 @@ func (r failingReader) Read(_ []byte) (int, error) {
 
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser()
+		p := parser.NewParser(false)
 		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
 		if err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))

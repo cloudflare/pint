@@ -4,25 +4,11 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules.yml"]
-rules.yml:4 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
+level=WARN msg="Failed to parse file content" err="YAML syntax error at line 4: expected a YAML string here, got null instead" path=rules.yml lines=1-15
+rules.yml:4 Fatal: expected a YAML string here, got null instead (yaml/parse)
  4 |       - record:
 
-rules.yml:6 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
- 6 |       - record:
-
-rules.yml:9 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
- 9 |         expr:
-
-rules.yml:10 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
- 10 |       - alert:
-
-rules.yml:12 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
- 12 |       - alert:
-
-rules.yml:15 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
- 15 |         expr:
-
-level=INFO msg="Problems found" Fatal=6
+level=INFO msg="Problems found" Fatal=1
 level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules.yml --
 groups:
