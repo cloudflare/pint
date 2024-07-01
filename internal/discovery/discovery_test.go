@@ -24,13 +24,13 @@ func (r failingReader) Read(_ []byte) (int, error) {
 
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser()
-		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
-		if err != nil {
-			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
-		}
+		p := parser.NewParser(false)
+		r := p.Parse([]byte(strings.Repeat("\n", offset) + s))
 		if len(r) != 1 {
 			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(r), s))
+		}
+		if r[0].Error.Err != nil {
+			panic(r[0].Error)
 		}
 		return r[0]
 	}

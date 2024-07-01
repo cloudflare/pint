@@ -2,6 +2,7 @@ package discovery_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -9,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -38,23 +38,15 @@ func TestGitBranchFinder(t *testing.T) {
 	includeAll := []*regexp.Regexp{regexp.MustCompile(".*")}
 
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser()
-		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
-		if err != nil {
-			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
-		}
+		p := parser.NewParser(false)
+		r := p.Parse([]byte(strings.Repeat("\n", offset) + s))
 		if len(r) != 1 {
 			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(r), s))
 		}
-		return r[0]
-	}
-
-	mustErr := func(s string) error {
-		_, errs := rulefmt.Parse([]byte(s))
-		if len(errs) == 0 {
-			panic(s)
+		if r[0].Error.Err != nil {
+			panic(r[0].Error)
 		}
-		return errs[0]
+		return r[0]
 	}
 
 	type setupFn func(t *testing.T)
@@ -727,14 +719,13 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{3},
-					PathError: mustErr(`
-groups:
-- name: v2
-  rules:
-  - record: up:count
-    expr: count(up)
-    expr: sum(up)
-`),
+					Rule: parser.Rule{
+						Lines: parser.LineRange{First: 2, Last: 7},
+						Error: parser.ParseError{
+							Err:  errors.New(`mapping key "expr" already defined at line 6`),
+							Line: 7,
+						},
+					},
 				},
 			},
 		},

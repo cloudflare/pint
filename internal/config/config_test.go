@@ -132,13 +132,9 @@ func TestSetDisabledChecks(t *testing.T) {
 	require.Equal(t, []string{checks.SyntaxCheckName, checks.RateCheckName}, cfg.Checks.Disabled)
 }
 
-func newRule(t *testing.T, content string) parser.Rule {
-	p := parser.NewParser()
-	rules, err := p.Parse([]byte(content))
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
+func newRule(content string) parser.Rule {
+	p := parser.NewParser(false)
+	rules := p.Parse([]byte(content))
 	return rules[0]
 }
 
@@ -161,7 +157,7 @@ func TestGetChecksForRule(t *testing.T) {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -186,7 +182,7 @@ prometheus "prom" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -219,7 +215,7 @@ prometheus "prom" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -258,7 +254,7 @@ checks {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint disable promql/counter
 # pint disable promql/rate
 # pint disable promql/series
@@ -293,7 +289,7 @@ prometheus "prom" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -320,7 +316,7 @@ prometheus "prom" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -346,7 +342,7 @@ prometheus "prom" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -372,7 +368,7 @@ prometheus "prom" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -410,7 +406,7 @@ prometheus "ignore" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -437,7 +433,7 @@ prometheus "ignore" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -467,7 +463,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -500,7 +496,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 - record: foo
   # pint disable promql/aggregate(instance:false)
   expr: sum(foo)
@@ -533,7 +529,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -567,7 +563,7 @@ prometheus "prom2" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint disable promql/series(prom1)
 # pint disable query/cost(prom2)
 - record: foo
@@ -648,7 +644,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -700,7 +696,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint disable promql/counter
 # pint disable promql/series
 # pint disable promql/rate
@@ -755,7 +751,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -792,7 +788,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -826,7 +822,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -860,7 +856,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -894,7 +890,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -928,7 +924,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -962,7 +958,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -998,7 +994,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1041,7 +1037,7 @@ prometheus "prom1" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 - record: foo
   expr: sum(foo)
   # pint disable promql/series
@@ -1083,7 +1079,7 @@ prometheus "prom1" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 - record: foo
   expr: sum(foo)
 `),
@@ -1134,7 +1130,7 @@ prometheus "prom1" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 - record: foo
   expr: sum(foo)
 `),
@@ -1175,7 +1171,7 @@ checks {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 - alert: foo
   expr: sum(foo)
 `),
@@ -1216,7 +1212,7 @@ checks {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 - alert: foo
   expr: sum(foo)
 `),
@@ -1243,7 +1239,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1274,7 +1270,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1303,7 +1299,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1333,7 +1329,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1362,7 +1358,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1391,7 +1387,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1420,7 +1416,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1451,7 +1447,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
+				Rule: newRule("- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1480,7 +1476,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1513,7 +1509,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1546,7 +1542,7 @@ checks {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # Some extra comment
 # pint disable promql/series
 # Some extra comment
@@ -1585,7 +1581,7 @@ checks {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint snooze 2099-11-AB labels/conflict
 # pint snooze 2099-11-28 labels/conflict won't work
 # pint snooze 2099-11-28
@@ -1633,7 +1629,7 @@ checks {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint snooze 2000-11-28 promql/series(prom1)
 # pint snooze 2000-11-28T10:24:18Z promql/range_query
 # pint snooze 2000-11-28 rule/duplicate
@@ -1687,7 +1683,7 @@ prometheus "prom3" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint disable alerts/count(+disable)
 # pint disable alerts/external_labels(+disable)
 # pint disable labels/conflict(+disable)
@@ -1748,7 +1744,7 @@ prometheus "prom3" {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, `
+				Rule: newRule(`
 # pint snooze 2099-11-28 alerts/count(+disable)
 # pint snooze 2099-11-28 alerts/external_labels(+disable)
 # pint snooze 2099-11-28 labels/conflict(+disable)
@@ -1809,7 +1805,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1853,7 +1849,7 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+				Rule: newRule("- record: foo\n  expr: sum(foo)\n"),
 			},
 			checks: []string{
 				checks.SyntaxCheckName,

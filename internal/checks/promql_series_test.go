@@ -471,7 +471,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- record: foo:bar\n  expr: sum(foo:bar)\n"),
+			entries:     parseContent("- record: foo:bar\n  expr: sum(foo:bar)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -515,7 +515,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- record: foo:bar\n  expr: sum(foo)\n"),
+			entries:     parseContent("- record: foo:bar\n  expr: sum(foo)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -559,7 +559,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: count(ALERTS{alertname=\"myalert\"})\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- alert: myalert\n  expr: sum(foo) == 0\n"),
+			entries:     parseContent("- alert: myalert\n  expr: sum(foo) == 0\n"),
 			problems:    noProblems,
 		},
 		{
@@ -567,7 +567,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: count(ALERTS{alertname=\"myalert\"})\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- alert: notmyalert\n  expr: sum(foo) == 0\n"),
+			entries:     parseContent("- alert: notmyalert\n  expr: sum(foo) == 0\n"),
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -588,7 +588,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo:bar{job=\"xxx\"})\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- record: foo:bar\n  expr: sum(foo:bar)\n"),
+			entries:     parseContent("- record: foo:bar\n  expr: sum(foo:bar)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
@@ -3096,7 +3096,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo:count) / sum(foo:sum) > 120\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- record: foo:count\n  expr: count(foo)\n- record: foo:sum\n  expr: sum(foo)\n"),
+			entries:     parseContent("- record: foo:count\n  expr: count(foo)\n- record: foo:sum\n  expr: sum(foo)\n"),
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{

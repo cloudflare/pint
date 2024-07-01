@@ -41,8 +41,8 @@ func TestBitBucketReporter(t *testing.T) {
 		pullRequestActivities reporter.BitBucketPullRequestActivities
 	}
 
-	p := parser.NewParser()
-	mockRules, _ := p.Parse([]byte(`
+	p := parser.NewParser(false)
+	mockRules := p.Parse([]byte(`
 - record: target is down
   expr: up == 0
 - record: sum errors

@@ -664,7 +664,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "rate_over_sum",
 			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
-			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			entries:     parseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
 			problems: func(_ string) []checks.Problem {
@@ -706,7 +706,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "rate_over_sum_error",
 			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
-			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			entries:     parseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -746,7 +746,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "rate_over_sum_on_gauge",
 			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
-			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			entries:     parseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
 			problems:    noProblems,
@@ -776,7 +776,7 @@ func TestRateCheck(t *testing.T) {
 		{
 			description: "sum_over_rate",
 			content:     "- alert: my alert\n  expr: sum(my:rate:5m)\n",
-			entries:     mustParseContent("- record: my:rate:5m\n  expr: rate(foo[5m])\n"),
+			entries:     parseContent("- record: my:rate:5m\n  expr: rate(foo[5m])\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
 			problems:    noProblems,

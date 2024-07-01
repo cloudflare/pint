@@ -100,6 +100,7 @@ groups:
 -- src/.pint.hcl --
 ci {
   baseBranch = "main"
+  include    = [".+.yml"]
 }
 prometheus "prom" {
   uri     = "http://127.0.0.1:7160"

@@ -4,11 +4,21 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/strict.yml:4 Fatal: YAML parser returned an error when reading this file: `groupname: "foo" is repeated in the same file`. (yaml/parse)
+rules/strict.yml:1-4 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+ 1 | groups:
+ 2 | - name: foo
+ 3 |   rules: []
  4 | - name: foo
 
-level=INFO msg="Problems found" Fatal=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+rules/strict.yml:4 Fatal: This rule is not a valid Prometheus rule: `This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 4: duplicated group name `foo`
+`. (yaml/parse)
+ 4 | - name: foo
+
+level=INFO msg="Problems found" Fatal=1 Bug=1
+level=ERROR msg="Fatal error" err="found 2 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 groups:
 - name: foo

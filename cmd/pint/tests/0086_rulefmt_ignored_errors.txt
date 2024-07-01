@@ -4,22 +4,14 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-rules/strict.yml:4 Fatal: This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`. (yaml/parse)
- 4 |   - expr: MissingAlertOrRecord
+rules/strict.yml:7 Fatal: This rule is not a valid Prometheus rule: `This file is not a valid Prometheus rule file.
+Errors found:
 
-rules/strict.yml:7 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+- line 7: expected a YAML string here, got null instead
+`. (yaml/parse)
  7 |     expr: 
 
-rules/strict.yml:10 Fatal: Prometheus failed to parse the query with this PromQL error: unknown function with name "sumz". (promql/syntax)
- 10 |     expr: sumz(0)
-
-rules/strict.yml:15 Fatal: Template failed to parse with this error: `function "bogus" not defined`. (alerts/template)
- 15 |       dashboard: '{{ bogus }}'
-
-rules/strict.yml:20 Fatal: Template failed to parse with this error: `function "bogus" not defined`. (alerts/template)
- 20 |       dashboard: '{{ bogus }}'
-
-level=INFO msg="Problems found" Fatal=5
+level=INFO msg="Problems found" Fatal=1
 level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 groups:

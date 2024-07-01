@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
-	"strings"
 	"time"
 
-	"github.com/prometheus/prometheus/model/rulefmt"
 	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/comments"
@@ -23,17 +21,6 @@ const (
 	RuleOwnerComment         = "rule/owner"
 )
 
-var ignoredErrors = []string{
-	"one of 'record' or 'alert' must be set",
-	"field 'expr' must be set in rule",
-	"could not parse expression: ",
-	"cannot unmarshal !!seq into rulefmt.ruleGroups",
-	": template: __",
-	"invalid label name: ",
-	"invalid annotation name: ",
-	"invalid recording rule name: ",
-}
-
 type FileIgnoreError struct {
 	Err  error
 	Line int
@@ -41,16 +28,6 @@ type FileIgnoreError struct {
 
 func (fe FileIgnoreError) Error() string {
 	return fe.Err.Error()
-}
-
-func isStrictIgnored(err error) bool {
-	s := err.Error()
-	for _, ign := range ignoredErrors {
-		if strings.Contains(s, ign) {
-			return true
-		}
-	}
-	return false
 }
 
 type ChangeType uint8
@@ -113,8 +90,6 @@ type Entry struct {
 }
 
 func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (entries []Entry, err error) {
-	p := parser.NewParser()
-
 	content, fileComments, err := parser.ReadContent(r)
 	if err != nil {
 		return nil, err
@@ -182,57 +157,17 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 		return entries, nil
 	}
 
-	if isStrict {
-		if _, errs := rulefmt.Parse(content.Body); len(errs) > 0 {
-			seen := map[string]struct{}{}
-			for _, err := range errs {
-				if isStrictIgnored(err) {
-					continue
-				}
-				if _, ok := seen[err.Error()]; ok {
-					continue
-				}
-				seen[err.Error()] = struct{}{}
-				entries = append(entries, Entry{
-					Path: Path{
-						Name:          sourcePath,
-						SymlinkTarget: reportedPath,
-					},
-					PathError:     err,
-					Owner:         fileOwner,
-					ModifiedLines: contentLines.Expand(),
-				})
-			}
-			if len(entries) > 0 {
-				return entries, nil
-			}
-		}
-	}
-
-	rules, err := p.Parse(content.Body)
-	if err != nil {
-		slog.Error(
-			"Failed to parse file content",
-			slog.Any("err", err),
-			slog.String("path", sourcePath),
-			slog.String("lines", contentLines.String()),
-		)
-		entries = append(entries, Entry{
-			Path: Path{
-				Name:          sourcePath,
-				SymlinkTarget: reportedPath,
-			},
-			PathError:     err,
-			Owner:         fileOwner,
-			ModifiedLines: contentLines.Expand(),
-		})
-		return entries, nil
-	}
-
-	for _, rule := range rules {
+	p := parser.NewParser(isStrict)
+	for _, rule := range p.Parse(content.Body) {
 		ruleOwner := fileOwner
 		for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
 			ruleOwner = owner.Name
+		}
+		var ml []int
+		if rule.Error.IsFatal {
+			ml = contentLines.Expand()
+		} else {
+			ml = rule.Lines.Expand()
 		}
 		entries = append(entries, Entry{
 			Path: Path{
@@ -240,7 +175,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 				SymlinkTarget: reportedPath,
 			},
 			Rule:           rule,
-			ModifiedLines:  rule.Lines.Expand(),
+			ModifiedLines:  ml,
 			Owner:          ruleOwner,
 			DisabledChecks: disabledChecks,
 		})

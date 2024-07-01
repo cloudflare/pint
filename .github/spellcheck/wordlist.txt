@@ -39,6 +39,7 @@ promql
 PromQL
 PRs
 prymitive
+rulefmt
 samber
 SNI
 symlink

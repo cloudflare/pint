@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"
 
@@ -15,9 +13,9 @@ import (
 
 func TestParse(t *testing.T) {
 	type testCaseT struct {
-		err     string
 		content []byte
 		output  []parser.Rule
+		strict  bool
 	}
 
 	testCases := []testCaseT{
@@ -31,8 +29,15 @@ func TestParse(t *testing.T) {
 		},
 		{
 			content: []byte(string("! !00 \xf6")),
-			output:  nil,
-			err:     "yaml: incomplete UTF-8 octet sequence",
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{
+						Line: 1,
+						Err:  errors.New("yaml: incomplete UTF-8 octet sequence"),
+					},
+				},
+			},
 		},
 		{
 			content: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
@@ -49,6 +54,30 @@ func TestParse(t *testing.T) {
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
 					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte("---\n- expr: foo\n  record: foo\n---\n- expr: bar\n"),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+						},
+					},
+					Lines: parser.LineRange{First: 2, Last: 3},
+				},
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
 				},
 			},
 		},
@@ -90,15 +119,39 @@ func TestParse(t *testing.T) {
 		},
 		{
 			content: []byte("- record: - foo\n"),
-			err:     "yaml: block sequence entries are not allowed in this context",
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{
+						Line: 1,
+						Err:  errors.New("yaml: block sequence entries are not allowed in this context"),
+					},
+				},
+			},
 		},
 		{
 			content: []byte("- record: foo  expr: sum(\n"),
-			err:     "yaml: mapping values are not allowed in this context",
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{
+						Line: 1,
+						Err:  errors.New("yaml: mapping values are not allowed in this context"),
+					},
+				},
+			},
 		},
 		{
 			content: []byte("- record\n\texpr: foo\n"),
-			err:     "yaml: line 2: found a tab character that violates indentation",
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 2},
+					Error: parser.ParseError{
+						Line: 2,
+						Err:  errors.New("found a tab character that violates indentation"),
+					},
+				},
+			},
 		},
 		{
 			content: []byte(`
@@ -621,7 +674,7 @@ apiVersion: v1
 metadata:
   name: example-app-alerts
   labels:
-  app: example-app
+    app: example-app
 data:
   alerts: |
     groups:
@@ -1371,7 +1424,15 @@ data:
     foo: ` + string("\xed\xbf\xbf")),
 			// Label values are invalid only if they aren't valid UTF-8 strings
 			// which also makes them unparsable by YAML.
-			err: "yaml: invalid Unicode character",
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 1, Last: 1},
+					Error: parser.ParseError{
+						Line: 1,
+						Err:  errors.New("yaml: invalid Unicode character"),
+					},
+				},
+			},
 		},
 		{
 			content: []byte(`
@@ -1653,7 +1714,10 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got binary data instead"), Line: 4},
+					Error: parser.ParseError{
+						Err:  errors.New("labels value must be a YAML mapping, got binary data instead"),
+						Line: 4,
+					},
 				},
 			},
 		},
@@ -1666,7 +1730,10 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("for value must be a YAML string, got float instead"), Line: 4},
+					Error: parser.ParseError{
+						Err:  errors.New("for value must be a YAML string, got float instead"),
+						Line: 4,
+					},
 				},
 			},
 		},
@@ -1689,7 +1756,15 @@ data:
   expr: bar
   labels: !! "SGVsbG8sIFdvcmxkIQ=="
 `),
-			err: "yaml: line 4: did not find expected tag URI",
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 4, Last: 4},
+					Error: parser.ParseError{
+						Line: 4,
+						Err:  errors.New("did not find expected tag URI"),
+					},
+				},
+			},
 		},
 		{
 			content: []byte(`
@@ -1700,7 +1775,10 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got string instead"), Line: 4},
+					Error: parser.ParseError{
+						Err:  errors.New("labels value must be a YAML mapping, got string instead"),
+						Line: 4,
+					},
 				},
 			},
 		},
@@ -1730,7 +1808,10 @@ data:
 				},
 				{
 					Lines: parser.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
+					Error: parser.ParseError{
+						Err:  errors.New("incomplete rule, no alert or record key"),
+						Line: 5,
+					},
 				},
 			},
 		},
@@ -1806,6 +1887,381 @@ data:
 				},
 			},
 		},
+		{
+			content: []byte(`---
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    expr: count(up)
+    labels:
+      foo:
+        bar: foo
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 9},
+					Error: parser.ParseError{Err: errors.New("labels foo value must be a YAML string, got mapping instead"), Line: 9},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 6},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "up:count",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "count(up)",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+  - record: up:count
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{
+						Err:  errors.New("missing expr key"),
+						Line: 5,
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: up:count
+  expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 2},
+					Error: parser.ParseError{
+						Line: 2,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 2: YAML list is not allowed here, expected a YAML mapping
+`),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 2},
+					Error: parser.ParseError{
+						Line: 2,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 2: unexpected key ` + "`rules`\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 4},
+					Error: parser.ParseError{
+						Line: 3,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 3: unexpected key ` + "`record`" + `
+- line 4: unexpected key ` + "`expr`" + `
+- line 3: ` + "`name` key is required and must be set" + `
+- line 3: ` + "`rules` key is required and must be set\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{
+						Line: 3,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 3: ` + "`name` key is required and must be set\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{
+						Line: 3,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 3: ` + "`rules` key is required and must be set\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups: {}
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 2},
+					Error: parser.ParseError{
+						Line: 2,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 2: YAML mapping is not allowed here, expected a YAML list
+`),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: []
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 3},
+					Error: parser.ParseError{
+						Line: 3,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 3: YAML list is not allowed here, expected a YAML scalar value
+- line 3: ` + "`rules` key is required and must be set\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  name: bar
+  name: bob
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{
+						Line: 3,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 4: duplicated key ` + "`name`" + `
+- line 5: duplicated key ` + "`name`" + `
+- line 3: ` + "`rules` key is required and must be set\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+    rules:
+      - record: up:count
+        expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{
+						Line: 5,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 5: YAML mapping is not allowed here, expected a YAML list
+`),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+    - rules:
+      - record: up:count
+        expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					Error: parser.ParseError{
+						Line: 5,
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 5: unexpected key ` + "`rules`\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+    - rules:
+      - record: up:count
+		expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 6, Last: 6},
+					Error: parser.ParseError{
+						Line: 6, // it's really 7 but go-yaml gives us 6
+						Err:  errors.New("found a tab character that violates indentation"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+---
+groups:
+- name: v1
+  rules:
+    - record: up:count
+      expr: count(up)
+---
+groups:
+- name: v1
+  rules:
+    - rules:
+      - record: up:count
+        expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 6, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "up:count",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "count(up)",
+							},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 8, Last: 12},
+					Error: parser.ParseError{
+						Line: 12,
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 12: unexpected key ` + "`rules`\n"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+---
+groups: []
+---
+groups:
+- name: foo
+  rules:
+    - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 4, Last: 8},
+					Error: parser.ParseError{
+						Line: 8,
+						// nolint error-strings
+						Err: errors.New(`This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 8: YAML scalar value is not allowed here, expected a YAML mapping
+`),
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
@@ -1828,16 +2284,10 @@ data:
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			t.Logf("--- Content ---%s--- END ---", tc.content)
+			t.Logf("\n--- Content ---%s--- END ---", tc.content)
 
-			p := parser.NewParser()
-			output, err := p.Parse(tc.content)
-
-			if tc.err != "" {
-				require.EqualError(t, err, tc.err)
-			} else {
-				require.NoError(t, err)
-			}
+			p := parser.NewParser(tc.strict)
+			output := p.Parse(tc.content)
 
 			if diff := cmp.Diff(tc.output, output, ignorePrometheusExpr, sameErrorText); diff != "" {
 				t.Errorf("Parse() returned wrong output (-want +got):\n%s", diff)
