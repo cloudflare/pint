@@ -4,8 +4,11 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="YAML syntax error at line 7: expected a YAML string here, got null instead" path=rules/strict.yml lines=1-20
-rules/strict.yml:7 Fatal: expected a YAML string here, got null instead (yaml/parse)
+rules/strict.yml:7 Fatal: This rule is not a valid Prometheus rule: `This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 7: expected a YAML string here, got null instead
+`. (yaml/parse)
  7 |     expr: 
 
 level=INFO msg="Problems found" Fatal=1

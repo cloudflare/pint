@@ -39,12 +39,12 @@ func TestGitBranchFinder(t *testing.T) {
 
 	mustParse := func(offset int, s string) parser.Rule {
 		p := parser.NewParser(false)
-		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
-		if err != nil {
-			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
-		}
+		r := p.Parse([]byte(strings.Repeat("\n", offset) + s))
 		if len(r) != 1 {
 			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(r), s))
+		}
+		if r[0].Error.Err != nil {
+			panic(r[0].Error)
 		}
 		return r[0]
 	}
@@ -719,9 +719,12 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{3},
-					PathError: parser.StrictError{
-						Err:  errors.New(`mapping key "expr" already defined at line 6`),
-						Line: 7,
+					Rule: parser.Rule{
+						Lines: parser.LineRange{First: 2, Last: 7},
+						Error: parser.ParseError{
+							Err:  errors.New(`mapping key "expr" already defined at line 6`),
+							Line: 7,
+						},
 					},
 				},
 			},

@@ -4,8 +4,17 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="YAML syntax error at line 2: unexpected key `alert`" path=rules/strict.yml lines=1-9
-rules/strict.yml:2 Fatal: unexpected key `alert` (yaml/parse)
+rules/strict.yml:2 Fatal: This rule is not a valid Prometheus rule: `This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 2: unexpected key `alert`
+- line 3: unexpected key `expr`
+- line 4: unexpected key `for`
+- line 5: unexpected key `labels`
+- line 8: unexpected key `annotations`
+- line 2: `name` key is required and must be set
+- line 2: `rules` key is required and must be set
+`. (yaml/parse)
  2 | - alert: Conntrack_Table_Almost_Full
 
 level=INFO msg="Problems found" Fatal=1

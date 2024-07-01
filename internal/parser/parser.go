@@ -38,14 +38,21 @@ type Parser struct {
 	isStrict bool
 }
 
-func (p Parser) Parse(content []byte) (rules []Rule, err error) {
+func (p Parser) Parse(content []byte) (rules []Rule) {
 	if len(content) == 0 {
-		return nil, nil
+		return nil
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("unable to parse YAML file: %s", r)
+			rules = append(rules, Rule{
+				Lines: LineRange{First: 1, Last: 1},
+				Error: ParseError{
+					Line:    1,
+					Err:     fmt.Errorf("unable to parse YAML file: %s", r),
+					IsFatal: true,
+				},
+			})
 		}
 	}()
 
@@ -58,26 +65,58 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 			break
 		}
 		if decodeErr != nil {
-			return nil, tryDecodingYamlError(decodeErr)
+			err := tryDecodingYamlError(decodeErr)
+			rules = append(rules, Rule{
+				Lines: LineRange{First: err.Line, Last: err.Line},
+				Error: err,
+			})
+			break
 		}
 		index++
 		if p.isStrict {
-			if err = validateRuleFile(&doc); err != nil {
-				return nil, err
+			errs := validateRuleFile(&doc)
+			if len(errs) > 0 {
+				var line int
+				var buf strings.Builder
+				buf.WriteString("This file is not a valid Prometheus rule file.\n")
+				buf.WriteString("Errors found:\n\n")
+				lr := LineRange{First: doc.Line, Last: doc.Line}
+				for _, err := range errs {
+					line = err.Line
+					lr.First = min(lr.First, err.Line)
+					lr.Last = max(lr.Last, err.Line)
+					buf.WriteString("- line ")
+					buf.WriteString(strconv.Itoa(err.Line))
+					buf.WriteString(": ")
+					buf.WriteString(err.Err.Error())
+					buf.WriteString("\n")
+				}
+				rules = append(rules, Rule{
+					Lines: lr,
+					Error: ParseError{
+						Line:    line,
+						Err:     errors.New(buf.String()),
+						IsFatal: true,
+					},
+				})
+				break
 			}
 		}
 		rules = append(rules, parseNode(content, &doc, 0)...)
 		if index > 1 && p.isStrict {
-			return nil, StrictError{
-				Err: errors.New("multi-document YAML files are not allowed"),
-				Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+			rules = append(rules, Rule{
+				Lines: LineRange{First: doc.Line, Last: doc.Line},
+				Error: ParseError{
+					Err: errors.New("multi-document YAML files are not allowed"),
+					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
 To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
-				Line: doc.Line,
-			}
+					Line: doc.Line,
+				},
+			})
 		}
 	}
 
-	return rules, err
+	return rules
 }
 
 func parseNode(content []byte, node *yaml.Node, offset int) (rules []Rule) {
@@ -608,19 +647,18 @@ var (
 	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
 )
 
-func tryDecodingYamlError(err error) error {
+func tryDecodingYamlError(err error) ParseError {
 	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe} {
 		parts := re.FindStringSubmatch(err.Error())
 		if len(parts) > 2 {
-			line, err2 := strconv.Atoi(parts[1])
-			if err2 != nil || line <= 0 {
-				return err
-			}
-			return StrictError{
-				Line: line,
-				Err:  errors.New(parts[2]),
+			if line, err2 := strconv.Atoi(parts[1]); line > 0 && err2 == nil {
+				return ParseError{
+					Line:    line,
+					Err:     errors.New(parts[2]),
+					IsFatal: true,
+				}
 			}
 		}
 	}
-	return err
+	return ParseError{Line: 1, Err: err, IsFatal: true}
 }

@@ -26,7 +26,7 @@ func detailsDependencyRule(kind, name, broken string) string {
 
 func TestRuleDependencyCheck(t *testing.T) {
 	parseWithState := func(input string, state discovery.ChangeType, sp, rp string) []discovery.Entry {
-		entries := mustParseContent(input)
+		entries := parseContent(input)
 		for i := range entries {
 			entries[i].State = state
 			entries[i].Path.Name = sp

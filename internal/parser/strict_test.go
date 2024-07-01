@@ -1,11 +1,13 @@
 package parser
 
 import (
+	"errors"
 	"io"
 	"strconv"
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
 )
@@ -13,46 +15,69 @@ import (
 func TestValidateRuleFile(t *testing.T) {
 	type testCaseT struct {
 		content string
-		err     string
-		line    int
+		errs    []ParseError
 	}
 
 	testCases := []testCaseT{
 		{
 			content: "[]",
-			err:     "YAML list is not allowed here, expected a YAML mapping",
-			line:    1,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+					Line: 1,
+				},
+			},
 		},
 		{
 			content: "\n\n[]",
-			err:     "YAML list is not allowed here, expected a YAML mapping",
-			line:    3,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+					Line: 3,
+				},
+			},
 		},
 		{
 			content: "groups: {}",
-			err:     "YAML mapping is not allowed here, expected a YAML list",
-			line:    1,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML mapping is not allowed here, expected a YAML list"),
+					Line: 1,
+				},
+			},
 		},
 		{
 			content: "groups: []",
 		},
 		{
 			content: "xgroups: {}",
-			err:     "unexpected key `xgroups`",
-			line:    1,
+			errs: []ParseError{
+				{
+					Err:  errors.New("unexpected key `xgroups`"),
+					Line: 1,
+				},
+			},
 		},
 		{
 			content: "\nbob\n",
-			err:     "YAML scalar value is not allowed here, expected a YAML mapping",
-			line:    2,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML scalar value is not allowed here, expected a YAML mapping"),
+					Line: 2,
+				},
+			},
 		},
 		{
 			content: `groups: []
 
 rules: []
 `,
-			err:  "unexpected key `rules`",
-			line: 3,
+			errs: []ParseError{
+				{
+					Err:  errors.New("unexpected key `rules`"),
+					Line: 3,
+				},
+			},
 		},
 		{
 			content: `
@@ -67,8 +92,12 @@ groups:
 - name: 
   rules: []
 `,
-			err:  "expected a YAML string here, got null instead",
-			line: 3,
+			errs: []ParseError{
+				{
+					Err:  errors.New("expected a YAML string here, got null instead"),
+					Line: 3,
+				},
+			},
 		},
 		{
 			content: `
@@ -92,8 +121,12 @@ groups:
     labels:
       job: foo
 `,
-			err:  "unexpected key `xxx`",
-			line: 7,
+			errs: []ParseError{
+				{
+					Err:  errors.New("unexpected key `xxx`"),
+					Line: 7,
+				},
+			},
 		},
 		{
 			content: `
@@ -106,8 +139,12 @@ groups:
     labels:
       job: foo
 `,
-			err:  "YAML mapping is not allowed here, expected a YAML list",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML mapping is not allowed here, expected a YAML list"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -120,8 +157,12 @@ groups:
       job:
         foo: bar
 `,
-			err:  "YAML mapping is not allowed here, expected a YAML scalar value",
-			line: 9,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML mapping is not allowed here, expected a YAML scalar value"),
+					Line: 9,
+				},
+			},
 		},
 		{
 			content: `
@@ -132,8 +173,12 @@ groups:
     expr:
       sum: sum(up)
 `,
-			err:  "YAML mapping is not allowed here, expected a YAML scalar value",
-			line: 7,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML mapping is not allowed here, expected a YAML scalar value"),
+					Line: 7,
+				},
+			},
 		},
 		{
 			content: `
@@ -143,8 +188,12 @@ groups:
 - name: foo
   rules: []
 `,
-			err:  "duplicated group name `name`",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("duplicated group name `foo`"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -157,8 +206,12 @@ groups:
       foo: bob
       foo: bar
 `,
-			err:  "duplicated key `foo`",
-			line: 9,
+			errs: []ParseError{
+				{
+					Err:  errors.New("duplicated key `foo`"),
+					Line: 9,
+				},
+			},
 		},
 		{
 			content: `
@@ -168,8 +221,12 @@ groups:
   - record: up:count
     expr: count(up)
     expr: sum(up)`,
-			err:  "duplicated key `expr`",
-			line: 7,
+			errs: []ParseError{
+				{
+					Err:  errors.New("duplicated key `expr`"),
+					Line: 7,
+				},
+			},
 		},
 		{
 			content: `
@@ -180,8 +237,12 @@ groups:
     expr: count(up)
 bogus: 1
 `,
-			err:  "unexpected key `bogus`",
-			line: 7,
+			errs: []ParseError{
+				{
+					Err:  errors.New("unexpected key `bogus`"),
+					Line: 7,
+				},
+			},
 		},
 		{
 			content: `
@@ -192,8 +253,12 @@ groups:
     expr: count(up)
     bogus: 1
 `,
-			err:  "unexpected key `bogus`",
-			line: 7,
+			errs: []ParseError{
+				{
+					Err:  errors.New("unexpected key `bogus`"),
+					Line: 7,
+				},
+			},
 		},
 		{
 			content: `
@@ -203,8 +268,12 @@ groups:
 
   rules:
 `,
-			err:  "YAML scalar value is not allowed here, expected a YAML list",
-			line: 6,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML scalar value is not allowed here, expected a YAML list"),
+					Line: 6,
+				},
+			},
 		},
 		{
 			content: `
@@ -213,8 +282,12 @@ groups:
   rules:
     expr: 1
 `,
-			err:  "YAML mapping is not allowed here, expected a YAML list",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML mapping is not allowed here, expected a YAML list"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -223,8 +296,12 @@ groups:
   rules:
     - expr: 1
 `,
-			err:  "expected a YAML string here, got integer instead",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("expected a YAML string here, got integer instead"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -233,8 +310,12 @@ groups:
   rules:
     - expr: null
 `,
-			err:  "expected a YAML string here, got null instead",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("expected a YAML string here, got null instead"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -243,8 +324,12 @@ groups:
   rules:
     - 1: null
 `,
-			err:  "expected a YAML string here, got integer instead",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("expected a YAML string here, got integer instead"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -253,8 +338,12 @@ groups:
   rules:
     - true: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `,
-			err:  "expected a YAML string here, got bool instead",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("expected a YAML string here, got bool instead"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -263,8 +352,12 @@ groups:
   rules:
     - expr: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `,
-			err:  "expected a YAML string here, got binary data instead",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("expected a YAML string here, got binary data instead"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -273,8 +366,12 @@ groups:
   rules:
     - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `,
-			err:  "YAML scalar value is not allowed here, expected a YAML mapping",
-			line: 5,
+			errs: []ParseError{
+				{
+					Err:  errors.New("YAML scalar value is not allowed here, expected a YAML mapping"),
+					Line: 5,
+				},
+			},
 		},
 		{
 			content: `
@@ -294,6 +391,17 @@ groups:
 		},
 	}
 
+	cmpErrorText := cmp.Comparer(func(x, y interface{}) bool {
+		xe := x.(error)
+		ye := y.(error)
+		return xe.Error() == ye.Error()
+	})
+	sameErrorText := cmp.FilterValues(func(x, y interface{}) bool {
+		_, xe := x.(error)
+		_, ye := y.(error)
+		return xe && ye
+	}, cmpErrorText)
+
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			t.Logf("\n--- Content ---%s--- END ---", tc.content)
@@ -307,15 +415,10 @@ groups:
 					break
 				}
 
-				err := validateRuleFile(&doc)
-				if tc.err == "" {
-					require.NoError(t, err)
-				} else {
-					require.Error(t, err)
-					var se StrictError
-					require.ErrorAs(t, err, &se)
-					require.EqualError(t, se.Err, tc.err)
-					require.Equal(t, tc.line, se.Line)
+				errs := validateRuleFile(&doc)
+				if diff := cmp.Diff(tc.errs, errs, sameErrorText); diff != "" {
+					t.Errorf("validateRuleFile() returned wrong output (-want +got):\n%s", diff)
+					return
 				}
 			}
 		})

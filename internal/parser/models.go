@@ -238,10 +238,12 @@ func (rr *RecordingRule) IsIdentical(b *RecordingRule) bool {
 	return true
 }
 
+// Use insread of StrictError.
 type ParseError struct {
-	Err      error
-	Fragment string
-	Line     int
+	Err     error
+	Details string
+	Line    int
+	IsFatal bool
 }
 
 type LineRange struct {

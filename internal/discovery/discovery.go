@@ -158,30 +158,16 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 	}
 
 	p := parser.NewParser(isStrict)
-	rules, err := p.Parse(content.Body)
-	if err != nil {
-		slog.Warn(
-			"Failed to parse file content",
-			slog.Any("err", err),
-			slog.String("path", sourcePath),
-			slog.String("lines", contentLines.String()),
-		)
-		entries = append(entries, Entry{
-			Path: Path{
-				Name:          sourcePath,
-				SymlinkTarget: reportedPath,
-			},
-			PathError:     err,
-			Owner:         fileOwner,
-			ModifiedLines: contentLines.Expand(),
-		})
-		return entries, nil
-	}
-
-	for _, rule := range rules {
+	for _, rule := range p.Parse(content.Body) {
 		ruleOwner := fileOwner
 		for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
 			ruleOwner = owner.Name
+		}
+		var ml []int
+		if rule.Error.IsFatal {
+			ml = contentLines.Expand()
+		} else {
+			ml = rule.Lines.Expand()
 		}
 		entries = append(entries, Entry{
 			Path: Path{
@@ -189,7 +175,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 				SymlinkTarget: reportedPath,
 			},
 			Rule:           rule,
-			ModifiedLines:  rule.Lines.Expand(),
+			ModifiedLines:  ml,
 			Owner:          ruleOwner,
 			DisabledChecks: disabledChecks,
 		})

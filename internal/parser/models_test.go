@@ -11,11 +11,7 @@ import (
 
 func newMustRule(content string) parser.Rule {
 	p := parser.NewParser(false)
-	rules, err := p.Parse([]byte(content))
-	if err != nil {
-		panic(err)
-	}
-	for _, rule := range rules {
+	for _, rule := range p.Parse([]byte(content)) {
 		return rule
 	}
 	return parser.Rule{}

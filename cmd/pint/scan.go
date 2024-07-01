@@ -23,6 +23,9 @@ const (
 	yamlParseReporter   = "yaml/parse"
 	ignoreFileReporter  = "ignore/file"
 	pintCommentReporter = "pint/comment"
+
+	yamlDetails = `This Prometheus rule is not valid.
+This usually means that it's missing some required fields.`
 )
 
 func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
@@ -153,27 +156,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 		default:
 			var commentErr comments.CommentError
 			var ignoreErr discovery.FileIgnoreError
-			var strictErr parser.StrictError
 			switch {
-			case errors.As(job.entry.PathError, &strictErr):
-				results <- reporter.Report{
-					Path: discovery.Path{
-						Name:          job.entry.Path.Name,
-						SymlinkTarget: job.entry.Path.SymlinkTarget,
-					},
-					ModifiedLines: job.entry.ModifiedLines,
-					Problem: checks.Problem{
-						Lines: parser.LineRange{
-							First: strictErr.Line,
-							Last:  strictErr.Line,
-						},
-						Reporter: yamlParseReporter,
-						Text:     strictErr.Err.Error(),
-						Details:  strictErr.Details,
-						Severity: checks.Fatal,
-					},
-					Owner: job.entry.Owner,
-				}
 			case errors.As(job.entry.PathError, &ignoreErr):
 				results <- reporter.Report{
 					Path: discovery.Path{
@@ -233,6 +216,10 @@ If this file is a template that will be rendered into valid YAML then you can in
 					Owner: job.entry.Owner,
 				}
 			case job.entry.Rule.Error.Err != nil:
+				details := yamlDetails
+				if job.entry.Rule.Error.Details != "" {
+					details = job.entry.Rule.Error.Details
+				}
 				results <- reporter.Report{
 					Path: discovery.Path{
 						Name:          job.entry.Path.Name,
@@ -247,8 +234,7 @@ If this file is a template that will be rendered into valid YAML then you can in
 						},
 						Reporter: yamlParseReporter,
 						Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", job.entry.Rule.Error.Err.Error()),
-						Details: `This Prometheus rule is not valid.
-This usually means that it's missing some required fields.`,
+						Details:  details,
 						Severity: checks.Fatal,
 					},
 					Owner: job.entry.Owner,

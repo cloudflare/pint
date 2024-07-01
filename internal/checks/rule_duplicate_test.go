@@ -16,7 +16,7 @@ func textDuplicateRule(path string, line int) string {
 }
 
 func TestRuleDuplicateCheck(t *testing.T) {
-	xxxEntries := mustParseContent("- record: foo\n  expr: up == 0\n")
+	xxxEntries := parseContent("- record: foo\n  expr: up == 0\n")
 	for i := range xxxEntries {
 		xxxEntries[i].Path.SymlinkTarget = "xxx.yml"
 	}
@@ -48,7 +48,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
-			entries:    mustParseContent("- record: foo\n  expr: up == 0\n"),
+			entries:    parseContent("- record: foo\n  expr: up == 0\n"),
 		},
 		{
 			description: "skip alerting entries",
@@ -58,7 +58,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
-			entries: mustParseContent(`
+			entries: parseContent(`
 - alert: foo
   expr: up == 0
 - record: baz
@@ -75,7 +75,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
-			entries: mustParseContent(`
+			entries: parseContent(`
 # foo
 - record: foo
   expr: up == 
@@ -91,7 +91,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
-			entries: mustParseContent(`
+			entries: parseContent(`
 - record: bar
   expr: up == 0
   labels:
@@ -110,7 +110,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
-			entries: mustParseContent(`
+			entries: parseContent(`
 - record: foo
   expr: up == 0
   labels:
@@ -141,7 +141,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					},
 				}
 			},
-			entries: mustParseContent(`
+			entries: parseContent(`
 - record: foo
   expr: up == 0
   labels:

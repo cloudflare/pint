@@ -136,8 +136,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 				defer prom.Close(reg)
 			}
 
-			entries, err := parseContent(tc.content)
-			require.NoError(t, err, "cannot parse rule content")
+			entries := parseContent(tc.content)
 			for _, entry := range entries {
 				ctx := context.Background()
 				if tc.ctx != nil {
@@ -154,7 +153,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		})
 
 		// broken rules to test check against rules with syntax error
-		entries, err := parseContent(`
+		entries := parseContent(`
 - alert: foo
   expr: 'foo{}{} > 0'
   annotations:
@@ -163,7 +162,6 @@ func runTests(t *testing.T, testCases []checkTest) {
 - record: foo
   expr: 'foo{}{}'
 `)
-		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
 				_ = tc.checker(newSimpleProm("prom")).Check(context.Background(), entry.Path, entry.Rule, tc.entries)
@@ -172,12 +170,9 @@ func runTests(t *testing.T, testCases []checkTest) {
 	}
 }
 
-func parseContent(content string) (entries []discovery.Entry, err error) {
+func parseContent(content string) (entries []discovery.Entry) {
 	p := parser.NewParser(false)
-	rules, err := p.Parse([]byte(content))
-	if err != nil {
-		return nil, err
-	}
+	rules := p.Parse([]byte(content))
 
 	for _, rule := range rules {
 		entries = append(entries, discovery.Entry{
@@ -190,14 +185,6 @@ func parseContent(content string) (entries []discovery.Entry, err error) {
 		})
 	}
 
-	return entries, nil
-}
-
-func mustParseContent(content string) (entries []discovery.Entry) {
-	entries, err := parseContent(content)
-	if err != nil {
-		panic(err)
-	}
 	return entries
 }
 

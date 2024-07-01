@@ -21,18 +21,8 @@ const (
 	mergeTag     = "!!merge"
 )
 
-type StrictError struct {
-	Err     error
-	Details string
-	Line    int
-}
-
-func (se StrictError) Error() string {
-	return fmt.Sprintf("YAML syntax error at line %d: %s", se.Line, se.Err.Error())
-}
-
 type validator interface {
-	validate(*yaml.Node) error
+	validate(*yaml.Node) []ParseError
 }
 
 func mustKind(node *yaml.Node, kind yaml.Kind) error {
@@ -59,25 +49,23 @@ type requireDocument struct {
 	v validator
 }
 
-func (rd requireDocument) validate(node *yaml.Node) (err error) {
-	if err = mustKind(node, yaml.DocumentNode); err != nil {
-		return StrictError{Err: err, Line: node.Line}
+func (rd requireDocument) validate(node *yaml.Node) (errs []ParseError) {
+	if err := mustKind(node, yaml.DocumentNode); err != nil {
+		return []ParseError{{Err: err, Line: node.Line}}
 	}
 	for _, child := range node.Content {
-		if err = rd.v.validate(child); err != nil {
-			return err
-		}
+		errs = append(errs, rd.v.validate(child)...)
 	}
-	return nil
+	return errs
 }
 
 type requireScalar struct {
 	tag string
 }
 
-func (rs requireScalar) validate(node *yaml.Node) (err error) {
-	if err = mustKindTag(node, yaml.ScalarNode, rs.tag); err != nil {
-		return StrictError{Err: err, Line: node.Line}
+func (rs requireScalar) validate(node *yaml.Node) (errs []ParseError) {
+	if err := mustKindTag(node, yaml.ScalarNode, rs.tag); err != nil {
+		return []ParseError{{Err: err, Line: node.Line}}
 	}
 	return nil
 }
@@ -86,44 +74,40 @@ type requireList struct {
 	v validator
 }
 
-func (rl requireList) validate(node *yaml.Node) (err error) {
-	if err = mustKind(node, yaml.SequenceNode); err != nil {
-		return StrictError{Err: err, Line: node.Line}
+func (rl requireList) validate(node *yaml.Node) (errs []ParseError) {
+	if err := mustKind(node, yaml.SequenceNode); err != nil {
+		return []ParseError{{Err: err, Line: node.Line}}
 	}
 	for _, n := range unpackNodes(node) {
-		if err = rl.v.validate(n); err != nil {
-			return err
-		}
+		errs = append(errs, rl.v.validate(n)...)
 	}
-	return nil
+	return errs
 }
 
 type requireMap struct {
 	v validator
 }
 
-func (rm requireMap) validate(node *yaml.Node) (err error) {
-	if err = mustKind(node, yaml.MappingNode); err != nil {
-		return StrictError{Err: err, Line: node.Line}
+func (rm requireMap) validate(node *yaml.Node) (errs []ParseError) {
+	if err := mustKind(node, yaml.MappingNode); err != nil {
+		return []ParseError{{Err: err, Line: node.Line}}
 	}
 
 	setKeys := map[string]struct{}{}
 
 	var ok bool
 	for _, n := range unpackNodes(node) {
-		if err = rm.v.validate(n); err != nil {
-			return err
-		}
+		errs = append(errs, rm.v.validate(n)...)
 		if _, ok = setKeys[n.Value]; ok {
-			return StrictError{
+			errs = append(errs, ParseError{
 				Err:  fmt.Errorf("duplicated key `%s`", n.Value),
 				Line: n.Line,
-			}
+			})
 		}
 		setKeys[n.Value] = struct{}{}
 	}
 
-	return nil
+	return errs
 }
 
 type requireExactMap struct {
@@ -132,57 +116,64 @@ type requireExactMap struct {
 	required     []string
 }
 
-func (rm requireExactMap) validate(node *yaml.Node) (err error) {
-	if err = mustKind(node, yaml.MappingNode); err != nil {
-		return StrictError{Err: err, Line: node.Line}
+func (rm requireExactMap) validate(node *yaml.Node) (errs []ParseError) {
+	if err := mustKind(node, yaml.MappingNode); err != nil {
+		return []ParseError{{Err: err, Line: node.Line}}
 	}
 
 	setKeys := make(map[string]struct{}, len(rm.required))
 
 	var v validator
 	var ok bool
+	var fns []func(string, int)
 	for i, n := range unpackNodes(node) {
 		if i%2 == 0 {
-			if err = mustKindTag(n, yaml.ScalarNode, strTag); err != nil {
-				return StrictError{Err: err, Line: n.Line}
+			if err := mustKindTag(n, yaml.ScalarNode, strTag); err != nil {
+				errs = append(errs, ParseError{Err: err, Line: n.Line})
+				continue
 			}
 			v, ok = rm.keys[n.Value]
 			if !ok {
-				return StrictError{Err: fmt.Errorf("unexpected key `%s`", n.Value), Line: n.Line}
+				errs = append(errs, ParseError{
+					Err:  fmt.Errorf("unexpected key `%s`", n.Value),
+					Line: n.Line,
+				})
 			}
 			if _, ok = setKeys[n.Value]; ok {
-				return StrictError{
+				errs = append(errs, ParseError{
 					Err:  fmt.Errorf("duplicated key `%s`", n.Value),
 					Line: n.Line,
-				}
+				})
 			}
 			setKeys[n.Value] = struct{}{}
 
 			for name, fn := range rm.nameCallback {
 				if name == n.Value {
-					fn(n.Value, n.Line)
+					fns = append(fns, fn)
 				}
 			}
-		} else {
-			if err = v.validate(n); err != nil {
-				return err
+		} else if v != nil {
+			errs = append(errs, v.validate(n)...)
+			for _, fn := range fns {
+				fn(n.Value, n.Line)
 			}
+			fns = nil
 		}
 	}
 
 	for _, key := range rm.required {
 		if _, ok = setKeys[key]; !ok {
-			return StrictError{
+			errs = append(errs, ParseError{
 				Err:  fmt.Errorf("`%s` key is required and must be set", key),
 				Line: node.Line,
-			}
+			})
 		}
 	}
 
-	return nil
+	return errs
 }
 
-func validateRuleFile(node *yaml.Node) (err error) {
+func validateRuleFile(node *yaml.Node) (errs []ParseError) {
 	groupNames := map[string][]int{}
 	nameCallback := func(s string, l int) {
 		groupNames[s] = append(groupNames[s], l)
@@ -222,20 +213,21 @@ func validateRuleFile(node *yaml.Node) (err error) {
 		},
 	}
 
-	if err = v.validate(node); err != nil {
-		return err
-	}
+	errs = append(errs, v.validate(node)...)
 
 	for name, lines := range groupNames {
-		if len(lines) > 1 {
-			return StrictError{
-				Err:  fmt.Errorf("duplicated group name `%s`", name),
-				Line: lines[len(lines)-1],
+		for i, line := range lines {
+			if i == 0 {
+				continue
 			}
+			errs = append(errs, ParseError{
+				Err:  fmt.Errorf("duplicated group name `%s`", name),
+				Line: line,
+			})
 		}
 	}
 
-	return nil
+	return errs
 }
 
 func descirbeTag(tag string) string {

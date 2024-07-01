@@ -5,8 +5,11 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="YAML syntax error at line 2: YAML list is not allowed here, expected a YAML mapping" path=rules/strict.yml lines=1-4
-rules/strict.yml:2 Fatal: YAML list is not allowed here, expected a YAML mapping (yaml/parse)
+rules/strict.yml:2 Fatal: This rule is not a valid Prometheus rule: `This file is not a valid Prometheus rule file.
+Errors found:
+
+- line 2: YAML list is not allowed here, expected a YAML mapping
+`. (yaml/parse)
  2 | - alert: No Owner
 
 level=INFO msg="Problems found" Fatal=1
