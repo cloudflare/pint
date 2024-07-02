@@ -66,7 +66,7 @@ func (tc testCommenter) IsEqual(e ExistingCommentV2, p PendingCommentV2) bool {
 }
 
 func TestCommenter(t *testing.T) {
-	p := parser.NewParser()
+	p := parser.NewParser(false)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

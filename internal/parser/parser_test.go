@@ -18,6 +18,7 @@ func TestParse(t *testing.T) {
 		err     string
 		content []byte
 		output  []parser.Rule
+		strict  bool
 	}
 
 	testCases := []testCaseT{
@@ -32,7 +33,7 @@ func TestParse(t *testing.T) {
 		{
 			content: []byte(string("! !00 \xf6")),
 			output:  nil,
-			err:     "yaml: incomplete UTF-8 octet sequence",
+			err:     "error at line 1: yaml: incomplete UTF-8 octet sequence",
 		},
 		{
 			content: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
@@ -49,6 +50,30 @@ func TestParse(t *testing.T) {
 				{
 					Lines: parser.LineRange{First: 1, Last: 2},
 					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte("---\n- expr: foo\n  record: foo\n---\n- expr: bar\n"),
+			output: []parser.Rule{
+				{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 3, Last: 3},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 2, Last: 2},
+								Value: "foo",
+							},
+						},
+					},
+					Lines: parser.LineRange{First: 2, Last: 3},
+				},
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
 				},
 			},
 		},
@@ -90,15 +115,15 @@ func TestParse(t *testing.T) {
 		},
 		{
 			content: []byte("- record: - foo\n"),
-			err:     "yaml: block sequence entries are not allowed in this context",
+			err:     "error at line 1: yaml: block sequence entries are not allowed in this context",
 		},
 		{
 			content: []byte("- record: foo  expr: sum(\n"),
-			err:     "yaml: mapping values are not allowed in this context",
+			err:     "error at line 1: yaml: mapping values are not allowed in this context",
 		},
 		{
 			content: []byte("- record\n\texpr: foo\n"),
-			err:     "yaml: line 2: found a tab character that violates indentation",
+			err:     "error at line 2: found a tab character that violates indentation",
 		},
 		{
 			content: []byte(`
@@ -621,7 +646,7 @@ apiVersion: v1
 metadata:
   name: example-app-alerts
   labels:
-  app: example-app
+    app: example-app
 data:
   alerts: |
     groups:
@@ -1371,7 +1396,7 @@ data:
     foo: ` + string("\xed\xbf\xbf")),
 			// Label values are invalid only if they aren't valid UTF-8 strings
 			// which also makes them unparsable by YAML.
-			err: "yaml: invalid Unicode character",
+			err: "error at line 1: yaml: invalid Unicode character",
 		},
 		{
 			content: []byte(`
@@ -1436,7 +1461,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("record value must be a YAML string, got integer instead"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("record value must be a string, got integer instead"), Line: 2},
 				},
 			},
 		},
@@ -1448,7 +1473,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("alert value must be a YAML string, got integer instead"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("alert value must be a string, got integer instead"), Line: 2},
 				},
 			},
 		},
@@ -1460,7 +1485,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("expr value must be a YAML string, got integer instead"), Line: 3},
+					Error: parser.ParseError{Err: errors.New("expr value must be a string, got integer instead"), Line: 3},
 				},
 			},
 		},
@@ -1473,7 +1498,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("for value must be a YAML string, got integer instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("for value must be a string, got integer instead"), Line: 4},
 				},
 			},
 		},
@@ -1486,7 +1511,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("keep_firing_for value must be a YAML string, got integer instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("keep_firing_for value must be a string, got integer instead"), Line: 4},
 				},
 			},
 		},
@@ -1499,7 +1524,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got list instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got list instead"), Line: 4},
 				},
 			},
 		},
@@ -1513,7 +1538,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("annotations value must be a YAML mapping, got list instead"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("annotations value must be a mapping, got list instead"), Line: 5},
 				},
 			},
 		},
@@ -1529,7 +1554,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 7},
-					Error: parser.ParseError{Err: errors.New("labels foo value must be a YAML string, got integer instead"), Line: 5},
+					Error: parser.ParseError{Err: errors.New("labels foo value must be a string, got integer instead"), Line: 5},
 				},
 			},
 		},
@@ -1545,7 +1570,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 7},
-					Error: parser.ParseError{Err: errors.New("annotations bar value must be a YAML string, got integer instead"), Line: 7},
+					Error: parser.ParseError{Err: errors.New("annotations bar value must be a string, got integer instead"), Line: 7},
 				},
 			},
 		},
@@ -1558,7 +1583,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got integer instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got integer instead"), Line: 4},
 				},
 			},
 		},
@@ -1571,7 +1596,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got bool instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got bool instead"), Line: 4},
 				},
 			},
 		},
@@ -1614,7 +1639,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("record value must be a YAML string, got bool instead"), Line: 2},
+					Error: parser.ParseError{Err: errors.New("record value must be a string, got bool instead"), Line: 2},
 				},
 			},
 		},
@@ -1627,7 +1652,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("record value must be a YAML string, got mapping instead"), Line: 3},
+					Error: parser.ParseError{Err: errors.New("record value must be a string, got mapping instead"), Line: 3},
 				},
 			},
 		},
@@ -1640,7 +1665,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got string instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got string instead"), Line: 4},
 				},
 			},
 		},
@@ -1653,7 +1678,10 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got binary data instead"), Line: 4},
+					Error: parser.ParseError{
+						Err:  errors.New("labels value must be a mapping, got binary data instead"),
+						Line: 4,
+					},
 				},
 			},
 		},
@@ -1666,7 +1694,10 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("for value must be a YAML string, got float instead"), Line: 4},
+					Error: parser.ParseError{
+						Err:  errors.New("for value must be a string, got float instead"),
+						Line: 4,
+					},
 				},
 			},
 		},
@@ -1679,7 +1710,7 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got garbage instead"), Line: 4},
+					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got garbage instead"), Line: 4},
 				},
 			},
 		},
@@ -1689,7 +1720,7 @@ data:
   expr: bar
   labels: !! "SGVsbG8sIFdvcmxkIQ=="
 `),
-			err: "yaml: line 4: did not find expected tag URI",
+			err: "error at line 4: did not find expected tag URI",
 		},
 		{
 			content: []byte(`
@@ -1700,7 +1731,10 @@ data:
 			output: []parser.Rule{
 				{
 					Lines: parser.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a YAML mapping, got string instead"), Line: 4},
+					Error: parser.ParseError{
+						Err:  errors.New("labels value must be a mapping, got string instead"),
+						Line: 4,
+					},
 				},
 			},
 		},
@@ -1730,7 +1764,10 @@ data:
 				},
 				{
 					Lines: parser.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
+					Error: parser.ParseError{
+						Err:  errors.New("incomplete rule, no alert or record key"),
+						Line: 5,
+					},
 				},
 			},
 		},
@@ -1806,6 +1843,961 @@ data:
 				},
 			},
 		},
+		{
+			content: []byte(`---
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    expr: count(up)
+    labels:
+      foo:
+        bar: foo
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 9},
+					Error: parser.ParseError{
+						Err:  errors.New("labels foo value must be a string, got mapping instead"),
+						Line: 9,
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 6},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "up:count",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "count(up)",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+  - record: up:count
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{
+						Err:  errors.New("missing expr key"),
+						Line: 5,
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: up:count
+  expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 2: top level field must be a groups key, got list",
+		},
+		{
+			content: []byte(`
+rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 2: unexpected key rules",
+		},
+		{
+			content: []byte(`
+groups:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 3: invalid group key record",
+		},
+		{
+			content: []byte(`
+groups:
+- rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 3: incomplete group definition, name is required and must be set",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+`),
+			strict: true,
+		},
+		{
+			content: []byte(`
+groups: {}
+`),
+			strict: true,
+			err:    "error at line 2: groups value must be a list, got mapping",
+		},
+		{
+			content: []byte(`
+groups:
+- name: []
+`),
+			strict: true,
+			err:    "error at line 3: group name must be a string, got list",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  name: bar
+  name: bob
+`),
+			strict: true,
+			err:    "error at line 4: duplicated key name",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+    rules:
+      - record: up:count
+        expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 4: rules must be a list, got mapping",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+    - rules:
+      - record: up:count
+        expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 5: invalid rule key rules",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v1
+  rules:
+    - rules:
+      - record: up:count
+		expr: count(up)
+`),
+			strict: true,
+			err:    "error at line 6: found a tab character that violates indentation",
+		},
+		{
+			content: []byte(`
+---
+groups:
+- name: v1
+  rules:
+    - record: up:count
+      expr: count(up)
+---
+groups:
+- name: v1
+  rules:
+    - rules:
+      - record: up:count
+        expr: count(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 6, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "up:count",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "count(up)",
+							},
+						},
+					},
+				},
+			},
+			err: "error at line 12: invalid rule key rules",
+		},
+		{
+			content: []byte(`
+---
+groups: []
+---
+groups:
+- name: foo
+  rules:
+    - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 8, Last: 8},
+					Error: parser.ParseError{
+						Line: 8,
+						Err:  errors.New("labels value must be a mapping, got binary data instead"),
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 4, Last: 4},
+					Error: parser.ParseError{
+						Line: 4,
+						Err:  errors.New("multi-document YAML files are not allowed"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte("[]"),
+			strict:  true,
+			err:     "error at line 1: top level field must be a groups key, got list",
+		},
+		{
+			content: []byte("\n\n[]"),
+			strict:  true,
+			err:     "error at line 3: top level field must be a groups key, got list",
+		},
+		{
+			content: []byte("groups: {}"),
+			strict:  true,
+			err:     "error at line 1: groups value must be a list, got mapping",
+		},
+		{
+			content: []byte("groups: []"),
+			strict:  true,
+		},
+		{
+			content: []byte("xgroups: {}"),
+			strict:  true,
+			err:     "error at line 1: unexpected key xgroups",
+		},
+		{
+			content: []byte("\nbob\n"),
+			strict:  true,
+			err:     "error at line 2: top level field must be a groups key, got string",
+		},
+		{
+			content: []byte(`groups: []
+
+rules: []
+`),
+			strict: true,
+			err:    "error at line 3: unexpected key rules",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules: []
+`),
+			strict: true,
+		},
+		{
+			content: []byte(`
+groups:
+- name: 
+  rules: []
+`),
+			strict: true,
+			err:    "error at line 3: group name must be a string, got null",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up)
+    labels:
+      job: foo
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 8},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 6, Last: 6},
+								Value: "sum(up)",
+							},
+						},
+						Labels: &parser.YamlMap{
+							Lines: parser.LineRange{First: 7, Last: 8},
+							Key: &parser.YamlNode{
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "job",
+									},
+									Value: &parser.YamlNode{
+										Lines: parser.LineRange{First: 8, Last: 8},
+										Value: "foo",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up)
+    xxx: 1
+    labels:
+      job: foo
+`),
+			strict: true,
+			err:    "error at line 7: invalid rule key xxx",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    record: foo
+    expr: sum(up)
+    xxx: 1
+    labels:
+      job: foo
+`),
+			strict: true,
+			err:    "error at line 4: rules must be a list, got mapping",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up)
+    labels:
+      job:
+        foo: bar
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 9},
+					Error: parser.ParseError{
+						Line: 9,
+						Err:  errors.New("labels job value must be a string, got mapping instead"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr:
+      sum: sum(up)
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{
+						Line: 7,
+						Err:  errors.New("expr value must be a string, got mapping instead"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules: []
+- name: foo
+  rules: []
+`),
+			strict: true,
+			err:    "error at line 5: duplicated group name",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: sum(up)
+    labels:
+      foo: bob
+      foo: bar
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 8, Last: 9},
+					Error: parser.ParseError{
+						Line: 9,
+						Err:  errors.New("duplicated labels key foo"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  rules:
+  - record: up:count
+    expr: count(up)
+    expr: sum(up)`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{
+						Line: 7,
+						Err:  errors.New("duplicated expr key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  rules:
+  - record: up:count
+    expr: count(up)
+bogus: 1
+`),
+			strict: true,
+			err:    "error at line 7: unexpected key bogus",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  rules:
+  - record: up:count
+    expr: count(up)
+    bogus: 1
+`),
+			strict: true,
+			err:    "error at line 7: invalid rule key bogus",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  rules:
+  - alert: up:count
+    for: 5m
+    keep_firing_for: 5m
+    expr: count(up)
+    labels: {}
+    annotations: {}
+    bogus: 1
+`),
+			strict: true,
+			err:    "error at line 11: invalid rule key bogus",
+		},
+		{
+			content: []byte(`
+groups:
+
+- name: CloudflareKafkaZookeeperExporter
+
+  rules:
+`),
+			strict: true,
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    expr: 1
+`),
+			strict: true,
+			err:    "error at line 4: rules must be a list, got mapping",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - expr: 1
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{
+						Line: 5,
+						Err:  errors.New("incomplete rule, no alert or record key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - expr: null
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{
+						Line: 5,
+						Err:  errors.New("incomplete rule, no alert or record key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - 1: null
+`),
+			strict: true,
+			err:    "error at line 5: invalid rule key 1",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - true: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			strict: true,
+			err:    "error at line 5: invalid rule key true",
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - expr: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{
+						Line: 5,
+						Err:  errors.New("incomplete rule, no alert or record key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - expr: !!binary "SGVsbG8sIFdvcmxkIQ=="
+      record: foo
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 6},
+					Error: parser.ParseError{
+						Line: 5,
+						Err:  errors.New("expr value must be a string, got binary data instead"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 5},
+					Error: parser.ParseError{
+						Line: 5,
+						Err:  errors.New("labels value must be a mapping, got binary data instead"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+---
+groups:
+- name: foo
+  rules:
+    - record: foo
+      expr: bar
+---
+groups:
+- name: foo
+  rules:
+    - record: foo
+      expr: bar
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 6, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "bar",
+							},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 12, Last: 13},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 12, Last: 12},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 13, Last: 13},
+								Value: "bar",
+							},
+						},
+					},
+				},
+				{
+					Lines: parser.LineRange{First: 8, Last: 8},
+					Error: parser.ParseError{
+						Line: 8,
+						Err:  errors.New("multi-document YAML files are not allowed"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - record: foo
+      expr: foo
+      expr: foo
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{
+						Line: 7,
+						Err:  errors.New("duplicated expr key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - record: foo
+      keep_firing_for: 1m
+      keep_firing_for: 2m
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{
+						Line: 7,
+						Err:  errors.New("duplicated keep_firing_for key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - record: foo
+      keep_firing_for: 1m
+      record: 2m
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					Error: parser.ParseError{
+						Line: 7,
+						Err:  errors.New("duplicated record key"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+    - []
+`),
+			strict: true,
+			err:    "error at line 5: rule definion must be a mapping, got list",
+		},
+		{
+			content: []byte(`
+1: 0
+`),
+			strict: true,
+			err:    "error at line 2: groups key must be a string, got a integer",
+		},
+		{
+			content: []byte(`
+true: 0
+`),
+			strict: true,
+			err:    "error at line 2: groups key must be a string, got a bool",
+		},
+		{
+			content: []byte(`
+groups: !!binary "SGVsbG8sIFdvcmxkIQ=="
+`),
+			strict: true,
+			err:    "error at line 2: groups value must be a list, got binary data",
+		},
+		{
+			content: []byte(`
+groups:
+  - true: null"
+`),
+			strict: true,
+			err:    "error at line 3: invalid group key true",
+		},
+		{
+			content: []byte(`
+!!!binary "groups": true"
+`),
+			strict: true,
+			err:    "error at line 2: groups key must be a string, got a binary",
+		},
+		{
+			content: []byte("[]"),
+			strict:  true,
+			err:     "error at line 1: top level field must be a groups key, got list",
+		},
+		{
+			content: []byte(`
+groups:
+  - true
+`),
+			strict: true,
+			err:    "error at line 3: group must be a mapping, got bool",
+		},
+		{
+			content: []byte(`
+groups:
+  - name:
+    rules: []
+`),
+			strict: true,
+			err:    "error at line 3: group name must be a string, got null",
+		},
+		{
+			content: []byte(`
+groups:
+  - name: ""
+    rules: []
+`),
+			strict: true,
+			err:    "error at line 3: group name cannot be empty",
+		},
+		{
+			content: []byte(`
+groups:
+  - name: 1
+    rules: []
+`),
+			strict: true,
+			err:    "error at line 3: group name must be a string, got integer",
+		},
+		{
+			content: []byte(`
+groups:
+  - name: foo
+    interval: 1
+    rules: []
+`),
+			strict: true,
+			err:    "error at line 4: group interval must be a string, got integer",
+		},
+		{
+			content: []byte(`
+groups:
+  - name: foo
+    interval: xxx
+    rules: []
+`),
+			strict: true,
+			err:    `error at line 4: invalid interval value: not a valid duration string: "xxx"`,
+		},
+		{
+			content: []byte(`
+groups:
+  - name: foo
+    query_offset: 1
+    rules: []
+`),
+			strict: true,
+			err:    "error at line 4: group query_offset must be a string, got integer",
+		},
+		{
+			content: []byte(`
+groups:
+  - name: foo
+    query_offset: xxx
+    rules: []
+`),
+			strict: true,
+			err:    `error at line 4: invalid query_offset value: not a valid duration string: "xxx"`,
+		},
+		{
+			content: []byte(`
+groups:
+  - name: foo
+    query_offset: 1m
+    limit: abc
+    rules: []
+`),
+			strict: true,
+			err:    "error at line 5: group limit must be a integer, got string",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  rules:
+  - alert: up:count
+    for: 5m &timeout
+    keep_firing_for: **timeout
+    expr: count(up)
+    labels: {}
+    annotations: {}
+    bogus: 1
+`),
+			strict: true,
+			err:    "error at line 7: did not find expected alphabetic or numeric character",
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  rules:
+  - alert: up:count
+    for: &for 1
+    keep_firing_for: *for
+    expr: count(up)
+    labels: {}
+    annotations: {}
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 10},
+					Error: parser.ParseError{
+						Line: 6,
+						Err:  errors.New("for value must be a string, got integer instead"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: v2
+  limit: &for 1
+  rules:
+  - alert: up:count
+    keep_firing_for: *for
+    expr: count(up)
+    labels: {}
+    annotations: {}
+`),
+			strict: true,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 6, Last: 10},
+					Error: parser.ParseError{
+						Line: 7,
+						Err:  errors.New("keep_firing_for value must be a string, got integer instead"),
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: "{{ source }}"
+  rules:
+# pint ignore/begin
+    
+# pint ignore/end
+`),
+			strict: true,
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
@@ -1828,9 +2820,9 @@ data:
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			t.Logf("--- Content ---%s--- END ---", tc.content)
+			t.Logf("\n--- Content ---%s--- END ---", tc.content)
 
-			p := parser.NewParser()
+			p := parser.NewParser(tc.strict)
 			output, err := p.Parse(tc.content)
 
 			if tc.err != "" {

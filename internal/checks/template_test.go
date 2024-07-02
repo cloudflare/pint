@@ -105,7 +105,7 @@ func TestTemplatedRegexpExpand(t *testing.T) {
 }
 
 func newMustRule(content string) parser.Rule {
-	p := parser.NewParser()
+	p := parser.NewParser(false)
 	rules, err := p.Parse([]byte(content))
 	if err != nil {
 		panic(err)

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -26,11 +28,15 @@ const (
 
 var ErrRuleCommentOnFile = errors.New("this comment is only valid when attached to a rule")
 
-func NewParser() Parser {
-	return Parser{}
+func NewParser(isStrict bool) Parser {
+	return Parser{
+		isStrict: isStrict,
+	}
 }
 
-type Parser struct{}
+type Parser struct {
+	isStrict bool
+}
 
 func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 	if len(content) == 0 {
@@ -43,8 +49,8 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		}
 	}()
 
-	var documents []yaml.Node
 	dec := yaml.NewDecoder(bytes.NewReader(content))
+	var index int
 	for {
 		var doc yaml.Node
 		decodeErr := dec.Decode(&doc)
@@ -52,14 +58,31 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 			break
 		}
 		if decodeErr != nil {
-			return nil, decodeErr
+			return nil, tryDecodingYamlError(decodeErr)
 		}
-		documents = append(documents, doc)
+		index++
+		if p.isStrict {
+			r, err := parseGroups(content, &doc)
+			if err.Err != nil {
+				return rules, err
+			}
+			rules = append(rules, r...)
+		} else {
+			rules = append(rules, parseNode(content, &doc, 0)...)
+		}
+		if index > 1 && p.isStrict {
+			rules = append(rules, Rule{
+				Lines: LineRange{First: doc.Line, Last: doc.Line},
+				Error: ParseError{
+					Err: errors.New("multi-document YAML files are not allowed"),
+					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
+					Line: doc.Line,
+				},
+			})
+		}
 	}
 
-	for _, doc := range documents {
-		rules = append(rules, parseNode(content, &doc, 0)...)
-	}
 	return rules, err
 }
 
@@ -121,8 +144,8 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 	var keepFiringForNode *yaml.Node
 	var labelsNode *yaml.Node
 	var annotationsNode *yaml.Node
-	labelsNodes := map[*yaml.Node]*yaml.Node{}
-	annotationsNodes := map[*yaml.Node]*yaml.Node{}
+	labelsNodes := []yamlMap{}
+	annotationsNodes := []yamlMap{}
 
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
@@ -287,35 +310,55 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		}
 		return rule, false
 	}
-	for key, part := range map[string]*yaml.Node{
-		recordKey:        recordNode,
-		alertKey:         alertNode,
-		exprKey:          exprNode,
-		forKey:           forNode,
-		keepFiringForKey: keepFiringForNode,
+	for _, entry := range []struct {
+		part *yaml.Node
+		key  string
+	}{
+		{key: recordKey, part: recordNode},
+		{key: alertKey, part: alertNode},
+		{key: exprKey, part: exprNode},
+		{key: forKey, part: forNode},
+		{key: keepFiringForKey, part: keepFiringForNode},
 	} {
-		if part != nil && !isTag(part.ShortTag(), "!!str") {
-			return invalidValueError(lines, part.Line+offset, key, "string", describeTag(part.ShortTag()))
+		if entry.part != nil && !isTag(entry.part.ShortTag(), strTag) {
+			return invalidValueError(lines, entry.part.Line+offset, entry.key, describeTag(strTag), describeTag(entry.part.ShortTag()))
 		}
 	}
 
-	for key, part := range map[string]*yaml.Node{
-		labelsKey:      labelsNode,
-		annotationsKey: annotationsNode,
+	for _, entry := range []struct {
+		part *yaml.Node
+		key  string
+	}{
+		{key: labelsKey, part: labelsNode},
+		{key: annotationsKey, part: annotationsNode},
 	} {
-		if part != nil && !isTag(part.ShortTag(), "!!map") {
-			return invalidValueError(lines, part.Line+offset, key, "mapping", describeTag(part.ShortTag()))
+		if entry.part != nil && !isTag(entry.part.ShortTag(), mapTag) {
+			return invalidValueError(lines, entry.part.Line+offset, entry.key, describeTag(mapTag), describeTag(entry.part.ShortTag()))
 		}
 	}
 
-	for section, parts := range map[string]map[*yaml.Node]*yaml.Node{
-		labelsKey:      labelsNodes,
-		annotationsKey: annotationsNodes,
+	for _, elem := range []struct {
+		key   string
+		parts []yamlMap
+	}{
+		{key: labelsKey, parts: labelsNodes},
+		{key: annotationsKey, parts: annotationsNodes},
 	} {
-		for key, value := range parts {
-			if !isTag(value.ShortTag(), "!!str") {
-				return invalidValueError(lines, value.Line+offset, fmt.Sprintf("%s %s", section, nodeValue(key)), "string", describeTag(value.ShortTag()))
+		names := map[string]struct{}{}
+		for _, entry := range elem.parts {
+			if !isTag(entry.val.ShortTag(), strTag) {
+				return invalidValueError(lines, entry.val.Line+offset, fmt.Sprintf("%s %s", elem.key, nodeValue(entry.key)), describeTag(strTag), describeTag(entry.val.ShortTag()))
 			}
+			if _, ok := names[entry.key.Value]; ok {
+				return Rule{
+					Lines: rangeFromYamlMaps(elem.parts),
+					Error: ParseError{
+						Line: entry.key.Line,
+						Err:  fmt.Errorf("duplicated %s key %s", elem.key, entry.key.Value),
+					},
+				}, false
+			}
+			names[entry.key.Value] = struct{}{}
 		}
 	}
 
@@ -423,7 +466,7 @@ func unpackNodes(node *yaml.Node) []*yaml.Node {
 	nodes := make([]*yaml.Node, 0, len(node.Content))
 	var isMerge bool
 	for _, part := range node.Content {
-		if part.ShortTag() == "!!merge" && part.Value == "<<" {
+		if part.ShortTag() == mergeTag && part.Value == "<<" {
 			isMerge = true
 		}
 
@@ -535,53 +578,71 @@ func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool) {
 	return rule, false
 }
 
-func invalidValueError(lines LineRange, line int, key, expectedKind, gotKind string) (Rule, bool) {
+func invalidValueError(lines LineRange, line int, key, expectedTag, gotTag string) (Rule, bool) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
 			Line: line,
-			Err:  fmt.Errorf("%s value must be a YAML %s, got %s instead", key, expectedKind, gotKind),
+			Err:  fmt.Errorf("%s value must be a %s, got %s instead", key, expectedTag, gotTag),
 		},
 	}
 	return rule, false
 }
 
 func isTag(tag, expected string) bool {
-	if tag == "!!null" {
+	if tag == nullTag {
 		return true
 	}
 	return tag == expected
 }
 
-func describeTag(tag string) string {
-	switch tag {
-	case "":
-		return "unknown type"
-	case "!!str":
-		return "string"
-	case "!!int":
-		return "integer"
-	case "!!seq":
-		return "list"
-	case "!!map":
-		return "mapping"
-	case "!!binary":
-		return "binary data"
-	default:
-		return strings.TrimLeft(tag, "!")
-	}
+type yamlMap struct {
+	key *yaml.Node
+	val *yaml.Node
 }
 
-func mappingNodes(node *yaml.Node) map[*yaml.Node]*yaml.Node {
-	m := make(map[*yaml.Node]*yaml.Node, len(node.Content))
+func mappingNodes(node *yaml.Node) []yamlMap {
+	m := make([]yamlMap, 0, len(node.Content)/2)
 	var key *yaml.Node
 	for _, child := range node.Content {
 		if key != nil {
-			m[key] = child
+			m = append(m, yamlMap{key: key, val: child})
 			key = nil
 		} else {
 			key = child
 		}
 	}
 	return m
+}
+
+func rangeFromYamlMaps(m []yamlMap) (lr LineRange) {
+	for _, entry := range m {
+		if lr.First == 0 {
+			lr.First = entry.key.Line
+			lr.Last = entry.val.Line
+		}
+		lr.First = min(lr.First, entry.key.Line, entry.val.Line)
+		lr.Last = max(lr.Last, entry.key.Line, entry.val.Line)
+	}
+	return lr
+}
+
+var (
+	yamlErrRe          = regexp.MustCompile("^yaml: line (.+): (.+)")
+	yamlUnmarshalErrRe = regexp.MustCompile("^yaml: unmarshal errors:\n  line (.+): (.+)")
+)
+
+func tryDecodingYamlError(err error) ParseError {
+	for _, re := range []*regexp.Regexp{yamlErrRe, yamlUnmarshalErrRe} {
+		parts := re.FindStringSubmatch(err.Error())
+		if len(parts) > 2 {
+			if line, err2 := strconv.Atoi(parts[1]); line > 0 && err2 == nil {
+				return ParseError{
+					Line: line,
+					Err:  errors.New(parts[2]),
+				}
+			}
+		}
+	}
+	return ParseError{Line: 1, Err: err}
 }
