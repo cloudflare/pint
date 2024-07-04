@@ -2,6 +2,7 @@ package discovery_test
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -9,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -38,7 +38,7 @@ func TestGitBranchFinder(t *testing.T) {
 	includeAll := []*regexp.Regexp{regexp.MustCompile(".*")}
 
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser()
+		p := parser.NewParser(false)
 		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
 		if err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
@@ -47,14 +47,6 @@ func TestGitBranchFinder(t *testing.T) {
 			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(r), s))
 		}
 		return r[0]
-	}
-
-	mustErr := func(s string) error {
-		_, errs := rulefmt.Parse([]byte(s))
-		if len(errs) == 0 {
-			panic(s)
-		}
-		return errs[0]
 	}
 
 	type setupFn func(t *testing.T)
@@ -726,15 +718,14 @@ groups:
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
 					},
-					ModifiedLines: []int{3},
-					PathError: mustErr(`
-groups:
-- name: v2
-  rules:
-  - record: up:count
-    expr: count(up)
-    expr: sum(up)
-`),
+					ModifiedLines: []int{5, 6, 7},
+					Rule: parser.Rule{
+						Lines: parser.LineRange{First: 5, Last: 7},
+						Error: parser.ParseError{
+							Line: 7,
+							Err:  errors.New("duplicated expr key"),
+						},
+					},
 				},
 			},
 		},

@@ -22,7 +22,7 @@ func TestTeamCityReporter(t *testing.T) {
 		summary     reporter.Summary
 	}
 
-	p := parser.NewParser()
+	p := parser.NewParser(false)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

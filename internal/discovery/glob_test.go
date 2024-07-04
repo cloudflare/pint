@@ -10,7 +10,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/prometheus/prometheus/model/rulefmt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -27,18 +26,10 @@ func TestGlobPathFinder(t *testing.T) {
 		entries  []discovery.Entry
 	}
 
-	p := parser.NewParser()
+	p := parser.NewParser(false)
 	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
 	testRules, err := p.Parse([]byte(testRuleBody))
 	require.NoError(t, err)
-
-	parseErr := func(input string) error {
-		_, err := rulefmt.Parse([]byte(input))
-		if err == nil {
-			panic(input)
-		}
-		return err[0]
-	}
 
 	testCases := []testCaseT{
 		{
@@ -108,7 +99,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -124,7 +118,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					PathError:     errors.New("yaml: line 2: mapping values are not allowed in this context"),
+					PathError: parser.ParseError{
+						Err:  errors.New("mapping values are not allowed in this context"),
+						Line: 2,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -141,7 +138,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -151,7 +151,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "link.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -171,7 +174,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "a/bar.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -181,7 +187,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "b/c/link.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -191,7 +200,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "b/link.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -226,7 +238,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "a/bar.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr("xxx:\nyyy:\n"),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 1,
+					},
 					ModifiedLines: []int{1, 2},
 					Owner:         "",
 				},
@@ -236,7 +251,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "b/c/link.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr("xxx:\nyyy:\n"),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 1,
+					},
 					ModifiedLines: []int{1, 2},
 					Owner:         "",
 				},
@@ -269,7 +287,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "a/bar.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
@@ -279,7 +300,10 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "b/c/link.yml",
 						SymlinkTarget: "a/bar.yml",
 					},
-					PathError:     parseErr(testRuleBody),
+					PathError: parser.ParseError{
+						Err:  errors.New("YAML list is not allowed here, expected a YAML mapping"),
+						Line: 3,
+					},
 					ModifiedLines: []int{1, 2, 3, 4},
 					Owner:         "bob",
 				},
