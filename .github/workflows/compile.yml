@@ -57,7 +57,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           mkdir .tmp
-          printf '${{ steps.changelog.outputs.markdown }}' > .tmp/changelog.txt
+          exec 3<<'HERE'
+          ${{ steps.changelog.outputs.markdown }}
+          HERE
+          cat /dev/fd/3 | tee .tmp/changelog.txt
 
       - name: Release binaries
         if: startsWith(github.ref, 'refs/tags/')
