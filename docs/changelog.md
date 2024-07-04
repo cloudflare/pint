@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.61.1
+
+### Fixed
+
+- Fixed release workflow on GitHub.
+
 ## v0.61.0
 
 ### Fixed
