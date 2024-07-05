@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.61.2
+
+### Fixed
+
+- Fixed false positive reports about removed rules when running `pint ci` on a branch that
+  contains YAML syntax errors.
+
 ## v0.61.1
 
 ### Fixed
