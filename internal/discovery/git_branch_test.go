@@ -1017,6 +1017,60 @@ groups:
 				},
 			},
 		},
+		{
+			title: "rule broken",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+groups:
+- name: v1
+  rules:
+  - record: rule1
+    expr: sum(up)
+  - record: rule2
+    expr: sum(up)
+  - record: rule3
+    expr: sum(up)
+  - record: rule4
+    expr: sum(up)
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+groups:
+- name: v2
+  rules:
+  - record: rule1
+    expr: sum(up)
+  - record: rule2
+    expr: sum(up)
+  - record: rule3
+    expr: sum(up)
+    +
+    sum(up)
+  - record: rule4
+    expr: sum(up)
+  - record: rule5
+    expr: sum(up)
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
+			entries: []discovery.Entry{
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{3, 11, 12, 13, 14, 15, 16},
+					PathError: parser.ParseError{
+						Line: 11,
+						Err:  errors.New("could not find expected ':'"),
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

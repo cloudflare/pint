@@ -76,6 +76,9 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("invalid file syntax: %w", err)
 		}
+
+		failedEntries := entriesWithPathErrors(entriesAfter)
+
 		slog.Debug(
 			"Parsing git file change",
 			slog.Any("commits", change.Commits),
@@ -134,7 +137,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
 				}
 				entries = append(entries, me.after)
-			case me.hasBefore && !me.hasAfter:
+			case me.hasBefore && !me.hasAfter && len(failedEntries) == 0:
 				me.before.State = Removed
 				ml := commonLines(change.Body.ModifiedLines, me.before.ModifiedLines)
 				if len(ml) > 0 {
@@ -149,6 +152,15 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
 				)
 				entries = append(entries, me.before)
+			case me.hasBefore && !me.hasAfter && len(failedEntries) > 0:
+				slog.Debug(
+					"Rule not present on HEAD branch but there are parse errors",
+					slog.String("name", me.before.Rule.Name()),
+					slog.String("state", me.before.State.String()),
+					slog.String("path", me.before.Path.Name),
+					slog.String("ruleLines", me.before.Rule.Lines.String()),
+					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+				)
 			default:
 				slog.Warn(
 					"Unknown rule state",
@@ -324,4 +336,13 @@ func countCommits(changes []*git.FileChange) int {
 		}
 	}
 	return len(commits)
+}
+
+func entriesWithPathErrors(entries []Entry) (match []Entry) {
+	for _, entry := range entries {
+		if entry.PathError != nil {
+			match = append(match, entry)
+		}
+	}
+	return match
 }
