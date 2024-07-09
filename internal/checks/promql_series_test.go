@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -59,6 +60,14 @@ func alertMissing(metric, alertname string) string {
 
 func metricIgnored(metric, check, re string) string {
 	return fmt.Sprintf("Metric name `%s` matches `%s` check ignore regexp `%s`.", metric, check, re)
+}
+
+func unusedDisableText(m string) string {
+	return fmt.Sprintf("pint %s comment `%s` check doesn't match any selector in this query", comments.DisableComment, m)
+}
+
+func unusedRuleSetText(m string) string {
+	return fmt.Sprintf("pint %s comment `%s` doesn't match any label matcher in this query", comments.RuleSetComment, m)
 }
 
 func TestSeriesCheck(t *testing.T) {
@@ -1726,6 +1735,16 @@ func TestSeriesCheck(t *testing.T) {
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedRuleSetText("promql/series(bar) min-age 5d"),
+						Details:  checks.SeriesCheckUnusedRuleSetComment,
+						Severity: checks.Warning,
+					},
 				}
 			},
 			mocks: []*prometheusMock{
@@ -2975,6 +2994,16 @@ func TestSeriesCheck(t *testing.T) {
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText(`promql/series({job="foo"})`),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
+					},
 				}
 			},
 			mocks: []*prometheusMock{
@@ -3008,6 +3037,16 @@ func TestSeriesCheck(t *testing.T) {
 						Text:     noMetricText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText(`promql/series(notfound{job=foo})`),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -3064,6 +3103,16 @@ func TestSeriesCheck(t *testing.T) {
 						Text:     noSeriesText("prom", uri, "notfound", "1w"),
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText(`promql/series(notfound{job="foo"})`),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
 					},
 				}
 			},
@@ -3421,6 +3470,64 @@ func TestSeriesCheck(t *testing.T) {
 					conds: []requestCondition{requireRangeQueryPath},
 					resp:  respondWithEmptyMatrix(),
 				},
+			},
+		},
+		{
+			description: "disable comment for prometheus server",
+			content: `
+# pint disable promql/series(prom)
+- record: my_series
+  expr: vector(1)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "disable comment for prometheus server",
+			content: `
+# pint disable promql/series(+mytag)
+- record: my_series
+  expr: vector(1)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "disable comment for a valid series",
+			content: `
+# pint disable promql/series(foo)
+- record: my_series
+  expr: count(foo)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "disable comment for a mismatched series",
+			content: `
+# pint disable promql/series(bar)
+# pint disable promql/series(foo)
+- record: my_series
+  expr: count(bar)
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText("promql/series(foo)"),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
+					},
+				}
 			},
 		},
 	}

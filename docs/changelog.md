@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.62.0
+
+### Added
+
+- [promql/series](checks/promql/series.md) check will now generate warnings if there are `# pint disable`
+  or `# pint rule/set` comments that are not matching any valid query selector or Prometheus server.
+
 ## v0.61.2
 
 ### Fixed
