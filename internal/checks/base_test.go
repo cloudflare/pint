@@ -75,7 +75,7 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 		"up",
 		[]*regexp.Regexp{},
 		[]*regexp.Regexp{},
-		[]string{},
+		[]string{"mytag"},
 	)
 }
 
@@ -129,8 +129,10 @@ func runTests(t *testing.T, testCases []checkTest) {
 				uri = srv.URL
 			}
 
+			var proms []*promapi.FailoverGroup
 			prom := tc.prometheus(uri)
 			if prom != nil {
+				proms = append(proms, prom)
 				reg := prometheus.NewRegistry()
 				prom.StartWorkers(reg)
 				defer prom.Close(reg)
@@ -139,7 +141,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
-				ctx := context.Background()
+				ctx := context.WithValue(context.Background(), promapi.AllPrometheusServers, proms)
 				if tc.ctx != nil {
 					ctx = tc.ctx()
 				}

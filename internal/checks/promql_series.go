@@ -70,6 +70,8 @@ To fully validate your changes it's best to first deploy the rules that generate
 	SeriesCheckCommonProblemDetails = `[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.`
 	SeriesCheckMinAgeDetails        = `You have a comment that tells pint how long can a metric be missing before it warns you about it but this comment is not formatted correctly.
 [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.`
+	SeriesCheckUnusedDisableComment = "One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax."
+	SeriesCheckUnusedRuleSetComment = "One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets labels that are used in the rule query.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax."
 )
 
 func NewSeriesCheck(prom *promapi.FailoverGroup) SeriesCheck {
@@ -118,8 +120,10 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 	params := promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration)
 
+	selectors := getSelectors(expr.Query)
+
 	done := map[string]bool{}
-	for _, selector := range getSelectors(expr.Query) {
+	for _, selector := range selectors {
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
@@ -531,6 +535,25 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		}
 	}
 
+	for _, disable := range orphanedDisableComments(ctx, rule, selectors) {
+		problems = append(problems, Problem{
+			Lines:    expr.Value.Lines,
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("pint %s comment `%s` check doesn't match any selector in this query", comments.DisableComment, disable.Match),
+			Details:  SeriesCheckUnusedDisableComment,
+			Severity: Warning,
+		})
+	}
+	for _, ruleSet := range orphanedRuleSetComments(c.Reporter(), rule, selectors) {
+		problems = append(problems, Problem{
+			Lines:    expr.Value.Lines,
+			Reporter: c.Reporter(),
+			Text:     fmt.Sprintf("pint %s comment `%s` doesn't match any label matcher in this query", comments.RuleSetComment, ruleSet.Value),
+			Details:  SeriesCheckUnusedRuleSetComment,
+			Severity: Warning,
+		})
+	}
+
 	return problems
 }
 
@@ -612,12 +635,7 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 
 func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelector) (minAge time.Duration, problems []Problem) {
 	minAge = time.Hour * 2
-	bareSelector := stripLabels(selector)
-	prefixes := []string{
-		c.Reporter() + " min-age ",
-		fmt.Sprintf("%s(%s) min-age ", c.Reporter(), bareSelector.String()),
-		fmt.Sprintf("%s(%s) min-age ", c.Reporter(), selector.String()),
-	}
+	prefixes := ruleSetMinAgePrefixes(c.Reporter(), selector)
 	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
 		for _, prefix := range prefixes {
 			if !strings.HasPrefix(ruleSet.Value, prefix) {
@@ -643,12 +661,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelec
 }
 
 func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.VectorSelector, labelName string) bool {
-	bareSelector := stripLabels(selector)
-	values := []string{
-		fmt.Sprintf("%s ignore/label-value %s", c.Reporter(), labelName),
-		fmt.Sprintf("%s(%s) ignore/label-value %s", c.Reporter(), bareSelector.String(), labelName),
-		fmt.Sprintf("%s(%s) ignore/label-value %s", c.Reporter(), selector.String(), labelName),
-	}
+	values := ruleSetIgnoreLabelValValues(c.Reporter(), labelName, selector)
 	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
 		for _, val := range values {
 			if ruleSet.Value == val {
@@ -748,6 +761,111 @@ func isDisabled(rule parser.Rule, selector promParser.VectorSelector) bool {
 	NEXT:
 	}
 	return false
+}
+
+func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []promParser.VectorSelector) (orhpaned []comments.Disable) {
+	var promNames, promTags []string
+	if val := ctx.Value(promapi.AllPrometheusServers); val != nil {
+		for _, server := range val.([]*promapi.FailoverGroup) {
+			promNames = append(promNames, server.Name())
+			promTags = append(promTags, server.Tags()...)
+		}
+	}
+
+	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
+		match := strings.TrimSuffix(strings.TrimPrefix(disable.Match, SeriesCheckName+"("), ")")
+		// Skip matching tags.
+		if strings.HasPrefix(match, "+") && slices.Contains(promTags, strings.TrimPrefix(match, "+")) {
+			continue
+		}
+		// Skip matching Prometheus servers.
+		if slices.Contains(promNames, match) {
+			continue
+		}
+		var wasUsed bool
+		if !strings.HasPrefix(disable.Match, SeriesCheckName+"(") || !strings.HasSuffix(disable.Match, ")") {
+			continue
+		}
+		for _, selector := range selectors {
+			// try full string or name match first
+			if match == selector.String() || match == selector.Name {
+				wasUsed = true
+				goto NEXT
+			}
+			// then try matchers
+			m, err := promParser.ParseMetricSelector(match)
+			if err != nil {
+				continue
+			}
+			var isMismatch bool
+			for _, l := range m {
+				var isMatch bool
+				for _, s := range selector.LabelMatchers {
+					if s.Type == l.Type && s.Name == l.Name && s.Value == l.Value {
+						isMatch = true
+						break
+					}
+				}
+				if !isMatch {
+					isMismatch = true
+					break
+				}
+			}
+			if !isMismatch {
+				wasUsed = true
+			}
+		}
+	NEXT:
+		if !wasUsed {
+			orhpaned = append(orhpaned, disable)
+		}
+	}
+	return orhpaned
+}
+
+func ruleSetIgnoreLabelValValues(reporter, labelName string, selector promParser.VectorSelector) []string {
+	bareSelector := stripLabels(selector)
+	return []string{
+		fmt.Sprintf("%s ignore/label-value %s", reporter, labelName),
+		fmt.Sprintf("%s(%s) ignore/label-value %s", reporter, bareSelector.String(), labelName),
+		fmt.Sprintf("%s(%s) ignore/label-value %s", reporter, selector.String(), labelName),
+	}
+}
+
+func ruleSetMinAgePrefixes(reporter string, selector promParser.VectorSelector) []string {
+	bareSelector := stripLabels(selector)
+	return []string{
+		reporter + " min-age ",
+		fmt.Sprintf("%s(%s) min-age ", reporter, bareSelector.String()),
+		fmt.Sprintf("%s(%s) min-age ", reporter, selector.String()),
+	}
+}
+
+func orphanedRuleSetComments(reporter string, rule parser.Rule, selectors []promParser.VectorSelector) (orhpaned []comments.RuleSet) {
+	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
+		var used bool
+		for _, selector := range selectors {
+			for _, lm := range selector.LabelMatchers {
+				for _, val := range ruleSetIgnoreLabelValValues(reporter, lm.Name, selector) {
+					if ruleSet.Value == val {
+						used = true
+						goto NEXT
+					}
+				}
+				for _, val := range ruleSetMinAgePrefixes(reporter, selector) {
+					if strings.HasPrefix(ruleSet.Value, val) {
+						used = true
+						goto NEXT
+					}
+				}
+			}
+		}
+	NEXT:
+		if !used {
+			orhpaned = append(orhpaned, ruleSet)
+		}
+	}
+	return orhpaned
 }
 
 func sinceDesc(t time.Time) (s string) {
