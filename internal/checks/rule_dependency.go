@@ -47,18 +47,18 @@ func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule 
 		return problems
 	}
 
+	filtered := nonRemovedEntries(entries)
+
+	for _, entry := range filtered {
+		if entry.Rule.Type() == rule.Type() && entry.Rule.Name() == rule.Name() {
+			// There's another rule with same type & name, do nothing.
+			return problems
+		}
+	}
+
 	var broken []*brokenDependency
 	var dep *brokenDependency
-	for _, entry := range entries {
-		if entry.State == discovery.Removed {
-			continue
-		}
-		if entry.PathError != nil {
-			continue
-		}
-		if entry.Rule.Error.Err != nil {
-			continue
-		}
+	for _, entry := range filtered {
 		if rule.RecordingRule != nil {
 			dep = c.usesVector(entry, rule.RecordingRule.Record.Value)
 		}
@@ -177,4 +177,20 @@ type brokenDependency struct {
 	path   string
 	name   string
 	line   int
+}
+
+func nonRemovedEntries(src []discovery.Entry) (dst []discovery.Entry) {
+	for _, entry := range src {
+		if entry.State == discovery.Removed {
+			continue
+		}
+		if entry.PathError != nil {
+			continue
+		}
+		if entry.Rule.Error.Err != nil {
+			continue
+		}
+		dst = append(dst, entry)
+	}
+	return dst
 }
