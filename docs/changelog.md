@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.62.1
+
+### Fixed
+
+- Fixed false positive warnings from [rule/dependency](checks/rule/dependency.md) check.
+
 ## v0.62.0
 
 ### Added
