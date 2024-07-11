@@ -50,7 +50,7 @@ level=INFO msg="Problems found" Bug=2 Warning=1
 rules.yml:8 Bug: `prom` Prometheus server at http://127.0.0.1:7160 didn't have any series for `up` metric in the last 1w. (promql/series)
  8 |     expr: up == 0
 
-rules.yml:8 Warning: pint disable comment `promql/series(xxx)` check doesn't match any selector in this query (promql/series)
+rules.yml:8 Warning: pint disable comment `promql/series(xxx)` doesn't match any selector in this query (promql/series)
  8 |     expr: up == 0
 
 rules.yml:16 Bug: `prom` Prometheus server at http://127.0.0.1:7160 didn't have any series for `up` metric in the last 1w. (promql/series)

@@ -7,6 +7,11 @@
 - [promql/series](checks/promql/series.md) check will now generate warnings if there are `# pint disable`
   or `# pint rule/set` comments that are not matching any valid query selector or Prometheus server.
 
+### Fixed
+
+- [promql/series](checks/promql/series.md) will now parse `rule/set` comments that target specific
+  time series selectors in PromQL the same way as `# pint disable` comments do.
+
 ## v0.61.2
 
 ### Fixed
