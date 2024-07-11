@@ -193,7 +193,7 @@ Duration must follow syntax documented [here](https://prometheus.io/docs/prometh
 To set `min-age` for specific metric:
 
 ```yaml
-# pint rule/set promql/series($metric_name) min-age $duration
+# pint rule/set promql/series($selector)) min-age $duration
 ```
 
 Example:

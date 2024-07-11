@@ -6,9 +6,9 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
-func HasVectorSelector(node *parser.PromQLNode) (vs []*promParser.VectorSelector) {
+func HasVectorSelector(node *parser.PromQLNode) (vs []promParser.VectorSelector) {
 	if n, ok := node.Expr.(*promParser.VectorSelector); ok {
-		vs = append(vs, n)
+		vs = append(vs, *n)
 	}
 
 	for _, child := range node.Children {

@@ -113,7 +113,7 @@ func TestReadContent(t *testing.T) {
 		},
 		{
 			input:  []byte("# pint ignore/begin\nfoo # pint ignore/line\nbar\n# pint ignore/begin"),
-			output: []byte("# pint ignore/begin\n    # pint ignore/line\n   \n# pint ignore/begin"),
+			output: []byte("# pint ignore/begin\n                      \n   \n# pint ignore/begin"),
 		},
 		{
 			input:  []byte("line1\nline2 # pint ignore/line\n"),
@@ -158,6 +158,10 @@ func TestReadContent(t *testing.T) {
 		{
 			input:  []byte("{#- hide this comment -#} # pint ignore/line\n"),
 			output: []byte("                          # pint ignore/line\n"),
+		},
+		{
+			input:  []byte("# pint ignore/begin\n  - alert: Ignored\n    # pint rule/set foo\n    # pint rule/set bar\n    expr: up\n# pint ignore/end\n"),
+			output: []byte("# pint ignore/begin\n                  \n                       \n                       \n            \n# pint ignore/end\n"),
 		},
 	}
 

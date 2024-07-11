@@ -63,7 +63,7 @@ func metricIgnored(metric, check, re string) string {
 }
 
 func unusedDisableText(m string) string {
-	return fmt.Sprintf("pint %s comment `%s` check doesn't match any selector in this query", comments.DisableComment, m)
+	return fmt.Sprintf("pint %s comment `%s` doesn't match any selector in this query", comments.DisableComment, m)
 }
 
 func unusedRuleSetText(m string) string {
@@ -1498,6 +1498,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#4 metric was present but disappeared / min-age / ok",
 			content: `
 - record: foo
+  # pint rule/set promql/series ignore/label-value instance
   # pint rule/set promql/series min-age 5d
   expr: sum(found{job="foo", instance="bar"})
 `,
@@ -1556,6 +1557,81 @@ func TestSeriesCheck(t *testing.T) {
 			content: `
 - record: foo
   # pint rule/set promql/series(found) min-age 5d
+  expr: sum(found{job="foo", instance="bar"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(found{instance="bar",job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(found)`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-7),
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{job=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(found{instance=~".+"})`},
+					},
+					resp: matrixResponse{
+						samples: []*model.SampleStream{
+							generateSampleStream(
+								map[string]string{},
+								time.Now().Add(time.Hour*24*-4).Add(time.Minute*-5),
+								time.Now(),
+								time.Minute*5,
+							),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#4 metric was present but disappeared / min-age with selector / match",
+			content: `
+- record: foo
+  # pint rule/set promql/series(found{instance="bar"}) min-age 5d
   expr: sum(found{job="foo", instance="bar"})
 `,
 			checker:    newSeriesCheck,
@@ -2234,6 +2310,118 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(foo{error="notfound"})`},
 					},
 					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#5 ignored label value / selector match",
+			content: `
+- record: foo
+  # pint rule/set promql/series(foo{}) ignore/label-value error
+  expr: sum(foo{error="notfound"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#5 ignored label value / selector mismatch",
+			content: `
+- record: foo
+  # pint rule/set promql/series(foo{job="bob"}) ignore/label-value error
+  expr: sum(foo{error="notfound"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
+						Details:  checks.SeriesCheckCommonProblemDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedRuleSetText(`promql/series(foo{job="bob"}) ignore/label-value error`),
+						Details:  checks.SeriesCheckUnusedRuleSetComment,
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
@@ -3504,6 +3692,59 @@ func TestSeriesCheck(t *testing.T) {
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
 			problems:   noProblems,
+		},
+		{
+			description: "disable comment with partial selector",
+			content: `
+# pint disable promql/series(foo{job="foo"})
+- record: my_series
+  expr: count(foo{env="prod", job="foo"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "disable comment with vector() fallback",
+			content: `
+- alert: Foo
+  # pint disable promql/series(metric1)
+  # pint disable promql/series(metric2)
+  # pint disable promql/series(metric3)
+  expr: |
+    (rate(metric2[5m]) or vector(0)) +
+    (rate(metric1[5m]) or vector(0)) +
+    (rate(metric3{log_name="samplerd"}[5m]) or vector(0))
+    > 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+		},
+		{
+			description: "unused rule/set comment",
+			content: `
+- alert : Foo
+  # pint rule/set promql/series(mymetric) ignore/label-value action
+  # pint rule/set promql/series(mymetric) ignore/label-value type
+  expr: (rate(mymetric{action="failure"}[2m]) or vector(0)) > 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
+						Details:  checks.SeriesCheckUnusedRuleSetComment,
+						Severity: checks.Warning,
+					},
+				}
+			},
 		},
 		{
 			description: "disable comment for a mismatched series",

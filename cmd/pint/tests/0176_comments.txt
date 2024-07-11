@@ -1,0 +1,45 @@
+http response prometheus /api/v1/status/flags 200 {"status":"success","data":{"storage.tsdb.retention.time": "1d"}}
+http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
+http response prometheus /api/v1/status/config 200 {"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}
+http response prometheus /api/v1/query_range 200 {"status":"success","data":{"resultType":"matrix","result":[]}}
+http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
+http start prometheus 127.0.0.1:7176
+
+pint.error --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tags=[] include=[] exclude=[]
+level=WARN msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" name=prom metric=up
+level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom metric=up
+rules/1.yml:15 Bug: `prom` Prometheus server at http://127.0.0.1:7176 didn't have any series for `up` metric in the last 1w. (promql/series)
+ 15 |     expr: up == 0
+
+level=INFO msg="Problems found" Bug=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yml --
+---
+groups:
+- name: "{{ source }}"
+  rules:
+# pint ignore/begin
+  - alert: Ignored
+    # pint rule/set promql/series(colo_metadata) ignore/label-value brand
+    # pint rule/set promql/series ignore/label-value colo_status
+    expr: count(colo_metadata{colo_status="v", brand="b1"}) > 0
+# pint ignore/end
+
+  # dummy comment 1
+  - alert: Active
+    # dummy comment 2
+    expr: up == 0
+
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:7176"
+  failover = []
+  timeout  = "5s"
+}

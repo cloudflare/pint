@@ -11,6 +11,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
 const (
@@ -52,7 +53,7 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 	}
 
 	done := map[string]struct{}{}
-	for _, selector := range getSelectors(expr.Query) {
+	for _, selector := range utils.HasVectorSelector(expr.Query) {
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
