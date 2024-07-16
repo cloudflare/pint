@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.62.2
+
+### Fixed
+
+- When using BitBucket reporter `pint ci` might create a comment longer than the limit allowed by BitBucket.
+  To avoid this pint will now truncate long comments.
+
 ## v0.62.1
 
 ### Fixed

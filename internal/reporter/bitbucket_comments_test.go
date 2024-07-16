@@ -3,6 +3,7 @@ package reporter
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 	"testing"
 	"time"
 
@@ -558,6 +559,49 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Text:     "This pint run would create 5 comment(s), which is more than 2 limit configured for pint.\n3 comments were skipped and won't be visibile on this PR.",
 					Severity: "NORMAL",
 					Anchor: BitBucketPendingCommentAnchor{
+						DiffType: "EFFECTIVE",
+					},
+				},
+			},
+		},
+		{
+			description: "truncate long comments",
+			maxComments: 2,
+			summary: Summary{reports: []Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "rule.yaml",
+						Name:          "rule.yaml",
+					},
+					ModifiedLines: []int{2, 3},
+					Problem: checks.Problem{
+						Severity: checks.Bug,
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Text:     strings.Repeat("X", maxCommentLength+1),
+						Reporter: "r1",
+					},
+				},
+			}},
+			changes: &bitBucketPRChanges{
+				pathModifiedLines: map[string][]int{
+					"rule.yaml": {2, 3},
+				},
+				pathLineMapping: map[string]map[int]int{
+					"rule.yaml": {2: 2, 3: 3},
+				},
+			},
+			comments: []BitBucketPendingComment{
+				{
+					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **r1** check.\n\n------\n\n" + strings.Repeat("X", maxCommentLength-98-4) + " ...",
+					Severity: "BLOCKER",
+					Anchor: BitBucketPendingCommentAnchor{
+						Path:     "rule.yaml",
+						Line:     2,
+						LineType: "ADDED",
+						FileType: "TO",
 						DiffType: "EFFECTIVE",
 					},
 				},
