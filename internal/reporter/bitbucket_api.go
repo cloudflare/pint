@@ -33,6 +33,8 @@ const (
 	NumberType     DataType = "NUMBER"
 	PercentageType DataType = "PERCENTAGE"
 	TextType       DataType = "TEXT"
+
+	maxCommentLength = 32768
 )
 
 type BitBucketReportData struct {
@@ -639,11 +641,19 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			severity = "NORMAL"
 		}
 
+		var text string
+		// BitBucket has a max comment length limit. If we hit it then truncate the comment.
+		if buf.Len() > maxCommentLength {
+			text = buf.String()[:maxCommentLength-4] + " ..."
+		} else {
+			text = buf.String()
+		}
+
 		pending := pendingComment{
 			severity: severity,
 			path:     reports[0].Path.SymlinkTarget,
 			line:     reports[0].Problem.Lines.Last,
-			text:     buf.String(),
+			text:     text,
 			anchor:   reports[0].Problem.Anchor,
 		}
 		comments = append(comments, pending.toBitBucketComment(changes))
