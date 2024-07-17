@@ -16,12 +16,20 @@ func newVectorMatchingCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewVectorMatchingCheck(prom)
 }
 
-func differentLabelsText(l, r string) string {
-	return fmt.Sprintf("This query will never return anything because the right and the left hand side have different labels: `[%s]` != `[%s]`.", l, r)
+func differentLabelsText(name, uri, q, l, r string) string {
+	return fmt.Sprintf("This query will never return anything on `%s` Prometheus server at %s because results from the right and the left hand side have different labels: `[%s]` != `[%s]`. Failing query: `%s`.", name, uri, l, r, q)
 }
 
-func usingMismatchText(f, l, r string) string {
-	return fmt.Sprintf("Using `%s` won't produce any results because both sides of the query have different labels: `[%s]` != `[%s]`.", f, l, r)
+func usingMismatchText(name, uri, q, f, l, r string) string {
+	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from both sides of the query have different labels: `[%s]` != `[%s]`. Failing query: `%s`.", f, name, uri, l, r, q)
+}
+
+func usingBothMissing(name, uri, q, f string) string {
+	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from both sides of the query don't have this label: `%s`.", f, name, uri, q)
+}
+
+func usingOneMissing(name, uri, q, side, f string) string {
+	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from the %s hand side of the query don't have this label: `%s`.", f, name, uri, side, q)
 }
 
 func differentFilters(k, lv, rv string) string {
@@ -49,7 +57,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -57,7 +65,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     differentLabelsText("instance, job, notfound", "instance, job"),
+						Text:     differentLabelsText("prom", uri, "foo_with_notfound / bar", "instance, job, notfound", "instance, job"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -194,7 +202,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / ignoring(xxx) app_registry\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -202,7 +210,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingMismatchText(`ignoring(xxx)`, "instance, job", "app_name"),
+						Text:     usingMismatchText("prom", uri, "foo / ignoring (xxx) app_registry", "ignoring(xxx)", "instance, job", "app_name"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -254,7 +262,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / on(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -262,7 +270,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "Using `on(notfound)` won't produce any results because both sides of the query don't have this label.",
+						Text:     usingBothMissing("prom", uri, "foo / on (notfound) bar", "on(notfound)"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -503,7 +511,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / on(notfound) bar_with_notfound\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -511,7 +519,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "Using `on(notfound)` won't produce any results because the left hand side of the query doesn't have this label: `foo`.",
+						Text:     usingOneMissing("prom", uri, "foo", "left", "on(notfound)"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -561,7 +569,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / on(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -569,7 +577,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "Using `on(notfound)` won't produce any results because the right hand side of the query doesn't have this label: `bar`.",
+						Text:     usingOneMissing("prom", uri, "bar", "right", "on(notfound)"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -619,7 +627,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -627,7 +635,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "Using `on(app_name)` won't produce any results because the left hand side of the query doesn't have this label: `(memory_bytes / ignoring (job) (memory_limit > 0))`.",
+						Text:     usingOneMissing("prom", uri, "(memory_bytes / ignoring (job) (memory_limit > 0))", "left", "on(app_name)"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -810,7 +818,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -818,7 +826,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job, notfound]` != `[instance, job]`.",
+						Text:     differentLabelsText("prom", uri, "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar", "instance, job, notfound", "instance, job"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -941,7 +949,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
+			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -949,7 +957,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     "This query will never return anything because the right and the left hand side have different labels: `[instance, job]` != `[dev, instance, job]`.",
+						Text:     differentLabelsText("prom", uri, "(foo / ignoring (notfound) foo_with_notfound) / (memory_bytes / ignoring (job) memory_limit)", "instance, job", "dev, instance, job"),
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
