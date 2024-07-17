@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/neilotoole/slogt"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
@@ -626,6 +627,9 @@ func TestBitBucketMakeComments(t *testing.T) {
 			if diff := cmp.Diff(tc.comments, comments); diff != "" {
 				t.Errorf("api.makeComments() returned wrong output (-want +got):\n%s", diff)
 				return
+			}
+			for _, comment := range comments {
+				require.LessOrEqual(t, len(comment.Text), maxCommentLength)
 			}
 		})
 	}
