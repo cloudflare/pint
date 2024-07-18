@@ -171,7 +171,7 @@ func actionCI(c *cli.Context) error {
 		); err != nil {
 			return err
 		}
-		reps = append(reps, gl)
+		reps = append(reps, reporter.NewCommentReporter(gl))
 	}
 
 	meta.cfg.Repository = detectRepository(meta.cfg.Repository)
@@ -191,6 +191,12 @@ func actionCI(c *cli.Context) error {
 			return fmt.Errorf("got not a valid number via GITHUB_PULL_REQUEST_NUMBER: %w", err)
 		}
 
+		var headCommit string
+		headCommit, err = git.HeadCommit(git.RunGit)
+		if err != nil {
+			return errors.New("failed to get the HEAD commit")
+		}
+
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
 		var gr reporter.GithubReporter
 		if gr, err = reporter.NewGithubReporter(
@@ -203,11 +209,11 @@ func actionCI(c *cli.Context) error {
 			meta.cfg.Repository.GitHub.Repo,
 			prNum,
 			meta.cfg.Repository.GitHub.MaxComments,
-			git.RunGit,
+			headCommit,
 		); err != nil {
 			return err
 		}
-		reps = append(reps, gr)
+		reps = append(reps, reporter.NewCommentReporter(gr))
 	}
 
 	minSeverity, err := checks.ParseSeverity(c.String(failOnFlag))

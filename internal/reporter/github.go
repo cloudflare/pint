@@ -13,14 +13,13 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 )
 
 var reviewBody = "### This pull request was validated by [pint](https://github.com/cloudflare/pint).\n"
 
 type GithubReporter struct {
-	gitCmd git.CommandRunner
+	headCommit string
 
 	client      *github.Client
 	version     string
@@ -34,9 +33,13 @@ type GithubReporter struct {
 	maxComments int
 }
 
+type ghCommentMeta struct {
+	id int64
+}
+
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
-func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, gitCmd git.CommandRunner) (_ GithubReporter, err error) {
+func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, headCommit string) (_ GithubReporter, err error) {
 	slog.Info(
 		"Will report problems to GitHub",
 		slog.String("baseURL", baseURL),
@@ -46,6 +49,7 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 		slog.String("repo", repo),
 		slog.Int("pr", prNum),
 		slog.Int("maxComments", maxComments),
+		slog.String("headCommit", headCommit),
 	)
 	gr := GithubReporter{
 		version:     version,
@@ -57,7 +61,7 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 		repo:        repo,
 		prNum:       prNum,
 		maxComments: maxComments,
-		gitCmd:      gitCmd,
+		headCommit:  headCommit,
 	}
 
 	ts := oauth2.StaticTokenSource(
@@ -76,36 +80,122 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 	return gr, nil
 }
 
-// Submit submits the summary to GitHub.
-func (gr GithubReporter) Submit(summary Summary) error {
-	headCommit, err := git.HeadCommit(gr.gitCmd)
-	if err != nil {
-		return fmt.Errorf("failed to get HEAD commit: %w", err)
-	}
-	slog.Info("Got HEAD commit from git", slog.String("commit", headCommit))
+func (gr GithubReporter) Describe() string {
+	return "GitHub"
+}
 
-	review, err := gr.findExistingReview()
+func (gr GithubReporter) Destinations(context.Context) ([]any, error) {
+	return []any{gr.prNum}, nil
+}
+
+func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, errs []error) error {
+	review, err := gr.findExistingReview(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to list pull request reviews: %w", err)
 	}
 	if review != nil {
-		if err = gr.updateReview(review, summary); err != nil {
+		if err = gr.updateReview(ctx, review, s); err != nil {
 			return fmt.Errorf("failed to update pull request review: %w", err)
 		}
 	} else {
-		if err = gr.createReview(headCommit, summary); err != nil {
+		if err = gr.createReview(ctx, s); err != nil {
 			return fmt.Errorf("failed to create pull request review: %w", err)
 		}
 	}
 
-	return gr.addReviewComments(headCommit, summary)
+	if gr.maxComments > 0 && len(s.reports) > gr.maxComments {
+		if err = gr.generalComment(ctx, tooManyCommentsMsg(len(s.reports), gr.maxComments)); err != nil {
+			errs = append(errs, fmt.Errorf("failed to create general comment: %w", err))
+		}
+	}
+	if len(errs) > 0 {
+		if err = gr.generalComment(ctx, errsToComment(errs)); err != nil {
+			return fmt.Errorf("failed to create general comment: %w", err)
+		}
+	}
+
+	return nil
 }
 
-func (gr GithubReporter) findExistingReview() (*github.PullRequestReview, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
+func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, error) {
+	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
 	defer cancel()
 
-	reviews, _, err := gr.client.PullRequests.ListReviews(ctx, gr.owner, gr.repo, gr.prNum, nil)
+	slog.Debug("Getting the list of pull request comments", slog.Int("pr", gr.prNum))
+	existing, _, err := gr.client.PullRequests.ListComments(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list pull request reviews: %w", err)
+	}
+
+	comments := make([]ExistingComment, 0, len(existing))
+	for _, ec := range existing {
+		if ec.GetPath() == "" {
+			slog.Debug("Skipping general comment", slog.Int64("id", ec.GetID()))
+			continue
+		}
+		comments = append(comments, ExistingComment{
+			path: ec.GetPath(),
+			text: ec.GetBody(),
+			line: ec.GetLine(),
+			meta: ghCommentMeta{id: ec.GetID()},
+		})
+	}
+
+	return comments, nil
+}
+
+func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) error {
+	var side string
+	if p.anchor == checks.AnchorBefore {
+		side = "LEFT"
+	} else {
+		side = "RIGHT"
+	}
+
+	comment := &github.PullRequestComment{
+		CommitID: github.String(gr.headCommit),
+		Path:     github.String(p.path),
+		Body:     github.String(p.text),
+		Line:     github.Int(p.line),
+		Side:     github.String(side),
+	}
+
+	slog.Debug("Creating a review comment", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
+
+	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	defer cancel()
+
+	_, _, err := gr.client.PullRequests.CreateComment(reqCtx, gr.owner, gr.repo, gr.prNum, comment)
+	return err
+}
+
+func (gr GithubReporter) Delete(_ context.Context, _ any, _ ExistingComment) error {
+	return nil
+}
+
+func (gr GithubReporter) CanDelete(ExistingComment) bool {
+	return false
+}
+
+func (gr GithubReporter) CanCreate(done int) bool {
+	return done < gr.maxComments
+}
+
+func (gr GithubReporter) IsEqual(existing ExistingComment, pending PendingComment) bool {
+	if existing.path != pending.path {
+		return false
+	}
+	if existing.line != pending.line {
+		return false
+	}
+	return strings.Trim(existing.text, "\n") == strings.Trim(pending.text, "\n")
+}
+
+func (gr GithubReporter) findExistingReview(ctx context.Context) (*github.PullRequestReview, error) {
+	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	defer cancel()
+
+	reviews, _, err := gr.client.PullRequests.ListReviews(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -119,14 +209,14 @@ func (gr GithubReporter) findExistingReview() (*github.PullRequestReview, error)
 	return nil, nil
 }
 
-func (gr GithubReporter) updateReview(review *github.PullRequestReview, summary Summary) error {
+func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRequestReview, summary Summary) error {
 	slog.Info("Updating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)))
 
-	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
+	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
 	defer cancel()
 
 	_, _, err := gr.client.PullRequests.UpdateReview(
-		ctx,
+		reqCtx,
 		gr.owner,
 		gr.repo,
 		gr.prNum,
@@ -136,81 +226,19 @@ func (gr GithubReporter) updateReview(review *github.PullRequestReview, summary 
 	return err
 }
 
-func (gr GithubReporter) addReviewComments(headCommit string, summary Summary) error {
-	slog.Info("Creating review comments")
+func (gr GithubReporter) createReview(ctx context.Context, summary Summary) error {
+	slog.Info("Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", gr.headCommit))
 
-	existingComments, err := gr.getReviewComments()
-	if err != nil {
-		return err
-	}
-
-	var added int
-	for _, rep := range summary.Reports() {
-		comment := reportToGitHubComment(headCommit, rep)
-
-		var found bool
-		for _, ec := range existingComments {
-			if ec.GetBody() == comment.GetBody() &&
-				ec.GetCommitID() == comment.GetCommitID() &&
-				ec.GetLine() == comment.GetLine() {
-				found = true
-				break
-			}
-		}
-		if found {
-			slog.Debug("Comment already exist",
-				slog.String("path", comment.GetPath()),
-				slog.Int("line", comment.GetLine()),
-				slog.String("commit", comment.GetCommitID()),
-				slog.String("body", comment.GetBody()),
-			)
-			continue
-		}
-
-		if err := gr.createComment(comment); err != nil {
-			return err
-		}
-		added++
-
-		if added >= gr.maxComments {
-			return gr.tooManyComments(len(summary.Reports()))
-		}
-	}
-
-	return nil
-}
-
-func (gr GithubReporter) getReviewComments() ([]*github.PullRequestComment, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
-	defer cancel()
-
-	comments, _, err := gr.client.PullRequests.ListComments(ctx, gr.owner, gr.repo, gr.prNum, nil)
-	return comments, err
-}
-
-func (gr GithubReporter) createComment(comment *github.PullRequestComment) error {
-	slog.Debug("Creating review comment", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
-
-	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
-	defer cancel()
-
-	_, _, err := gr.client.PullRequests.CreateComment(ctx, gr.owner, gr.repo, gr.prNum, comment)
-	return err
-}
-
-func (gr GithubReporter) createReview(headCommit string, summary Summary) error {
-	slog.Info("Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", headCommit))
-
-	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
+	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
 	defer cancel()
 
 	_, resp, err := gr.client.PullRequests.CreateReview(
-		ctx,
+		reqCtx,
 		gr.owner,
 		gr.repo,
 		gr.prNum,
 		&github.PullRequestReviewRequest{
-			CommitID: github.String(headCommit),
+			CommitID: github.String(gr.headCommit),
 			Body:     github.String(formatGHReviewBody(gr.version, summary)),
 			Event:    github.String("COMMENT"),
 		},
@@ -300,53 +328,16 @@ func formatGHReviewBody(version string, summary Summary) string {
 	return b.String()
 }
 
-func reportToGitHubComment(headCommit string, rep Report) *github.PullRequestComment {
-	var msgPrefix, msgSuffix string
-	reportLine, srcLine := moveReportedLine(rep)
-	if reportLine != srcLine {
-		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, comment moved here: ", srcLine)
-	}
-	if rep.Problem.Details != "" {
-		msgSuffix = "\n\n" + rep.Problem.Details
-	}
-
-	var side string
-	if rep.Problem.Anchor == checks.AnchorBefore {
-		side = "LEFT"
-	} else {
-		side = "RIGHT"
-	}
-
-	c := github.PullRequestComment{
-		CommitID: github.String(headCommit),
-		Path:     github.String(rep.Path.SymlinkTarget),
-		Body: github.String(fmt.Sprintf(
-			"%s [%s](https://cloudflare.github.io/pint/checks/%s.html): %s%s%s",
-			problemIcon(rep.Problem.Severity),
-			rep.Problem.Reporter,
-			rep.Problem.Reporter,
-			msgPrefix,
-			rep.Problem.Text,
-			msgSuffix,
-		)),
-		Line: github.Int(reportLine),
-		Side: github.String(side),
-	}
-
-	return &c
-}
-
-func (gr GithubReporter) tooManyComments(nrComments int) error {
+func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
 	comment := github.IssueComment{
-		Body: github.String(fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
-%d comments were skipped and won't be visibile on this PR.`, nrComments, gr.maxComments, nrComments-gr.maxComments)),
+		Body: github.String(body),
 	}
 
 	slog.Debug("Creating PR comment", slog.String("body", comment.GetBody()))
 
-	ctx, cancel := context.WithTimeout(context.Background(), gr.timeout)
+	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
 	defer cancel()
 
-	_, _, err := gr.client.Issues.CreateComment(ctx, gr.owner, gr.repo, gr.prNum, &comment)
+	_, _, err := gr.client.Issues.CreateComment(reqCtx, gr.owner, gr.repo, gr.prNum, &comment)
 	return err
 }
