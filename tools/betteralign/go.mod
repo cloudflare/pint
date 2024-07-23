@@ -2,7 +2,7 @@ module _
 
 go 1.22.0
 
-require github.com/dkorunic/betteralign v0.4.5
+require github.com/dkorunic/betteralign v0.5.0
 
 require (
 	github.com/KimMachineGun/automemlimit v0.6.1 // indirect
