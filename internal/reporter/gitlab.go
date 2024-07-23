@@ -138,31 +138,22 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 	return dsts, nil
 }
 
-func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs []error) error {
+func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs []error) (err error) {
 	mr := dst.(gitlabMR)
 	if gl.maxComments > 0 && len(s.reports) > gl.maxComments {
-		if err := gl.generalComment(ctx, mr.mrID, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
-			return err
+		if err = gl.generalComment(ctx, mr.mrID, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
+			errs = append(errs, fmt.Errorf("failed to create general comment: %w", err))
 		}
 	}
 	if len(errs) > 0 {
-		var buf strings.Builder
-		buf.WriteString("There were some errors when pint was reporting problems via GitLab APIs.\n")
-		buf.WriteString("Some review comments might be outdated or missing.\n")
-		buf.WriteString("List of all errors:\n\n")
-		for _, err := range errs {
-			buf.WriteString("- `")
-			buf.WriteString(err.Error())
-			buf.WriteString("`\n")
-		}
-		if err := gl.generalComment(ctx, mr.mrID, buf.String()); err != nil {
-			return err
+		if err = gl.generalComment(ctx, mr.mrID, errsToComment(errs)); err != nil {
+			return fmt.Errorf("failed to create general comment: %w", err)
 		}
 	}
 	return nil
 }
 
-func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingCommentV2, error) {
+func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingComment, error) {
 	mr := dst.(gitlabMR)
 	slog.Debug("Getting the list of merge request discussions", slog.Int("mr", mr.mrID))
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
@@ -171,9 +162,9 @@ func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingCommentV2
 	if err != nil {
 		return nil, err
 	}
-	comments := make([]ExistingCommentV2, 0, len(discs))
+	comments := make([]ExistingComment, 0, len(discs))
 	for _, disc := range discs {
-		var c ExistingCommentV2
+		var c ExistingComment
 		for _, note := range disc.Notes {
 			if note.System {
 				goto NEXT
@@ -210,7 +201,7 @@ func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingCommentV2
 	return comments, nil
 }
 
-func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingCommentV2) error {
+func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingComment) error {
 	mr := dst.(gitlabMR)
 	opt := reportToGitLabDiscussion(comment, mr.diffs, mr.version)
 	if opt == nil {
@@ -223,7 +214,7 @@ func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingCom
 	return err
 }
 
-func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingCommentV2) error {
+func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingComment) error {
 	mr := dst.(gitlabMR)
 	c := comment.meta.(gitlabComment)
 	slog.Debug("Deleting stale merge request discussion note",
@@ -243,7 +234,7 @@ func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingCo
 	return err
 }
 
-func (gl GitLabReporter) IsEqual(existing ExistingCommentV2, pending PendingCommentV2) bool {
+func (gl GitLabReporter) IsEqual(existing ExistingComment, pending PendingComment) bool {
 	if existing.path != pending.path {
 		return false
 	}
@@ -253,11 +244,12 @@ func (gl GitLabReporter) IsEqual(existing ExistingCommentV2, pending PendingComm
 	return strings.Trim(existing.text, "\n") == strings.Trim(pending.text, "\n")
 }
 
-func (gl GitLabReporter) CanCreate(done int) (bool, error) {
-	if done >= gl.maxComments {
-		return false, errors.New(tooManyCommentsMsg(done, gl.maxComments))
-	}
-	return true, nil
+func (gl GitLabReporter) CanDelete(ExistingComment) bool {
+	return true
+}
+
+func (gl GitLabReporter) CanCreate(done int) bool {
+	return done < gl.maxComments
 }
 
 func (gl *GitLabReporter) getUserID(ctx context.Context) (int, error) {
@@ -333,7 +325,7 @@ func (gl GitLabReporter) generalComment(ctx context.Context, mrNum int, msg stri
 	return err
 }
 
-func reportToGitLabDiscussion(pending PendingCommentV2, diffs []*gitlab.MergeRequestDiff, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
+func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeRequestDiff, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
 	diff := getDiffForPath(diffs, pending.path)
 	if diff == nil {
 		slog.Debug("Skipping report for path with no GitLab diff",
@@ -474,11 +466,7 @@ func loggifyDiscussion(opt *gitlab.CreateMergeRequestDiscussionOptions) (attrs [
 	return attrs
 }
 
-func (gl GitLabReporter) Submit(summary Summary) (err error) {
-	return Submit(context.Background(), summary, gl)
-}
-
 func tooManyCommentsMsg(nr, max int) string {
 	return fmt.Sprintf(`This pint run would create %d comment(s), which is more than the limit configured for pint (%d).
-	%d comment(s) were skipped and won't be visibile on this PR.`, nr, max, nr-max)
+%d comment(s) were skipped and won't be visibile on this PR.`, nr, max, nr-max)
 }

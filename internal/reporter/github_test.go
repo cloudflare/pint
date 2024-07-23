@@ -1,6 +1,7 @@
 package reporter_test
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"log/slog"
@@ -15,7 +16,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 )
@@ -24,7 +24,6 @@ func TestGithubReporter(t *testing.T) {
 	type testCaseT struct {
 		httpHandler http.Handler
 		error       func(uri string) string
-		gitCmd      git.CommandRunner
 
 		description string
 
@@ -45,16 +44,9 @@ func TestGithubReporter(t *testing.T) {
   expr: sum(errors) by (job)
 `))
 
-	blameLine := func(sha string, line int, filename, content string) string {
-		return fmt.Sprintf(`%s %d %d 1
-filename %s
-	%s
-`, sha, line, line, filename, content)
-	}
-
 	for _, tc := range []testCaseT{
 		{
-			description: "timeout errors out",
+			description: "list pull requests timeout",
 			owner:       "foo",
 			repo:        "bar",
 			token:       "something",
@@ -65,16 +57,6 @@ filename %s
 				_, _ = w.Write([]byte("OK"))
 			}),
 			timeout: 100 * time.Millisecond,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			error: func(_ string) string {
 				return "failed to list pull request reviews: context deadline exceeded"
 			},
@@ -107,16 +89,6 @@ filename %s
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					w.WriteHeader(http.StatusBadRequest)
@@ -151,6 +123,16 @@ filename %s
 			},
 		},
 		{
+			description: "no problems",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			reports:     []reporter.Report{},
+		},
+		{
 			description: "happy path",
 			owner:       "foo",
 			repo:        "bar",
@@ -158,16 +140,6 @@ filename %s
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -198,16 +170,6 @@ filename %s
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					w.WriteHeader(http.StatusBadGateway)
@@ -249,16 +211,6 @@ filename %s
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
@@ -304,16 +256,6 @@ filename %s
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
@@ -355,16 +297,6 @@ filename %s
 			prNum:       123,
 			maxComments: 2,
 			timeout:     time.Second,
-			gitCmd: func(args ...string) ([]byte, error) {
-				if args[0] == "rev-parse" {
-					return []byte("fake-commit-id"), nil
-				}
-				if args[0] == "blame" {
-					content := blameLine("fake-commit-id", 2, "foo.txt", "up == 0")
-					return []byte(content), nil
-				}
-				return nil, nil
-			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
@@ -378,8 +310,8 @@ filename %s
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
 					switch b {
-					case `{"body":":stop_sign: [mock1](https://cloudflare.github.io/pint/checks/mock1.html): syntax error1\n\nsyntax details1","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
-					case `{"body":":stop_sign: [mock2](https://cloudflare.github.io/pint/checks/mock2.html): syntax error2\n\nsyntax details2","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"fake-commit-id"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock1** check.\n\n------\n\nsyntax error1\n\nsyntax details1\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock1.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock2** check.\n\n------\n\nsyntax error2\n\nsyntax details2\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock2.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
 					case `{"body":"This pint run would create 4 comment(s), which is more than 2 limit configured for pint.\n2 comments were skipped and won't be visibile on this PR."}`:
 					default:
 						t.Errorf("Unexpected comment: %s", b)
@@ -387,6 +319,219 @@ filename %s
 				}
 				_, _ = w.Write([]byte(""))
 			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock1",
+						Text:     "syntax error1",
+						Details:  "syntax details1",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock2",
+						Text:     "syntax error2",
+						Details:  "syntax details2",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock3",
+						Text:     "syntax error3",
+						Details:  "syntax details3",
+						Severity: checks.Fatal,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock4",
+						Text:     "syntax error4",
+						Details:  "syntax details4",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "maxComments 2, too many comments comment error",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 2,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":1,"commit_id":"fake-commit-id","path":"foo.txt","line":2,"body":":stop_sign: [mock](https://cloudflare.github.io/pint/checks/mock.html): syntax error\n\nsyntax details"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					if b == `{"body":"This pint run would create 4 comment(s), which is more than the limit configured for pint (2).\n2 comment(s) were skipped and won't be visibile on this PR."}` {
+						w.WriteHeader(http.StatusInternalServerError)
+						_, _ = w.Write([]byte("Cannot create issue comment"))
+						return
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock1",
+						Text:     "syntax error1",
+						Details:  "syntax details1",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock2",
+						Text:     "syntax error2",
+						Details:  "syntax details2",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock3",
+						Text:     "syntax error3",
+						Details:  "syntax details3",
+						Severity: checks.Fatal,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock4",
+						Text:     "syntax error4",
+						Details:  "syntax details4",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "general comment error",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 2,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[{"id":1,"commit_id":"fake-commit-id","path":"foo.txt","line":2,"body":":stop_sign: [mock](https://cloudflare.github.io/pint/checks/mock.html): syntax error\n\nsyntax details"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/issues/123/comments" {
+					w.WriteHeader(http.StatusInternalServerError)
+					_, _ = w.Write([]byte("Cannot create issue comment"))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			error: func(uri string) string {
+				return fmt.Sprintf("failed to create general comment: POST %s/api/v3/repos/foo/bar/issues/123/comments: 500  []", uri)
+			},
 			reports: []reporter.Report{
 				{
 					Path: discovery.Path{
@@ -503,11 +648,11 @@ filename %s
 				tc.repo,
 				tc.prNum,
 				tc.maxComments,
-				tc.gitCmd,
+				"HEAD",
 			)
 			require.NoError(t, err)
 
-			err = r.Submit(reporter.NewSummary(tc.reports))
+			err = reporter.Submit(context.Background(), reporter.NewSummary(tc.reports), r)
 			if tc.error == nil {
 				require.NoError(t, err)
 			} else {

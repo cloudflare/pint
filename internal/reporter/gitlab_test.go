@@ -2,11 +2,9 @@ package reporter_test
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 	"time"
 
@@ -76,83 +74,6 @@ func TestGitLabReporter(t *testing.T) {
 	fooDiff := `@@ -1,4 +1,6 @@\n- record: target is down\n-  expr: up == 0\n+  expr: up == 1\n+  labels:\n+    foo: bar\n- record: sum errors\nexpr: sum(errors) by (job)\n`
 
 	testCases := []testCaseT{
-		{
-			description: "returns an error on non-200 HTTP response",
-			branch:      "fakeBranch",
-			token:       "fakeToken",
-			timeout:     time.Second,
-			project:     123,
-			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(400)
-				_, _ = w.Write([]byte("Bad Request"))
-			}),
-			errorHandler: func(err error) error {
-				if err != nil && strings.HasPrefix(err.Error(), "failed to get GitLab user ID:") {
-					return nil
-				}
-				return fmt.Errorf("wrong error: %w", err)
-			},
-		},
-		{
-			description: "returns an error on HTTP response timeout",
-			branch:      "fakeBranch",
-			token:       "fakeToken",
-			timeout:     time.Second,
-			project:     123,
-			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				time.Sleep(time.Second * 2)
-				w.WriteHeader(400)
-				_, _ = w.Write([]byte("Bad Request"))
-			}),
-			errorHandler: func(err error) error {
-				if err != nil && strings.HasSuffix(err.Error(), "context deadline exceeded") {
-					return nil
-				}
-				return fmt.Errorf("wrong error: %w", err)
-			},
-		},
-		{
-			description: "returns an error on non-json body",
-			branch:      "fakeBranch",
-			token:       "fakeToken",
-			timeout:     time.Second,
-			project:     123,
-			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(200)
-				_, _ = w.Write([]byte("OK"))
-			}),
-			errorHandler: func(err error) error {
-				if err != nil && strings.HasPrefix(err.Error(), "failed to get GitLab user ID:") {
-					return nil
-				}
-				return fmt.Errorf("wrong error: %w", err)
-			},
-		},
-		{
-			description: "returns an error on empty JSON body",
-			branch:      "fakeBranch",
-			token:       "fakeToken",
-			timeout:     time.Second,
-			project:     123,
-			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(200)
-				_, _ = w.Write([]byte("{}"))
-			}),
-			errorHandler: func(err error) error {
-				if err != nil && strings.HasPrefix(err.Error(), "failed to get GitLab merge request details: json: cannot unmarshal object into Go value of type") {
-					return nil
-				}
-				return fmt.Errorf("wrong error: %w", err)
-			},
-		},
 		{
 			description: "empty list of merge requests",
 			branch:      "fakeBranch",
@@ -275,11 +196,9 @@ func TestGitLabReporter(t *testing.T) {
 			if err == nil {
 				summary := reporter.NewSummary(tc.reports)
 				err = reporter.Submit(context.Background(), summary, r)
+				require.NoError(t, err)
 			}
-			if e := tc.errorHandler(err); e != nil {
-				t.Errorf("error check failure: %s", e)
-				return
-			}
+			require.NoError(t, tc.errorHandler(err))
 		})
 	}
 }

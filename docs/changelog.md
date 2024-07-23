@@ -5,6 +5,7 @@
 ### Changed
 
 - [promql/vector_matching](checks/promql/vector_matching.md) will now report more details, including which Prometheus server reports problems and which part of the query is the issue.
+- GitHub report code was refactored, it should behave as before.
 
 ## v0.62.2
 
