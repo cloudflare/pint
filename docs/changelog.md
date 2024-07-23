@@ -2,6 +2,10 @@
 
 ## v0.63.0
 
+### Fixed
+
+- Fixed false positive warnings from [alerts/comparison](checks/alerts/comparison.md) when using `absent_over_time()`.
+
 ### Changed
 
 - [promql/vector_matching](checks/promql/vector_matching.md) will now report more details, including which Prometheus server reports problems and which part of the query is the issue.

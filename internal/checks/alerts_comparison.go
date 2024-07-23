@@ -116,8 +116,10 @@ func hasComparision(n promParser.Node) *promParser.BinaryExpr {
 }
 
 func isAbsent(node promParser.Node) bool {
-	if node, ok := node.(*promParser.Call); ok && (node.Func.Name == "absent") {
-		return true
+	if node, ok := node.(*promParser.Call); ok {
+		if node.Func.Name == "absent" || node.Func.Name == "absent_over_time" {
+			return true
+		}
 	}
 
 	for _, child := range promParser.Children(node) {
