@@ -19,6 +19,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
   },
   "checks": {
     "enabled": [
+      "alerts/absent",
       "alerts/annotation",
       "alerts/count",
       "alerts/external_labels",

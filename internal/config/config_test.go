@@ -194,7 +194,8 @@ prometheus "prom" {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.RegexpCheckName,
+				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
@@ -202,6 +203,7 @@ prometheus "prom" {
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.CounterCheckName + "(prom)",
+				checks.AlertsAbsentCheckName + "(prom)",
 			},
 		},
 		{
@@ -227,7 +229,8 @@ prometheus "prom" {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.RegexpCheckName,
+				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
@@ -235,6 +238,7 @@ prometheus "prom" {
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.CounterCheckName + "(prom)",
+				checks.AlertsAbsentCheckName + "(prom)",
 			},
 		},
 		{
@@ -380,7 +384,8 @@ prometheus "prom" {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.RegexpCheckName,
+				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
@@ -388,6 +393,7 @@ prometheus "prom" {
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.CounterCheckName + "(prom)",
+				checks.AlertsAbsentCheckName + "(prom)",
 			},
 		},
 		{
@@ -418,7 +424,8 @@ prometheus "ignore" {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RateCheckName + "(prom)",
+				checks.RegexpCheckName,
+				checks.RateCheckName + "(prom)",
 				checks.SeriesCheckName + "(prom)",
 				checks.VectorMatchingCheckName + "(prom)",
 				checks.RangeQueryCheckName + "(prom)",
@@ -426,6 +433,7 @@ prometheus "ignore" {
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.CounterCheckName + "(prom)",
+				checks.AlertsAbsentCheckName + "(prom)",
 			},
 		},
 		{
@@ -475,7 +483,8 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.AggregationCheckName + "(job:true)",
+				checks.RegexpCheckName,
+				checks.AggregationCheckName + "(job:true)",
 				checks.AggregationCheckName + "(instance:false)",
 				checks.AggregationCheckName + "(rack:false)",
 			},
@@ -512,7 +521,8 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.AggregationCheckName + "(job:true)",
+				checks.RegexpCheckName,
+				checks.AggregationCheckName + "(job:true)",
 				checks.AggregationCheckName + "(rack:false)",
 			},
 		},
@@ -591,11 +601,13 @@ prometheus "prom2" {
 				checks.RangeQueryCheckName + "(prom1)",
 				checks.LabelsConflictCheckName + "(prom1)",
 				checks.AlertsExternalLabelsCheckName + "(prom1)",
+				checks.AlertsAbsentCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
 				checks.RuleDuplicateCheckName + "(prom2)",
 				checks.CounterCheckName + "(prom2)",
+				checks.AlertsAbsentCheckName + "(prom2)",
 				checks.CostCheckName + "(prom1)",
 			},
 		},
@@ -656,7 +668,8 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.LabelCheckName + "(team:true)",
+				checks.RegexpCheckName,
+				checks.LabelCheckName + "(team:true)",
 				checks.AnnotationCheckName + "(summary:true)",
 				checks.LabelCheckName + "(team:false)",
 				checks.AnnotationCheckName + "(summary=~^foo.+$:true)",
@@ -763,7 +776,8 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RejectCheckName + "(key=~'^http://.+$')",
+				checks.RegexpCheckName,
+				checks.RejectCheckName + "(key=~'^http://.+$')",
 				checks.RejectCheckName + "(val=~'^http://.+$')",
 				checks.RejectCheckName + "(key=~'^.* +.*$')",
 				checks.RejectCheckName + "(val=~'^$')",
@@ -902,7 +916,8 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
+				checks.RegexpCheckName,
+				checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
 			},
 		},
 		{
@@ -1006,7 +1021,8 @@ rule {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
+				checks.RegexpCheckName,
+				checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
 			},
 		},
 		{
@@ -1027,6 +1043,7 @@ checks {
 	"promql/range_query",
 	"rule/duplicate",
 	"labels/conflict",
+	"alerts/absent",
   ]
 }
 prometheus "prom1" {
@@ -1103,6 +1120,7 @@ prometheus "prom1" {
 				checks.LabelsConflictCheckName + "(prom1)",
 				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.CounterCheckName + "(prom1)",
+				checks.AlertsAbsentCheckName + "(prom1)",
 				checks.AlertsCheckName + "(prom1)",
 			},
 		},
@@ -1655,6 +1673,7 @@ checks {
 				checks.LabelsConflictCheckName + "(prom1)",
 				checks.AlertsExternalLabelsCheckName + "(prom1)",
 				checks.CounterCheckName + "(prom1)",
+				checks.AlertsAbsentCheckName + "(prom1)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
@@ -1662,6 +1681,7 @@ checks {
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
 				checks.CounterCheckName + "(prom2)",
+				checks.AlertsAbsentCheckName + "(prom2)",
 			},
 			disabledChecks: []string{"promql/rate"},
 		},
@@ -1698,6 +1718,7 @@ prometheus "prom3" {
 # pint disable promql/rate(+disable)
 # pint disable promql/vector_matching(+disable)
 # pint disable rule/duplicate(+disable)
+# pint disable alerts/absent(+disable)
 - record: foo
   expr: sum(foo)
 `),
@@ -1716,6 +1737,7 @@ prometheus "prom3" {
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
 				checks.CounterCheckName + "(prom2)",
+				checks.AlertsAbsentCheckName + "(prom2)",
 				checks.RateCheckName + "(prom3)",
 				checks.SeriesCheckName + "(prom3)",
 				checks.VectorMatchingCheckName + "(prom3)",
@@ -1724,6 +1746,7 @@ prometheus "prom3" {
 				checks.LabelsConflictCheckName + "(prom3)",
 				checks.AlertsExternalLabelsCheckName + "(prom3)",
 				checks.CounterCheckName + "(prom3)",
+				checks.AlertsAbsentCheckName + "(prom3)",
 			},
 		},
 		{
@@ -1759,6 +1782,7 @@ prometheus "prom3" {
 # pint snooze 2099-11-28 promql/rate(+disable)
 # pint snooze 2099-11-28 promql/vector_matching(+disable)
 # pint snooze 2099-11-28 rule/duplicate(+disable)
+# pint snooze 2099-11-28 alers/absent(+disable)
 - record: foo
   expr: sum(foo)
 `),
@@ -1769,7 +1793,8 @@ prometheus "prom3" {
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
 				checks.FragileCheckName,
-				checks.RegexpCheckName, checks.RateCheckName + "(prom2)",
+				checks.RegexpCheckName,
+				checks.RateCheckName + "(prom2)",
 				checks.SeriesCheckName + "(prom2)",
 				checks.VectorMatchingCheckName + "(prom2)",
 				checks.RangeQueryCheckName + "(prom2)",
@@ -1777,6 +1802,7 @@ prometheus "prom3" {
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
 				checks.CounterCheckName + "(prom2)",
+				checks.AlertsAbsentCheckName + "(prom2)",
 				checks.RateCheckName + "(prom3)",
 				checks.SeriesCheckName + "(prom3)",
 				checks.VectorMatchingCheckName + "(prom3)",
@@ -1785,6 +1811,7 @@ prometheus "prom3" {
 				checks.LabelsConflictCheckName + "(prom3)",
 				checks.AlertsExternalLabelsCheckName + "(prom3)",
 				checks.CounterCheckName + "(prom3)",
+				checks.AlertsAbsentCheckName + "(prom3)",
 			},
 		},
 		{
@@ -1825,6 +1852,7 @@ rule {
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.CounterCheckName + "(prom)",
+				checks.AlertsAbsentCheckName + "(prom)",
 				checks.AlertsCheckName + "(prom)",
 			},
 		},
@@ -1869,6 +1897,7 @@ rule {
 				checks.LabelsConflictCheckName + "(prom)",
 				checks.AlertsExternalLabelsCheckName + "(prom)",
 				checks.CounterCheckName + "(prom)",
+				checks.AlertsAbsentCheckName + "(prom)",
 				checks.AlertsCheckName + "(prom)",
 			},
 		},
