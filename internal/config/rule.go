@@ -25,6 +25,7 @@ type Rule struct {
 	KeepFiringFor *ForSettings         `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
 	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
+	RuleName      []RuleNameSettings   `hcl:"name,block" json:"name,omitempty"`
 }
 
 func (rule Rule) validate() (err error) {
@@ -90,6 +91,12 @@ func (rule Rule) validate() (err error) {
 
 	if rule.KeepFiringFor != nil {
 		if err = rule.KeepFiringFor.validate(); err != nil {
+			return err
+		}
+	}
+
+	for _, name := range rule.RuleName {
+		if err = name.validate(); err != nil {
 			return err
 		}
 	}
@@ -269,6 +276,15 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleForCheckName,
 			check: checks.NewRuleForCheck(checks.RuleForKeepFiringFor, minFor, maxFor, rule.KeepFiringFor.Comment, severity),
+		})
+	}
+
+	for _, name := range rule.RuleName {
+		re := checks.MustTemplatedRegexp(name.Regex)
+		severity := name.getSeverity(checks.Information)
+		enabled = append(enabled, checkMeta{
+			name:  checks.RuleNameCheckName,
+			check: checks.NewRuleNameCheck(re, name.Comment, severity),
 		})
 	}
 

@@ -159,6 +159,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -198,6 +199,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -251,6 +253,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -307,6 +310,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -360,6 +364,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -402,6 +407,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -462,6 +468,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -523,6 +530,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -571,6 +579,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -668,6 +677,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -729,6 +739,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -789,6 +800,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -849,6 +861,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -909,6 +922,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -969,6 +983,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1029,6 +1044,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1083,6 +1099,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1138,6 +1155,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1192,6 +1210,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1246,6 +1265,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1300,6 +1320,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1354,6 +1375,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1408,6 +1430,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1463,6 +1486,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1517,6 +1541,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1572,6 +1597,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1632,6 +1658,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1694,6 +1721,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1744,6 +1772,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1798,6 +1827,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1851,6 +1881,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1916,6 +1947,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -1986,6 +2018,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2092,6 +2125,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2155,6 +2189,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2231,6 +2266,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2290,6 +2326,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2352,6 +2389,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2415,6 +2453,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2500,6 +2539,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2564,6 +2604,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2627,6 +2668,7 @@
       "rule/dependency",
       "rule/duplicate",
       "rule/for",
+      "rule/name",
       "rule/label",
       "rule/link",
       "rule/reject"
@@ -2668,6 +2710,55 @@
       "concurrency": 16,
       "rateLimit": 100,
       "required": false
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/name - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/name",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {},
+  "rules": [
+    {
+      "name": [
+        {
+          "key": "total:.+"
+        }
+      ]
     }
   ]
 }

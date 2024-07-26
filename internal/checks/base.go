@@ -33,6 +33,7 @@ var (
 		RuleDependencyCheckName,
 		RuleDuplicateCheckName,
 		RuleForCheckName,
+		RuleNameCheckName,
 		LabelCheckName,
 		RuleLinkCheckName,
 		RejectCheckName,

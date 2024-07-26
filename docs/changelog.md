@@ -5,6 +5,7 @@
 ### Added
 
 - Added [alerts/absent](checks/alerts/absent.md) check.
+- Added [rule/name](checks/rule/name.md) check - #1020.
 
 ### Changed
 
