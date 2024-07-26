@@ -157,6 +157,11 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			check: checks.NewCounterCheck(p),
 			tags:  p.Tags(),
 		})
+		allChecks = append(allChecks, checkMeta{
+			name:  checks.CounterCheckName,
+			check: checks.NewAlertsAbsentCheck(p),
+			tags:  p.Tags(),
+		})
 	}
 
 	for _, rule := range cfg.Rules {

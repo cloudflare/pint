@@ -12,6 +12,7 @@ import (
 
 var (
 	CheckNames = []string{
+		AlertsAbsentCheckName,
 		AnnotationCheckName,
 		AlertsCheckName,
 		AlertsExternalLabelsCheckName,
@@ -37,6 +38,7 @@ var (
 		RejectCheckName,
 	}
 	OnlineChecks = []string{
+		AlertsAbsentCheckName,
 		AlertsCheckName,
 		AlertsExternalLabelsCheckName,
 		LabelsConflictCheckName,
