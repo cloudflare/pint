@@ -1664,132 +1664,6 @@
 }
 ---
 
-[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
-{
-  "ci": {
-    "baseBranch": "master",
-    "maxCommits": 20
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/absent",
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/counter",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template",
-      "alerts/external_labels"
-    ]
-  },
-  "owners": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
-{
-  "ci": {
-    "baseBranch": "master",
-    "maxCommits": 20
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/absent",
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/counter",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template",
-      "alerts/external_labels"
-    ]
-  },
-  "owners": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    }
-  ]
-}
----
-
 [TestGetChecksForRule/single_prometheus_server - 1]
 {
   "ci": {
@@ -2012,82 +1886,6 @@
 }
 ---
 
-[TestGetChecksForRule/tag_snoozes_all_prometheus_checks - 1]
-{
-  "ci": {
-    "baseBranch": "master",
-    "maxCommits": 20
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/absent",
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/counter",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "2m0s",
-      "uptime": "up",
-      "tags": [
-        "foo",
-        "disable",
-        "bar"
-      ],
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "2m0s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    },
-    {
-      "name": "prom3",
-      "uri": "http://localhost/3",
-      "timeout": "2m0s",
-      "uptime": "up",
-      "tags": [
-        "foo"
-      ],
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    }
-  ]
-}
----
-
 [TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
 {
   "ci": {
@@ -2153,91 +1951,6 @@
   "rules": [
     {
       "cost": {}
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/multiple_cost_checks - 1]
-{
-  "ci": {
-    "baseBranch": "master",
-    "maxCommits": 20
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/absent",
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/counter",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ]
-  },
-  "owners": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost",
-      "timeout": "1s",
-      "uptime": "up",
-      "include": [
-        "rules.yml"
-      ],
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    }
-  ],
-  "rules": [
-    {
-      "cost": {
-        "comment": "this is rule comment",
-        "severity": "info"
-      }
-    },
-    {
-      "cost": {
-        "severity": "warning",
-        "maxSeries": 10000
-      }
-    },
-    {
-      "cost": {
-        "severity": "bug",
-        "maxSeries": 20000
-      }
     }
   ]
 }
@@ -2344,69 +2057,6 @@
         "step": "1m",
         "resolve": "5m"
       }
-    }
-  ]
-}
----
-
-[TestGetChecksForRule/two_prometheus_servers_/_snoozed_checks_via_comment - 1]
-{
-  "ci": {
-    "baseBranch": "master",
-    "maxCommits": 20
-  },
-  "parser": {},
-  "checks": {
-    "enabled": [
-      "alerts/absent",
-      "alerts/annotation",
-      "alerts/count",
-      "alerts/external_labels",
-      "alerts/for",
-      "alerts/template",
-      "labels/conflict",
-      "promql/aggregate",
-      "alerts/comparison",
-      "promql/fragile",
-      "promql/range_query",
-      "promql/rate",
-      "promql/regexp",
-      "promql/syntax",
-      "promql/vector_matching",
-      "query/cost",
-      "promql/counter",
-      "promql/series",
-      "rule/dependency",
-      "rule/duplicate",
-      "rule/for",
-      "rule/label",
-      "rule/link",
-      "rule/reject"
-    ],
-    "disabled": [
-      "alerts/template",
-      "promql/regexp"
-    ]
-  },
-  "owners": {},
-  "prometheus": [
-    {
-      "name": "prom1",
-      "uri": "http://localhost/1",
-      "timeout": "1s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
-    },
-    {
-      "name": "prom2",
-      "uri": "http://localhost/2",
-      "timeout": "1s",
-      "uptime": "up",
-      "concurrency": 16,
-      "rateLimit": 100,
-      "required": false
     }
   ]
 }
@@ -2667,6 +2317,357 @@
         "severity": "bug",
         "minCount": 100
       }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_all_checks_via_comment - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "alerts/external_labels"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/multiple_cost_checks - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "uptime": "up",
+      "include": [
+        "rules.yml"
+      ],
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ],
+  "rules": [
+    {
+      "cost": {
+        "comment": "this is rule comment",
+        "severity": "info"
+      }
+    },
+    {
+      "cost": {
+        "severity": "warning",
+        "maxSeries": 10000
+      }
+    },
+    {
+      "cost": {
+        "severity": "bug",
+        "maxSeries": 20000
+      }
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "alerts/external_labels",
+      "alerts/absent"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_snoozed_checks_via_comment - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "promql/regexp"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/tag_snoozes_all_prometheus_checks - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "tags": [
+        "foo",
+        "disable",
+        "bar"
+      ],
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom3",
+      "uri": "http://localhost/3",
+      "timeout": "2m0s",
+      "uptime": "up",
+      "tags": [
+        "foo"
+      ],
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
     }
   ]
 }

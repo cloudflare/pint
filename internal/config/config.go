@@ -158,7 +158,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{
-			name:  checks.CounterCheckName,
+			name:  checks.AlertsAbsentCheckName,
 			check: checks.NewAlertsAbsentCheck(p),
 			tags:  p.Tags(),
 		})

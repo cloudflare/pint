@@ -270,6 +270,7 @@ checks {
 # pint disable promql/range_query
 # pint disable rule/duplicate
 # pint disable labels/conflict
+# pint disable alerts/absent
 - record: foo
   expr: sum(foo)
 `),
@@ -734,6 +735,8 @@ rule {
 				checks.AlertForCheckName,
 				checks.ComparisonCheckName,
 				checks.TemplateCheckName,
+				checks.AlertsAbsentCheckName + "(prom1)",
+				checks.AlertsAbsentCheckName + "(prom2)",
 				checks.CostCheckName + "(prom1)",
 				checks.CostCheckName + "(prom2)",
 				checks.CostCheckName + "(prom1:10000)",
@@ -1555,7 +1558,7 @@ prometheus "prom2" {
   timeout = "1s"
 }
 checks {
-  disabled = [ "alerts/template", "alerts/external_labels" ]
+  disabled = [ "alerts/template", "alerts/external_labels", "alerts/absent" ]
 }
 `,
 			entry: discovery.Entry{
@@ -1612,7 +1615,7 @@ checks {
 # pint snooze 2099-11-28 rule/duplicate
 # pint snooze 2099-11-28T00:00:00+00:00 promql/vector_matching
 # pint snooze 2099-11-28 promql/counter
-- record: foo
+- record: foo # pint snooze 2099-11-28 alerts/absent
   expr: sum(foo)
 # pint file/disable promql/vector_matching
 `),
@@ -1782,7 +1785,7 @@ prometheus "prom3" {
 # pint snooze 2099-11-28 promql/rate(+disable)
 # pint snooze 2099-11-28 promql/vector_matching(+disable)
 # pint snooze 2099-11-28 rule/duplicate(+disable)
-# pint snooze 2099-11-28 alers/absent(+disable)
+# pint snooze 2099-11-28 alerts/absent(+disable)
 - record: foo
   expr: sum(foo)
 `),
