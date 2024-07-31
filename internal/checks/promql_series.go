@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -573,7 +574,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string) string 
 	buf.WriteString(query)
 	buf.WriteString("` was found on other prometheus servers:\n\n")
 
-	var matches int
+	var matches, skipped int
 	for _, prom := range servers {
 		slog.Debug("Checking if metric exists on any other Prometheus server", slog.String("check", c.Reporter()), slog.String("selector", query))
 
@@ -591,6 +592,10 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string) string 
 
 		if series > 0 {
 			matches++
+			if matches > 10 {
+				skipped++
+				continue
+			}
 			buf.WriteString("- [")
 			buf.WriteString(prom.Name())
 			buf.WriteString("](")
@@ -599,6 +604,11 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string) string 
 			buf.WriteString(query)
 			buf.WriteString(")\n")
 		}
+	}
+	if skipped > 0 {
+		buf.WriteString("- and ")
+		buf.WriteString(strconv.Itoa(skipped))
+		buf.WriteString(" other server(s).\n")
 	}
 
 	buf.WriteString("\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n")

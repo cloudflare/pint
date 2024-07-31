@@ -93,12 +93,15 @@ type problemsFn func(string) []checks.Problem
 
 type newPrometheusFn func(string) *promapi.FailoverGroup
 
-type newCtxFn func() context.Context
+type newCtxFn func(string) context.Context
+
+type otherPromsFn func(string) []*promapi.FailoverGroup
 
 type checkTest struct {
 	description string
 	content     string
 	prometheus  newPrometheusFn
+	otherProms  otherPromsFn
 	ctx         newCtxFn
 	checker     newCheckFn
 	entries     []discovery.Entry
@@ -130,12 +133,20 @@ func runTests(t *testing.T, testCases []checkTest) {
 			}
 
 			var proms []*promapi.FailoverGroup
+			reg := prometheus.NewRegistry()
 			prom := tc.prometheus(uri)
 			if prom != nil {
 				proms = append(proms, prom)
-				reg := prometheus.NewRegistry()
 				prom.StartWorkers(reg)
 				defer prom.Close(reg)
+			}
+
+			if tc.otherProms != nil {
+				for _, op := range tc.otherProms(uri) {
+					proms = append(proms, op)
+					op.StartWorkers(reg)
+					defer op.Close(reg)
+				}
 			}
 
 			entries, err := parseContent(tc.content)
@@ -143,7 +154,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 			for _, entry := range entries {
 				ctx := context.WithValue(context.Background(), promapi.AllPrometheusServers, proms)
 				if tc.ctx != nil {
-					ctx = tc.ctx()
+					ctx = tc.ctx(uri)
 				}
 				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
