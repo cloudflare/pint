@@ -118,7 +118,7 @@ func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, errs []e
 }
 
 func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, error) {
-	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	slog.Debug("Getting the list of pull request comments", slog.Int("pr", gr.prNum))
@@ -162,7 +162,7 @@ func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) er
 
 	slog.Debug("Creating a review comment", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
 
-	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	_, _, err := gr.client.PullRequests.CreateComment(reqCtx, gr.owner, gr.repo, gr.prNum, comment)
@@ -192,7 +192,7 @@ func (gr GithubReporter) IsEqual(existing ExistingComment, pending PendingCommen
 }
 
 func (gr GithubReporter) findExistingReview(ctx context.Context) (*github.PullRequestReview, error) {
-	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	reviews, _, err := gr.client.PullRequests.ListReviews(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
@@ -212,7 +212,7 @@ func (gr GithubReporter) findExistingReview(ctx context.Context) (*github.PullRe
 func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRequestReview, summary Summary) error {
 	slog.Info("Updating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)))
 
-	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	_, _, err := gr.client.PullRequests.UpdateReview(
@@ -229,7 +229,7 @@ func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRe
 func (gr GithubReporter) createReview(ctx context.Context, summary Summary) error {
 	slog.Info("Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", gr.headCommit))
 
-	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	_, resp, err := gr.client.PullRequests.CreateReview(
@@ -335,9 +335,13 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 
 	slog.Debug("Creating PR comment", slog.String("body", comment.GetBody()))
 
-	reqCtx, cancel := context.WithTimeout(ctx, gr.timeout)
+	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
 	_, _, err := gr.client.Issues.CreateComment(reqCtx, gr.owner, gr.repo, gr.prNum, &comment)
 	return err
+}
+
+func (gr GithubReporter) reqContext(ctx context.Context) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true), gr.timeout)
 }

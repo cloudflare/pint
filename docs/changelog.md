@@ -15,6 +15,7 @@
 ### Fixed
 
 - Fixed false positive warnings from [alerts/comparison](checks/alerts/comparison.md) when using `absent_over_time()`.
+- GitHub reporter will now wait before making more requests if it's rate limited - #699.
 
 ## v0.62.2
 
