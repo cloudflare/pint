@@ -11,6 +11,7 @@
 
 - [promql/vector_matching](checks/promql/vector_matching.md) will now report more details, including which Prometheus server reports problems and which part of the query is the issue.
 - GitHub report code was refactored, it should behave as before.
+- When running `pint ci` pint will now run all checks on unmodified rules when a `file/disable` comment was removed.
 
 ### Fixed
 
