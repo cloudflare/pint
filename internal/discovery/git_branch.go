@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log/slog"
+	"sort"
 	"strings"
 
 	"golang.org/x/exp/slices"
@@ -275,7 +276,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 			if !matched && a.Rule.Name() != "" && a.Rule.IsIdentical(b.Rule) {
 				m.before = b
 				m.hasBefore = true
-				m.isIdentical = true
+				m.isIdentical = isEntryIdentical(b, a)
 				m.wasMoved = a.Path.Name != b.Path.Name
 				matched = true
 				slog.Debug(
@@ -315,6 +316,16 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	}
 
 	return ml
+}
+
+func isEntryIdentical(b, a Entry) bool {
+	if !slices.Equal(sort.StringSlice(b.DisabledChecks), sort.StringSlice(a.DisabledChecks)) {
+		slog.Debug("List of disabled checks was modified",
+			slog.Any("before", sort.StringSlice(b.DisabledChecks)),
+			slog.Any("after", sort.StringSlice(a.DisabledChecks)))
+		return false
+	}
+	return true
 }
 
 func findRulesByName(entries []Entry, name string, typ parser.RuleType) (nomatch, match []Entry) {

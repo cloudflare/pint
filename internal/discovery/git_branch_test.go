@@ -1071,6 +1071,62 @@ groups:
 				},
 			},
 		},
+		{
+			title: "file/disable comment removed",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+# pint file/disable promql/series
+
+- alert: rule1
+  expr: sum(foo) by(job)
+- alert: rule2
+  expr: sum(foo) by(job)
+- alert: rule3
+  expr: sum(foo) by(job)
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+
+
+- alert: rule1
+  expr: sum(foo) by(job)
+- alert: rule2
+  expr: sum(foo) by(job)
+- alert: rule3
+  expr: sum(foo) by(job)
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			entries: []discovery.Entry{
+				{
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					Rule: mustParse(3, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					Rule: mustParse(5, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State: discovery.Modified,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					Rule: mustParse(7, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
