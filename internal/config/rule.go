@@ -353,3 +353,10 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 func strictRegex(s string) *regexp.Regexp {
 	return regexp.MustCompile("^" + s + "$")
 }
+
+func MustCompileRegexes(l ...string) (r []*regexp.Regexp) {
+	for _, pattern := range l {
+		r = append(r, strictRegex(pattern))
+	}
+	return r
+}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -64,16 +63,6 @@ func actionCI(c *cli.Context) error {
 		return err
 	}
 
-	includeRe := []*regexp.Regexp{}
-	for _, pattern := range meta.cfg.CI.Include {
-		includeRe = append(includeRe, regexp.MustCompile("^"+pattern+"$"))
-	}
-
-	excludeRe := []*regexp.Regexp{}
-	for _, pattern := range meta.cfg.CI.Exclude {
-		excludeRe = append(excludeRe, regexp.MustCompile("^"+pattern+"$"))
-	}
-
 	meta.cfg.CI = detectCI(meta.cfg.CI)
 	baseBranch := meta.cfg.CI.BaseBranch
 	if c.String(baseBranchFlag) != "" {
@@ -92,7 +81,11 @@ func actionCI(c *cli.Context) error {
 	slog.Info("Finding all rules to check on current git branch", slog.String("base", baseBranch))
 
 	var entries []discovery.Entry
-	filter := git.NewPathFilter(includeRe, excludeRe, meta.cfg.Parser.CompileRelaxed())
+	filter := git.NewPathFilter(
+		config.MustCompileRegexes(meta.cfg.Parser.Include...),
+		config.MustCompileRegexes(meta.cfg.Parser.Exclude...),
+		config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
+	)
 
 	entries, err = discovery.NewGlobFinder([]string{"*"}, filter).Find()
 	if err != nil {

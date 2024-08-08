@@ -29,6 +29,18 @@ func TestParserSettings(t *testing.T) {
 			},
 			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
 		},
+		{
+			conf: Parser{
+				Include: []string{"(.+++)"},
+			},
+			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
+		},
+		{
+			conf: Parser{
+				Exclude: []string{"(.+++)"},
+			},
+			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
+		},
 	}
 
 	for _, tc := range testCases {

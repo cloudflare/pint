@@ -64,11 +64,18 @@ Syntax:
 
 ```js
 parser {
+  include = [ "(.*)", ... ]
+  exclude = [ "(.*)", ... ]
   relaxed = [ "(.*)", ... ]
 }
 ```
 
-- `relaxed` - by default, pint will now parse all files in strict mode, where
+- `include` - list of file patterns to check when running checks. Only files
+  matching those regexp rules will be checked, other modified files will be ignored.
+- `exclude` - list of file patterns to ignore when running checks.
+  This option takes precedence over `include`, so if a file path matches both
+  `include` & `exclude` patterns, it will be excluded.
+- `relaxed` - by default, pint will parse all files in strict mode, where
   all rule files must have the exact syntax Prometheus expects:
 
   ```yaml
@@ -116,18 +123,11 @@ Syntax:
 
 ```js
 ci {
-  include    = [ "(.*)", ... ]
-  exclude    = [ "(.*)", ... ]
   maxCommits = 20
   baseBranch = "master"
 }
 ```
 
-- `include` - list of file patterns to check when running checks. Only files
-  matching those regexp rules will be checked, other modified files will be ignored.
-- `exclude` - list of file patterns to ignore when running checks.
-  This option takes precedence over `include`, so if a file path matches both
-  `include` & `exclude` patterns, it will be excluded.
 - `maxCommits` - by default, pint will try to find all commits on the current branch,
   this requires full git history to be present, if we have a shallow clone this
   might fail to find only current branch commits and give us a huge list.

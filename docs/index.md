@@ -107,15 +107,6 @@ jobs:
 To customise pint checks create a `.pint.hcl` file in the root of your repository.
 See [Configuration](configuration.md) for a description of all options.
 
-If your repository contains other files, not only Prometheus rules, then tell pint
-to only check selected paths when running checks on a pull request:
-
-```js
-ci {
-  include    = [ "rules/dev/.*.yml", "rules/prod/.*" ]
-}
-```
-
 When pint runs checks after a push to a branch (for example after a merge), then
 it will pass `workdir` option to `pint lint`, which means that all files inside
 `rules` directory will be checked.
@@ -316,6 +307,15 @@ See [parser](configuration.md#parser) documentation for more details.
 "Relaxed" parser mode will load anything that can be parsed as Prometheus rule,
 while "strict" parser mode will fail if it reads a file that wouldn't load
 cleanly as Prometheus config file.
+
+If your repository contains other files, not only Prometheus rules, then tell pint
+to only check selected paths when running pint:
+
+```js
+parser {
+  include    = [ "rules/dev/.*.yml", "rules/prod/.*" ]
+}
+```
 
 ## Control comments
 

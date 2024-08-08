@@ -6,6 +6,8 @@ import (
 
 type Parser struct {
 	Relaxed []string `hcl:"relaxed,optional" json:"relaxed,omitempty"`
+	Include []string `hcl:"include,optional" json:"include,omitempty"`
+	Exclude []string `hcl:"exclude,optional" json:"exclude,omitempty"`
 }
 
 func (p Parser) validate() error {
@@ -15,12 +17,16 @@ func (p Parser) validate() error {
 			return err
 		}
 	}
-	return nil
-}
-
-func (p Parser) CompileRelaxed() (r []*regexp.Regexp) {
-	for _, pattern := range p.Relaxed {
-		r = append(r, regexp.MustCompile("^"+pattern+"$"))
+	for _, path := range p.Include {
+		if _, err := regexp.Compile(path); err != nil {
+			return err
+		}
 	}
-	return r
+
+	for _, path := range p.Exclude {
+		if _, err := regexp.Compile(path); err != nil {
+			return err
+		}
+	}
+	return nil
 }

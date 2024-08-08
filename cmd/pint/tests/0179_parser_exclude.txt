@@ -1,0 +1,24 @@
+pint.ok -l debug --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
+level=DEBUG msg="File path is in the exclude list" path=rules/0002.yml exclude=["^rules/0002.yml$"]
+level=DEBUG msg="Glob finder completed" count=1
+level=DEBUG msg="Generated all Prometheus servers" count=0
+level=DEBUG msg="Found recording rule" path=rules/0001.yml record=ok lines=1-2
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=ok
+-- rules/0001.yml --
+- record: ok
+  expr: sum(foo) without(job)
+-- rules/0002.yml --
+- record: failing
+  expr: sum()
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+  exclude = ["rules/0002.yml"]
+}

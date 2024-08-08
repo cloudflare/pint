@@ -308,7 +308,11 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 	}
 
 	slog.Info("Finding all rules to check", slog.Any("paths", paths))
-	entries, err := discovery.NewGlobFinder(paths, git.NewPathFilter(nil, nil, c.cfg.Parser.CompileRelaxed())).Find()
+	entries, err := discovery.NewGlobFinder(paths, git.NewPathFilter(
+		config.MustCompileRegexes(c.cfg.Parser.Include...),
+		config.MustCompileRegexes(c.cfg.Parser.Exclude...),
+		config.MustCompileRegexes(c.cfg.Parser.Relaxed...),
+	)).Find()
 	if err != nil {
 		return err
 	}
