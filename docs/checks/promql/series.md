@@ -141,7 +141,8 @@ Syntax:
 
 ```js
 check "promql/series" {
-  ignoreMetrics = [ "(.*)", ... ]
+  ignoreMetrics     = [ "(.*)", ... ]
+  ignoreLabelsValue = { "...": [ "...", ... ] }
 }
 ```
 
@@ -159,6 +160,10 @@ check "promql/series" {
 - `ignoreMetrics` - list of regexp matchers, if a metric is missing from Prometheus
   but the name matches any of provided regexp matchers then pint will only report a
   warning, instead of a bug level report.
+- `ignoreLabelsValue` - allows to configure a global list of label **names** for which pint
+  should **NOT** report problems if there's a query that uses a **value** that does not exist.
+  This can be also set per rule using `# pint rule/set promql/series ignore/label-value $labelName`
+  comments, see below.
 
 Example:
 
@@ -172,6 +177,19 @@ check "promql/series" {
     ".*_errors",
     ".*_errors_.*",
   ]
+}
+```
+
+If you might have a query with `http_requests_total{code="401"}` selector but `http_requests_total`
+will only have time series with `code="401"` label if there were requests that resulted in responses
+with HTTP code `401`, which would result in a pint reports. This example would disable all such pint
+reports for all Prometheus rules:
+
+```js
+check "promql/series" {
+  ignoreLabelsValue = {
+    "http_requests_total" = [ "code" ]
+  }
 }
 ```
 
@@ -232,10 +250,13 @@ there's at least one HTTP response that generated this code.
 You can relax pint checks so it doesn't validate if label values for specific
 labels are present on any time series.
 
+This can be also set globally for all rules using `ignoreLabelsValue` config option,
+see above.
+
 Syntax:
 
 ```yaml
-# pint rule/set promql/series ignore/label-value $labelName`
+# pint rule/set promql/series ignore/label-value $labelName
 ```
 
 Example:

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.64.0
+
+### Added
+
+- Added `ignoreLabelsValue` to [promql/series](checks/promql/series.md) check settings.
+
 ## v0.63.0
 
 ### Added

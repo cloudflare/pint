@@ -24,9 +24,10 @@ import (
 )
 
 type PromqlSeriesSettings struct {
-	LookbackRange         string   `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
-	LookbackStep          string   `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
-	IgnoreMetrics         []string `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
+	IgnoreLabelsValue     map[string][]string `hcl:"ignoreLabelsValue,optional" json:"ignoreLabelsValue,omitempty"`
+	LookbackRange         string              `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
+	LookbackStep          string              `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
+	IgnoreMetrics         []string            `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
 	ignoreMetricsRe       []*regexp.Regexp
 	lookbackRangeDuration time.Duration
 	lookbackStepDuration  time.Duration
@@ -389,8 +390,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			if lm.Type != labels.MatchEqual && lm.Type != labels.MatchRegexp {
 				continue
 			}
-			if c.isLabelValueIgnored(rule, selector, lm.Name) {
-				slog.Debug("Label check disabled by comment", slog.String("selector", (&selector).String()), slog.String("label", lm.Name))
+			if c.isLabelValueIgnored(settings, rule, selector, lm.Name) {
 				continue
 			}
 			labelSelector := promParser.VectorSelector{
@@ -674,7 +674,17 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelec
 	return minAge, problems
 }
 
-func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.VectorSelector, labelName string) bool {
+func (c SeriesCheck) isLabelValueIgnored(settings *PromqlSeriesSettings, rule parser.Rule, selector promParser.VectorSelector, labelName string) bool {
+	for matcher, names := range settings.IgnoreLabelsValue {
+		isMatch, _ := matchSelectorToMetric(selector, matcher)
+		if !isMatch {
+			continue
+		}
+		if slices.Contains(names, labelName) {
+			slog.Debug("Label check disabled globally via config", slog.String("label", labelName))
+			return true
+		}
+	}
 	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
 		matcher, key, value := parseRuleSet(ruleSet.Value)
 		if key != "ignore/label-value" {
@@ -687,6 +697,7 @@ func (c SeriesCheck) isLabelValueIgnored(rule parser.Rule, selector promParser.V
 			}
 		}
 		if labelName == value {
+			slog.Debug("Label check disabled by comment", slog.String("selector", (&selector).String()), slog.String("label", labelName))
 			return true
 		}
 	}
