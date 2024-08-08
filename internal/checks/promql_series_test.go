@@ -2294,7 +2294,7 @@ func TestSeriesCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "#5 ignored label value",
+			description: "#5 ignored label value via comment",
 			content: `
 - record: foo
   # pint rule/set promql/series ignore/label-value error
@@ -2310,6 +2310,182 @@ func TestSeriesCheck(t *testing.T) {
 						formCond{key: "query", value: `count(foo{error="notfound"})`},
 					},
 					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#5 ignored label value globally / match name",
+			content: `
+- record: foo
+  expr: sum(foo{error="notfound"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			ctx: func(_ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					IgnoreLabelsValue: map[string][]string{
+						"foo": {"error"},
+					},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#5 ignored label value globally / match selector",
+			content: `
+- record: foo
+  expr: sum(foo{error="notfound"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			ctx: func(_ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					IgnoreLabelsValue: map[string][]string{
+						"foo{}": {"error"},
+					},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `absent(foo{error=~".+"})`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "#5 ignored label value globally / no match",
+			content: `
+- record: foo
+  expr: sum(foo{error="notfound"})
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			ctx: func(_ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					IgnoreLabelsValue: map[string][]string{
+						"foo{cluster=\"dev\"}": {"error"},
+					},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
+						Details:  checks.SeriesCheckCommonProblemDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo{error="notfound"})`},
+					},
+					resp: respondWithEmptyMatrix(),
 				},
 				{
 					conds: []requestCondition{
