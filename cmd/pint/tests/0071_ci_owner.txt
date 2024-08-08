@@ -56,8 +56,10 @@ groups:
 
 -- src/.pint.hcl --
 ci {
-  include    = [".+.yml"]
   baseBranch = "main"
+}
+parser {
+  include    = [".+.yml"]
 }
 repository {
   bitbucket {

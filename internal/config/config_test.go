@@ -1971,7 +1971,7 @@ func TestConfigErrors(t *testing.T) {
 			err:    "maxCommits cannot be <= 0",
 		},
 		{
-			config: `ci {include = [".+", ".+++"]}`,
+			config: `parser {include = [".+", ".+++"]}`,
 			err:    "error parsing regexp: invalid nested repetition operator: `++`",
 		},
 		{

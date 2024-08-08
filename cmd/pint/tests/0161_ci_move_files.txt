@@ -78,6 +78,8 @@ groups:
 -- src/.pint.hcl --
 ci {
   baseBranch = "main"
+}
+parser {
   include    = [".+.yml"]
 }
 prometheus "prom1" {

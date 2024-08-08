@@ -5,6 +5,8 @@
 ### Added
 
 - Added `ignoreLabelsValue` to [promql/series](checks/promql/series.md) check settings.
+- Added `include` & `exclude` options were moved from the `ci` to the `parser` configuration block.
+  They now apply to all pint commands, not just `pint ci` - #631.
 
 ## v0.63.0
 

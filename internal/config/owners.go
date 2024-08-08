@@ -23,8 +23,6 @@ func (o Owners) CompileAllowed() (r []*regexp.Regexp) {
 		r = append(r, regexp.MustCompile(".*"))
 		return r
 	}
-	for _, pattern := range o.Allowed {
-		r = append(r, regexp.MustCompile("^"+pattern+"$"))
-	}
+	r = append(r, MustCompileRegexes(o.Allowed...)...)
 	return r
 }

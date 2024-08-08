@@ -63,7 +63,11 @@ func actionLint(c *cli.Context) error {
 	}
 
 	slog.Info("Finding all rules to check", slog.Any("paths", paths))
-	finder := discovery.NewGlobFinder(paths, git.NewPathFilter(nil, nil, meta.cfg.Parser.CompileRelaxed()))
+	finder := discovery.NewGlobFinder(paths, git.NewPathFilter(
+		config.MustCompileRegexes(meta.cfg.Parser.Include...),
+		config.MustCompileRegexes(meta.cfg.Parser.Exclude...),
+		config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
+	))
 	entries, err := finder.Find()
 	if err != nil {
 		return err

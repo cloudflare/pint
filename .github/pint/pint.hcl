@@ -1,3 +1,3 @@
-ci {
+parser {
   include    = [".github/pint/rules/.*"]
 }

@@ -37,8 +37,8 @@ stderr 'level=DEBUG msg="Skipping file due to include/exclude rules" path=b.yml'
 -- src/.pint.hcl --
 ci {
   baseBranch = "main"
-  exclude = [".*.yml"]
 }
 parser {
+  exclude = [".*.yml"]
   relaxed = [".*"]
 }
