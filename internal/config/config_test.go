@@ -2149,6 +2149,22 @@ func TestConfigErrors(t *testing.T) {
 			err:    "error parsing regexp: invalid nested repetition operator: `++`",
 		},
 		{
+			config: `check "promql/series" {
+  ignoreLabelsValue = {
+    "foo bar" = [ "abc" ]
+  }
+}`,
+			err: `"foo bar" is not a valid PromQL metric selector: 1:5: parse error: unexpected identifier "bar"`,
+		},
+		{
+			config: `check "promql/series" {
+  ignoreLabelsValue = {
+    "foo{" = [ "abc" ]
+  }
+}`,
+			err: `"foo{" is not a valid PromQL metric selector: 1:5: parse error: unexpected end of input inside braces`,
+		},
+		{
 			config: `rule {
   link ".+++" {}
 }`,

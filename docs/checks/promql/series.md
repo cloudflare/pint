@@ -164,6 +164,8 @@ check "promql/series" {
   should **NOT** report problems if there's a query that uses a **value** that does not exist.
   This can be also set per rule using `# pint rule/set promql/series ignore/label-value $labelName`
   comments, see below.
+  The value of this option is a map where the key is a metric selector to match on and the value
+  is the list of label names.
 
 Example:
 
@@ -192,6 +194,33 @@ check "promql/series" {
   }
 }
 ```
+
+You can use any metric selectors as keys in `ignoreLabelsValue` if you want apply it only
+to metric selectors in queries that match the selector in `ignoreLabelsValue`.
+For example if you have a rule that uses the same metric with two different selectors:
+
+```yaml
+- alerts: ...
+  expr: |
+    rate(http_requests_total{env="prod", code="401"}[5m]) > 0
+    or
+    rate(http_requests_total{env="dev", code="401"}[5m]) > 0
+```
+
+And you want to disable pint warnings only for the second selector (`http_requests_total{env="dev", code="401"}`)
+but not the first one (`http_requests_total{env="prod", code="401"}`) you can do that by adding any label matcher
+used in the query:
+
+```js
+check "promql/series" {
+  ignoreLabelsValue = {
+    "http_requests_total{env=\"dev\"}" = [ "code" ]
+  }
+}
+```
+
+You can only use label matchers that would match the selector from the query itself, not from the time series
+the query would return. This whole logic applies only to the query, not to the results of it.
 
 ### min-age
 
