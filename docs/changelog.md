@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.64.1
+
+### Fixed
+
+- Validate `ignoreLabelsValue` option values in the pint config.
+
 ## v0.64.0
 
 ### Added

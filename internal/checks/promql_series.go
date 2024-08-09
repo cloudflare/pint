@@ -60,6 +60,12 @@ func (c *PromqlSeriesSettings) Validate() error {
 		c.lookbackStepDuration = time.Duration(dur)
 	}
 
+	for selector := range c.IgnoreLabelsValue {
+		if _, err := promParser.ParseMetricSelector(selector); err != nil {
+			return fmt.Errorf("%q is not a valid PromQL metric selector: %w", selector, err)
+		}
+	}
+
 	return nil
 }
 
