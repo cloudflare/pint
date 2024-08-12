@@ -43,7 +43,7 @@ rule {
     kind = "recording"
   }
 
-  label "rec:.+" {
+  name "rec:.+" {
     comment  = "ALl recording rules must use the `rec:` prefix."
     severity = "bug"
   }
@@ -83,7 +83,7 @@ you can add a more specific comment.
 Example pint rule:
 
 ```js
-label "rec:.+" {
+name "rec:.+" {
   comment  = "ALl recording rules must use the `rec:` prefix."
   severity = "bug"
 }
