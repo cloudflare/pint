@@ -11,7 +11,7 @@ import (
 func TestRuleName(t *testing.T) {
 	testCases := []checkTest{
 		{
-			description: "doesn't ignore rules with syntax errors",
+			description: "recording rule name doesn't match",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
@@ -33,7 +33,7 @@ func TestRuleName(t *testing.T) {
 			},
 		},
 		{
-			description: "doesn't ignore rules with syntax errors",
+			description: "recording rule name match",
 			content:     "- record: total:foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
@@ -42,7 +42,7 @@ func TestRuleName(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
-			description: "doesn't ignore rules with syntax errors",
+			description: "alerting rule name doesn't match",
 			content:     "- alert: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
@@ -64,7 +64,7 @@ func TestRuleName(t *testing.T) {
 			},
 		},
 		{
-			description: "doesn't ignore rules with syntax errors",
+			description: "alerting rule name match",
 			content:     "- alert: total:foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
