@@ -170,7 +170,7 @@ pint_prometheus_cache_evictions_total{name="prom"} 0
 # TYPE pint_prometheus_cache_size gauge
 pint_prometheus_cache_size{name="prom"} 0
 `),
-		names...,
+		"pint_prometheus_cache_size", "pint_prometheus_cache_evictions_total",
 	))
 
 	var i uint64
