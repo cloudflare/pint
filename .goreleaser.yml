@@ -25,7 +25,7 @@ archives:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 release:
   extra_files:
     - glob: ./README.md

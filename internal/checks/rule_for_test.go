@@ -10,12 +10,12 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func forMin(key, min string) string {
-	return fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", key, min)
+func forMin(key, m string) string {
+	return fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", key, m)
 }
 
-func forMax(key, max string) string {
-	return fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", key, max)
+func forMax(key, m string) string {
+	return fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", key, m)
 }
 
 func TestRuleForCheck(t *testing.T) {
