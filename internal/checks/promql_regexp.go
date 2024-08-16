@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"regexp"
 	"regexp/syntax"
+	"slices"
+	"strings"
 
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
@@ -57,6 +59,10 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
+
+		good := make([]*labels.Matcher, 0, len(selector.LabelMatchers))
+		bad := make([]badMatcher, 0, len(selector.LabelMatchers))
+
 		var name string
 		for _, lm := range selector.LabelMatchers {
 			if lm.Name == model.MetricNameLabel && lm.Type == labels.MatchEqual {
@@ -67,6 +73,7 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 		done[selector.String()] = struct{}{}
 		for _, lm := range selector.LabelMatchers {
 			if lm.Type != labels.MatchRegexp && lm.Type != labels.MatchNotRegexp {
+				good = append(good, lm)
 				continue
 			}
 
@@ -78,7 +85,7 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				re = "^(?:" + re + ")$"
 			}
 
-			var hasFlags, isUseful, isWildcard, isLiteral bool
+			var hasFlags, isUseful, isWildcard, isLiteral, isBad bool
 			var beginText, endText int
 			r, _ := syntax.Parse(re, syntax.Perl)
 			for _, s := range r.Sub {
@@ -123,37 +130,76 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				case labels.MatchNotRegexp:
 					op = labels.MatchNotEqual
 				}
-				var text string
-				switch {
-				case isWildcard && op == labels.MatchEqual:
-					text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all `%s` values.", name, lm.Name)
-				case isWildcard && op == labels.MatchNotEqual:
-					text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s{%s=\"\"}` if you want to match on all time series for `%s` without the `%s` label.", name, lm.Name, name, lm.Name)
-				default:
-					text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.", lm, lm.Name, op, lm.Value)
-
-				}
-				problems = append(problems, Problem{
-					Lines:    expr.Value.Lines,
-					Reporter: c.Reporter(),
-					Text:     text,
-					Details:  RegexpCheckDetails,
-					Severity: Bug,
-				})
+				bad = append(bad, badMatcher{lm: lm, op: op, isWildcard: isWildcard})
+				isBad = true
 			}
 			if beginText > 1 || endText > 1 {
-				problems = append(problems, Problem{
-					Lines:    expr.Value.Lines,
-					Reporter: c.Reporter(),
-					Text: fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
-						lm, lm.Name, lm.Type, lm.Value,
-					),
-					Details:  RegexpCheckDetails,
-					Severity: Bug,
-				})
+				bad = append(bad, badMatcher{lm: lm, badAnchor: true})
+				isBad = true
 			}
+			if !isBad {
+				good = append(good, lm)
+			}
+		}
+		for _, b := range bad {
+			var text string
+			switch {
+			case b.badAnchor:
+				text = fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
+					b.lm, b.lm.Name, b.lm.Type, b.lm.Value,
+				)
+			case b.isWildcard && b.op == labels.MatchEqual:
+				text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all `%s` values.",
+					makeLabel(name, good...), b.lm.Name)
+			case b.isWildcard && b.op == labels.MatchNotEqual:
+				text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all time series for `%s` without the `%s` label.",
+					makeLabel(name, slices.Concat(good, []*labels.Matcher{{Type: labels.MatchEqual, Name: b.lm.Name, Value: ""}})...), name, b.lm.Name)
+			default:
+				text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
+					b.lm, b.lm.Name, b.op, b.lm.Value)
+
+			}
+			problems = append(problems, Problem{
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Text:     text,
+				Details:  RegexpCheckDetails,
+				Severity: Bug,
+			})
 		}
 	}
 
 	return problems
+}
+
+type badMatcher struct {
+	lm         *labels.Matcher
+	op         labels.MatchType
+	isWildcard bool
+	badAnchor  bool
+}
+
+func makeLabel(name string, matchers ...*labels.Matcher) string {
+	filtered := make([]*labels.Matcher, 0, len(matchers))
+	for _, m := range matchers {
+		if m.Type == labels.MatchEqual && m.Name == labels.MetricName {
+			continue
+		}
+		filtered = append(filtered, m)
+	}
+	if len(filtered) == 0 {
+		return name
+	}
+
+	var b strings.Builder
+	b.WriteString(name)
+	b.WriteRune('{')
+	for i, m := range filtered {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+		b.WriteString(m.String())
+	}
+	b.WriteRune('}')
+	return b.String()
 }

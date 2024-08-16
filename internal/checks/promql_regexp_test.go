@@ -234,6 +234,102 @@ func TestRegexpCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "unnecessary wildcard regexp / many filters",
+			content:     "- record: foo\n  expr: foo{job=~\".*\", cluster=~\".*\", instance=\"bob\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "Unnecessary wildcard regexp, simply use `foo{instance=\"bob\"}` if you want to match on all `job` values.",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "Unnecessary wildcard regexp, simply use `foo{instance=\"bob\"}` if you want to match on all `cluster` values.",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "unnecessary wildcard regexp / many filters / no name",
+			content: `- record: foo
+  expr: |
+    {job=~".*", cluster=~".*", instance="bob"}
+`,
+			checker:    newRegexpCheck,
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  3,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "Unnecessary wildcard regexp, simply use `{instance=\"bob\"}` if you want to match on all `job` values.",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  3,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "Unnecessary wildcard regexp, simply use `{instance=\"bob\"}` if you want to match on all `cluster` values.",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
+			description: "unnecessary wildcard regexp / many filters / regexp name",
+			content: `- record: foo
+  expr: |
+    {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
+`,
+			checker:    newRegexpCheck,
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  3,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "Unnecessary wildcard regexp, simply use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `job` values.",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  3,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "Unnecessary wildcard regexp, simply use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `cluster` values.",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
+		{
 			description: "greedy wildcard regexp",
 			content:     "- record: foo\n  expr: foo{job=~\".+\"}\n",
 			checker:     newRegexpCheck,
