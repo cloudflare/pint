@@ -85,14 +85,18 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				re = "^(?:" + re + ")$"
 			}
 
-			var hasFlags, isUseful, isWildcard, isLiteral, isBad bool
+			var hasFlags, isUseful, isWildcard, isLiteral, isBad, isSmelly bool
 			var beginText, endText int
+			var lastOp syntax.Op
 			r, _ := syntax.Parse(re, syntax.Perl)
 			for _, s := range r.Sub {
 				// If effective flags are different from default flags then we assume regexp is useful.
 				// It could be case sensitive match.
 				if s.Flags > 0 && s.Flags != syntax.Perl {
 					hasFlags = true
+				}
+				if isOpSmelly(s.Op, lastOp) {
+					isSmelly = true
 				}
 				// nolint: exhaustive
 				switch s.Op {
@@ -114,6 +118,7 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				default:
 					isUseful = true
 				}
+				lastOp = s.Op
 			}
 			if hasFlags && !isWildcard {
 				isUseful = true
@@ -137,12 +142,16 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				bad = append(bad, badMatcher{lm: lm, badAnchor: true})
 				isBad = true
 			}
+			if isSmelly {
+				bad = append(bad, badMatcher{lm: lm, isSmelly: true})
+			}
 			if !isBad {
 				good = append(good, lm)
 			}
 		}
 		for _, b := range bad {
 			var text string
+			s := Bug
 			switch {
 			case b.badAnchor:
 				text = fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
@@ -154,6 +163,9 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 			case b.isWildcard && b.op == labels.MatchNotEqual:
 				text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all time series for `%s` without the `%s` label.",
 					makeLabel(name, slices.Concat(good, []*labels.Matcher{{Type: labels.MatchEqual, Name: b.lm.Name, Value: ""}})...), name, b.lm.Name)
+			case b.isSmelly:
+				text = fmt.Sprintf("`{%s}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels", b.lm.String())
+				s = Warning
 			default:
 				text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
 					b.lm, b.lm.Name, b.op, b.lm.Value)
@@ -164,7 +176,7 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				Reporter: c.Reporter(),
 				Text:     text,
 				Details:  RegexpCheckDetails,
-				Severity: Bug,
+				Severity: s,
 			})
 		}
 	}
@@ -176,6 +188,7 @@ type badMatcher struct {
 	lm         *labels.Matcher
 	op         labels.MatchType
 	isWildcard bool
+	isSmelly   bool
 	badAnchor  bool
 }
 
@@ -202,4 +215,14 @@ func makeLabel(name string, matchers ...*labels.Matcher) string {
 	}
 	b.WriteRune('}')
 	return b.String()
+}
+
+func isOpSmelly(a, b syntax.Op) bool {
+	if a == syntax.OpLiteral && (b == syntax.OpStar || b == syntax.OpPlus) {
+		return true
+	}
+	if b == syntax.OpLiteral && (a == syntax.OpStar || a == syntax.OpPlus) {
+		return true
+	}
+	return false
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.65.0
+
+### Added
+
+- [promql/regexp](checks/promql/regexp.md) check will now look for smelly regexp selectors.
+  See check docs for details.
+
 ## v0.64.1
 
 ### Fixed
