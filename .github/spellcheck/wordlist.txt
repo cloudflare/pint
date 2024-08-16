@@ -9,6 +9,7 @@ CLI
 cloudflare
 Cloudflare
 config
+configs
 Deduplicate
 deduplicated
 dir

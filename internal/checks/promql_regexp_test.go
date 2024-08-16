@@ -30,7 +30,7 @@ func TestRegexpCheck(t *testing.T) {
 		},
 		{
 			description: "valid regexp",
-			content:     "- record: foo\n  expr: foo{job=~\"bar.+\"}\n",
+			content:     "- record: foo\n  expr: foo{job=~\"bar|foo\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
 			problems:    noProblems,
@@ -51,7 +51,7 @@ func TestRegexpCheck(t *testing.T) {
 		},
 		{
 			description: "valid partial regexp",
-			content:     "- record: foo\n  expr: foo{job=~\"prefix.*\"}\n",
+			content:     "- record: foo\n  expr: foo{job=~\"prefix(a|b)\"}\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
 			problems:    noProblems,
@@ -400,6 +400,33 @@ func TestRegexpCheck(t *testing.T) {
 		{
 			description: "positive wildcard regexp",
 			content:     "- record: foo\n  expr: count({name=~\".+\", job=\"foo\"})\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
+		{
+			description: "smelly selector",
+			content:     "- record: foo\n  expr: foo{job=~\"service_.*_prod\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "non-smelly selector",
+			content:     "- record: foo\n  expr: rate(http_requests_total{job=\"foo\", code=~\"5..\"}[5m])\n",
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
 			problems:    noProblems,
