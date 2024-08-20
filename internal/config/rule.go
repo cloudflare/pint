@@ -23,6 +23,7 @@ type Rule struct {
 	Alerts        *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
 	For           *ForSettings         `hcl:"for,block" json:"for,omitempty"`
 	KeepFiringFor *ForSettings         `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
+	RangeQuery    *RangeQuerySettings  `hcl:"range_query,block" json:"range_query,omitempty"`
 	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
 	RuleName      []RuleNameSettings   `hcl:"name,block" json:"name,omitempty"`
@@ -97,6 +98,12 @@ func (rule Rule) validate() (err error) {
 
 	for _, name := range rule.RuleName {
 		if err = name.validate(); err != nil {
+			return err
+		}
+	}
+
+	if rule.RangeQuery != nil {
+		if err = rule.RangeQuery.validate(); err != nil {
 			return err
 		}
 	}
@@ -285,6 +292,15 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 		enabled = append(enabled, checkMeta{
 			name:  checks.RuleNameCheckName,
 			check: checks.NewRuleNameCheck(re, name.Comment, severity),
+		})
+	}
+
+	if rule.RangeQuery != nil {
+		severity := rule.RangeQuery.getSeverity(checks.Warning)
+		limit, _ := parseDuration(rule.RangeQuery.Max)
+		enabled = append(enabled, checkMeta{
+			name:  checks.CostCheckName,
+			check: checks.NewRangeQueryCheck(nil, limit, rule.RangeQuery.Comment, severity),
 		})
 	}
 

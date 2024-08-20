@@ -134,7 +134,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 		})
 		allChecks = append(allChecks, checkMeta{
 			name:  checks.RangeQueryCheckName,
-			check: checks.NewRangeQueryCheck(p),
+			check: checks.NewRangeQueryCheck(p, 0, "", checks.Warning),
 			tags:  p.Tags(),
 		})
 		allChecks = append(allChecks, checkMeta{

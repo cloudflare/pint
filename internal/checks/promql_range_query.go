@@ -9,6 +9,7 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -17,12 +18,15 @@ const (
 	RangeQueryCheckName = "promql/range_query"
 )
 
-func NewRangeQueryCheck(prom *promapi.FailoverGroup) RangeQueryCheck {
-	return RangeQueryCheck{prom: prom}
+func NewRangeQueryCheck(prom *promapi.FailoverGroup, limit time.Duration, comment string, severity Severity) RangeQueryCheck {
+	return RangeQueryCheck{prom: prom, limit: limit, comment: comment, severity: severity}
 }
 
 type RangeQueryCheck struct {
-	prom *promapi.FailoverGroup
+	prom     *promapi.FailoverGroup
+	comment  string
+	limit    time.Duration
+	severity Severity
 }
 
 func (c RangeQueryCheck) Meta() CheckMeta {
@@ -38,6 +42,9 @@ func (c RangeQueryCheck) Meta() CheckMeta {
 }
 
 func (c RangeQueryCheck) String() string {
+	if c.limit > 0 {
+		return fmt.Sprintf("%s(%s)", RangeQueryCheckName, output.HumanizeDuration(c.limit))
+	}
 	return fmt.Sprintf("%s(%s)", RangeQueryCheckName, c.prom.Name())
 }
 
@@ -47,8 +54,23 @@ func (c RangeQueryCheck) Reporter() string {
 
 func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
-
 	if expr.SyntaxError != nil {
+		return problems
+	}
+
+	if c.limit > 0 {
+		for _, problem := range c.checkNode(ctx, expr.Query, c.limit, fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit))) {
+			problems = append(problems, Problem{
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Text:     problem.text,
+				Details:  maybeComment(c.comment),
+				Severity: c.severity,
+			})
+		}
+	}
+
+	if c.prom == nil || len(problems) > 0 {
 		return problems
 	}
 
@@ -84,7 +106,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		retention = time.Hour * 24 * 15
 	}
 
-	for _, problem := range c.checkNode(ctx, expr.Query, retention, flags.URI) {
+	for _, problem := range c.checkNode(ctx, expr.Query, retention, fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI), model.Duration(retention))) {
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
@@ -96,20 +118,20 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 	return problems
 }
 
-func (c RangeQueryCheck) checkNode(ctx context.Context, node *parser.PromQLNode, retention time.Duration, uri string) (problems []exprProblem) {
+func (c RangeQueryCheck) checkNode(ctx context.Context, node *parser.PromQLNode, retention time.Duration, reason string) (problems []exprProblem) {
 	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
 			problems = append(problems, exprProblem{
 				expr: node.Expr.String(),
-				text: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s is configured to only keep %s of metrics history.",
-					node.Expr, model.Duration(n.Range), promText(c.prom.Name(), uri), model.Duration(retention)),
+				text: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
+					node.Expr, model.Duration(n.Range), reason),
 				severity: Warning,
 			})
 		}
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, child, retention, uri)...)
+		problems = append(problems, c.checkNode(ctx, child, retention, reason)...)
 	}
 
 	return problems

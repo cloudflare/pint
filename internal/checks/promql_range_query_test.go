@@ -3,6 +3,7 @@ package checks_test
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/parser"
@@ -10,7 +11,11 @@ import (
 )
 
 func newRangeQueryCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
-	return checks.NewRangeQueryCheck(prom)
+	return checks.NewRangeQueryCheck(prom, 0, "", checks.Fatal)
+}
+
+func newRangeQueryCheckWithLimit(prom *promapi.FailoverGroup) checks.RuleChecker {
+	return checks.NewRangeQueryCheck(prom, time.Hour*4, "some text", checks.Bug)
 }
 
 func retentionToLow(name, uri, metric, qr, retention string) string {
@@ -212,6 +217,33 @@ func TestRangeQueryCheck(t *testing.T) {
 						"storage.tsdb.retention.time": "0s",
 					}},
 				},
+			},
+		},
+		{
+			description: "limit / 3h",
+			content:     "- record: foo\n  expr: rate(foo[3h])\n",
+			checker:     newRangeQueryCheckWithLimit,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
+		{
+			description: "limit / 5h",
+			content:     "- record: foo\n  expr: rate(foo[5h])\n",
+			checker:     newRangeQueryCheckWithLimit,
+			prometheus:  noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "promql/range_query",
+						Text:     "`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.",
+						Details:  "Rule comment: some text",
+						Severity: checks.Bug,
+					},
+				}
 			},
 		},
 	}
