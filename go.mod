@@ -11,7 +11,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.21.0
 	github.com/klauspost/compress v1.17.9
 	github.com/neilotoole/slogt v1.1.0
-	github.com/prometheus/client_golang v1.20.0
+	github.com/prometheus/client_golang v1.20.1
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.55.0
 	github.com/prometheus/prometheus v0.54.0
