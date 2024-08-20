@@ -155,4 +155,3 @@ rule {
         strip = [ "instance" ]
     }
 }
-

@@ -1929,6 +1929,32 @@ rule {
 				checks.AlertsCheckName + "(prom)",
 			},
 		},
+		{
+			title: "custom range_query",
+			config: `rule {
+  range_query {
+    max      = "1h"
+	severity = "bug"
+  }
+}`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.RangeQueryCheckName + "(1h)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -2276,6 +2302,14 @@ func TestConfigErrors(t *testing.T) {
   }
 }`,
 			err: "unknown severity: xxx",
+		},
+		{
+			config: `rule {
+  range_query {
+	max = "abc"
+  }
+}`,
+			err: `not a valid duration string: "abc"`,
 		},
 	}
 

@@ -6,6 +6,8 @@
 
 - [promql/regexp](checks/promql/regexp.md) check will now look for smelly regexp selectors.
   See check docs for details.
+- [promql/range_query](checks/promql/range_query.md) now allows to configure a custom maximum
+  duration for range queries - #1064.
 
 ## v0.64.1
 
