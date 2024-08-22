@@ -16,16 +16,19 @@ exec touch .keep
 exec git add .keep
 exec git commit -am 'v2'
 
-pint.ok --no-color ci
+pint.error --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
-level=INFO msg="No rules found, skipping Prometheus discovery"
+level=INFO msg="Problems found" Bug=1
+rules.yml:4 Bug: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
+ 4 |   expr: sum(foo)
+
+level=ERROR msg="Fatal error" err="problems found"
 -- src/rules.yml --
-# pint ignore/file
 - record: rule1
   expr: sum(foo) by(job)
 - record: rule2
@@ -38,4 +41,14 @@ ci {
 parser {
   relaxed = [".*"]
   include = ["rules.yml"]
+}
+rule {
+    match {
+      kind  = "recording"
+      state = ["any"]
+    }
+    aggregate ".+" {
+        keep     = [ "job" ]
+        severity = "bug"
+    }
 }

@@ -113,6 +113,8 @@ func (rule Rule) validate() (err error) {
 }
 
 func (rule Rule) resolveChecks(ctx context.Context, e discovery.Entry, prometheusServers []*promapi.FailoverGroup) []checkMeta {
+	cmd := ctx.Value(CommandKey).(ContextCommandVal)
+
 	enabled := []checkMeta{}
 
 	for _, ignore := range rule.Ignore {
@@ -124,12 +126,33 @@ func (rule Rule) resolveChecks(ctx context.Context, e discovery.Entry, prometheu
 	if len(rule.Match) > 0 {
 		var found bool
 		for _, match := range rule.Match {
+			switch {
+			case len(match.State) != 0:
+				// use value from config
+			case cmd == CICommand:
+				match.State = CIStates
+			default:
+				match.State = AnyStates
+			}
 			if match.IsMatch(ctx, e.Path.Name, e) {
 				found = true
 				break
 			}
 		}
 		if !found {
+			return enabled
+		}
+	} else {
+		// If there are no match blocks then we would allow rule in any state to pass through.
+		// But we need to exclude some states depending on commands we run.
+		var match Match
+		switch cmd {
+		case CICommand:
+			match.State = CIStates
+		default:
+			match.State = AnyStates
+		}
+		if !match.IsMatch(ctx, e.Path.Name, e) {
 			return enabled
 		}
 	}

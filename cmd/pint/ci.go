@@ -96,6 +96,7 @@ func actionCI(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
+	entries = filterNoopEntries(entries)
 
 	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
 
@@ -341,4 +342,14 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		return nil
 	}
 	return gh
+}
+
+func filterNoopEntries(src []discovery.Entry) (dst []discovery.Entry) {
+	for _, e := range src {
+		if e.State == discovery.Noop && e.PathError != nil {
+			continue
+		}
+		dst = append(dst, e)
+	}
+	return dst
 }

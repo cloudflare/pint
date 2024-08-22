@@ -147,11 +147,10 @@ func newRule(t *testing.T, content string) parser.Rule {
 
 func TestGetChecksForRule(t *testing.T) {
 	type testCaseT struct {
-		title          string
-		config         string
-		checks         []string
-		disabledChecks []string
-		entry          discovery.Entry
+		title  string
+		config string
+		checks []string
+		entry  discovery.Entry
 	}
 
 	testCases := []testCaseT{
@@ -1603,6 +1602,7 @@ checks {
 - record: foo
   expr: sum(foo)
 `),
+				DisabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict", "promql/counter"},
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1611,7 +1611,6 @@ checks {
 				checks.FragileCheckName,
 				checks.RegexpCheckName,
 			},
-			disabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict", "promql/counter"},
 		},
 		{
 			title: "two prometheus servers / snoozed checks via comment",
@@ -1647,6 +1646,7 @@ checks {
   expr: sum(foo)
 # pint file/disable promql/vector_matching
 `),
+				DisabledChecks: []string{"promql/rate"},
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1659,7 +1659,6 @@ checks {
 				checks.LabelsConflictCheckName + "(prom2)",
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
 			},
-			disabledChecks: []string{"promql/rate"},
 		},
 		{
 			title: "two prometheus servers / expired snooze",
@@ -1691,6 +1690,7 @@ checks {
   expr: sum(foo)
 # pint file/disable promql/vector_matching
 `),
+				DisabledChecks: []string{"promql/rate"},
 			},
 			checks: []string{
 				checks.SyntaxCheckName,
@@ -1714,7 +1714,6 @@ checks {
 				checks.CounterCheckName + "(prom2)",
 				checks.AlertsAbsentCheckName + "(prom2)",
 			},
-			disabledChecks: []string{"promql/rate"},
 		},
 		{
 			title: "tag disables all prometheus checks",
@@ -1958,6 +1957,91 @@ rule {
 				checks.RangeQueryCheckName + "(1h)",
 			},
 		},
+		{
+			title: "state mismatch",
+			config: `
+rule {
+  match {
+    state = ["renamed"]
+  }
+  aggregate ".+" {
+    severity = "bug"
+	keep     = ["job"]
+  }
+}
+rule {
+  ignore {
+    state = ["modified"]
+  }
+  aggregate ".+" {
+    severity = "bug"
+	strip    = ["instance", "rack"]
+  }
+}`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+`),
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "state match",
+			config: `
+rule {
+  match {
+    state = ["renamed"]
+  }
+  aggregate ".+" {
+    severity = "bug"
+	keep     = ["job"]
+  }
+}
+rule {
+  ignore {
+    state = ["modified"]
+  }
+  aggregate ".+" {
+    severity = "bug"
+	strip    = ["instance", "rack"]
+  }
+}`,
+			entry: discovery.Entry{
+				State: discovery.Moved,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+`),
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AggregationCheckName + "(job:true)",
+				checks.AggregationCheckName + "(instance:false)",
+				checks.AggregationCheckName + "(rack:false)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -1977,7 +2061,7 @@ rule {
 			defer gen.Stop()
 			require.NoError(t, gen.GenerateStatic())
 
-			checks := cfg.GetChecksForRule(ctx, gen, tc.entry, tc.disabledChecks)
+			checks := cfg.GetChecksForRule(ctx, gen, tc.entry)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())
@@ -2313,6 +2397,14 @@ func TestConfigErrors(t *testing.T) {
   }
 }`,
 			err: `not a valid duration string: "abc"`,
+		},
+		{
+			config: `rule {
+  match {
+    state = ["added", "foo"]
+  }
+}`,
+			err: "unknown rule state: foo",
 		},
 	}
 

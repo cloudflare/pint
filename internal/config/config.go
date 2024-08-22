@@ -15,6 +15,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -80,8 +81,67 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry, disabledChecks []string) []checks.RuleChecker {
+func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
+
+	proms := gen.ServersForPath(entry.Path.Name)
+	allChecks := getBaseChecks(ctx, proms, entry)
+	for _, rule := range cfg.Rules {
+		allChecks = append(allChecks, rule.resolveChecks(ctx, entry, proms)...)
+	}
+
+	for _, cm := range allChecks {
+		// Entry state is not what the check is for.
+		if !slices.Contains(cm.check.Meta().States, entry.State) {
+			continue
+		}
+
+		// check if check is disabled for specific rule
+		if !isEnabled(cfg.Checks.Enabled, entry.DisabledChecks, entry.Rule, cm.name, cm.check, cm.tags) {
+			continue
+		}
+
+		// check if rule was disabled
+		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, entry.Rule, cm.name, cm.check, cm.tags) {
+			continue
+		}
+		// check if rule was already enabled
+		var v bool
+		for _, er := range enabled {
+			if er.String() == cm.check.String() {
+				v = true
+				break
+			}
+		}
+		if !v {
+			enabled = append(enabled, cm.check)
+		}
+	}
+
+	el := []string{}
+	for _, e := range enabled {
+		el = append(el, fmt.Sprintf("%v", e))
+	}
+	slog.Debug("Configured checks for rule",
+		slog.Any("enabled", el),
+		slog.String("path", entry.Path.Name),
+		slog.String("rule", entry.Rule.Name()),
+	)
+
+	return enabled
+}
+
+func getBaseChecks(ctx context.Context, proms []*promapi.FailoverGroup, entry discovery.Entry) []checkMeta {
+	cmd := ctx.Value(CommandKey).(ContextCommandVal)
+	if cmd == CICommand {
+		switch entry.State {
+		case discovery.Noop, discovery.Excluded:
+			// Don't include base checks for non-modified rules when running ci.
+			return []checkMeta{}
+		case discovery.Unknown, discovery.Added, discovery.Modified, discovery.Removed, discovery.Moved:
+			// Include all checks.
+		}
+	}
 
 	allChecks := []checkMeta{
 		{
@@ -113,8 +173,6 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			check: checks.NewRuleDependencyCheck(),
 		},
 	}
-
-	proms := gen.ServersForPath(entry.Path.Name)
 
 	for _, p := range proms {
 		allChecks = append(allChecks, checkMeta{
@@ -163,50 +221,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 			tags:  p.Tags(),
 		})
 	}
-
-	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(ctx, entry, proms)...)
-	}
-
-	for _, cm := range allChecks {
-		// Entry state is not what the check is for.
-		if !slices.Contains(cm.check.Meta().States, entry.State) {
-			continue
-		}
-
-		// check if check is disabled for specific rule
-		if !isEnabled(cfg.Checks.Enabled, disabledChecks, entry.Rule, cm.name, cm.check, cm.tags) {
-			continue
-		}
-
-		// check if rule was disabled
-		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, entry.Rule, cm.name, cm.check, cm.tags) {
-			continue
-		}
-		// check if rule was already enabled
-		var v bool
-		for _, er := range enabled {
-			if er.String() == cm.check.String() {
-				v = true
-				break
-			}
-		}
-		if !v {
-			enabled = append(enabled, cm.check)
-		}
-	}
-
-	el := []string{}
-	for _, e := range enabled {
-		el = append(el, fmt.Sprintf("%v", e))
-	}
-	slog.Debug("Configured checks for rule",
-		slog.Any("enabled", el),
-		slog.String("path", entry.Path.Name),
-		slog.String("rule", entry.Rule.Name()),
-	)
-
-	return enabled
+	return allChecks
 }
 
 func getContext() *hcl.EvalContext {

@@ -23,9 +23,7 @@ cmp stderr ../stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
-level=INFO msg="No rules found, skipping Prometheus discovery"
 -- src/rules.yml --
-# pint ignore/file
 - record: rule1
   expr: sum(foo) by(job)
 - record: rule2
@@ -38,4 +36,10 @@ ci {
 parser {
   relaxed = [".*"]
   include = ["rules.yml"]
+}
+rule {
+    aggregate ".+" {
+        keep     = [ "job" ]
+        severity = "bug"
+    }
 }

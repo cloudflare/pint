@@ -80,10 +80,10 @@ parser {
 
   ```yaml
   groups:
-  - name: example
-    rules:
-    - record: ...
-      expr: ...
+    - name: example
+      rules:
+        - record: ...
+          expr: ...
   ```
 
   If you're using pint to lint rules that are embedded inside a different structure
@@ -519,9 +519,10 @@ Syntax:
 ```js
 rule {
   match {
-    path = "(.+)"
-    name = "(.+)"
-    kind = "alerting|recording"
+    path    = "(.+)"
+    state   = [ "any|added|modified|renamed|unmodified", ... ]
+    name    = "(.+)"
+    kind    = "alerting|recording"
     command = "ci|lint|watch"
     annotation "(.*)" {
       value = "(.*)"
@@ -534,9 +535,10 @@ rule {
   match { ... }
   match { ... }
   ignore {
-    path = "(.+)"
-    name = "(.+)"
-    kind = "alerting|recording"
+    path    = "(.+)"
+    state   = [ "any|added|modified|renamed|unmodified", ... ]
+    name    = "(.+)"
+    kind    = "alerting|recording"
     command = "ci|lint|watch"
     annotation "(.*)" {
       value = "(.*)"
@@ -555,10 +557,19 @@ rule {
 }
 ```
 
-- `match:path` - only files matching this pattern will be checked by this rule
+- `match:path` - only files matching this pattern will be checked by this rule.
+- `match:state` - only match rules based on their state. Default value for `state` depends on the
+  pint command that is being run, for `pint ci` the default value is `["added", "modified", "renamed"]`,
+  for any other command the default value is `["any"]`.
+  Possible values:
+  - `any` - match rule in any state
+  - `added` - a rule is being added in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
+  - `modified` - a rule is being modified in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
+  - `renamed` - a rule is being modified in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
+  - `unmodified` - a rule is not being modified in a git commit when running `pint ci` or other pint command was run that doesn't try to detect which rules were modified.
 - `match:name` - only rules with names (`record` for recording rules and `alert` for alerting
-  rules) matching this pattern will be checked rule
-- `match:kind` - optional rule type filter, only rule of this type will be checked
+  rules) matching this pattern will be checked rule.
+- `match:kind` - optional rule type filter, only rule of this type will be checked.
 - `match:command` - optional command type filter, this allows to include or ignore rules
   based on the command pint is run with `pint ci`, `pint lint` or `pint watch`.
 - `match:annotation` - optional annotation filter, only alert rules with at least one
@@ -581,6 +592,8 @@ be matched / ignored.
 
 Examples:
 
+Check applied only to severity="critical" and severity="warning" alerts in "ci" or "lint" command is run:
+
 ```js
 rule {
   match {
@@ -593,9 +606,11 @@ rule {
   ignore {
     command = "watch"
   }
-  [ check applied only to severity="critical" and severity="warning" alerts in "ci" or "lint" command is run ]
+  check { ... }
 }
 ```
+
+Check applied unless "watch" or "lint" command is run:
 
 ```js
 rule {
@@ -605,24 +620,39 @@ rule {
   ignore {
     command = "lint"
   }
-  [ check applied unless "watch" or "lint" command is run ]
+  check { ... }
 }
 ```
+
+Check applied only to alerting rules with "for" field value that is >= 5m:
 
 ```js
 rule {
   match {
     for = ">= 5m"
   }
-  [ check applied only to alerting rules with "for" field value that is >= 5m ]
+  check { ... }
 }
 ```
+
+Check applied only to alerting rules with "keep_firing_for" field value that is > 15m:
 
 ```js
 rule {
   match {
     keep_firing_for = "> 15m"
   }
-  [ check applied only to alerting rules with "keep_firing_for" field value that is > 15m ]
+  check { ... }
+}
+```
+
+Check that is run on all rules, including unmodified files, when running `pint ci`:
+
+```js
+rule {
+  match {
+    state = ["any"]
+  }
+  check { ... }
 }
 ```
