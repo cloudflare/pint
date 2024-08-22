@@ -1,3 +1,4 @@
+http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml"}]
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []

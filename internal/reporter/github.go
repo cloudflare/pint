@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -35,6 +36,10 @@ type GithubReporter struct {
 
 type ghCommentMeta struct {
 	id int64
+}
+
+type ghPR struct {
+	paths []string
 }
 
 // NewGithubReporter creates a new GitHub reporter that reports
@@ -84,8 +89,10 @@ func (gr GithubReporter) Describe() string {
 	return "GitHub"
 }
 
-func (gr GithubReporter) Destinations(context.Context) ([]any, error) {
-	return []any{gr.prNum}, nil
+func (gr GithubReporter) Destinations(ctx context.Context) (_ []any, err error) {
+	pr := ghPR{}
+	pr.paths, err = gr.listPRFiles(ctx)
+	return []any{pr}, err
 }
 
 func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, errs []error) error {
@@ -144,7 +151,16 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 	return comments, nil
 }
 
-func (gr GithubReporter) Create(ctx context.Context, _ any, p PendingComment) error {
+func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) error {
+	pr := dst.(ghPR)
+
+	if !slices.Contains(pr.paths, p.path) {
+		slog.Debug("Skipping report for path with no changes",
+			slog.String("path", p.path),
+		)
+		return nil
+	}
+
 	var side string
 	if p.anchor == checks.AnchorBefore {
 		side = "LEFT"
@@ -248,6 +264,22 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	}
 	slog.Info("Pull request review created", slog.String("status", resp.Status))
 	return nil
+}
+
+func (gr GithubReporter) listPRFiles(ctx context.Context) ([]string, error) {
+	reqCtx, cancel := gr.reqContext(ctx)
+	defer cancel()
+
+	slog.Debug("Getting the list of modified files", slog.Int("pr", gr.prNum))
+	files, _, err := gr.client.PullRequests.ListFiles(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list pull request files: %w", err)
+	}
+	paths := []string{}
+	for _, file := range files {
+		paths = append(paths, file.GetFilename())
+	}
+	return paths, nil
 }
 
 func formatGHReviewBody(version string, summary Summary) string {
