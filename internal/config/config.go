@@ -15,7 +15,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsimple"
@@ -84,37 +83,14 @@ func (cfg Config) String() string {
 func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
+	defaultMatch := []Match{{State: defaultMatchStates(ctx.Value(CommandKey).(ContextCommandVal))}}
 	proms := gen.ServersForPath(entry.Path.Name)
-	allChecks := getBaseChecks(ctx, proms, entry)
-	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(ctx, entry, proms)...)
+	for _, pr := range baseRules(proms, defaultMatch) {
+		enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
 	}
-
-	for _, cm := range allChecks {
-		// Entry state is not what the check is for.
-		if !slices.Contains(cm.check.Meta().States, entry.State) {
-			continue
-		}
-
-		// check if check is disabled for specific rule
-		if !isEnabled(cfg.Checks.Enabled, entry.DisabledChecks, entry.Rule, cm.name, cm.check, cm.tags) {
-			continue
-		}
-
-		// check if rule was disabled
-		if !isEnabled(cfg.Checks.Enabled, cfg.Checks.Disabled, entry.Rule, cm.name, cm.check, cm.tags) {
-			continue
-		}
-		// check if rule was already enabled
-		var v bool
-		for _, er := range enabled {
-			if er.String() == cm.check.String() {
-				v = true
-				break
-			}
-		}
-		if !v {
-			enabled = append(enabled, cm.check)
+	for _, rule := range cfg.Rules {
+		for _, pr := range parseRule(rule, proms, defaultMatch) {
+			enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
 		}
 	}
 
@@ -129,99 +105,6 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 	)
 
 	return enabled
-}
-
-func getBaseChecks(ctx context.Context, proms []*promapi.FailoverGroup, entry discovery.Entry) []checkMeta {
-	cmd := ctx.Value(CommandKey).(ContextCommandVal)
-	if cmd == CICommand {
-		switch entry.State {
-		case discovery.Noop, discovery.Excluded:
-			// Don't include base checks for non-modified rules when running ci.
-			return []checkMeta{}
-		case discovery.Unknown, discovery.Added, discovery.Modified, discovery.Removed, discovery.Moved:
-			// Include all checks.
-		}
-	}
-
-	allChecks := []checkMeta{
-		{
-			name:  checks.SyntaxCheckName,
-			check: checks.NewSyntaxCheck(),
-		},
-		{
-			name:  checks.AlertForCheckName,
-			check: checks.NewAlertsForCheck(),
-		},
-		{
-			name:  checks.ComparisonCheckName,
-			check: checks.NewComparisonCheck(),
-		},
-		{
-			name:  checks.TemplateCheckName,
-			check: checks.NewTemplateCheck(),
-		},
-		{
-			name:  checks.FragileCheckName,
-			check: checks.NewFragileCheck(),
-		},
-		{
-			name:  checks.RegexpCheckName,
-			check: checks.NewRegexpCheck(),
-		},
-		{
-			name:  checks.RuleDependencyCheckName,
-			check: checks.NewRuleDependencyCheck(),
-		},
-	}
-
-	for _, p := range proms {
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.RateCheckName,
-			check: checks.NewRateCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.SeriesCheckName,
-			check: checks.NewSeriesCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.VectorMatchingCheckName,
-			check: checks.NewVectorMatchingCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.RangeQueryCheckName,
-			check: checks.NewRangeQueryCheck(p, 0, "", checks.Warning),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.RuleDuplicateCheckName,
-			check: checks.NewRuleDuplicateCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.LabelsConflictCheckName,
-			check: checks.NewLabelsConflictCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.AlertsExternalLabelsCheckName,
-			check: checks.NewAlertsExternalLabelsCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.CounterCheckName,
-			check: checks.NewCounterCheck(p),
-			tags:  p.Tags(),
-		})
-		allChecks = append(allChecks, checkMeta{
-			name:  checks.AlertsAbsentCheckName,
-			check: checks.NewAlertsAbsentCheck(p),
-			tags:  p.Tags(),
-		})
-	}
-	return allChecks
 }
 
 func getContext() *hcl.EvalContext {
@@ -336,10 +219,4 @@ func parseDuration(d string) (time.Duration, error) {
 		return 0, err
 	}
 	return time.Duration(mdur), nil
-}
-
-type checkMeta struct {
-	name  string
-	check checks.RuleChecker
-	tags  []string
 }
