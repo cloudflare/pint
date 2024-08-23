@@ -317,7 +317,7 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 		return err
 	}
 
-	s, err := checkRules(ctx, workers, isOffline, gen, c.cfg, entries)
+	s, err := checkRules(ctx, "watch", workers, isOffline, gen, c.cfg, entries)
 	if err != nil {
 		return err
 	}

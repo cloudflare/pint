@@ -222,8 +222,9 @@ func getContext() *hcl.EvalContext {
 func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error) {
 	cfg = Config{
 		CI: &CI{
-			MaxCommits: 20,
-			BaseBranch: "master",
+			MaxCommits:  20,
+			BaseBranch:  "master",
+			MinSeverity: "info",
 		},
 		Parser: &Parser{},
 		Checks: &Checks{

@@ -82,7 +82,7 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	summary, err := checkRules(ctx, meta.workers, meta.isOffline, gen, meta.cfg, entries)
+	summary, err := checkRules(ctx, "lint", meta.workers, meta.isOffline, gen, meta.cfg, entries)
 	if err != nil {
 		return err
 	}

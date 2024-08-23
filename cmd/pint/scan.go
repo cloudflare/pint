@@ -28,7 +28,7 @@ const (
 This usually means that it's missing some required fields.`
 )
 
-func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
+func checkRules(ctx context.Context, cmd string, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
 	if isOffline {
 		slog.Info("Offline mode, skipping Prometheus discovery")
 	} else {
@@ -127,9 +127,26 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 		defer close(jobs)
 	}()
 
-	for result := range results {
-		summary.Report(result)
+	shouldReport := func(sev checks.Severity) bool {
+		return true
 	}
+
+	if cmd == "ci" {
+		minSev, err := checks.ParseSeverity(cfg.CI.MinSeverity)
+		if err != nil {
+			minSev = checks.Warning
+		}
+		shouldReport = func(sev checks.Severity) bool {
+			return sev >= minSev
+		}
+	}
+
+	for result := range results {
+		if shouldReport(result.Problem.Severity) {
+			summary.Report(result)
+		}
+	}
+
 	summary.SortReports()
 	summary.Duration = time.Since(start)
 	summary.TotalEntries = len(entries)

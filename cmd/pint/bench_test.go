@@ -102,6 +102,6 @@ rule {
 
 	b.ResetTimer()
 	for n := 0; n < b.N; n++ {
-		_, _ = checkRules(ctx, 10, false, gen, cfg, entries)
+		_, _ = checkRules(ctx, "", 10, false, gen, cfg, entries)
 	}
 }
