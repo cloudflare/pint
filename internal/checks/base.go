@@ -118,8 +118,9 @@ type Problem struct {
 }
 
 type CheckMeta struct {
-	States   []discovery.ChangeType
-	IsOnline bool
+	States        []discovery.ChangeType
+	IsOnline      bool
+	AlwaysEnabled bool
 }
 
 type RuleChecker interface {

@@ -2061,7 +2061,7 @@ rule {
 			defer gen.Stop()
 			require.NoError(t, gen.GenerateStatic())
 
-			checks := cfg.GetChecksForRule(ctx, gen, tc.entry)
+			checks := cfg.GetChecksForEntry(ctx, gen, tc.entry)
 			checkNames := make([]string, 0, len(checks))
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())

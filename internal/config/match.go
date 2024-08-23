@@ -21,6 +21,7 @@ const (
 	StateAdded      = "added"
 	StateModified   = "modified"
 	StateRenamed    = "renamed"
+	StateRemoved    = "removed"
 	StateUnmodified = "unmodified"
 )
 
@@ -30,7 +31,7 @@ var (
 	LintCommand  ContextCommandVal = "lint"
 	WatchCommand ContextCommandVal = "watch"
 
-	CIStates  = []string{StateAdded, StateModified, StateRenamed}
+	CIStates  = []string{StateAdded, StateModified, StateRenamed, StateRemoved}
 	AnyStates = []string{StateAny}
 )
 
@@ -89,7 +90,7 @@ func (m Match) validate(allowEmpty bool) error {
 
 	for _, s := range m.State {
 		switch s {
-		case StateAny, StateAdded, StateModified, StateRenamed, StateUnmodified:
+		case StateAny, StateAdded, StateModified, StateRenamed, StateRemoved, StateUnmodified:
 			// valid values
 		default:
 			return fmt.Errorf("unknown rule state: %s", s)
@@ -338,6 +339,10 @@ func stateMatches(states []string, state discovery.ChangeType) bool {
 			}
 		case StateRenamed:
 			if state == discovery.Moved {
+				return true
+			}
+		case StateRemoved:
+			if state == discovery.Removed {
 				return true
 			}
 		case StateUnmodified:

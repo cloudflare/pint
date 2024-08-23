@@ -110,6 +110,10 @@ func (rule Rule) validate() (err error) {
 }
 
 func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
+	if check.Meta().AlwaysEnabled {
+		return true
+	}
+
 	matches := []string{
 		name,
 		check.String(),

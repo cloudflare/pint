@@ -80,17 +80,26 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
+func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	defaultMatch := []Match{{State: defaultMatchStates(ctx.Value(CommandKey).(ContextCommandVal))}}
 	proms := gen.ServersForPath(entry.Path.Name)
-	for _, pr := range baseRules(proms, defaultMatch) {
-		enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
-	}
-	for _, rule := range cfg.Rules {
-		for _, pr := range parseRule(rule, proms, defaultMatch) {
+
+	if entry.PathError != nil || entry.Rule.Error.Err != nil {
+		enabled = parsedRule{
+			match: defaultMatch,
+			name:  checks.ErrorCheckName,
+			check: checks.NewErrorCheck(entry.PathError),
+		}.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
+	} else {
+		for _, pr := range baseRules(proms, defaultMatch) {
 			enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
+		}
+		for _, rule := range cfg.Rules {
+			for _, pr := range parseRule(rule, proms, defaultMatch) {
+				enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
+			}
 		}
 	}
 

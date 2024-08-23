@@ -520,7 +520,7 @@ Syntax:
 rule {
   match {
     path    = "(.+)"
-    state   = [ "any|added|modified|renamed|unmodified", ... ]
+    state   = [ "any|added|modified|renamed|removed|unmodified", ... ]
     name    = "(.+)"
     kind    = "alerting|recording"
     command = "ci|lint|watch"
@@ -536,7 +536,7 @@ rule {
   match { ... }
   ignore {
     path    = "(.+)"
-    state   = [ "any|added|modified|renamed|unmodified", ... ]
+    state   = [ "any|added|modified|renamed|removed|unmodified", ... ]
     name    = "(.+)"
     kind    = "alerting|recording"
     command = "ci|lint|watch"
@@ -566,6 +566,7 @@ rule {
   - `added` - a rule is being added in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
   - `modified` - a rule is being modified in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
   - `renamed` - a rule is being modified in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
+  - `removed` - a rule is being removed in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
   - `unmodified` - a rule is not being modified in a git commit when running `pint ci` or other pint command was run that doesn't try to detect which rules were modified.
 - `match:name` - only rules with names (`record` for recording rules and `alert` for alerting
   rules) matching this pattern will be checked rule.

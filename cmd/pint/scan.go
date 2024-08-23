@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"time"
@@ -11,21 +9,10 @@ import (
 	"go.uber.org/atomic"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
-)
-
-const (
-	yamlParseReporter   = "yaml/parse"
-	ignoreFileReporter  = "ignore/file"
-	pintCommentReporter = "pint/comment"
-
-	yamlDetails = `This Prometheus rule is not valid.
-This usually means that it's missing some required fields.`
 )
 
 func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
@@ -84,7 +71,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				continue
 			case entry.Rule.Error.Err != nil && entry.State == discovery.Removed:
 				continue
-			case entry.PathError == nil && entry.Rule.Error.Err == nil:
+			default:
 				if entry.Rule.RecordingRule != nil {
 					rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Inc()
 					slog.Debug("Found recording rule",
@@ -101,9 +88,16 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 						slog.String("lines", entry.Rule.Lines.String()),
 					)
 				}
+				if entry.Rule.Error.Err != nil {
+					slog.Debug("Found invalid rule",
+						slog.String("path", entry.Path.Name),
+						slog.String("lines", entry.Rule.Lines.String()),
+					)
+					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
+				}
 
 				checkedEntriesCount.Inc()
-				checkList := cfg.GetChecksForRule(ctx, gen, entry)
+				checkList := cfg.GetChecksForEntry(ctx, gen, entry)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
 					if check.Meta().IsOnline {
@@ -113,15 +107,6 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					}
 					jobs <- scanJob{entry: entry, allEntries: entries, check: check}
 				}
-			default:
-				if entry.Rule.Error.Err != nil {
-					slog.Debug("Found invalid rule",
-						slog.String("path", entry.Path.Name),
-						slog.String("lines", entry.Rule.Lines.String()),
-					)
-					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
-				}
-				jobs <- scanJob{entry: entry, allEntries: entries, check: nil}
 			}
 		}
 		defer close(jobs)
@@ -154,72 +139,19 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 		case <-ctx.Done():
 			return
 		default:
-			var commentErr comments.CommentError
-			var ignoreErr discovery.FileIgnoreError
-			switch {
-			case errors.As(job.entry.PathError, &ignoreErr):
-				results <- reporter.Report{
-					Path: discovery.Path{
-						Name:          job.entry.Path.Name,
-						SymlinkTarget: job.entry.Path.SymlinkTarget,
-					},
-					ModifiedLines: job.entry.ModifiedLines,
-					Problem: checks.Problem{
-						Lines: parser.LineRange{
-							First: ignoreErr.Line,
-							Last:  ignoreErr.Line,
-						},
-						Reporter: ignoreFileReporter,
-						Text:     ignoreErr.Error(),
-						Severity: checks.Information,
-					},
-					Owner: job.entry.Owner,
-				}
-			case errors.As(job.entry.PathError, &commentErr):
-				results <- reporter.Report{
-					Path: discovery.Path{
-						Name:          job.entry.Path.Name,
-						SymlinkTarget: job.entry.Path.SymlinkTarget,
-					},
-					ModifiedLines: job.entry.ModifiedLines,
-					Problem: checks.Problem{
-						Lines: parser.LineRange{
-							First: commentErr.Line,
-							Last:  commentErr.Line,
-						},
-						Reporter: pintCommentReporter,
-						Text:     "This comment is not a valid pint control comment: " + commentErr.Error(),
-						Severity: checks.Warning,
-					},
-					Owner: job.entry.Owner,
-				}
-			case job.entry.PathError != nil:
-				results <- reporter.Report{
-					Path: discovery.Path{
-						Name:          job.entry.Path.Name,
-						SymlinkTarget: job.entry.Path.SymlinkTarget,
-					},
-					ModifiedLines: job.entry.ModifiedLines,
-					Problem: checks.Problem{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  1,
-						},
-						Reporter: yamlParseReporter,
-						Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", job.entry.PathError),
-						Details: `pint cannot read this file because YAML parser returned an error.
-This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
-If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
-`,
-						Severity: checks.Fatal,
-					},
-					Owner: job.entry.Owner,
-				}
-			case job.entry.Rule.Error.Err != nil:
-				details := yamlDetails
-				if job.entry.Rule.Error.Details != "" {
-					details = job.entry.Rule.Error.Details
-				}
+			if job.entry.State == discovery.Unknown {
+				slog.Warn(
+					"Bug: unknown rule state",
+					slog.String("path", job.entry.Path.String()),
+					slog.Int("line", job.entry.Rule.Lines.First),
+					slog.String("name", job.entry.Rule.Name()),
+				)
+			}
+
+			start := time.Now()
+			problems := job.check.Check(ctx, job.entry.Path, job.entry.Rule, job.allEntries)
+			checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
+			for _, problem := range problems {
 				results <- reporter.Report{
 					Path: discovery.Path{
 						Name:          job.entry.Path.Name,
@@ -227,42 +159,8 @@ If this file is a template that will be rendered into valid YAML then you can in
 					},
 					ModifiedLines: job.entry.ModifiedLines,
 					Rule:          job.entry.Rule,
-					Problem: checks.Problem{
-						Lines: parser.LineRange{
-							First: job.entry.Rule.Error.Line,
-							Last:  job.entry.Rule.Error.Line,
-						},
-						Reporter: yamlParseReporter,
-						Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", job.entry.Rule.Error.Err.Error()),
-						Details:  details,
-						Severity: checks.Fatal,
-					},
-					Owner: job.entry.Owner,
-				}
-			default:
-				if job.entry.State == discovery.Unknown {
-					slog.Warn(
-						"Bug: unknown rule state",
-						slog.String("path", job.entry.Path.String()),
-						slog.Int("line", job.entry.Rule.Lines.First),
-						slog.String("name", job.entry.Rule.Name()),
-					)
-				}
-
-				start := time.Now()
-				problems := job.check.Check(ctx, job.entry.Path, job.entry.Rule, job.allEntries)
-				checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
-				for _, problem := range problems {
-					results <- reporter.Report{
-						Path: discovery.Path{
-							Name:          job.entry.Path.Name,
-							SymlinkTarget: job.entry.Path.SymlinkTarget,
-						},
-						ModifiedLines: job.entry.ModifiedLines,
-						Rule:          job.entry.Rule,
-						Problem:       problem,
-						Owner:         job.entry.Owner,
-					}
+					Problem:       problem,
+					Owner:         job.entry.Owner,
 				}
 			}
 		}
