@@ -9,6 +9,10 @@
 - [promql/range_query](checks/promql/range_query.md) now allows to configure a custom maximum
   duration for range queries - #1064.
 
+### Fixed
+
+- Don't try to report problem on unmodified files when using GitHub reporter.
+
 ## v0.64.1
 
 ### Fixed

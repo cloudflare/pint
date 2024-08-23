@@ -46,13 +46,59 @@ func TestGithubReporter(t *testing.T) {
 
 	for _, tc := range []testCaseT{
 		{
-			description: "list pull requests timeout",
+			description: "list files error",
 			owner:       "foo",
 			repo:        "bar",
 			token:       "something",
 			prNum:       123,
 			maxComments: 50,
-			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusBadRequest)
+					_, _ = w.Write([]byte("Error"))
+					return
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			error: func(uri string) string {
+				return fmt.Sprintf("failed to list pull request files: GET %s/api/v3/repos/foo/bar/pulls/123/files: 400  []", uri)
+			},
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "list pull reviews timeout",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte("[]"))
+					return
+				}
 				time.Sleep(1 * time.Second)
 				_, _ = w.Write([]byte("OK"))
 			}),
@@ -514,6 +560,11 @@ func TestGithubReporter(t *testing.T) {
 			maxComments: 2,
 			timeout:     time.Second,
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`[{"filename":"foo.txt"}]`))
+					return
+				}
 				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
 					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
 					return
