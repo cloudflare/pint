@@ -36,10 +36,6 @@ type GitBranchFinder struct {
 }
 
 func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
-	for i := range allEntries {
-		allEntries[i].State = Excluded
-	}
-
 	changes, err := git.Changes(f.gitCmd, f.baseBranch, f.filter)
 	if err != nil {
 		return nil, err

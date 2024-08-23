@@ -16,11 +16,13 @@ const (
 	AlertingRuleType  = "alerting"
 	RecordingRuleType = "recording"
 	InvalidRuleType   = "invalid"
-)
 
-type (
-	ContextCommandKey string
-	ContextCommandVal string
+	StateAny        = "any"
+	StateAdded      = "added"
+	StateModified   = "modified"
+	StateRenamed    = "renamed"
+	StateRemoved    = "removed"
+	StateUnmodified = "unmodified"
 )
 
 var (
@@ -28,6 +30,14 @@ var (
 	CICommand    ContextCommandVal = "ci"
 	LintCommand  ContextCommandVal = "lint"
 	WatchCommand ContextCommandVal = "watch"
+
+	CIStates  = []string{StateAdded, StateModified, StateRenamed, StateRemoved}
+	AnyStates = []string{StateAny}
+)
+
+type (
+	ContextCommandKey string
+	ContextCommandVal string
 )
 
 type Match struct {
@@ -39,6 +49,7 @@ type Match struct {
 	Kind          string             `hcl:"kind,optional" json:"kind,omitempty"`
 	For           string             `hcl:"for,optional" json:"for,omitempty"`
 	KeepFiringFor string             `hcl:"keep_firing_for,optional" json:"keep_firing_for,omitempty"`
+	State         []string           `hcl:"state,optional" json:"state,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {
@@ -77,7 +88,16 @@ func (m Match) validate(allowEmpty bool) error {
 		}
 	}
 
-	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil && m.Command == nil && m.For == "" {
+	for _, s := range m.State {
+		switch s {
+		case StateAny, StateAdded, StateModified, StateRenamed, StateRemoved, StateUnmodified:
+			// valid values
+		default:
+			return fmt.Errorf("unknown rule state: %s", s)
+		}
+	}
+
+	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil && m.Command == nil && m.For == "" && m.State == nil {
 		return errors.New("ignore block must have at least one condition")
 	}
 
@@ -91,6 +111,10 @@ func (m Match) IsMatch(ctx context.Context, path string, e discovery.Entry) bool
 		if cmd != *m.Command {
 			return false
 		}
+	}
+
+	if len(m.State) != 0 && !stateMatches(m.State, e.State) {
+		return false
 	}
 
 	if m.Kind != "" {
@@ -296,6 +320,36 @@ func (dm durationMatch) isMatch(dur time.Duration) bool {
 		return dur >= dm.dur
 	case opMore:
 		return dur > dm.dur
+	}
+	return false
+}
+
+func stateMatches(states []string, state discovery.ChangeType) bool {
+	for _, s := range states {
+		switch s {
+		case StateAny:
+			return true
+		case StateAdded:
+			if state == discovery.Added {
+				return true
+			}
+		case StateModified:
+			if state == discovery.Modified {
+				return true
+			}
+		case StateRenamed:
+			if state == discovery.Moved {
+				return true
+			}
+		case StateRemoved:
+			if state == discovery.Removed {
+				return true
+			}
+		case StateUnmodified:
+			if state == discovery.Noop {
+				return true
+			}
+		}
 	}
 	return false
 }

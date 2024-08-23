@@ -507,6 +507,164 @@ func TestMatch(t *testing.T) {
 			},
 			isMatch: false,
 		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+				State:   config.CIStates,
+			},
+			isMatch: false,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Added,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+			},
+			isMatch: true,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+				State:   []string{config.StateAny},
+			},
+			isMatch: true,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+				State:   []string{config.StateAdded},
+			},
+			isMatch: false,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+				State:   []string{config.StateUnmodified},
+			},
+			isMatch: true,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Moved,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+				State:   []string{config.StateUnmodified},
+			},
+			isMatch: false,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Modified,
+			},
+			match: config.Match{
+				Command: &config.CICommand,
+				State:   []string{config.StateModified},
+			},
+			isMatch: true,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Removed,
+			},
+			match: config.Match{
+				State: []string{config.StateModified},
+			},
+			isMatch: false,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Moved,
+			},
+			match: config.Match{
+				State: []string{config.StateRenamed},
+			},
+			isMatch: true,
+		},
+		{
+			cmd:  config.CICommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Unknown,
+			},
+			match: config.Match{
+				State: []string{config.StateRenamed},
+			},
+			isMatch: false,
+		},
+		{
+			cmd:  config.LintCommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match:   config.Match{},
+			isMatch: true,
+		},
+		{
+			cmd:  config.WatchCommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match:   config.Match{},
+			isMatch: true,
+		},
+		{
+			cmd:  config.WatchCommand,
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match: config.Match{
+				State: []string{},
+			},
+			isMatch: true,
+		},
 	}
 
 	for i, tc := range testCases {
