@@ -14,6 +14,7 @@ import (
 const (
 	configFlag   = "config"
 	logLevelFlag = "log-level"
+	enabledFlag  = "enabled"
 	disabledFlag = "disabled"
 	offlineFlag  = "offline"
 	noColorFlag  = "no-color"
@@ -59,6 +60,12 @@ func newApp() *cli.App {
 				Value:   cli.NewStringSlice(),
 				Usage:   "List of checks to disable (example: promql/cost).",
 			},
+			&cli.StringSliceFlag{
+				Name:    enabledFlag,
+				Aliases: []string{"e"},
+				Value:   cli.NewStringSlice(),
+				Usage:   "Only enable these checks (example: promql/cost).",
+			},
 			&cli.BoolFlag{
 				Name:    offlineFlag,
 				Aliases: []string{"o"},
@@ -100,11 +107,22 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 		return meta, fmt.Errorf("--%s flag must be > 0", workersFlag)
 	}
 
-	meta.cfg, err = config.Load(c.Path(configFlag), c.IsSet(configFlag))
+	var fromFile bool
+	meta.cfg, fromFile, err = config.Load(c.Path(configFlag), c.IsSet(configFlag))
 	if err != nil {
 		return meta, fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}
+	if fromFile {
+		slog.Debug("Adding pint config to the parser exclude list", slog.String("path", c.Path(configFlag)))
+		meta.cfg.Parser.Exclude = append(meta.cfg.Parser.Exclude, c.Path(configFlag))
+	}
+
 	meta.cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
+	enabled := c.StringSlice(enabledFlag)
+	if len(enabled) > 0 {
+		meta.cfg.Checks.Enabled = enabled
+	}
+
 	if c.Bool(offlineFlag) {
 		meta.isOffline = true
 		meta.cfg.DisableOnlineChecks()

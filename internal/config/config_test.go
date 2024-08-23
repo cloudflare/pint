@@ -24,13 +24,15 @@ func TestMain(t *testing.M) {
 }
 
 func TestConfigLoadMissingFile(t *testing.T) {
-	_, err := config.Load("/foo/bar/pint.hcl", true)
+	_, ok, err := config.Load("/foo/bar/pint.hcl", true)
 	require.EqualError(t, err, "<nil>: Configuration file not found; The configuration file /foo/bar/pint.hcl does not exist.")
+	require.True(t, ok)
 }
 
 func TestConfigLoadMissingFileOk(t *testing.T) {
-	_, err := config.Load("/foo/bar/pint.hcl", false)
+	_, ok, err := config.Load("/foo/bar/pint.hcl", false)
 	require.NoError(t, err)
+	require.False(t, ok)
 }
 
 func TestDisableOnlineChecksWithPrometheus(t *testing.T) {
@@ -43,8 +45,9 @@ prometheus "prom" {
 `), 0o644)
 	require.NoError(t, err)
 
-	cfg, err := config.Load(path, true)
+	cfg, ok, err := config.Load(path, true)
 	require.NoError(t, err)
+	require.True(t, ok)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
 	defer gen.Stop()
@@ -64,7 +67,7 @@ func TestDisableOnlineChecksWithoutPrometheus(t *testing.T) {
 	err := os.WriteFile(path, []byte(``), 0o644)
 	require.NoError(t, err)
 
-	cfg, err := config.Load(path, true)
+	cfg, _, err := config.Load(path, true)
 	require.NoError(t, err)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
@@ -90,7 +93,7 @@ prometheus "prom" {
 `), 0o644)
 	require.NoError(t, err)
 
-	cfg, err := config.Load(path, true)
+	cfg, _, err := config.Load(path, true)
 	require.NoError(t, err)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
@@ -117,7 +120,7 @@ func TestSetDisabledChecks(t *testing.T) {
 	err := os.WriteFile(path, []byte(``), 0o644)
 	require.NoError(t, err)
 
-	cfg, err := config.Load(path, true)
+	cfg, _, err := config.Load(path, true)
 	require.NoError(t, err)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
@@ -1967,7 +1970,7 @@ rule {
 				require.NoError(t, err)
 			}
 
-			cfg, err := config.Load(path, false)
+			cfg, _, err := config.Load(path, false)
 			require.NoError(t, err)
 
 			gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())
@@ -2322,7 +2325,7 @@ func TestConfigErrors(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			_, err := config.Load(path, false)
+			_, _, err := config.Load(path, false)
 			require.EqualError(t, err, tc.err, tc.config)
 		})
 	}
@@ -2343,6 +2346,6 @@ prometheus "prom" {
 `), 0o644)
 	require.NoError(t, err)
 
-	_, err = config.Load(path, true)
+	_, _, err = config.Load(path, true)
 	require.EqualError(t, err, `prometheus server name must be unique, found two or more config blocks using "prom" name`)
 }

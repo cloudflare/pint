@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -83,12 +84,20 @@ func (m Match) validate(allowEmpty bool) error {
 	return nil
 }
 
-func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
-	if m.Kind != "" {
-		if r.AlertingRule != nil && m.Kind != AlertingRuleType {
+func (m Match) IsMatch(ctx context.Context, path string, e discovery.Entry) bool {
+	cmd := ctx.Value(CommandKey).(ContextCommandVal)
+
+	if m.Command != nil {
+		if cmd != *m.Command {
 			return false
 		}
-		if r.RecordingRule != nil && m.Kind != RecordingRuleType {
+	}
+
+	if m.Kind != "" {
+		if e.Rule.AlertingRule != nil && m.Kind != AlertingRuleType {
+			return false
+		}
+		if e.Rule.RecordingRule != nil && m.Kind != RecordingRuleType {
 			return false
 		}
 	}
@@ -102,37 +111,30 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 
 	if m.Name != "" {
 		re := strictRegex(m.Name)
-		if r.AlertingRule != nil && !re.MatchString(r.AlertingRule.Alert.Value) {
+		if e.Rule.AlertingRule != nil && !re.MatchString(e.Rule.AlertingRule.Alert.Value) {
 			return false
 		}
-		if r.RecordingRule != nil && !re.MatchString(r.RecordingRule.Record.Value) {
+		if e.Rule.RecordingRule != nil && !re.MatchString(e.Rule.RecordingRule.Record.Value) {
 			return false
 		}
 	}
 
 	if m.Label != nil {
-		if !m.Label.isMatching(r) {
+		if !m.Label.isMatching(e.Rule) {
 			return false
 		}
 	}
 
 	if m.Annotation != nil {
-		if !m.Annotation.isMatching(r) {
-			return false
-		}
-	}
-
-	if m.Command != nil {
-		cmd := ctx.Value(CommandKey).(ContextCommandVal)
-		if cmd != *m.Command {
+		if !m.Annotation.isMatching(e.Rule) {
 			return false
 		}
 	}
 
 	if m.For != "" {
-		if r.AlertingRule != nil && r.AlertingRule.For != nil {
+		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.For != nil {
 			dm, _ := parseDurationMatch(m.For)
-			if dur, err := parseDuration(r.AlertingRule.For.Value); err == nil {
+			if dur, err := parseDuration(e.Rule.AlertingRule.For.Value); err == nil {
 				if !dm.isMatch(dur) {
 					return false
 				}
@@ -143,9 +145,9 @@ func (m Match) IsMatch(ctx context.Context, path string, r parser.Rule) bool {
 	}
 
 	if m.KeepFiringFor != "" {
-		if r.AlertingRule != nil && r.AlertingRule.KeepFiringFor != nil {
+		if e.Rule.AlertingRule != nil && e.Rule.AlertingRule.KeepFiringFor != nil {
 			dm, _ := parseDurationMatch(m.KeepFiringFor)
-			if dur, err := parseDuration(r.AlertingRule.KeepFiringFor.Value); err == nil {
+			if dur, err := parseDuration(e.Rule.AlertingRule.KeepFiringFor.Value); err == nil {
 				if !dm.isMatch(dur) {
 					return false
 				}

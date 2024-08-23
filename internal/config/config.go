@@ -165,7 +165,7 @@ func (cfg *Config) GetChecksForRule(ctx context.Context, gen *PrometheusGenerato
 	}
 
 	for _, rule := range cfg.Rules {
-		allChecks = append(allChecks, rule.resolveChecks(ctx, entry.Path.Name, entry.Rule, proms)...)
+		allChecks = append(allChecks, rule.resolveChecks(ctx, entry, proms)...)
 	}
 
 	for _, cm := range allChecks {
@@ -219,7 +219,7 @@ func getContext() *hcl.EvalContext {
 	return &hcl.EvalContext{Variables: vars}
 }
 
-func Load(path string, failOnMissing bool) (cfg Config, err error) {
+func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error) {
 	cfg = Config{
 		CI: &CI{
 			MaxCommits: 20,
@@ -237,81 +237,82 @@ func Load(path string, failOnMissing bool) (cfg Config, err error) {
 	}
 
 	if _, err = os.Stat(path); err == nil || failOnMissing {
+		fromFile = true
 		slog.Info("Loading configuration file", slog.String("path", path))
 		ectx := getContext()
 		err = hclsimple.DecodeFile(path, ectx, &cfg)
 		if err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	if cfg.CI != nil {
 		if err = cfg.CI.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	if cfg.Owners != nil {
 		if err = cfg.Owners.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	if cfg.Parser != nil {
 		if err = cfg.Parser.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	if cfg.Repository != nil {
 		if err = cfg.Repository.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	if cfg.Checks != nil {
 		if err = cfg.Checks.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	for _, chk := range cfg.Check {
 		if err = chk.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	promNames := make([]string, 0, len(cfg.Prometheus))
 	for i, prom := range cfg.Prometheus {
 		if err = prom.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 
 		if slices.Contains(promNames, prom.Name) {
-			return cfg, fmt.Errorf("prometheus server name must be unique, found two or more config blocks using %q name", prom.Name)
+			return cfg, fromFile, fmt.Errorf("prometheus server name must be unique, found two or more config blocks using %q name", prom.Name)
 		}
 		promNames = append(promNames, prom.Name)
 
 		cfg.Prometheus[i].applyDefaults()
 
 		if _, err = prom.TLS.toHTTPConfig(); err != nil {
-			return cfg, fmt.Errorf("invalid prometheus TLS configuration: %w", err)
+			return cfg, fromFile, fmt.Errorf("invalid prometheus TLS configuration: %w", err)
 		}
 	}
 
 	if cfg.Discovery != nil {
 		if err = cfg.Discovery.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
 	for _, rule := range cfg.Rules {
 		if err = rule.validate(); err != nil {
-			return cfg, err
+			return cfg, fromFile, err
 		}
 	}
 
-	return cfg, nil
+	return cfg, fromFile, nil
 }
 
 func parseDuration(d string) (time.Duration, error) {

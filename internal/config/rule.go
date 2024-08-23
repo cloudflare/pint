@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -111,11 +112,11 @@ func (rule Rule) validate() (err error) {
 	return nil
 }
 
-func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, prometheusServers []*promapi.FailoverGroup) []checkMeta {
+func (rule Rule) resolveChecks(ctx context.Context, e discovery.Entry, prometheusServers []*promapi.FailoverGroup) []checkMeta {
 	enabled := []checkMeta{}
 
 	for _, ignore := range rule.Ignore {
-		if ignore.IsMatch(ctx, path, r) {
+		if ignore.IsMatch(ctx, e.Path.Name, e) {
 			return enabled
 		}
 	}
@@ -123,7 +124,7 @@ func (rule Rule) resolveChecks(ctx context.Context, path string, r parser.Rule, 
 	if len(rule.Match) > 0 {
 		var found bool
 		for _, match := range rule.Match {
-			if match.IsMatch(ctx, path, r) {
+			if match.IsMatch(ctx, e.Path.Name, e) {
 				found = true
 				break
 			}

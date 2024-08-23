@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -8,6 +9,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -784,6 +786,56 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+			},
+		},
+		{
+			description: "sum_over_rate / ignore entry with PathError",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     []discovery.Entry{{PathError: errors.New("mock error")}},
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "sum_over_rate / ignore entry with rule error",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries: []discovery.Entry{
+				{
+					Rule: parser.Rule{
+						Error: parser.ParseError{
+							Err: errors.New("mock error"),
+						},
+					},
+				},
+			},
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
 				},
 			},
 		},

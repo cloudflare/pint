@@ -21,11 +21,12 @@ cmp stderr ../stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
 level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
 level=DEBUG msg="Got branch information" base=origin/main current=v2
 level=INFO msg="Finding all rules to check on current git branch" base=origin/main
 level=DEBUG msg="Excluding git directory from glob results" path=.git glob=*
-level=DEBUG msg="File parsed" path=.pint.hcl rules=0
+level=DEBUG msg="File path is in the exclude list" path=.pint.hcl exclude=["^.pint.hcl$"]
 level=DEBUG msg="File parsed" path=rules.yml rules=1
 level=DEBUG msg="Glob finder completed" count=1
 level=DEBUG msg="Running git command" args=["log","--reverse","--no-merges","--first-parent","--format=%H","--name-status","origin/main..HEAD"]

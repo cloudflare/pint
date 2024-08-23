@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
 level=INFO msg="Configured new Prometheus server" name=foo uris=1 uptime=up tags=[] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=foo uri=http://localhost:7169 workers=16
 level=ERROR msg="Fatal error" err="no Prometheus named \"prom\" configured in pint"

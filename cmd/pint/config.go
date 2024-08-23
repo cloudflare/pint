@@ -21,7 +21,7 @@ func actionConfig(c *cli.Context) (err error) {
 		return fmt.Errorf("failed to set log level: %w", err)
 	}
 
-	cfg, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
+	cfg, _, err := config.Load(c.Path(configFlag), c.IsSet(configFlag))
 	if err != nil {
 		return fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}

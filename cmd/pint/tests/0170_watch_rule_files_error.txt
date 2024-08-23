@@ -8,6 +8,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
 level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tags=[] include=[] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom uri=http://localhost:7170 workers=16
 level=DEBUG msg="Starting rule_fules watch" name=prom
