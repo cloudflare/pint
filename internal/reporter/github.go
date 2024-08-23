@@ -176,7 +176,13 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 		Side:     github.String(side),
 	}
 
-	slog.Debug("Creating a review comment", slog.String("body", comment.GetBody()), slog.String("commit", comment.GetCommitID()))
+	slog.Debug("Creating a pr comment",
+		slog.String("commit", comment.GetCommitID()),
+		slog.String("path", comment.GetPath()),
+		slog.Int("line", comment.GetLine()),
+		slog.String("side", comment.GetSide()),
+		slog.String("body", comment.GetBody()),
+	)
 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
@@ -248,16 +254,21 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
+	review := github.PullRequestReviewRequest{
+		CommitID: github.String(gr.headCommit),
+		Body:     github.String(formatGHReviewBody(gr.version, summary)),
+		Event:    github.String("COMMENT"),
+	}
+	slog.Debug("Creating a review",
+		slog.String("commit", review.GetCommitID()),
+		slog.String("body", review.GetBody()),
+	)
 	_, resp, err := gr.client.PullRequests.CreateReview(
 		reqCtx,
 		gr.owner,
 		gr.repo,
 		gr.prNum,
-		&github.PullRequestReviewRequest{
-			CommitID: github.String(gr.headCommit),
-			Body:     github.String(formatGHReviewBody(gr.version, summary)),
-			Event:    github.String("COMMENT"),
-		},
+		&review,
 	)
 	if err != nil {
 		return err

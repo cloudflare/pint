@@ -94,7 +94,7 @@ rule {
 	require.NoError(b, os.WriteFile(tmp+"/.pint.hcl", content, 0o644))
 
 	ctx := context.Background()
-	cfg, err := config.Load(tmp+"/.pint.hcl", false)
+	cfg, _, err := config.Load(tmp+"/.pint.hcl", false)
 	require.NoError(b, err)
 
 	gen := config.NewPrometheusGenerator(cfg, prometheus.NewRegistry())

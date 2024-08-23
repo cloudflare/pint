@@ -25,7 +25,6 @@ cmp stderr ../stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
-level=WARN msg="Failed to parse file content" err="error at line 1: top level field must be a groups key, got string" path=.pint.hcl lines=1-24
 level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=up tags=[] include=["^rules/alert.*$"] exclude=[]
 level=INFO msg="Configured new Prometheus server" name=prom2a uris=1 uptime=up tags=[] include=["^rules/record.*$"] exclude=[]
 level=INFO msg="Configured new Prometheus server" name=prom2b uris=1 uptime=up tags=[] include=["^rules/record.*$"] exclude=[]

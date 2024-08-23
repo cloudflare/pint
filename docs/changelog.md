@@ -8,10 +8,13 @@
   See check docs for details.
 - [promql/range_query](checks/promql/range_query.md) now allows to configure a custom maximum
   duration for range queries - #1064.
+- Added `--enabled` flag to the pint command. Passing this flag will only run selected check(s).
 
 ### Fixed
 
 - Don't try to report problem on unmodified files when using GitHub reporter.
+- If there is a pint config file present then pint will now always add it to the `parser` block `exclude` list.
+  This is to avoid trying to parse it as a rule file if it's included in the same folder as rules.
 
 ## v0.64.1
 

@@ -2,10 +2,14 @@ package config_test
 
 import (
 	"context"
+	"log/slog"
 	"strconv"
 	"testing"
 
+	"github.com/neilotoole/slogt"
+
 	"github.com/cloudflare/pint/internal/config"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 
 	"github.com/stretchr/testify/require"
@@ -16,7 +20,7 @@ func TestMatch(t *testing.T) {
 		match   config.Match
 		cmd     config.ContextCommandVal
 		path    string
-		rule    parser.Rule
+		entry   discovery.Entry
 		isMatch bool
 	}
 
@@ -24,15 +28,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
-
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match:   config.Match{},
 			isMatch: true,
 		},
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Path: "bar.yaml",
 			},
@@ -41,7 +50,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Path: "foo.yaml",
 			},
@@ -50,7 +62,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Path: ".+.yaml",
 			},
@@ -59,7 +74,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Path: "bar.+.yaml",
 			},
@@ -68,10 +86,13 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Alert: parser.YamlNode{Value: "Foo"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{Value: "Foo"},
+					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Name: "Foo",
@@ -81,10 +102,13 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Alert: parser.YamlNode{Value: "Foo"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{Value: "Foo"},
+					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Name: "Foo",
@@ -95,10 +119,13 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Alert: parser.YamlNode{Value: "Foo"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{Value: "Foo"},
+					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Name: "Bar",
@@ -108,10 +135,13 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Record: parser.YamlNode{Value: "Foo"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{Value: "Foo"},
+					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Name: "Bar",
@@ -121,17 +151,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Labels: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "foo", Value: "bar"},
@@ -141,17 +174,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Labels: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "foo", Value: "bar"},
@@ -161,17 +197,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Labels: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "dev"},
@@ -181,17 +220,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Labels: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "cluster", Value: "dev"},
@@ -201,17 +243,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Labels: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
@@ -221,17 +266,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{
-					Labels: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{
+						Labels: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},
@@ -241,8 +289,11 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{},
+				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Kind: "alerting",
@@ -252,18 +303,23 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{},
+				},
+				State: discovery.Noop,
 			},
-
 			match:   config.Match{},
 			isMatch: true,
 		},
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{},
+				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Kind: "recording",
@@ -273,8 +329,11 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{},
+				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Kind: "recording",
@@ -284,8 +343,11 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				RecordingRule: &parser.RecordingRule{},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					RecordingRule: &parser.RecordingRule{},
+				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Kind: "alerting",
@@ -295,17 +357,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Annotations: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Annotations: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "foo", Value: "bar"},
@@ -315,17 +380,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Annotations: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Annotations: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "foo", Value: "bar"},
@@ -335,17 +403,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Annotations: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Annotations: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},
@@ -355,17 +426,20 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{
-				AlertingRule: &parser.AlertingRule{
-					Annotations: &parser.YamlMap{
-						Items: []*parser.YamlKeyValue{
-							{
-								Key:   &parser.YamlNode{Value: "cluster"},
-								Value: &parser.YamlNode{Value: "prod"},
+			entry: discovery.Entry{
+				Rule: parser.Rule{
+					AlertingRule: &parser.AlertingRule{
+						Annotations: &parser.YamlMap{
+							Items: []*parser.YamlKeyValue{
+								{
+									Key:   &parser.YamlNode{Value: "cluster"},
+									Value: &parser.YamlNode{Value: "prod"},
+								},
 							},
 						},
 					},
 				},
+				State: discovery.Noop,
 			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
@@ -375,7 +449,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Annotation: &config.MatchAnnotation{Key: "cluster", Value: "prod"},
 			},
@@ -384,7 +461,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Label: &config.MatchLabel{Key: "cluster", Value: "prod"},
 			},
@@ -393,7 +473,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Command: &config.LintCommand,
 			},
@@ -402,7 +485,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.LintCommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Command: &config.WatchCommand,
 			},
@@ -411,7 +497,10 @@ func TestMatch(t *testing.T) {
 		{
 			cmd:  config.CICommand,
 			path: "foo.yaml",
-			rule: parser.Rule{},
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
 			match: config.Match{
 				Command: &config.CICommand,
 				Path:    "bar.yaml",
@@ -422,8 +511,9 @@ func TestMatch(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
 			ctx := context.WithValue(context.Background(), config.CommandKey, tc.cmd)
-			isMatch := tc.match.IsMatch(ctx, tc.path, tc.rule)
+			isMatch := tc.match.IsMatch(ctx, tc.path, tc.entry)
 			require.Equal(t, tc.isMatch, isMatch)
 		})
 	}

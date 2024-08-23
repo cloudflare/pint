@@ -110,22 +110,24 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			case me.hasBefore && me.hasAfter:
 				switch {
 				case me.isIdentical && !me.wasMoved:
+					me.after.State = Excluded
+					me.after.ModifiedLines = []int{}
 					slog.Debug(
 						"Rule content was not modified on HEAD, identical rule present before",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("lines", me.after.Rule.Lines.String()),
 					)
-					me.after.State = Excluded
-					me.after.ModifiedLines = []int{}
 				case me.wasMoved:
+					me.after.State = Moved
+					me.after.ModifiedLines = git.CountLines(change.Body.After)
 					slog.Debug(
 						"Rule content was not modified on HEAD but the file was moved or renamed",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("lines", me.after.Rule.Lines.String()),
 					)
-					me.after.State = Moved
-					me.after.ModifiedLines = git.CountLines(change.Body.After)
 				default:
+					me.after.State = Modified
+					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
 					slog.Debug(
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
@@ -134,8 +136,6 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 						slog.String("ruleLines", me.after.Rule.Lines.String()),
 						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
 					)
-					me.after.State = Modified
-					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
 				}
 				entries = append(entries, me.after)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) == 0:

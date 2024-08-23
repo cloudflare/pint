@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
+level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=3
 level=DEBUG msg="Glob finder completed" count=3
