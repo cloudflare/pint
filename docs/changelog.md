@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.65.1
+
+### Fixed
+
+- Fixed a bug in `match` block `state` handling that caused all rules to always match any state.
+
 ## v0.65.0
 
 ### Added

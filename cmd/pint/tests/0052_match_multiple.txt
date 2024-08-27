@@ -9,9 +9,9 @@ level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=2
 level=DEBUG msg="Glob finder completed" count=2
 level=DEBUG msg="Generated all Prometheus servers" count=0
-level=DEBUG msg="Found recording rule" path=rules/0001.yml record=colo:recording lines=4-5
+level=DEBUG msg="Found recording rule" path=rules/0001.yml record=colo:recording lines=4-5 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=colo:recording
-level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=colo:alerting lines=7-8
+level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=colo:alerting lines=7-8 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=colo:alerting
 rules/0001.yml:5 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
  5 |     expr: sum(foo) without(job)
