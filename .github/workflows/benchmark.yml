@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  test-go:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code

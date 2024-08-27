@@ -8,6 +8,8 @@ on:
     branches:
       - main
 
+permissions: read-all
+
 jobs:
   goreleaser-config:
     runs-on: ubuntu-latest
