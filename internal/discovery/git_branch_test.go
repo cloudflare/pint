@@ -206,7 +206,7 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -472,7 +472,7 @@ groups:
 					Rule:          mustParse(6, "- record: up:count:2a\n  expr: count(up)\n"),
 				},
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -535,7 +535,7 @@ groups:
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n  for: 0s\n"),
 				},
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -566,7 +566,7 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -606,7 +606,7 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -650,7 +650,7 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -659,7 +659,7 @@ groups:
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -756,7 +756,7 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -765,7 +765,7 @@ groups:
 					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -887,7 +887,7 @@ groups:
 			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
 			entries: []discovery.Entry{
 				{
-					State: discovery.Excluded,
+					State: discovery.Noop,
 					Path: discovery.Path{
 						Name:          "rules.yml",
 						SymlinkTarget: "rules.yml",
@@ -1124,6 +1124,83 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					Rule: mustParse(7, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+				},
+			},
+		},
+		{
+			title: "add two dups",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+- alert: rule1
+  expr: sum(foo) by(job)
+- alert: rule2
+  expr: sum(foo) by(job)
+- alert: rule3
+  expr: sum(foo) by(job)
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+- alert: rule1
+  expr: sum(foo) by(job)
+- alert: rule2
+  expr: sum(foo) by(job)
+- alert: rule3
+  expr: sum(foo) by(job)
+- alert: rule1
+  expr: sum(foo) by(job)
+- alert: rule1
+  expr: sum(foo) by(job)
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, includeAll), "main", 4),
+			entries: []discovery.Entry{
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{},
+					Rule:          mustParse(1, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{},
+					Rule:          mustParse(3, "- alert: rule2\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State: discovery.Noop,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{},
+					Rule:          mustParse(5, "- alert: rule3\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{8, 9},
+					Rule:          mustParse(7, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
+				},
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{10, 11},
+					Rule:          mustParse(9, "- alert: rule1\n  expr: sum(foo) by(job)\n"),
 				},
 			},
 		},
