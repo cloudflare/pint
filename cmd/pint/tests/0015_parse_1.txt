@@ -1,4 +1,4 @@
-pint.ok parse 'sum(rate(foo[5m])) without(job) + (sum(rate(bar[5m])) without(job) > 0)'
+exec pint parse 'sum(rate(foo[5m])) without(job) + (sum(rate(bar[5m])) without(job) > 0)'
 cmp stdout stdout.txt
 ! stderr .
 

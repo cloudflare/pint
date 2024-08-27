@@ -1,7 +1,7 @@
 http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{"name":"prom1"},"value":[1698249632.491,"1"]},{"metric":{"name":"prom2"},"value":[1698249632.491,"1"]}]}}
 http start prometheus 127.0.0.1:7152
 
-pint.ok -l debug --no-color lint rules
+exec pint -l debug --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 

@@ -5,7 +5,7 @@ http response prometheus /api/v1/query_range 200 {"status":"success","data":{"re
 http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus 127.0.0.1:7080
 
-pint.ok --no-color lint rules
+exec pint --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 

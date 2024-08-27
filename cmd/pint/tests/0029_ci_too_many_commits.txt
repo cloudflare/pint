@@ -22,7 +22,7 @@ exec git commit -am 'recert to v1'
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
-pint.error --no-color ci
+! exec pint --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 

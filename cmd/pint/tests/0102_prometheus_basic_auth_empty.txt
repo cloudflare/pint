@@ -4,7 +4,7 @@ http auth-response prometheus /api/v1/query_range admin pass 200 {"status":"succ
 http auth-response prometheus /api/v1/query admin pass 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus 127.0.0.1:7102
 
-pint.error -l debug --no-color lint rules
+! exec pint -l debug --no-color lint rules
 ! stdout .
 ! stderr 'admin:pass'
 -- rules/1.yml --

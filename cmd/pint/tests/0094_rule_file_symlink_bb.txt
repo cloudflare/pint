@@ -37,7 +37,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-pint.error -l debug -d promql/series --no-color ci
+! exec pint -l debug -d promql/series --no-color ci
 ! stdout .
 
 stderr 'path=rules.yml rule=rule1'

@@ -16,7 +16,7 @@ exec git checkout -b v2
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
-pint.error -l debug -d promql/series --no-color ci
+! exec pint -l debug -d promql/series --no-color ci
 ! stdout .
 stderr 'level=ERROR msg="Fatal error" err="symlink.yml is a symlink but target file cannot be evaluated: lstat xxx.yml: no such file or directory"'
 

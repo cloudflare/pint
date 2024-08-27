@@ -27,7 +27,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-pint.ok -l debug --no-color ci
+exec pint -l debug --no-color ci
 ! stdout .
 stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":4}'
 stderr '{"path":"rules.yml","message":"alerts/count:.*,"line":11}'

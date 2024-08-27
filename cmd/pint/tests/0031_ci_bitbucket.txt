@@ -20,7 +20,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-pint.ok -l debug --no-color ci
+exec pint -l debug --no-color ci
 ! stdout .
 stderr 'msg="Sending a request to BitBucket" method=PUT'
 stderr 'msg="BitBucket request completed" status=200'

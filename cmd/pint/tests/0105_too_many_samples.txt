@@ -5,7 +5,7 @@ http response prometheus /api/v1/query_range 400 {"status":"error","errorType":"
 http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus 127.0.0.1:7105
 
-pint.error --no-color lint rules
+! exec pint --no-color lint rules
 ! stdout .
 stderr 'level=ERROR msg="Query returned an error" err="query processing would load too many samples into memory in query execution" uri=http://127.0.0.1:7105 query=count\(up\)'
 stderr 'level=WARN msg="Cannot detect Prometheus uptime gaps" err="execution: query processing would load too many samples into memory in query execution" name=prom'

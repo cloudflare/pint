@@ -1,3 +1,3 @@
-pint.error -l xxx --no-color ci
+! exec pint -l xxx --no-color ci
 ! stdout .
 stderr 'ERROR Fatal error err="failed to set log level: ''xxx'' is not a valid log level"'

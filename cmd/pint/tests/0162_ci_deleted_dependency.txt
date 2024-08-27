@@ -17,7 +17,7 @@ exec git checkout -b v2
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
-pint.ok -l error --offline --no-color ci
+exec pint -l error --offline --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 

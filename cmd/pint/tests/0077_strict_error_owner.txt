@@ -1,4 +1,4 @@
-pint.error --no-color lint --require-owner rules
+! exec pint --no-color lint --require-owner rules
 ! stdout .
 cmp stderr stderr.txt
 

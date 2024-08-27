@@ -1,4 +1,4 @@
-pint.ok --no-color lint --min-severity=bug rules
+exec pint --no-color lint --min-severity=bug rules
 ! stdout .
 cmp stderr stderr.txt
 

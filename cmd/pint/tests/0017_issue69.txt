@@ -1,6 +1,6 @@
 exec sh ./copy.sh
 exec sh ./ulimit.sh
-pint.error --no-color -l error lint rules
+! exec pint --no-color -l error lint rules
 ! stdout .
 
 cmp stderr stderr.txt

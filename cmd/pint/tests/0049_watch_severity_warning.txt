@@ -1,6 +1,6 @@
 exec bash -x ./test.sh &
 
-pint.ok watch --listen=127.0.0.1:6049 --min-severity=warning --pidfile=pint.pid glob rules
+exec pint watch --listen=127.0.0.1:6049 --min-severity=warning --pidfile=pint.pid glob rules
 cmp curl.txt metrics.txt
 
 -- test.sh --

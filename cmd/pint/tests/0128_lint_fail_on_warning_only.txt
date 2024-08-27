@@ -1,4 +1,4 @@
-pint.error --no-color lint --fail-on=warning --min-severity=bug rules
+! exec pint --no-color lint --fail-on=warning --min-severity=bug rules
 ! stdout .
 cmp stderr stderr.txt
 

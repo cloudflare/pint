@@ -21,7 +21,7 @@ exec git commit -am 'import rules and config'
 exec git checkout -b v1
 cp ../src/v1.yml rules.yml
 exec git commit -am 'v1'
-pint.ok --no-color ci
+exec pint --no-color ci
 cmp stderr ../stderrV1.txt
 
 exec git checkout main
@@ -30,7 +30,7 @@ exec git merge v1
 exec git checkout -b v2
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
-pint.error --no-color ci
+! exec pint --no-color ci
 ! stdout .
 cmp stderr ../stderrV2.txt
 

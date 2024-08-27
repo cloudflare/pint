@@ -1,4 +1,4 @@
-pint.ok parse '"foo"'
+exec pint parse '"foo"'
 cmp stdout stdout.txt
 ! stderr .
 

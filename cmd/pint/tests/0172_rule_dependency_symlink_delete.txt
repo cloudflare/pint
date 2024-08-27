@@ -19,7 +19,7 @@ exec git checkout -b v2
 exec git rm -fr rules2
 exec git commit -am 'v2'
 
-pint.ok -l error --offline --no-color ci
+exec pint -l error --offline --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 

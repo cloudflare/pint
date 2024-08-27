@@ -2,7 +2,7 @@ http response prometheus /api/v1/metadata 200 {"status":"success","data":{}}
 http response prometheus / 502 Bad Gateway
 http start prometheus 127.0.0.1:7104
 
-pint.error --no-color lint rules
+! exec pint --no-color lint rules
 ! stdout .
 stderr 'level=ERROR msg="Query returned an error" err="server error: 502" uri=http://127.0.0.1:7104 query=/api/v1/status/config'
 stderr 'level=ERROR msg="Query returned an error" err="server error: 502" uri=http://127.0.0.1:7104 query=/api/v1/status/flags'

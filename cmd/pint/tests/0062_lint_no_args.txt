@@ -1,4 +1,4 @@
-pint.error --workers=1 --no-color lint
+! exec pint --workers=1 --no-color lint
 ! stdout .
 cmp stderr stderr.txt
 

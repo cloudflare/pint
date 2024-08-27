@@ -1,4 +1,4 @@
-pint.error --no-color watch --min-severity=foo glob bar
+! exec pint --no-color watch --min-severity=foo glob bar
 ! stdout .
 cmp stderr stderr.txt
 

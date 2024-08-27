@@ -1,5 +1,5 @@
 env NO_COLOR=0
-pint.error lint rules
+! exec pint lint rules
 ! stdout .
 cmp stderr stderr.txt
 

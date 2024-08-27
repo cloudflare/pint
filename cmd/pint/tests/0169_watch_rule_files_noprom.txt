@@ -1,4 +1,4 @@
-pint.error --no-color -l debug watch --interval=5s --listen=127.0.0.1:6169 --pidfile=pint.pid rule_files prom
+! exec pint --no-color -l debug watch --interval=5s --listen=127.0.0.1:6169 --pidfile=pint.pid rule_files prom
 ! stdout .
 cmp stderr stderr.txt
 

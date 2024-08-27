@@ -25,33 +25,17 @@ import (
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
-// mock command that fails tests if error is returned.
-func mockMainShouldSucceed() int {
-	app := newApp()
-	err := app.Run(os.Args)
-	if err != nil {
-		slog.Error("Fatal error", slog.Any("err", err))
-		return 1
-	}
-	return 0
-}
-
-// mock command that fails tests if no error is returned.
-func mockMainShouldFail() int {
-	app := newApp()
-	err := app.Run(os.Args)
-	if err != nil {
-		slog.Error("Fatal error", slog.Any("err", err))
-		return 0
-	}
-	fmt.Fprintf(os.Stderr, "expected an error but none was returned\n")
-	return 1
-}
-
 func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"pint.ok":    mockMainShouldSucceed,
-		"pint.error": mockMainShouldFail,
+		"pint": func() int {
+			app := newApp()
+			err := app.Run(os.Args)
+			if err != nil {
+				slog.Error("Fatal error", slog.Any("err", err))
+				return 1
+			}
+			return 0
+		},
 	}))
 }
 

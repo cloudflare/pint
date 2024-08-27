@@ -1,4 +1,4 @@
-pint.error --no-color --config not_existed_config.hcl lint rules
+! exec pint --no-color --config not_existed_config.hcl lint rules
 ! stdout .
 cmp stderr stderr.txt
 

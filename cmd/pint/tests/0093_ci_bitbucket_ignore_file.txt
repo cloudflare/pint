@@ -20,7 +20,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-pint.ok --no-color -l debug ci
+exec pint --no-color -l debug ci
 ! stdout .
 stderr 'level=INFO msg="Problems found" Information=1'
 stderr 'result":"PASS"'

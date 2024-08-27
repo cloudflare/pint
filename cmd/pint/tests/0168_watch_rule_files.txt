@@ -7,7 +7,7 @@ http start prometheus 127.0.0.1:7168
 
 exec bash -x ./test.sh &
 
-pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6168 --pidfile=pint.pid rule_files prom
+exec pint --no-color -l debug watch --interval=5s --listen=127.0.0.1:6168 --pidfile=pint.pid rule_files prom
 ! stdout .
 
 stderr 'level=DEBUG msg="Glob finder completed" count=2'

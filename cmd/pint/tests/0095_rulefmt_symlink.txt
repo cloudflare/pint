@@ -1,7 +1,7 @@
 mkdir rules/strict
 exec ln -s ../relaxed/1.yml rules/strict/symlink.yml
 
-pint.ok -l debug --no-color lint rules
+exec pint -l debug --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 

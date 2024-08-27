@@ -1,4 +1,4 @@
-pint.ok parse 'rate(http_requests_total[5m] offset -1w)'
+exec pint parse 'rate(http_requests_total[5m] offset -1w)'
 cmp stdout stdout.txt
 ! stderr .
 

@@ -8,7 +8,7 @@ http start prometheus1 127.0.0.1:7157
 http response prometheus2 /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1698249632.491,"1"]}]}}
 http start prometheus2 127.0.0.1:8157
 
-pint.error --no-color lint rules
+! exec pint --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 
