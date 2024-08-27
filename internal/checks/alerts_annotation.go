@@ -3,13 +3,12 @@ package checks
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
-
-	"golang.org/x/exp/slices"
 )
 
 const (

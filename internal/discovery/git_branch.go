@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"log/slog"
+	"slices"
 	"sort"
 	"strings"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"

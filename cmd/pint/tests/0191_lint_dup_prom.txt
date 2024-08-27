@@ -1,0 +1,19 @@
+! exec pint --no-color lint rules.yml
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": prometheus server name must be unique, found two or more config blocks using \"prom\" name"
+-- rules.yml --
+-- .pint.hcl --
+prometheus "prom" {
+  uri      = "http://127.0.0.1:2191"
+  timeout  = "5s"
+  required = true
+}
+prometheus "prom" {
+  uri      = "http://127.0.0.1:3191"
+  timeout  = "5s"
+  required = true
+}

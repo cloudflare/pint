@@ -8,9 +8,8 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"slices"
 	"time"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"

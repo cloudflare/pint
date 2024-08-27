@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"slices"
 	"time"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/parser"

@@ -7,9 +7,8 @@ import (
 	"log/slog"
 	"os"
 	"path"
+	"slices"
 	"strings"
-
-	"golang.org/x/exp/slices"
 )
 
 type FileStatus rune
