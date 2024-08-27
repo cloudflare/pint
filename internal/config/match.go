@@ -105,7 +105,7 @@ func (m Match) validate(allowEmpty bool) error {
 }
 
 func (m Match) IsMatch(ctx context.Context, path string, e discovery.Entry) bool {
-	cmd := ctx.Value(CommandKey).(ContextCommandVal)
+	cmd := commandFromContext(ctx)
 
 	if m.Command != nil {
 		if cmd != *m.Command {
