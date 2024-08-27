@@ -45,8 +45,6 @@ func (c ChangeType) String() string {
 		return "removed"
 	case Moved:
 		return "moved"
-	case Excluded:
-		return "excluded"
 	default:
 		return "---"
 	}
@@ -63,7 +61,6 @@ const (
 	Modified
 	Removed
 	Moved
-	Excluded
 )
 
 type Path struct {

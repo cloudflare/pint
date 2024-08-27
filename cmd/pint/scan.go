@@ -65,8 +65,6 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	go func() {
 		for _, entry := range entries {
 			switch {
-			case entry.State == discovery.Excluded:
-				continue
 			case entry.PathError != nil && entry.State == discovery.Removed:
 				continue
 			case entry.Rule.Error.Err != nil && entry.State == discovery.Removed:

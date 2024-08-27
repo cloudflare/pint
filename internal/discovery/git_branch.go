@@ -105,7 +105,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			case me.hasBefore && me.hasAfter:
 				switch {
 				case me.isIdentical && !me.wasMoved:
-					me.after.State = Excluded
+					me.after.State = Noop
 					me.after.ModifiedLines = []int{}
 					slog.Debug(
 						"Rule content was not modified on HEAD, identical rule present before",

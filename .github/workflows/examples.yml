@@ -8,8 +8,10 @@ on:
     branches:
       - main
 
+permissions: read-all
+
 jobs:
-  test-go:
+  examples:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
