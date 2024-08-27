@@ -665,6 +665,15 @@ func TestMatch(t *testing.T) {
 			},
 			isMatch: true,
 		},
+		{
+			path: "foo.yaml",
+			entry: discovery.Entry{
+				Rule:  parser.Rule{},
+				State: discovery.Noop,
+			},
+			match:   config.Match{},
+			isMatch: true,
+		},
 	}
 
 	for i, tc := range testCases {

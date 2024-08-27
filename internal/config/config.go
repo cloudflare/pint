@@ -83,7 +83,7 @@ func (cfg Config) String() string {
 func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	defaultMatch := []Match{{State: defaultMatchStates(ctx.Value(CommandKey).(ContextCommandVal))}}
+	defaultMatch := []Match{{State: defaultMatchStates(commandFromContext(ctx))}}
 	proms := gen.ServersForPath(entry.Path.Name)
 
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
@@ -228,4 +228,11 @@ func parseDuration(d string) (time.Duration, error) {
 		return 0, err
 	}
 	return time.Duration(mdur), nil
+}
+
+func commandFromContext(ctx context.Context) (cmd ContextCommandVal) {
+	if val := ctx.Value(CommandKey); val != nil {
+		cmd = val.(ContextCommandVal)
+	}
+	return cmd
 }
