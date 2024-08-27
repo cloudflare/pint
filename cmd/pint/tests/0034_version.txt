@@ -1,4 +1,4 @@
-pint.ok version
+exec pint version
 cmp stdout stdout.txt
 ! stderr .
 

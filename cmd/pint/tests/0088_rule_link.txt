@@ -5,7 +5,7 @@ http redirect mock /redirect/200 /200
 http redirect mock /redirect/404 /404
 http start mock 127.0.0.1:7088
 
-pint.ok --no-color lint --min-severity=info rules
+exec pint --no-color lint --min-severity=info rules
 ! stdout .
 cmp stderr stderr.txt
 

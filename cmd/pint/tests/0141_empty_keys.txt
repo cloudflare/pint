@@ -1,4 +1,4 @@
-pint.error --no-color lint rules.yml
+! exec pint --no-color lint rules.yml
 ! stdout .
 cmp stderr stderr.txt
 

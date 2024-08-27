@@ -1,7 +1,7 @@
 http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus 127.0.0.1:7148
 
-pint.ok -l debug --no-color lint rules
+exec pint -l debug --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 

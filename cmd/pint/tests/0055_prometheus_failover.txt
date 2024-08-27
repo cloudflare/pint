@@ -3,7 +3,7 @@ http response prometheus /api/v1/query_range 200 {"status":"success","data":{"re
 http response prometheus /api/v1/query 200 {"status":"success","data":{"resultType":"vector","result":[]}}
 http start prometheus 127.0.0.1:7055
 
-pint.error --no-color lint rules
+! exec pint --no-color lint rules
 ! stdout .
 stderr 'level=ERROR msg="Query returned an error" err="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055 query=count\(foo\)'
 stderr 'level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055 query=/api/v1/status/config'

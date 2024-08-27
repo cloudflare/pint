@@ -18,7 +18,7 @@ exec cp -R ../src/v2/rules .
 exec git add rules
 exec git commit -am 'v2'
 
-pint.ok --no-color ci
+exec pint --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 

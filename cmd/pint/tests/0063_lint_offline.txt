@@ -1,4 +1,4 @@
-pint.ok --offline --no-color lint rules
+exec pint --offline --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 

@@ -11,7 +11,7 @@ env GIT_COMMITTER_EMAIL=pint@example.com
 exec git add .
 exec git commit -am 'import rules and config'
 
-pint.ok --no-color ci --base-branch=main
+exec pint --no-color ci --base-branch=main
 ! stdout .
 cmp stderr ../stderr.txt
 

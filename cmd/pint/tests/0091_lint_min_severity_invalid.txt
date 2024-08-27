@@ -1,4 +1,4 @@
-pint.error --no-color lint --min-severity=xxx rules
+! exec pint --no-color lint --min-severity=xxx rules
 ! stdout .
 cmp stderr stderr.txt
 

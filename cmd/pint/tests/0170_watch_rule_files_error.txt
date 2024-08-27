@@ -3,7 +3,7 @@ http start prometheus 127.0.0.1:7170
 
 exec bash -x ./test.sh &
 
-pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6170 --pidfile=pint.pid rule_files prom
+exec pint --no-color -l debug watch --interval=5s --listen=127.0.0.1:6170 --pidfile=pint.pid rule_files prom
 cmp stderr stderr.txt
 
 -- stderr.txt --

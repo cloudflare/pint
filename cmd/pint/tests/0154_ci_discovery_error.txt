@@ -15,7 +15,7 @@ exec git checkout -b v2
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
-pint.error --no-color -l debug ci
+! exec pint --no-color -l debug ci
 ! stdout .
 stderr 'level=ERROR msg="Fatal error" err="filepath discovery error: lstat notfound: no such file or directory"'
 

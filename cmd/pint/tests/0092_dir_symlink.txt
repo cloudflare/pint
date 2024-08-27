@@ -3,7 +3,7 @@ mkdir rules/src
 exec ln -s src rules/dst
 exec ln -s rules linked
 
-pint.ok -l debug --no-color lint rules linked rules/src/rule.yaml
+exec pint -l debug --no-color lint rules linked rules/src/rule.yaml
 ! stdout .
 cmp stderr stderr.txt
 

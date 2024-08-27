@@ -1,7 +1,7 @@
 env FOO=BAR
 env AUTH_KEY=1234
 env FAKE_ENV=KEY=VAL
-pint.ok --no-color config
+exec pint --no-color config
 ! stdout .
 cmp stderr stderr.txt
 

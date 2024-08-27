@@ -1,4 +1,4 @@
-pint.error parse 'sum(foo) by('
+! exec pint parse 'sum(foo) by('
 ! stdout .
 cmp stderr stderr.txt
 

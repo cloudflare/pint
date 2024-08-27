@@ -26,7 +26,7 @@ exec git commit -am 'v2'
 exec git mv rules.yaml renamed.yaml
 exec git commit -am 'v3'
 
-pint.error --no-color ci
+! exec pint --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 

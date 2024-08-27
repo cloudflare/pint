@@ -22,7 +22,7 @@ exec git commit -am 'v2'
 exec git rm a.yml
 exec git commit -am 'v3'
 
-pint.error --no-color ci -t
+! exec pint --no-color ci -t
 ! stdout .
 cmp stderr ../stderr.txt
 

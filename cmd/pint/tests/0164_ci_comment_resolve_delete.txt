@@ -25,7 +25,7 @@ exec git commit -am 'import rules and config'
 exec git checkout -b modify
 cp ../src/v1.yml rules.yml
 exec git commit -am 'v1'
-pint.error --no-color ci
+! exec pint --no-color ci
 stderr 'msg="Problems found" Fatal=1'
 stderr 'msg="Sending a request to BitBucket" method=DELETE path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'
 stderr 'msg="Sending a request to BitBucket" method=PUT path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'
@@ -43,7 +43,7 @@ stderr 'msg="Added pull request comments to BitBucket" count=1'
 
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
-pint.ok --no-color ci
+exec pint --no-color ci
 ! stdout .
 ! stderr 'msg="Problems found"'
 stderr 'msg="Sending a request to BitBucket" method=DELETE path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'

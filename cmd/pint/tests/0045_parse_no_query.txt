@@ -1,4 +1,4 @@
-pint.error --no-color parse
+! exec pint --no-color parse
 ! stdout .
 cmp stderr stderr.txt
 

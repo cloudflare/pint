@@ -1,5 +1,5 @@
 mkdir rules
-pint.error  --no-color lint rules
+! exec pint  --no-color lint rules
 ! stdout .
 cmp stderr stderr.txt
 

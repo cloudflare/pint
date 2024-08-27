@@ -15,7 +15,7 @@ exec git checkout -b v2
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
-pint.error -l debug --no-color ci --base-branch=origin/main
+! exec pint -l debug --no-color ci --base-branch=origin/main
 ! stdout .
 cmp stderr ../stderr.txt
 

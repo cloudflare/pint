@@ -20,7 +20,7 @@ cp ../src/b.yml b.yml
 exec git add b.yml
 exec git commit -am 'v2'
 
-pint.ok -l debug --no-color ci
+exec pint -l debug --no-color ci
 ! stdout .
 stderr 'level=DEBUG msg="Got branch information" base=main current=v2'
 stderr 'level=DEBUG msg="Git file change" change=A path=a.yml commit=.*'

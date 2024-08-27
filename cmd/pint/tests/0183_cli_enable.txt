@@ -1,4 +1,4 @@
-pint.ok -l debug --no-color -e promql/aggregate lint rules
+exec pint -l debug --no-color -e promql/aggregate lint rules
 ! stdout .
 cmp stderr stderr.txt
 

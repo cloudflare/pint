@@ -1,4 +1,4 @@
-pint.error --no-color watch --listen=127.0.0.1:6064 glob
+! exec pint --no-color watch --listen=127.0.0.1:6064 glob
 ! stdout .
 cmp stderr stderr.txt
 

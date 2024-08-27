@@ -1,4 +1,4 @@
-pint.ok parse 'sum(http_requests_total{method="GET"} @ 1609746000)'
+exec pint parse 'sum(http_requests_total{method="GET"} @ 1609746000)'
 cmp stdout stdout.txt
 ! stderr .
 

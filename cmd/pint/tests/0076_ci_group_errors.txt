@@ -20,7 +20,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-pint.error -l warn --no-color ci --require-owner
+! exec pint -l warn --no-color ci --require-owner
 ! stdout .
 cmp stderr ../stderr.txt
 

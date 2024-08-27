@@ -24,7 +24,7 @@ exec git commit -am 'v2'
 
 env GITHUB_AUTH_TOKEN=12345
 env GITHUB_PULL_REQUEST_NUMBER=1
-pint.error -l debug --offline --no-color ci --fail-on=warning
+! exec pint -l debug --offline --no-color ci --fail-on=warning
 ! stdout .
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
 

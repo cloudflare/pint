@@ -22,7 +22,7 @@ exec git commit -am 'import rules and config'
 exec git checkout -b v1
 cp ../src/v1.yml rules.yml
 exec git commit -am 'v1'
-pint.ok --no-color ci
+exec pint --no-color ci
 cmp stderr ../stderrV1.txt
 
 -- stderrV1.txt --

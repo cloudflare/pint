@@ -1,6 +1,6 @@
 exec bash -x ./test.sh &
 
-pint.ok --no-color -l debug watch --interval=5s --listen=127.0.0.1:6041 --pidfile=pint.pid glob rules
+exec pint --no-color -l debug watch --interval=5s --listen=127.0.0.1:6041 --pidfile=pint.pid glob rules
 ! stdout .
 
 stderr 'level=INFO msg="Pidfile created" path=pint.pid'

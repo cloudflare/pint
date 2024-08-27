@@ -1,5 +1,5 @@
 env NO_COLOR=1
-pint.ok --no-color lint --min-severity=info rules
+exec pint --no-color lint --min-severity=info rules
 ! stdout .
 cmp stderr stderr.txt
 
