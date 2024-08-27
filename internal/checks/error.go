@@ -12,8 +12,6 @@ import (
 )
 
 const (
-	ErrorCheckName = "error"
-
 	yamlParseReporter   = "yaml/parse"
 	ignoreFileReporter  = "ignore/file"
 	pintCommentReporter = "pint/comment"
@@ -22,12 +20,14 @@ const (
 This usually means that it's missing some required fields.`
 )
 
-func NewErrorCheck(err error) ErrorCheck {
-	return ErrorCheck{err: err}
+func NewErrorCheck(entry discovery.Entry) ErrorCheck {
+	return ErrorCheck{
+		problem: parseRuleError(entry.Rule, entry.PathError),
+	}
 }
 
 type ErrorCheck struct {
-	err error
+	problem Problem
 }
 
 func (c ErrorCheck) Meta() CheckMeta {
@@ -45,21 +45,26 @@ func (c ErrorCheck) Meta() CheckMeta {
 }
 
 func (c ErrorCheck) String() string {
-	return ErrorCheckName
+	return c.problem.Reporter
 }
 
 func (c ErrorCheck) Reporter() string {
-	return ErrorCheckName
+	return c.problem.Reporter
 }
 
-func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, _ parser.Rule, _ []discovery.Entry) (problems []Problem) {
+	problems = append(problems, c.problem)
+	return problems
+}
+
+func parseRuleError(rule parser.Rule, err error) Problem {
 	var commentErr comments.CommentError
 	var ignoreErr discovery.FileIgnoreError
 
 	switch {
-	case errors.As(c.err, &ignoreErr):
+	case errors.As(err, &ignoreErr):
 		slog.Debug("ignore/file report", slog.Any("err", ignoreErr))
-		problems = append(problems, Problem{
+		return Problem{
 			Lines: parser.LineRange{
 				First: ignoreErr.Line,
 				Last:  ignoreErr.Line,
@@ -67,11 +72,11 @@ func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule,
 			Reporter: ignoreFileReporter,
 			Text:     ignoreErr.Error(),
 			Severity: Information,
-		})
+		}
 
-	case errors.As(c.err, &commentErr):
+	case errors.As(err, &commentErr):
 		slog.Debug("invalid comment report", slog.Any("err", commentErr))
-		problems = append(problems, Problem{
+		return Problem{
 			Lines: parser.LineRange{
 				First: commentErr.Line,
 				Last:  commentErr.Line,
@@ -79,31 +84,31 @@ func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule,
 			Reporter: pintCommentReporter,
 			Text:     "This comment is not a valid pint control comment: " + commentErr.Error(),
 			Severity: Warning,
-		})
+		}
 
-	case c.err != nil:
-		slog.Debug("yaml syntax report", slog.Any("err", c.err))
-		problems = append(problems, Problem{
+	case err != nil:
+		slog.Debug("yaml syntax report", slog.Any("err", err))
+		return Problem{
 			Lines: parser.LineRange{
 				First: 1,
 				Last:  1,
 			},
 			Reporter: yamlParseReporter,
-			Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", c.err),
+			Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", err),
 			Details: `pint cannot read this file because YAML parser returned an error.
 This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
 `,
 			Severity: Fatal,
-		})
+		}
 
-	case rule.Error.Err != nil:
+	default:
 		slog.Debug("rule error report", slog.Any("err", rule.Error.Err))
 		details := yamlDetails
 		if rule.Error.Details != "" {
 			details = rule.Error.Details
 		}
-		problems = append(problems, Problem{
+		return Problem{
 			Lines: parser.LineRange{
 				First: rule.Error.Line,
 				Last:  rule.Error.Line,
@@ -112,8 +117,6 @@ If this file is a template that will be rendered into valid YAML then you can in
 			Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
 			Details:  details,
 			Severity: Fatal,
-		})
+		}
 	}
-
-	return problems
 }

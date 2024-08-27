@@ -87,10 +87,11 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 	proms := gen.ServersForPath(entry.Path.Name)
 
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
+		check := checks.NewErrorCheck(entry)
 		enabled = parsedRule{
 			match: defaultMatch,
-			name:  checks.ErrorCheckName,
-			check: checks.NewErrorCheck(entry.PathError),
+			name:  check.Reporter(),
+			check: check,
 		}.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
 	} else {
 		for _, pr := range baseRules(proms, defaultMatch) {
