@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 
@@ -175,6 +176,199 @@ func TestGitLabReporter(t *testing.T) {
 				return err
 			},
 		},
+		{
+			description: "list merge requests failed",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Minute,
+			project:     123,
+			maxComments: 50,
+			reports:     []reporter.Report{fooReport},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/v4/user":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`{"id": 123}`))
+					}
+				case "/api/v4/projects/123/merge_requests":
+					w.WriteHeader(500)
+					_, _ = w.Write([]byte("Mock error"))
+				default:
+					w.WriteHeader(200)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[]`))
+					}
+				}
+			}),
+			errorHandler: func(err error) error {
+				if strings.HasSuffix(err.Error(), ": Mock error") {
+					return nil
+				}
+				return err
+			},
+		},
+		{
+			description: "user request failed",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Minute,
+			project:     123,
+			maxComments: 50,
+			reports:     []reporter.Report{fooReport},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/v4/user":
+					w.WriteHeader(500)
+					_, _ = w.Write([]byte("Mock error"))
+				default:
+					w.WriteHeader(200)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[]`))
+					}
+				}
+			}),
+			errorHandler: func(err error) error {
+				if strings.HasSuffix(err.Error(), ": Mock error") {
+					return nil
+				}
+				return err
+			},
+		},
+		{
+			description: "too many comments",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Second,
+			project:     123,
+			maxComments: 1,
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{1},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{2},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{3},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+				switch r.URL.Path {
+				case "/api/v4/user":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`{"id": 123}`))
+					}
+				case "/api/v4/projects/123/merge_requests":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"iid":1}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/diffs":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/versions":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[
+{"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
+{"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
+]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/discussions":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[]`))
+					} else {
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "no diff",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Second,
+			project:     123,
+			maxComments: 1,
+			reports:     []reporter.Report{fooReport},
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(200)
+				switch r.URL.Path {
+				case "/api/v4/user":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`{"id": 123}`))
+					}
+				case "/api/v4/projects/123/merge_requests":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"iid":1}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/diffs":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/versions":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[
+{"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
+{"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
+]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/discussions":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[]`))
+					} else {
+
+						_, _ = w.Write([]byte(`ERROR`))
+						t.FailNow()
+					}
+				}
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -196,7 +390,7 @@ func TestGitLabReporter(t *testing.T) {
 			if err == nil {
 				summary := reporter.NewSummary(tc.reports)
 				err = reporter.Submit(context.Background(), summary, r)
-				require.NoError(t, err)
+				require.NoError(t, tc.errorHandler(err))
 			}
 			require.NoError(t, tc.errorHandler(err))
 		})
