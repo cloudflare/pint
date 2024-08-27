@@ -83,7 +83,8 @@ func (cfg Config) String() string {
 func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
-	defaultMatch := []Match{{State: defaultMatchStates(commandFromContext(ctx))}}
+	defaultStates := defaultMatchStates(commandFromContext(ctx))
+	defaultMatch := []Match{{State: defaultStates}}
 	proms := gen.ServersForPath(entry.Path.Name)
 
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
@@ -98,7 +99,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 			enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
 		}
 		for _, rule := range cfg.Rules {
-			for _, pr := range parseRule(rule, proms, defaultMatch) {
+			for _, pr := range parseRule(rule, proms, defaultStates) {
 				enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
 			}
 		}

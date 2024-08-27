@@ -178,14 +178,21 @@ func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRul
 	return rules
 }
 
-func defaultRuleMatch(match, fallback []Match) []Match {
+func defaultRuleMatch(match []Match, defaultStates []string) []Match {
 	if len(match) == 0 {
-		return fallback
+		return []Match{{State: defaultStates}}
 	}
-	return match
+	dst := make([]Match, 0, len(match))
+	for _, m := range match {
+		if len(m.State) == 0 {
+			m.State = defaultStates
+		}
+		dst = append(dst, m)
+	}
+	return dst
 }
 
-func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMatch []Match) (rules []parsedRule) {
+func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultStates []string) (rules []parsedRule) {
 	if len(rule.Aggregate) > 0 {
 		var nameRegex *checks.TemplatedRegexp
 		for _, aggr := range rule.Aggregate {
@@ -195,7 +202,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			severity := aggr.getSeverity(checks.Warning)
 			for _, label := range aggr.Keep {
 				rules = append(rules, parsedRule{
-					match:  defaultRuleMatch(rule.Match, defaultMatch),
+					match:  defaultRuleMatch(rule.Match, defaultStates),
 					ignore: rule.Ignore,
 					name:   checks.AggregationCheckName,
 					check:  checks.NewAggregationCheck(nameRegex, label, true, aggr.Comment, severity),
@@ -203,7 +210,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			}
 			for _, label := range aggr.Strip {
 				rules = append(rules, parsedRule{
-					match:  defaultRuleMatch(rule.Match, defaultMatch),
+					match:  defaultRuleMatch(rule.Match, defaultStates),
 					ignore: rule.Ignore,
 					name:   checks.AggregationCheckName,
 					check:  checks.NewAggregationCheck(nameRegex, label, false, aggr.Comment, severity),
@@ -217,7 +224,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 		evalDur, _ := parseDuration(rule.Cost.MaxEvaluationDuration)
 		for _, prom := range prometheusServers {
 			rules = append(rules, parsedRule{
-				match:  defaultRuleMatch(rule.Match, defaultMatch),
+				match:  defaultRuleMatch(rule.Match, defaultStates),
 				ignore: rule.Ignore,
 				name:   checks.CostCheckName,
 				check:  checks.NewCostCheck(prom, rule.Cost.MaxSeries, rule.Cost.MaxTotalSamples, rule.Cost.MaxPeakSamples, evalDur, rule.Cost.Comment, severity),
@@ -237,7 +244,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			}
 			severity := ann.getSeverity(checks.Warning)
 			rules = append(rules, parsedRule{
-				match:  defaultRuleMatch(rule.Match, defaultMatch),
+				match:  defaultRuleMatch(rule.Match, defaultStates),
 				ignore: rule.Ignore,
 				name:   checks.AnnotationCheckName,
 				check:  checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), tokenRegex, valueRegex, ann.Values, ann.Required, ann.Comment, severity),
@@ -256,7 +263,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			}
 			severity := lab.getSeverity(checks.Warning)
 			rules = append(rules, parsedRule{
-				match:  defaultRuleMatch(rule.Match, defaultMatch),
+				match:  defaultRuleMatch(rule.Match, defaultStates),
 				ignore: rule.Ignore,
 				name:   checks.LabelCheckName,
 				check:  checks.NewLabelCheck(checks.MustTemplatedRegexp(lab.Key), tokenRegex, valueRegex, lab.Values, lab.Required, lab.Comment, severity),
@@ -280,7 +287,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 		severity := rule.Alerts.getSeverity(checks.Information)
 		for _, prom := range prometheusServers {
 			rules = append(rules, parsedRule{
-				match:  defaultRuleMatch(rule.Match, defaultMatch),
+				match:  defaultRuleMatch(rule.Match, defaultStates),
 				ignore: rule.Ignore,
 				name:   checks.AlertsCheckName,
 				check:  checks.NewAlertsCheck(prom, qRange, qStep, qResolve, rule.Alerts.MinCount, rule.Alerts.Comment, severity),
@@ -295,7 +302,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			re := checks.MustTemplatedRegexp(reject.Regex)
 			if reject.LabelKeys {
 				rules = append(rules, parsedRule{
-					match:  defaultRuleMatch(rule.Match, defaultMatch),
+					match:  defaultRuleMatch(rule.Match, defaultStates),
 					ignore: rule.Ignore,
 					name:   checks.RejectCheckName,
 					check:  checks.NewRejectCheck(true, false, re, nil, severity),
@@ -303,7 +310,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			}
 			if reject.LabelValues {
 				rules = append(rules, parsedRule{
-					match:  defaultRuleMatch(rule.Match, defaultMatch),
+					match:  defaultRuleMatch(rule.Match, defaultStates),
 					ignore: rule.Ignore,
 					name:   checks.RejectCheckName,
 					check:  checks.NewRejectCheck(true, false, nil, re, severity),
@@ -311,7 +318,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			}
 			if reject.AnnotationKeys {
 				rules = append(rules, parsedRule{
-					match:  defaultRuleMatch(rule.Match, defaultMatch),
+					match:  defaultRuleMatch(rule.Match, defaultStates),
 					ignore: rule.Ignore,
 					name:   checks.RejectCheckName,
 					check:  checks.NewRejectCheck(false, true, re, nil, severity),
@@ -319,7 +326,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			}
 			if reject.AnnotationValues {
 				rules = append(rules, parsedRule{
-					match:  defaultRuleMatch(rule.Match, defaultMatch),
+					match:  defaultRuleMatch(rule.Match, defaultStates),
 					ignore: rule.Ignore,
 					name:   checks.RejectCheckName,
 					check:  checks.NewRejectCheck(false, true, nil, re, severity),
@@ -338,7 +345,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 			timeout = time.Minute
 		}
 		rules = append(rules, parsedRule{
-			match:  defaultRuleMatch(rule.Match, defaultMatch),
+			match:  defaultRuleMatch(rule.Match, defaultStates),
 			ignore: rule.Ignore,
 			name:   checks.RuleLinkCheckName,
 			check:  checks.NewRuleLinkCheck(re, link.URI, timeout, link.Headers, link.Comment, severity),
@@ -348,7 +355,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 	if rule.For != nil {
 		severity, minFor, maxFor := rule.For.resolve()
 		rules = append(rules, parsedRule{
-			match:  defaultRuleMatch(rule.Match, defaultMatch),
+			match:  defaultRuleMatch(rule.Match, defaultStates),
 			ignore: rule.Ignore,
 			name:   checks.RuleForCheckName,
 			check:  checks.NewRuleForCheck(checks.RuleForFor, minFor, maxFor, rule.For.Comment, severity),
@@ -358,7 +365,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 	if rule.KeepFiringFor != nil {
 		severity, minFor, maxFor := rule.KeepFiringFor.resolve()
 		rules = append(rules, parsedRule{
-			match:  defaultRuleMatch(rule.Match, defaultMatch),
+			match:  defaultRuleMatch(rule.Match, defaultStates),
 			ignore: rule.Ignore,
 			name:   checks.RuleForCheckName,
 			check:  checks.NewRuleForCheck(checks.RuleForKeepFiringFor, minFor, maxFor, rule.KeepFiringFor.Comment, severity),
@@ -369,7 +376,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 		re := checks.MustTemplatedRegexp(name.Regex)
 		severity := name.getSeverity(checks.Information)
 		rules = append(rules, parsedRule{
-			match:  defaultRuleMatch(rule.Match, defaultMatch),
+			match:  defaultRuleMatch(rule.Match, defaultStates),
 			ignore: rule.Ignore,
 			name:   checks.RuleNameCheckName,
 			check:  checks.NewRuleNameCheck(re, name.Comment, severity),
@@ -380,7 +387,7 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultMat
 		severity := rule.RangeQuery.getSeverity(checks.Warning)
 		limit, _ := parseDuration(rule.RangeQuery.Max)
 		rules = append(rules, parsedRule{
-			match:  defaultRuleMatch(rule.Match, defaultMatch),
+			match:  defaultRuleMatch(rule.Match, defaultStates),
 			ignore: rule.Ignore,
 			name:   checks.CostCheckName,
 			check:  checks.NewRangeQueryCheck(nil, limit, rule.RangeQuery.Comment, severity),

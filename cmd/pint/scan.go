@@ -78,6 +78,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 						slog.String("path", entry.Path.Name),
 						slog.String("record", entry.Rule.RecordingRule.Record.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
+						slog.String("state", entry.State.String()),
 					)
 				}
 				if entry.Rule.AlertingRule != nil {
@@ -86,12 +87,14 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 						slog.String("path", entry.Path.Name),
 						slog.String("alert", entry.Rule.AlertingRule.Alert.Value),
 						slog.String("lines", entry.Rule.Lines.String()),
+						slog.String("state", entry.State.String()),
 					)
 				}
 				if entry.Rule.Error.Err != nil {
 					slog.Debug("Found invalid rule",
 						slog.String("path", entry.Path.Name),
 						slog.String("lines", entry.Rule.Lines.String()),
+						slog.String("state", entry.State.String()),
 					)
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
 				}
