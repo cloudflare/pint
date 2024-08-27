@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	textTemplate "text/template"
 	"text/template/parse"
@@ -15,7 +16,6 @@ import (
 	"github.com/prometheus/prometheus/promql"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	promTemplate "github.com/prometheus/prometheus/template"
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"

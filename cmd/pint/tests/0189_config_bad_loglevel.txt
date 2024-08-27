@@ -1,0 +1,7 @@
+! exec pint -l invalid --no-color config
+! stdout .
+stderr 'ERROR Fatal error err="failed to set log level: ''invalid'' is not a valid log level"'
+
+! exec pint -l invalid --no-color parse 'foo'
+! stdout .
+stderr 'ERROR Fatal error err="failed to set log level: ''invalid'' is not a valid log level"'

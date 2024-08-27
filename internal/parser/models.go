@@ -2,10 +2,10 @@ package parser
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
-	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/comments"

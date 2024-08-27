@@ -3,13 +3,13 @@ package checks
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"

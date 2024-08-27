@@ -2,9 +2,8 @@ package config
 
 import (
 	"context"
+	"slices"
 	"time"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
