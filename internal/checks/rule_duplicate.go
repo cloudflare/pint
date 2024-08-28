@@ -44,8 +44,9 @@ func (c RuleDuplicateCheck) Reporter() string {
 }
 
 func (c RuleDuplicateCheck) Check(ctx context.Context, path discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
-	if rule.RecordingRule == nil || rule.RecordingRule.Expr.SyntaxError != nil {
-		return nil
+	expr := rule.Expr()
+	if expr.SyntaxError != nil {
+		return problems
 	}
 
 	for _, entry := range entries {
@@ -53,6 +54,9 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path discovery.Path, rule
 			continue
 		}
 		if entry.Rule.Error.Err != nil {
+			continue
+		}
+		if entry.Rule.Expr().SyntaxError != nil {
 			continue
 		}
 		if entry.Rule.RecordingRule == nil {
@@ -67,23 +71,24 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path discovery.Path, rule
 		if !c.prom.IsEnabledForPath(entry.Path.Name) {
 			continue
 		}
-		if entry.Rule.RecordingRule.Record.Value != rule.RecordingRule.Record.Value {
-			continue
+
+		// Look for identical recording rules.
+		if entry.Rule.RecordingRule != nil && rule.RecordingRule != nil && entry.Rule.RecordingRule.Record.Value == rule.RecordingRule.Record.Value {
+			problems = append(problems, c.compareRules(ctx, rule.RecordingRule, entry, rule.Lines)...)
 		}
-		problems = append(problems, c.compareRules(ctx, rule.RecordingRule, entry, rule.Lines)...)
 	}
 	return problems
 }
 
 func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines parser.LineRange) (problems []Problem) {
-	ruleALabels := buildRuleLabels(rule)
-	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule)
+	ruleALabels := buildRuleLabels(rule.Labels)
+	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule.Labels)
 
 	if ruleALabels.Hash() != ruleBLabels.Hash() {
 		return nil
 	}
 
-	if rule.Expr.Value.Value == entry.Rule.RecordingRule.Expr.Value.Value {
+	if rule.Expr.Query.Expr.String() == entry.Rule.RecordingRule.Expr.Query.Expr.String() {
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
@@ -95,14 +100,14 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 	return problems
 }
 
-func buildRuleLabels(rule *parser.RecordingRule) labels.Labels {
-	if rule.Labels == nil || len(rule.Labels.Items) == 0 {
+func buildRuleLabels(l *parser.YamlMap) labels.Labels {
+	if l == nil || len(l.Items) == 0 {
 		return labels.EmptyLabels()
 	}
 
-	pairs := make([]string, 0, len(rule.Labels.Items))
-	for _, l := range rule.Labels.Items {
-		pairs = append(pairs, l.Key.Value, l.Value.Value)
+	pairs := make([]string, 0, len(l.Items))
+	for _, label := range l.Items {
+		pairs = append(pairs, label.Key.Value, label.Value.Value)
 	}
 	return labels.FromStrings(pairs...)
 }

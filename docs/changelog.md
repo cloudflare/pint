@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.66.0
+
+### Fixed
+
+- Improved accuracy of the [rule/duplicate](checks/rule/duplicate.md) check.
+
 ## v0.65.1
 
 ### Fixed
