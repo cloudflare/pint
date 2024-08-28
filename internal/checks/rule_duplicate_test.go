@@ -173,6 +173,35 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: noProblems,
 			entries:  xxxEntries,
 		},
+		{
+			description: "same expr but formatted differently",
+			content:     "- record: job:up:sum\n  expr: sum(up) by(job)\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDuplicateCheck(prom)
+			},
+			prometheus: newSimpleProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  2,
+						},
+						Reporter: checks.RuleDuplicateCheckName,
+						Text:     textDuplicateRule("fake.yml", 6),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			entries: mustParseContent(`
+- record: job:up:sum
+  expr: sum by(job) (up)
+  labels:
+    cluster: prod
+- record: job:up:sum
+  expr: sum by(job) (up)
+`),
+		},
 	}
 
 	runTests(t, testCases)
