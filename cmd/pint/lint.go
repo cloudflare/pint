@@ -110,7 +110,14 @@ func actionLint(c *cli.Context) error {
 	if c.Bool(teamCityFlag) {
 		r = reporter.NewTeamCityReporter(os.Stderr)
 	} else if c.Bool(checkStyleFlag) {
-		r = reporter.NewCheckStyleReporter(os.Stderr)
+		file, err := os.Create("checkstyle.xml") //create a new file
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		defer file.Close()
+		fmt.Println("File is created successfully.")
+		r = reporter.NewCheckStyleReporter(file)
 	} else {
 		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
 	}
