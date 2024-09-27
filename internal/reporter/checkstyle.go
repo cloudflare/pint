@@ -1,6 +1,8 @@
 package reporter
 
 import (
+	"bytes"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"strings"
@@ -51,10 +53,12 @@ func (cs CheckStyleReporter) Submit(summary Summary) error {
 	for dir, reports := range dirs {
 		buf.WriteString(fmt.Sprintf("<file name=\"%s\" >\n", dir))
 		for _, report := range reports {
+			xmlBuf := new(bytes.Buffer)
+			xml.EscapeText(xmlBuf, []byte(report.Problem.Text))
 			line := fmt.Sprintf("<error line=\"%d\" severity=\"%s\" message=\"%s\" source=\"%s\" />\n",
 				report.Problem.Lines.First,
 				report.Problem.Severity.String(),
-				report.Problem.Text,
+				xmlBuf.String(),
 				report.Problem.Reporter,
 			)
 			buf.WriteString(line)
