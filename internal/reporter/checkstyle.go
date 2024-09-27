@@ -49,9 +49,9 @@ func (cs CheckStyleReporter) Submit(summary Summary) error {
 	buf.WriteString("<checkstyle version='4.3'>\n")
 
 	for dir, reports := range dirs {
-		buf.WriteString(fmt.Sprintf("<file name='%s' >\n", dir))
+		buf.WriteString(fmt.Sprintf("<file name\"%s\" >\n", dir))
 		for _, report := range reports {
-			line := fmt.Sprintf("<error line='%d' severity='%s' message='%s' source='%s' />\n",
+			line := fmt.Sprintf("<error line=\"%d\" severity=\"%s\" message=\"%s\" source=\"%s\" />\n",
 				report.Problem.Lines.First,
 				report.Problem.Severity.String(),
 				report.Problem.Text,
