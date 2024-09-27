@@ -48,6 +48,12 @@ var lintCmd = &cli.Command{
 			Value:   false,
 			Usage:   "Report problems using TeamCity Service Messages.",
 		},
+		&cli.BoolFlag{
+			Name:    checkStyleFlag,
+			Aliases: []string{"c"},
+			Value:   false,
+			Usage:   "Report problems using checkstyle xml.",
+		},
 	},
 }
 
@@ -103,6 +109,8 @@ func actionLint(c *cli.Context) error {
 	var r reporter.Reporter
 	if c.Bool(teamCityFlag) {
 		r = reporter.NewTeamCityReporter(os.Stderr)
+	} else if c.Bool(checkStyleFlag) {
+		r = reporter.NewCheckStyleReporter(os.Stderr)
 	} else {
 		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
 	}

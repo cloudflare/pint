@@ -23,6 +23,7 @@ var (
 	baseBranchFlag = "base-branch"
 	failOnFlag     = "fail-on"
 	teamCityFlag   = "teamcity"
+	checkStyleFlag = "checkstyle"
 )
 
 var ciCmd = &cli.Command{
