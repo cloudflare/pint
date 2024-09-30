@@ -1,0 +1,10 @@
+exec pint parse -- '-up'
+cmp stdout stdout.txt
+! stderr .
+
+-- stdout.txt --
+++ node: -up
+  UnaryExpr:
+    * Type: vector
+    * Op: -
+    * Expr: up
