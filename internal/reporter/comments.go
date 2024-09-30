@@ -33,7 +33,7 @@ type Commenter interface {
 	Delete(context.Context, any, ExistingComment) error
 	CanCreate(int) bool
 	CanDelete(ExistingComment) bool
-	IsEqual(ExistingComment, PendingComment) bool
+	IsEqual(any, ExistingComment, PendingComment) bool
 }
 
 func NewCommentReporter(c Commenter) CommentReporter {
@@ -220,7 +220,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) (er
 			slog.String("msg", pending.text),
 		)
 		for _, existing := range existingComments {
-			if c.IsEqual(existing, pending) {
+			if c.IsEqual(dst, existing, pending) {
 				slog.Debug("Comment already exists",
 					slog.String("reporter", c.Describe()),
 					slog.String("path", pending.path),
@@ -259,7 +259,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) (er
 
 	for _, existing := range existingComments {
 		for _, pending := range pendingComments {
-			if c.IsEqual(existing, pending) {
+			if c.IsEqual(dst, existing, pending) {
 				goto NEXTDelete
 			}
 		}

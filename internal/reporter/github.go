@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -39,7 +38,20 @@ type ghCommentMeta struct {
 }
 
 type ghPR struct {
-	paths []string
+	files []*github.CommitFile
+}
+
+func (pr ghPR) String() string {
+	return fmt.Sprintf("%d file(s)", len(pr.files))
+}
+
+func (pr ghPR) getFile(path string) *github.CommitFile {
+	for _, f := range pr.files {
+		if f.GetFilename() == path {
+			return f
+		}
+	}
+	return nil
 }
 
 // NewGithubReporter creates a new GitHub reporter that reports
@@ -91,7 +103,7 @@ func (gr GithubReporter) Describe() string {
 
 func (gr GithubReporter) Destinations(ctx context.Context) (_ []any, err error) {
 	pr := ghPR{}
-	pr.paths, err = gr.listPRFiles(ctx)
+	pr.files, err = gr.listPRFiles(ctx)
 	return []any{pr}, err
 }
 
@@ -154,25 +166,29 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) error {
 	pr := dst.(ghPR)
 
-	if !slices.Contains(pr.paths, p.path) {
+	file := pr.getFile(p.path)
+	if file == nil {
 		slog.Debug("Skipping report for path with no changes",
 			slog.String("path", p.path),
 		)
 		return nil
 	}
 
-	var side string
-	if p.anchor == checks.AnchorBefore {
-		side = "LEFT"
-	} else {
-		side = "RIGHT"
+	diffs := parseDiffLines(file.GetPatch())
+	if len(diffs) == 0 {
+		slog.Debug("Skipping report for path with no diff",
+			slog.String("path", p.path),
+		)
+		return nil
 	}
+
+	side, line := gr.fixCommentLine(dst, p)
 
 	comment := &github.PullRequestComment{
 		CommitID: github.String(gr.headCommit),
 		Path:     github.String(p.path),
 		Body:     github.String(p.text),
-		Line:     github.Int(p.line),
+		Line:     github.Int(line),
 		Side:     github.String(side),
 	}
 
@@ -203,11 +219,12 @@ func (gr GithubReporter) CanCreate(done int) bool {
 	return done < gr.maxComments
 }
 
-func (gr GithubReporter) IsEqual(existing ExistingComment, pending PendingComment) bool {
+func (gr GithubReporter) IsEqual(dst any, existing ExistingComment, pending PendingComment) bool {
 	if existing.path != pending.path {
 		return false
 	}
-	if existing.line != pending.line {
+	_, line := gr.fixCommentLine(dst, pending)
+	if existing.line != line {
 		return false
 	}
 	return strings.Trim(existing.text, "\n") == strings.Trim(pending.text, "\n")
@@ -277,7 +294,7 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	return nil
 }
 
-func (gr GithubReporter) listPRFiles(ctx context.Context) ([]string, error) {
+func (gr GithubReporter) listPRFiles(ctx context.Context) ([]*github.CommitFile, error) {
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
@@ -286,11 +303,7 @@ func (gr GithubReporter) listPRFiles(ctx context.Context) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pull request files: %w", err)
 	}
-	paths := []string{}
-	for _, file := range files {
-		paths = append(paths, file.GetFilename())
-	}
-	return paths, nil
+	return files, nil
 }
 
 func formatGHReviewBody(version string, summary Summary) string {
@@ -387,4 +400,41 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 
 func (gr GithubReporter) reqContext(ctx context.Context) (context.Context, context.CancelFunc) {
 	return context.WithTimeout(context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true), gr.timeout)
+}
+
+func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int) {
+	pr := dst.(ghPR)
+	file := pr.getFile(p.path)
+
+	var side string
+	if p.anchor == checks.AnchorBefore {
+		side = "LEFT"
+	} else {
+		side = "RIGHT"
+	}
+
+	line := p.line
+	diffs := parseDiffLines(file.GetPatch())
+	dl, ok := diffLineFor(diffs, p.line)
+	switch {
+	case ok && dl.wasModified && p.anchor == checks.AnchorAfter:
+		// Comment on new or modified line.
+		line = dl.new
+	case ok && dl.wasModified && p.anchor == checks.AnchorBefore:
+		// Comment on new or modified line.
+		line = dl.old
+	default:
+		// Comment on unmodified line.
+		// Find first modified line and put it there.
+		for _, d := range diffs {
+			if !d.wasModified {
+				continue
+			}
+			line = d.new
+			side = "RIGHT"
+			break
+		}
+	}
+
+	return side, line
 }
