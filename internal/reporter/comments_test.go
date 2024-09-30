@@ -68,7 +68,7 @@ func (tc testCommenter) CanCreate(n int) bool {
 	return tc.canCreate(n)
 }
 
-func (tc testCommenter) IsEqual(e ExistingComment, p PendingComment) bool {
+func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool {
 	return tc.isEqual(e, p)
 }
 

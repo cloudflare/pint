@@ -662,6 +662,169 @@ func TestGithubReporter(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "modified line",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{1},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "unmodified line",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
+		{
+			description: "removed line",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,5 +1,4 @@\n - record: target is down\n   expr: up == 0\n-  labels: {}\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":3,"side":"LEFT","commit_id":"HEAD"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{3},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorBefore,
+					},
+				},
+			},
+		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
