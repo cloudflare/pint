@@ -54,8 +54,8 @@ func (cs CheckStyleReporter) Submit(summary Summary) error {
 		buf.WriteString(fmt.Sprintf("<file name=\"%s\" >\n", dir))
 		for _, report := range reports {
 			xmlBuf := new(bytes.Buffer)
-			report.Problem.Details
-			xml.EscapeText(xmlBuf, []byte(report.Problem.Text))
+			textDetails := fmt.Sprintf("Text:%s\n Details:%s", report.Problem.Text, report.Problem.Details)
+			xml.EscapeText(xmlBuf, []byte(textDetails))
 			line := fmt.Sprintf("<error line=\"%d\" severity=\"%s\" message=\"%s\" source=\"%s\" />\n",
 				report.Problem.Lines.First,
 				report.Problem.Severity.String(),
