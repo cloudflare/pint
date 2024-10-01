@@ -20,15 +20,6 @@ type CheckStyleReporter struct {
 
 type Dirs map[string][]Report
 
-func (d Dirs) SetDefault(key string, val []Report) (result []Report) {
-	if v, ok := d[key]; ok {
-		return v
-	} else {
-		d[key] = val
-		return val
-	}
-}
-
 func sortByFile(summary Summary) Dirs {
 	x := make(Dirs)
 	for _, report := range summary.reports {
@@ -46,14 +37,18 @@ func (cs CheckStyleReporter) Submit(summary Summary) error {
 	for dir, reports := range dirs {
 		buf.WriteString(fmt.Sprintf("<file name=\"%s\" >\n", dir))
 		for _, report := range reports {
-			xmlBuf := new(bytes.Buffer)
+			// xml excape message
+			xmlMessageBuf := bytes.Buffer{}
 			textDetails := fmt.Sprintf("Text:%s\n Details:%s", report.Problem.Text, report.Problem.Details)
-			xml.EscapeText(xmlBuf, []byte(textDetails))
+			xml.EscapeText(&xmlMessageBuf, []byte(textDetails))
+			// xml escape reporter
+			xmlReporterBuf := bytes.Buffer{}
+			xml.EscapeText(&xmlReporterBuf, []byte(report.Problem.Reporter))
 			line := fmt.Sprintf("<error line=\"%d\" severity=\"%s\" message=\"%s\" source=\"%s\" />\n",
 				report.Problem.Lines.First,
 				report.Problem.Severity.String(),
-				xmlBuf.String(),
-				report.Problem.Reporter,
+				xmlMessageBuf.String(),
+				xmlReporterBuf.String(),
 			)
 			buf.WriteString(line)
 		}
