@@ -38,13 +38,8 @@ func sortByFile(summary Summary) Dirs {
 }
 
 func (cs CheckStyleReporter) Submit(summary Summary) error {
-
 	dirs := sortByFile(summary)
-
 	var buf strings.Builder
-	// for _, report := range summary.reports {
-	// 	buf.WriteString(fmt.Sprintf("______%s\n", report.Problem.Text))
-	// }
 	buf.WriteString("<?xml version='1.0' encoding='UTF-8'?>\n")
 	buf.WriteString("<checkstyle version='4.3'>\n")
 
