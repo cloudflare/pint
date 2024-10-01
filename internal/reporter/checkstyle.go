@@ -32,9 +32,7 @@ func (d Dirs) SetDefault(key string, val []Report) (result []Report) {
 func sortByFile(summary Summary) Dirs {
 	x := make(Dirs)
 	for _, report := range summary.reports {
-		dir := x.SetDefault(report.Path.Name, make([]Report, 1))
-		dir = append(dir, report)
-		x[report.Path.Name] = dir
+		x[report.Path.Name] = append(x[report.Path.Name], report)
 	}
 	return x
 }
