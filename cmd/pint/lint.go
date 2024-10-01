@@ -110,7 +110,6 @@ func actionLint(c *cli.Context) error {
 	if c.Bool(teamCityFlag) {
 		r = reporter.NewTeamCityReporter(os.Stderr)
 	} else if c.Bool(checkStyleFlag) {
-		fmt.Println("File is created successfully.")
 		r = reporter.NewCheckStyleReporter(os.Stdout)
 	} else {
 		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
