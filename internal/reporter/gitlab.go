@@ -234,7 +234,7 @@ func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingCo
 	return err
 }
 
-func (gl GitLabReporter) IsEqual(existing ExistingComment, pending PendingComment) bool {
+func (gl GitLabReporter) IsEqual(_ any, existing ExistingComment, pending PendingComment) bool {
 	if existing.path != pending.path {
 		return false
 	}
@@ -346,7 +346,7 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 		},
 	}
 
-	dl, ok := diffLineFor(parseDiffLines(diff), pending.line)
+	dl, ok := diffLineFor(parseDiffLines(diff.Diff), pending.line)
 	switch {
 	case !ok:
 		// No diffLine for this line, most likely unmodified ?.
@@ -393,10 +393,10 @@ func diffLineFor(lines []diffLine, line int) (diffLine, bool) {
 
 var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)
 
-func parseDiffLines(diff *gitlab.MergeRequestDiff) (lines []diffLine) {
+func parseDiffLines(diff string) (lines []diffLine) {
 	var oldLine, newLine int
 
-	sc := bufio.NewScanner(strings.NewReader(diff.Diff))
+	sc := bufio.NewScanner(strings.NewReader(diff))
 	for sc.Scan() {
 		line := sc.Text()
 		switch {

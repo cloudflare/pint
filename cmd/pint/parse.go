@@ -102,6 +102,12 @@ func parseNode(node parser.Node, level int) {
 		printNode(level, "StringLiteral:")
 		level += levelStep
 		printNode(level, "* Type: %v", n.Type())
+	case *parser.UnaryExpr:
+		printNode(level, "UnaryExpr:")
+		level += levelStep
+		printNode(level, "* Type: %v", n.Type())
+		printNode(level, "* Op: %v", n.Op)
+		printNode(level, "* Expr: %v", n.Expr)
 	default:
 		printNode(level, "! Unsupported node")
 	}
