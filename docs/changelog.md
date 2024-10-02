@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.65.3
+
+### Fixed
+
+- Fixed GitHub actions permissions.
+
 ## v0.65.2
 
 ### Fixed

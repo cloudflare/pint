@@ -13,7 +13,9 @@ on:
     types:
       - published
 
-permissions: read-all
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   build:
