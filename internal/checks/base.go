@@ -131,7 +131,6 @@ type RuleChecker interface {
 }
 
 type exprProblem struct {
-	expr     string
 	text     string
 	details  string
 	severity Severity

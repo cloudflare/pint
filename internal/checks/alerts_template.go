@@ -344,7 +344,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems []exprProblem) {
 	for _, call := range utils.HasOuterRate(node) {
 		problems = append(problems, exprProblem{
-			expr:     call.String(),
 			text:     fmt.Sprintf("Using the value of `%s` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.", call),
 			details:  "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
 			severity: Information,

@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -10,6 +11,10 @@ import (
 
 func newFragileCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewFragileCheck()
+}
+
+func fragileSampleFunc(s string) string {
+	return fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", s)
 }
 
 func TestFragileCheck(t *testing.T) {
@@ -63,7 +68,7 @@ func TestFragileCheck(t *testing.T) {
 							First: 2,
 							Last:  2,
 						},
-						Reporter: "promql/fragile",
+						Reporter: checks.FragileCheckName,
 						Text:     text,
 						Severity: checks.Warning,
 					},
@@ -82,7 +87,7 @@ func TestFragileCheck(t *testing.T) {
 							First: 2,
 							Last:  2,
 						},
-						Reporter: "promql/fragile",
+						Reporter: checks.FragileCheckName,
 						Text:     text,
 						Severity: checks.Warning,
 					},
@@ -101,7 +106,7 @@ func TestFragileCheck(t *testing.T) {
 							First: 2,
 							Last:  2,
 						},
-						Reporter: "promql/fragile",
+						Reporter: checks.FragileCheckName,
 						Text:     text,
 						Severity: checks.Warning,
 					},
@@ -120,7 +125,7 @@ func TestFragileCheck(t *testing.T) {
 							First: 2,
 							Last:  2,
 						},
-						Reporter: "promql/fragile",
+						Reporter: checks.FragileCheckName,
 						Text:     text,
 						Severity: checks.Warning,
 					},
@@ -139,7 +144,7 @@ func TestFragileCheck(t *testing.T) {
 							First: 2,
 							Last:  2,
 						},
-						Reporter: "promql/fragile",
+						Reporter: checks.FragileCheckName,
 						Text:     text,
 						Severity: checks.Warning,
 					},
@@ -215,6 +220,33 @@ func TestFragileCheck(t *testing.T) {
 			checker:    newFragileCheck,
 			prometheus: noProm,
 			problems:   noProblems,
+		},
+		{
+			description: "warns about topk() as source of series",
+			content:     "- alert: foo\n  expr: topk(10, foo)\n",
+			checker:     newFragileCheck,
+			prometheus:  noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.FragileCheckName,
+						Text:     fragileSampleFunc("topk"),
+						Details:  checks.FragileCheckSamplingDetails,
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "ignores aggregated topk()",
+			content:     "- alert: foo\n  expr: min(topk(10, foo)) > 5000\n",
+			checker:     newFragileCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
 		},
 	}
 

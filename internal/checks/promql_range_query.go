@@ -122,7 +122,6 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, node *parser.PromQLNode,
 	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
 			problems = append(problems, exprProblem{
-				expr: node.Expr.String(),
 				text: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
 					node.Expr, model.Duration(n.Range), reason),
 				severity: Warning,

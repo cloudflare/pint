@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.68.0
+
+### Added
+
+- [promql/fragile](checks/promql/fragile.md) will now warn when alerting rules are using
+  one of the aggregation operation that can return different series on every evaluation,
+  which can cause alert floppiness - [#820](https://github.com/cloudflare/pint/issues/820).
+
+### Fixed
+
+- Don't try to create GitLab comments on unmodified lines - [#1147](https://github.com/cloudflare/pint/pull/1147).
+
 ## v0.67.0
 
 ### Added

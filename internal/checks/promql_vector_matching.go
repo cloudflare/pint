@@ -82,7 +82,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
-				expr:     node.Expr.String(),
 				text:     text,
 				severity: severity,
 			})
@@ -125,7 +124,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			for k, lv := range lhsMatchers {
 				if rv, ok := rhsMatchers[k]; ok && rv != lv {
 					problems = append(problems, exprProblem{
-						expr:     node.Expr.String(),
 						text:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
@@ -139,7 +137,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
-				expr:     node.Expr.String(),
 				text:     text,
 				severity: severity,
 			})
@@ -153,7 +150,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 		if err != nil {
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
-				expr:     node.Expr.String(),
 				text:     text,
 				severity: severity,
 			})
@@ -167,7 +163,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
-						expr: node.Expr.String(),
 						text: fmt.Sprintf(
 							"Using `on(%s)` won't produce any results on %s because results from the left hand side of the query don't have this label: `%s`.",
 							name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).LHS),
@@ -177,7 +172,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				}
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
-						expr: node.Expr.String(),
 						text: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
 							name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).RHS),
 						details:  VectorMatchingCheckDetails,
@@ -186,7 +180,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
-						expr: node.Expr.String(),
 						text: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
 							name, promText(c.prom.Name(), qr.URI), node.Expr),
 						details:  VectorMatchingCheckDetails,
@@ -198,7 +191,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			l, r := leftLabels.getFirstNonOverlap(rightLabels)
 			if len(n.VectorMatching.MatchingLabels) == 0 {
 				problems = append(problems, exprProblem{
-					expr: node.Expr.String(),
 					text: fmt.Sprintf("This query will never return anything on %s because results from the right and the left hand side have different labels: `%s` != `%s`. Failing query: `%s`.",
 						promText(c.prom.Name(), qr.URI), l, r, node.Expr),
 					details:  VectorMatchingCheckDetails,
@@ -206,7 +198,6 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 				})
 			} else {
 				problems = append(problems, exprProblem{
-					expr: node.Expr.String(),
 					text: fmt.Sprintf("Using `ignoring(%s)` won't produce any results on %s because results from both sides of the query have different labels: `%s` != `%s`. Failing query: `%s`.",
 						strings.Join(n.VectorMatching.MatchingLabels, ","), promText(c.prom.Name(), qr.URI), l, r, node.Expr),
 					details:  VectorMatchingCheckDetails,
