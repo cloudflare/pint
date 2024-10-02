@@ -95,7 +95,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				Last:  parseErr.Line,
 			},
 			Reporter: yamlParseReporter,
-			Text:     parseErr.Error(),
+			Text:     parseErr.Err.Error(),
 			Details: `pint cannot read this file because YAML parser returned an error.
 This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).

@@ -6,7 +6,7 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 2: top level field must be a groups key, got list" path=rules/strict.yml lines=1-4
-rules/strict.yml:2 Fatal: error at line 2: top level field must be a groups key, got list (yaml/parse)
+rules/strict.yml:2 Fatal: top level field must be a groups key, got list (yaml/parse)
  2 | - alert: No Owner
 
 level=INFO msg="Problems found" Fatal=1
