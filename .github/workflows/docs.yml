@@ -1,7 +1,8 @@
 name: Spellcheck
 on: [pull_request]
 
-permissions: read-all
+permissions:
+  pages: write
 
 jobs:
   spellcheck:
