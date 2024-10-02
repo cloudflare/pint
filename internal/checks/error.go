@@ -60,6 +60,7 @@ func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, _ parser.Rule, _ 
 func parseRuleError(rule parser.Rule, err error) Problem {
 	var commentErr comments.CommentError
 	var ignoreErr discovery.FileIgnoreError
+	var parseErr parser.ParseError
 
 	switch {
 	case errors.As(err, &ignoreErr):
@@ -86,15 +87,15 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 			Severity: Warning,
 		}
 
-	case err != nil:
-		slog.Debug("yaml syntax report", slog.Any("err", err))
+	case errors.As(err, &parseErr):
+		slog.Debug("parse error", slog.Any("err", parseErr))
 		return Problem{
 			Lines: parser.LineRange{
-				First: 1,
-				Last:  1,
+				First: parseErr.Line,
+				Last:  parseErr.Line,
 			},
 			Reporter: yamlParseReporter,
-			Text:     fmt.Sprintf("YAML parser returned an error when reading this file: `%s`.", err),
+			Text:     parseErr.Error(),
 			Details: `pint cannot read this file because YAML parser returned an error.
 This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).

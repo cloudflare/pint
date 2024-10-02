@@ -45,7 +45,7 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			err = fmt.Errorf("unable to parse YAML file: %s", r)
+			err = ParseError{Err: fmt.Errorf("unable to parse YAML file: %s", r)}
 		}
 	}()
 

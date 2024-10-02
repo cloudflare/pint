@@ -7,6 +7,7 @@
 - Improved accuracy of the [rule/duplicate](checks/rule/duplicate.md) check.
 - Fixed GitHub reporter trying to create pull request comments to unmodified lines - #1120.
 - Fixed colored output on some environments - #1106.
+- Show correct line number when reporting YAML syntax errors.
 
 ## v0.65.1
 

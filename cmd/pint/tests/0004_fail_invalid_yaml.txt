@@ -6,8 +6,8 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 4: did not find expected key" path=rules/bad.yaml lines=1-7
-rules/bad.yaml:1 Fatal: YAML parser returned an error when reading this file: `error at line 4: did not find expected key`. (yaml/parse)
- 1 | xxx:
+rules/bad.yaml:4 Fatal: error at line 4: did not find expected key (yaml/parse)
+ 4 | 
 
 rules/ok.yml:5 Fatal: Prometheus failed to parse the query with this PromQL error: unclosed left bracket. (promql/syntax)
  5 |     expr: sum(foo[5m)
