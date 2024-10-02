@@ -6,7 +6,7 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 6: did not find expected '-' indicator" path=rules/1.yaml lines=1-12
-rules/1.yaml:6 Fatal: error at line 6: did not find expected '-' indicator (yaml/parse)
+rules/1.yaml:6 Fatal: did not find expected '-' indicator (yaml/parse)
  6 | 
 
 level=INFO msg="Problems found" Fatal=1
