@@ -1,6 +1,12 @@
 # Changelog
 
-## v0.65.4
+## v0.66.0
+
+### Added
+
+- Added `fallbackTimeout` option to the [promql/series](checks/promql/series.md) check
+  that controls how much time pint can spend checking other Prometheus servers for missing
+  metrics.
 
 ### Fixed
 

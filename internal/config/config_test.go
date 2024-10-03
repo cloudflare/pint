@@ -2278,6 +2278,18 @@ func TestConfigErrors(t *testing.T) {
 			err: `"foo{" is not a valid PromQL metric selector: 1:5: parse error: unexpected end of input inside braces`,
 		},
 		{
+			config: `check "promql/series" { lookbackRange = "1x" }`,
+			err:    `unknown unit "x" in duration "1x"`,
+		},
+		{
+			config: `check "promql/series" { lookbackStep = "1x" }`,
+			err:    `unknown unit "x" in duration "1x"`,
+		},
+		{
+			config: `check "promql/series" { fallbackTimeout = "1x" }`,
+			err:    `unknown unit "x" in duration "1x"`,
+		},
+		{
 			config: `rule {
   link ".+++" {}
 }`,

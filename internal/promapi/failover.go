@@ -199,7 +199,15 @@ func (fg *FailoverGroup) Config(ctx context.Context, cacheTTL time.Duration) (cf
 
 func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResult, err error) {
 	var uri string
-	for _, prom := range fg.servers {
+	for try, prom := range fg.servers {
+		if try > 0 {
+			slog.Debug(
+				"Using failover URI",
+				slog.String("name", fg.name),
+				slog.Int("retry", try),
+				slog.String("uri", prom.safeURI),
+			)
+		}
 		uri = prom.safeURI
 		qr, err = prom.Query(ctx, expr)
 		if err == nil {

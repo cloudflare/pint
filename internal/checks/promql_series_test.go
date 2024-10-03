@@ -4070,6 +4070,60 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "series present on other servers / timeout",
+			content:     "- record: foo\n  expr: notfound\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(_ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					FallbackTimeout: "50ms",
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			otherProms: func(uri string) []*promapi.FailoverGroup {
+				var proms []*promapi.FailoverGroup
+				for i := range 15 {
+					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				}
+				return proms
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Details:  fmt.Sprintf("`notfound` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=notfound)\n- [prom1](%s/other/graph?g0.expr=notfound)\n- [prom2](%s/other/graph?g0.expr=notfound)\n\npint tried to check 15 server(s) but stopped after checking 3 server(s) due to reaching time limit (50ms).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n", uri, uri, uri),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					resp: sleepResponse{
+						sleep: time.Millisecond * 20,
+						resp:  respondWithSingleInstantVector(),
+					},
+				},
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
