@@ -141,8 +141,11 @@ Syntax:
 
 ```js
 check "promql/series" {
+  lookbackRange     = "7d"
+  lookbackStep      = "5m"
   ignoreMetrics     = [ "(.*)", ... ]
   ignoreLabelsValue = { "...": [ "...", ... ] }
+  fallbackTimeout   = "5m"
 }
 ```
 
@@ -166,6 +169,13 @@ check "promql/series" {
   comments, see below.
   The value of this option is a map where the key is a metric selector to match on and the value
   is the list of label names.
+- `fallbackTimeout` - if a query uses a metric that is missing from a Prometheus server pint will
+  check if that metric is present on any other Prometheus server and report any findings.
+  This option controls how long can these extra checks take if there a long list of additional
+  servers to check. pint will abort checking more Prometheus servers when it reaches that time limit.
+  This is a timeout for the whole operation of checking other Prometheus servers. With the default limit
+  of 5 minutes and if there's 10 extra Prometheus servers to check and it takes 5 minutes to check first
+  4 servers then pint will abort checking remaining 6 servers.
 
 Example:
 

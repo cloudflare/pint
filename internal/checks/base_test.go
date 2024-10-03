@@ -152,10 +152,11 @@ func runTests(t *testing.T, testCases []checkTest) {
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
-				ctx := context.WithValue(context.Background(), promapi.AllPrometheusServers, proms)
+				ctx := context.Background()
 				if tc.ctx != nil {
 					ctx = tc.ctx(uri)
 				}
+				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
 				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
@@ -468,11 +469,15 @@ func (mr metadataResponse) respond(w http.ResponseWriter, _ *http.Request) {
 }
 
 type sleepResponse struct {
+	resp  responseWriter
 	sleep time.Duration
 }
 
-func (sr sleepResponse) respond(_ http.ResponseWriter, _ *http.Request) {
+func (sr sleepResponse) respond(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(sr.sleep)
+	if sr.resp != nil {
+		sr.resp.respond(w, r)
+	}
 }
 
 var (
