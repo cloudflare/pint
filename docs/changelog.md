@@ -6,6 +6,7 @@
 
 - Reverted `Fixed colored output on some environments - #1106` change
   as it was breaking GitHub report comments.
+- Fixed panics in [rule/duplicate](checks/rule/duplicate.md) check.
 
 ## v0.65.3
 

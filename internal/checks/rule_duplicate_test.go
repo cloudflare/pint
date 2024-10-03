@@ -1,12 +1,14 @@
 package checks_test
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -32,13 +34,16 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
-			description: "ignores alerting rules",
-			content:     "- alert: foo\n  expr: up == 0\n",
+			description: "ignores entries with path errors",
+			content:     "- record: foo\n  expr: up == 0\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
 			problems:   noProblems,
+			entries: []discovery.Entry{
+				{PathError: errors.New("Mock error")},
+			},
 		},
 		{
 			description: "ignores self",
