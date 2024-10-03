@@ -590,6 +590,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 		return SeriesCheckCommonProblemDetails
 	}
 
+	var suffix string
 	var buf strings.Builder
 	buf.WriteRune('`')
 	buf.WriteString(query)
@@ -603,13 +604,8 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 				slog.String("check", c.Reporter()),
 				slog.String("selector", query),
 			)
-			buf.WriteString("\npint tried to check ")
-			buf.WriteString(strconv.Itoa(len(servers)))
-			buf.WriteString(" server(s) but stopped after checking ")
-			buf.WriteString(strconv.Itoa(tested))
-			buf.WriteString(" server(s) due to reaching time limit (")
-			buf.WriteString(output.HumanizeDuration(timeout))
-			buf.WriteString(").\n")
+			suffix = fmt.Sprintf("\npint tried to check %d server(s) but stopped after checking %d server(s) due to reaching time limit (%s).\n",
+				len(servers), tested, output.HumanizeDuration(timeout))
 			break
 		}
 
@@ -652,6 +648,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 		buf.WriteString(strconv.Itoa(skipped))
 		buf.WriteString(" other server(s).\n")
 	}
+	buf.WriteString(suffix)
 
 	buf.WriteString("\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n")
 
