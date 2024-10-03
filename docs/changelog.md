@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.65.4
+
+### Fixed
+
+- Reverted `Fixed colored output on some environments - #1106` change
+  as it was breaking GitHub report comments.
+
 ## v0.65.3
 
 ### Fixed

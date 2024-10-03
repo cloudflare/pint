@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/fatih/color"
-
 	"github.com/cloudflare/pint/internal/log"
 )
 
@@ -18,10 +16,6 @@ func initLogger(level string, noColor bool) error {
 	nc := os.Getenv("NO_COLOR")
 	if nc != "" && nc != "0" {
 		noColor = true
-	}
-	// Override fatih/color detection of when to **disable** coloring.
-	if !noColor {
-		color.NoColor = false
 	}
 
 	log.Setup(l, noColor)
