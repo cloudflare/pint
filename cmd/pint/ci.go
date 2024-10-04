@@ -125,14 +125,16 @@ func actionCI(c *cli.Context) error {
 	}
 
 	reps := []reporter.Reporter{}
-
-	if c.Bool(teamCityFlag) {
-		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
-	} else if c.Bool(checkStyleFlag) {
-		reps = append(reps, reporter.NewCheckStyleReporter(os.Stdout))
-	} else {
-		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information))
+	var r reporter.Reporter
+	if c.Bool(checkStyleFlag) {
+		r = reporter.NewCheckStyleReporter(os.Stdout)
 	}
+	if c.Bool(teamCityFlag) {
+		f = reporter.NewTeamCityReporter(os.Stderr)
+	} else {
+		r = reporter.NewConsoleReporter(os.Stderr, checks.Information)
+	}
+	reps = append(reps, r)
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {
 		token, ok := os.LookupEnv("BITBUCKET_AUTH_TOKEN")

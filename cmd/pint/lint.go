@@ -107,10 +107,11 @@ func actionLint(c *cli.Context) error {
 	}
 
 	var r reporter.Reporter
+	if c.Bool(checkStyleFlag) {
+		r = reporter.NewCheckStyleReporter(os.Stdout)
+	}
 	if c.Bool(teamCityFlag) {
 		r = reporter.NewTeamCityReporter(os.Stderr)
-	} else if c.Bool(checkStyleFlag) {
-		r = reporter.NewCheckStyleReporter(os.Stdout)
 	} else {
 		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
 	}

@@ -40,10 +40,16 @@ func (cs CheckStyleReporter) Submit(summary Summary) error {
 			// xml excape message
 			xmlMessageBuf := bytes.Buffer{}
 			textDetails := fmt.Sprintf("Text:%s\n Details:%s", report.Problem.Text, report.Problem.Details)
-			xml.EscapeText(&xmlMessageBuf, []byte(textDetails))
+			err := xml.EscapeText(&xmlMessageBuf, []byte(textDetails))
+			if err != nil {
+				return err
+			}
 			// xml escape reporter
 			xmlReporterBuf := bytes.Buffer{}
-			xml.EscapeText(&xmlReporterBuf, []byte(report.Problem.Reporter))
+			err = xml.EscapeText(&xmlReporterBuf, []byte(report.Problem.Reporter))
+			if err != nil {
+				return err
+			}
 			line := fmt.Sprintf("<error line=\"%d\" severity=\"%s\" message=\"%s\" source=\"%s\" />\n",
 				report.Problem.Lines.First,
 				report.Problem.Severity.String(),
