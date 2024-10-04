@@ -48,10 +48,10 @@ var lintCmd = &cli.Command{
 			Value:   false,
 			Usage:   "Report problems using TeamCity Service Messages.",
 		},
-		&cli.BoolFlag{
+		&cli.StringFlag{
 			Name:    checkStyleFlag,
 			Aliases: []string{"c"},
-			Value:   false,
+			Value:   "",
 			Usage:   "Report problems using checkstyle xml.",
 		},
 	},
@@ -106,19 +106,26 @@ func actionLint(c *cli.Context) error {
 		return fmt.Errorf("invalid --%s value: %w", failOnFlag, err)
 	}
 
-	var r reporter.Reporter
-	if c.Bool(checkStyleFlag) {
-		r = reporter.NewCheckStyleReporter(os.Stdout)
-	}
+	reps := []reporter.Reporter{}
 	if c.Bool(teamCityFlag) {
-		r = reporter.NewTeamCityReporter(os.Stderr)
+		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
+		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, minSeverity))
 	}
 
-	err = r.Submit(summary)
-	if err != nil {
-		return err
+	if c.String(checkStyleFlag) != "" {
+		f, err := os.Create(c.String(checkStyleFlag))
+		if err != nil {
+			return err
+		}
+		reps = append(reps, reporter.NewCheckStyleReporter(f))
+	}
+
+	for _, rep := range reps {
+		err = rep.Submit(summary)
+		if err != nil {
+			return fmt.Errorf("submitting reports: %w", err)
+		}
 	}
 
 	bySeverity := summary.CountBySeverity()

@@ -55,10 +55,10 @@ var ciCmd = &cli.Command{
 			Value:   false,
 			Usage:   "Print found problems using TeamCity Service Messages format.",
 		},
-		&cli.BoolFlag{
+		&cli.StringFlag{
 			Name:    checkStyleFlag,
 			Aliases: []string{"c"},
-			Value:   false,
+			Value:   "",
 			Usage:   "Report problems using checkstyle xml.",
 		},
 	},
@@ -125,16 +125,18 @@ func actionCI(c *cli.Context) error {
 	}
 
 	reps := []reporter.Reporter{}
-	var r reporter.Reporter
-	if c.Bool(checkStyleFlag) {
-		r = reporter.NewCheckStyleReporter(os.Stdout)
+	if c.String(checkStyleFlag) != "" {
+		f, err := os.Create(c.String(checkStyleFlag))
+		if err != nil {
+			return err
+		}
+		reps = append(reps, reporter.NewCheckStyleReporter(f))
 	}
 	if c.Bool(teamCityFlag) {
-		f = reporter.NewTeamCityReporter(os.Stderr)
+		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		r = reporter.NewConsoleReporter(os.Stderr, checks.Information)
+		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information))
 	}
-	reps = append(reps, r)
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {
 		token, ok := os.LookupEnv("BITBUCKET_AUTH_TOKEN")
