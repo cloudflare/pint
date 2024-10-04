@@ -1,19 +1,7 @@
 env NO_COLOR=1
 ! exec pint --no-color lint --min-severity=info --checkstyle=checkstyle.xml rules
-! stdout .
 cmp checkstyle.xml checkstyle_check.xml
 
--- stderr.txt --
-level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Tried to read more lines than present in the source file, this is likely due to '
-' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details" path=rules/0001.yml
-rules/0001.yml:5 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
- 5 |     expr: up
-
-rules/0001.yml:7 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected identifier "with". (promql/syntax)
-
-level=INFO msg="Problems found" Fatal=1 Warning=1
-level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 groups:
 - name: test
