@@ -89,6 +89,8 @@ rule {
 }
 ```
 
+{% endraw %}
+
 If you have an annotation that can contain multiple different values as a single string,
 for example `components: "db api memcached"`, and you want to ensure only valid values
 are included then use `token` and `values`.
