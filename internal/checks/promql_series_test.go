@@ -437,7 +437,7 @@ func TestSeriesCheck(t *testing.T) {
 		{
 			description: "#2 series never present, custom range",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					LookbackRange: "3d",
 					LookbackStep:  "6m",
@@ -446,7 +446,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
@@ -669,7 +669,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#2 series never present but metric ignored",
 			content:     "- record: foo\n  expr: sum(notfound)\n",
 			checker:     newSeriesCheck,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					IgnoreMetrics: []string{"foo", "bar", "not.+"},
 				}
@@ -677,7 +677,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -1413,7 +1413,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#4 metric was present but disappeared over 1h ago / ignored",
 			content:     "- record: foo\n  expr: sum(found{job=\"foo\", instance=\"bar\"})\n",
 			checker:     newSeriesCheck,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					IgnoreMetrics: []string{"foo", "found", "not.+"},
 				}
@@ -1421,7 +1421,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -1990,7 +1990,7 @@ func TestSeriesCheck(t *testing.T) {
 			description: "#5 metric was present but not with label value",
 			content:     "- record: foo\n  expr: sum(found{notfound=\"notfound\", instance=~\".+\", not!=\"negative\", instance!~\"bad\"})\n",
 			checker:     newSeriesCheck,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					IgnoreMetrics: []string{"foo", "bar", "found"},
 				}
@@ -1998,7 +1998,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			prometheus: newSimpleProm,
 			problems: func(uri string) []checks.Problem {
@@ -2342,7 +2342,7 @@ func TestSeriesCheck(t *testing.T) {
 `,
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					IgnoreLabelsValue: map[string][]string{
 						"foo": {"error"},
@@ -2352,7 +2352,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			problems: noProblems,
 			mocks: []*prometheusMock{
@@ -2394,7 +2394,7 @@ func TestSeriesCheck(t *testing.T) {
 `,
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					IgnoreLabelsValue: map[string][]string{
 						"foo{}": {"error"},
@@ -2404,7 +2404,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			problems: noProblems,
 			mocks: []*prometheusMock{
@@ -2446,7 +2446,7 @@ func TestSeriesCheck(t *testing.T) {
 `,
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					IgnoreLabelsValue: map[string][]string{
 						"foo{cluster=\"dev\"}": {"error"},
@@ -2456,7 +2456,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
@@ -4075,7 +4075,7 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: notfound\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			ctx: func(_ string) context.Context {
+			ctx: func(ctx context.Context, _ string) context.Context {
 				s := checks.PromqlSeriesSettings{
 					FallbackTimeout: "50ms",
 				}
@@ -4083,7 +4083,7 @@ func TestSeriesCheck(t *testing.T) {
 					t.Error(err)
 					t.FailNow()
 				}
-				return context.WithValue(context.Background(), checks.SettingsKey(checks.SeriesCheckName), &s)
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
 			},
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
@@ -4111,6 +4111,61 @@ func TestSeriesCheck(t *testing.T) {
 					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
 					resp: sleepResponse{
 						sleep: time.Millisecond * 20,
+						resp:  respondWithSingleInstantVector(),
+					},
+				},
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
+		{
+			description: "series present on other servers / timeout 2",
+			content:     "- record: foo\n  expr: notfound\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					FallbackTimeout: "5s",
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			otherProms: func(uri string) []*promapi.FailoverGroup {
+				var proms []*promapi.FailoverGroup
+				for i := range 30 {
+					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				}
+				return proms
+			},
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Details: fmt.Sprintf("`notfound` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=notfound)\n- [prom1](%s/other/graph?g0.expr=notfound)\n- [prom2](%s/other/graph?g0.expr=notfound)\n- [prom3](%s/other/graph?g0.expr=notfound)\n- [prom4](%s/other/graph?g0.expr=notfound)\n- [prom5](%s/other/graph?g0.expr=notfound)\n- [prom6](%s/other/graph?g0.expr=notfound)\n- [prom7](%s/other/graph?g0.expr=notfound)\n- [prom8](%s/other/graph?g0.expr=notfound)\n- [prom9](%s/other/graph?g0.expr=notfound)\n- and 12 other server(s).\n\npint tried to check 30 server(s) but stopped after checking 22 server(s) due to reaching time limit (5s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n",
+							uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					resp: sleepResponse{
+						sleep: time.Millisecond * 230,
 						resp:  respondWithSingleInstantVector(),
 					},
 				},
