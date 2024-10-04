@@ -59,7 +59,7 @@ var ciCmd = &cli.Command{
 			Name:    checkStyleFlag,
 			Aliases: []string{"c"},
 			Value:   "",
-			Usage:   "Report problems using checkstyle xml.",
+			Usage:   "Create a checkstyle xml formatted report of all problems to this path.",
 		},
 	},
 }
@@ -126,9 +126,9 @@ func actionCI(c *cli.Context) error {
 
 	reps := []reporter.Reporter{}
 	if c.String(checkStyleFlag) != "" {
-		f, err := os.Create(c.String(checkStyleFlag))
-		if err != nil {
-			return err
+		f, fileErr := os.Create(c.String(checkStyleFlag))
+		if fileErr != nil {
+			return fileErr
 		}
 		reps = append(reps, reporter.NewCheckStyleReporter(f))
 	}
