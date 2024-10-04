@@ -23,7 +23,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -93,7 +92,7 @@ type problemsFn func(string) []checks.Problem
 
 type newPrometheusFn func(string) *promapi.FailoverGroup
 
-type newCtxFn func(string) context.Context
+type newCtxFn func(context.Context, string) context.Context
 
 type otherPromsFn func(string) []*promapi.FailoverGroup
 
@@ -149,17 +148,18 @@ func runTests(t *testing.T, testCases []checkTest) {
 				}
 			}
 
+			ctx, cancel := context.WithCancel(context.Background())
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
-				ctx := context.Background()
 				if tc.ctx != nil {
-					ctx = tc.ctx(uri)
+					ctx = tc.ctx(ctx, uri)
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
 				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
 				require.Equal(t, tc.problems(uri), problems)
 			}
+			cancel()
 
 			// verify that all mocks were used
 			for _, mock := range tc.mocks {
@@ -572,14 +572,6 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 		})
 		from = from.Add(step)
 	}
-	slog.Debug(
-		"Generating sample stream for tests",
-		slog.String("labels", metric.String()),
-		slog.String("from", from.UTC().Format(time.RFC3339Nano)),
-		slog.String("until", until.UTC().Format(time.RFC3339Nano)),
-		slog.String("step", output.HumanizeDuration(step)),
-		slog.Int("samples", len(s.Values)),
-	)
 	return s
 }
 

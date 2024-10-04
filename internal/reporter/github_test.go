@@ -825,6 +825,47 @@ func TestGithubReporter(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "review comment",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					if b != `{"commit_id":"HEAD","body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\n:heavy_exclamation_mark:\tProblems found.\n| Severity | Number of problems |\n| --- | --- |\n| Fatal | 1 |\n<details><summary>Stats</summary>\n<p>\n\n| Stat | Value |\n| --- | --- |\n| Version | v0.0.0 |\n| Number of rules parsed | 0 |\n| Number of rules checked | 0 |\n| Number of problems found | 1 |\n| Number of offline checks | 0 |\n| Number of online checks | 0 |\n| Checks duration | 0 |\n\n</p>\n</details>\n\n<details><summary>Problems</summary>\n<p>\n\nFailed to generate list of problems: open foo.txt: no such file or directory\n</p>\n</details>\n\n","event":"COMMENT"}` {
+						t.Errorf("Unexpected comment: %s", b)
+						t.FailNow()
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{1},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Lines: parser.LineRange{
+							First: 1,
+							Last:  1,
+						},
+						Reporter: "mock",
+						Text:     "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Fatal,
+					},
+				},
+			},
+		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))

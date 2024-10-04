@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.66.1
+
+### Fixed
+
+- Fixed message formatting in the [promql/series](checks/promql/series.md) check.
+
 ## v0.66.0
 
 ### Added
