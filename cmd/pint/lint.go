@@ -118,7 +118,12 @@ func actionLint(c *cli.Context) error {
 		if fileErr != nil {
 			return fileErr
 		}
-		reps = append(reps, reporter.NewCheckStyleReporter(f))
+		// execute here so we can close the file right after
+		reporter.NewCheckStyleReporter(f).Submit(summary)
+		cerr := f.Close()
+		if cerr != nil {
+			return cerr
+		}
 	}
 
 	for _, rep := range reps {
