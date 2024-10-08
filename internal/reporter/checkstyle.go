@@ -27,7 +27,7 @@ func createCheckstyleReport(summary Summary) checkstyleReport {
 	return x
 }
 
-func (d checkstyleReport) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 	err := e.EncodeToken(xml.StartElement{
 		Name: xml.Name{Local: "checkstyle"},
 		Attr: []xml.Attr{
@@ -41,7 +41,7 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 		return err
 	}
 	for dir, reports := range d {
-		err := e.EncodeToken(xml.StartElement{
+		errEnc := e.EncodeToken(xml.StartElement{
 			Name: xml.Name{Local: "file"},
 			Attr: []xml.Attr{
 				{
@@ -50,25 +50,25 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, start xml.StartElement) err
 				},
 			},
 		})
-		if err != nil {
-			return err
+		if errEnc != nil {
+			return errEnc
 		}
 		for _, report := range reports {
-			err := e.Encode(report)
-			if err != nil {
-				return err
+			errEnc2 := e.Encode(report)
+			if errEnc2 != nil {
+				return errEnc2
 			}
 		}
-		err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "file"}})
-		if err != nil {
-			return err
+		errEnc = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "file"}})
+		if errEnc != nil {
+			return errEnc
 		}
 	}
 	err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "checkstyle"}})
-	return nil
+	return err
 }
 
-func (r Report) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 	startel := xml.StartElement{
 		Name: xml.Name{Local: "error"},
 		Attr: []xml.Attr{
@@ -91,6 +91,9 @@ func (r Report) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		},
 	}
 	err := e.EncodeToken(startel)
+	if err != nil {
+		return err
+	}
 	err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "error"}})
 
 	return err

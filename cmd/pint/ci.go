@@ -131,7 +131,8 @@ func actionCI(c *cli.Context) error {
 			return fileErr
 		}
 		// execute here so we can close the file right after
-		reporter.NewCheckStyleReporter(f).Submit(summary)
+		errRep := reporter.NewCheckStyleReporter(f).Submit(summary)
+		slog.Error("Error encountered", "error:", errRep)
 		cerr := f.Close()
 		if cerr != nil {
 			return cerr
