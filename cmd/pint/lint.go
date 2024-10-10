@@ -114,17 +114,13 @@ func actionLint(c *cli.Context) error {
 	}
 
 	if c.String(checkStyleFlag) != "" {
-		f, fileErr := os.Create(c.String(checkStyleFlag))
-		if fileErr != nil {
-			return fileErr
+		var f *os.File
+		f, err = os.Create(c.String(checkStyleFlag))
+		if err != nil {
+			return err
 		}
-		// execute here so we can close the file right after
-		errRep := reporter.NewCheckStyleReporter(f).Submit(summary)
-		slog.Error("Error encountered", "error:", errRep)
-		cerr := f.Close()
-		if cerr != nil {
-			return cerr
-		}
+		defer f.Close()
+		reps = append(reps, reporter.NewCheckStyleReporter(f))
 	}
 
 	for _, rep := range reps {

@@ -1,6 +1,5 @@
-env NO_COLOR=1
 ! exec pint --no-color lint --min-severity=info --checkstyle=checkstyle.xml rules
-cmp checkstyle.xml checkstyle_check.xml
+cmp checkstyle.xml checkstyle_expected.xml
 
 -- rules/0001.yml --
 groups:
@@ -10,11 +9,11 @@ groups:
     expr: up
   - alert: Example
     expr: sum(xxx) with()
--- checkstyle_check.xml --
+-- checkstyle_expected.xml --
 <?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="rules/0001.yml">
-    <error line="5" severity="Warning" message="Text:Alert query doesn&#39;t have any condition, it will always fire if the metric exists.&#xA; Details:Prometheus alerting rules will trigger an alert for each query that returns *any* result.&#xA;Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.&#xA;In most cases this can be achieved by having some condition in the query expression.&#xA;For example `up == 0` or `rate(error_total[2m]) &gt; 0`.&#xA;Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators)." source="alerts/comparison"></error>
-    <error line="7" severity="Fatal" message="Text:Prometheus failed to parse the query with this PromQL error: unexpected identifier &#34;with&#34;.&#xA; Details:[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation." source="promql/syntax"></error>
+    <error line="5" severity="Warning" message="Alert query doesn&#39;t have any condition, it will always fire if the metric exists.&#xA;Prometheus alerting rules will trigger an alert for each query that returns *any* result.&#xA;Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.&#xA;In most cases this can be achieved by having some condition in the query expression.&#xA;For example `up == 0` or `rate(error_total[2m]) &gt; 0`.&#xA;Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators)." source="alerts/comparison"></error>
+    <error line="7" severity="Fatal" message="Prometheus failed to parse the query with this PromQL error: unexpected identifier &#34;with&#34;.&#xA;[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation." source="promql/syntax"></error>
   </file>
 </checkstyle>

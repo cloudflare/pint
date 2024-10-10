@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"log/slog"
 	"strconv"
 )
 
@@ -27,8 +28,8 @@ func createCheckstyleReport(summary Summary) checkstyleReport {
 	return x
 }
 
-func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
-	err := e.EncodeToken(xml.StartElement{
+func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
+	err = e.EncodeToken(xml.StartElement{
 		Name: xml.Name{Local: "checkstyle"},
 		Attr: []xml.Attr{
 			{
@@ -41,34 +42,35 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 		return err
 	}
 	for dir, reports := range d {
-		errEnc := e.EncodeToken(xml.StartElement{
-			Name: xml.Name{Local: "file"},
-			Attr: []xml.Attr{
-				{
-					Name:  xml.Name{Local: "name"},
-					Value: dir,
+		if err = e.EncodeToken(
+			xml.StartElement{
+				Name: xml.Name{Local: "file"},
+				Attr: []xml.Attr{
+					{
+						Name:  xml.Name{Local: "name"},
+						Value: dir,
+					},
 				},
-			},
-		})
-		if errEnc != nil {
-			return errEnc
+			}); err != nil {
+			return err
 		}
 		for _, report := range reports {
-			errEnc2 := e.Encode(report)
-			if errEnc2 != nil {
-				return errEnc2
+			if err = e.Encode(report); err != nil {
+				return err
 			}
 		}
-		errEnc = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "file"}})
-		if errEnc != nil {
-			return errEnc
+		if err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "file"}}); err != nil {
+			return err
 		}
 	}
-	err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "checkstyle"}})
-	return err
+	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "checkstyle"}})
 }
 
-func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
+func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
+	msg := r.Problem.Text
+	if r.Problem.Details != "" {
+		msg += "\n" + r.Problem.Details
+	}
 	startel := xml.StartElement{
 		Name: xml.Name{Local: "error"},
 		Attr: []xml.Attr{
@@ -82,7 +84,7 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 			},
 			{
 				Name:  xml.Name{Local: "message"},
-				Value: fmt.Sprintf("Text:%s\n Details:%s", r.Problem.Text, r.Problem.Details),
+				Value: msg,
 			},
 			{
 				Name:  xml.Name{Local: "source"},
@@ -90,21 +92,19 @@ func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 			},
 		},
 	}
-	err := e.EncodeToken(startel)
-	if err != nil {
+	if err = e.EncodeToken(startel); err != nil {
 		return err
 	}
-	err = e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "error"}})
-
-	return err
+	return e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "error"}})
 }
 
 func (cs CheckStyleReporter) Submit(summary Summary) error {
 	checkstyleReport := createCheckstyleReport(summary)
 	xmlString, err := xml.MarshalIndent(checkstyleReport, "", "  ")
 	if err != nil {
-		fmt.Printf("%v", err)
+		slog.Error("Failed to marshal checkstyle report", slog.Any("err", err))
+		return err
 	}
-	fmt.Fprint(cs.output, string(xml.Header)+string(xmlString)+"\n")
-	return nil
+	_, err = fmt.Fprint(cs.output, string(xml.Header)+string(xmlString)+"\n")
+	return err
 }
