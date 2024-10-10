@@ -48,6 +48,12 @@ var lintCmd = &cli.Command{
 			Value:   false,
 			Usage:   "Report problems using TeamCity Service Messages.",
 		},
+		&cli.StringFlag{
+			Name:    checkStyleFlag,
+			Aliases: []string{"c"},
+			Value:   "",
+			Usage:   "Create a checkstyle xml formatted report of all problems to this path.",
+		},
 	},
 }
 
@@ -100,16 +106,32 @@ func actionLint(c *cli.Context) error {
 		return fmt.Errorf("invalid --%s value: %w", failOnFlag, err)
 	}
 
-	var r reporter.Reporter
+	reps := []reporter.Reporter{}
 	if c.Bool(teamCityFlag) {
-		r = reporter.NewTeamCityReporter(os.Stderr)
+		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		r = reporter.NewConsoleReporter(os.Stderr, minSeverity)
+		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, minSeverity))
 	}
 
-	err = r.Submit(summary)
-	if err != nil {
-		return err
+	if c.String(checkStyleFlag) != "" {
+		f, fileErr := os.Create(c.String(checkStyleFlag))
+		if fileErr != nil {
+			return fileErr
+		}
+		// execute here so we can close the file right after
+		errRep := reporter.NewCheckStyleReporter(f).Submit(summary)
+		slog.Error("Error encountered", "error:", errRep)
+		cerr := f.Close()
+		if cerr != nil {
+			return cerr
+		}
+	}
+
+	for _, rep := range reps {
+		err = rep.Submit(summary)
+		if err != nil {
+			return fmt.Errorf("submitting reports: %w", err)
+		}
 	}
 
 	bySeverity := summary.CountBySeverity()

@@ -23,6 +23,7 @@ var (
 	baseBranchFlag = "base-branch"
 	failOnFlag     = "fail-on"
 	teamCityFlag   = "teamcity"
+	checkStyleFlag = "checkstyle"
 )
 
 var ciCmd = &cli.Command{
@@ -53,6 +54,12 @@ var ciCmd = &cli.Command{
 			Aliases: []string{"t"},
 			Value:   false,
 			Usage:   "Print found problems using TeamCity Service Messages format.",
+		},
+		&cli.StringFlag{
+			Name:    checkStyleFlag,
+			Aliases: []string{"c"},
+			Value:   "",
+			Usage:   "Create a checkstyle xml formatted report of all problems to this path.",
 		},
 	},
 }
@@ -118,7 +125,19 @@ func actionCI(c *cli.Context) error {
 	}
 
 	reps := []reporter.Reporter{}
-
+	if c.String(checkStyleFlag) != "" {
+		f, fileErr := os.Create(c.String(checkStyleFlag))
+		if fileErr != nil {
+			return fileErr
+		}
+		// execute here so we can close the file right after
+		errRep := reporter.NewCheckStyleReporter(f).Submit(summary)
+		slog.Error("Error encountered", "error:", errRep)
+		cerr := f.Close()
+		if cerr != nil {
+			return cerr
+		}
+	}
 	if c.Bool(teamCityFlag) {
 		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
