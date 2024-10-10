@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.67.0
+
+### Added
+
+- Added `--checkstyle` flag to `pint lint` & `pint ci` for writing XML report file
+  in `checkstyle` format - [#1129](https://github.com/cloudflare/pint/pull/1129).
+
 ## v0.66.1
 
 ### Fixed

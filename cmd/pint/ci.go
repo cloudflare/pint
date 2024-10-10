@@ -125,23 +125,19 @@ func actionCI(c *cli.Context) error {
 	}
 
 	reps := []reporter.Reporter{}
-	if c.String(checkStyleFlag) != "" {
-		f, fileErr := os.Create(c.String(checkStyleFlag))
-		if fileErr != nil {
-			return fileErr
-		}
-		// execute here so we can close the file right after
-		errRep := reporter.NewCheckStyleReporter(f).Submit(summary)
-		slog.Error("Error encountered", "error:", errRep)
-		cerr := f.Close()
-		if cerr != nil {
-			return cerr
-		}
-	}
 	if c.Bool(teamCityFlag) {
 		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
 		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information))
+	}
+	if c.String(checkStyleFlag) != "" {
+		var f *os.File
+		f, err = os.Create(c.String(checkStyleFlag))
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		reps = append(reps, reporter.NewCheckStyleReporter(f))
 	}
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {

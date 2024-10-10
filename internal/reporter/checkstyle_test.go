@@ -61,7 +61,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="Information" message="Text:mock text&#xA; Details:mock details" source="mock"></error>
+    <error line="5" severity="Information" message="mock text&#xA;mock details" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -90,7 +90,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="Bug" message="Text:mock text&#xA; Details:" source="mock"></error>
+    <error line="5" severity="Bug" message="mock text" source="mock"></error>
   </file>
 </checkstyle>
 `,
@@ -121,7 +121,7 @@ func TestCheckstyleReporter(t *testing.T) {
 			output: `<?xml version="1.0" encoding="UTF-8"?>
 <checkstyle version="4.3">
   <file name="foo.txt">
-    <error line="5" severity="Bug" message="Text:mock text&#xA;&#x9;&#x9;with [new lines] and pipe| chars that are &#39;quoted&#39;&#xA;&#x9;&#x9;&#xA; Details:" source="mock"></error>
+    <error line="5" severity="Bug" message="mock text&#xA;&#x9;&#x9;with [new lines] and pipe| chars that are &#39;quoted&#39;&#xA;&#x9;&#x9;" source="mock"></error>
   </file>
 </checkstyle>
 `,
