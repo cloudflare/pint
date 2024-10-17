@@ -359,17 +359,17 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 	switch {
 	case !ok:
 		// No diffLine for this line, most likely unmodified ?.
-		d.Position.NewLine = gitlab.Ptr(dl.new)
-		d.Position.OldLine = gitlab.Ptr(dl.old)
+		d.Position.NewLine = gitlab.Ptr(pending.line)
+		d.Position.OldLine = gitlab.Ptr(pending.line)
 	case pending.anchor == checks.AnchorBefore:
 		// Comment on removed line.
 		d.Position.OldLine = gitlab.Ptr(dl.old)
 	case ok && !dl.wasModified:
-		// Commend on unmodified line.
+		// Comment on unmodified line.
 		d.Position.NewLine = gitlab.Ptr(dl.new)
 		d.Position.OldLine = gitlab.Ptr(dl.old)
 	default:
-		// Commend on new or modified line.
+		// Comment on new or modified line.
 		d.Position.NewLine = gitlab.Ptr(dl.new)
 	}
 
@@ -392,10 +392,37 @@ type diffLine struct {
 }
 
 func diffLineFor(lines []diffLine, line int) (diffLine, bool) {
-	for _, dl := range lines {
+	if len(lines) == 0 {
+		return diffLine{}, false
+	}
+
+	for i, dl := range lines {
 		if dl.new == line {
 			return dl, true
 		}
+		// Calculate unmodified line that does not present in the diff
+		if dl.new > line {
+			lastLines := dl
+			if i > 0 {
+				lastLines = lines[i-1]
+			}
+			gap := line - lastLines.new
+			return diffLine{
+				old:         lastLines.old + gap,
+				new:         line,
+				wasModified: false,
+			}, true
+		}
+	}
+	// Calculate unmodified line that is greater than the last diff line
+	lastLines := lines[len(lines)-1]
+	if line > lastLines.new {
+		gap := line - lastLines.new
+		return diffLine{
+			old:         lastLines.old + gap,
+			new:         line,
+			wasModified: false,
+		}, true
 	}
 	return diffLine{}, false
 }
