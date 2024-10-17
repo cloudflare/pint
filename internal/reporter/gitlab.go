@@ -155,10 +155,7 @@ func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs [
 
 func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingComment, error) {
 	mr := dst.(gitlabMR)
-	slog.Debug("Getting the list of merge request discussions", slog.Int("mr", mr.mrID))
-	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
-	defer cancel()
-	discs, _, err := gl.client.Discussions.ListMergeRequestDiscussions(gl.project, mr.mrID, nil, gitlab.WithContext(reqCtx))
+	discs, err := gl.getDiscussions(ctx, mr.mrID)
 	if err != nil {
 		return nil, err
 	}
@@ -311,6 +308,18 @@ func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int) (*gitlab.M
 		return nil, errors.New("no merge request versions found")
 	}
 	return vers[0], nil
+}
+
+func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int) ([]*gitlab.Discussion, error) {
+	slog.Debug("Getting the list of merge request discussions", slog.Int("mr", mrNum))
+	discs, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.Discussion, *gitlab.Response, error) {
+		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
+		defer cancel()
+		return gl.client.Discussions.ListMergeRequestDiscussions(gl.project, mrNum, &gitlab.ListMergeRequestDiscussionsOptions{
+			Page: pageNum,
+		}, gitlab.WithContext(reqCtx))
+	})
+	return discs, err
 }
 
 func (gl GitLabReporter) generalComment(ctx context.Context, mrNum int, msg string) error {
