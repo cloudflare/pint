@@ -15,7 +15,7 @@ jobs:
           show-progress: false
 
       - name: Spellcheck
-        uses: rojopolis/spellcheck-github-actions@0.42.0
+        uses: rojopolis/spellcheck-github-actions@b83ca7c1b5c285e4f2b43e209a455c74872ec341 # 0.42.0
         with:
           config_path: .github/spellcheck/config.yml
 
