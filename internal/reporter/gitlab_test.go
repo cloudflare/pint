@@ -2,9 +2,11 @@ package reporter_test
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -395,4 +397,208 @@ func TestGitLabReporter(t *testing.T) {
 			require.NoError(t, tc.errorHandler(err))
 		})
 	}
+}
+
+func TestGitLabReporterCommentLine(t *testing.T) {
+	type testCaseT struct {
+		description     string
+		problemLine     int
+		expectedNewLine int
+		expectedOldLine int
+		anchor          checks.Anchor
+	}
+
+	p := parser.NewParser(false)
+	mockRules, _ := p.Parse([]byte(`
+- record: target is down
+  expr: up == 0
+- record: sum errors
+  expr: sum(errors) by (job)
+`))
+
+	multipleDiffs := `@@ -15,6 +15,7 @@ spec:
+      annotations:
+	    foo: bar
+        description: some description
++       runbook_url: https://runbook.url
+        summary: summary text
+      expr: up == 0
+      for: 10m
+@@ -141,6 +142,5 @@ spec:
+        description: some description
+        summary: some summary
+      expr: sum(errors) by (job)
+-     for: 15m
+      labels:
+        severity: warning`
+	multipleDiffs = strings.ReplaceAll(multipleDiffs, "\n", "\\n")
+	multipleDiffs = strings.ReplaceAll(multipleDiffs, "\t", "\\t")
+
+	errorHandler := func(err error) error { return err }
+
+	testCases := []testCaseT{
+		{
+			description:     "comment on new line",
+			problemLine:     18,
+			expectedNewLine: 18,
+		},
+		{
+			description:     "comment on removed line",
+			problemLine:     145,
+			expectedOldLine: 145,
+			anchor:          checks.AnchorBefore,
+		},
+		{
+			description:     "unmodified line before existing line in the diff",
+			problemLine:     10,
+			expectedNewLine: 10,
+			expectedOldLine: 10,
+		},
+		{
+			description:     "unmodified line that exists in the diff",
+			problemLine:     16,
+			expectedNewLine: 16,
+			expectedOldLine: 16,
+		},
+		{
+			description:     "unmodified line after added line and exists in the diff",
+			problemLine:     19,
+			expectedNewLine: 19,
+			expectedOldLine: 18,
+		},
+		{
+			description:     "unmodified line after added line and not exists in the diff",
+			problemLine:     23,
+			expectedNewLine: 23,
+			expectedOldLine: 22,
+		},
+		{
+			description:     "unmodified line before removed line and exists in the diff",
+			problemLine:     143,
+			expectedNewLine: 143,
+			expectedOldLine: 142,
+		},
+		{
+			description:     "unmodified line after removed line and exists in the diff",
+			problemLine:     145,
+			expectedNewLine: 145,
+			expectedOldLine: 145,
+		},
+		{
+			description:     "unmodified line after removed line and not exists in the diff",
+			problemLine:     148,
+			expectedNewLine: 148,
+			expectedOldLine: 148,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			slog.SetDefault(slogt.New(t))
+
+			srv := httptest.NewServer(getHTTPHandlerForCommentingLines(
+				tc.expectedNewLine, tc.expectedOldLine, multipleDiffs, t))
+			defer srv.Close()
+
+			r, err := reporter.NewGitLabReporter(
+				"v0.0.0",
+				"fakeBranch",
+				srv.URL,
+				time.Second,
+				"fakeToken",
+				123,
+				10,
+			)
+			if err == nil {
+				summary := reporter.NewSummary([]reporter.Report{
+					{
+						Path: discovery.Path{
+							Name:          "foo.txt",
+							SymlinkTarget: "foo.txt",
+						},
+						ModifiedLines: []int{2},
+						Rule:          mockRules[1],
+						Problem: checks.Problem{
+							Lines: parser.LineRange{
+								First: tc.problemLine,
+								Last:  tc.problemLine,
+							},
+							Reporter: "mock",
+							Text:     "syntax error",
+							Details:  "syntax details",
+							Severity: checks.Fatal,
+							Anchor:   tc.anchor,
+						},
+					},
+				})
+				err = reporter.Submit(context.Background(), summary, r)
+			}
+			require.NoError(t, errorHandler(err))
+		})
+	}
+}
+
+func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff string, t *testing.T) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+		switch r.URL.Path {
+		case "/api/v4/user":
+			if r.Method == http.MethodGet {
+				_, _ = w.Write([]byte(`{"id": 123}`))
+			}
+		case "/api/v4/projects/123/merge_requests":
+			if r.Method == http.MethodGet {
+				_, _ = w.Write([]byte(`[{"iid":1}]`))
+			}
+		case "/api/v4/projects/123/merge_requests/1/diffs":
+			if r.Method == http.MethodGet {
+				_, _ = w.Write([]byte(`[{"diff":"` + diff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+			}
+		case "/api/v4/projects/123/merge_requests/1/versions":
+			if r.Method == http.MethodGet {
+				_, _ = w.Write([]byte(`[
+	{"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
+	{"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
+	]`))
+			}
+		case "/api/v4/projects/123/merge_requests/1/discussions":
+			if r.Method == http.MethodGet {
+				_, _ = w.Write([]byte(`[]`))
+			} else {
+				body, _ := io.ReadAll(r.Body)
+				b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+
+				str := ""
+				if expectedNewLine != 0 {
+					str = `"new_line":` + strconv.Itoa(expectedNewLine)
+				}
+				if expectedOldLine != 0 {
+					if str != "" {
+						str += ","
+					}
+					str += `"old_line":` + strconv.Itoa(expectedOldLine)
+				}
+
+				expected := `{
+		"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+		"position":{
+			"base_sha":"base",
+			"head_sha":"head",
+			"start_sha":"start",
+			"new_path":"foo.txt",
+			"old_path":"foo.txt",
+			"position_type":"text",
+			` + str + `
+		}
+	}`
+				expected = strings.ReplaceAll(expected, "\n", "")
+				expected = strings.ReplaceAll(expected, "\t", "")
+				if b != expected {
+					t.Errorf("Unexpected comment: %s", b)
+					t.FailNow()
+				}
+				_, _ = w.Write([]byte(`{}`))
+			}
+		}
+	})
 }
