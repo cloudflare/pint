@@ -101,7 +101,6 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 			}
 			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
 				p := exprProblem{
-					expr: node.Expr.String(),
 					text: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
 						n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 					details:  RateCheckDetails,
@@ -121,7 +120,6 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 				if err != nil {
 					text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 					problems = append(problems, exprProblem{
-						expr:     s.Name,
 						text:     text,
 						severity: severity,
 					})
@@ -130,7 +128,6 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 				for _, m := range metadata.Metadata {
 					if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
 						problems = append(problems, exprProblem{
-							expr: s.Name,
 							text: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
 								n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
 							details:  RateCheckDetails,
@@ -153,7 +150,6 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 								if err != nil {
 									text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 									problems = append(problems, exprProblem{
-										expr:     sv.Name,
 										text:     text,
 										severity: severity,
 									})
@@ -162,7 +158,6 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 								for _, m := range metadata.Metadata {
 									if m.Type == v1.MetricTypeCounter {
 										problems = append(problems, exprProblem{
-											expr: node.Expr.String(),
 											text: fmt.Sprintf("`rate(sum(counter))` chain detected, `%s` is called here on results of `%s`, calling `rate()` on `sum()` results will return bogus results, always `sum(rate(counter))`, never `rate(sum(counter))`.",
 												node.Expr, sm),
 											severity: Bug,

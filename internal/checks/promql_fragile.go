@@ -2,6 +2,8 @@ package checks
 
 import (
 	"context"
+	"fmt"
+	"slices"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
@@ -12,6 +14,11 @@ import (
 
 const (
 	FragileCheckName = "promql/fragile"
+
+	FragileCheckSamplingDetails = `Alerts are identied by labels, two alerts with identical sets of labels are identical.
+If two alerts have the same name but the rest of labels isn't 100% identical then they are two different alerts.
+If the same alert query returns results that over time have different labels on them then previous alert instances will resolve and new alerts will be fired.
+This can happen when using one of the aggregation operation like topk or bottomk as they can return a different time series each time they are evaluated.`
 )
 
 func NewFragileCheck() FragileCheck {
@@ -46,18 +53,32 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 		return nil
 	}
 
-	for _, problem := range c.checkNode(expr.Query) {
+	for _, problem := range c.checkAggregation(expr.Query) {
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Text:     problem.text,
-			Severity: Warning,
+			Details:  problem.details,
+			Severity: problem.severity,
 		})
 	}
+
+	if rule.AlertingRule != nil {
+		for _, problem := range c.checkSampling(expr.Query) {
+			problems = append(problems, Problem{
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Text:     problem.text,
+				Details:  problem.details,
+				Severity: problem.severity,
+			})
+		}
+	}
+
 	return problems
 }
 
-func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
+func (c FragileCheck) checkAggregation(node *parser.PromQLNode) (problems []exprProblem) {
 	if n := utils.HasOuterBinaryExpr(node); n != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
 		if n.VectorMatching != nil && n.VectorMatching.On {
 			goto NEXT
@@ -89,7 +110,6 @@ func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 		}
 		if len(series) >= 2 {
 			p := exprProblem{
-				expr:     node.Expr.String(),
 				text:     "Aggregation using `without()` can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using `by()` to ensure consistent labels.",
 				severity: Warning,
 			}
@@ -100,8 +120,26 @@ func (c FragileCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem
 
 NEXT:
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(child)...)
+		problems = append(problems, c.checkAggregation(child)...)
 	}
 
 	return problems
+}
+
+func (c FragileCheck) checkSampling(node *parser.PromQLNode) (problems []exprProblem) {
+	src := utils.LabelsSource(node)
+	if src.Type != utils.AggregateSource {
+		return nil
+	}
+	if src.EmptyLabels {
+		return nil
+	}
+	if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
+		return nil
+	}
+	return append(problems, exprProblem{
+		text:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+		details:  FragileCheckSamplingDetails,
+		severity: Warning,
+	})
 }
