@@ -22,6 +22,19 @@ const (
 	RegexpCheckDetails = `See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.`
 )
 
+type PromqlRegexpSettings struct {
+	Smelly        *bool `hcl:"smelly,optional" json:"smelly,omitempty"`
+	smellyEnabled bool
+}
+
+func (c *PromqlRegexpSettings) Validate() error {
+	c.smellyEnabled = true
+	if c.Smelly != nil {
+		c.smellyEnabled = *c.Smelly
+	}
+	return nil
+}
+
 func NewRegexpCheck() RegexpCheck {
 	return RegexpCheck{}
 }
@@ -48,10 +61,19 @@ func (c RegexpCheck) Reporter() string {
 	return RegexpCheckName
 }
 
-func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
+	}
+
+	var settings *PromqlRegexpSettings
+	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
+		settings = s.(*PromqlRegexpSettings)
+	}
+	if settings == nil {
+		settings = &PromqlRegexpSettings{}
+		_ = settings.Validate()
 	}
 
 	done := map[string]struct{}{}
@@ -142,7 +164,7 @@ func (c RegexpCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 				bad = append(bad, badMatcher{lm: lm, badAnchor: true})
 				isBad = true
 			}
-			if isSmelly {
+			if settings.smellyEnabled && isSmelly {
 				bad = append(bad, badMatcher{lm: lm, isSmelly: true})
 			}
 			if !isBad {

@@ -7,6 +7,8 @@
 - [promql/fragile](checks/promql/fragile.md) will now warn when alerting rules are using
   one of the aggregation operation that can return different series on every evaluation,
   which can cause alert floppiness - [#820](https://github.com/cloudflare/pint/issues/820).
+- [promql/regexp](checks/promql/regexp.md) check now supports extra configuration options
+  to disable reports on smelly selector - [#1096](https://github.com/cloudflare/pint/issues/1096).
 
 ### Fixed
 

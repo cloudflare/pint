@@ -135,6 +135,9 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
         ".*_errors",
         ".*_errors_.*"
       ]
+    },
+    {
+      "smelly": false
     }
   ],
   "rules": [
@@ -268,6 +271,10 @@ check "promql/series" {
     ".*_errors",
     ".*_errors_.*",
   ]
+}
+
+check "promql/regexp" {
+  smelly = false
 }
 
 rule{  }
