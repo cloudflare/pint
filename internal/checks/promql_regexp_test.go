@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -430,6 +431,55 @@ func TestRegexpCheck(t *testing.T) {
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
 			problems:    noProblems,
+		},
+		{
+			description: "smelly selector / enabled",
+			content:     "- record: foo\n  expr: foo{job=~\"service_.*_prod\"}\n",
+			checker:     newRegexpCheck,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				yes := true
+				s := checks.PromqlRegexpSettings{
+					Smelly: &yes,
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.RegexpCheckName), &s)
+			},
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.RegexpCheckName,
+						Text:     "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+						Details:  checks.RegexpCheckDetails,
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "smelly selector / disabled",
+			content:     "- record: foo\n  expr: foo{job=~\"service_.*_prod\"}\n",
+			checker:     newRegexpCheck,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				no := false
+				s := checks.PromqlRegexpSettings{
+					Smelly: &no,
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.RegexpCheckName), &s)
+			},
+			prometheus: noProm,
+			problems:   noProblems,
 		},
 	}
 	runTests(t, testCases)

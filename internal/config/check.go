@@ -27,6 +27,8 @@ func (c Check) Decode() (s CheckSettings, err error) {
 	switch c.Name {
 	case checks.SeriesCheckName:
 		s = &checks.PromqlSeriesSettings{}
+	case checks.RegexpCheckName:
+		s = &checks.PromqlRegexpSettings{}
 	default:
 		return nil, fmt.Errorf("unknown check %q", c.Name)
 	}

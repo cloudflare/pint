@@ -141,7 +141,25 @@ And simple explicit queries:
 
 ## Configuration
 
-This check doesn't have any configuration options.
+This check supports setting extra configuration option to fine tune its behaviour.
+
+Syntax:
+
+```js
+check "promql/regexp" {
+  smelly = true|false
+}
+```
+
+- `smelly` - enable or disable reports about smelly selectors. This is enabled by default.
+
+Example:
+
+```js
+check "promql/regexp" {
+  smelly = false
+}
+```
 
 ## How to enable it
 

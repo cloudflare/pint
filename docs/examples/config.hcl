@@ -23,6 +23,11 @@ prometheus "dev" {
   timeout = "60s"
 }
 
+# Disable smelly selectors warning in promql/regexp check.
+check "promql/regexp" {
+  smelly = false
+}
+
 rule {
   # Disallow spaces in label/annotation keys, they're only allowed in values.
   reject ".* +.*" {
