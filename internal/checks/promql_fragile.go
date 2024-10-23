@@ -127,19 +127,22 @@ NEXT:
 }
 
 func (c FragileCheck) checkSampling(node *parser.PromQLNode) (problems []exprProblem) {
-	src := utils.LabelsSource(node)
-	if src.Type != utils.AggregateSource {
-		return nil
+	s := utils.LabelsSource(node)
+	for _, src := range append(s.Alternatives, s) {
+		if src.Type != utils.AggregateSource {
+			continue
+		}
+		if src.FixedLabels && len(src.OnlyLabels) == 0 {
+			continue
+		}
+		if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
+			continue
+		}
+		problems = append(problems, exprProblem{
+			text:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+			details:  FragileCheckSamplingDetails,
+			severity: Warning,
+		})
 	}
-	if src.EmptyLabels {
-		return nil
-	}
-	if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
-		return nil
-	}
-	return append(problems, exprProblem{
-		text:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
-		details:  FragileCheckSamplingDetails,
-		severity: Warning,
-	})
+	return problems
 }
