@@ -28,8 +28,9 @@ type Source struct {
 	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
 	OnlyLabels       []string // Labels that are the only ones that can be present on the results (by).
 	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
+	Alternatives     []Source // Alternative lable sources
 	Type             SourceType
-	EmptyLabels      bool // No labels at all will be present on the results.
+	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 }
 
 func LabelsSource(node *parser.PromQLNode) Source {
@@ -56,8 +57,8 @@ func parseAggregation(n *promParser.AggregateExpr) (s Source) {
 			s.OnlyLabels = removeFromSlice(s.OnlyLabels, name)
 		}
 	} else {
+		s.FixedLabels = true
 		if len(n.Grouping) == 0 {
-			s.EmptyLabels = true
 			s.GuaranteedLabels = nil
 			s.OnlyLabels = nil
 		} else {
@@ -105,9 +106,8 @@ func walkNode(node promParser.Node) (s Source) {
 			s.Operation = "count_values"
 			// Param is the label to store the count value in.
 			s.GuaranteedLabels = append(s.GuaranteedLabels, n.Param.(*promParser.StringLiteral).Val)
-			if s.EmptyLabels || len(s.OnlyLabels) > 0 {
+			if s.FixedLabels {
 				s.OnlyLabels = append(s.OnlyLabels, n.Param.(*promParser.StringLiteral).Val)
-				s.EmptyLabels = false
 			}
 		case promParser.QUANTILE:
 			s = parseAggregation(n)
@@ -142,8 +142,10 @@ func walkNode(node promParser.Node) (s Source) {
 		case n.VectorMatching.Card == promParser.CardOneToMany:
 			s = walkNode(n.RHS)
 		case n.VectorMatching.Card == promParser.CardManyToMany:
-			// FIXME need to handle 'foo or bar' here, we might have multiple selectors as the source.
 			s = walkNode(n.LHS)
+			if n.Op == promParser.LOR {
+				s.Alternatives = append(s.Alternatives, walkNode(n.RHS))
+			}
 		case n.VectorMatching.Card == promParser.CardManyToOne:
 			s = walkNode(n.LHS)
 		}

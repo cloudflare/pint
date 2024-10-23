@@ -242,6 +242,56 @@ func TestFragileCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "warns about topk() as source of series (or)",
+			content:     "- alert: foo\n  expr: bar or topk(10, foo)\n",
+			checker:     newFragileCheck,
+			prometheus:  noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.FragileCheckName,
+						Text:     fragileSampleFunc("topk"),
+						Details:  checks.FragileCheckSamplingDetails,
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
+			description: "warns about topk() as source of series (multiple)",
+			content:     "- alert: foo\n  expr: bar or topk(10, foo) or bottomk(10, foo)\n",
+			checker:     newFragileCheck,
+			prometheus:  noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.FragileCheckName,
+						Text:     fragileSampleFunc("topk"),
+						Details:  checks.FragileCheckSamplingDetails,
+						Severity: checks.Warning,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.FragileCheckName,
+						Text:     fragileSampleFunc("bottomk"),
+						Details:  checks.FragileCheckSamplingDetails,
+						Severity: checks.Warning,
+					},
+				}
+			},
+		},
+		{
 			description: "ignores aggregated topk()",
 			content:     "- alert: foo\n  expr: min(topk(10, foo)) > 5000\n",
 			checker:     newFragileCheck,

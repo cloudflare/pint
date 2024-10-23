@@ -137,7 +137,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "sum",
 				Selector:    mustParseVector(`foo{job="myjob"}`, 4),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -152,10 +152,11 @@ func TestLabelsSource(t *testing.T) {
 		{
 			expr: `sum(foo) by(job)`,
 			output: utils.Source{
-				Type:       utils.AggregateSource,
-				Operation:  "sum",
-				Selector:   mustParseVector(`foo`, 4),
-				OnlyLabels: []string{"job"},
+				Type:        utils.AggregateSource,
+				Operation:   "sum",
+				Selector:    mustParseVector(`foo`, 4),
+				OnlyLabels:  []string{"job"},
+				FixedLabels: true,
 			},
 		},
 		{
@@ -166,6 +167,7 @@ func TestLabelsSource(t *testing.T) {
 				Selector:         mustParseVector(`foo{job="myjob"}`, 4),
 				OnlyLabels:       []string{"job"},
 				GuaranteedLabels: []string{"job"},
+				FixedLabels:      true,
 			},
 		},
 		{
@@ -184,7 +186,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "min",
 				Selector:    mustParseVector(`foo{job="myjob"}`, 4),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -193,7 +195,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "max",
 				Selector:    mustParseVector(`foo{job="myjob"}`, 4),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -204,15 +206,17 @@ func TestLabelsSource(t *testing.T) {
 				Selector:         mustParseVector(`foo{job="myjob"}`, 4),
 				GuaranteedLabels: []string{"job"},
 				OnlyLabels:       []string{"job"},
+				FixedLabels:      true,
 			},
 		},
 		{
 			expr: `group(foo) by(job)`,
 			output: utils.Source{
-				Type:       utils.AggregateSource,
-				Operation:  "group",
-				Selector:   mustParseVector(`foo`, 6),
-				OnlyLabels: []string{"job"},
+				Type:        utils.AggregateSource,
+				Operation:   "group",
+				Selector:    mustParseVector(`foo`, 6),
+				OnlyLabels:  []string{"job"},
+				FixedLabels: true,
 			},
 		},
 		{
@@ -221,7 +225,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "stddev",
 				Selector:    mustParseVector(`foo`, 12),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -230,7 +234,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "stdvar",
 				Selector:    mustParseVector(`foo`, 12),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -289,7 +293,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "quantile",
 				Selector:    mustParseVector(`foo`, 19),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -300,6 +304,7 @@ func TestLabelsSource(t *testing.T) {
 				Selector:         mustParseVector(`build_version`, 24),
 				GuaranteedLabels: []string{"version"},
 				OnlyLabels:       []string{"version"},
+				FixedLabels:      true,
 			},
 		},
 		{
@@ -330,6 +335,7 @@ func TestLabelsSource(t *testing.T) {
 				Selector:         mustParseVector(`build_version`, 24),
 				GuaranteedLabels: []string{"version"},
 				OnlyLabels:       []string{"job", "version"},
+				FixedLabels:      true,
 			},
 		},
 		{
@@ -425,7 +431,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "count",
 				Selector:    mustParseVector(`foo`, 6),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -434,7 +440,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:        utils.AggregateSource,
 				Operation:   "count",
 				Selector:    mustParseVector(`up{job="a"}`, 6),
-				EmptyLabels: true,
+				FixedLabels: true,
 			},
 		},
 		{
@@ -472,19 +478,50 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
-			// FIXME
 			expr: `foo or bar`,
 			output: utils.Source{
 				Type:     utils.SelectorSource,
 				Selector: mustParseVector(`foo`, 0),
+				Alternatives: []utils.Source{
+					{
+						Type:     utils.SelectorSource,
+						Selector: mustParseVector(`bar`, 7),
+					},
+				},
 			},
 		},
 		{
-			// FIXME
+			expr: `foo or bar or baz`,
+			output: utils.Source{
+				Type:     utils.SelectorSource,
+				Selector: mustParseVector(`foo`, 0),
+				Alternatives: []utils.Source{
+					{
+						Type:     utils.SelectorSource,
+						Selector: mustParseVector(`bar`, 7),
+					},
+					{
+						Type:     utils.SelectorSource,
+						Selector: mustParseVector(`baz`, 14),
+					},
+				},
+			},
+		},
+		{
 			expr: `(foo or bar) or baz`,
 			output: utils.Source{
 				Type:     utils.SelectorSource,
 				Selector: mustParseVector(`foo`, 1),
+				Alternatives: []utils.Source{
+					{
+						Type:     utils.SelectorSource,
+						Selector: mustParseVector(`bar`, 8),
+					},
+					{
+						Type:     utils.SelectorSource,
+						Selector: mustParseVector(`baz`, 16),
+					},
+				},
 			},
 		},
 		{
@@ -494,6 +531,7 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "count",
 				Selector:       mustParseVector(`up{job="foo", cluster="dev"}`, 10),
 				ExcludedLabels: []string{"job", "cluster"},
+				FixedLabels:    true,
 			},
 		},
 		{
