@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/model/timestamp"
 	"github.com/prometheus/prometheus/promql"
 	promParser "github.com/prometheus/prometheus/promql/parser"
@@ -119,28 +118,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		return nil
 	}
 
-	aggrs := utils.HasOuterAggregation(rule.AlertingRule.Expr.Query)
-	absentCalls := utils.HasOuterAbsent(rule.AlertingRule.Expr.Query)
-	binExpr := utils.HasOuterBinaryExpr(rule.AlertingRule.Expr.Query)
+	src := utils.LabelsSource(rule.AlertingRule.Expr.Query)
 	vectors := utils.HasVectorSelector(rule.AlertingRule.Expr.Query)
-
-	var safeLabels []string
-	for _, be := range binaryExprs(rule.AlertingRule.Expr.Query) {
-		if be.VectorMatching != nil {
-			safeLabels = append(safeLabels, be.VectorMatching.MatchingLabels...)
-			safeLabels = append(safeLabels, be.VectorMatching.Include...)
-		}
-	}
-	for _, cl := range calls(rule.AlertingRule.Expr.Query, "label_replace") {
-		for i, v := range cl.Args {
-			if i == 1 {
-				if s, ok := v.(*promParser.StringLiteral); ok {
-					safeLabels = append(safeLabels, s.Val)
-				}
-				break
-			}
-		}
-	}
 
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
@@ -170,52 +149,17 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, aggr := range aggrs {
-				for _, msg := range checkMetricLabels(msgAggregation, label.Key.Value, label.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: label.Key.Lines.First,
-							Last:  label.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     msg,
-						Details:  TemplateCheckAggregationDetails,
-						Severity: Bug,
-					})
-				}
-			}
-
-			for _, call := range absentCalls {
-				if len(utils.HasOuterAggregation(call.Fragment)) > 0 {
-					continue
-				}
-				for _, msg := range checkMetricLabels(msgAbsent, label.Key.Value, label.Value.Value, absentLabels(call), false, safeLabels) {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: label.Key.Lines.First,
-							Last:  label.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     msg,
-						Details:  TemplateCheckAbsentDetails,
-						Severity: Bug,
-					})
-				}
-			}
-
-			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
-				for _, msg := range checkMetricLabels(msgOn, label.Key.Value, label.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: label.Key.Lines.First,
-							Last:  label.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     msg,
-						Details:  TemplateCheckOnDetails,
-						Severity: Bug,
-					})
-				}
+			for _, problem := range checkQueryLabels(label.Key.Value, label.Value.Value, src) {
+				problems = append(problems, Problem{
+					Lines: parser.LineRange{
+						First: label.Key.Lines.First,
+						Last:  label.Value.Lines.Last,
+					},
+					Reporter: c.Reporter(),
+					Text:     problem.text,
+					Details:  problem.details,
+					Severity: problem.severity,
+				})
 			}
 
 			labelNames := getTemplateLabels(label.Key.Value, label.Value.Value)
@@ -251,44 +195,17 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, aggr := range aggrs {
-				for _, msg := range checkMetricLabels(msgAggregation, annotation.Key.Value, annotation.Value.Value, aggr.Grouping, aggr.Without, safeLabels) {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: annotation.Key.Lines.First,
-							Last:  annotation.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     msg,
-						Details:  TemplateCheckAggregationDetails,
-						Severity: Bug,
-					})
-				}
-			}
-
-			for _, call := range absentCalls {
-				if len(utils.HasOuterAggregation(call.Fragment)) > 0 {
-					continue
-				}
-				if call.BinExpr != nil &&
-					call.BinExpr.VectorMatching != nil &&
-					(call.BinExpr.VectorMatching.Card == promParser.CardManyToOne ||
-						call.BinExpr.VectorMatching.Card == promParser.CardOneToMany) &&
-					len(call.BinExpr.VectorMatching.Include) == 0 {
-					continue
-				}
-				for _, msg := range checkMetricLabels(msgAbsent, annotation.Key.Value, annotation.Value.Value, absentLabels(call), false, safeLabels) {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: annotation.Key.Lines.First,
-							Last:  annotation.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     msg,
-						Details:  TemplateCheckAbsentDetails,
-						Severity: Bug,
-					})
-				}
+			for _, problem := range checkQueryLabels(annotation.Key.Value, annotation.Value.Value, src) {
+				problems = append(problems, Problem{
+					Lines: parser.LineRange{
+						First: annotation.Key.Lines.First,
+						Last:  annotation.Value.Lines.Last,
+					},
+					Reporter: c.Reporter(),
+					Text:     problem.text,
+					Details:  problem.details,
+					Severity: problem.severity,
+				})
 			}
 
 			labelNames := getTemplateLabels(annotation.Key.Value, annotation.Value.Value)
@@ -302,21 +219,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 						Reporter: c.Reporter(),
 						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
 						Details:  TemplateCheckLabelsDetails,
-						Severity: Bug,
-					})
-				}
-			}
-
-			if binExpr != nil && binExpr.VectorMatching != nil && binExpr.VectorMatching.Card == promParser.CardOneToOne && binExpr.VectorMatching.On && len(binExpr.VectorMatching.MatchingLabels) > 0 {
-				for _, msg := range checkMetricLabels(msgOn, annotation.Key.Value, annotation.Value.Value, binExpr.VectorMatching.MatchingLabels, false, safeLabels) {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: annotation.Key.Lines.First,
-							Last:  annotation.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     msg,
-						Details:  TemplateCheckOnDetails,
 						Severity: Bug,
 					})
 				}
@@ -589,8 +491,8 @@ func getTemplateLabels(name, text string) (names []string) {
 	return names
 }
 
-func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLabels bool, safeLabels []string) (msgs []string) {
-	vars, aliases, ok := findTemplateVariables(name, text)
+func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems []exprProblem) {
+	vars, aliases, ok := findTemplateVariables(labelName, labelValue)
 	if !ok {
 		return nil
 	}
@@ -600,72 +502,52 @@ func checkMetricLabels(msg, name, text string, metricLabels []string, excludeLab
 	for _, v := range vars {
 		for _, a := range labelsAliases {
 			if len(v) > 1 && v[0] == a {
-				var found bool
-				for _, l := range metricLabels {
-					if len(v) > 1 && v[1] == l {
-						found = true
+				if _, ok := done[v[1]]; ok {
+					continue
+				}
+				for _, s := range append(src.Alternatives, src) {
+					if s.FixedLabels && !slices.Contains(s.IncludedLabels, v[1]) {
+						problems = append(problems, textForProblem(v[1], s, Bug))
+						goto NEXT
+					}
+					if slices.Contains(s.ExcludedLabels, v[1]) {
+						problems = append(problems, textForProblem(v[1], s, Bug))
+						goto NEXT
 					}
 				}
-				if found == excludeLabels {
-					if _, ok := done[v[1]]; !ok && !slices.Contains(safeLabels, v[1]) {
-						msgs = append(msgs, fmt.Sprintf(msg, v[1]))
-						done[v[1]] = struct{}{}
-					}
-				}
+			NEXT:
+				done[v[1]] = struct{}{}
 			}
 		}
 	}
 
-	return msgs
+	return problems
 }
 
-func absentLabels(f utils.PromQLFragment) []string {
-	labelMap := map[string]struct{}{}
-
-	for _, child := range f.Fragment.Children {
-		for _, v := range utils.HasVectorSelector(child) {
-			for _, lm := range v.LabelMatchers {
-				if lm.Type == labels.MatchEqual {
-					labelMap[lm.Name] = struct{}{}
-				}
-			}
+func textForProblem(label string, src utils.Source, severity Severity) exprProblem {
+	switch {
+	case src.Operation == "absent":
+		return exprProblem{
+			text:     fmt.Sprintf(msgAbsent, label),
+			details:  TemplateCheckAbsentDetails,
+			severity: severity,
+		}
+	case slices.Contains([]string{
+		promParser.CardOneToOne.String(),
+		promParser.CardOneToMany.String(),
+		promParser.CardManyToMany.String(),
+		promParser.CardManyToOne.String(),
+	}, src.Operation):
+		return exprProblem{
+			text:     fmt.Sprintf(msgOn, label),
+			details:  TemplateCheckOnDetails,
+			severity: severity,
+		}
+	default:
+		return exprProblem{
+			text:     fmt.Sprintf(msgAggregation, label),
+			details:  TemplateCheckAggregationDetails,
+			severity: severity,
 		}
 	}
-
-	if f.BinExpr != nil && f.BinExpr.VectorMatching != nil {
-		for _, name := range f.BinExpr.VectorMatching.Include {
-			labelMap[name] = struct{}{}
-		}
-	}
-
-	names := make([]string, 0, len(labelMap))
-	for name := range labelMap {
-		names = append(names, name)
-	}
-
-	return names
-}
-
-func binaryExprs(node *parser.PromQLNode) (be []*promParser.BinaryExpr) {
-	if n, ok := node.Expr.(*promParser.BinaryExpr); ok {
-		be = append(be, n)
-	}
-
-	for _, child := range node.Children {
-		be = append(be, binaryExprs(child)...)
-	}
-
-	return be
-}
-
-func calls(node *parser.PromQLNode, name string) (cl []*promParser.Call) {
-	if n, ok := node.Expr.(*promParser.Call); ok && n.Func.Name == name {
-		cl = append(cl, n)
-	}
-
-	for _, child := range node.Children {
-		cl = append(cl, calls(child, name)...)
-	}
-
-	return cl
 }

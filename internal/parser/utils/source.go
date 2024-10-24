@@ -37,42 +37,6 @@ func LabelsSource(node *parser.PromQLNode) Source {
 	return walkNode(node.Expr)
 }
 
-func removeFromSlice(sl []string, s string) []string {
-	idx := slices.Index(sl, s)
-	if idx >= 0 {
-		if len(sl) == 1 {
-			return nil
-		}
-		return slices.Delete(sl, idx, idx+1)
-	}
-	return sl
-}
-
-func parseAggregation(n *promParser.AggregateExpr) (s Source) {
-	s = walkNode(n.Expr)
-	if n.Without {
-		s.ExcludedLabels = append(s.ExcludedLabels, n.Grouping...)
-		for _, name := range n.Grouping {
-			s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, name)
-			s.OnlyLabels = removeFromSlice(s.OnlyLabels, name)
-		}
-	} else {
-		s.FixedLabels = true
-		if len(n.Grouping) == 0 {
-			s.GuaranteedLabels = nil
-			s.OnlyLabels = nil
-		} else {
-			s.OnlyLabels = append(s.OnlyLabels, n.Grouping...)
-			for _, name := range n.Grouping {
-				s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
-			}
-		}
-	}
-	s.Type = AggregateSource
-	s.Call = nil
-	return s
-}
-
 func walkNode(node promParser.Node) (s Source) {
 	switch n := node.(type) {
 	case *promParser.AggregateExpr:
@@ -105,9 +69,10 @@ func walkNode(node promParser.Node) (s Source) {
 			s = parseAggregation(n)
 			s.Operation = "count_values"
 			// Param is the label to store the count value in.
-			s.GuaranteedLabels = append(s.GuaranteedLabels, n.Param.(*promParser.StringLiteral).Val)
+			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, n.Param.(*promParser.StringLiteral).Val)
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Param.(*promParser.StringLiteral).Val)
 			if s.FixedLabels {
-				s.OnlyLabels = append(s.OnlyLabels, n.Param.(*promParser.StringLiteral).Val)
+				s.OnlyLabels = appendToSlice(s.OnlyLabels, n.Param.(*promParser.StringLiteral).Val)
 			}
 		case promParser.QUANTILE:
 			s = parseAggregation(n)
@@ -137,8 +102,14 @@ func walkNode(node promParser.Node) (s Source) {
 		switch {
 		case n.VectorMatching == nil:
 			s = walkNode(n.LHS)
+			if s.Type == NumberSource {
+				s = walkNode(n.RHS)
+			}
 		case n.VectorMatching.Card == promParser.CardOneToOne:
 			s = walkNode(n.LHS)
+			if n.VectorMatching.On {
+				s.FixedLabels = true
+			}
 		case n.VectorMatching.Card == promParser.CardOneToMany:
 			s = walkNode(n.RHS)
 		case n.VectorMatching.Card == promParser.CardManyToMany:
@@ -150,34 +121,19 @@ func walkNode(node promParser.Node) (s Source) {
 			s = walkNode(n.LHS)
 		}
 		if n.VectorMatching != nil {
-			s.IncludedLabels = append(s.IncludedLabels, n.VectorMatching.Include...)
-			s.IncludedLabels = append(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			if s.Operation == "" {
+				s.Operation = n.VectorMatching.Card.String()
+			}
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
+			// on=true when using on(), on=false when using ignore()
+			if n.VectorMatching.On {
+				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			}
+			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
 		}
 
 	case *promParser.Call:
-		s.Type = FuncSource
-		s.Operation = n.Func.Name
-		s.Call = n
-
-		var vt promParser.ValueType
-		for i, e := range n.Args {
-			if i >= len(n.Func.ArgTypes) {
-				vt = n.Func.ArgTypes[len(n.Func.ArgTypes)-1]
-			} else {
-				vt = n.Func.ArgTypes[i]
-			}
-			// nolint: exhaustive
-			switch vt {
-			case promParser.ValueTypeVector:
-				s.Selector, _ = e.(*promParser.VectorSelector)
-			case promParser.ValueTypeMatrix:
-				if ss, ok := e.(*promParser.SubqueryExpr); ok {
-					s.Selector = walkNode(ss.Expr).Selector
-				} else {
-					s.Selector, _ = e.(*promParser.MatrixSelector).VectorSelector.(*promParser.VectorSelector)
-				}
-			}
-		}
+		s = parseCall(n)
 
 	case *promParser.MatrixSelector:
 		s = walkNode(n.VectorSelector)
@@ -209,12 +165,98 @@ func walkNode(node promParser.Node) (s Source) {
 				continue
 			}
 			if lm.Type == labels.MatchEqual || lm.Type == labels.MatchRegexp {
-				s.GuaranteedLabels = append(s.GuaranteedLabels, lm.Name)
+				s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, lm.Name)
 			}
 		}
 
 	default:
 		// unhandled type
 	}
+	return s
+}
+
+func removeFromSlice(sl []string, s ...string) []string {
+	for _, v := range s {
+		idx := slices.Index(sl, v)
+		if idx >= 0 {
+			if len(sl) == 1 {
+				return nil
+			}
+			return slices.Delete(sl, idx, idx+1)
+		}
+	}
+	return sl
+}
+
+func appendToSlice(dst []string, values ...string) []string {
+	for _, v := range values {
+		if !slices.Contains(dst, v) {
+			dst = append(dst, v)
+		}
+	}
+	return dst
+}
+
+func parseAggregation(n *promParser.AggregateExpr) (s Source) {
+	s = walkNode(n.Expr)
+	if n.Without {
+		s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.Grouping...)
+		for _, name := range n.Grouping {
+			s.IncludedLabels = removeFromSlice(s.IncludedLabels, name)
+			s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, name)
+			s.OnlyLabels = removeFromSlice(s.OnlyLabels, name)
+		}
+	} else {
+		s.FixedLabels = true
+		if len(n.Grouping) == 0 {
+			s.GuaranteedLabels = nil
+			s.OnlyLabels = nil
+		} else {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Grouping...)
+			s.OnlyLabels = appendToSlice(s.OnlyLabels, n.Grouping...)
+			for _, name := range n.Grouping {
+				s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
+			}
+		}
+	}
+	s.Type = AggregateSource
+	s.Call = nil
+	return s
+}
+
+func parseCall(n *promParser.Call) (s Source) {
+	s.Type = FuncSource
+	s.Operation = n.Func.Name
+	s.Call = n
+
+	var vt promParser.ValueType
+	for i, e := range n.Args {
+		if i >= len(n.Func.ArgTypes) {
+			vt = n.Func.ArgTypes[len(n.Func.ArgTypes)-1]
+		} else {
+			vt = n.Func.ArgTypes[i]
+		}
+
+		// nolint: exhaustive
+		switch vt {
+		case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
+			s.Selector = walkNode(e).Selector
+		}
+	}
+
+	if n.Func.Name == "absent" {
+		s.FixedLabels = true
+		for _, lm := range s.Selector.LabelMatchers {
+			if lm.Name == labels.MetricName {
+				continue
+			}
+			if lm.Type == labels.MatchEqual {
+				s.IncludedLabels = appendToSlice(s.IncludedLabels, lm.Name)
+				s.OnlyLabels = appendToSlice(s.OnlyLabels, lm.Name)
+				s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, lm.Name)
+			}
+		}
+	}
+
 	return s
 }
