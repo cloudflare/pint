@@ -525,6 +525,7 @@ func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems 
 }
 
 func textForProblem(label string, src utils.Source, severity Severity) exprProblem {
+	fmt.Printf("LAB[%s] SRC: %+v\n", label, src)
 	switch {
 	case src.Operation == "absent":
 		return exprProblem{

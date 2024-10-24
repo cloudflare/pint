@@ -1309,6 +1309,75 @@ func TestTemplateCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "multiple or",
+			content: `
+- alert: Prefix_Advertised_On_Very_Few_Routers
+  expr: >
+    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*|.*multicolo.*|.*aggregate.*|.*test.*|.*tier1.*|.*regional.*|.*brat.*|.*utopia.*|.*byoip.*",prefix!~"141.101.112.0/20|190.93.240.0/20"})
+    < 0.5 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
+    < 0.4 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*aggregate.*"} OR router_anycast_prefix_enabled{prefix=~"141.101.112.0/20|190.93.240.0/20"})
+    < 20 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
+    < 8 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+    < on() group_left() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+    < 0.1 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*brat.*",cidr_use_case!~".*tier1.*",plan=~".*(free|pro).*"})
+    <  0.1 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*utopia.*"})
+    < 5 > 0
+  annotations:
+    dashboard: 'Prefix is {{ $labels.prefix }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
+		{
+			description: "multiple or / missing group_left()",
+			content: `
+- alert: Prefix_Advertised_On_Very_Few_Routers
+  expr: >
+    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*|.*multicolo.*|.*aggregate.*|.*test.*|.*tier1.*|.*regional.*|.*brat.*|.*utopia.*|.*byoip.*",prefix!~"141.101.112.0/20|190.93.240.0/20"})
+    < 0.5 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
+    < 0.4 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*aggregate.*"} OR router_anycast_prefix_enabled{prefix=~"141.101.112.0/20|190.93.240.0/20"})
+    < 20 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
+    < 8 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+    < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+    < 0.1 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*brat.*",cidr_use_case!~".*tier1.*",plan=~".*(free|pro).*"})
+    <  0.1 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*utopia.*"})
+    < 5 > 0
+  annotations:
+    dashboard: 'Prefix is {{ $labels.prefix }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 21,
+							Last:  21,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `prefix` label but the query removes it.",
+						Details:  checks.TemplateCheckAggregationDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
+		},
 	}
 	runTests(t, testCases)
 }
