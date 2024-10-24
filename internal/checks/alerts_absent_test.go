@@ -35,11 +35,44 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems:    noProblems,
 		},
 		{
+			description: "ignores rules with no absent()",
+			content:     "- alert: foo\n  expr: count(foo)\n  for: 2m\n",
+			checker:     newAlertsAbsentCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+		},
+		{
 			description: "ignores rules with invalid duration",
 			content:     "- alert: foo\n  expr: absent(foo)\n  for: abc\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
 			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+			},
+		},
+		{
+			description: "count() or absent() without for",
+			content:     "- alert: foo\n  expr: count(foo) > 5 or absent(foo)\n",
+			checker:     newAlertsAbsentCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.AlertsAbsentCheckName,
+						Text:     absentForNeeded("prom", uri, "2m"),
+						Details:  checks.AlertsAbsentCheckDetails,
+						Severity: checks.Warning,
+					},
+				}
+			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
