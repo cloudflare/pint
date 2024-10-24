@@ -525,6 +525,8 @@ func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems 
 }
 
 func textForProblem(label string, src utils.Source, severity Severity) exprProblem {
+	// FIXME add query fragment to the details
+
 	switch {
 	case src.Operation == "absent":
 		return exprProblem{
