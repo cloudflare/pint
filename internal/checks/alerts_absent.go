@@ -8,10 +8,10 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 
 	"github.com/prometheus/common/model"
-	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
 const (
@@ -58,7 +58,15 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		return problems
 	}
 
-	if n, ok := rule.AlertingRule.Expr.Query.Expr.(*promParser.Call); !ok || n.Func.Name != "absent" {
+	var hasAbsent bool
+	src := utils.LabelsSource(rule.AlertingRule.Expr.Query)
+	for _, s := range append(src.Alternatives, src) {
+		if s.Operation == "absent" {
+			hasAbsent = true
+		}
+	}
+
+	if !hasAbsent {
 		return problems
 	}
 
