@@ -476,7 +476,7 @@ func TestTemplateCheck(t *testing.T) {
 			problems:   noProblems,
 		},
 		{
-			description: "annotation label missing from metrics (absent)",
+			description: "annotation label missing from metrics (absent, and)",
 			content: `
 - alert: Foo Is Missing
   expr: absent(foo{job="bar"}) AND on(job) foo
@@ -543,7 +543,30 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `instance` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `job` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
 		},
 		{
 			description: "annotation label missing from metrics (absent(sum))",
@@ -563,8 +586,18 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  5,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `instance` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `job` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -617,16 +650,6 @@ func TestTemplateCheck(t *testing.T) {
 						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
-					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
-						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but `absent()` is not passing it.",
-						Details:  checks.TemplateCheckAbsentDetails,
-						Severity: checks.Bug,
-					},
 				}
 			},
 		},
@@ -652,7 +675,30 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `cluster` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `env` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
 		},
 		{
 			description: "bar * on() group_right(...) absent()",
@@ -676,7 +722,30 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `cluster` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.TemplateCheckName,
+						Text:     "Template is using `env` label but `absent()` is not passing it.",
+						Details:  checks.TemplateCheckAbsentDetails,
+						Severity: checks.Bug,
+					},
+				}
+			},
 		},
 		{
 			description: "foo and on() absent(bar)",

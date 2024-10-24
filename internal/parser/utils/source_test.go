@@ -152,11 +152,11 @@ func TestLabelsSource(t *testing.T) {
 		{
 			expr: `sum(foo) by(job)`,
 			output: utils.Source{
-				Type:        utils.AggregateSource,
-				Operation:   "sum",
-				Selector:    mustParseVector(`foo`, 4),
-				OnlyLabels:  []string{"job"},
-				FixedLabels: true,
+				Type:           utils.AggregateSource,
+				Operation:      "sum",
+				Selector:       mustParseVector(`foo`, 4),
+				IncludedLabels: []string{"job"},
+				FixedLabels:    true,
 			},
 		},
 		{
@@ -165,7 +165,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:             utils.AggregateSource,
 				Operation:        "sum",
 				Selector:         mustParseVector(`foo{job="myjob"}`, 4),
-				OnlyLabels:       []string{"job"},
+				IncludedLabels:   []string{"job"},
 				GuaranteedLabels: []string{"job"},
 				FixedLabels:      true,
 			},
@@ -205,18 +205,18 @@ func TestLabelsSource(t *testing.T) {
 				Operation:        "avg",
 				Selector:         mustParseVector(`foo{job="myjob"}`, 4),
 				GuaranteedLabels: []string{"job"},
-				OnlyLabels:       []string{"job"},
+				IncludedLabels:   []string{"job"},
 				FixedLabels:      true,
 			},
 		},
 		{
 			expr: `group(foo) by(job)`,
 			output: utils.Source{
-				Type:        utils.AggregateSource,
-				Operation:   "group",
-				Selector:    mustParseVector(`foo`, 6),
-				OnlyLabels:  []string{"job"},
-				FixedLabels: true,
+				Type:           utils.AggregateSource,
+				Operation:      "group",
+				Selector:       mustParseVector(`foo`, 6),
+				IncludedLabels: []string{"job"},
+				FixedLabels:    true,
 			},
 		},
 		{
@@ -303,7 +303,7 @@ func TestLabelsSource(t *testing.T) {
 				Operation:        "count_values",
 				Selector:         mustParseVector(`build_version`, 24),
 				GuaranteedLabels: []string{"version"},
-				OnlyLabels:       []string{"version"},
+				IncludedLabels:   []string{"version"},
 				FixedLabels:      true,
 			},
 		},
@@ -313,6 +313,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:             utils.AggregateSource,
 				Operation:        "count_values",
 				Selector:         mustParseVector(`build_version`, 24),
+				IncludedLabels:   []string{"version"},
 				GuaranteedLabels: []string{"version"},
 				ExcludedLabels:   []string{"job"},
 			},
@@ -323,6 +324,7 @@ func TestLabelsSource(t *testing.T) {
 				Type:             utils.AggregateSource,
 				Operation:        "count_values",
 				Selector:         mustParseVector(`build_version{job="foo"}`, 24),
+				IncludedLabels:   []string{"version"},
 				GuaranteedLabels: []string{"version"},
 				ExcludedLabels:   []string{"job"},
 			},
@@ -334,7 +336,7 @@ func TestLabelsSource(t *testing.T) {
 				Operation:        "count_values",
 				Selector:         mustParseVector(`build_version`, 24),
 				GuaranteedLabels: []string{"version"},
-				OnlyLabels:       []string{"job", "version"},
+				IncludedLabels:   []string{"job", "version"},
 				FixedLabels:      true,
 			},
 		},
@@ -385,6 +387,7 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo"} / bar`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardOneToOne.String(),
 				Selector:         mustParseVector(`foo{job="foo"}`, 0),
 				GuaranteedLabels: []string{"job"},
 			},
@@ -393,15 +396,18 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo"} * on(instance) bar`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardOneToOne.String(),
 				Selector:         mustParseVector(`foo{job="foo"}`, 0),
 				GuaranteedLabels: []string{"job"},
 				IncludedLabels:   []string{"instance"},
+				FixedLabels:      true,
 			},
 		},
 		{
 			expr: `foo{job="foo"} * on(instance) group_left(bar) bar`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardManyToOne.String(),
 				Selector:         mustParseVector(`foo{job="foo"}`, 0),
 				IncludedLabels:   []string{"bar", "instance"},
 				GuaranteedLabels: []string{"job"},
@@ -411,6 +417,7 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo"} * on(instance) group_left(cluster) bar{cluster="bar", ignored="true"}`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardManyToOne.String(),
 				Selector:         mustParseVector(`foo{job="foo"}`, 0),
 				IncludedLabels:   []string{"cluster", "instance"},
 				GuaranteedLabels: []string{"job"},
@@ -420,6 +427,7 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo", ignored="true"} * on(instance) group_right(job) bar{cluster="bar"}`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardOneToMany.String(),
 				Selector:         mustParseVector(`bar{cluster="bar"}`, 63),
 				IncludedLabels:   []string{"job", "instance"},
 				GuaranteedLabels: []string{"cluster"},
@@ -447,6 +455,7 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo", instance="1"} and bar`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardManyToMany.String(),
 				Selector:         mustParseVector(`foo{job="foo", instance="1"}`, 0),
 				GuaranteedLabels: []string{"job", "instance"},
 			},
@@ -455,6 +464,7 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo", instance="1"} and on(cluster) bar`,
 			output: utils.Source{
 				Type:             utils.SelectorSource,
+				Operation:        promParser.CardManyToMany.String(),
 				Selector:         mustParseVector(`foo{job="foo", instance="1"}`, 0),
 				IncludedLabels:   []string{"cluster"},
 				GuaranteedLabels: []string{"job", "instance"},
@@ -480,8 +490,9 @@ func TestLabelsSource(t *testing.T) {
 		{
 			expr: `foo or bar`,
 			output: utils.Source{
-				Type:     utils.SelectorSource,
-				Selector: mustParseVector(`foo`, 0),
+				Type:      utils.SelectorSource,
+				Operation: promParser.CardManyToMany.String(),
+				Selector:  mustParseVector(`foo`, 0),
 				Alternatives: []utils.Source{
 					{
 						Type:     utils.SelectorSource,
@@ -493,8 +504,9 @@ func TestLabelsSource(t *testing.T) {
 		{
 			expr: `foo or bar or baz`,
 			output: utils.Source{
-				Type:     utils.SelectorSource,
-				Selector: mustParseVector(`foo`, 0),
+				Type:      utils.SelectorSource,
+				Operation: promParser.CardManyToMany.String(),
+				Selector:  mustParseVector(`foo`, 0),
 				Alternatives: []utils.Source{
 					{
 						Type:     utils.SelectorSource,
@@ -510,8 +522,9 @@ func TestLabelsSource(t *testing.T) {
 		{
 			expr: `(foo or bar) or baz`,
 			output: utils.Source{
-				Type:     utils.SelectorSource,
-				Selector: mustParseVector(`foo`, 1),
+				Type:      utils.SelectorSource,
+				Operation: promParser.CardManyToMany.String(),
+				Selector:  mustParseVector(`foo`, 1),
 				Alternatives: []utils.Source{
 					{
 						Type:     utils.SelectorSource,
@@ -629,6 +642,286 @@ func TestLabelsSource(t *testing.T) {
 				},
 			},
 		},
+		{
+			expr: `
+(
+	sum(foo:sum > 0) without(notify)
+	* on(job) group_left(notify)
+	job:notify
+)
+and on(job)
+sum(foo:count) by(job) > 20`,
+			output: utils.Source{
+				Type:           utils.AggregateSource,
+				Operation:      "sum",
+				Selector:       mustParseVector(`foo:sum`, 8),
+				IncludedLabels: []string{"notify", "job"},
+			},
+		},
+		{
+			expr: `container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}`,
+			output: utils.Source{
+				Type:           utils.SelectorSource,
+				Operation:      promParser.CardOneToOne.String(),
+				Selector:       mustParseVector(`container_file_descriptors`, 0),
+				IncludedLabels: []string{"instance", "app_name"},
+				FixedLabels:    true,
+			},
+		},
+		{
+			expr: `container_file_descriptors / on (instance, app_name) group_left() container_ulimits_soft{ulimit="max_open_files"}`,
+			output: utils.Source{
+				Type:           utils.SelectorSource,
+				Operation:      promParser.CardManyToOne.String(),
+				Selector:       mustParseVector(`container_file_descriptors`, 0),
+				IncludedLabels: []string{"instance", "app_name"},
+			},
+		},
+		{
+			expr: `absent(foo{job="bar"})`,
+			output: utils.Source{
+				Type:             utils.FuncSource,
+				Operation:        "absent",
+				Selector:         mustParseVector(`foo{job="bar"}`, 7),
+				IncludedLabels:   []string{"job"},
+				GuaranteedLabels: []string{"job"},
+				FixedLabels:      true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						mustParseVector(`foo{job="bar"}`, 7),
+					},
+					PosRange: posrange.PositionRange{
+						Start: 0,
+						End:   22,
+					},
+				},
+			},
+		},
+		{
+			expr: `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`,
+			output: utils.Source{
+				Type:             utils.FuncSource,
+				Operation:        "absent",
+				Selector:         mustParseVector(`foo{job="bar", cluster!="dev", instance=~".+", env="prod"}`, 7),
+				IncludedLabels:   []string{"job", "env"},
+				GuaranteedLabels: []string{"job", "env"},
+				FixedLabels:      true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						mustParseVector(`foo{job="bar", cluster!="dev", instance=~".+", env="prod"}`, 7),
+					},
+					PosRange: posrange.PositionRange{
+						Start: 0,
+						End:   66,
+					},
+				},
+			},
+		},
+		{
+			expr: `absent(sum(foo) by(job, instance))`,
+			output: utils.Source{
+				Type:        utils.FuncSource,
+				Operation:   "absent",
+				Selector:    mustParseVector(`foo`, 11),
+				FixedLabels: true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						&promParser.AggregateExpr{
+							Op:       promParser.SUM,
+							Expr:     mustParseVector("foo", 11),
+							Grouping: []string{"job", "instance"},
+							PosRange: posrange.PositionRange{
+								Start: 7,
+								End:   33,
+							},
+						},
+					},
+					PosRange: posrange.PositionRange{
+						Start: 0,
+						End:   34,
+					},
+				},
+			},
+		},
+		{
+			expr: `absent(foo{job="prometheus", xxx="1"}) AND on(job) prometheus_build_info`,
+			output: utils.Source{
+				Type:             utils.FuncSource,
+				Operation:        "absent",
+				Selector:         mustParseVector(`foo{job="prometheus", xxx="1"}`, 7),
+				IncludedLabels:   []string{"job", "xxx"},
+				GuaranteedLabels: []string{"job", "xxx"},
+				FixedLabels:      true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						mustParseVector(`foo{job="prometheus", xxx="1"}`, 7),
+					},
+					PosRange: posrange.PositionRange{
+						Start: 0,
+						End:   38,
+					},
+				},
+			},
+		},
+		{
+			expr: `1 + sum(foo) by(notjob)`,
+			output: utils.Source{
+				Type:           utils.AggregateSource,
+				Operation:      "sum",
+				Selector:       mustParseVector(`foo`, 8),
+				IncludedLabels: []string{"notjob"},
+				FixedLabels:    true,
+			},
+		},
+		{
+			expr: `count(node_exporter_build_info) by (instance, version) != ignoring(package,version) group_left(foo) count(deb_package_version) by (instance, version, package)`,
+			output: utils.Source{
+				Type:           utils.AggregateSource,
+				Operation:      "count",
+				Selector:       mustParseVector(`node_exporter_build_info`, 6),
+				IncludedLabels: []string{"instance", "version", "foo"}, // FIXME foo shouldn't be there because count() doesn't produce it
+				FixedLabels:    true,
+			},
+		},
+		{
+			expr: `absent(foo) or absent(bar)`,
+			output: utils.Source{
+				Type:        utils.FuncSource,
+				Operation:   "absent",
+				Selector:    mustParseVector(`foo`, 7),
+				FixedLabels: true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						mustParseVector(`foo`, 7),
+					},
+					PosRange: posrange.PositionRange{
+						Start: 0,
+						End:   11,
+					},
+				},
+				Alternatives: []utils.Source{
+					{
+						Type:        utils.FuncSource,
+						Operation:   "absent",
+						Selector:    mustParseVector(`bar`, 22),
+						FixedLabels: true,
+						Call: &promParser.Call{
+							Func: &promParser.Function{
+								Name: "absent",
+								ArgTypes: []promParser.ValueType{
+									promParser.ValueTypeVector,
+								},
+								Variadic:   0,
+								ReturnType: promParser.ValueTypeVector,
+							},
+							Args: promParser.Expressions{
+								mustParseVector(`bar`, 22),
+							},
+							PosRange: posrange.PositionRange{
+								Start: 15,
+								End:   26,
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `bar * on() group_right(cluster, env) absent(foo{job="xxx"})`,
+			output: utils.Source{
+				Type:             utils.FuncSource,
+				Operation:        "absent",
+				Selector:         mustParseVector(`foo{job="xxx"}`, 44),
+				IncludedLabels:   []string{"job", "cluster", "env"},
+				GuaranteedLabels: []string{"job"},
+				FixedLabels:      true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						mustParseVector(`foo{job="xxx"}`, 44),
+					},
+					PosRange: posrange.PositionRange{
+						Start: 37,
+						End:   59,
+					},
+				},
+			},
+		},
+		{
+			expr: `bar * on() group_right() absent(foo{job="xxx"})`,
+			output: utils.Source{
+				Type:             utils.FuncSource,
+				Operation:        "absent",
+				Selector:         mustParseVector(`foo{job="xxx"}`, 32),
+				IncludedLabels:   []string{"job"},
+				GuaranteedLabels: []string{"job"},
+				FixedLabels:      true,
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "absent",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						mustParseVector(`foo{job="xxx"}`, 32),
+					},
+					PosRange: posrange.PositionRange{
+						Start: 25,
+						End:   47,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -639,7 +932,7 @@ func TestLabelsSource(t *testing.T) {
 				t.FailNow()
 			}
 			output := utils.LabelsSource(n)
-			require.Equal(t, tc.output, output)
+			require.EqualExportedValues(t, tc.output, output)
 		})
 	}
 }

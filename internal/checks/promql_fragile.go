@@ -132,7 +132,7 @@ func (c FragileCheck) checkSampling(node *parser.PromQLNode) (problems []exprPro
 		if src.Type != utils.AggregateSource {
 			continue
 		}
-		if src.FixedLabels && len(src.OnlyLabels) == 0 {
+		if src.FixedLabels && len(src.IncludedLabels) == 0 {
 			continue
 		}
 		if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
