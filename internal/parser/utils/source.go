@@ -24,9 +24,8 @@ type Source struct {
 	Selector         *promParser.VectorSelector
 	Call             *promParser.Call
 	Operation        string
-	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series.
+	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
 	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
-	OnlyLabels       []string // Labels that are the only ones that can be present on the results (by).
 	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
 	Alternatives     []Source // Alternative lable sources
 	Type             SourceType
@@ -71,9 +70,6 @@ func walkNode(node promParser.Node) (s Source) {
 			// Param is the label to store the count value in.
 			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, n.Param.(*promParser.StringLiteral).Val)
 			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Param.(*promParser.StringLiteral).Val)
-			if s.FixedLabels {
-				s.OnlyLabels = appendToSlice(s.OnlyLabels, n.Param.(*promParser.StringLiteral).Val)
-			}
 		case promParser.QUANTILE:
 			s = parseAggregation(n)
 			s.Operation = "quantile"
@@ -182,7 +178,7 @@ func removeFromSlice(sl []string, s ...string) []string {
 			if len(sl) == 1 {
 				return nil
 			}
-			return slices.Delete(sl, idx, idx+1)
+			sl = slices.Delete(sl, idx, idx+1)
 		}
 	}
 	return sl
@@ -201,19 +197,15 @@ func parseAggregation(n *promParser.AggregateExpr) (s Source) {
 	s = walkNode(n.Expr)
 	if n.Without {
 		s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.Grouping...)
-		for _, name := range n.Grouping {
-			s.IncludedLabels = removeFromSlice(s.IncludedLabels, name)
-			s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, name)
-			s.OnlyLabels = removeFromSlice(s.OnlyLabels, name)
-		}
+		s.IncludedLabels = removeFromSlice(s.IncludedLabels, n.Grouping...)
+		s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, n.Grouping...)
 	} else {
 		s.FixedLabels = true
 		if len(n.Grouping) == 0 {
+			s.IncludedLabels = nil
 			s.GuaranteedLabels = nil
-			s.OnlyLabels = nil
 		} else {
 			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Grouping...)
-			s.OnlyLabels = appendToSlice(s.OnlyLabels, n.Grouping...)
 			for _, name := range n.Grouping {
 				s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
 			}
@@ -252,7 +244,6 @@ func parseCall(n *promParser.Call) (s Source) {
 			}
 			if lm.Type == labels.MatchEqual {
 				s.IncludedLabels = appendToSlice(s.IncludedLabels, lm.Name)
-				s.OnlyLabels = appendToSlice(s.OnlyLabels, lm.Name)
 				s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, lm.Name)
 			}
 		}
