@@ -2,6 +2,7 @@ package promapi
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -35,7 +36,7 @@ func labelsBefore(ls, o labels.Labels) bool {
 	o.Range(func(l labels.Label) {
 		lns = append(lns, l.Name)
 	})
-	sort.Strings(lns)
+	slices.Sort(lns)
 	for _, ln := range lns {
 		mlv, ok := labelValue(ls, ln)
 		if !ok {

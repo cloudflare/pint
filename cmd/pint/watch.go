@@ -9,7 +9,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
-	"sort"
+	"slices"
 	"strings"
 	"sync"
 	"syscall"
@@ -406,7 +406,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 
 	ch <- prometheus.MustNewConstMetric(c.problems, prometheus.GaugeValue, float64(len(done)))
 
-	sort.Strings(keys)
+	slices.Sort(keys)
 	var reported int
 	for _, key := range keys {
 		ch <- done[key]

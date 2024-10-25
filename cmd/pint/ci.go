@@ -257,6 +257,7 @@ func actionCI(c *cli.Context) error {
 		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
 	}
 
+	summary.SortReports()
 	for _, rep := range reps {
 		err = rep.Submit(summary)
 		if err != nil {
