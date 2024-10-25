@@ -1,0 +1,241 @@
+! exec pint --no-color lint --json=report.json rules
+! stdout .
+cmp report.json expected.json
+
+-- expected.json --
+[
+  {
+    "path": "rules/0001.yml",
+    "reporter": "promql/aggregate",
+    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "severity": "Warning",
+    "lines": [
+      2
+    ]
+  },
+  {
+    "path": "rules/0001.yml",
+    "reporter": "promql/aggregate",
+    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
+    "severity": "Warning",
+    "lines": [
+      6
+    ]
+  },
+  {
+    "path": "rules/0002.yaml",
+    "reporter": "promql/regexp",
+    "problem": "Unnecessary regexp match on static string `job=~\"foo\"`, use `job=\"foo\"` instead.",
+    "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
+    "severity": "Bug",
+    "lines": [
+      2
+    ]
+  },
+  {
+    "path": "rules/0002.yaml",
+    "reporter": "promql/regexp",
+    "problem": "Unnecessary regexp match on static string `job!~\"foo\"`, use `job!=\"foo\"` instead.",
+    "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
+    "severity": "Bug",
+    "lines": [
+      5
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
+    "severity": "Warning",
+    "lines": [
+      11
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "severity": "Warning",
+    "lines": [
+      11
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/syntax",
+    "problem": "Prometheus failed to parse the query with this PromQL error: unexpected right parenthesis ')'.",
+    "details": "[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.",
+    "severity": "Fatal",
+    "lines": [
+      14
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "severity": "Warning",
+    "lines": [
+      22,
+      23,
+      24,
+      25
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
+    "severity": "Warning",
+    "lines": [
+      28,
+      29,
+      30,
+      31
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "severity": "Warning",
+    "lines": [
+      28,
+      29,
+      30,
+      31
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "severity": "Warning",
+    "lines": [
+      34,
+      35,
+      36,
+      37
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, remove instance from `by()`.",
+    "severity": "Warning",
+    "lines": [
+      40
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "promql/aggregate",
+    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
+    "severity": "Warning",
+    "lines": [
+      40
+    ]
+  },
+  {
+    "path": "rules/0003.yaml",
+    "reporter": "alerts/template",
+    "problem": "Using the value of `rate(errors[5m])` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.",
+    "severity": "Information",
+    "lines": [
+      61
+    ]
+  }
+]
+-- rules/0001.yml --
+- record: colo_job:fl_cf_html_bytes_in:rate10m
+  expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+- record: colo_job:foo:rate1m
+  expr: sum(rate(foo[1m])) WITHOUT (instance)
+- record: colo_job:foo:irate3m
+  expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+
+-- rules/0002.yaml --
+- record: colo_job:down:count
+  expr: up{job=~"foo"} == 0
+
+- record: colo_job:down:count
+  expr: up{job!~"foo"} == 0
+
+-- rules/0003.yaml --
+# pint ignore/begin
+{%- set foo = 1 %}
+{% set bar = 2 -%}
+{# comment #}
+{#
+  comment 
+#}
+# pint ignore/end
+
+- record: colo_job:up:count
+  expr: sum(foo) without(job)
+
+- record: invalid
+  expr: sum(foo) by ())
+
+# pint ignore/begin
+- record: colo_job:down:count
+  expr: up == {{ foo }}
+# pint ignore/end
+
+- record: colo:multiline
+  expr: |
+    sum(
+      multiline
+    ) without(job, instance)
+
+- record: colo:multiline:sum
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+- record: colo:multiline2
+  expr: >-
+    sum(
+      multiline2
+    ) without(job, instance)
+
+- record: colo_job:up:byinstance
+  expr: sum(byinstance) by(instance)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[4m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[5m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate5min
+  expr:  sum(irate(node_cpu_seconds_total[5m])) without (cpu)
+
+- alert: Instance Is Down
+  expr: up == 0
+
+- alert: Error Rate
+  expr: sum(rate(errors[5m])) > 0.5
+
+- alert: Error Rate
+  expr: sum(rate(errors[5m])) > 0.5
+  annotations:
+    link: http://docs
+    summary: 'error rate: {{ $value }}'
+
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+rule {
+    match {
+      kind = "recording"
+    }
+    aggregate ".+" {
+        keep = [ "job" ]
+    }
+    aggregate "colo(?:_.+)?:.+" {
+        strip = [ "instance" ]
+    }
+}

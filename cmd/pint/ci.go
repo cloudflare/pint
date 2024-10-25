@@ -24,6 +24,7 @@ var (
 	failOnFlag     = "fail-on"
 	teamCityFlag   = "teamcity"
 	checkStyleFlag = "checkstyle"
+	jsonFlag       = "json"
 )
 
 var ciCmd = &cli.Command{
@@ -59,7 +60,13 @@ var ciCmd = &cli.Command{
 			Name:    checkStyleFlag,
 			Aliases: []string{"c"},
 			Value:   "",
-			Usage:   "Create a checkstyle xml formatted report of all problems to this path.",
+			Usage:   "Write a checkstyle xml formatted report of all problems to this path.",
+		},
+		&cli.StringFlag{
+			Name:    jsonFlag,
+			Aliases: []string{"j"},
+			Value:   "",
+			Usage:   "Write a JSON formatted report of all problems to this path.",
 		},
 	},
 }
@@ -138,6 +145,15 @@ func actionCI(c *cli.Context) error {
 		}
 		defer f.Close()
 		reps = append(reps, reporter.NewCheckStyleReporter(f))
+	}
+	if c.String(jsonFlag) != "" {
+		var j *os.File
+		j, err = os.Create(c.String(jsonFlag))
+		if err != nil {
+			return err
+		}
+		defer j.Close()
+		reps = append(reps, reporter.NewJSONReporter(j))
 	}
 
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {

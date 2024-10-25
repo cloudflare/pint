@@ -23,28 +23,7 @@ type ConsoleReporter struct {
 }
 
 func (cr ConsoleReporter) Submit(summary Summary) (err error) {
-	reports := summary.Reports()
-	sort.Slice(reports, func(i, j int) bool {
-		if reports[i].Path.Name < reports[j].Path.Name {
-			return true
-		}
-		if reports[i].Path.Name > reports[j].Path.Name {
-			return false
-		}
-		if reports[i].Problem.Lines.First < reports[j].Problem.Lines.First {
-			return true
-		}
-		if reports[i].Problem.Lines.First > reports[j].Problem.Lines.First {
-			return false
-		}
-		if reports[i].Problem.Reporter < reports[j].Problem.Reporter {
-			return true
-		}
-		if reports[i].Problem.Reporter > reports[j].Problem.Reporter {
-			return false
-		}
-		return reports[i].Problem.Text < reports[j].Problem.Text
-	})
+	reports := sortReports(summary.Reports())
 
 	perFile := map[string][]string{}
 	for _, report := range reports {
@@ -142,4 +121,29 @@ func countDigits(n int) (c int) {
 		c++
 	}
 	return c
+}
+
+func sortReports(reports []Report) []Report {
+	sort.SliceStable(reports, func(i, j int) bool {
+		if reports[i].Path.Name < reports[j].Path.Name {
+			return true
+		}
+		if reports[i].Path.Name > reports[j].Path.Name {
+			return false
+		}
+		if reports[i].Problem.Lines.First < reports[j].Problem.Lines.First {
+			return true
+		}
+		if reports[i].Problem.Lines.First > reports[j].Problem.Lines.First {
+			return false
+		}
+		if reports[i].Problem.Reporter < reports[j].Problem.Reporter {
+			return true
+		}
+		if reports[i].Problem.Reporter > reports[j].Problem.Reporter {
+			return false
+		}
+		return reports[i].Problem.Text < reports[j].Problem.Text
+	})
+	return reports
 }
