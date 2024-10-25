@@ -86,21 +86,26 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 	defaultMatch := []Match{{State: defaultStates}}
 	proms := gen.ServersForPath(entry.Path.Name)
 
+	parsedRules := make([]parsedRule, 0, len(cfg.Rules))
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
 		check := checks.NewErrorCheck(entry)
-		enabled = parsedRule{
+		parsedRules = append(parsedRules, parsedRule{
 			match: defaultMatch,
 			name:  check.Reporter(),
 			check: check,
-		}.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
+		})
 	} else {
-		for _, pr := range baseRules(proms, defaultMatch) {
-			enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
-		}
+		parsedRules = append(parsedRules, baseRules(proms, defaultMatch)...)
 		for _, rule := range cfg.Rules {
-			for _, pr := range parseRule(rule, proms, defaultStates) {
-				enabled = pr.entryChecks(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry)
-			}
+			parsedRules = append(parsedRules, parseRule(rule, proms, defaultStates)...)
+		}
+	}
+	for _, pr := range parsedRules {
+		if !isMatch(ctx, entry, pr.ignore, pr.match) {
+			continue
+		}
+		if pr.isEnabled(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry, cfg.Rules) {
+			enabled = append(enabled, pr.check)
 		}
 	}
 

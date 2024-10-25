@@ -11,6 +11,27 @@
   to disable reports on smelly selector - [#1096](https://github.com/cloudflare/pint/issues/1096).
 - Added `--json` flag to both `pint lint` and `pint ci` commands, this enables writing a JSON file
   with the report of all problems [#606](https://github.com/cloudflare/pint/issues/606).
+- Checks can be enabled or disabled specifically for some Prometheus rules via `rule {}` config blocks.
+  Adding `enable` or `disable` option with a list of checks names allows to selectively enable or disable
+  checks only for Prometheus rules that match given `rule {}` definition.
+  Enabling checks only for matching rules will only work if these checks are disabled globally via
+  `check { disabled = [] }` config block.
+  For example to disable `promql/rate` check for all rules except alerting rules in the `rules/critical` folder:
+
+  ```js
+  checks {
+    # This will disable promql/rate by default.
+    disabled = [ "promql/rate" ]
+  }
+  rule {
+    match {
+      path = "rules/critical/.*"
+      kind = "alerting"
+    }
+    # This will enable promql/rate only for Prometheus rules matching all our match conditions above.
+    enable = [ "promql/rate" ]
+  }
+  ```
 
 ### Fixed
 

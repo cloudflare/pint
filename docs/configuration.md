@@ -551,6 +551,9 @@ rule {
   ignore { ... }
   ignore { ... }
 
+  enable  = [ "..." ]
+  disable = [ "..." ]
+
   [ check definition ]
   ...
   [ check definition ]
@@ -586,6 +589,11 @@ rule {
   way as `for` match filter.
 - `ignore` - works exactly like `match` but does the opposite - any alerting or recording rule
   matching all conditions defined on `ignore` will not be checked by this `rule` block.
+- `enable` - list of check names to enable for any Prometheus rule matching this block.
+  Enabling checks here will overwrite `check { disable = [...] }` settings, but won't
+  enable checks disable specifically for some Prometheus rule via `# pint disable ...` comments.
+- `disable` - list of check names to disable for any Prometheus rule matching this block.
+  This takes precedence over `enable` option above.
 
 Note: both `match` and `ignore` require all defined filters to be satisfied to work.
 If multiple `match` and/or `ignore` rules are present any of them needs to match for the rule to
@@ -655,5 +663,22 @@ rule {
     state = ["any"]
   }
   check { ... }
+}
+```
+
+Disable `promql/rate` check for all rules except alerting rules in the `rules/critical` folder:
+
+```js
+checks {
+  # This will disable promql/rate by default.
+  disabled = [ "promql/rate" ]
+}
+rule {
+  match {
+    path = "rules/critical/.*"
+    kind = "alerting"
+  }
+  # This will enable promql/rate only for Prometheus rules matching all our match conditions above.
+  enable = [ "promql/rate" ]
 }
 ```

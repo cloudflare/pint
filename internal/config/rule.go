@@ -14,6 +14,8 @@ import (
 type Rule struct {
 	Match         []Match              `hcl:"match,block" json:"match,omitempty"`
 	Ignore        []Match              `hcl:"ignore,block" json:"ignore,omitempty"`
+	Enable        []string             `hcl:"enable,optional" json:"enable,omitempty"`
+	Disable       []string             `hcl:"disable,optional" json:"disable,omitempty"`
 	Aggregate     []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
 	Annotation    []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
 	Label         []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
@@ -36,6 +38,18 @@ func (rule Rule) validate() (err error) {
 
 	for _, ignore := range rule.Ignore {
 		if err = ignore.validate(false); err != nil {
+			return err
+		}
+	}
+
+	for _, name := range rule.Enable {
+		if err = validateCheckName(name); err != nil {
+			return err
+		}
+	}
+
+	for _, name := range rule.Disable {
+		if err = validateCheckName(name); err != nil {
 			return err
 		}
 	}
