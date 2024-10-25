@@ -1,7 +1,8 @@
 package reporter
 
 import (
-	"sort"
+	"cmp"
+	"slices"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -79,20 +80,15 @@ func (s Summary) hasReport(r Report) bool {
 }
 
 func (s *Summary) SortReports() {
-	sort.SliceStable(s.reports, func(i, j int) bool {
-		if s.reports[i].Path.SymlinkTarget != s.reports[j].Path.SymlinkTarget {
-			return s.reports[i].Path.SymlinkTarget < s.reports[j].Path.SymlinkTarget
-		}
-		if s.reports[i].Path.Name != s.reports[j].Path.Name {
-			return s.reports[i].Path.Name < s.reports[j].Path.Name
-		}
-		if s.reports[i].Problem.Lines.First != s.reports[j].Problem.Lines.First {
-			return s.reports[i].Problem.Lines.First < s.reports[j].Problem.Lines.First
-		}
-		if s.reports[i].Problem.Reporter != s.reports[j].Problem.Reporter {
-			return s.reports[i].Problem.Reporter < s.reports[j].Problem.Reporter
-		}
-		return s.reports[i].Problem.Text < s.reports[j].Problem.Text
+	slices.SortFunc(s.reports, func(a, b Report) int {
+		return cmp.Or(
+			cmp.Compare(a.Path.Name, b.Path.Name),
+			cmp.Compare(a.Problem.Lines.First, b.Problem.Lines.First),
+			cmp.Compare(a.Problem.Lines.Last, b.Problem.Lines.Last),
+			cmp.Compare(a.Problem.Severity, b.Problem.Severity),
+			cmp.Compare(a.Problem.Reporter, b.Problem.Reporter),
+			cmp.Compare(a.Problem.Text, b.Problem.Text),
+		)
 	})
 }
 

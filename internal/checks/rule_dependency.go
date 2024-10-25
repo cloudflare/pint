@@ -1,9 +1,10 @@
 package checks
 
 import (
+	"cmp"
 	"context"
 	"fmt"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -83,14 +84,12 @@ func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule 
 		return problems
 	}
 
-	sort.Slice(broken, func(i, j int) bool {
-		if broken[i].path != broken[j].path {
-			return broken[i].path < broken[j].path
-		}
-		if broken[i].line != broken[j].line {
-			return broken[i].line < broken[j].line
-		}
-		return broken[i].name < broken[j].name
+	slices.SortFunc(broken, func(a, b *brokenDependency) int {
+		return cmp.Or(
+			cmp.Compare(a.path, b.path),
+			cmp.Compare(a.line, b.line),
+			cmp.Compare(a.name, b.name),
+		)
 	})
 
 	var details strings.Builder

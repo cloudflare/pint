@@ -139,6 +139,7 @@ func actionLint(c *cli.Context) error {
 		reps = append(reps, reporter.NewJSONReporter(j))
 	}
 
+	summary.SortReports()
 	for _, rep := range reps {
 		err = rep.Submit(summary)
 		if err != nil {

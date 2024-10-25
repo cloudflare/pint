@@ -116,7 +116,6 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	for result := range results {
 		summary.Report(result)
 	}
-	summary.SortReports()
 	summary.Duration = time.Since(start)
 	summary.TotalEntries = len(entries)
 	summary.CheckedEntries = checkedEntriesCount.Load()

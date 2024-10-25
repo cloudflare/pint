@@ -5,7 +5,7 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/fatih/color"
@@ -23,10 +23,8 @@ type ConsoleReporter struct {
 }
 
 func (cr ConsoleReporter) Submit(summary Summary) (err error) {
-	reports := sortReports(summary.Reports())
-
 	perFile := map[string][]string{}
-	for _, report := range reports {
+	for _, report := range summary.Reports() {
 		if report.Problem.Severity < cr.minSeverity {
 			continue
 		}
@@ -88,7 +86,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 	for path := range perFile {
 		paths = append(paths, path)
 	}
-	sort.Strings(paths)
+	slices.Sort(paths)
 
 	for _, path := range paths {
 		msgs := perFile[path]
@@ -121,29 +119,4 @@ func countDigits(n int) (c int) {
 		c++
 	}
 	return c
-}
-
-func sortReports(reports []Report) []Report {
-	sort.SliceStable(reports, func(i, j int) bool {
-		if reports[i].Path.Name < reports[j].Path.Name {
-			return true
-		}
-		if reports[i].Path.Name > reports[j].Path.Name {
-			return false
-		}
-		if reports[i].Problem.Lines.First < reports[j].Problem.Lines.First {
-			return true
-		}
-		if reports[i].Problem.Lines.First > reports[j].Problem.Lines.First {
-			return false
-		}
-		if reports[i].Problem.Reporter < reports[j].Problem.Reporter {
-			return true
-		}
-		if reports[i].Problem.Reporter > reports[j].Problem.Reporter {
-			return false
-		}
-		return reports[i].Problem.Text < reports[j].Problem.Text
-	})
-	return reports
 }

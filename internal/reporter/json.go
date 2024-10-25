@@ -24,7 +24,7 @@ type JSONReport struct {
 }
 
 func (jr JSONReporter) Submit(summary Summary) (err error) {
-	reports := sortReports(summary.Reports())
+	reports := summary.Reports()
 	out := make([]JSONReport, 0, len(reports))
 
 	for _, report := range reports {

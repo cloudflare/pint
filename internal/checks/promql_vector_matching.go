@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"slices"
-	"sort"
 	"strings"
 
 	"github.com/prometheus/common/model"
@@ -243,7 +242,7 @@ func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ign
 			ls.add(l.Name)
 		})
 		if len(ls.names) > 1 {
-			sort.Strings(ls.names)
+			slices.Sort(ls.names)
 		}
 		lsets = append(lsets, ls)
 	}

@@ -2,7 +2,7 @@ package output
 
 import (
 	"fmt"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -10,7 +10,7 @@ import (
 func FormatLineRangeString(lines []int) string {
 	ls := make([]int, len(lines))
 	copy(ls, lines)
-	sort.Ints(ls)
+	slices.Sort(ls)
 
 	var ranges []string
 	start := -1
