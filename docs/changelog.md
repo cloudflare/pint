@@ -9,6 +9,8 @@
   which can cause alert floppiness - [#820](https://github.com/cloudflare/pint/issues/820).
 - [promql/regexp](checks/promql/regexp.md) check now supports extra configuration options
   to disable reports on smelly selector - [#1096](https://github.com/cloudflare/pint/issues/1096).
+- Added `--json` flag to both `pint lint` and `pint ci` commands, this enables writing a JSON file
+  with the report of all problems [#606](https://github.com/cloudflare/pint/issues/606).
 
 ### Fixed
 

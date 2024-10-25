@@ -1,0 +1,16 @@
+! exec pint --no-color lint --json=x/y/z/problems.json rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=ERROR msg="Fatal error" err="open x/y/z/problems.json: no such file or directory"
+-- rules/0001.yml --
+groups:
+- name: test
+  rules:
+  - alert: Example
+    expr: up
+  - alert: Example
+    expr: sum(xxx) with()
+
