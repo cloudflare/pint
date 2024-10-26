@@ -670,7 +670,7 @@ Disable `promql/rate` check for all rules except alerting rules in the `rules/cr
 
 ```js
 checks {
-  # This will disable promql/rate by default.
+  // This will disable promql/rate by default.
   disabled = [ "promql/rate" ]
 }
 rule {
@@ -678,7 +678,7 @@ rule {
     path = "rules/critical/.*"
     kind = "alerting"
   }
-  # This will enable promql/rate only for Prometheus rules matching all our match conditions above.
+  // This will enable promql/rate only for Prometheus rules matching all our match conditions above.
   enable = [ "promql/rate" ]
 }
 ```
