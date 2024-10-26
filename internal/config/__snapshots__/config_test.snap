@@ -2969,3 +2969,216 @@
   ]
 }
 ---
+
+[TestGetChecksForRule/check_disabled_globally_but_enabled_via_rule{} - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/name",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "alerts/external_labels",
+      "rule/duplicate",
+      "alerts/absent",
+      "promql/series",
+      "promql/vector_matching"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom",
+      "uri": "http://localhost",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ],
+  "rules": [
+    {
+      "disable": [
+        "rule/duplicate"
+      ]
+    },
+    {
+      "match": [
+        {
+          "kind": "alerting"
+        }
+      ],
+      "disable": [
+        "promql/series"
+      ]
+    },
+    {
+      "enable": [
+        "promql/series"
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/check_enabled_globally_but_disabled_via_rule{} - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/name",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ]
+  },
+  "owners": {},
+  "rules": [
+    {
+      "match": [
+        {
+          "kind": "recording"
+        }
+      ],
+      "disable": [
+        "rule/duplicate"
+      ]
+    }
+  ]
+}
+---
+
+[TestGetChecksForRule/two_prometheus_servers_/_check_disable_via_rule_{} - 1]
+{
+  "ci": {
+    "baseBranch": "master",
+    "maxCommits": 20
+  },
+  "parser": {},
+  "checks": {
+    "enabled": [
+      "alerts/absent",
+      "alerts/annotation",
+      "alerts/count",
+      "alerts/external_labels",
+      "alerts/for",
+      "alerts/template",
+      "labels/conflict",
+      "promql/aggregate",
+      "alerts/comparison",
+      "promql/fragile",
+      "promql/range_query",
+      "promql/rate",
+      "promql/regexp",
+      "promql/syntax",
+      "promql/vector_matching",
+      "query/cost",
+      "promql/counter",
+      "promql/series",
+      "rule/dependency",
+      "rule/duplicate",
+      "rule/for",
+      "rule/name",
+      "rule/label",
+      "rule/link",
+      "rule/reject"
+    ],
+    "disabled": [
+      "alerts/template",
+      "promql/regexp"
+    ]
+  },
+  "owners": {},
+  "prometheus": [
+    {
+      "name": "prom1",
+      "uri": "http://localhost/1",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    },
+    {
+      "name": "prom2",
+      "uri": "http://localhost/2",
+      "timeout": "1s",
+      "uptime": "up",
+      "concurrency": 16,
+      "rateLimit": 100,
+      "required": false
+    }
+  ],
+  "rules": [
+    {
+      "match": [
+        {
+          "path": "rules.yml"
+        }
+      ],
+      "disable": [
+        "promql/series",
+        "promql/range_query",
+        "rule/duplicate",
+        "promql/vector_matching",
+        "promql/counter"
+      ]
+    }
+  ]
+}
+---

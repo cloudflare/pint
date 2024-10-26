@@ -2042,6 +2042,125 @@ rule {
 				checks.AggregationCheckName + "(rack:false)",
 			},
 		},
+		{
+			title: "check disabled globally but enabled via rule{}",
+			config: `
+prometheus "prom" {
+  uri     = "http://localhost"
+  timeout = "1s"
+}
+checks {
+  disabled = [ "alerts/template", "alerts/external_labels", "rule/duplicate", "alerts/absent", "promql/series", "promql/vector_matching" ]
+}
+rule {
+  disable = [ "rule/duplicate" ]
+}
+rule {
+  match { kind = "alerting" }
+  disable = [ "promql/series" ]
+}
+rule {
+  enable = [ "promql/series" ]
+}
+`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+`),
+				DisabledChecks: []string{"promql/rate", "promql/range_query"},
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.SeriesCheckName + "(prom)",
+				checks.LabelsConflictCheckName + "(prom)",
+				checks.CounterCheckName + "(prom)",
+			},
+		},
+		{
+			title: "check enabled globally but disabled via rule{}",
+			config: `
+rule {
+  match {
+    kind = "recording"
+  }
+  disable = ["rule/duplicate"]
+}
+`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo
+  expr: sum(foo)
+`),
+				DisabledChecks: []string{"alerts/template", "alerts/external_labels", "alerts/absent"},
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+			},
+		},
+		{
+			title: "two prometheus servers / check disable via rule {}",
+			config: `
+prometheus "prom1" {
+  uri     = "http://localhost/1"
+  timeout = "1s"
+}
+prometheus "prom2" {
+  uri     = "http://localhost/2"
+  timeout = "1s"
+}
+checks {
+  disabled = [ "alerts/template", "promql/regexp" ]
+}
+rule {
+  match {
+    path = "rules.yml"
+  }
+  disable = ["promql/series", "promql/range_query", "rule/duplicate", "promql/vector_matching", "promql/counter"]
+}
+`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo # pint snooze 2099-11-28 alerts/absent
+  expr: sum(foo)
+# pint file/disable promql/vector_matching
+`),
+				DisabledChecks: []string{"promql/rate"},
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.FragileCheckName,
+				checks.LabelsConflictCheckName + "(prom1)",
+				checks.AlertsExternalLabelsCheckName + "(prom1)",
+				checks.LabelsConflictCheckName + "(prom2)",
+				checks.AlertsExternalLabelsCheckName + "(prom2)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -2417,6 +2536,18 @@ func TestConfigErrors(t *testing.T) {
   }
 }`,
 			err: "unknown rule state: foo",
+		},
+		{
+			config: `rule {
+  enable = ["bob"]
+}`,
+			err: "unknown check name bob",
+		},
+		{
+			config: `rule {
+  disable = ["bob"]
+}`,
+			err: "unknown check name bob",
 		},
 	}
 

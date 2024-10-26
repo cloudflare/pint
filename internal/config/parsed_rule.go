@@ -18,39 +18,59 @@ type parsedRule struct {
 	tags   []string
 }
 
-func (rule parsedRule) entryChecks(ctx context.Context, enabled, disabled []string, checks []checks.RuleChecker, e discovery.Entry) []checks.RuleChecker {
-	for _, ignore := range rule.ignore {
+func isMatch(ctx context.Context, e discovery.Entry, ignore, match []Match) bool {
+	for _, ignore := range ignore {
 		if ignore.IsMatch(ctx, e.Path.Name, e) {
-			return checks
+			return false
 		}
 	}
 
-	if len(rule.match) > 0 {
+	if len(match) > 0 {
 		var found bool
-		for _, match := range rule.match {
+		for _, match := range match {
 			if match.IsMatch(ctx, e.Path.Name, e) {
 				found = true
 				break
 			}
 		}
 		if !found {
-			return checks
+			return false
 		}
 	}
 
+	return true
+}
+
+func (rule parsedRule) isEnabled(ctx context.Context, enabled, disabled []string, checks []checks.RuleChecker, e discovery.Entry, cfgRules []Rule) bool {
 	// Entry state is not what the check is for.
 	if !slices.Contains(rule.check.Meta().States, e.State) {
-		return checks
+		return false
 	}
 
-	// Check if check is disabled for specific rule.
+	// Check if check is disabled for specific Prometheus rule.
 	if !isEnabled(enabled, e.DisabledChecks, e.Rule, rule.name, rule.check, rule.tags) {
-		return checks
+		return false
+	}
+
+	var enabledByConfigRule bool
+	for _, cfgRule := range cfgRules {
+		if !isMatch(ctx, e, cfgRule.Ignore, cfgRule.Match) {
+			continue
+		}
+		if slices.Contains(cfgRule.Disable, rule.name) {
+			return false
+		}
+		if slices.Contains(cfgRule.Enable, rule.name) {
+			enabledByConfigRule = true
+		}
+	}
+	if enabledByConfigRule {
+		return true
 	}
 
 	// Check if rule was disabled globally.
 	if !isEnabled(enabled, disabled, e.Rule, rule.name, rule.check, rule.tags) {
-		return checks
+		return false
 	}
 	// Check if rule was already enabled.
 	var v bool
@@ -60,11 +80,7 @@ func (rule parsedRule) entryChecks(ctx context.Context, enabled, disabled []stri
 			break
 		}
 	}
-	if !v {
-		checks = append(checks, rule.check)
-	}
-
-	return checks
+	return !v
 }
 
 func defaultMatchStates(cmd ContextCommandVal) []string {
