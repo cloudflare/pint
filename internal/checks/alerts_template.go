@@ -39,6 +39,7 @@ When using ` + "`on()`" + `make sure that all labels you're trying to use in thi
 	msgAggregation = "Template is using `%s` label but the query removes it."
 	msgAbsent      = "Template is using `%s` label but `absent()` is not passing it."
 	msgOn          = "Template is using `%s` label but the query uses `on(...)` without it being set there, this label will be missing from the query result."
+	msgVector      = "Template is using `%s` label but the query doesn't produce any labels."
 )
 
 var (
@@ -119,8 +120,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 	}
 
 	src := utils.LabelsSource(rule.AlertingRule.Expr.Query)
-	vectors := utils.HasVectorSelector(rule.AlertingRule.Expr.Query)
-
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
 	if rule.AlertingRule.Labels != nil {
@@ -161,22 +160,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Severity: problem.severity,
 				})
 			}
-
-			labelNames := getTemplateLabels(label.Key.Value, label.Value.Value)
-			if len(labelNames) > 0 && len(vectors) == 0 {
-				for _, name := range labelNames {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: label.Key.Lines.First,
-							Last:  label.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
-						Details:  TemplateCheckLabelsDetails,
-						Severity: Bug,
-					})
-				}
-			}
 		}
 	}
 
@@ -206,22 +189,6 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Details:  problem.details,
 					Severity: problem.severity,
 				})
-			}
-
-			labelNames := getTemplateLabels(annotation.Key.Value, annotation.Value.Value)
-			if len(labelNames) > 0 && len(vectors) == 0 {
-				for _, name := range labelNames {
-					problems = append(problems, Problem{
-						Lines: parser.LineRange{
-							First: annotation.Key.Lines.First,
-							Last:  annotation.Value.Lines.Last,
-						},
-						Reporter: c.Reporter(),
-						Text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", name),
-						Details:  TemplateCheckLabelsDetails,
-						Severity: Bug,
-					})
-				}
 			}
 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
@@ -473,24 +440,6 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func getTemplateLabels(name, text string) (names []string) {
-	vars, aliases, ok := findTemplateVariables(name, text)
-	if !ok {
-		return nil
-	}
-
-	labelsAliases := aliases.varAliases(".Labels")
-	for _, v := range vars {
-		for _, a := range labelsAliases {
-			if len(v) > 1 && v[0] == a {
-				names = append(names, v[1])
-			}
-		}
-	}
-
-	return names
-}
-
 func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems []exprProblem) {
 	vars, aliases, ok := findTemplateVariables(labelName, labelValue)
 	if !ok {
@@ -532,6 +481,12 @@ func textForProblem(label string, src utils.Source, severity Severity) exprProbl
 		return exprProblem{
 			text:     fmt.Sprintf(msgAbsent, label),
 			details:  TemplateCheckAbsentDetails,
+			severity: severity,
+		}
+	case src.Returns == promParser.ValueTypeScalar, src.Returns == promParser.ValueTypeString, src.Operation == "vector":
+		return exprProblem{
+			text:     fmt.Sprintf(msgVector, label),
+			details:  TemplateCheckLabelsDetails,
 			severity: severity,
 		}
 	case slices.Contains([]string{

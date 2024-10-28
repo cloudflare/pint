@@ -1378,6 +1378,18 @@ func TestTemplateCheck(t *testing.T) {
 				}
 			},
 		},
+		{
+			description: "time - metric",
+			content: `
+- alert: Foo
+  expr: (time() - foo_timestamp_unix) > 5*3600
+  labels:
+    notify: "{{ $labels.notify }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   noProblems,
+		},
 	}
 	runTests(t, testCases)
 }
