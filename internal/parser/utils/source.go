@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/cloudflare/pint/internal/parser"
 
@@ -23,6 +25,7 @@ const (
 type Source struct {
 	Selector         *promParser.VectorSelector
 	Call             *promParser.Call
+	ExcludeReason    map[string]string // Reason why a label was excluded
 	Operation        string
 	Returns          promParser.ValueType
 	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
@@ -71,6 +74,8 @@ func walkNode(node promParser.Node) (s Source) {
 			// Param is the label to store the count value in.
 			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, n.Param.(*promParser.StringLiteral).Val)
 			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Param.(*promParser.StringLiteral).Val)
+			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.Param.(*promParser.StringLiteral).Val)
+			delete(s.ExcludeReason, n.Param.(*promParser.StringLiteral).Val)
 		case promParser.QUANTILE:
 			s = parseAggregation(n)
 			s.Operation = "quantile"
@@ -96,38 +101,7 @@ func walkNode(node promParser.Node) (s Source) {
 		}
 
 	case *promParser.BinaryExpr:
-		switch {
-		case n.VectorMatching == nil:
-			s = walkNode(n.LHS)
-			if s.Returns == promParser.ValueTypeScalar || s.Returns == promParser.ValueTypeString {
-				s = walkNode(n.RHS)
-			}
-		case n.VectorMatching.Card == promParser.CardOneToOne:
-			s = walkNode(n.LHS)
-			if n.VectorMatching.On {
-				s.FixedLabels = true
-			}
-		case n.VectorMatching.Card == promParser.CardOneToMany:
-			s = walkNode(n.RHS)
-		case n.VectorMatching.Card == promParser.CardManyToMany:
-			s = walkNode(n.LHS)
-			if n.Op == promParser.LOR {
-				s.Alternatives = append(s.Alternatives, walkNode(n.RHS))
-			}
-		case n.VectorMatching.Card == promParser.CardManyToOne:
-			s = walkNode(n.LHS)
-		}
-		if n.VectorMatching != nil {
-			if s.Operation == "" {
-				s.Operation = n.VectorMatching.Card.String()
-			}
-			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
-			// on=true when using on(), on=false when using ignore()
-			if n.VectorMatching.On {
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
-			}
-			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
-		}
+		s = parseBinOps(n)
 
 	case *promParser.Call:
 		s = parseCall(n)
@@ -191,6 +165,14 @@ func appendToSlice(dst []string, values ...string) []string {
 	return dst
 }
 
+func setInMap(dst map[string]string, key, val string) map[string]string {
+	if dst == nil {
+		dst = map[string]string{}
+	}
+	dst[key] = val
+	return dst
+}
+
 func guaranteedLabelsFromSelector(selector *promParser.VectorSelector) (names []string) {
 	// Any label used in positive filters is gurnateed to be present.
 	for _, lm := range selector.LabelMatchers {
@@ -210,6 +192,14 @@ func parseAggregation(n *promParser.AggregateExpr) (s Source) {
 		s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.Grouping...)
 		s.IncludedLabels = removeFromSlice(s.IncludedLabels, n.Grouping...)
 		s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, n.Grouping...)
+		for _, name := range n.Grouping {
+			s.ExcludeReason = setInMap(
+				s.ExcludeReason,
+				name,
+				fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
+					strings.Join(n.Grouping, ", ")),
+			)
+		}
 	} else {
 		s.FixedLabels = true
 		if len(n.Grouping) == 0 {
@@ -220,6 +210,12 @@ func parseAggregation(n *promParser.AggregateExpr) (s Source) {
 			for _, name := range n.Grouping {
 				s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
 			}
+			s.ExcludeReason = setInMap(
+				s.ExcludeReason,
+				"",
+				fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
+					strings.Join(n.Grouping, ", ")),
+			)
 		}
 	}
 	s.Type = AggregateSource
@@ -352,6 +348,69 @@ func parseCall(n *promParser.Call) (s Source) {
 		// Unsupported function
 		s.Returns = promParser.ValueTypeNone
 		s.Call = nil
+	}
+
+	return s
+}
+
+func parseBinOps(n *promParser.BinaryExpr) (s Source) {
+	switch {
+	case n.VectorMatching == nil:
+		s = walkNode(n.LHS)
+		if s.Returns == promParser.ValueTypeScalar || s.Returns == promParser.ValueTypeString {
+			s = walkNode(n.RHS)
+		}
+
+	case n.VectorMatching.Card == promParser.CardOneToOne:
+		s = walkNode(n.LHS)
+		if n.VectorMatching.On {
+			s.FixedLabels = true
+			s.ExcludeReason = setInMap(s.ExcludeReason, "", fmt.Sprintf(
+				"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
+				n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+			))
+		}
+
+	case n.VectorMatching.Card == promParser.CardOneToMany:
+		s = walkNode(n.RHS)
+
+	case n.VectorMatching.Card == promParser.CardManyToMany:
+		s = walkNode(n.LHS)
+		if n.Op == promParser.LOR {
+			s.Alternatives = append(s.Alternatives, walkNode(n.RHS))
+		}
+
+	case n.VectorMatching.Card == promParser.CardManyToOne:
+		s = walkNode(n.LHS)
+	}
+
+	if n.VectorMatching != nil {
+		if s.Operation == "" {
+			s.Operation = n.VectorMatching.Card.String()
+		}
+		s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
+		// on=true when using on(), on=false when using ignore()
+		if n.VectorMatching.On {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.MatchingLabels...)
+			for _, name := range n.VectorMatching.MatchingLabels {
+				delete(s.ExcludeReason, name)
+			}
+		} else if n.VectorMatching.Card == promParser.CardOneToOne {
+			s.IncludedLabels = removeFromSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, n.VectorMatching.MatchingLabels...)
+			s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.VectorMatching.MatchingLabels...)
+			for _, name := range n.VectorMatching.MatchingLabels {
+				s.ExcludeReason = setInMap(s.ExcludeReason, name, fmt.Sprintf(
+					"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
+					n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+				))
+			}
+		}
+		s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
+		for _, name := range n.VectorMatching.Include {
+			delete(s.ExcludeReason, name)
+		}
 	}
 
 	return s
