@@ -33,13 +33,9 @@ Since there are no matching time series there are also no labels. If some time s
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the ` + "`up`" + ` metric instead.`
 	TemplateCheckOnDetails = `Using [vector matching](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) operations will impact which labels are available on the results of your query.
-When using ` + "`on()`" + `make sure that all labels you're trying to use in this templare match what the query can return.`
+When using ` + "`on()`" + ` make sure that all labels you're trying to use in this templare match what the query can return.
+For queries using ` + "ignoring()`" + ` any label included there will be stripped from the results.`
 	TemplateCheckLabelsDetails = `This query doesn't seem to be using any time series and so cannot have any labels.`
-
-	msgAggregation = "Template is using `%s` label but the query removes it."
-	msgAbsent      = "Template is using `%s` label but `absent()` is not passing it."
-	msgOn          = "Template is using `%s` label but the query uses `on(...)` without it being set there, this label will be missing from the query result."
-	msgVector      = "Template is using `%s` label but the query doesn't produce any labels."
 )
 
 var (
@@ -73,10 +69,10 @@ var (
 		"humanizeDuration":   dummyFuncMap,
 		"humanizePercentage": dummyFuncMap,
 		"humanizeTimestamp":  dummyFuncMap,
+		"toTime":             dummyFuncMap,
 		"pathPrefix":         dummyFuncMap,
 		"externalURL":        dummyFuncMap,
 		"parseDuration":      dummyFuncMap,
-		"toTime":             dummyFuncMap,
 	}
 )
 
@@ -456,11 +452,11 @@ func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems 
 				}
 				for _, s := range append(src.Alternatives, src) {
 					if s.FixedLabels && !slices.Contains(s.IncludedLabels, v[1]) {
-						problems = append(problems, textForProblem(v[1], s, Bug))
+						problems = append(problems, textForProblem(v[1], "", s, Bug))
 						goto NEXT
 					}
 					if slices.Contains(s.ExcludedLabels, v[1]) {
-						problems = append(problems, textForProblem(v[1], s, Bug))
+						problems = append(problems, textForProblem(v[1], v[1], s, Bug))
 						goto NEXT
 					}
 				}
@@ -473,19 +469,23 @@ func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems 
 	return problems
 }
 
-func textForProblem(label string, src utils.Source, severity Severity) exprProblem {
-	// FIXME add query fragment to the details
-
+func textForProblem(label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
 	switch {
 	case src.Operation == "absent":
 		return exprProblem{
-			text:     fmt.Sprintf(msgAbsent, label),
+			text:     fmt.Sprintf("Template is using `%s` label but `%s` is not passing it.", label, src.Call.String()),
 			details:  TemplateCheckAbsentDetails,
 			severity: severity,
 		}
-	case src.Returns == promParser.ValueTypeScalar, src.Returns == promParser.ValueTypeString, src.Operation == "vector":
+	case src.Operation == "vector":
 		return exprProblem{
-			text:     fmt.Sprintf(msgVector, label),
+			text:     fmt.Sprintf("Template is using `%s` label but `%s` doesn't produce any labels.", label, src.Call.String()),
+			details:  TemplateCheckLabelsDetails,
+			severity: severity,
+		}
+	case src.Returns == promParser.ValueTypeScalar, src.Returns == promParser.ValueTypeString:
+		return exprProblem{
+			text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", label),
 			details:  TemplateCheckLabelsDetails,
 			severity: severity,
 		}
@@ -496,13 +496,14 @@ func textForProblem(label string, src utils.Source, severity Severity) exprProbl
 		promParser.CardManyToOne.String(),
 	}, src.Operation):
 		return exprProblem{
-			text:     fmt.Sprintf(msgOn, label),
+			text: fmt.Sprintf("Template is using `%s` label but the query results won't have this label. %s",
+				label, src.ExcludeReason[reasonLabel]),
 			details:  TemplateCheckOnDetails,
 			severity: severity,
 		}
 	default:
 		return exprProblem{
-			text:     fmt.Sprintf(msgAggregation, label),
+			text:     fmt.Sprintf("Template is using `%s` label but the query removes it.", label),
 			details:  TemplateCheckAggregationDetails,
 			severity: severity,
 		}

@@ -48,6 +48,14 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: "1 / 5",
+			output: utils.Source{
+				Type:        utils.NumberSource,
+				Returns:     promParser.ValueTypeScalar,
+				FixedLabels: true,
+			},
+		},
+		{
 			expr: `"test"`,
 			output: utils.Source{
 				Type:        utils.StringSource,
@@ -135,6 +143,14 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: "foo / 5",
+			output: utils.Source{
+				Type:     utils.SelectorSource,
+				Returns:  promParser.ValueTypeVector,
+				Selector: mustParseVector("foo", 0),
+			},
+		},
+		{
 			expr: "-foo",
 			output: utils.Source{
 				Type:     utils.SelectorSource,
@@ -160,6 +176,9 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "sum",
 				Selector:       mustParseVector(`foo{job="myjob"}`, 4),
 				ExcludedLabels: []string{"job"},
+				ExcludeReason: map[string]string{
+					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -171,6 +190,9 @@ func TestLabelsSource(t *testing.T) {
 				Selector:       mustParseVector(`foo`, 4),
 				IncludedLabels: []string{"job"},
 				FixedLabels:    true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -183,6 +205,9 @@ func TestLabelsSource(t *testing.T) {
 				IncludedLabels:   []string{"job"},
 				GuaranteedLabels: []string{"job"},
 				FixedLabels:      true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -194,6 +219,9 @@ func TestLabelsSource(t *testing.T) {
 				Selector:         mustParseVector(`foo{job="myjob"}`, 4),
 				GuaranteedLabels: []string{"job"},
 				ExcludedLabels:   []string{"instance"},
+				ExcludeReason: map[string]string{
+					"instance": "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -226,6 +254,9 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"job"},
 				IncludedLabels:   []string{"job"},
 				FixedLabels:      true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -237,6 +268,9 @@ func TestLabelsSource(t *testing.T) {
 				Selector:       mustParseVector(`foo`, 6),
 				IncludedLabels: []string{"job"},
 				FixedLabels:    true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -343,6 +377,9 @@ func TestLabelsSource(t *testing.T) {
 				IncludedLabels:   []string{"version"},
 				GuaranteedLabels: []string{"version"},
 				ExcludedLabels:   []string{"job"},
+				ExcludeReason: map[string]string{
+					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -355,6 +392,9 @@ func TestLabelsSource(t *testing.T) {
 				IncludedLabels:   []string{"version"},
 				GuaranteedLabels: []string{"version"},
 				ExcludedLabels:   []string{"job"},
+				ExcludeReason: map[string]string{
+					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -367,6 +407,9 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"version"},
 				IncludedLabels:   []string{"job", "version"},
 				FixedLabels:      true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -413,6 +456,9 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "sum",
 				Selector:       mustParseVector(`foo`, 9),
 				ExcludedLabels: []string{"instance"},
+				ExcludeReason: map[string]string{
+					"instance": "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -435,6 +481,9 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"job"},
 				IncludedLabels:   []string{"instance"},
 				FixedLabels:      true,
+				ExcludeReason: map[string]string{
+					"": "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -488,6 +537,22 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "count",
 				Selector:    mustParseVector(`up{job="a"}`, 6),
 				FixedLabels: true,
+				ExcludeReason: map[string]string{
+					"": "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+				},
+			},
+		},
+		{
+			expr: `count(up{job="a"} / on (env) up{job="b"})`,
+			output: utils.Source{
+				Type:        utils.AggregateSource,
+				Returns:     promParser.ValueTypeVector,
+				Operation:   "count",
+				Selector:    mustParseVector(`up{job="a"}`, 6),
+				FixedLabels: true,
+				ExcludeReason: map[string]string{
+					"": "Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -521,6 +586,24 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `topk(10, foo) without(cluster)`,
+			output: utils.Source{
+				Type:      utils.AggregateSource,
+				Returns:   promParser.ValueTypeVector,
+				Operation: "topk",
+				Selector:  mustParseVector(`foo`, 9),
+			},
+		},
+		{
+			expr: `topk(10, foo) by(cluster)`,
+			output: utils.Source{
+				Type:      utils.AggregateSource,
+				Returns:   promParser.ValueTypeVector,
+				Operation: "topk",
+				Selector:  mustParseVector(`foo`, 9),
+			},
+		},
+		{
 			expr: `bottomk(10, sum(rate(foo[5m])) without(job))`,
 			output: utils.Source{
 				Type:           utils.AggregateSource,
@@ -528,6 +611,9 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "bottomk",
 				Selector:       mustParseVector(`foo`, 21),
 				ExcludedLabels: []string{"job"},
+				ExcludeReason: map[string]string{
+					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -589,14 +675,28 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `foo unless bar`,
+			output: utils.Source{
+				Type:      utils.SelectorSource,
+				Returns:   promParser.ValueTypeVector,
+				Operation: promParser.CardManyToMany.String(),
+				Selector:  mustParseVector(`foo`, 0),
+			},
+		},
+		{
 			expr: `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`,
 			output: utils.Source{
 				Type:           utils.AggregateSource,
 				Returns:        promParser.ValueTypeVector,
 				Operation:      "count",
 				Selector:       mustParseVector(`up{job="foo", cluster="dev"}`, 10),
-				ExcludedLabels: []string{"job", "cluster"},
+				ExcludedLabels: []string{"job", "cluster"}, // FIXME empty
 				FixedLabels:    true,
+				ExcludeReason: map[string]string{
+					"":        "Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.",
+					"job":     "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
+					"cluster": "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
+				},
 			},
 		},
 		{
@@ -714,6 +814,7 @@ sum(foo:count) by(job) > 20`,
 				Operation:      "sum",
 				Selector:       mustParseVector(`foo:sum`, 8),
 				IncludedLabels: []string{"notify", "job"},
+				ExcludeReason:  map[string]string{},
 			},
 		},
 		{
@@ -725,6 +826,9 @@ sum(foo:count) by(job) > 20`,
 				Selector:       mustParseVector(`container_file_descriptors`, 0),
 				IncludedLabels: []string{"instance", "app_name"},
 				FixedLabels:    true,
+				ExcludeReason: map[string]string{
+					"": "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -868,6 +972,9 @@ sum(foo:count) by(job) > 20`,
 				Selector:       mustParseVector(`foo`, 8),
 				IncludedLabels: []string{"notjob"},
 				FixedLabels:    true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -879,6 +986,9 @@ sum(foo:count) by(job) > 20`,
 				Selector:       mustParseVector(`node_exporter_build_info`, 6),
 				IncludedLabels: []string{"instance", "version", "foo"}, // FIXME foo shouldn't be there because count() doesn't produce it
 				FixedLabels:    true,
+				ExcludeReason: map[string]string{
+					"": "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
+				},
 			},
 		},
 		{
@@ -1220,6 +1330,20 @@ sum(foo:count) by(job) > 20`,
 				Type:     utils.SelectorSource,
 				Returns:  promParser.ValueTypeVector,
 				Selector: mustParseVector("my_metric", 10),
+			},
+		},
+		{
+			expr: `up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}`,
+			output: utils.Source{
+				Type:             utils.SelectorSource,
+				Returns:          promParser.ValueTypeVector,
+				Operation:        promParser.CardOneToOne.String(),
+				Selector:         mustParseVector(`up{instance="a", job="prometheus"}`, 0),
+				GuaranteedLabels: []string{"instance"},
+				ExcludedLabels:   []string{"job"},
+				ExcludeReason: map[string]string{
+					"job": "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
+				},
 			},
 		},
 	}
