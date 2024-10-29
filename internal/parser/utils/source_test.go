@@ -166,6 +166,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "sum",
 				Selector:    mustParseVector(`foo{job="myjob"}`, 4),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `sum(foo{job="myjob"})`,
+					},
+				},
 			},
 		},
 		{
@@ -176,8 +182,11 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "sum",
 				Selector:       mustParseVector(`foo{job="myjob"}`, 4),
 				ExcludedLabels: []string{"job"},
-				ExcludeReason: map[string]string{
-					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"job": {
+						Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `sum(foo{job="myjob"}) without(job)`,
+					},
 				},
 			},
 		},
@@ -190,8 +199,11 @@ func TestLabelsSource(t *testing.T) {
 				Selector:       mustParseVector(`foo`, 4),
 				IncludedLabels: []string{"job"},
 				FixedLabels:    true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `sum(foo) by(job)`,
+					},
 				},
 			},
 		},
@@ -205,8 +217,11 @@ func TestLabelsSource(t *testing.T) {
 				IncludedLabels:   []string{"job"},
 				GuaranteedLabels: []string{"job"},
 				FixedLabels:      true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `sum(foo{job="myjob"}) by(job)`,
+					},
 				},
 			},
 		},
@@ -219,8 +234,11 @@ func TestLabelsSource(t *testing.T) {
 				Selector:         mustParseVector(`foo{job="myjob"}`, 4),
 				GuaranteedLabels: []string{"job"},
 				ExcludedLabels:   []string{"instance"},
-				ExcludeReason: map[string]string{
-					"instance": "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"instance": {
+						Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `sum(foo{job="myjob"}) without(instance)`,
+					},
 				},
 			},
 		},
@@ -232,6 +250,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "min",
 				Selector:    mustParseVector(`foo{job="myjob"}`, 4),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `min(foo{job="myjob"})`,
+					},
+				},
 			},
 		},
 		{
@@ -242,6 +266,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "max",
 				Selector:    mustParseVector(`foo{job="myjob"}`, 4),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `max(foo{job="myjob"})`,
+					},
+				},
 			},
 		},
 		{
@@ -254,8 +284,11 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"job"},
 				IncludedLabels:   []string{"job"},
 				FixedLabels:      true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `avg(foo{job="myjob"}) by(job)`,
+					},
 				},
 			},
 		},
@@ -268,8 +301,11 @@ func TestLabelsSource(t *testing.T) {
 				Selector:       mustParseVector(`foo`, 6),
 				IncludedLabels: []string{"job"},
 				FixedLabels:    true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `group(foo) by(job)`,
+					},
 				},
 			},
 		},
@@ -281,6 +317,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "stddev",
 				Selector:    mustParseVector(`foo`, 12),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `stddev(rate(foo[5m]))`,
+					},
+				},
 			},
 		},
 		{
@@ -291,6 +333,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "stdvar",
 				Selector:    mustParseVector(`foo`, 12),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `stdvar(rate(foo[5m]))`,
+					},
+				},
 			},
 		},
 		{
@@ -353,6 +401,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "quantile",
 				Selector:    mustParseVector(`foo`, 19),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `quantile(0.9, rate(foo[5m]))`,
+					},
+				},
 			},
 		},
 		{
@@ -365,6 +419,12 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"version"},
 				IncludedLabels:   []string{"version"},
 				FixedLabels:      true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `count_values("version", build_version)`,
+					},
+				},
 			},
 		},
 		{
@@ -377,8 +437,11 @@ func TestLabelsSource(t *testing.T) {
 				IncludedLabels:   []string{"version"},
 				GuaranteedLabels: []string{"version"},
 				ExcludedLabels:   []string{"job"},
-				ExcludeReason: map[string]string{
-					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"job": {
+						Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `count_values("version", build_version) without(job)`,
+					},
 				},
 			},
 		},
@@ -392,8 +455,11 @@ func TestLabelsSource(t *testing.T) {
 				IncludedLabels:   []string{"version"},
 				GuaranteedLabels: []string{"version"},
 				ExcludedLabels:   []string{"job"},
-				ExcludeReason: map[string]string{
-					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"job": {
+						Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `count_values("version", build_version{job="foo"}) without(job)`,
+					},
 				},
 			},
 		},
@@ -407,8 +473,11 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"version"},
 				IncludedLabels:   []string{"job", "version"},
 				FixedLabels:      true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `count_values("version", build_version) by(job)`,
+					},
 				},
 			},
 		},
@@ -456,8 +525,11 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "sum",
 				Selector:       mustParseVector(`foo`, 9),
 				ExcludedLabels: []string{"instance"},
-				ExcludeReason: map[string]string{
-					"instance": "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"instance": {
+						Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `sum(rate(foo[10m])) without(instance)`,
+					},
 				},
 			},
 		},
@@ -481,8 +553,11 @@ func TestLabelsSource(t *testing.T) {
 				GuaranteedLabels: []string{"job"},
 				IncludedLabels:   []string{"instance"},
 				FixedLabels:      true,
-				ExcludeReason: map[string]string{
-					"": "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+						Fragment: `foo{job="foo"} * on(instance) bar`,
+					},
 				},
 			},
 		},
@@ -527,6 +602,12 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "count",
 				Selector:    mustParseVector(`foo`, 6),
 				FixedLabels: true,
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `count(foo / bar)`,
+					},
+				},
 			},
 		},
 		{
@@ -537,8 +618,11 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "count",
 				Selector:    mustParseVector(`up{job="a"}`, 6),
 				FixedLabels: true,
-				ExcludeReason: map[string]string{
-					"": "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `count(up{job="a"} / on () up{job="b"})`,
+					},
 				},
 			},
 		},
@@ -550,8 +634,11 @@ func TestLabelsSource(t *testing.T) {
 				Operation:   "count",
 				Selector:    mustParseVector(`up{job="a"}`, 6),
 				FixedLabels: true,
-				ExcludeReason: map[string]string{
-					"": "Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation that removes all labels.",
+						Fragment: `count(up{job="a"} / on (env) up{job="b"})`,
+					},
 				},
 			},
 		},
@@ -611,8 +698,11 @@ func TestLabelsSource(t *testing.T) {
 				Operation:      "bottomk",
 				Selector:       mustParseVector(`foo`, 21),
 				ExcludedLabels: []string{"job"},
-				ExcludeReason: map[string]string{
-					"job": "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"job": {
+						Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `sum(rate(foo[5m])) without(job)`,
+					},
 				},
 			},
 		},
@@ -692,10 +782,19 @@ func TestLabelsSource(t *testing.T) {
 				Selector:       mustParseVector(`up{job="foo", cluster="dev"}`, 10),
 				ExcludedLabels: []string{"job", "cluster"}, // FIXME empty
 				FixedLabels:    true,
-				ExcludeReason: map[string]string{
-					"":        "Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.",
-					"job":     "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
-					"cluster": "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `sum(up{job="foo", cluster="dev"}) by(job, cluster)`,
+					},
+					"job": {
+						Reason:   "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`,
+					},
+					"cluster": {
+						Reason:   "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`,
+					},
 				},
 			},
 		},
@@ -814,7 +913,7 @@ sum(foo:count) by(job) > 20`,
 				Operation:      "sum",
 				Selector:       mustParseVector(`foo:sum`, 8),
 				IncludedLabels: []string{"notify", "job"},
-				ExcludeReason:  map[string]string{},
+				ExcludeReason:  map[string]utils.ExcludedLabel{},
 			},
 		},
 		{
@@ -826,8 +925,11 @@ sum(foo:count) by(job) > 20`,
 				Selector:       mustParseVector(`container_file_descriptors`, 0),
 				IncludedLabels: []string{"instance", "app_name"},
 				FixedLabels:    true,
-				ExcludeReason: map[string]string{
-					"": "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+						Fragment: `container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}`,
+					},
 				},
 			},
 		},
@@ -972,8 +1074,11 @@ sum(foo:count) by(job) > 20`,
 				Selector:       mustParseVector(`foo`, 8),
 				IncludedLabels: []string{"notjob"},
 				FixedLabels:    true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `sum(foo) by(notjob)`,
+					},
 				},
 			},
 		},
@@ -986,8 +1091,11 @@ sum(foo:count) by(job) > 20`,
 				Selector:       mustParseVector(`node_exporter_build_info`, 6),
 				IncludedLabels: []string{"instance", "version", "foo"}, // FIXME foo shouldn't be there because count() doesn't produce it
 				FixedLabels:    true,
-				ExcludeReason: map[string]string{
-					"": "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"": {
+						Reason:   "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
+						Fragment: `count(node_exporter_build_info) by (instance, version)`,
+					},
 				},
 			},
 		},
@@ -1341,8 +1449,93 @@ sum(foo:count) by(job) > 20`,
 				Selector:         mustParseVector(`up{instance="a", job="prometheus"}`, 0),
 				GuaranteedLabels: []string{"instance"},
 				ExcludedLabels:   []string{"job"},
-				ExcludeReason: map[string]string{
-					"job": "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"job": {
+						Reason:   "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
+						Fragment: `up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}`,
+					},
+				},
+			},
+		},
+		{
+			expr: `
+avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
+< 0.5 > 0
+or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+< on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
+or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+< 0.1 > 0
+`,
+			output: utils.Source{
+				Type:           utils.AggregateSource,
+				Returns:        promParser.ValueTypeVector,
+				Operation:      "avg",
+				Selector:       mustParseVector(`router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}`, 41),
+				ExcludedLabels: []string{"router", "colo_id", "instance"},
+				ExcludeReason: map[string]utils.ExcludedLabel{
+					"router": {
+						Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
+					},
+					"colo_id": {
+						Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
+					},
+					"instance": {
+						Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+						Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
+					},
+				},
+				Alternatives: []utils.Source{
+					{
+						Type:             utils.AggregateSource,
+						Returns:          promParser.ValueTypeVector,
+						Operation:        "sum",
+						Selector:         mustParseVector(`router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
+						GuaranteedLabels: []string{"cidr_use_case"},
+						ExcludedLabels:   []string{"router", "colo_id", "instance"},
+						FixedLabels:      true,
+						ExcludeReason: map[string]utils.ExcludedLabel{
+							"router": {
+								Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+								Fragment: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`,
+							},
+							"colo_id": {
+								Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+								Fragment: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`,
+							},
+							"instance": {
+								Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+								Fragment: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`,
+							},
+							"": {
+								Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+								Fragment: "sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~\".*tier1.*\"})\n< on() count(colo_router_tier:disabled_pops:max{tier=\"1\",router=~\"edge.*\"}) * 0.4",
+							},
+						},
+					},
+					{
+						Type:             utils.AggregateSource,
+						Returns:          promParser.ValueTypeVector,
+						Operation:        "avg",
+						Selector:         mustParseVector(`router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}`, 343),
+						GuaranteedLabels: []string{"cidr_use_case"},
+						ExcludedLabels:   []string{"router", "colo_id", "instance"},
+						ExcludeReason: map[string]utils.ExcludedLabel{
+							"router": {
+								Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+								Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
+							},
+							"colo_id": {
+								Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+								Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
+							},
+							"instance": {
+								Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+								Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -1355,7 +1548,7 @@ sum(foo:count) by(job) > 20`,
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.LabelsSource(n)
+			output := utils.LabelsSource(tc.expr, n)
 			require.EqualExportedValues(t, tc.output, output)
 		})
 	}
@@ -1394,7 +1587,7 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.LabelsSource(n)
+			output := utils.LabelsSource(b.String(), n)
 			require.NotNil(t, output.Call, "no call detected in: %q ~> %+v", b.String(), output)
 			require.Equal(t, name, output.Operation)
 			require.Equal(t, def.ReturnType, output.Returns, "incorrect return type on Source{}")
@@ -1410,6 +1603,6 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 			},
 		},
 	}
-	output := utils.LabelsSource(n)
+	output := utils.LabelsSource("fake_call()", n)
 	require.Nil(t, output.Call, "no call should have been detected in fake function")
 }
