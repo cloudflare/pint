@@ -64,7 +64,7 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	}
 
 	if rule.AlertingRule != nil {
-		for _, problem := range c.checkSampling(expr.Value.Value, expr.Query) {
+		for _, problem := range c.checkSampling(expr.Value.Value, expr.Query.Expr) {
 			problems = append(problems, Problem{
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
@@ -126,7 +126,7 @@ NEXT:
 	return problems
 }
 
-func (c FragileCheck) checkSampling(expr string, node *parser.PromQLNode) (problems []exprProblem) {
+func (c FragileCheck) checkSampling(expr string, node promParser.Node) (problems []exprProblem) {
 	s := utils.LabelsSource(expr, node)
 	for _, src := range append(s.Alternatives, s) {
 		if src.Type != utils.AggregateSource {
