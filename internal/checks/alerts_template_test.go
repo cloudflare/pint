@@ -294,8 +294,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation that removes all labels.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(foo)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -314,8 +314,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation that removes all labels.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(foo)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -334,8 +334,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(foo) without(job)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -354,8 +354,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(foo) without(job)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -374,8 +374,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(foo) without(job)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -394,8 +394,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation that removes all labels.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(bar)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -414,8 +414,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `job` label but the query results won't have this label. Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum(foo) by(notjob)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -440,8 +440,8 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  6,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `ixtance` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `ixtance` label but the query results won't have this label. Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `count(build_info) by (instance, version)`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -1312,14 +1312,12 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "multiple or",
 			content: `
-- alert: Prefix_Advertised_On_Very_Few_Routers
+- alert: Foo
   expr: >
-    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*|.*multicolo.*|.*aggregate.*|.*test.*|.*tier1.*|.*regional.*|.*brat.*|.*utopia.*|.*byoip.*",prefix!~"141.101.112.0/20|190.93.240.0/20"})
+    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
     < 0.5 > 0
     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
     < 0.4 > 0
-    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*aggregate.*"} OR router_anycast_prefix_enabled{prefix=~"141.101.112.0/20|190.93.240.0/20"})
-    < 20 > 0
     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
     < 8 > 0
     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
@@ -1340,14 +1338,12 @@ func TestTemplateCheck(t *testing.T) {
 		{
 			description: "multiple or / missing group_left()",
 			content: `
-- alert: Prefix_Advertised_On_Very_Few_Routers
+- alert: Foo
   expr: >
-    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*|.*multicolo.*|.*aggregate.*|.*test.*|.*tier1.*|.*regional.*|.*brat.*|.*utopia.*|.*byoip.*",prefix!~"141.101.112.0/20|190.93.240.0/20"})
+    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
     < 0.5 > 0
     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
     < 0.4 > 0
-    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*aggregate.*"} OR router_anycast_prefix_enabled{prefix=~"141.101.112.0/20|190.93.240.0/20"})
-    < 20 > 0
     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
     < 8 > 0
     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
@@ -1367,12 +1363,12 @@ func TestTemplateCheck(t *testing.T) {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
-							First: 21,
-							Last:  21,
+							First: 19,
+							Last:  19,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `prefix` label but the query removes it.",
-						Details:  checks.TemplateCheckAggregationDetails,
+						Text:     "Template is using `prefix` label but the query results won't have this label. Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+						Details:  checks.TemplateCheckAggregationDetails + "\nQuery fragment causing this problem: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~\".*tier1.*\"}) < on() count(colo_router_tier:disabled_pops:max{tier=\"1\",router=~\"edge.*\"}) * 0.4`.",
 						Severity: checks.Bug,
 					},
 				}

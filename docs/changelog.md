@@ -33,10 +33,15 @@
   }
   ```
 
+### Changed
+
+- [alerts/template](checks/alerts/template.md) check was refactored and will now produce more accurate results.
+  Messages produced by this check might include details of the PromQL query fragment causing the problem
+  if the query is complex enough.
+
 ### Fixed
 
 - Don't try to create GitLab comments on unmodified lines - [#1147](https://github.com/cloudflare/pint/pull/1147).
-- [alerts/template](checks/alerts/template.md) check was refactored and will now produce more accurate results.
 
 ## v0.67.0
 

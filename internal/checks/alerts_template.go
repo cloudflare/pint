@@ -115,7 +115,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		return nil
 	}
 
-	src := utils.LabelsSource(rule.AlertingRule.Expr.Query)
+	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query)
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
 	if rule.AlertingRule.Labels != nil {
@@ -144,7 +144,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(label.Key.Value, label.Value.Value, src) {
+			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr.Value.Value, label.Key.Value, label.Value.Value, src) {
 				problems = append(problems, Problem{
 					Lines: parser.LineRange{
 						First: label.Key.Lines.First,
@@ -174,7 +174,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(annotation.Key.Value, annotation.Value.Value, src) {
+			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr.Value.Value, annotation.Key.Value, annotation.Value.Value, src) {
 				problems = append(problems, Problem{
 					Lines: parser.LineRange{
 						First: annotation.Key.Lines.First,
@@ -436,7 +436,7 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems []exprProblem) {
+func checkQueryLabels(query, labelName, labelValue string, src utils.Source) (problems []exprProblem) {
 	vars, aliases, ok := findTemplateVariables(labelName, labelValue)
 	if !ok {
 		return nil
@@ -452,11 +452,11 @@ func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems 
 				}
 				for _, s := range append(src.Alternatives, src) {
 					if s.FixedLabels && !slices.Contains(s.IncludedLabels, v[1]) {
-						problems = append(problems, textForProblem(v[1], "", s, Bug))
+						problems = append(problems, textForProblem(query, v[1], "", s, Bug))
 						goto NEXT
 					}
 					if slices.Contains(s.ExcludedLabels, v[1]) {
-						problems = append(problems, textForProblem(v[1], v[1], s, Bug))
+						problems = append(problems, textForProblem(query, v[1], v[1], s, Bug))
 						goto NEXT
 					}
 				}
@@ -469,7 +469,7 @@ func checkQueryLabels(labelName, labelValue string, src utils.Source) (problems 
 	return problems
 }
 
-func textForProblem(label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
+func textForProblem(query, label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
 	switch {
 	case src.Operation == "absent":
 		return exprProblem{
@@ -489,23 +489,26 @@ func textForProblem(label, reasonLabel string, src utils.Source, severity Severi
 			details:  TemplateCheckLabelsDetails,
 			severity: severity,
 		}
-	case slices.Contains([]string{
-		promParser.CardOneToOne.String(),
-		promParser.CardOneToMany.String(),
-		promParser.CardManyToMany.String(),
-		promParser.CardManyToOne.String(),
-	}, src.Operation):
+	case src.Operation == promParser.CardOneToOne.String():
 		return exprProblem{
 			text: fmt.Sprintf("Template is using `%s` label but the query results won't have this label. %s",
-				label, src.ExcludeReason[reasonLabel]),
-			details:  TemplateCheckOnDetails,
+				label, src.ExcludeReason[reasonLabel].Reason),
+			details:  maybeAddQueryFragment(query, src.ExcludeReason[reasonLabel].Fragment, TemplateCheckOnDetails),
 			severity: severity,
 		}
 	default:
 		return exprProblem{
-			text:     fmt.Sprintf("Template is using `%s` label but the query removes it.", label),
-			details:  TemplateCheckAggregationDetails,
+			text: fmt.Sprintf("Template is using `%s` label but the query results won't have this label. %s",
+				label, src.ExcludeReason[reasonLabel].Reason),
+			details:  maybeAddQueryFragment(query, src.ExcludeReason[reasonLabel].Fragment, TemplateCheckAggregationDetails),
 			severity: severity,
 		}
 	}
+}
+
+func maybeAddQueryFragment(query, fragment, msg string) string {
+	if fragment == query {
+		return msg
+	}
+	return fmt.Sprintf("%s\nQuery fragment causing this problem: `%s`.", msg, fragment)
 }

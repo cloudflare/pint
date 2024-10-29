@@ -263,7 +263,7 @@ rules.yml:29-30 Bug: `summary` annotation is required. (alerts/annotation)
  29 |     annotations:
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
-rules.yml:30 Bug: Template is using `instance` label but the query removes it. (alerts/template)
+rules.yml:30 Bug: Template is using `instance` label but the query results won't have this label. Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results. (alerts/template)
  30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
 rules.yml:32-33 Bug: `link` annotation is required. (alerts/annotation)
