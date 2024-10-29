@@ -361,42 +361,23 @@ func parseBinOps(n *promParser.BinaryExpr) (s Source) {
 			s = walkNode(n.RHS)
 		}
 
+		// foo{} +               bar{}
+		// foo{} + on(...)       bar{}
+		// foo{} + ignoring(...) bar{}
 	case n.VectorMatching.Card == promParser.CardOneToOne:
 		s = walkNode(n.LHS)
 		if n.VectorMatching.On {
 			s.FixedLabels = true
-			s.ExcludeReason = setInMap(s.ExcludeReason, "", fmt.Sprintf(
-				"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
-				n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-			))
-		}
-
-	case n.VectorMatching.Card == promParser.CardOneToMany:
-		s = walkNode(n.RHS)
-
-	case n.VectorMatching.Card == promParser.CardManyToMany:
-		s = walkNode(n.LHS)
-		if n.Op == promParser.LOR {
-			s.Alternatives = append(s.Alternatives, walkNode(n.RHS))
-		}
-
-	case n.VectorMatching.Card == promParser.CardManyToOne:
-		s = walkNode(n.LHS)
-	}
-
-	if n.VectorMatching != nil {
-		if s.Operation == "" {
-			s.Operation = n.VectorMatching.Card.String()
-		}
-		s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
-		// on=true when using on(), on=false when using ignore()
-		if n.VectorMatching.On {
 			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
 			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.MatchingLabels...)
 			for _, name := range n.VectorMatching.MatchingLabels {
 				delete(s.ExcludeReason, name)
 			}
-		} else if n.VectorMatching.Card == promParser.CardOneToOne {
+			s.ExcludeReason = setInMap(s.ExcludeReason, "", fmt.Sprintf(
+				"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
+				n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+			))
+		} else {
 			s.IncludedLabels = removeFromSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
 			s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, n.VectorMatching.MatchingLabels...)
 			s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.VectorMatching.MatchingLabels...)
@@ -407,10 +388,56 @@ func parseBinOps(n *promParser.BinaryExpr) (s Source) {
 				))
 			}
 		}
+
+		// foo{} + on(...)       group_left(...) bar{}
+		// foo{} + ignoring(...) group_left(...) bar{}
+	case n.VectorMatching.Card == promParser.CardOneToMany:
+		s = walkNode(n.RHS)
+		s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
+		if n.VectorMatching.On {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			for _, name := range n.VectorMatching.MatchingLabels {
+				delete(s.ExcludeReason, name)
+			}
+		}
 		s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
 		for _, name := range n.VectorMatching.Include {
 			delete(s.ExcludeReason, name)
 		}
+
+		// foo{} + on(...)       group_right(...) bar{}
+		// foo{} + ignoring(...) group_right(...) bar{}
+	case n.VectorMatching.Card == promParser.CardManyToOne:
+		s = walkNode(n.LHS)
+		s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
+		if n.VectorMatching.On {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			for _, name := range n.VectorMatching.MatchingLabels {
+				delete(s.ExcludeReason, name)
+			}
+		}
+		s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
+		for _, name := range n.VectorMatching.Include {
+			delete(s.ExcludeReason, name)
+		}
+
+		// foo{} and on(...)       bar{}
+		// foo{} and ignoring(...) bar{}
+	case n.VectorMatching.Card == promParser.CardManyToMany:
+		s = walkNode(n.LHS)
+		if n.VectorMatching.On {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
+			for _, name := range n.VectorMatching.MatchingLabels {
+				delete(s.ExcludeReason, name)
+			}
+		}
+		if n.Op == promParser.LOR {
+			s.Alternatives = append(s.Alternatives, walkNode(n.RHS))
+		}
+	}
+
+	if n.VectorMatching != nil && s.Operation == "" {
+		s.Operation = n.VectorMatching.Card.String()
 	}
 
 	return s
