@@ -22,19 +22,13 @@ import (
 )
 
 const (
-	TemplateCheckName               = "alerts/template"
-	TemplateCheckSyntaxDetails      = `Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).`
-	TemplateCheckAggregationDetails = `The query used here is using one of [aggregation functions](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators) provided by PromQL.
-By default aggregations will remove *all* labels from the results, unless you explicitly specify which labels to remove or keep.
-This means that with current query it's impossible for the results to have labels you're trying to use.`
+	TemplateCheckName          = "alerts/template"
+	TemplateCheckSyntaxDetails = `Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).`
 	TemplateCheckAbsentDetails = `The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
 You will only get any results back if the metric selector you pass doesn't match anything.
 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the ` + "`up`" + ` metric instead.`
-	TemplateCheckOnDetails = `Using [vector matching](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) operations will impact which labels are available on the results of your query.
-When using ` + "`on()`" + ` make sure that all labels you're trying to use in this templare match what the query can return.
-For queries using ` + "ignoring()`" + ` any label included there will be stripped from the results.`
 	TemplateCheckLabelsDetails = `This query doesn't seem to be using any time series and so cannot have any labels.`
 )
 
@@ -489,18 +483,10 @@ func textForProblem(query, label, reasonLabel string, src utils.Source, severity
 			details:  TemplateCheckLabelsDetails,
 			severity: severity,
 		}
-	case src.Operation == promParser.CardOneToOne.String():
-		return exprProblem{
-			text: fmt.Sprintf("Template is using `%s` label but the query results won't have this label. %s",
-				label, src.ExcludeReason[reasonLabel].Reason),
-			details:  maybeAddQueryFragment(query, src.ExcludeReason[reasonLabel].Fragment, TemplateCheckOnDetails),
-			severity: severity,
-		}
 	default:
 		return exprProblem{
-			text: fmt.Sprintf("Template is using `%s` label but the query results won't have this label. %s",
-				label, src.ExcludeReason[reasonLabel].Reason),
-			details:  maybeAddQueryFragment(query, src.ExcludeReason[reasonLabel].Fragment, TemplateCheckAggregationDetails),
+			text:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
+			details:  maybeAddQueryFragment(query, src.ExcludeReason[reasonLabel].Fragment, src.ExcludeReason[reasonLabel].Reason),
 			severity: severity,
 		}
 	}
