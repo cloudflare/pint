@@ -1,16 +1,18 @@
 # Changelog
 
-## v0.68.0
+## v0.67.0
 
 ### Added
 
+- Added `--checkstyle` flag to `pint lint` & `pint ci` for writing XML report file
+  in `checkstyle` format - [#1129](https://github.com/cloudflare/pint/pull/1129).
+- Added `--json` flag to both `pint lint` and `pint ci` commands, this enables writing a JSON file
+  with the report of all problems [#606](https://github.com/cloudflare/pint/issues/606).
 - [promql/fragile](checks/promql/fragile.md) will now warn when alerting rules are using
   one of the aggregation operation that can return different series on every evaluation,
   which can cause alert floppiness - [#820](https://github.com/cloudflare/pint/issues/820).
 - [promql/regexp](checks/promql/regexp.md) check now supports extra configuration options
   to disable reports on smelly selector - [#1096](https://github.com/cloudflare/pint/issues/1096).
-- Added `--json` flag to both `pint lint` and `pint ci` commands, this enables writing a JSON file
-  with the report of all problems [#606](https://github.com/cloudflare/pint/issues/606).
 - Checks can be enabled or disabled specifically for some Prometheus rules via `rule {}` config blocks.
   Adding `enable` or `disable` option with a list of checks names allows to selectively enable or disable
   checks only for Prometheus rules that match given `rule {}` definition.
@@ -42,13 +44,6 @@
 ### Fixed
 
 - Don't try to create GitLab comments on unmodified lines - [#1147](https://github.com/cloudflare/pint/pull/1147).
-
-## v0.67.0
-
-### Added
-
-- Added `--checkstyle` flag to `pint lint` & `pint ci` for writing XML report file
-  in `checkstyle` format - [#1129](https://github.com/cloudflare/pint/pull/1129).
 
 ## v0.66.1
 
