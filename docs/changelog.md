@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.67.1
+
+### Fixed
+
+- Improved message formatting in the [alerts/template](checks/alerts/template.md) check.
+
 ## v0.67.0
 
 ### Added
