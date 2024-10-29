@@ -109,7 +109,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		return nil
 	}
 
-	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query)
+	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr)
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
 	if rule.AlertingRule.Labels != nil {

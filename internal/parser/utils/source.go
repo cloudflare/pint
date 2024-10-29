@@ -5,8 +5,6 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/cloudflare/pint/internal/parser"
-
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	"github.com/prometheus/prometheus/promql/parser/posrange"
@@ -42,8 +40,8 @@ type Source struct {
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 }
 
-func LabelsSource(expr string, node *parser.PromQLNode) Source {
-	return walkNode(expr, node.Expr)
+func LabelsSource(expr string, node promParser.Node) Source {
+	return walkNode(expr, node)
 }
 
 func walkNode(expr string, node promParser.Node) (s Source) {

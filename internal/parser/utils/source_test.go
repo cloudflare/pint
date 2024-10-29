@@ -1616,7 +1616,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.LabelsSource(tc.expr, n)
+			output := utils.LabelsSource(tc.expr, n.Expr)
 			require.EqualExportedValues(t, tc.output, output)
 		})
 	}
@@ -1655,7 +1655,7 @@ func TestLabelsSourceCallCoverage(t *testing.T) {
 				t.Error(err)
 				t.FailNow()
 			}
-			output := utils.LabelsSource(b.String(), n)
+			output := utils.LabelsSource(b.String(), n.Expr)
 			require.NotNil(t, output.Call, "no call detected in: %q ~> %+v", b.String(), output)
 			require.Equal(t, name, output.Operation)
 			require.Equal(t, def.ReturnType, output.Returns, "incorrect return type on Source{}")
@@ -1671,6 +1671,6 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 			},
 		},
 	}
-	output := utils.LabelsSource("fake_call()", n)
+	output := utils.LabelsSource("fake_call()", n.Expr)
 	require.Nil(t, output.Call, "no call should have been detected in fake function")
 }
