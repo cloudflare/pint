@@ -646,7 +646,7 @@ func TestTemplateCheck(t *testing.T) {
 							Last:  5,
 						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but `absent(bar)` is not passing it.",
+						Text:     "Template is using `job` label but `absent(foo)` is not passing it.",
 						Details:  checks.TemplateCheckAbsentDetails,
 						Severity: checks.Bug,
 					},
