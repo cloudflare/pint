@@ -1539,6 +1539,74 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 				},
 			},
 		},
+		{
+			expr: `label_replace(sum(foo) without(instance), "instance", "none", "", "")`,
+			output: utils.Source{
+				Type:             utils.FuncSource,
+				Returns:          promParser.ValueTypeVector,
+				Operation:        "label_replace",
+				Selector:         mustParseVector(`foo`, 18),
+				GuaranteedLabels: []string{"instance"},
+				Call: &promParser.Call{
+					Func: &promParser.Function{
+						Name: "label_replace",
+						ArgTypes: []promParser.ValueType{
+							promParser.ValueTypeVector,
+							promParser.ValueTypeString,
+							promParser.ValueTypeString,
+							promParser.ValueTypeString,
+							promParser.ValueTypeString,
+						},
+						Variadic:   0,
+						ReturnType: promParser.ValueTypeVector,
+					},
+					Args: promParser.Expressions{
+						&promParser.AggregateExpr{
+							Op:       promParser.SUM,
+							Expr:     mustParseVector("foo", 18),
+							Grouping: []string{"instance"},
+							Without:  true,
+							PosRange: posrange.PositionRange{
+								Start: 14,
+								End:   40,
+							},
+						},
+						&promParser.StringLiteral{
+							Val: "instance",
+							PosRange: posrange.PositionRange{
+								Start: 42,
+								End:   52,
+							},
+						},
+						&promParser.StringLiteral{
+							Val: "none",
+							PosRange: posrange.PositionRange{
+								Start: 54,
+								End:   60,
+							},
+						},
+						&promParser.StringLiteral{
+							Val: "",
+							PosRange: posrange.PositionRange{
+								Start: 62,
+								End:   64,
+							},
+						},
+						&promParser.StringLiteral{
+							Val: "",
+							PosRange: posrange.PositionRange{
+								Start: 66,
+								End:   68,
+							},
+						},
+					},
+					PosRange: posrange.PositionRange{
+						Start: 0,
+						End:   69,
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
