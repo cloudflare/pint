@@ -59,8 +59,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 	}
 
 	var hasAbsent bool
-	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr)
-	for _, s := range append(src.Alternatives, src) {
+	for _, s := range utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr) {
 		if s.Operation == "absent" {
 			hasAbsent = true
 		}

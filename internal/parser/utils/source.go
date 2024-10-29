@@ -35,13 +35,17 @@ type Source struct {
 	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
 	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
 	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
-	Alternatives     []Source // Alternative lable sources
+	alternatives     []Source // Alternative lable sources
 	Type             SourceType
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 }
 
-func LabelsSource(expr string, node promParser.Node) Source {
-	return walkNode(expr, node)
+func LabelsSource(expr string, node promParser.Node) (src []Source) {
+	s := walkNode(expr, node)
+	src = make([]Source, 0, len(s.alternatives)+1)
+	src = append(src, s)
+	src = append(src, s.alternatives...)
+	return src
 }
 
 func walkNode(expr string, node promParser.Node) (s Source) {
@@ -480,7 +484,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (s Source) {
 			}
 		}
 		if n.Op == promParser.LOR {
-			s.Alternatives = append(s.Alternatives, walkNode(expr, n.RHS))
+			s.alternatives = append(s.alternatives, walkNode(expr, n.RHS))
 		}
 	}
 

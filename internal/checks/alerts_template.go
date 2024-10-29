@@ -430,7 +430,7 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func checkQueryLabels(query, labelName, labelValue string, src utils.Source) (problems []exprProblem) {
+func checkQueryLabels(query, labelName, labelValue string, src []utils.Source) (problems []exprProblem) {
 	vars, aliases, ok := findTemplateVariables(labelName, labelValue)
 	if !ok {
 		return nil
@@ -444,7 +444,7 @@ func checkQueryLabels(query, labelName, labelValue string, src utils.Source) (pr
 				if _, ok := done[v[1]]; ok {
 					continue
 				}
-				for _, s := range append(src.Alternatives, src) {
+				for _, s := range src {
 					if s.FixedLabels && !slices.Contains(s.IncludedLabels, v[1]) {
 						problems = append(problems, textForProblem(query, v[1], "", s, Bug))
 						goto NEXT

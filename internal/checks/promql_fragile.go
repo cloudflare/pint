@@ -127,8 +127,7 @@ NEXT:
 }
 
 func (c FragileCheck) checkSampling(expr string, node promParser.Node) (problems []exprProblem) {
-	s := utils.LabelsSource(expr, node)
-	for _, src := range append(s.Alternatives, s) {
+	for _, src := range utils.LabelsSource(expr, node) {
 		if src.Type != utils.AggregateSource {
 			continue
 		}
