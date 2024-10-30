@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.67.2
+
+### Fixed
+
+- Improved the accuracy of [alerts/template](checks/alerts/template.md) check.
+
 ## v0.67.1
 
 ### Fixed
