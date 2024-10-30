@@ -27,7 +27,7 @@ type ExcludedLabel struct {
 }
 
 type Source struct {
-	Selector         *promParser.VectorSelector
+	Selectors        []*promParser.VectorSelector
 	Call             *promParser.Call
 	ExcludeReason    map[string]ExcludedLabel // Reason why a label was excluded
 	Operation        string
@@ -86,8 +86,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.VectorSelector:
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
-		s.Selector = n
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.Selectors = append(s.Selectors, n)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, n)...)
 		src = append(src, s)
 
 	default:
@@ -126,14 +126,33 @@ func setInMap(dst map[string]ExcludedLabel, key string, val ExcludedLabel) map[s
 	return dst
 }
 
-func guaranteedLabelsFromSelector(selector *promParser.VectorSelector) (names []string) {
-	// Any label used in positive filters is gurnateed to be present.
-	for _, lm := range selector.LabelMatchers {
-		if lm.Name == labels.MetricName {
-			continue
-		}
-		if lm.Type == labels.MatchEqual || lm.Type == labels.MatchRegexp {
+var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
+
+func labelsFromSelectors(matches []labels.MatchType, selectors ...*promParser.VectorSelector) (names []string) {
+	nameCount := map[string]int{}
+	var ok bool
+	for _, selector := range selectors {
+		// Any label used in positive filters is gurnateed to be present.
+		for _, lm := range selector.LabelMatchers {
+			if lm.Name == labels.MetricName {
+				continue
+			}
+
+			if !slices.Contains(matches, lm.Type) {
+				continue
+			}
+
 			names = appendToSlice(names, lm.Name)
+
+			if _, ok = nameCount[lm.Name]; !ok {
+				nameCount[lm.Name] = 0
+			}
+			nameCount[lm.Name]++
+		}
+	}
+	for name, cnt := range nameCount {
+		if cnt != len(selectors) {
+			names = removeFromSlice(names, name)
 		}
 	}
 	return names
@@ -299,7 +318,9 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 		// nolint: exhaustive
 		switch vt {
 		case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
-			s.Selector = walkNode(expr, e)[0].Selector // FIXME
+			for _, es := range walkNode(expr, e) {
+				s.Selectors = append(s.Selectors, es.Selectors...)
+			}
 		}
 	}
 
@@ -307,40 +328,35 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 	case "abs", "sgn", "acos", "acosh", "asin", "asinh", "atan", "atanh", "cos", "cosh", "sin", "sinh", "tan", "tanh":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "ceil", "floor", "round":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "changes", "resets":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "clamp", "clamp_max", "clamp_min":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "absent", "absent_over_time":
 		s.Returns = promParser.ValueTypeVector
 		s.FixedLabels = true
-		for _, lm := range s.Selector.LabelMatchers {
-			if lm.Name == labels.MetricName {
-				continue
-			}
-			if lm.Type == labels.MatchEqual {
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, lm.Name)
-				s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, lm.Name)
-			}
+		for _, name := range labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, s.Selectors...) {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, name)
+			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, name)
 		}
 
 	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "days_in_month", "day_of_month", "day_of_week", "day_of_year", "hour", "minute", "month", "year":
 		s.Returns = promParser.ValueTypeVector
@@ -349,33 +365,33 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 		if len(s.Call.Args) == 0 {
 			s.FixedLabels = true
 		} else {
-			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 		}
 
 	case "deg", "rad", "ln", "log10", "log2", "sqrt", "exp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "delta", "idelta", "increase", "deriv", "irate", "rate":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "histogram_avg", "histogram_count", "histogram_sum", "histogram_stddev", "histogram_stdvar", "histogram_fraction", "histogram_quantile":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "holt_winters", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "label_replace", "label_join":
 		// One label added to the results.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, s.Call.Args[1].(*promParser.StringLiteral).Val)
 
 	case "pi":
@@ -397,7 +413,7 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 	case "timestamp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, guaranteedLabelsFromSelector(s.Selector)...)
+		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "vector":
 		s.Returns = promParser.ValueTypeVector
