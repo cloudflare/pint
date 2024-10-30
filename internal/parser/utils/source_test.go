@@ -46,6 +46,12 @@ func TestLabelsSource(t *testing.T) {
 					Type:        utils.NumberSource,
 					Returns:     promParser.ValueTypeScalar,
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "1",
+						},
+					},
 				},
 			},
 		},
@@ -56,6 +62,28 @@ func TestLabelsSource(t *testing.T) {
 					Type:        utils.NumberSource,
 					Returns:     promParser.ValueTypeScalar,
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "1",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `1 > bool 0`,
+			output: []utils.Source{
+				{
+					Type:        utils.NumberSource,
+					Returns:     promParser.ValueTypeScalar,
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "1",
+						},
+					},
 				},
 			},
 		},
@@ -66,6 +94,12 @@ func TestLabelsSource(t *testing.T) {
 					Type:        utils.StringSource,
 					Returns:     promParser.ValueTypeString,
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a string value with no labels.",
+							Fragment: `"test"`,
+						},
+					},
 				},
 			},
 		},
@@ -1164,6 +1198,12 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "year",
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `year()` with no arguments will return an empty time series with no labels.",
+							Fragment: `year()`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "year",
@@ -1336,6 +1376,12 @@ sum(foo:count) by(job) > 20`,
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
 					FixedLabels:      true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(foo{job="bar"})`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1369,6 +1415,12 @@ sum(foo:count) by(job) > 20`,
 					IncludedLabels:   []string{"job", "env"},
 					GuaranteedLabels: []string{"job", "env"},
 					FixedLabels:      true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1400,6 +1452,12 @@ sum(foo:count) by(job) > 20`,
 						mustParseVector(`foo`, 11),
 					},
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(sum(foo) by(job, instance))`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1441,6 +1499,12 @@ sum(foo:count) by(job) > 20`,
 					IncludedLabels:   []string{"job", "xxx"},
 					GuaranteedLabels: []string{"job", "xxx"},
 					FixedLabels:      true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(foo{job="prometheus", xxx="1"})`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1514,6 +1578,12 @@ sum(foo:count) by(job) > 20`,
 						mustParseVector(`foo`, 7),
 					},
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(foo)`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1540,6 +1610,12 @@ sum(foo:count) by(job) > 20`,
 						mustParseVector(`bar`, 22),
 					},
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(bar)`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1571,6 +1647,12 @@ sum(foo:count) by(job) > 20`,
 						mustParseVector(`foo`, 17),
 					},
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent_over_time(foo[5m])`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent_over_time",
@@ -1597,6 +1679,12 @@ sum(foo:count) by(job) > 20`,
 						mustParseVector(`bar`, 36),
 					},
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(bar)`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1630,6 +1718,12 @@ sum(foo:count) by(job) > 20`,
 					IncludedLabels:   []string{"job", "cluster", "env"},
 					GuaranteedLabels: []string{"job"},
 					FixedLabels:      true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(foo{job="xxx"})`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1663,6 +1757,12 @@ sum(foo:count) by(job) > 20`,
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
 					FixedLabels:      true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							Fragment: `absent(foo{job="xxx"})`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "absent",
@@ -1691,6 +1791,12 @@ sum(foo:count) by(job) > 20`,
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "vector",
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: `vector(1)`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "vector",
@@ -1756,6 +1862,12 @@ sum(foo:count) by(job) > 20`,
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "days_in_month",
 					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `days_in_month()` with no arguments will return an empty time series with no labels.",
+							Fragment: `days_in_month()`,
+						},
+					},
 					Call: &promParser.Call{
 						Func: &promParser.Function{
 							Name: "days_in_month",
@@ -2056,6 +2168,44 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 						PosRange: posrange.PositionRange{
 							Start: 0,
 							End:   69,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `
+sum by (region, target, colo_name) (
+    sum_over_time(probe_success{job="abc"}[5m])
+	or
+	vector(1)
+) == 0`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector(`probe_success{job="abc"}`, 56),
+					},
+					IncludedLabels: []string{"region", "target", "colo_name"},
+					FixedLabels:    true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
+							Fragment: "sum by (region, target, colo_name) (\n    sum_over_time(probe_success{job=\"abc\"}[5m])\n\tor\n\tvector(1)\n)",
+						},
+					},
+				},
+				{
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "sum",
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(1)",
 						},
 					},
 				},

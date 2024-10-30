@@ -65,7 +65,17 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.NumberLiteral:
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason:   "This returns a number value with no labels.",
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 		src = append(src, s)
 
 	case *promParser.ParenExpr:
@@ -74,7 +84,17 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.StringLiteral:
 		s.Type = StringSource
 		s.Returns = promParser.ValueTypeString
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason:   "This returns a string value with no labels.",
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 		src = append(src, s)
 
 	case *promParser.UnaryExpr:
@@ -266,7 +286,6 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				)
 			}
 		} else {
-			s.FixedLabels = true
 			if len(n.Grouping) == 0 {
 				s.IncludedLabels = nil
 				s.GuaranteedLabels = nil
@@ -279,20 +298,29 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					},
 				)
 			} else {
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Grouping...)
-				for _, name := range n.Grouping {
-					s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
+				// Check if source of labels already fixes them.
+				if !s.FixedLabels {
+					s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Grouping...)
+					for _, name := range n.Grouping {
+						s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
+					}
+					s.ExcludeReason = setInMap(
+						s.ExcludeReason,
+						"",
+						ExcludedLabel{
+							Reason: fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
+								strings.Join(n.Grouping, ", ")),
+							Fragment: getQueryFragment(expr, n.PosRange),
+						},
+					)
 				}
-				s.ExcludeReason = setInMap(
-					s.ExcludeReason,
-					"",
-					ExcludedLabel{
-						Reason: fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
-							strings.Join(n.Grouping, ", ")),
-						Fragment: getQueryFragment(expr, n.PosRange),
-					},
-				)
+				for _, name := range s.GuaranteedLabels {
+					if !slices.Contains(n.Grouping, name) {
+						s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, name)
+					}
+				}
 			}
+			s.FixedLabels = true
 		}
 		s.Type = AggregateSource
 		s.Returns = promParser.ValueTypeVector
@@ -352,6 +380,19 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 			s.IncludedLabels = appendToSlice(s.IncludedLabels, name)
 			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, name)
 		}
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason: fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if provided query doesn't match any time series.
+You will only get any results back if the metric selector you pass doesn't match anything.
+Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+This means that the only labels you can get back from absent call are the ones you pass to it.
+If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `+"`up`"+` metric instead.`,
+					n.Func.Name, n.Func.Name),
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 
 	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
 		// No change to labels.
@@ -364,6 +405,17 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 		// Otherwise no change to labels.
 		if len(s.Call.Args) == 0 {
 			s.FixedLabels = true
+			s.IncludedLabels = nil
+			s.GuaranteedLabels = nil
+			s.ExcludeReason = setInMap(
+				s.ExcludeReason,
+				"",
+				ExcludedLabel{
+					Reason: fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
+						n.Func.Name),
+					Fragment: getQueryFragment(expr, n.PosRange),
+				},
+			)
 		} else {
 			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 		}
@@ -396,11 +448,31 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 
 	case "pi":
 		s.Returns = promParser.ValueTypeScalar
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 
 	case "scalar":
 		s.Returns = promParser.ValueTypeScalar
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 
 	case "sort", "sort_desc":
 		// No change to labels.
@@ -408,7 +480,17 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 
 	case "time":
 		s.Returns = promParser.ValueTypeScalar
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 
 	case "timestamp":
 		// No change to labels.
@@ -417,7 +499,17 @@ func parseCall(expr string, n *promParser.Call) (s Source) {
 
 	case "vector":
 		s.Returns = promParser.ValueTypeVector
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.ExcludeReason = setInMap(
+			s.ExcludeReason,
+			"",
+			ExcludedLabel{
+				Reason:   fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
+				Fragment: getQueryFragment(expr, n.PosRange),
+			},
+		)
 
 	default:
 		// Unsupported function
@@ -439,7 +531,15 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			}
 		}
 		if !ok {
-			src = append(src, walkNode(expr, n.RHS)...)
+			for _, rs := range walkNode(expr, n.RHS) {
+				if rs.Returns != promParser.ValueTypeScalar && rs.Returns != promParser.ValueTypeString {
+					ok = true
+					src = append(src, rs)
+				}
+			}
+		}
+		if !ok {
+			src = append(src, s)
 		}
 
 		// foo{} +               bar{}
