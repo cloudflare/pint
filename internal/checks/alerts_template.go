@@ -24,12 +24,6 @@ import (
 const (
 	TemplateCheckName          = "alerts/template"
 	TemplateCheckSyntaxDetails = `Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).`
-	TemplateCheckAbsentDetails = `The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
-You will only get any results back if the metric selector you pass doesn't match anything.
-Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
-This means that the only labels you can get back from absent call are the ones you pass to it.
-If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the ` + "`up`" + ` metric instead.`
-	TemplateCheckLabelsDetails = `This query doesn't seem to be using any time series and so cannot have any labels.`
 )
 
 var (
@@ -464,37 +458,13 @@ func checkQueryLabels(query, labelName, labelValue string, src []utils.Source) (
 }
 
 func textForProblem(query, label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
-	switch {
-	case src.Operation == "absent":
-		return exprProblem{
-			text:     fmt.Sprintf("Template is using `%s` label but `%s` is not passing it.", label, src.Call.String()),
-			details:  TemplateCheckAbsentDetails,
-			severity: severity,
-		}
-	case src.Operation == "vector":
-		return exprProblem{
-			text:     fmt.Sprintf("Template is using `%s` label but `%s` doesn't produce any labels.", label, src.Call.String()),
-			details:  TemplateCheckLabelsDetails,
-			severity: severity,
-		}
-	case src.Returns == promParser.ValueTypeScalar, src.Returns == promParser.ValueTypeString:
-		return exprProblem{
-			text:     fmt.Sprintf("Template is using `%s` label but the query doesn't produce any labels.", label),
-			details:  TemplateCheckLabelsDetails,
-			severity: severity,
-		}
-	default:
-		return exprProblem{
-			text:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
-			details:  maybeAddQueryFragment(query, src.ExcludeReason[reasonLabel].Fragment, src.ExcludeReason[reasonLabel].Reason),
-			severity: severity,
-		}
+	details := src.ExcludeReason[reasonLabel].Reason
+	if query != src.ExcludeReason[reasonLabel].Fragment {
+		details = fmt.Sprintf("%s\nQuery fragment causing this problem: `%s`.", details, src.ExcludeReason[reasonLabel].Fragment)
 	}
-}
-
-func maybeAddQueryFragment(query, fragment, msg string) string {
-	if fragment == query {
-		return msg
+	return exprProblem{
+		text:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
+		details:  details,
+		severity: severity,
 	}
-	return fmt.Sprintf("%s\nQuery fragment causing this problem: `%s`.", msg, fragment)
 }
