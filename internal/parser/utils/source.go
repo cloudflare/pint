@@ -514,7 +514,9 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
 		s.AlwaysReturns = true
-		s.ReturnedNumbers = append(s.ReturnedNumbers, n.Args[0].(*promParser.NumberLiteral).Val)
+		if v, ok := n.Args[0].(*promParser.NumberLiteral); ok {
+			s.ReturnedNumbers = append(s.ReturnedNumbers, v.Val)
+		}
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.67.3
+
+### Fixed
+
+- Fixed a crash when parsing `vector()` calls with non-number arguments.
+
 ## v0.67.2
 
 ### Fixed
