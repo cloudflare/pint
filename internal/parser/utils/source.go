@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"math"
 	"slices"
 	"strings"
 
@@ -32,11 +33,14 @@ type Source struct {
 	ExcludeReason    map[string]ExcludedLabel // Reason why a label was excluded
 	Operation        string
 	Returns          promParser.ValueType
-	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
-	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
-	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
+	ReturnedNumbers  []float64 // If AlwaysReturns=true this is the number that's returned
+	IncludedLabels   []string  // Labels that are included by filters, they will be present if exist on source series (by).
+	ExcludedLabels   []string  // Labels guaranteed to be excluded from the results (without).
+	GuaranteedLabels []string  // Labels guaranteed to be present on the results (matchers).
 	Type             SourceType
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
+	IsDead           bool // True if this source cannot be reached and is dead code.
+	AlwaysReturns    bool // True if this source always returns results.
 }
 
 func LabelsSource(expr string, node promParser.Node) (src []Source) {
@@ -65,9 +69,11 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.NumberLiteral:
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
+		s.ReturnedNumbers = append(s.ReturnedNumbers, n.Val)
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.AlwaysReturns = true
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
@@ -87,6 +93,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.AlwaysReturns = true
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
@@ -405,6 +412,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		// Otherwise no change to labels.
 		if len(s.Call.Args) == 0 {
 			s.FixedLabels = true
+			s.AlwaysReturns = true
 			s.IncludedLabels = nil
 			s.GuaranteedLabels = nil
 			s.ExcludeReason = setInMap(
@@ -451,6 +459,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.AlwaysReturns = true
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
@@ -465,6 +474,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.AlwaysReturns = true
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
@@ -483,6 +493,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.AlwaysReturns = true
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
@@ -502,6 +513,8 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
+		s.AlwaysReturns = true
+		s.ReturnedNumbers = append(s.ReturnedNumbers, n.Args[0].(*promParser.NumberLiteral).Val)
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
@@ -522,24 +535,33 @@ If you're hoping to get instance specific labels this way and alert when some ta
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	var s Source
 	switch {
+
+	// foo{} + 1
+	// 1 + foo{}
+	// foo{} > 1
+	// 1 > foo{}
 	case n.VectorMatching == nil:
-		var ok bool
-		for _, s = range walkNode(expr, n.LHS) {
-			if s.Returns != promParser.ValueTypeScalar && s.Returns != promParser.ValueTypeString {
-				ok = true
-				src = append(src, s)
-			}
-		}
-		if !ok {
-			for _, rs := range walkNode(expr, n.RHS) {
-				if rs.Returns != promParser.ValueTypeScalar && rs.Returns != promParser.ValueTypeString {
-					ok = true
+		lhs := walkNode(expr, n.LHS)
+		rhs := walkNode(expr, n.RHS)
+		for _, ls := range lhs {
+			for _, rs := range rhs {
+				switch {
+				case ls.AlwaysReturns && rs.AlwaysReturns:
+					// Both sides always return something
+					for i, lv := range ls.ReturnedNumbers {
+						for _, rv := range rs.ReturnedNumbers {
+							ls.ReturnedNumbers[i], ls.IsDead = calculateStaticReturn(lv, rv, n.Op, ls.IsDead)
+						}
+					}
+					src = append(src, ls)
+				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
+					// Use labels from LHS
+					src = append(src, ls)
+				case rs.Returns == promParser.ValueTypeVector, rs.Returns == promParser.ValueTypeMatrix:
+					// Use labels from RHS
 					src = append(src, rs)
 				}
 			}
-		}
-		if !ok {
-			src = append(src, s)
 		}
 
 		// foo{} +               bar{}
@@ -646,6 +668,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		// foo{} and on(...)       bar{}
 		// foo{} and ignoring(...) bar{}
 	case n.VectorMatching.Card == promParser.CardManyToMany:
+		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		for _, s = range walkNode(expr, n.LHS) {
 			if n.VectorMatching.On {
 				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
@@ -656,6 +679,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
+			if !s.AlwaysReturns {
+				lhsCanBeEmpty = true
+			}
 			src = append(src, s)
 		}
 		if n.Op == promParser.LOR {
@@ -663,9 +689,55 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				if s.Operation == "" {
 					s.Operation = n.VectorMatching.Card.String()
 				}
+				// If LHS can NOT be empty then RHS is dead code.
+				if !lhsCanBeEmpty {
+					s.IsDead = true
+				}
 				src = append(src, s)
 			}
 		}
 	}
 	return src
+}
+
+func calculateStaticReturn(lv, rv float64, op promParser.ItemType, isDead bool) (float64, bool) {
+	switch op {
+	case promParser.EQLC:
+		if lv != rv {
+			return lv, true
+		}
+	case promParser.NEQ:
+		if lv == rv {
+			return lv, true
+		}
+	case promParser.LTE:
+		if lv > rv {
+			return lv, true
+		}
+	case promParser.LSS:
+		if lv >= rv {
+			return lv, true
+		}
+	case promParser.GTE:
+		if lv < rv {
+			return lv, true
+		}
+	case promParser.GTR:
+		if lv <= rv {
+			return lv, true
+		}
+	case promParser.ADD:
+		return lv + rv, isDead
+	case promParser.SUB:
+		return lv - rv, isDead
+	case promParser.MUL:
+		return lv * rv, isDead
+	case promParser.DIV:
+		return lv / rv, isDead
+	case promParser.MOD:
+		return math.Mod(lv, rv), isDead
+	case promParser.POW:
+		return math.Pow(lv, rv), isDead
+	}
+	return lv, isDead
 }

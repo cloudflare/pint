@@ -43,9 +43,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: "1",
 			output: []utils.Source{
 				{
-					Type:        utils.NumberSource,
-					Returns:     promParser.ValueTypeScalar,
-					FixedLabels: true,
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -59,13 +61,267 @@ func TestLabelsSource(t *testing.T) {
 			expr: "1 / 5",
 			output: []utils.Source{
 				{
-					Type:        utils.NumberSource,
-					Returns:     promParser.ValueTypeScalar,
-					FixedLabels: true,
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{0.2},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
 							Fragment: "1",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(2 ^ 5) == bool 5",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					IsDead:          true,
+					ReturnedNumbers: []float64{32},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "2",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(2 ^ 5 + 11) % 5 <= bool 2",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					IsDead:          true,
+					ReturnedNumbers: []float64{3},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "2",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(2 ^ 5 + 11) % 5 >= bool 20",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					IsDead:          true,
+					ReturnedNumbers: []float64{3},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "2",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(2 ^ 5 + 11) % 5 <= bool 3",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{3},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "2",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(2 ^ 5 + 11) % 5 < bool 1",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					IsDead:          true,
+					ReturnedNumbers: []float64{3},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "2",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "20 - 15 < bool 1",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					IsDead:          true,
+					ReturnedNumbers: []float64{5},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "20",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "2 * 5",
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{10},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "2",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(foo or bar) * 5",
+			output: []utils.Source{
+				{
+					Type:      utils.SelectorSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: promParser.CardManyToMany.String(),
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector("foo", 1),
+					},
+				},
+				{
+					Type:      utils.SelectorSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: promParser.CardManyToMany.String(),
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector("bar", 8),
+					},
+				},
+			},
+		},
+		{
+			expr: "(foo or vector(2)) * 5",
+			output: []utils.Source{
+				{
+					Type:      utils.SelectorSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: promParser.CardManyToMany.String(),
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector("foo", 1),
+					},
+				},
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{10},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(2)",
+						},
+					},
+					Call: &promParser.Call{
+						Func: &promParser.Function{
+							Name: "vector",
+							ArgTypes: []promParser.ValueType{
+								promParser.ValueTypeScalar,
+							},
+							Variadic:   0,
+							ReturnType: promParser.ValueTypeVector,
+						},
+						Args: promParser.Expressions{
+							&promParser.NumberLiteral{
+								Val: 2,
+								PosRange: posrange.PositionRange{
+									Start: 15,
+									End:   16,
+								},
+							},
+						},
+						PosRange: posrange.PositionRange{
+							Start: 8,
+							End:   17,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(foo or vector(5)) * (vector(2) or bar)",
+			output: []utils.Source{
+				{
+					Type:      utils.SelectorSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: promParser.CardManyToMany.String(),
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector("foo", 1),
+					},
+				},
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{5}, // FIXME should be 10 really but it's one-to-one binops
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(5)",
+						},
+					},
+					Call: &promParser.Call{
+						Func: &promParser.Function{
+							Name: "vector",
+							ArgTypes: []promParser.ValueType{
+								promParser.ValueTypeScalar,
+							},
+							Variadic:   0,
+							ReturnType: promParser.ValueTypeVector,
+						},
+						Args: promParser.Expressions{
+							&promParser.NumberLiteral{
+								Val: 5,
+								PosRange: posrange.PositionRange{
+									Start: 15,
+									End:   16,
+								},
+							},
+						},
+						PosRange: posrange.PositionRange{
+							Start: 8,
+							End:   17,
 						},
 					},
 				},
@@ -75,9 +331,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: `1 > bool 0`,
 			output: []utils.Source{
 				{
-					Type:        utils.NumberSource,
-					Returns:     promParser.ValueTypeScalar,
-					FixedLabels: true,
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -88,12 +346,31 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `20 > bool 10`,
+			output: []utils.Source{
+				{
+					Type:            utils.NumberSource,
+					Returns:         promParser.ValueTypeScalar,
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{20},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "20",
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `"test"`,
 			output: []utils.Source{
 				{
-					Type:        utils.StringSource,
-					Returns:     promParser.ValueTypeString,
-					FixedLabels: true,
+					Type:          utils.StringSource,
+					Returns:       promParser.ValueTypeString,
+					FixedLabels:   true,
+					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a string value with no labels.",
@@ -1194,10 +1471,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: "year()",
 			output: []utils.Source{
 				{
-					Type:        utils.FuncSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "year",
-					FixedLabels: true,
+					Type:          utils.FuncSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "year",
+					FixedLabels:   true,
+					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `year()` with no arguments will return an empty time series with no labels.",
@@ -1787,10 +2065,12 @@ sum(foo:count) by(job) > 20`,
 			expr: "vector(1)",
 			output: []utils.Source{
 				{
-					Type:        utils.FuncSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "vector",
-					FixedLabels: true,
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -1858,10 +2138,11 @@ sum(foo:count) by(job) > 20`,
 			expr: `days_in_month()`,
 			output: []utils.Source{
 				{
-					Type:        utils.FuncSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "days_in_month",
-					FixedLabels: true,
+					Type:          utils.FuncSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "days_in_month",
+					FixedLabels:   true,
+					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `days_in_month()` with no arguments will return an empty time series with no labels.",
@@ -2198,14 +2479,250 @@ sum by (region, target, colo_name) (
 					},
 				},
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					FixedLabels: true,
+					Type:            utils.AggregateSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "sum",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					IsDead:          true,
+					ReturnedNumbers: []float64{1},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
 							Fragment: "vector(1)",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `vector(1) or foo`,
+			output: []utils.Source{
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(1)",
+						},
+					},
+					Call: &promParser.Call{
+						Func: &promParser.Function{
+							Name: "vector",
+							ArgTypes: []promParser.ValueType{
+								promParser.ValueTypeScalar,
+							},
+							Variadic:   0,
+							ReturnType: promParser.ValueTypeVector,
+						},
+						Args: promParser.Expressions{
+							&promParser.NumberLiteral{
+								Val: 1,
+								PosRange: posrange.PositionRange{
+									Start: 7,
+									End:   8,
+								},
+							},
+						},
+						PosRange: posrange.PositionRange{
+							Start: 0,
+							End:   9,
+						},
+					},
+				},
+				{
+					Type:      utils.SelectorSource,
+					Operation: promParser.CardManyToMany.String(),
+					Returns:   promParser.ValueTypeVector,
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector("foo", 13),
+					},
+					IsDead: true,
+				},
+			},
+		},
+		{
+			expr: `vector(0) > 0`,
+			output: []utils.Source{
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{0},
+					IsDead:          true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(0)",
+						},
+					},
+					Call: &promParser.Call{
+						Func: &promParser.Function{
+							Name: "vector",
+							ArgTypes: []promParser.ValueType{
+								promParser.ValueTypeScalar,
+							},
+							Variadic:   0,
+							ReturnType: promParser.ValueTypeVector,
+						},
+						Args: promParser.Expressions{
+							&promParser.NumberLiteral{
+								Val: 0,
+								PosRange: posrange.PositionRange{
+									Start: 7,
+									End:   8,
+								},
+							},
+						},
+						PosRange: posrange.PositionRange{
+							Start: 0,
+							End:   9,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `sum(foo or vector(0)) > 0`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector(`foo`, 4),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo or vector(0))`,
+						},
+					},
+				},
+				{
+					Type:            utils.AggregateSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "sum",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{0},
+					IsDead:          true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: "sum(foo or vector(0))",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `(sum(foo or vector(1)) > 0) == 2`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector(`foo`, 5),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo or vector(1))`,
+						},
+					},
+				},
+				{
+					Type:            utils.AggregateSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "sum",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
+					IsDead:          true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: "sum(foo or vector(1))",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `(sum(foo or vector(1)) > 0) != 2`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector(`foo`, 5),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo or vector(1))`,
+						},
+					},
+				},
+				{
+					Type:            utils.AggregateSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "sum",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: "sum(foo or vector(1))",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `(sum(foo or vector(2)) > 0) != 2`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParseVector(`foo`, 5),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo or vector(2))`,
+						},
+					},
+				},
+				{
+					Type:            utils.AggregateSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "sum",
+					FixedLabels:     true,
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{2},
+					IsDead:          true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: "sum(foo or vector(2))",
 						},
 					},
 				},

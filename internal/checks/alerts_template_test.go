@@ -1439,7 +1439,7 @@ func TestTemplateCheck(t *testing.T) {
 			},
 		},
 		{
-			description: "",
+			description: "ignore dead code",
 			content: `
 - alert: Foo
   expr: sum by (region, target, colo_name) (sum_over_time(probe_success{job="abc"}[5m]) or vector(1)) == 0
@@ -1449,30 +1449,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
-						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `region` label but the query results won't have this label.",
-						Details:  "Calling `vector()` will return a vector value with no labels.\nQuery fragment causing this problem: `vector(1)`.",
-						Severity: checks.Bug,
-					},
-					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
-						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `target` label but the query results won't have this label.",
-						Details:  "Calling `vector()` will return a vector value with no labels.\nQuery fragment causing this problem: `vector(1)`.",
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:   noProblems,
 		},
 	}
 	runTests(t, testCases)
