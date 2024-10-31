@@ -2104,6 +2104,109 @@ sum(foo:count) by(job) > 20`,
 			},
 		},
 		{
+			expr: "vector(scalar(foo))",
+			output: []utils.Source{
+				{
+					Type:          utils.FuncSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "vector",
+					FixedLabels:   true,
+					AlwaysReturns: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: `vector(scalar(foo))`,
+						},
+					},
+					Call: &promParser.Call{
+						Func: &promParser.Function{
+							Name: "vector",
+							ArgTypes: []promParser.ValueType{
+								promParser.ValueTypeScalar,
+							},
+							Variadic:   0,
+							ReturnType: promParser.ValueTypeVector,
+						},
+						Args: promParser.Expressions{
+							&promParser.Call{
+								Func: &promParser.Function{
+									Name: "scalar",
+									ArgTypes: []promParser.ValueType{
+										promParser.ValueTypeVector,
+									},
+									Variadic:   0,
+									ReturnType: promParser.ValueTypeScalar,
+								},
+								Args: promParser.Expressions{
+									mustParseVector("foo", 14),
+								},
+								PosRange: posrange.PositionRange{
+									Start: 7,
+									End:   18,
+								},
+							},
+						},
+						PosRange: posrange.PositionRange{
+							Start: 0,
+							End:   19,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "vector(0.0  >= bool 0.5) == 1",
+			output: []utils.Source{
+				{
+					Type:          utils.FuncSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "vector",
+					FixedLabels:   true,
+					AlwaysReturns: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: `vector(0.0  >= bool 0.5)`,
+						},
+					},
+					Call: &promParser.Call{
+						Func: &promParser.Function{
+							Name: "vector",
+							ArgTypes: []promParser.ValueType{
+								promParser.ValueTypeScalar,
+							},
+							Variadic:   0,
+							ReturnType: promParser.ValueTypeVector,
+						},
+						Args: promParser.Expressions{
+							&promParser.BinaryExpr{
+								Op: promParser.GTE,
+								LHS: &promParser.NumberLiteral{
+									Val: 0,
+									PosRange: posrange.PositionRange{
+										Start: 7,
+										End:   10,
+									},
+								},
+								RHS: &promParser.NumberLiteral{
+									Val: 0.5,
+									PosRange: posrange.PositionRange{
+										Start: 20,
+										End:   23,
+									},
+								},
+								ReturnBool: true,
+							},
+						},
+						PosRange: posrange.PositionRange{
+							Start: 0,
+							End:   24,
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `sum_over_time(foo{job="myjob"}[5m])`,
 			output: []utils.Source{
 				{
