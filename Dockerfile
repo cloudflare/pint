@@ -1,4 +1,4 @@
-FROM golang:1.23.2-alpine
+FROM golang:1.23.3-alpine
 COPY . /src
 WORKDIR /src
 RUN apk add make git
