@@ -2798,6 +2798,88 @@ groups:
 `),
 			strict: true,
 		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: |
+      {"up"}
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 6, Last: 7},
+								Value: "{\"up\"}\n",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: |
+      {'up'}
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 6, Last: 7},
+								Value: "{'up'}\n",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules:
+  - record: foo
+    expr: |
+      {'up' == 1}
+`),
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 5, Last: 5},
+							Value: "foo",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 6, Last: 7},
+								Value: "{'up' == 1}\n",
+							},
+							SyntaxError: errors.New("unexpected character inside braces: '1'"),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
