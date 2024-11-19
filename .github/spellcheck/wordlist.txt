@@ -58,6 +58,7 @@ unmarshal
 uptime
 URI
 URIs
+UTF
 validator
 VCS
 yaml

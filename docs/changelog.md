@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.68.0
+
+### Changed
+
+- pint now uses [Prometheus 3.0](https://prometheus.io/blog/2024/11/14/prometheus-3-0/) libraries
+  for parsing PromQL, which adds support for new query syntax that allows for dots and UTF-8 chars
+  in metric/label names, example:
+
+  ```js
+  {"status.üp"} == 0
+  ```
+
 ## v0.67.3
 
 ### Fixed
