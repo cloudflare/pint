@@ -409,5 +409,14 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 		})
 	}
 
+	if rule.Report != nil {
+		rules = append(rules, parsedRule{
+			match:  defaultRuleMatch(rule.Match, defaultStates),
+			ignore: rule.Ignore,
+			name:   checks.CostCheckName,
+			check:  checks.NewReportCheck(rule.Report.Comment, rule.Report.getSeverity()),
+		})
+	}
+
 	return rules
 }
