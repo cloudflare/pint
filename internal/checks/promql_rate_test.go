@@ -27,7 +27,11 @@ func notCounterText(name, uri, fun, metric, kind string) string {
 }
 
 func rateSumText(rateName, sumExpr string) string {
-	return fmt.Sprintf("`rate(sum(counter))` chain detected, `rate(%s)` is called here on results of `%s`, calling `rate()` on `sum()` results will return bogus results, always `sum(rate(counter))`, never `rate(sum(counter))`.", rateName, sumExpr)
+	return fmt.Sprintf("`rate(sum(counter))` chain detected, `rate(%s)` is called here on results of `%s`.", rateName, sumExpr)
+}
+
+func rateSumDetails() string {
+	return "You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`"
 }
 
 func TestRateCheck(t *testing.T) {
@@ -678,6 +682,7 @@ func TestRateCheck(t *testing.T) {
 						},
 						Reporter: "promql/rate",
 						Text:     rateSumText("my:sum[5m]", "sum(foo)"),
+						Details:  rateSumDetails(),
 						Severity: checks.Bug,
 					},
 				}
@@ -834,6 +839,55 @@ func TestRateCheck(t *testing.T) {
 					conds: []requestCondition{
 						requireMetadataPath,
 						formCond{"metric", "my:sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "sum(rate(sum)) / sum(rate(sum))",
+			content: `
+- alert: Plexi_Worker_High_Signing_Latency
+  expr: |
+    sum(
+      rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
+    ) by (environment, namespace)
+    /
+    sum(
+      rate(global:response_time_count{namespace!~"test[.].+"}[15m])
+    ) by (environment, namespace)
+    > 3000
+`,
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: global:response_time_sum
+  expr: sum(response_time_sum:rate2m)
+- record: response_time_sum:rate2m
+  expr: rate(response_time_sum[2m])
+`),
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  11,
+						},
+						Reporter: "promql/rate",
+						Text:     rateSumText(`global:response_time_sum{namespace!~"test[.].+"}[15m]`, "sum(response_time_sum:rate2m)"),
+						Details:  rateSumDetails(),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 53s\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
 					},
 					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
 				},

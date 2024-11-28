@@ -12,6 +12,9 @@
   {"status.üp"} == 0
   ```
 
+- [promql/rate](checks/promql/rate.md) will now report a warning if it detects a `rate(sum(...))`
+  but doesn't have metadata to confirm if `...` is a counter or not.
+
 ## v0.67.3
 
 ### Fixed

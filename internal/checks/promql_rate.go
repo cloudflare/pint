@@ -144,9 +144,12 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 						continue
 					}
 					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError == nil && e.Rule.RecordingRule.Record.Value == s.Name {
-						for _, sm := range utils.HasOuterSum(e.Rule.RecordingRule.Expr.Query) {
-							if sv, ok := sm.Expr.(*promParser.VectorSelector); ok {
-								metadata, err := c.prom.Metadata(ctx, sv.Name)
+						for _, src := range utils.LabelsSource(e.Rule.RecordingRule.Expr.Value.Value, e.Rule.RecordingRule.Expr.Query.Expr) {
+							if src.Type != utils.AggregateSource {
+								continue
+							}
+							for _, vs := range src.Selectors {
+								metadata, err := c.prom.Metadata(ctx, vs.Name)
 								if err != nil {
 									text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 									problems = append(problems, exprProblem{
@@ -155,15 +158,30 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 									})
 									continue
 								}
+								canReport := true
+								severity := Warning
 								for _, m := range metadata.Metadata {
-									if m.Type == v1.MetricTypeCounter {
-										problems = append(problems, exprProblem{
-											text: fmt.Sprintf("`rate(sum(counter))` chain detected, `%s` is called here on results of `%s`, calling `rate()` on `sum()` results will return bogus results, always `sum(rate(counter))`, never `rate(sum(counter))`.",
-												node.Expr, sm),
-											severity: Bug,
-										})
+									// nolint:exhaustive
+									switch m.Type {
+									case v1.MetricTypeCounter:
+										severity = Bug
+									default:
+										canReport = false
 									}
 								}
+								if !canReport {
+									continue
+								}
+								problems = append(problems, exprProblem{
+									text: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
+										src.Operation, node.Expr, src.Operation, vs),
+									details: fmt.Sprintf(
+										"You can only calculate `rate()` directly from a counter metric. "+
+											"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
+											"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
+										src.Operation, src.Operation),
+									severity: severity,
+								})
 							}
 						}
 					}
