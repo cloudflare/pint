@@ -53,7 +53,7 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 		return nil
 	}
 
-	for _, problem := range c.checkAggregation(expr.Query) {
+	for _, problem := range c.checkAggregation(expr.Value.Value, expr.Query) {
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
@@ -78,7 +78,7 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	return problems
 }
 
-func (c FragileCheck) checkAggregation(node *parser.PromQLNode) (problems []exprProblem) {
+func (c FragileCheck) checkAggregation(query string, node *parser.PromQLNode) (problems []exprProblem) {
 	if n := utils.HasOuterBinaryExpr(node); n != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
 		if n.VectorMatching != nil && n.VectorMatching.On {
 			goto NEXT
@@ -91,8 +91,8 @@ func (c FragileCheck) checkAggregation(node *parser.PromQLNode) (problems []expr
 		}
 		var isFragile bool
 		for _, child := range node.Children {
-			for _, agg := range utils.HasOuterAggregation(child) {
-				if agg.Without {
+			for _, src := range utils.LabelsSource(query, child.Expr) {
+				if src.Type == utils.AggregateSource && !src.FixedLabels {
 					isFragile = true
 				}
 			}
@@ -120,7 +120,7 @@ func (c FragileCheck) checkAggregation(node *parser.PromQLNode) (problems []expr
 
 NEXT:
 	for _, child := range node.Children {
-		problems = append(problems, c.checkAggregation(child)...)
+		problems = append(problems, c.checkAggregation(query, child)...)
 	}
 
 	return problems
