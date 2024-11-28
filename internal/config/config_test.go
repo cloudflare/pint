@@ -2161,6 +2161,37 @@ rule {
 				checks.AlertsExternalLabelsCheckName + "(prom2)",
 			},
 		},
+		{
+			title: "reject rules",
+			config: `
+rule {
+  match {
+    kind = "recording"
+  }
+  report {
+    comment  = "You cannot add any recording rules to this Prometheus server."
+    severity = "bug"
+  }
+}
+`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.ReportCheckName,
+			},
+		},
 	}
 
 	dir := t.TempDir()
@@ -2548,6 +2579,24 @@ func TestConfigErrors(t *testing.T) {
   disable = ["bob"]
 }`,
 			err: "unknown check name bob",
+		},
+		{
+			config: `rule {
+  report {
+    comment = ""
+	severity = "warning"
+  }
+}`,
+			err: "report comment cannot be empty",
+		},
+		{
+			config: `rule {
+  report {
+    comment = "foo"
+	severity = "xxx"
+  }
+}`,
+			err: "unknown severity: xxx",
 		},
 	}
 

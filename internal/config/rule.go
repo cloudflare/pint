@@ -24,6 +24,7 @@ type Rule struct {
 	For           *ForSettings         `hcl:"for,block" json:"for,omitempty"`
 	KeepFiringFor *ForSettings         `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
 	RangeQuery    *RangeQuerySettings  `hcl:"range_query,block" json:"range_query,omitempty"`
+	Report        *ReportSettings      `hcl:"report,block" json:"report,omitempty"`
 	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
 	RuleName      []RuleNameSettings   `hcl:"name,block" json:"name,omitempty"`
@@ -116,6 +117,12 @@ func (rule Rule) validate() (err error) {
 
 	if rule.RangeQuery != nil {
 		if err = rule.RangeQuery.validate(); err != nil {
+			return err
+		}
+	}
+
+	if rule.Report != nil {
+		if err = rule.Report.validate(); err != nil {
 			return err
 		}
 	}

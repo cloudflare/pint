@@ -37,6 +37,7 @@ var (
 		LabelCheckName,
 		RuleLinkCheckName,
 		RejectCheckName,
+		ReportCheckName,
 	}
 	OnlineChecks = []string{
 		AlertsAbsentCheckName,

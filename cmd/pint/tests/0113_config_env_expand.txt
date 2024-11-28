@@ -43,7 +43,8 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       "rule/name",
       "rule/label",
       "rule/link",
-      "rule/reject"
+      "rule/reject",
+      "rule/report"
     ]
   },
   "owners": {},

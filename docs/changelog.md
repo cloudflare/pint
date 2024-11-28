@@ -2,6 +2,10 @@
 
 ## v0.68.0
 
+### Added
+
+- Added [rule/report](checks/rule/report.md) check.
+
 ### Changed
 
 - pint now uses [Prometheus 3.0](https://prometheus.io/blog/2024/11/14/prometheus-3-0/) libraries
