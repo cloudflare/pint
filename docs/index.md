@@ -32,6 +32,11 @@ If you run pint against a different service, like [Thanos](https://thanos.io/) s
 might return problems due to API call errors, since not all Prometheus HTTP APIs are supported by it.
 In that case, you might want to disable failing checks in the pint configuration file.
 
+**IMPORTANT** `pint` is a tool we wrote to work with our **Prometheus** deployment. It's not intended to be
+used with other services that offer partial compatibility with Prometheus, there are **NO PLANS**
+to add support for any other services. The only reason we would add support for other systems is if
+we started to use them ourselves.
+
 ## Usage
 
 There are three modes it works in:

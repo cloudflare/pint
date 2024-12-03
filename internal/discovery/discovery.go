@@ -85,7 +85,7 @@ type Entry struct {
 	State          ChangeType
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (entries []Entry, err error) {
+func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool, schema parser.Schema) (entries []Entry, err error) {
 	content, fileComments, err := parser.ReadContent(r)
 	if err != nil {
 		return nil, err
@@ -153,7 +153,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool) (ent
 		return entries, nil
 	}
 
-	p := parser.NewParser(isStrict)
+	p := parser.NewParser(isStrict, schema)
 	rules, err := p.Parse(content.Body)
 	if err != nil {
 		slog.Warn(

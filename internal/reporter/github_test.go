@@ -36,7 +36,7 @@ func TestGithubReporter(t *testing.T) {
 		timeout     time.Duration
 	}
 
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

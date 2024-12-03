@@ -1,0 +1,26 @@
+! exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+rules/1.yml:7 Fatal: This rule is not a valid Prometheus rule: `invalid partial_response_strategy value: bob`. (yaml/parse)
+ 7 |     partial_response_strategy: bob
+
+level=INFO msg="Problems found" Fatal=1
+level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+-- rules/1.yml --
+groups:
+- name: foo
+  rules:
+  - alert: foo
+    expr: up == 0
+  - record: bar
+    partial_response_strategy: bob
+    expr: sum(up)
+
+-- .pint.hcl --
+parser {
+  schema = "thanos"
+}

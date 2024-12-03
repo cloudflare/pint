@@ -40,7 +40,7 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(content []byte, doc *yaml.Node) (rules []Rule, err ParseError) {
+func parseGroups(content []byte, doc *yaml.Node, schema Schema) (rules []Rule, err ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
@@ -71,7 +71,7 @@ func parseGroups(content []byte, doc *yaml.Node) (rules []Rule, err ParseError) 
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
-				name, r, err := parseGroup(content, group)
+				name, r, err := parseGroup(content, group, schema)
 				if err.Err != nil {
 					return rules, err
 				}
@@ -89,7 +89,7 @@ func parseGroups(content []byte, doc *yaml.Node) (rules []Rule, err ParseError) 
 	return rules, ParseError{}
 }
 
-func parseGroup(content []byte, group *yaml.Node) (name string, rules []Rule, err ParseError) {
+func parseGroup(content []byte, group *yaml.Node, schema Schema) (name string, rules []Rule, err ParseError) {
 	if !isTag(group.ShortTag(), mapTag) {
 		return "", nil, ParseError{
 			Line: group.Line,
@@ -143,7 +143,7 @@ func parseGroup(content []byte, group *yaml.Node) (name string, rules []Rule, er
 				}
 			}
 			for _, rule := range unpackNodes(entry.val) {
-				r, err := parseRuleStrict(content, rule)
+				r, err := parseRuleStrict(content, rule, schema)
 				if err.Err != nil {
 					return "", nil, err
 				}
@@ -177,7 +177,7 @@ func parseGroup(content []byte, group *yaml.Node) (name string, rules []Rule, er
 	return name, rules, ParseError{}
 }
 
-func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
+func parseRuleStrict(content []byte, rule *yaml.Node, schema Schema) (Rule, ParseError) {
 	if !isTag(rule.ShortTag(), mapTag) {
 		return Rule{}, ParseError{
 			Line: rule.Line,
@@ -190,13 +190,20 @@ func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
 			continue
 		}
 		switch node.Value {
-		case "record":
-		case "alert":
-		case "expr":
-		case "for":
-		case "keep_firing_for":
-		case "labels":
-		case "annotations":
+		case recordKey:
+		case alertKey:
+		case exprKey:
+		case forKey:
+		case keepFiringForKey:
+		case labelsKey:
+		case annotationsKey:
+		case partialResponseStrategyKey:
+			if schema != ThanosSchema {
+				return Rule{}, ParseError{
+					Line: node.Line,
+					Err:  fmt.Errorf("%s is only valid when parser is configured to use the Thanos rule schema", node.Value),
+				}
+			}
 		default:
 			return Rule{}, ParseError{
 				Line: node.Line,
@@ -205,6 +212,6 @@ func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
 		}
 	}
 
-	r, _ := parseRule(content, rule, 0)
+	r, _ := parseRule(content, rule, 0, schema)
 	return r, ParseError{}
 }
