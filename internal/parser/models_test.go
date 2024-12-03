@@ -10,7 +10,7 @@ import (
 )
 
 func newMustRule(content string) parser.Rule {
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	rules, err := p.Parse([]byte(content))
 	if err != nil {
 		panic(err)

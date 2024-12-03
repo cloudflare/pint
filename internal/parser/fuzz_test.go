@@ -276,7 +276,7 @@ labels:
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	f.Fuzz(func(t *testing.T, s string) {
 		t.Logf("Parsing: [%s]\n", s)
 		_, _ = p.Parse([]byte(s))

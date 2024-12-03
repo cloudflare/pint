@@ -16,6 +16,7 @@ import (
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/log"
+	"github.com/cloudflare/pint/internal/parser"
 )
 
 func BenchmarkFindEntries(b *testing.B) {
@@ -24,6 +25,7 @@ func BenchmarkFindEntries(b *testing.B) {
 	finder := discovery.NewGlobFinder(
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
+		parser.PrometheusSchema,
 	)
 	for n := 0; n < b.N; n++ {
 		_, _ = finder.Find()
@@ -36,6 +38,7 @@ func BenchmarkCheckRules(b *testing.B) {
 	finder := discovery.NewGlobFinder(
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
+		parser.PrometheusSchema,
 	)
 	entries, err := finder.Find()
 	if err != nil {

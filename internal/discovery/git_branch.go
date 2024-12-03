@@ -18,12 +18,14 @@ func NewGitBranchFinder(
 	filter git.PathFilter,
 	baseBranch string,
 	maxCommits int,
+	schema parser.Schema,
 ) GitBranchFinder {
 	return GitBranchFinder{
 		gitCmd:     gitCmd,
 		filter:     filter,
 		baseBranch: baseBranch,
 		maxCommits: maxCommits,
+		schema:     schema,
 	}
 }
 
@@ -32,6 +34,7 @@ type GitBranchFinder struct {
 	baseBranch string
 	filter     git.PathFilter
 	maxCommits int
+	schema     parser.Schema
 }
 
 func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
@@ -59,6 +62,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			change.Path.Before.Name,
 			bytes.NewReader(change.Body.Before),
 			!f.filter.IsRelaxed(change.Path.Before.Name),
+			f.schema,
 		)
 		if err != nil {
 			slog.Debug("Cannot read before rules", slog.String("path", change.Path.Before.Name), slog.Any("err", err))
@@ -68,6 +72,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			change.Path.After.Name,
 			bytes.NewReader(change.Body.After),
 			!f.filter.IsRelaxed(change.Path.After.Name),
+			f.schema,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("invalid file syntax: %w", err)

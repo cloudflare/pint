@@ -14,6 +14,7 @@ import (
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/urfave/cli/v2"
@@ -100,13 +101,14 @@ func actionCI(c *cli.Context) error {
 		config.MustCompileRegexes(meta.cfg.Parser.Exclude...),
 		config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
 	)
+	schema := parseSchema(meta.cfg.Parser.Schema)
 
-	entries, err = discovery.NewGlobFinder([]string{"*"}, filter).Find()
+	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema).Find()
 	if err != nil {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits).Find(entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema).Find(entries)
 	if err != nil {
 		return err
 	}
@@ -373,4 +375,11 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		return nil
 	}
 	return gh
+}
+
+func parseSchema(s string) parser.Schema {
+	if s == config.SchemaThanos {
+		return parser.ThanosSchema
+	}
+	return parser.PrometheusSchema
 }

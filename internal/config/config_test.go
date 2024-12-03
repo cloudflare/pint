@@ -136,7 +136,7 @@ func TestSetDisabledChecks(t *testing.T) {
 }
 
 func newRule(t *testing.T, content string) parser.Rule {
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	rules, err := p.Parse([]byte(content))
 	if err != nil {
 		t.Error(err)

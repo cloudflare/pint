@@ -50,7 +50,7 @@ func TestGitLabReporter(t *testing.T) {
 		maxComments int
 	}
 
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0
@@ -408,7 +408,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 		anchor          checks.Anchor
 	}
 
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

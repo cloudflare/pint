@@ -41,6 +41,22 @@ func TestParserSettings(t *testing.T) {
 			},
 			err: errors.New("error parsing regexp: invalid nested repetition operator: `++`"),
 		},
+		{
+			conf: Parser{
+				Schema: SchemaPrometheus,
+			},
+		},
+		{
+			conf: Parser{
+				Schema: SchemaThanos,
+			},
+		},
+		{
+			conf: Parser{
+				Schema: "xxx",
+			},
+			err: errors.New("unsupported parser scheme: xxx"),
+		},
 	}
 
 	for _, tc := range testCases {

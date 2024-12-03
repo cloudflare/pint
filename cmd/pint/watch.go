@@ -19,6 +19,7 @@ import (
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
+	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 
@@ -202,10 +203,12 @@ func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 		return err
 	}
 
+	schema := parseSchema(meta.cfg.Parser.Schema)
+
 	// start timer to run every $interval
 	ack := make(chan bool, 1)
 	mainCtx, mainCancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
-	stop := startTimer(mainCtx, meta.workers, meta.isOffline, gen, interval, ack, collector)
+	stop := startTimer(mainCtx, meta.workers, meta.isOffline, gen, schema, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -229,7 +232,7 @@ func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 	return nil
 }
 
-func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
+func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, schema parser.Schema, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
 	ticker := time.NewTicker(time.Second)
 	stop := make(chan bool, 1)
 	wasBootstrapped := false
@@ -243,7 +246,7 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
-				if err := collector.scan(ctx, workers, isOffline, gen); err != nil {
+				if err := collector.scan(ctx, workers, isOffline, gen, schema); err != nil {
 					slog.Error("Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
@@ -301,18 +304,22 @@ func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks
 	}
 }
 
-func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator) error {
+func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, schema parser.Schema) error {
 	paths, err := c.finder(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get the list of paths to check: %w", err)
 	}
 
 	slog.Info("Finding all rules to check", slog.Any("paths", paths))
-	entries, err := discovery.NewGlobFinder(paths, git.NewPathFilter(
-		config.MustCompileRegexes(c.cfg.Parser.Include...),
-		config.MustCompileRegexes(c.cfg.Parser.Exclude...),
-		config.MustCompileRegexes(c.cfg.Parser.Relaxed...),
-	)).Find()
+	entries, err := discovery.NewGlobFinder(
+		paths,
+		git.NewPathFilter(
+			config.MustCompileRegexes(c.cfg.Parser.Include...),
+			config.MustCompileRegexes(c.cfg.Parser.Exclude...),
+			config.MustCompileRegexes(c.cfg.Parser.Relaxed...),
+		),
+		schema,
+	).Find()
 	if err != nil {
 		return err
 	}

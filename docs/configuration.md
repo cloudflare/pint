@@ -64,12 +64,21 @@ Syntax:
 
 ```js
 parser {
+  schema  = "prometheus|thanos"
   include = [ "(.*)", ... ]
   exclude = [ "(.*)", ... ]
   relaxed = [ "(.*)", ... ]
 }
 ```
 
+- `schema` - rule file schema to use, valid values are `prometheus` and `thanos`.
+  Setting it to `prometheus` means that pint will assume that all rules have the schema
+  as defined in [alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
+  and [recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+  Prometheus docs.
+  Setting it to `thanos` will tell pint to use the schema as defined
+  in [Thanos Rule](https://thanos.io/tip/components/rule.md/) docs.
+  Default value is `prometheus`.
 - `include` - list of file patterns to check when running checks. Only files
   matching those regexp rules will be checked, other modified files will be ignored.
 - `exclude` - list of file patterns to ignore when running checks.

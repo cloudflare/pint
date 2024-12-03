@@ -73,7 +73,7 @@ func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool
 }
 
 func TestCommenter(t *testing.T) {
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0
@@ -752,7 +752,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 		maxComments int
 	}
 
-	p := parser.NewParser(false)
+	p := parser.NewParser(false, parser.PrometheusSchema)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.69.0
+
+### Added
+
+- Added `schema` option to the `parser` configuration block for setting rule validation
+  schema. Default value is `prometheus` and tells pint to expect rules with the schema
+  expected by Prometheus itself. If you use pint to validate rules loaded into Thanos Rule
+  component then set `schema` to `thanos` in your pint config file:
+
+  ```js
+  parser {
+    schema = "thanos"
+  }
+  ```
+
 ## v0.68.0
 
 ### Added
