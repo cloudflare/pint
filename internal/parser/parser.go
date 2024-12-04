@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	// Standard Prometheus fields.
 	recordKey        = "record"
 	exprKey          = "expr"
 	labelsKey        = "labels"
@@ -25,9 +24,6 @@ const (
 	forKey           = "for"
 	keepFiringForKey = "keep_firing_for"
 	annotationsKey   = "annotations"
-
-	// Thanos Rule specific fields.
-	partialResponseStrategyKey = "partial_response_strategy"
 )
 
 var ErrRuleCommentOnFile = errors.New("this comment is only valid when attached to a rule")
@@ -100,7 +96,7 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 }
 
 func parseNode(content []byte, node *yaml.Node, offset int, schema Schema) (rules []Rule) {
-	ret, isEmpty := parseRule(content, node, offset, schema)
+	ret, isEmpty := parseRule(content, node, offset)
 	if !isEmpty {
 		rules = append(rules, ret)
 		return rules
@@ -115,7 +111,7 @@ func parseNode(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 				rules = append(rules, parseNode(content, n, offset, schema)...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty = parseRule(content, root, offset, schema)
+			rule, isEmpty = parseRule(content, root, offset)
 			if !isEmpty {
 				rules = append(rules, rule)
 			} else {
@@ -136,7 +132,7 @@ func parseNode(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 	return rules
 }
 
-func parseRule(content []byte, node *yaml.Node, offset int, schema Schema) (rule Rule, _ bool) {
+func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) {
 	if node.Kind != yaml.MappingNode {
 		return rule, true
 	}
@@ -149,7 +145,6 @@ func parseRule(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 	var forPart *YamlNode
 	var keepFiringForPart *YamlNode
 	var annotationsPart *YamlMap
-	var partialResponseStrategyPart *YamlNode
 
 	var recordNode *yaml.Node
 	var alertNode *yaml.Node
@@ -158,7 +153,6 @@ func parseRule(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 	var keepFiringForNode *yaml.Node
 	var labelsNode *yaml.Node
 	var annotationsNode *yaml.Node
-	var partialResponseStrategyNode *yaml.Node
 
 	labelsNodes := []yamlMap{}
 	annotationsNodes := []yamlMap{}
@@ -248,18 +242,6 @@ func parseRule(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 				annotationsNodes = mappingNodes(part)
 				annotationsPart = newYamlMap(key, part, offset)
 				lines.Last = max(lines.Last, annotationsPart.Lines.Last)
-			case partialResponseStrategyKey:
-				if schema != ThanosSchema {
-					unknownKeys = append(unknownKeys, key)
-					continue
-				}
-
-				if partialResponseStrategyPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, partialResponseStrategyKey)
-				}
-				partialResponseStrategyNode = part
-				partialResponseStrategyPart = newYamlNodeWithKey(key, part, offset)
-				lines.Last = max(lines.Last, partialResponseStrategyPart.Lines.Last)
 			default:
 				unknownKeys = append(unknownKeys, key)
 			}
@@ -455,25 +437,6 @@ func parseRule(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 					},
 				}, false
 			}
-		}
-	}
-
-	if partialResponseStrategyPart != nil && partialResponseStrategyNode != nil {
-		val := nodeValue(partialResponseStrategyNode)
-		if !isTag(partialResponseStrategyNode.ShortTag(), strTag) {
-			return invalidValueError(lines, partialResponseStrategyNode.Line+offset, partialResponseStrategyKey, describeTag(strTag), describeTag(partialResponseStrategyNode.ShortTag()))
-		}
-		switch val {
-		case "warn":
-		case "abort":
-		default:
-			return Rule{
-				Lines: lines,
-				Error: ParseError{
-					Line: partialResponseStrategyPart.Lines.First,
-					Err:  fmt.Errorf("invalid %s value: %s", partialResponseStrategyKey, val),
-				},
-			}, false
 		}
 	}
 
