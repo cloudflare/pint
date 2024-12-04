@@ -8,11 +8,11 @@ level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": uns
 -- rules/1.yml --
 groups:
 - name: foo
+  partial_response_strategy: bob
   rules:
   - alert: foo
     expr: up == 0
   - record: bar
-    partial_response_strategy: bob
     expr: sum(up)
 
 -- .pint.hcl --

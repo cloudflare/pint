@@ -2885,90 +2885,36 @@ groups:
 			content: []byte(`
 groups:
 - name: mygroup
+  partial_response_strategy: bob
   rules:
   - record: up:count
     expr: count(up)
-    partial_response_strategy: bob
 `),
 			strict: true,
-			err:    "error at line 7: partial_response_strategy is only valid when parser is configured to use the Thanos rule schema",
+			err:    "error at line 4: partial_response_strategy is only valid when parser is configured to use the Thanos rule schema",
 		},
 		{
 			content: []byte(`
 groups:
 - name: mygroup
-  rules:
-  - record: up:count
-    expr: count(up)
-    partial_response_strategy: warn
-`),
-			strict: true,
-			schema: parser.ThanosSchema,
-			output: []parser.Rule{
-				{
-					Lines: parser.LineRange{First: 5, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Lines: parser.LineRange{First: 5, Last: 5},
-							Value: "up:count",
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "count(up)",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			content: []byte(`
-groups:
-- name: mygroup
-  rules:
-  - record: up:count
-    expr: count(up)
-    partial_response_strategy: abort
-`),
-			strict: true,
-			schema: parser.ThanosSchema,
-			output: []parser.Rule{
-				{
-					Lines: parser.LineRange{First: 5, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Lines: parser.LineRange{First: 5, Last: 5},
-							Value: "up:count",
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 6, Last: 6},
-								Value: "count(up)",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			content: []byte(`
-- record: up:count
-  expr: count(up)
   partial_response_strategy: warn
+  rules:
+  - record: up:count
+    expr: count(up)
 `),
+			strict: true,
 			schema: parser.ThanosSchema,
 			output: []parser.Rule{
 				{
-					Lines: parser.LineRange{First: 2, Last: 4},
+					Lines: parser.LineRange{First: 6, Last: 7},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlNode{
-							Lines: parser.LineRange{First: 2, Last: 2},
+							Lines: parser.LineRange{First: 6, Last: 6},
 							Value: "up:count",
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
+								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "count(up)",
 							},
 						},
@@ -2978,22 +2924,26 @@ groups:
 		},
 		{
 			content: []byte(`
-- record: up:count
-  expr: count(up)
+groups:
+- name: mygroup
   partial_response_strategy: abort
+  rules:
+  - record: up:count
+    expr: count(up)
 `),
+			strict: true,
 			schema: parser.ThanosSchema,
 			output: []parser.Rule{
 				{
-					Lines: parser.LineRange{First: 2, Last: 4},
+					Lines: parser.LineRange{First: 6, Last: 7},
 					RecordingRule: &parser.RecordingRule{
 						Record: parser.YamlNode{
-							Lines: parser.LineRange{First: 2, Last: 2},
+							Lines: parser.LineRange{First: 6, Last: 6},
 							Value: "up:count",
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines: parser.LineRange{First: 3, Last: 3},
+								Lines: parser.LineRange{First: 7, Last: 7},
 								Value: "count(up)",
 							},
 						},
@@ -3005,19 +2955,27 @@ groups:
 			content: []byte(`
 groups:
 - name: mygroup
+  partial_response_strategy: abort
   rules:
   - record: up:count
     expr: count(up)
-    partial_response_strategy: bob
 `),
-			strict: true,
-			schema: parser.ThanosSchema,
+			strict: false,
+			schema: parser.PrometheusSchema,
 			output: []parser.Rule{
 				{
-					Lines: parser.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("invalid partial_response_strategy value: bob"),
+					Lines: parser.LineRange{First: 6, Last: 7},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 6, Last: 6},
+							Value: "up:count",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 7, Last: 7},
+								Value: "count(up)",
+							},
+						},
 					},
 				},
 			},
@@ -3026,41 +2984,27 @@ groups:
 			content: []byte(`
 groups:
 - name: mygroup
+  partial_response_strategy: bob
   rules:
   - record: up:count
     expr: count(up)
-    partial_response_strategy: 1
 `),
 			strict: true,
 			schema: parser.ThanosSchema,
-			output: []parser.Rule{
-				{
-					Lines: parser.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("partial_response_strategy value must be a string, got integer instead"),
-					},
-				},
-			},
+			err:    "error at line 4: invalid partial_response_strategy value: bob",
 		},
 		{
-			content: []byte("- record: foo\n  expr: foo\n  partial_response_strategy: true\n"),
-			output: []parser.Rule{
-				{
-					Lines: parser.LineRange{First: 1, Last: 3},
-					Error: parser.ParseError{Err: errors.New("invalid key(s) found: partial_response_strategy"), Line: 3},
-				},
-			},
-		},
-		{
-			content: []byte("- record: foo\n  expr: foo\n  partial_response_strategy: true\n  partial_response_strategy: false\n"),
-			schema:  parser.ThanosSchema,
-			output: []parser.Rule{
-				{
-					Lines: parser.LineRange{First: 1, Last: 4},
-					Error: parser.ParseError{Err: errors.New("duplicated partial_response_strategy key"), Line: 4},
-				},
-			},
+			content: []byte(`
+groups:
+- name: mygroup
+  partial_response_strategy: 1
+  rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			schema: parser.ThanosSchema,
+			err:    "error at line 4: partial_response_strategy must be a string, got integer",
 		},
 	}
 

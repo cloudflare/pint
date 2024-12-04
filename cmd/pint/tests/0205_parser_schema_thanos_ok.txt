@@ -8,12 +8,17 @@ level=INFO msg="Finding all rules to check" paths=["rules"]
 -- rules/1.yml --
 groups:
 - name: foo
+  partial_response_strategy: warn
   rules:
   - alert: foo
-    partial_response_strategy: warn
     expr: up == 0
+
+-- rules/2.yml --
+groups:
+- name: foo
+  partial_response_strategy: abort
+  rules:
   - record: bar
-    partial_response_strategy: abort
     expr: sum(up)
 
 -- .pint.hcl --

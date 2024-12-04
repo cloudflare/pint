@@ -143,11 +143,33 @@ func parseGroup(content []byte, group *yaml.Node, schema Schema) (name string, r
 				}
 			}
 			for _, rule := range unpackNodes(entry.val) {
-				r, err := parseRuleStrict(content, rule, schema)
+				r, err := parseRuleStrict(content, rule)
 				if err.Err != nil {
 					return "", nil, err
 				}
 				rules = append(rules, r)
+			}
+		case "partial_response_strategy":
+			if schema != ThanosSchema {
+				return "", nil, ParseError{
+					Line: entry.key.Line,
+					Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
+				}
+			}
+			if !isTag(entry.val.ShortTag(), strTag) {
+				return "", nil, ParseError{
+					Line: entry.key.Line,
+					Err:  fmt.Errorf("partial_response_strategy must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
+				}
+			}
+			switch val := nodeValue(entry.val); val {
+			case "warn":
+			case "abort":
+			default:
+				return "", nil, ParseError{
+					Line: entry.key.Line,
+					Err:  fmt.Errorf("invalid partial_response_strategy value: %s", val),
+				}
 			}
 		default:
 			return "", nil, ParseError{
@@ -177,7 +199,7 @@ func parseGroup(content []byte, group *yaml.Node, schema Schema) (name string, r
 	return name, rules, ParseError{}
 }
 
-func parseRuleStrict(content []byte, rule *yaml.Node, schema Schema) (Rule, ParseError) {
+func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
 	if !isTag(rule.ShortTag(), mapTag) {
 		return Rule{}, ParseError{
 			Line: rule.Line,
@@ -197,13 +219,6 @@ func parseRuleStrict(content []byte, rule *yaml.Node, schema Schema) (Rule, Pars
 		case keepFiringForKey:
 		case labelsKey:
 		case annotationsKey:
-		case partialResponseStrategyKey:
-			if schema != ThanosSchema {
-				return Rule{}, ParseError{
-					Line: node.Line,
-					Err:  fmt.Errorf("%s is only valid when parser is configured to use the Thanos rule schema", node.Value),
-				}
-			}
 		default:
 			return Rule{}, ParseError{
 				Line: node.Line,
@@ -212,6 +227,6 @@ func parseRuleStrict(content []byte, rule *yaml.Node, schema Schema) (Rule, Pars
 		}
 	}
 
-	r, _ := parseRule(content, rule, 0, schema)
+	r, _ := parseRule(content, rule, 0)
 	return r, ParseError{}
 }
