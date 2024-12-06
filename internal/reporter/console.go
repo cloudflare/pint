@@ -5,93 +5,84 @@ import (
 	"io"
 	"log/slog"
 	"os"
-	"slices"
 	"strings"
 
 	"github.com/fatih/color"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 )
 
-func NewConsoleReporter(output io.Writer, minSeverity checks.Severity) ConsoleReporter {
-	return ConsoleReporter{output: output, minSeverity: minSeverity}
+func NewConsoleReporter(output io.Writer, minSeverity checks.Severity, noColor bool) ConsoleReporter {
+	return ConsoleReporter{
+		output:      output,
+		minSeverity: minSeverity,
+		noColor:     noColor,
+	}
 }
 
 type ConsoleReporter struct {
 	output      io.Writer
 	minSeverity checks.Severity
+	noColor     bool
 }
 
 func (cr ConsoleReporter) Submit(summary Summary) (err error) {
-	perFile := map[string][]string{}
-	for _, report := range summary.Reports() {
-		if report.Problem.Severity < cr.minSeverity {
-			continue
-		}
-
-		if _, ok := perFile[report.Path.Name]; !ok {
-			perFile[report.Path.Name] = []string{}
-		}
-
-		var content string
-		if report.Problem.Anchor == checks.AnchorAfter {
-			content, err = readFile(report.Path.Name)
-			if err != nil {
-				return err
+	var buf strings.Builder
+	var content string
+	for _, reports := range summary.ReportsPerPath() {
+		content = ""
+		for _, report := range reports {
+			if report.Problem.Severity < cr.minSeverity {
+				continue
 			}
-		}
+			if content == "" && report.Problem.Anchor == checks.AnchorAfter {
+				content, err = readFile(report.Path.Name)
+				if err != nil {
+					return err
+				}
+			}
+			buf.Reset()
 
-		path := report.Path.Name
-		if report.Path.Name != report.Path.SymlinkTarget {
-			path = fmt.Sprintf("%s ~> %s", report.Path.Name, report.Path.SymlinkTarget)
-		}
-		path = color.CyanString("%s:%s", path, report.Problem.Lines)
-		if report.Problem.Anchor == checks.AnchorBefore {
-			path += " " + color.RedString("(deleted)")
-		}
-		path += " "
+			buf.WriteString(output.MaybeColor(color.CyanString, cr.noColor, report.Path.Name)) // nolint:govet
+			if report.Path.Name != report.Path.SymlinkTarget {
+				buf.WriteString(output.MaybeColor(color.CyanString, cr.noColor, " ~> %s", report.Path.SymlinkTarget))
+			}
+			buf.WriteString(output.MaybeColor(color.CyanString, cr.noColor, ":%s", report.Problem.Lines.String()))
+			if report.Problem.Anchor == checks.AnchorBefore {
+				buf.WriteRune(' ')
+				buf.WriteString(output.MaybeColor(color.RedString, cr.noColor, "(deleted)"))
+			}
+			buf.WriteRune(' ')
 
-		msg := []string{path}
-		switch report.Problem.Severity {
-		case checks.Bug, checks.Fatal:
-			msg = append(msg, color.RedString("%s: %s", report.Problem.Severity, report.Problem.Text))
-		case checks.Warning:
-			msg = append(msg, color.YellowString("%s: %s", report.Problem.Severity, report.Problem.Text))
-		case checks.Information:
-			msg = append(msg, color.HiBlackString("%s: %s", report.Problem.Severity, report.Problem.Text))
-		}
-		msg = append(msg, color.MagentaString(" (%s)\n", report.Problem.Reporter))
+			switch report.Problem.Severity {
+			case checks.Bug, checks.Fatal:
+				buf.WriteString(output.MaybeColor(color.RedString, cr.noColor, "%s: %s", report.Problem.Severity, report.Problem.Text))
+			case checks.Warning:
+				buf.WriteString(output.MaybeColor(color.YellowString, cr.noColor, "%s: %s", report.Problem.Severity, report.Problem.Text))
+			case checks.Information:
+				buf.WriteString(output.MaybeColor(color.HiBlackString, cr.noColor, "%s: %s", report.Problem.Severity, report.Problem.Text))
+			}
+			buf.WriteString(output.MaybeColor(color.MagentaString, cr.noColor, " (%s)\n", report.Problem.Reporter))
 
-		if report.Problem.Anchor == checks.AnchorAfter {
-			lines := strings.Split(content, "\n")
-			lastLine := report.Problem.Lines.Last
-			if lastLine > len(lines)-1 {
-				lastLine = len(lines) - 1
-				slog.Warn(
-					"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
-					slog.String("path", report.Path.Name),
-				)
+			if report.Problem.Anchor == checks.AnchorAfter {
+				lines := strings.Split(content, "\n")
+				lastLine := report.Problem.Lines.Last
+				if lastLine > len(lines)-1 {
+					lastLine = len(lines) - 1
+					slog.Warn(
+						"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
+						slog.String("path", report.Path.Name),
+					)
+				}
+
+				nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
+				for i := report.Problem.Lines.First; i <= lastLine; i++ {
+					buf.WriteString(output.MaybeColor(color.WhiteString, cr.noColor, nrFmt+" | %s\n", i, lines[i-1]))
+				}
 			}
 
-			nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
-			for i := report.Problem.Lines.First; i <= lastLine; i++ {
-				msg = append(msg, color.WhiteString(nrFmt+" | %s\n", i, lines[i-1]))
-			}
-		}
-
-		perFile[report.Path.Name] = append(perFile[report.Path.Name], strings.Join(msg, ""))
-	}
-
-	paths := []string{}
-	for path := range perFile {
-		paths = append(paths, path)
-	}
-	slices.Sort(paths)
-
-	for _, path := range paths {
-		msgs := perFile[path]
-		for _, msg := range msgs {
-			fmt.Fprintln(cr.output, msg)
+			fmt.Fprintln(cr.output, buf.String())
 		}
 	}
 

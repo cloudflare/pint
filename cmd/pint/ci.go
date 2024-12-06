@@ -137,7 +137,7 @@ func actionCI(c *cli.Context) error {
 	if c.Bool(teamCityFlag) {
 		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information))
+		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information, c.Bool(noColorFlag)))
 	}
 	if c.String(checkStyleFlag) != "" {
 		var f *os.File

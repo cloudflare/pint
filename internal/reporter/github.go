@@ -367,7 +367,7 @@ func formatGHReviewBody(version string, summary Summary) string {
 	b.WriteString("<details><summary>Problems</summary>\n<p>\n\n")
 	if len(summary.Reports()) > 0 {
 		buf := bytes.NewBuffer(nil)
-		cr := NewConsoleReporter(buf, checks.Information)
+		cr := NewConsoleReporter(buf, checks.Information, true)
 		err := cr.Submit(summary)
 		if err != nil {
 			b.WriteString(fmt.Sprintf("Failed to generate list of problems: %s", err))

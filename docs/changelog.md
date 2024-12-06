@@ -15,6 +15,10 @@
   }
   ```
 
+### Fixed
+
+- The console reporter won't color the output if `--no-color` flag is set.
+
 ## v0.68.0
 
 ### Added
