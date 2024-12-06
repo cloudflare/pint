@@ -7,8 +7,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fatih/color"
-
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
 )
@@ -44,26 +42,28 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			}
 			buf.Reset()
 
-			buf.WriteString(output.MaybeColor(color.CyanString, cr.noColor, report.Path.Name)) // nolint:govet
+			buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, report.Path.Name))
 			if report.Path.Name != report.Path.SymlinkTarget {
-				buf.WriteString(output.MaybeColor(color.CyanString, cr.noColor, " ~> %s", report.Path.SymlinkTarget))
+				buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, " ~> "+report.Path.SymlinkTarget))
 			}
-			buf.WriteString(output.MaybeColor(color.CyanString, cr.noColor, ":%s", report.Problem.Lines.String()))
+			buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, ":"+report.Problem.Lines.String()))
 			if report.Problem.Anchor == checks.AnchorBefore {
-				buf.WriteRune(' ')
-				buf.WriteString(output.MaybeColor(color.RedString, cr.noColor, "(deleted)"))
+				buf.WriteString(output.MaybeColor(output.Red, cr.noColor, " (deleted)"))
 			}
 			buf.WriteRune(' ')
 
 			switch report.Problem.Severity {
 			case checks.Bug, checks.Fatal:
-				buf.WriteString(output.MaybeColor(color.RedString, cr.noColor, "%s: %s", report.Problem.Severity, report.Problem.Text))
+				buf.WriteString(output.MaybeColor(output.Red, cr.noColor,
+					report.Problem.Severity.String()+": "+report.Problem.Text))
 			case checks.Warning:
-				buf.WriteString(output.MaybeColor(color.YellowString, cr.noColor, "%s: %s", report.Problem.Severity, report.Problem.Text))
+				buf.WriteString(output.MaybeColor(output.Yellow, cr.noColor,
+					report.Problem.Severity.String()+": "+report.Problem.Text))
 			case checks.Information:
-				buf.WriteString(output.MaybeColor(color.HiBlackString, cr.noColor, "%s: %s", report.Problem.Severity, report.Problem.Text))
+				buf.WriteString(output.MaybeColor(output.Black, cr.noColor,
+					report.Problem.Severity.String()+": "+report.Problem.Text))
 			}
-			buf.WriteString(output.MaybeColor(color.MagentaString, cr.noColor, " (%s)\n", report.Problem.Reporter))
+			buf.WriteString(output.MaybeColor(output.Magenta, cr.noColor, " ("+report.Problem.Reporter+")\n"))
 
 			if report.Problem.Anchor == checks.AnchorAfter {
 				lines := strings.Split(content, "\n")
@@ -78,7 +78,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 
 				nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
 				for i := report.Problem.Lines.First; i <= lastLine; i++ {
-					buf.WriteString(output.MaybeColor(color.WhiteString, cr.noColor, nrFmt+" | %s\n", i, lines[i-1]))
+					buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
 				}
 			}
 

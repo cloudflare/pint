@@ -53,6 +53,7 @@ func newApp() *cli.App {
 				Aliases: []string{"n"},
 				Value:   false,
 				Usage:   "Disable output colouring.",
+				EnvVars: []string{"NO_COLOR"},
 			},
 			&cli.StringSliceFlag{
 				Name:    disabledFlag,

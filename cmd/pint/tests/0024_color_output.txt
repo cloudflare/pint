@@ -6,51 +6,51 @@ cmp stderr stderr.txt
 -- stderr.txt --
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Loading configuration file"[0m [2mpath=[0m[96m.pint.hcl[0m
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Finding all rules to check"[0m [2mpaths=[0m[96m["rules"][0m
-rules/0001.yml:2 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
-
-rules/0001.yml:6 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
-
-rules/0003.yaml:11 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 11 |   expr: sum(foo) without(job)
-
-rules/0003.yaml:11 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 11 |   expr: sum(foo) without(job)
-
-rules/0003.yaml:14 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected right parenthesis ')'. (promql/syntax)
- 14 |   expr: sum(foo) by ())
-
-rules/0003.yaml:22-25 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 22 |   expr: |
- 23 |     sum(
- 24 |       multiline
- 25 |     ) without(job, instance)
-
-rules/0003.yaml:28-31 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 28 |   expr: |
- 29 |     sum(sum) without(job)
- 30 |     +
- 31 |     sum(sum) without(job)
-
-rules/0003.yaml:28-31 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 28 |   expr: |
- 29 |     sum(sum) without(job)
- 30 |     +
- 31 |     sum(sum) without(job)
-
-rules/0003.yaml:34-37 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 34 |   expr: >-
- 35 |     sum(
- 36 |       multiline2
- 37 |     ) without(job, instance)
-
-rules/0003.yaml:40 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, remove instance from `by()`. (promql/aggregate)
- 40 |   expr: sum(byinstance) by(instance)
-
-rules/0003.yaml:40 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
- 40 |   expr: sum(byinstance) by(instance)
-
+[96mrules/0001.yml[0m[96m:2[0m [93mWarning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.[0m[95m (promql/aggregate)
+[0m[97m 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+[0m
+[96mrules/0001.yml[0m[96m:6[0m [93mWarning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.[0m[95m (promql/aggregate)
+[0m[97m 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+[0m
+[96mrules/0003.yaml[0m[96m:11[0m [93mWarning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.[0m[95m (promql/aggregate)
+[0m[97m 11 |   expr: sum(foo) without(job)
+[0m
+[96mrules/0003.yaml[0m[96m:11[0m [93mWarning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.[0m[95m (promql/aggregate)
+[0m[97m 11 |   expr: sum(foo) without(job)
+[0m
+[96mrules/0003.yaml[0m[96m:14[0m [91mFatal: Prometheus failed to parse the query with this PromQL error: unexpected right parenthesis ')'.[0m[95m (promql/syntax)
+[0m[97m 14 |   expr: sum(foo) by ())
+[0m
+[96mrules/0003.yaml[0m[96m:22-25[0m [93mWarning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.[0m[95m (promql/aggregate)
+[0m[97m 22 |   expr: |
+[0m[97m 23 |     sum(
+[0m[97m 24 |       multiline
+[0m[97m 25 |     ) without(job, instance)
+[0m
+[96mrules/0003.yaml[0m[96m:28-31[0m [93mWarning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.[0m[95m (promql/aggregate)
+[0m[97m 28 |   expr: |
+[0m[97m 29 |     sum(sum) without(job)
+[0m[97m 30 |     +
+[0m[97m 31 |     sum(sum) without(job)
+[0m
+[96mrules/0003.yaml[0m[96m:28-31[0m [93mWarning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.[0m[95m (promql/aggregate)
+[0m[97m 28 |   expr: |
+[0m[97m 29 |     sum(sum) without(job)
+[0m[97m 30 |     +
+[0m[97m 31 |     sum(sum) without(job)
+[0m
+[96mrules/0003.yaml[0m[96m:34-37[0m [93mWarning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.[0m[95m (promql/aggregate)
+[0m[97m 34 |   expr: >-
+[0m[97m 35 |     sum(
+[0m[97m 36 |       multiline2
+[0m[97m 37 |     ) without(job, instance)
+[0m
+[96mrules/0003.yaml[0m[96m:40[0m [93mWarning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, remove instance from `by()`.[0m[95m (promql/aggregate)
+[0m[97m 40 |   expr: sum(byinstance) by(instance)
+[0m
+[96mrules/0003.yaml[0m[96m:40[0m [93mWarning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.[0m[95m (promql/aggregate)
+[0m[97m 40 |   expr: sum(byinstance) by(instance)
+[0m
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Problems found"[0m [2mFatal=[0m[94m1[0m [2mWarning=[0m[94m10[0m
 [2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97m"Fatal error"[0m [2merr=[0m[91m"found 1 problem(s) with severity Bug or higher"[0m
 -- rules/0001.yml --
