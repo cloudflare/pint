@@ -2192,6 +2192,88 @@ rule {
 				checks.ReportCheckName,
 			},
 		},
+		{
+			title: "multiple checks and disable comment / locked rule",
+			config: `
+rule {
+  locked = false
+  aggregate ".+" {
+    severity = "bug"
+	keep     = ["job"]
+  }
+}
+rule {
+  locked = true
+  aggregate ".+" {
+	comment  = "this is rule comment"
+    severity = "bug"
+	strip    = ["instance", "rack"]
+  }
+}`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo
+  # pint disable promql/aggregate
+  expr: sum(foo)
+`),
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AggregationCheckName + "(instance:false)",
+				checks.AggregationCheckName + "(rack:false)",
+			},
+		},
+		{
+			title: "multiple checks and snooze comment / locked rule",
+			config: `
+rule {
+  locked = false
+  aggregate ".+" {
+    severity = "bug"
+	keep     = ["job"]
+  }
+}
+rule {
+  locked = true
+  aggregate ".+" {
+	comment  = "this is rule comment"
+    severity = "bug"
+	strip    = ["instance", "rack"]
+  }
+}`,
+			entry: discovery.Entry{
+				State: discovery.Modified,
+				Path: discovery.Path{
+					Name:          "rules.yml",
+					SymlinkTarget: "rules.yml",
+				},
+				Rule: newRule(t, `
+- record: foo
+  # pint snooze 2099-11-28 promql/aggregate
+  expr: sum(foo)
+`),
+			},
+			checks: []string{
+				checks.SyntaxCheckName,
+				checks.AlertForCheckName,
+				checks.ComparisonCheckName,
+				checks.TemplateCheckName,
+				checks.FragileCheckName,
+				checks.RegexpCheckName,
+				checks.AggregationCheckName + "(instance:false)",
+				checks.AggregationCheckName + "(rack:false)",
+			},
+		},
 	}
 
 	dir := t.TempDir()
