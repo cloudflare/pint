@@ -9,16 +9,8 @@ import (
 	"log/slog"
 	"strings"
 	"sync"
-)
 
-const (
-	dim         = 2
-	fgHiRed     = 91
-	fgHiYellow  = 93
-	fgHiBlue    = 94
-	fgHiMagenta = 95
-	fgHiCyan    = 96
-	fgHiWhite   = 97
+	"github.com/cloudflare/pint/internal/output"
 )
 
 type handler struct {
@@ -48,22 +40,22 @@ func (h *handler) Enabled(_ context.Context, level slog.Level) bool {
 func (h *handler) Handle(_ context.Context, record slog.Record) error {
 	buf := bytes.NewBuffer(make([]byte, 0, 128))
 
-	var lc int
+	var lc output.Color
 	switch record.Level {
 	case slog.LevelInfo:
-		lc = fgHiWhite
+		lc = output.White
 	case slog.LevelError:
-		lc = fgHiRed
+		lc = output.Red
 	case slog.LevelWarn:
-		lc = fgHiYellow
+		lc = output.Yellow
 	case slog.LevelDebug:
-		lc = fgHiMagenta
+		lc = output.Magenta
 	}
 	h.printKey(buf, "level")
 	h.printVal(buf, record.Level.String(), lc)
 	_, _ = buf.WriteRune(' ')
 	h.printKey(buf, "msg")
-	h.printVal(buf, record.Message, fgHiWhite)
+	h.printVal(buf, record.Message, output.White)
 
 	record.Attrs(func(attr slog.Attr) bool {
 		_, _ = buf.WriteRune(' ')
@@ -91,21 +83,14 @@ func (h *handler) WithGroup(_ string) slog.Handler {
 }
 
 func (h *handler) printKey(buf *bytes.Buffer, s string) {
-	_, _ = buf.WriteString(h.maybeWriteColor(s+"=", dim))
+	_, _ = buf.WriteString(output.MaybeColor(output.Dim, h.noColor, s+"="))
 }
 
-func (h *handler) printVal(buf *bytes.Buffer, s string, color int) {
+func (h *handler) printVal(buf *bytes.Buffer, s string, color output.Color) {
 	if !strings.HasPrefix(s, "[") && !strings.HasPrefix(s, "{") && strings.Contains(s, " ") {
 		s = "\"" + h.escaper.Replace(s) + "\""
 	}
-	_, _ = buf.WriteString(h.maybeWriteColor(s, color))
-}
-
-func (h *handler) maybeWriteColor(s string, color int) string {
-	if h.noColor {
-		return s
-	}
-	return fmt.Sprintf("\033[%dm%s\033[0m", color, s)
+	_, _ = buf.WriteString(output.MaybeColor(color, h.noColor, s))
 }
 
 func (h *handler) appendAttr(buf *bytes.Buffer, attr slog.Attr) {
@@ -118,14 +103,14 @@ func (h *handler) appendAttr(buf *bytes.Buffer, attr slog.Attr) {
 	case slog.KindAny:
 		switch attr.Value.Any().(type) {
 		case error:
-			h.printVal(buf, formatString(attr), fgHiRed)
+			h.printVal(buf, formatString(attr), output.Red)
 		default:
-			h.printVal(buf, formatAny(attr), fgHiCyan)
+			h.printVal(buf, formatAny(attr), output.Cyan)
 		}
 	case slog.KindString:
-		h.printVal(buf, formatString(attr), fgHiCyan)
+		h.printVal(buf, formatString(attr), output.Cyan)
 	default:
-		h.printVal(buf, formatAny(attr), fgHiBlue)
+		h.printVal(buf, formatAny(attr), output.Blue)
 	}
 }
 

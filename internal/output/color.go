@@ -2,11 +2,22 @@ package output
 
 import "fmt"
 
-type ColorFn func(format string, a ...any) string
+type Color int
 
-func MaybeColor(fn ColorFn, disabled bool, format string, a ...any) string {
+const (
+	Dim     Color = 2
+	Black   Color = 90
+	Red     Color = 91
+	Yellow  Color = 93
+	Blue    Color = 94
+	Magenta Color = 95
+	Cyan    Color = 96
+	White   Color = 97
+)
+
+func MaybeColor(color Color, disabled bool, s string) string {
 	if disabled {
-		return fmt.Sprintf(format, a...)
+		return s
 	}
-	return fn(format, a...)
+	return fmt.Sprintf("\033[%dm%s\033[0m", color, s)
 }
