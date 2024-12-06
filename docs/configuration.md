@@ -527,6 +527,7 @@ Syntax:
 
 ```js
 rule {
+  locked    = true|false
   match {
     path    = "(.+)"
     state   = [ "any|added|modified|renamed|removed|unmodified", ... ]
@@ -569,6 +570,8 @@ rule {
 }
 ```
 
+- `locked` - if set to `true` this rule will be locked, which means that it cannot be disabled using
+  `# pint disable ...` or `# pint snooze ...` comments.
 - `match:path` - only files matching this pattern will be checked by this rule.
 - `match:state` - only match rules based on their state. Default value for `state` depends on the
   pint command that is being run, for `pint ci` the default value is `["added", "modified", "renamed"]`,

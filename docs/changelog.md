@@ -15,6 +15,9 @@
   }
   ```
 
+- Rules configured in `pint` config can now be locked - when a rule is locked it cannot
+  be disabled by users by adding a `# pint disable ...` or `# pint snooze ...` comments.
+
 ### Fixed
 
 - The console reporter won't color the output if `--no-color` flag is set.

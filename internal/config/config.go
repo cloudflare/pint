@@ -104,7 +104,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		if !isMatch(ctx, entry, pr.ignore, pr.match) {
 			continue
 		}
-		if pr.isEnabled(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry, cfg.Rules) {
+		if pr.isEnabled(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry, cfg.Rules, pr.locked) {
 			enabled = append(enabled, pr.check)
 		}
 	}

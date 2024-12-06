@@ -28,6 +28,7 @@ type Rule struct {
 	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
 	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
 	RuleName      []RuleNameSettings   `hcl:"name,block" json:"name,omitempty"`
+	Locked        bool                 `hcl:"locked,optional" json:"locked,omitempty"`
 }
 
 func (rule Rule) validate() (err error) {
@@ -130,11 +131,7 @@ func (rule Rule) validate() (err error) {
 	return nil
 }
 
-func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
-	if check.Meta().AlwaysEnabled {
-		return true
-	}
-
+func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
 	matches := []string{
 		name,
 		check.String(),
@@ -142,7 +139,6 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 	for _, tag := range promTags {
 		matches = append(matches, fmt.Sprintf("%s(+%s)", name, tag))
 	}
-
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
 		for _, match := range matches {
 			if match == disable.Match {
@@ -151,7 +147,7 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 					slog.String("check", check.String()),
 					slog.String("match", match),
 				)
-				return false
+				return true
 			}
 		}
 	}
@@ -167,9 +163,20 @@ func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name st
 					slog.String("match", snooze.Match),
 					slog.Time("until", snooze.Until),
 				)
-				return false
+				return true
 			}
 		}
+	}
+	return false
+}
+
+func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker, promTags []string, locked bool) bool {
+	if check.Meta().AlwaysEnabled {
+		return true
+	}
+
+	if !locked && isDisabledForRule(rule, name, check, promTags) {
+		return false
 	}
 
 	for _, c := range disabledChecks {
