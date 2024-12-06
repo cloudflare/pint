@@ -119,7 +119,7 @@ func actionLint(c *cli.Context) error {
 	if c.Bool(teamCityFlag) {
 		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, minSeverity))
+		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, minSeverity, c.Bool(noColorFlag)))
 	}
 
 	if c.String(checkStyleFlag) != "" {

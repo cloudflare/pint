@@ -96,6 +96,19 @@ func (s Summary) Reports() (reports []Report) {
 	return s.reports
 }
 
+func (s Summary) ReportsPerPath() (reports [][]Report) {
+	curPath := []Report{}
+	for _, r := range s.reports {
+		if len(curPath) > 0 && curPath[0].Path.Name != r.Path.Name {
+			reports = append(reports, curPath)
+			curPath = []Report{}
+		}
+		curPath = append(curPath, r)
+	}
+	reports = append(reports, curPath)
+	return reports
+}
+
 func (s Summary) HasFatalProblems() bool {
 	for _, r := range s.Reports() {
 		if r.Problem.Severity == checks.Fatal {
