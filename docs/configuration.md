@@ -71,13 +71,15 @@ parser {
 }
 ```
 
-- `schema` - rule file schema to use, valid values are `prometheus` and `thanos`.
-  Setting it to `prometheus` means that pint will assume that all rules have the schema
+- `schema` - rule file schema to use when using `strict` parser mode, valid values are `prometheus` and `thanos`.
+  This option is has no effect when `relaxed` mode is enabled, see below.
+  Setting it to `prometheus` means that pint will assume that all rule files have the schema
   as defined in [alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
   and [recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
   Prometheus docs.
   Setting it to `thanos` will tell pint to use the schema as defined
-  in [Thanos Rule](https://thanos.io/tip/components/rule.md/) docs.
+  in [Thanos Rule](https://thanos.io/tip/components/rule.md/) docs, which currently allows for setting
+  an extra key on the rule group object - `partial_response_strategy`.
   Default value is `prometheus`.
 - `include` - list of file patterns to check when running checks. Only files
   matching those regexp rules will be checked, other modified files will be ignored.
@@ -85,13 +87,30 @@ parser {
   This option takes precedence over `include`, so if a file path matches both
   `include` & `exclude` patterns, it will be excluded.
 - `relaxed` - by default, pint will parse all files in strict mode, where
-  all rule files must have the exact syntax Prometheus expects:
+  all rule files must have the exact syntax Prometheus or Thanos expects:
+
+  When using `schema: prometheus` (default):
 
   ```yaml
   groups:
     - name: example
       rules:
         - record: ...
+          expr: ...
+        - alert: ...
+          expr: ...
+  ```
+
+  When using `schema: thanos`:
+
+  ```yaml
+  groups:
+    - name: example
+      partial_response_strategy: abort
+      rules:
+        - record: ...
+          expr: ...
+        - alert: ...
           expr: ...
   ```
 
