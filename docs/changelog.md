@@ -5,7 +5,10 @@
 ### Added
 
 - Added `schema` option to the `parser` configuration block for setting rule validation
-  schema. Default value is `prometheus` and tells pint to expect rules with the schema
+  schema. This option is only used when files are parsed in strict mode - which is when
+  rule file path does NOT match any of the `parser:relaxed` regex values or when simply
+  `parser:relaxed` is not set at all.
+  Default value is `prometheus` and tells pint to expect rule files with the schema
   expected by Prometheus itself. If you use pint to validate rules loaded into Thanos Rule
   component then set `schema` to `thanos` in your pint config file:
 
@@ -13,6 +16,31 @@
   parser {
     schema = "thanos"
   }
+  ```
+
+  File schema when using `schema: prometheus` (default):
+
+  ```yaml
+  groups:
+    - name: example
+      rules:
+        - record: ...
+          expr: ...
+        - alert: ...
+          expr: ...
+  ```
+
+  When using `schema: thanos`:
+
+  ```yaml
+  groups:
+    - name: example
+      partial_response_strategy: abort
+      rules:
+        - record: ...
+          expr: ...
+        - alert: ...
+          expr: ...
   ```
 
 - Rules configured in `pint` config can now be locked - when a rule is locked it cannot
