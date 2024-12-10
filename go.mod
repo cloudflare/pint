@@ -18,8 +18,8 @@ require (
 	github.com/rogpeppe/go-internal v1.13.1
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
-	github.com/xanzy/go-gitlab v0.115.0
 	github.com/zclconf/go-cty v1.15.1
+	gitlab.com/gitlab-org/api/client-go v0.116.0
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/ratelimit v0.3.1
