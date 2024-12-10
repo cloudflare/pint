@@ -151,7 +151,7 @@ func TestReadContent(t *testing.T) {
 			comments: []comments.Comment{
 				{
 					Type:  comments.FileOwnerType,
-					Value: comments.Owner{Name: "bob"},
+					Value: comments.Owner{Name: "bob", Line: 1},
 				},
 			},
 		},
@@ -179,7 +179,7 @@ func TestReadContent(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			r := bytes.NewReader(tc.input)
-			output, comments, err := parser.ReadContent(r)
+			output, err := parser.ReadContent(r)
 
 			hadError := err != nil
 			if hadError != tc.shouldError {
@@ -194,7 +194,7 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tc.comments, comments, sameErrorText); diff != "" {
+			if diff := cmp.Diff(tc.comments, output.FileComments, sameErrorText); diff != "" {
 				t.Errorf("ReadContent() returned wrong comments (-want +got):\n%s", diff)
 				return
 			}

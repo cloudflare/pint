@@ -59,6 +59,7 @@ func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, _ parser.Rule, _ 
 
 func parseRuleError(rule parser.Rule, err error) Problem {
 	var commentErr comments.CommentError
+	var ownerErr comments.OwnerError
 	var ignoreErr discovery.FileIgnoreError
 	var parseErr parser.ParseError
 
@@ -85,6 +86,18 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 			Reporter: pintCommentReporter,
 			Text:     "This comment is not a valid pint control comment: " + commentErr.Error(),
 			Severity: Warning,
+		}
+
+	case errors.As(err, &ownerErr):
+		slog.Debug("invalid owner report", slog.Any("err", ownerErr))
+		return Problem{
+			Lines: parser.LineRange{
+				First: ownerErr.Line,
+				Last:  ownerErr.Line,
+			},
+			Reporter: discovery.RuleOwnerComment,
+			Text:     fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", ownerErr.Name, ownerErr.Name),
+			Severity: Bug,
 		}
 
 	case errors.As(err, &parseErr):

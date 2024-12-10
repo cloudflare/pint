@@ -154,8 +154,11 @@ func TestParse(t *testing.T) {
 			input: "# pint file/owner bob and alice",
 			output: []comments.Comment{
 				{
-					Type:  comments.FileOwnerType,
-					Value: comments.Owner{Name: "bob and alice"},
+					Type: comments.FileOwnerType,
+					Value: comments.Owner{
+						Name: "bob and alice",
+						Line: 1,
+					},
 				},
 			},
 		},
@@ -175,8 +178,10 @@ func TestParse(t *testing.T) {
 			input: "# pint rule/owner bob and alice",
 			output: []comments.Comment{
 				{
-					Type:  comments.RuleOwnerType,
-					Value: comments.Owner{Name: "bob and alice"},
+					Type: comments.RuleOwnerType,
+					Value: comments.Owner{
+						Name: "bob and alice",
+					},
 				},
 			},
 		},
@@ -403,8 +408,11 @@ func TestParse(t *testing.T) {
 					Offset: len("code "),
 				},
 				{
-					Type:   comments.FileOwnerType,
-					Value:  comments.Owner{Name: "bob"},
+					Type: comments.FileOwnerType,
+					Value: comments.Owner{
+						Name: "bob",
+						Line: 2,
+					},
 					Offset: 1,
 				},
 			},
@@ -493,6 +501,13 @@ func TestCommentValueString(t *testing.T) {
 			comment: comments.Invalid{Err: comments.CommentError{
 				Line: 1,
 				Err:  errors.New("foo bar"),
+			}},
+			expected: "foo bar",
+		},
+		{
+			comment: comments.Invalid{Err: comments.CommentError{
+				Line: 1,
+				Err:  comments.OwnerError{Name: "foo bar"},
 			}},
 			expected: "foo bar",
 		},

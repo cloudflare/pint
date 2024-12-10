@@ -43,13 +43,14 @@ func emptyLine(line string, comments []comments.Comment, stripComments bool) str
 }
 
 type Content struct {
-	Body       []byte
-	TotalLines int
-	IgnoreLine int
-	Ignored    bool
+	Body         []byte
+	FileComments []comments.Comment
+	TotalLines   int
+	IgnoreLine   int
+	Ignored      bool
 }
 
-func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err error) {
+func ReadContent(r io.Reader) (out Content, err error) {
 	reader := bufio.NewReader(r)
 	var (
 		lineno       int
@@ -100,21 +101,21 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 					skip = skipNextLine
 					found = true
 				case comments.FileOwnerType:
-					fileComments = append(fileComments, comment)
+					out.FileComments = append(out.FileComments, comment)
 				case comments.RuleOwnerType:
 					// pass
 				case comments.FileDisableType:
-					fileComments = append(fileComments, comment)
+					out.FileComments = append(out.FileComments, comment)
 				case comments.DisableType:
 					// pass
 				case comments.FileSnoozeType:
-					fileComments = append(fileComments, comment)
+					out.FileComments = append(out.FileComments, comment)
 				case comments.SnoozeType:
 					// pass
 				case comments.RuleSetType:
 					// pass
 				case comments.InvalidComment:
-					fileComments = append(fileComments, comment)
+					out.FileComments = append(out.FileComments, comment)
 				}
 			}
 			switch {
@@ -166,8 +167,8 @@ func ReadContent(r io.Reader) (out Content, fileComments []comments.Comment, err
 	}
 
 	if !errors.Is(err, io.EOF) {
-		return out, fileComments, err
+		return out, err
 	}
 
-	return out, fileComments, nil
+	return out, nil
 }

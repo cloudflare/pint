@@ -7,23 +7,26 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-func NewGlobFinder(patterns []string, filter git.PathFilter, schema parser.Schema) GlobFinder {
+func NewGlobFinder(patterns []string, filter git.PathFilter, schema parser.Schema, allowedOwners []*regexp.Regexp) GlobFinder {
 	return GlobFinder{
-		patterns: patterns,
-		filter:   filter,
-		schema:   schema,
+		patterns:      patterns,
+		filter:        filter,
+		schema:        schema,
+		allowedOwners: allowedOwners,
 	}
 }
 
 type GlobFinder struct {
-	patterns []string
-	filter   git.PathFilter
-	schema   parser.Schema
+	filter        git.PathFilter
+	patterns      []string
+	allowedOwners []*regexp.Regexp
+	schema        parser.Schema
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
@@ -69,7 +72,7 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		if err != nil {
 			return nil, err
 		}
-		el, err := readRules(fp.target, fp.path, fd, !f.filter.IsRelaxed(fp.target), f.schema)
+		el, err := readRules(fp.target, fp.path, fd, !f.filter.IsRelaxed(fp.target), f.schema, f.allowedOwners)
 		if err != nil {
 			fd.Close()
 			return nil, fmt.Errorf("invalid file syntax: %w", err)

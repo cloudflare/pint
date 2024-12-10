@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"regexp"
 	"slices"
 	"time"
 
@@ -85,8 +86,8 @@ type Entry struct {
 	State          ChangeType
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool, schema parser.Schema) (entries []Entry, err error) {
-	content, fileComments, err := parser.ReadContent(r)
+func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool, schema parser.Schema, allowedOwners []*regexp.Regexp) (entries []Entry, err error) {
+	content, err := parser.ReadContent(r)
 	if err != nil {
 		return nil, err
 	}
@@ -96,14 +97,19 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool, sche
 		Last:  content.TotalLines,
 	}
 
+	var badOwners []comments.Comment
 	var fileOwner string
 	var disabledChecks []string
-	for _, comment := range fileComments {
+	for _, comment := range content.FileComments {
 		// nolint:exhaustive
 		switch comment.Type {
 		case comments.FileOwnerType:
 			owner := comment.Value.(comments.Owner)
-			fileOwner = owner.Name
+			if isValidOwner(owner.Name, allowedOwners) {
+				fileOwner = owner.Name
+			} else {
+				badOwners = append(badOwners, comment)
+			}
 		case comments.FileDisableType:
 			disable := comment.Value.(comments.Disable)
 			if !slices.Contains(disabledChecks, disable.Match) {
@@ -191,6 +197,32 @@ func readRules(reportedPath, sourcePath string, r io.Reader, isStrict bool, sche
 		})
 	}
 
+	if len(rules) == 0 && len(badOwners) > 0 {
+		for _, comment := range badOwners {
+			owner := comment.Value.(comments.Owner)
+			entries = append(entries, Entry{
+				Path: Path{
+					Name:          sourcePath,
+					SymlinkTarget: reportedPath,
+				},
+				PathError:     comments.OwnerError(owner),
+				ModifiedLines: contentLines.Expand(),
+			})
+		}
+	}
+
 	slog.Debug("File parsed", slog.String("path", sourcePath), slog.Int("rules", len(entries)))
 	return entries, nil
+}
+
+func isValidOwner(s string, valid []*regexp.Regexp) bool {
+	if len(valid) == 0 {
+		return true
+	}
+	for _, v := range valid {
+		if v.MatchString(s) {
+			return true
+		}
+	}
+	return false
 }

@@ -338,7 +338,7 @@ groups:
 			fmt.Sprintf("rPath=%s sPath=%s strict=%v title=%s", tc.reportedPath, tc.sourcePath, tc.isStrict, tc.title),
 			func(t *testing.T) {
 				r := tc.sourceFunc(t)
-				entries, err := readRules(tc.reportedPath, tc.sourcePath, r, tc.isStrict, parser.PrometheusSchema)
+				entries, err := readRules(tc.reportedPath, tc.sourcePath, r, tc.isStrict, parser.PrometheusSchema, nil)
 				if tc.err != "" {
 					require.EqualError(t, err, tc.err)
 				} else {

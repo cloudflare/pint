@@ -9,6 +9,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
+	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -204,11 +205,12 @@ func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 	}
 
 	schema := parseSchema(meta.cfg.Parser.Schema)
+	allowedOwners := meta.cfg.Owners.CompileAllowed()
 
 	// start timer to run every $interval
 	ack := make(chan bool, 1)
 	mainCtx, mainCancel := context.WithCancel(context.WithValue(context.Background(), config.CommandKey, config.WatchCommand))
-	stop := startTimer(mainCtx, meta.workers, meta.isOffline, gen, schema, interval, ack, collector)
+	stop := startTimer(mainCtx, meta.workers, meta.isOffline, gen, schema, allowedOwners, interval, ack, collector)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -232,7 +234,7 @@ func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 	return nil
 }
 
-func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, schema parser.Schema, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
+func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, schema parser.Schema, allowedOwners []*regexp.Regexp, interval time.Duration, ack chan bool, collector *problemCollector) chan bool {
 	ticker := time.NewTicker(time.Second)
 	stop := make(chan bool, 1)
 	wasBootstrapped := false
@@ -246,7 +248,7 @@ func startTimer(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					ticker.Reset(interval)
 					wasBootstrapped = true
 				}
-				if err := collector.scan(ctx, workers, isOffline, gen, schema); err != nil {
+				if err := collector.scan(ctx, workers, isOffline, gen, schema, allowedOwners); err != nil {
 					slog.Error("Got an error when running checks", slog.Any("err", err))
 				}
 				checkIterationsTotal.Inc()
@@ -304,7 +306,7 @@ func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks
 	}
 }
 
-func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, schema parser.Schema) error {
+func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, schema parser.Schema, allowedOwners []*regexp.Regexp) error {
 	paths, err := c.finder(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get the list of paths to check: %w", err)
@@ -319,6 +321,7 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 			config.MustCompileRegexes(c.cfg.Parser.Relaxed...),
 		),
 		schema,
+		allowedOwners,
 	).Find()
 	if err != nil {
 		return err

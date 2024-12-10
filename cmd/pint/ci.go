@@ -95,20 +95,21 @@ func actionCI(c *cli.Context) error {
 
 	slog.Info("Finding all rules to check on current git branch", slog.String("base", baseBranch))
 
-	var entries []discovery.Entry
 	filter := git.NewPathFilter(
 		config.MustCompileRegexes(meta.cfg.Parser.Include...),
 		config.MustCompileRegexes(meta.cfg.Parser.Exclude...),
 		config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
 	)
-	schema := parseSchema(meta.cfg.Parser.Schema)
 
-	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema).Find()
+	schema := parseSchema(meta.cfg.Parser.Schema)
+	allowedOwners := meta.cfg.Owners.CompileAllowed()
+	var entries []discovery.Entry
+	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, allowedOwners).Find()
 	if err != nil {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema).Find(entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema, allowedOwners).Find(entries)
 	if err != nil {
 		return err
 	}
@@ -130,7 +131,7 @@ func actionCI(c *cli.Context) error {
 	}
 
 	if c.Bool(requireOwnerFlag) {
-		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)
+		summary.Report(verifyOwners(entries, allowedOwners)...)
 	}
 
 	reps := []reporter.Reporter{}
