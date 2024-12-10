@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.69.1
+
+### Fixed
+
+- `# pint file/owner` comments were not validated properly for files with no rules.
+  This is now fixed.
+
 ## v0.69.0
 
 ### Added

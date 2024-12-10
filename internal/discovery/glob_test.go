@@ -34,32 +34,32 @@ func TestGlobPathFinder(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"[]"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"[]"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "failed to expand file path pattern []: syntax error in pattern",
 		},
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{},
-			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
-			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"foo/*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "no matching files",
 		},
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -75,7 +75,7 @@ func TestGlobPathFinder(t *testing.T) {
 		},
 		{
 			files:  map[string]string{"foo/bar.yml": testRuleBody + "\n\n# pint file/owner alice\n"},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -91,7 +91,7 @@ func TestGlobPathFinder(t *testing.T) {
 		},
 		{
 			files:  map[string]string{"bar.yml": testRuleBody},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -110,7 +110,7 @@ func TestGlobPathFinder(t *testing.T) {
 		},
 		{
 			files:  map[string]string{"bar.yml": "record:::{}\n  expr: sum(foo)\n\n# pint file/owner bob\n"},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -130,7 +130,7 @@ func TestGlobPathFinder(t *testing.T) {
 		{
 			files:    map[string]string{"bar.yml": testRuleBody},
 			symlinks: map[string]string{"link.yml": "bar.yml"},
-			finder:   discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder:   discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -166,7 +166,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/link.yml":   "../a/bar.yml",
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -215,7 +215,7 @@ func TestGlobPathFinder(t *testing.T) {
 				"b/link.yml":   "../a/bar.yml",
 				"b/c/link.yml": "../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "b/c/link.yml is a symlink but target file cannot be evaluated: lstat b/a: no such file or directory",
 		},
 		{
@@ -223,14 +223,14 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, nil),
 		},
 		{
 			files: map[string]string{"a/bar.yml": "xxx:\nyyy:\n"},
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -265,21 +265,21 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, nil),
 		},
 		{
 			files: map[string]string{"a/bar.yml": "xxx:\nyyy:\n"},
 			symlinks: map[string]string{
 				"b/c/d": "../../a",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, []*regexp.Regexp{regexp.MustCompile(".*")}), parser.PrometheusSchema, nil),
 		},
 		{
 			files: map[string]string{"a/bar.yml": testRuleBody},
 			symlinks: map[string]string{
 				"b/c/link.yml": "../../a/bar.yml",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			entries: []discovery.Entry{
 				{
 					State: discovery.Noop,
@@ -313,7 +313,7 @@ func TestGlobPathFinder(t *testing.T) {
 			symlinks: map[string]string{
 				"input.yml": "/xx/ccc/fdd",
 			},
-			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema),
+			finder: discovery.NewGlobFinder([]string{"*"}, git.NewPathFilter(nil, nil, nil), parser.PrometheusSchema, nil),
 			err:    "input.yml is a symlink but target file cannot be evaluated: lstat /xx: no such file or directory",
 		},
 	}

@@ -26,6 +26,7 @@ func BenchmarkFindEntries(b *testing.B) {
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
 		parser.PrometheusSchema,
+		nil,
 	)
 	for n := 0; n < b.N; n++ {
 		_, _ = finder.Find()
@@ -39,6 +40,7 @@ func BenchmarkCheckRules(b *testing.B) {
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
 		parser.PrometheusSchema,
+		nil,
 	)
 	entries, err := finder.Find()
 	if err != nil {

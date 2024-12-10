@@ -94,6 +94,15 @@ func (ce CommentError) Error() string {
 	return ce.Err.Error()
 }
 
+type OwnerError struct {
+	Name string
+	Line int
+}
+
+func (oe OwnerError) Error() string {
+	return oe.Name
+}
+
 type Invalid struct {
 	Err CommentError
 }
@@ -104,6 +113,7 @@ func (i Invalid) String() string {
 
 type Owner struct {
 	Name string
+	Line int
 }
 
 func (o Owner) String() string {
@@ -152,7 +162,7 @@ func parseSnooze(s string) (snz Snooze, err error) {
 	return snz, nil
 }
 
-func parseValue(typ Type, s string) (CommentValue, error) {
+func parseValue(typ Type, s string, line int) (CommentValue, error) {
 	switch typ {
 	case IgnoreFileType, IgnoreLineType, IgnoreBeginType, IgnoreEndType, IgnoreNextLineType:
 		if s != "" {
@@ -162,7 +172,7 @@ func parseValue(typ Type, s string) (CommentValue, error) {
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileOwnerComment)
 		}
-		return Owner{Name: s}, nil
+		return Owner{Name: s, Line: line}, nil
 	case RuleOwnerType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", RuleOwnerComment)
@@ -209,7 +219,7 @@ const (
 	readsValue
 )
 
-func parseComment(s string) (parsed []Comment, err error) {
+func parseComment(s string, line int) (parsed []Comment, err error) {
 	var buf strings.Builder
 	var c Comment
 
@@ -291,7 +301,7 @@ func parseComment(s string) (parsed []Comment, err error) {
 	}
 
 	if c.Type != UnknownType {
-		c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()))
+		c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()), line)
 		parsed = append(parsed, c)
 	}
 
@@ -303,7 +313,7 @@ func Parse(lineno int, text string) (comments []Comment) {
 	var index int
 	for sc.Scan() {
 		line := sc.Text()
-		parsed, err := parseComment(line)
+		parsed, err := parseComment(line, lineno+index)
 		if err != nil {
 			comments = append(comments, Comment{
 				Type:  InvalidComment,

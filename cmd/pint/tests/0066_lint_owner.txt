@@ -46,6 +46,11 @@ groups:
 
 # pint rule/owner bob
 
+-- rules/4.yml --
+groups:
+- name: foo
+  rules: []
+
 -- .pint.hcl --
 parser {
   relaxed = ["foo", "bar", "rules/3.yml"]

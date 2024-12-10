@@ -75,6 +75,7 @@ func actionLint(c *cli.Context) error {
 	}
 
 	slog.Info("Finding all rules to check", slog.Any("paths", paths))
+	allowedOwners := meta.cfg.Owners.CompileAllowed()
 	finder := discovery.NewGlobFinder(
 		paths,
 		git.NewPathFilter(
@@ -82,7 +83,9 @@ func actionLint(c *cli.Context) error {
 			config.MustCompileRegexes(meta.cfg.Parser.Exclude...),
 			config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
 		),
-		parseSchema(meta.cfg.Parser.Schema))
+		parseSchema(meta.cfg.Parser.Schema),
+		allowedOwners,
+	)
 	entries, err := finder.Find()
 	if err != nil {
 		return err
@@ -103,7 +106,7 @@ func actionLint(c *cli.Context) error {
 	}
 
 	if c.Bool(requireOwnerFlag) {
-		summary.Report(verifyOwners(entries, meta.cfg.Owners.CompileAllowed())...)
+		summary.Report(verifyOwners(entries, allowedOwners)...)
 	}
 
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
