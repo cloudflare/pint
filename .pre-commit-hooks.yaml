@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=https://json.schemastore.org/pre-commit-hooks.json
+- id: pint
+  name: validate prometheus rules with pint
+  language: golang
+  entry: pint --offline lint
+  types:
+    - yaml
