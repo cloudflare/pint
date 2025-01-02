@@ -17,6 +17,7 @@ import (
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/log"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func BenchmarkFindEntries(b *testing.B) {
@@ -50,23 +51,23 @@ func BenchmarkCheckRules(b *testing.B) {
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/api/v1/status/config":
+		case promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
-		case "/api/v1/status/flags":
+		case promapi.APIPathFlags:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"storage.tsdb.retention.time": "1d"}}`))
-		case "/api/v1/metadata":
+		case promapi.APIPathMetadata:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
-		case "/api/v1/query":
+		case promapi.APIPathQuery:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"vector","result":[]}}`))
-		case "/api/v1/query_range":
+		case promapi.APIPathQueryRange:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))

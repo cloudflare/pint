@@ -14,6 +14,10 @@ import (
 	"github.com/prymitive/current"
 )
 
+const (
+	APIPathMetadata = "/api/v1/metadata"
+)
+
 type MetadataResult struct {
 	URI      string
 	Metadata []v1.Metadata
@@ -58,7 +62,7 @@ func (q metadataQuery) Run() queryResult {
 }
 
 func (q metadataQuery) Endpoint() string {
-	return "/api/v1/metadata"
+	return APIPathMetadata
 }
 
 func (q metadataQuery) String() string {
@@ -76,7 +80,7 @@ func (q metadataQuery) CacheTTL() time.Duration {
 func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
 	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", p.safeURI), slog.String("metric", metric))
 
-	key := "/api/v1/metadata/" + metric
+	key := APIPathMetadata + metric
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 

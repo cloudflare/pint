@@ -3975,7 +3975,7 @@ func TestSeriesCheck(t *testing.T) {
 			},
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
 					resp:  respondWithEmptyVector(),
 				},
 				{
@@ -4016,7 +4016,7 @@ func TestSeriesCheck(t *testing.T) {
 			},
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
 					resp:  respondWithSingleInstantVector(),
 				},
 				{
@@ -4057,7 +4057,7 @@ func TestSeriesCheck(t *testing.T) {
 			},
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
 					resp:  respondWithSingleInstantVector(),
 				},
 				{
@@ -4108,7 +4108,7 @@ func TestSeriesCheck(t *testing.T) {
 			},
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
 					resp: sleepResponse{
 						sleep: time.Millisecond * 20,
 						resp:  respondWithSingleInstantVector(),
@@ -4163,7 +4163,7 @@ func TestSeriesCheck(t *testing.T) {
 			},
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/api/v1/query"}},
+					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
 					resp: sleepResponse{
 						sleep: time.Millisecond * 230,
 						resp:  respondWithSingleInstantVector(),
