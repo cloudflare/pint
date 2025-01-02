@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.70.0
+
+### Added
+
+- When running `pint watch` command `/health` HTTP endpoint can now be used for liveness probes.
+
 ## v0.69.1
 
 ### Fixed
