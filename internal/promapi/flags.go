@@ -14,6 +14,10 @@ import (
 	"github.com/prymitive/current"
 )
 
+const (
+	APIPathFlags = "/api/v1/status/flags"
+)
+
 type FlagsResult struct {
 	Flags v1.FlagsResult
 	URI   string
@@ -52,11 +56,11 @@ func (q flagsQuery) Run() queryResult {
 }
 
 func (q flagsQuery) Endpoint() string {
-	return "/api/v1/status/flags"
+	return APIPathFlags
 }
 
 func (q flagsQuery) String() string {
-	return "/api/v1/status/flags"
+	return APIPathFlags
 }
 
 func (q flagsQuery) CacheKey() uint64 {
@@ -70,9 +74,8 @@ func (q flagsQuery) CacheTTL() time.Duration {
 func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
 	slog.Debug("Scheduling Prometheus flags query", slog.String("uri", p.safeURI))
 
-	key := "/api/v1/status/flags"
-	p.locker.lock(key)
-	defer p.locker.unlock(key)
+	p.locker.lock(APIPathFlags)
+	defer p.locker.unlock(APIPathFlags)
 
 	resultChan := make(chan queryResult)
 	p.queries <- queryRequest{

@@ -20,31 +20,31 @@ import (
 func TestConfig(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/30s/api/v1/status/config":
+		case "/30s" + promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
-		case "/1m/api/v1/status/config":
+		case "/1m" + promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}`))
-		case "/default/api/v1/status/config":
+		case "/default" + promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-		case "/once/api/v1/status/config":
+		case "/once" + promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-		case "/slow/api/v1/status/config":
+		case "/slow" + promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  {}\n"}}`))
-		case "/error/api/v1/status/config":
+		case "/error" + promapi.APIPathConfig:
 			w.WriteHeader(500)
 			_, _ = w.Write([]byte("fake error\n"))
-		case "/badYaml/api/v1/status/config":
+		case "/badYaml" + promapi.APIPathConfig:
 			w.WriteHeader(200)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"invalid yaml"}}`))

@@ -22,6 +22,10 @@ import (
 	"github.com/cloudflare/pint/internal/output"
 )
 
+const (
+	APIPathQueryRange = "/api/v1/query_range"
+)
+
 type RangeQueryResult struct {
 	URI    string
 	Series SeriesTimeRanges
@@ -69,7 +73,7 @@ func (q rangeQuery) Run() queryResult {
 }
 
 func (q rangeQuery) Endpoint() string {
-	return "/api/v1/query_range"
+	return APIPathQueryRange
 }
 
 func (q rangeQuery) String() string {
@@ -116,7 +120,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		slog.Int("slices", len(slices)),
 	)
 
-	key := fmt.Sprintf("/api/v1/query_range/%s/%s", expr, params.String())
+	key := fmt.Sprintf("%s/%s/%s", APIPathQueryRange, expr, params.String())
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 

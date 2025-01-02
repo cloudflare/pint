@@ -15,6 +15,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	APIPathConfig = "/api/v1/status/config"
+)
+
 type ConfigSectionGlobal struct {
 	ExternalLabels     map[string]string `yaml:"external_labels"`
 	ScrapeInterval     time.Duration     `yaml:"scrape_interval"`
@@ -62,18 +66,18 @@ func (q configQuery) Run() queryResult {
 
 	qr.value, err = streamConfig(resp.Body)
 	if err != nil {
-		prometheusQueryErrorsTotal.WithLabelValues(q.prom.name, "/api/v1/status/config", errReason(err)).Inc()
+		prometheusQueryErrorsTotal.WithLabelValues(q.prom.name, APIPathConfig, errReason(err)).Inc()
 		qr.err = fmt.Errorf("failed to decode config data in %s response: %w", q.prom.safeURI, err)
 	}
 	return qr
 }
 
 func (q configQuery) Endpoint() string {
-	return "/api/v1/status/config"
+	return APIPathConfig
 }
 
 func (q configQuery) String() string {
-	return "/api/v1/status/config"
+	return APIPathConfig
 }
 
 func (q configQuery) CacheKey() uint64 {
@@ -87,9 +91,8 @@ func (q configQuery) CacheTTL() time.Duration {
 func (p *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*ConfigResult, error) {
 	slog.Debug("Scheduling Prometheus configuration query", slog.String("uri", p.safeURI))
 
-	key := "/api/v1/status/config"
-	p.locker.lock(key)
-	defer p.locker.unlock(key)
+	p.locker.lock(APIPathConfig)
+	defer p.locker.unlock(APIPathConfig)
 
 	if cacheTTL == 0 {
 		cacheTTL = time.Minute

@@ -17,6 +17,10 @@ import (
 	"github.com/prymitive/current"
 )
 
+const (
+	APIPathQuery = "/api/v1/query"
+)
+
 type QueryResult struct {
 	URI    string
 	Series []Sample
@@ -63,7 +67,7 @@ func (q instantQuery) Run() queryResult {
 }
 
 func (q instantQuery) Endpoint() string {
-	return "/api/v1/query"
+	return APIPathQuery
 }
 
 func (q instantQuery) String() string {
@@ -81,7 +85,7 @@ func (q instantQuery) CacheTTL() time.Duration {
 func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
 	slog.Debug("Scheduling prometheus query", slog.String("uri", p.safeURI), slog.String("query", expr))
 
-	key := "/api/v1/query/" + expr
+	key := APIPathQuery + expr
 	p.locker.lock(key)
 	defer p.locker.unlock(key)
 

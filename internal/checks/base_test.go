@@ -285,11 +285,11 @@ func (fc formCond) isMatch(r *http.Request) bool {
 }
 
 var (
-	requireConfigPath     = requestPathCond{path: "/api/v1/status/config"}
-	requireFlagsPath      = requestPathCond{path: "/api/v1/status/flags"}
-	requireQueryPath      = requestPathCond{path: "/api/v1/query"}
-	requireRangeQueryPath = requestPathCond{path: "/api/v1/query_range"}
-	requireMetadataPath   = requestPathCond{path: "/api/v1/metadata"}
+	requireConfigPath     = requestPathCond{path: promapi.APIPathConfig}
+	requireFlagsPath      = requestPathCond{path: promapi.APIPathFlags}
+	requireQueryPath      = requestPathCond{path: promapi.APIPathQuery}
+	requireRangeQueryPath = requestPathCond{path: promapi.APIPathQueryRange}
+	requireMetadataPath   = requestPathCond{path: promapi.APIPathMetadata}
 )
 
 type promError struct {
