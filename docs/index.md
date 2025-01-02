@@ -152,6 +152,15 @@ Run pint as a daemon in watch mode where it continuously checks
 all rules found in selected files and exposes metrics about
 found problems.
 
+By default it will start a HTTP server on port `8080` and run all checks every
+10 minutes. This can be customised by passing extra flags to the `watch` command.
+Run `pint watch -h` to see all available flags.
+
+Currently supported HTTP paths:
+
+- `/health` - static endpoint for liveness probes.
+- `/metrics` - returns Prometheus metrics, see below.
+
 #### Manually selecting files and directories
 
 You can tell it to continuously test specific files or directories:
@@ -203,11 +212,7 @@ pint watch rule_files local
 
 #### Accessing watch mode metrics
 
-By default it will start a HTTP server on port `8080` and run all checks every
-10 minutes. This can be customised by passing extra flags to the `watch` command.
-Run `pint watch -h` to see all available flags.
-
-Query `/metrics` to see all expose metrics, example with default flags:
+Query `/metrics` HTTP endpoint to see all expose metrics, example with default flags:
 
 ```shell
 curl -s http://localhost:8080/metrics

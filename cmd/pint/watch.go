@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
 	"net/http"
 	_ "net/http/pprof"
@@ -180,6 +181,9 @@ func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 	rulesParsedTotal.WithLabelValues(config.RecordingRuleType).Add(0)
 	rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Add(0)
 
+	http.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, "OK\n")
+	})
 	http.Handle("/metrics", promhttp.HandlerFor(metricsRegistry, promhttp.HandlerOpts{
 		ErrorLog: slog.NewLogLogger(slog.Default().Handler(), slog.LevelError),
 		Timeout:  time.Second * 20,
