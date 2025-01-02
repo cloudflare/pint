@@ -24,6 +24,9 @@ linters:
     - godot
     - copyloopvar
     - perfsprint
+    - exptostd
+    - nilnesserr
+    - usetesting
 
 issues:
   max-same-issues: 0
