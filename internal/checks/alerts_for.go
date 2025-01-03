@@ -29,7 +29,8 @@ func (c AlertsForChecksFor) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: false,
+		Online:        false,
+		AlwaysEnabled: false,
 	}
 }
 

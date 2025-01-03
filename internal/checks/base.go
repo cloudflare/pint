@@ -120,7 +120,7 @@ type Problem struct {
 
 type CheckMeta struct {
 	States        []discovery.ChangeType
-	IsOnline      bool
+	Online        bool
 	AlwaysEnabled bool
 }
 

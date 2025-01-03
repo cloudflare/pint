@@ -36,7 +36,8 @@ func (c CounterCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: true,
+		Online:        true,
+		AlwaysEnabled: false,
 	}
 }
 

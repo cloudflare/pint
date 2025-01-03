@@ -27,9 +27,14 @@ linters:
     - exptostd
     - nilnesserr
     - usetesting
+    - exhaustruct
 
 issues:
   max-same-issues: 0
+  exclude-rules:
+  - path: ^.*_test\.go$
+    linters:
+    - exhaustruct
 
 linters-settings:
   goimports:
@@ -40,3 +45,23 @@ linters-settings:
     enable-all: true
   nakedret:
     max-func-lines: 0
+  exhaustruct:
+    exclude:
+      - net/http\..+
+      - crypto/tls\..+
+      - encoding/xml\..+
+      - .+/checks\.badMatcher
+      - .+/checks\.Problem
+      - .+/checks\.exprProblem
+      - .+/checks\..+Settings
+      - .+/config\.Match
+      - .+/discovery\.Entry
+      - .+/parser\.Rule
+      - .+/parser\.ParseError
+      - .+/parser\.VectorSelector
+      - .+/promapi\.MetricTimeRange
+      - github.com/prometheus/.+\..+
+      - github.com/urfave/cli/.+
+      - gitlab.com/gitlab-org/api/.+
+      - github.com/google/go-github/.+
+      - github.com/hashicorp/hcl/.+

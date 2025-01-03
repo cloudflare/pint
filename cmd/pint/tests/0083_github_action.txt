@@ -61,4 +61,3 @@ groups:
 
 -- src/.pint.hcl --
 repository {}
-

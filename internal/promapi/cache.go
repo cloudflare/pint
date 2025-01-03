@@ -22,6 +22,7 @@ func (e *endpointStats) hit()  { e.hits++ }
 func (e *endpointStats) miss() { e.misses++ }
 
 func newQueryCache(maxStale time.Duration) *queryCache {
+	// nolint:exhaustruct
 	return &queryCache{
 		entries:  map[uint64]*cacheEntry{},
 		stats:    map[string]*endpointStats{},
@@ -43,7 +44,7 @@ func (c *queryCache) endpointStats(endpoint string) *endpointStats {
 		return e
 	}
 
-	e = &endpointStats{}
+	e = &endpointStats{hits: 0, misses: 0}
 	c.stats[endpoint] = e
 	return e
 }
@@ -72,8 +73,9 @@ func (c *queryCache) set(key uint64, val any, ttl time.Duration) {
 	defer c.mu.Unlock()
 
 	c.entries[key] = &cacheEntry{
-		data:    val,
-		lastGet: time.Now(),
+		data:      val,
+		lastGet:   time.Now(),
+		expiresAt: time.Time{},
 	}
 	if ttl > 0 {
 		c.entries[key].expiresAt = time.Now().Add(ttl)

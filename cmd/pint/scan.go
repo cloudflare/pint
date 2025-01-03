@@ -102,7 +102,7 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 				checkList := cfg.GetChecksForEntry(ctx, gen, entry)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
-					if check.Meta().IsOnline {
+					if check.Meta().Online {
 						onlineChecksCount.Inc()
 					} else {
 						offlineChecksCount.Inc()

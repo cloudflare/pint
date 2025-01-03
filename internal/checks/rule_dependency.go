@@ -30,7 +30,8 @@ func (c RuleDependencyCheck) Meta() CheckMeta {
 		States: []discovery.ChangeType{
 			discovery.Removed,
 		},
-		IsOnline: false,
+		Online:        false,
+		AlwaysEnabled: false,
 	}
 }
 

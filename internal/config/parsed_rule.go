@@ -30,6 +30,17 @@ func newParsedRule(rule Rule, defaultStates []string, name string, check checks.
 	}
 }
 
+func baseParsedRule(match []Match, name string, check checks.RuleChecker, tags []string) parsedRule {
+	return parsedRule{
+		match:  match,
+		ignore: nil,
+		name:   name,
+		check:  check,
+		tags:   tags,
+		locked: false,
+	}
+}
+
 func isMatch(ctx context.Context, e discovery.Entry, ignore, match []Match) bool {
 	for _, ignore := range ignore {
 		if ignore.IsMatch(ctx, e.Path.Name, e) {
@@ -106,99 +117,26 @@ func defaultMatchStates(cmd ContextCommandVal) []string {
 
 func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRule) {
 	rules = append(rules,
-		parsedRule{
-			match: match,
-			name:  checks.SyntaxCheckName,
-			check: checks.NewSyntaxCheck(),
-		},
-		parsedRule{
-			match: match,
-			name:  checks.AlertForCheckName,
-			check: checks.NewAlertsForCheck(),
-		},
-		parsedRule{
-			match: match,
-			name:  checks.ComparisonCheckName,
-			check: checks.NewComparisonCheck(),
-		},
-		parsedRule{
-			match: match,
-			name:  checks.TemplateCheckName,
-			check: checks.NewTemplateCheck(),
-		},
-		parsedRule{
-			match: match,
-			name:  checks.FragileCheckName,
-			check: checks.NewFragileCheck(),
-		},
-		parsedRule{
-			match: match,
-			name:  checks.RegexpCheckName,
-			check: checks.NewRegexpCheck(),
-		},
-		parsedRule{
-			match: match,
-			name:  checks.RuleDependencyCheckName,
-			check: checks.NewRuleDependencyCheck(),
-		},
+		baseParsedRule(match, checks.SyntaxCheckName, checks.NewSyntaxCheck(), nil),
+		baseParsedRule(match, checks.AlertForCheckName, checks.NewAlertsForCheck(), nil),
+		baseParsedRule(match, checks.ComparisonCheckName, checks.NewComparisonCheck(), nil),
+		baseParsedRule(match, checks.TemplateCheckName, checks.NewTemplateCheck(), nil),
+		baseParsedRule(match, checks.FragileCheckName, checks.NewFragileCheck(), nil),
+		baseParsedRule(match, checks.RegexpCheckName, checks.NewRegexpCheck(), nil),
+		baseParsedRule(match, checks.RuleDependencyCheckName, checks.NewRuleDependencyCheck(), nil),
 	)
 
 	for _, p := range proms {
 		rules = append(rules,
-			parsedRule{
-				match: match,
-				name:  checks.RateCheckName,
-				check: checks.NewRateCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.SeriesCheckName,
-				check: checks.NewSeriesCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.VectorMatchingCheckName,
-				check: checks.NewVectorMatchingCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.RangeQueryCheckName,
-				check: checks.NewRangeQueryCheck(p, 0, "", checks.Warning),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.RuleDuplicateCheckName,
-				check: checks.NewRuleDuplicateCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.LabelsConflictCheckName,
-				check: checks.NewLabelsConflictCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.AlertsExternalLabelsCheckName,
-				check: checks.NewAlertsExternalLabelsCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.CounterCheckName,
-				check: checks.NewCounterCheck(p),
-				tags:  p.Tags(),
-			},
-			parsedRule{
-				match: match,
-				name:  checks.AlertsAbsentCheckName,
-				check: checks.NewAlertsAbsentCheck(p),
-				tags:  p.Tags(),
-			},
+			baseParsedRule(match, checks.RateCheckName, checks.NewRateCheck(p), p.Tags()),
+			baseParsedRule(match, checks.SeriesCheckName, checks.NewSeriesCheck(p), p.Tags()),
+			baseParsedRule(match, checks.VectorMatchingCheckName, checks.NewVectorMatchingCheck(p), p.Tags()),
+			baseParsedRule(match, checks.RangeQueryCheckName, checks.NewRangeQueryCheck(p, 0, "", checks.Warning), p.Tags()),
+			baseParsedRule(match, checks.RuleDuplicateCheckName, checks.NewRuleDuplicateCheck(p), p.Tags()),
+			baseParsedRule(match, checks.LabelsConflictCheckName, checks.NewLabelsConflictCheck(p), p.Tags()),
+			baseParsedRule(match, checks.AlertsExternalLabelsCheckName, checks.NewAlertsExternalLabelsCheck(p), p.Tags()),
+			baseParsedRule(match, checks.CounterCheckName, checks.NewCounterCheck(p), p.Tags()),
+			baseParsedRule(match, checks.AlertsAbsentCheckName, checks.NewAlertsAbsentCheck(p), p.Tags()),
 		)
 	}
 
@@ -207,7 +145,7 @@ func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRul
 
 func defaultRuleMatch(match []Match, defaultStates []string) []Match {
 	if len(match) == 0 {
-		return []Match{{State: defaultStates}}
+		return []Match{{State: defaultStates}} // nolint:exhaustruct
 	}
 	dst := make([]Match, 0, len(match))
 	for _, m := range match {
