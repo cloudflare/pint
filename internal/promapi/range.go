@@ -44,7 +44,7 @@ func (q rangeQuery) Run() queryResult {
 	ctx, cancel := q.prom.requestContext(q.ctx)
 	defer cancel()
 
-	qr := queryResult{}
+	var qr queryResult
 
 	args := url.Values{}
 	args.Set("query", q.expr)
@@ -132,7 +132,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 
 	results := make(chan queryResult, len(slices))
 	for _, s := range slices {
-		query := queryRequest{
+		query := queryRequest{ // nolint:exhaustruct
 			query: rangeQuery{
 				prom: p,
 				ctx:  ctx,
@@ -165,9 +165,9 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		close(results)
 	}()
 
-	merged := RangeQueryResult{
+	merged := RangeQueryResult{ // nolint:exhaustruct
 		URI: p.publicURI,
-		Series: SeriesTimeRanges{
+		Series: SeriesTimeRanges{ // nolint:exhaustruct
 			From:  start,
 			Until: end,
 			Step:  step,

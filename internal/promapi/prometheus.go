@@ -118,7 +118,7 @@ func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeo
 		publicURI = safeURI
 	}
 
-	prom := Prometheus{
+	prom := Prometheus{ // nolint:exhaustruct
 		name:        name,
 		unsafeURI:   uri,
 		safeURI:     safeURI,

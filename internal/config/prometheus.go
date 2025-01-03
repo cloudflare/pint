@@ -190,6 +190,7 @@ func NewPrometheusGenerator(cfg Config, metricsRegistry *prometheus.Registry) *P
 	return &PrometheusGenerator{
 		metricsRegistry: metricsRegistry,
 		cfg:             cfg,
+		servers:         nil,
 	}
 }
 

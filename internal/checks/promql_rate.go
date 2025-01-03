@@ -47,7 +47,8 @@ func (c RateCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: true,
+		Online:        true,
+		AlwaysEnabled: false,
 	}
 }
 
@@ -78,7 +79,7 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		return problems
 	}
 
-	done := &completedList{}
+	done := &completedList{values: nil}
 	for _, problem := range c.checkNode(ctx, expr.Query, entries, cfg, done) {
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,

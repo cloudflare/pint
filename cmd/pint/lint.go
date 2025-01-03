@@ -192,6 +192,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 				Path:          entry.Path,
 				ModifiedLines: entry.ModifiedLines,
 				Rule:          entry.Rule,
+				Owner:         "",
 				Problem: checks.Problem{
 					Lines:    entry.Rule.Lines,
 					Reporter: discovery.RuleOwnerComment,
@@ -211,6 +212,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 			Path:          entry.Path,
 			ModifiedLines: entry.ModifiedLines,
 			Rule:          entry.Rule,
+			Owner:         "",
 			Problem: checks.Problem{
 				Lines:    entry.Rule.Lines,
 				Reporter: discovery.RuleOwnerComment,

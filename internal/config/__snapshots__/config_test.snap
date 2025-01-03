@@ -6,6 +6,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -47,6 +48,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -99,6 +101,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -155,6 +158,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -220,6 +224,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -275,6 +280,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -333,6 +339,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -388,6 +395,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -443,6 +451,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -510,6 +519,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -554,6 +564,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -616,6 +627,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -679,6 +691,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -729,6 +742,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -801,6 +815,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -900,6 +915,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -987,6 +1003,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1050,6 +1067,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1112,6 +1130,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1174,6 +1193,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1236,6 +1256,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1298,6 +1319,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1360,6 +1382,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1422,6 +1445,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1486,6 +1510,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1559,6 +1584,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {},
   "owners": {},
   "prometheus": [
@@ -1594,6 +1620,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "promql/syntax",
@@ -1634,6 +1661,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "promql/syntax",
@@ -1679,6 +1707,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "promql/syntax",
@@ -1724,6 +1753,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1780,6 +1810,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1837,6 +1868,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1893,6 +1925,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -1949,6 +1982,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2005,6 +2039,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2061,6 +2096,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2117,6 +2153,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2174,6 +2211,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2230,6 +2268,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2287,6 +2326,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2337,6 +2377,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2403,6 +2444,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2468,6 +2510,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2533,6 +2576,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2611,6 +2655,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2689,6 +2734,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2750,6 +2796,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2814,6 +2861,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2863,6 +2911,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -2943,6 +2992,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -3023,6 +3073,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -3105,6 +3156,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -3158,6 +3210,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -3239,6 +3292,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -3293,6 +3347,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",
@@ -3361,6 +3416,7 @@
     "maxCommits": 20
   },
   "parser": {},
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",

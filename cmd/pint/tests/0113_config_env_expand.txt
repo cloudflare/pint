@@ -17,6 +17,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
       ".*"
     ]
   },
+  "repository": {},
   "checks": {
     "enabled": [
       "alerts/absent",

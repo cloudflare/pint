@@ -285,44 +285,19 @@ func logSeverityCounters(src map[checks.Severity]int) (attrs []any) {
 }
 
 func detectCI(cfg *config.CI) *config.CI {
-	var isNil, isDirty bool
-
-	if cfg == nil {
-		isNil = true
-		cfg = &config.CI{}
-	}
-
 	if bb := os.Getenv("GITHUB_BASE_REF"); bb != "" {
-		isDirty = true
 		cfg.BaseBranch = bb
 		slog.Debug("got base branch from GITHUB_BASE_REF env variable", slog.String("branch", bb))
-	}
-
-	if isNil && !isDirty {
-		return nil
 	}
 	return cfg
 }
 
 func detectRepository(cfg *config.Repository) *config.Repository {
-	var isNil, isDirty bool
-
-	if cfg == nil {
-		isNil = true
-		cfg = &config.Repository{}
-	}
-
 	if os.Getenv("GITHUB_ACTION") != "" {
-		isDirty = true
 		cfg.GitHub = detectGithubActions(cfg.GitHub)
 	}
-
 	if cfg != nil && cfg.GitHub != nil && cfg.GitHub.MaxComments == 0 {
 		cfg.GitHub.MaxComments = 50
-	}
-
-	if isNil && !isDirty {
-		return nil
 	}
 	return cfg
 }
@@ -342,7 +317,7 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 
 	if gh == nil {
 		isNil = true
-		gh = &config.GitHub{Timeout: time.Minute.String()}
+		gh = &config.GitHub{Timeout: time.Minute.String()} // nolint:exhaustruct
 	}
 
 	if repo := os.Getenv("GITHUB_REPOSITORY"); repo != "" {

@@ -49,7 +49,8 @@ func (c RuleForCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: false,
+		Online:        false,
+		AlwaysEnabled: false,
 	}
 }
 

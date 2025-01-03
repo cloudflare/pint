@@ -151,7 +151,7 @@ func parseSnooze(s string) (snz Snooze, err error) {
 		return Snooze{}, fmt.Errorf("invalid snooze comment, expected '$TIME $MATCH' got %q", s)
 	}
 
-	snz = Snooze{Match: parts[1]}
+	snz.Match = parts[1]
 	snz.Until, err = time.Parse(time.RFC3339, parts[0])
 	if err != nil {
 		snz.Until, err = time.Parse("2006-01-02", parts[0])
@@ -177,7 +177,7 @@ func parseValue(typ Type, s string, line int) (CommentValue, error) {
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", RuleOwnerComment)
 		}
-		return Owner{Name: s}, nil
+		return Owner{Name: s, Line: 0}, nil // comment attached to the rule, line numbers are unreliable
 	case FileDisableType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileDisableComment)
@@ -316,8 +316,9 @@ func Parse(lineno int, text string) (comments []Comment) {
 		parsed, err := parseComment(line, lineno+index)
 		if err != nil {
 			comments = append(comments, Comment{
-				Type:  InvalidComment,
-				Value: Invalid{Err: CommentError{Line: lineno + index, Err: err}},
+				Type:   InvalidComment,
+				Value:  Invalid{Err: CommentError{Line: lineno + index, Err: err}},
+				Offset: 0,
 			})
 			continue
 		}

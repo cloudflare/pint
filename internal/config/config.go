@@ -89,11 +89,7 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 	parsedRules := make([]parsedRule, 0, len(cfg.Rules))
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
 		check := checks.NewErrorCheck(entry)
-		parsedRules = append(parsedRules, parsedRule{
-			match: defaultMatch,
-			name:  check.Reporter(),
-			check: check,
-		})
+		parsedRules = append(parsedRules, baseParsedRule(defaultMatch, check.Reporter(), check, nil))
 	} else {
 		parsedRules = append(parsedRules, baseRules(proms, defaultMatch)...)
 		for _, rule := range cfg.Rules {
@@ -133,12 +129,13 @@ func getContext() *hcl.EvalContext {
 }
 
 func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error) {
-	cfg = Config{
+	cfg = Config{ // nolint:exhaustruct
 		CI: &CI{
 			MaxCommits: 20,
 			BaseBranch: "master",
 		},
-		Parser: &Parser{},
+		Parser:     &Parser{},     // nolint:exhaustruct
+		Repository: &Repository{}, // nolint:exhaustruct
 		Checks: &Checks{
 			Enabled:  checks.CheckNames,
 			Disabled: []string{},

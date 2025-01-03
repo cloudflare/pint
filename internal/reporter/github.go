@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v63/github"
+	"github.com/google/go-github/v68/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -25,7 +25,6 @@ type GithubReporter struct {
 	version     string
 	baseURL     string
 	uploadURL   string
-	authToken   string
 	owner       string
 	repo        string
 	timeout     time.Duration
@@ -68,24 +67,24 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 		slog.Int("maxComments", maxComments),
 		slog.String("headCommit", headCommit),
 	)
+
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token}, // nolint:exhaustruct
+	)
+	tc := oauth2.NewClient(context.Background(), ts)
+
 	gr := GithubReporter{
+		client:      github.NewClient(tc),
 		version:     version,
 		baseURL:     baseURL,
 		uploadURL:   uploadURL,
 		timeout:     timeout,
-		authToken:   token,
 		owner:       owner,
 		repo:        repo,
 		prNum:       prNum,
 		maxComments: maxComments,
 		headCommit:  headCommit,
 	}
-
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: gr.authToken},
-	)
-	tc := oauth2.NewClient(context.Background(), ts)
-	gr.client = github.NewClient(tc)
 
 	if gr.uploadURL != "" && gr.baseURL != "" {
 		gr.client, err = gr.client.WithEnterpriseURLs(gr.baseURL, gr.uploadURL)
@@ -102,7 +101,7 @@ func (gr GithubReporter) Describe() string {
 }
 
 func (gr GithubReporter) Destinations(ctx context.Context) (_ []any, err error) {
-	pr := ghPR{}
+	var pr ghPR
 	pr.files, err = gr.listPRFiles(ctx)
 	return []any{pr}, err
 }
@@ -185,11 +184,11 @@ func (gr GithubReporter) Create(ctx context.Context, dst any, p PendingComment) 
 	side, line := gr.fixCommentLine(dst, p)
 
 	comment := &github.PullRequestComment{
-		CommitID: github.String(gr.headCommit),
-		Path:     github.String(p.path),
-		Body:     github.String(p.text),
-		Line:     github.Int(line),
-		Side:     github.String(side),
+		CommitID: github.Ptr(gr.headCommit),
+		Path:     github.Ptr(p.path),
+		Body:     github.Ptr(p.text),
+		Line:     github.Ptr(line),
+		Side:     github.Ptr(side),
 	}
 
 	slog.Debug("Creating a pr comment",
@@ -272,9 +271,9 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 	defer cancel()
 
 	review := github.PullRequestReviewRequest{
-		CommitID: github.String(gr.headCommit),
-		Body:     github.String(formatGHReviewBody(gr.version, summary)),
-		Event:    github.String("COMMENT"),
+		CommitID: github.Ptr(gr.headCommit),
+		Body:     github.Ptr(formatGHReviewBody(gr.version, summary)),
+		Event:    github.Ptr("COMMENT"),
 	}
 	slog.Debug("Creating a review",
 		slog.String("commit", review.GetCommitID()),
@@ -386,7 +385,7 @@ func formatGHReviewBody(version string, summary Summary) string {
 
 func (gr GithubReporter) generalComment(ctx context.Context, body string) error {
 	comment := github.IssueComment{
-		Body: github.String(body),
+		Body: github.Ptr(body),
 	}
 
 	slog.Debug("Creating PR comment", slog.String("body", comment.GetBody()))

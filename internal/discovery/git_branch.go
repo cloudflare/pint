@@ -273,7 +273,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 			slog.String("name", a.Rule.Name()),
 		)
 
-		m := matchedEntry{after: a, hasAfter: true}
+		m := matchedEntry{after: a, hasAfter: true} // nolint:exhaustruct
 		beforeSwap := make([]Entry, 0, len(before))
 		var matches []Entry
 		var matched bool
@@ -318,7 +318,7 @@ func matchEntries(before, after []Entry) (ml []matchedEntry) {
 	}
 
 	for _, b := range before {
-		ml = append(ml, matchedEntry{before: b, hasBefore: true})
+		ml = append(ml, matchedEntry{before: b, hasBefore: true}) // nolint:exhaustruct
 	}
 
 	return ml

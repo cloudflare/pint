@@ -39,7 +39,8 @@ func (c VectorMatchingCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: true,
+		Online:        true,
+		AlwaysEnabled: false,
 	}
 }
 
@@ -150,6 +151,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, node *parser.PromQLN
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 			problems = append(problems, exprProblem{
 				text:     text,
+				details:  "",
 				severity: severity,
 			})
 			return problems
@@ -318,5 +320,5 @@ func (ls labelSets) getFirstNonOverlap(bs labelSets) (labelSet, labelSet) {
 			}
 		}
 	}
-	return labelSet{}, labelSet{}
+	return labelSet{}, labelSet{} // nolint:exhaustruct
 }

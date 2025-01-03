@@ -130,11 +130,12 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 
 func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
 	ym := YamlMap{
+		Key:   newYamlNode(key, offset),
+		Items: nil,
 		Lines: LineRange{
 			First: key.Line + offset,
 			Last:  key.Line + offset,
 		},
-		Key: newYamlNode(key, offset),
 	}
 
 	var ckey *yaml.Node
@@ -163,7 +164,9 @@ func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 
 func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
 	expr := PromQLExpr{
-		Value: newYamlNodeWithKey(key, val, offset),
+		Value:       newYamlNodeWithKey(key, val, offset),
+		SyntaxError: nil,
+		Query:       nil,
 	}
 
 	qlNode, err := DecodeExpr(expr.Value.Value)

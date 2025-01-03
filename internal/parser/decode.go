@@ -32,8 +32,9 @@ func (pn PromQLNode) MarshalJSON() ([]byte, error) {
 // instance with parent and children populated.
 func tree(expr promParser.Node, parent *PromQLNode) *PromQLNode {
 	n := PromQLNode{
-		Parent: parent,
-		Expr:   expr,
+		Parent:   parent,
+		Expr:     expr,
+		Children: nil,
 	}
 	for _, child := range promParser.Children(expr) {
 		n.Children = append(n.Children, tree(child, &n))

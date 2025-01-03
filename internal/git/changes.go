@@ -109,10 +109,10 @@ func Changes(cmd CommandRunner, baseBranch string, filter PathFilter) ([]*FileCh
 		}
 
 		// Rest is populated inside the next loop.
-		change := &FileChange{
+		change := &FileChange{ // nolint:exhaustruct
 			Status: status,
-			Path: PathDiff{
-				After: Path{
+			Path: PathDiff{ // nolint:exhaustruct
+				After: Path{ // nolint:exhaustruct
 					Name: dstPath,
 				},
 			},

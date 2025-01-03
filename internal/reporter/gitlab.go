@@ -84,6 +84,7 @@ func NewGitLabReporter(version, branch, uri string, timeout time.Duration, token
 		slog.Int("maxComments", maxComments),
 	)
 	gl := GitLabReporter{
+		client:      nil,
 		timeout:     timeout,
 		version:     version,
 		branch:      branch,
@@ -124,8 +125,10 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 	for _, id := range ids {
 		slog.Info("Found open GitLab merge request", slog.String("branch", gl.branch), slog.Int("id", id))
 		dst := gitlabMR{
-			userID: userID,
-			mrID:   id,
+			version: nil,
+			diffs:   nil,
+			userID:  userID,
+			mrID:    id,
 		}
 		if dst.version, err = gl.getVersions(ctx, id); err != nil {
 			return nil, fmt.Errorf("failed to get GitLab merge request versions: %w", err)
@@ -393,7 +396,7 @@ type diffLine struct {
 
 func diffLineFor(lines []diffLine, line int) (diffLine, bool) {
 	if len(lines) == 0 {
-		return diffLine{}, false
+		return diffLine{old: 0, new: 0, wasModified: false}, false
 	}
 
 	for i, dl := range lines {
@@ -424,7 +427,7 @@ func diffLineFor(lines []diffLine, line int) (diffLine, bool) {
 			wasModified: false,
 		}, true
 	}
-	return diffLine{}, false
+	return diffLine{old: 0, new: 0, wasModified: false}, false
 }
 
 var diffRe = regexp.MustCompile(`@@ \-(\d+),(\d+) \+(\d+),(\d+) @@`)

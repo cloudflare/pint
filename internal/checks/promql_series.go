@@ -105,7 +105,8 @@ func (c SeriesCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: true,
+		Online:        true,
+		AlwaysEnabled: false,
 	}
 }
 
@@ -245,7 +246,8 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				slog.String("name", c.prom.Name()),
 				slog.String("metric", c.prom.UptimeMetric()),
 			)
-			promUptime = &promapi.RangeQueryResult{
+			promUptime = &promapi.RangeQueryResult{ // nolint:exhaustruct
+				URI: c.prom.URI(),
 				Series: promapi.SeriesTimeRanges{
 					From:  params.Start(),
 					Until: params.End(),
@@ -258,6 +260,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 							End:         params.End(),
 						},
 					},
+					Gaps: nil,
 				},
 			}
 		}

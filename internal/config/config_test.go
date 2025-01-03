@@ -35,6 +35,29 @@ func TestConfigLoadMissingFileOk(t *testing.T) {
 	require.False(t, ok)
 }
 
+func TestConfigLoadMergeDefaults(t *testing.T) {
+	dir := t.TempDir()
+	path := path.Join(dir, "config.hcl")
+	err := os.WriteFile(path, []byte("parser {}\n"), 0o644)
+	require.NoError(t, err)
+
+	cfg, ok, err := config.Load(path, true)
+	require.NoError(t, err)
+	require.True(t, ok)
+	require.NotNil(t, cfg.CI)
+	require.Equal(t, 20, cfg.CI.MaxCommits)
+	require.NotNil(t, cfg.Repository)
+}
+
+func TestConfigLoadMergeDefaultsWhenMissing(t *testing.T) {
+	cfg, ok, err := config.Load("xxx.hcl", false)
+	require.NoError(t, err)
+	require.False(t, ok)
+	require.NotNil(t, cfg.CI)
+	require.Equal(t, 20, cfg.CI.MaxCommits)
+	require.NotNil(t, cfg.Repository)
+}
+
 func TestDisableOnlineChecksWithPrometheus(t *testing.T) {
 	dir := t.TempDir()
 	path := path.Join(dir, "config.hcl")

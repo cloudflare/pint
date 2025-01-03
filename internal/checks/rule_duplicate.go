@@ -31,7 +31,8 @@ func (c RuleDuplicateCheck) Meta() CheckMeta {
 			discovery.Modified,
 			discovery.Moved,
 		},
-		IsOnline: false,
+		Online:        false,
+		AlwaysEnabled: false,
 	}
 }
 
