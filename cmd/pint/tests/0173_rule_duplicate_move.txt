@@ -28,6 +28,7 @@ level=INFO msg="Finding all rules to check on current git branch" base=main
 level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=up tags=[] include=["^rules/alert.*$"] exclude=[]
 level=INFO msg="Configured new Prometheus server" name=prom2a uris=1 uptime=up tags=[] include=["^rules/record.*$"] exclude=[]
 level=INFO msg="Configured new Prometheus server" name=prom2b uris=1 uptime=up tags=[] include=["^rules/record.*$"] exclude=[]
+level=INFO msg="Checking Prometheus rules" entries=7 workers=10 online=true
 -- src/v1/rules/alert1.yml --
 groups:
 - name: g1

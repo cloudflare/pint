@@ -5,6 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=4 workers=10 online=true
 rules/1.yml:22-23 Bug: `summary` annotation is required. (alerts/annotation)
  22 |           - alert: Example_High_Restart_Rate
  23 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )

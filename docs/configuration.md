@@ -81,11 +81,11 @@ parser {
   in [Thanos Rule](https://thanos.io/tip/components/rule.md/) docs, which currently allows for setting
   an extra key on the rule group object - `partial_response_strategy`.
   Default value is `prometheus`.
-- `include` - list of file patterns to check when running checks. Only files
+- `include` - list of regexp patterns to check when running checks. Only files
   matching those regexp rules will be checked, other modified files will be ignored.
-- `exclude` - list of file patterns to ignore when running checks.
+- `exclude` - list of regexp patterns to ignore when running checks.
   This option takes precedence over `include`, so if a file path matches both
-  `include` & `exclude` patterns, it will be excluded.
+  `include` & `exclude` regexp patterns, it will be excluded.
 - `relaxed` - by default, pint will parse all files in strict mode, where
   all rule files must have the exact syntax Prometheus or Thanos expects:
 
@@ -118,8 +118,32 @@ parser {
   you can set this option to allow fuzzy parsing, which will try to find rule
   definitions anywhere in the file, without requiring `groups -> rules -> rule`
   structure to be present.
-  This option takes a list of file patterns, all files matching those regexp rules
+  This option takes a list of regexp patterns, all files matching those regexp rules
   will be parsed in relaxed mode.
+
+**NOTE**: remember that all options that accept regexp patterns (shown as `"(.*)"` in syntax docs) are **anchored**.
+If you do set any patterns in the `parser` section then they must match the way you run pint.
+For example if you have a git repository with a `rules` directory containing Prometheus rules then
+you might set `include = ["rules/.*"]` in the config. Which internally will be parsed as `$rules/.*$` regexp pattern.
+This means that if you then pass absolute paths to pint commands (`pint lint /my/repo/rules`) it won't match that regexp.
+If you do want to use pint with both relative and absolute paths make sure your regexp patterns allow for it, example:
+
+```js
+parser {
+  include = [ "(.*/)?rules/.*" ]
+}
+```
+
+Or explicitly set both relative and absolute path:
+
+```js
+parser {
+  include = [
+    "rules/.*",
+    "/my/repo/rules/.*",
+  ]
+}
+```
 
 ## Owners
 
@@ -414,7 +438,7 @@ instances is needed. This can be configured using `discovery` config blocks.
 ### File path discovery
 
 File path discovery allows to generate Prometheus server definitions used by pint
-based on path patterns on disk.
+based on path regexp patterns on disk.
 Syntax:
 
 ```js
@@ -591,7 +615,7 @@ rule {
 
 - `locked` - if set to `true` this rule will be locked, which means that it cannot be disabled using
   `# pint disable ...` or `# pint snooze ...` comments.
-- `match:path` - only files matching this pattern will be checked by this rule.
+- `match:path` - only files matching this regexp pattern will be checked by this rule.
 - `match:state` - only match rules based on their state. Default value for `state` depends on the
   pint command that is being run, for `pint ci` the default value is `["added", "modified", "renamed"]`,
   for any other command the default value is `["any"]`.
@@ -603,14 +627,14 @@ rule {
   - `removed` - a rule is being removed in a git commit, a rule can only be in this state when running `pint ci` on a pull request.
   - `unmodified` - a rule is not being modified in a git commit when running `pint ci` or other pint command was run that doesn't try to detect which rules were modified.
 - `match:name` - only rules with names (`record` for recording rules and `alert` for alerting
-  rules) matching this pattern will be checked rule.
+  rules) matching this regexp pattern will be checked rule.
 - `match:kind` - optional rule type filter, only rule of this type will be checked.
 - `match:command` - optional command type filter, this allows to include or ignore rules
   based on the command pint is run with `pint ci`, `pint lint` or `pint watch`.
 - `match:annotation` - optional annotation filter, only alert rules with at least one
-  annotation matching this pattern will be checked by this rule.
+  annotation matching this regexp pattern will be checked by this rule.
 - `match:label` - optional annotation filter, only rules with at least one label
-  matching this pattern will be checked by this rule. For recording rules only static
+  matching this regexp pattern will be checked by this rule. For recording rules only static
   labels set on the recording rule are considered.
 - `match:for` - optional alerting rule `for` filter. If set, only alerting rules with the `for`
   field present and matching the provided value will be checked by this rule. Recording rules

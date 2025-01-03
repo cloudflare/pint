@@ -1,0 +1,33 @@
+exec pint -l debug --no-color lint $WORK/rules
+! stdout .
+stderr 'level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true'
+! stderr 'level=INFO msg="No rules found, skipping Prometheus discovery"'
+
+exec pint -l debug --no-color lint rules
+! stdout .
+stderr 'level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true'
+! stderr 'level=INFO msg="No rules found, skipping Prometheus discovery"'
+
+exec pint -l debug --no-color lint ../*0208*/rules
+! stdout .
+stderr 'level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true'
+! stderr 'level=INFO msg="No rules found, skipping Prometheus discovery"'
+
+-- rules/0001.yml --
+groups:
+- name: test1
+  rules:
+  - record: "colo:test1"
+    expr: sum(foo) without(job)
+
+-- rules/0002.yml --
+groups:
+- name: test2
+  rules:
+  - record: "colo:test2"
+    expr: sum(foo) without(job)
+
+-- .pint.hcl --
+parser {
+  include = ["(.*/)?rules/.*"]
+}

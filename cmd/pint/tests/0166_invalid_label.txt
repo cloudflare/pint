@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 rules/1.yaml:7 Fatal: This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`. (yaml/parse)
  7 |       "{{ $value }}": "down"
 

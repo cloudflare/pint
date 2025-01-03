@@ -45,5 +45,6 @@ parser {
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=false
 level=INFO msg="Offline mode, skipping Prometheus discovery"
 level=ERROR msg="Fatal error" err="open x/y/z/checkstyle.xml: no such file or directory"

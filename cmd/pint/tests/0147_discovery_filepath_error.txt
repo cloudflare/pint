@@ -8,6 +8,7 @@ level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
 level=DEBUG msg="Glob finder completed" count=1
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=INFO msg="Finding Prometheus servers using file paths" dir=notfound match=^(?P<name>\w+).ya?ml$
 level=ERROR msg="Fatal error" err="filepath discovery error: lstat notfound: no such file or directory"
 -- rules/0001.yml --

@@ -13,6 +13,7 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=prometheus_ready tags=[] include=[] exclude=[]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=WARN msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" name=prom1 metric=prometheus_ready
 level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom1 metric=prometheus_ready
 rules/1.yml:2 Warning: `http_errors_total[2d]` selector is trying to query Prometheus for 2d worth of metrics, but `prom1` Prometheus server at http://127.0.0.1:7080 is configured to only keep 1d of metrics history. (promql/range_query)

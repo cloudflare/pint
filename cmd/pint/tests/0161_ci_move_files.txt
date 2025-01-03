@@ -39,6 +39,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
 level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=up tags=[] include=["^prom1.yml$"] exclude=[]
 level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 uptime=up tags=[] include=["^prom2.yml$"] exclude=[]
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 -- stderrV2.txt --
 prom2.yml:10 Bug: `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w. (promql/series)
  10 |     expr: up == 0

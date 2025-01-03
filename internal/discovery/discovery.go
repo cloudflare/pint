@@ -65,8 +65,8 @@ const (
 )
 
 type Path struct {
-	Name          string // file path, it can be symlink
-	SymlinkTarget string // symlink target, or the same as name if not a symlink
+	Name          string // File path, it can be symlink.
+	SymlinkTarget string // Symlink target, or the same as name if not a symlink.
 }
 
 func (p Path) String() string {

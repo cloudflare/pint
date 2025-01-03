@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 rules/strict.yml:4 Fatal: This rule is not a valid Prometheus rule: `missing expr key`. (yaml/parse)
  4 |   - record: foo
 
