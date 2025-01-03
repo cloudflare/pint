@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 rules/0001.yml:7 Information: Using the value of `rate(errors[2m])` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly. (alerts/template)
  7 |       summary: 'error rate: {{ $value }}'
 

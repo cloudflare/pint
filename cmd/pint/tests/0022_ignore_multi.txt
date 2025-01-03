@@ -5,6 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
 rules/1.yaml:2 Warning: `dropped` label should be removed when aggregating `^.+$` rules, remove dropped from `by()`. (promql/aggregate)
  2 |   expr: sum(errors_total) by(keep,dropped)
 

@@ -11,6 +11,7 @@ level=DEBUG msg="Adding pint config to the parser exclude list" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=1
 level=DEBUG msg="Glob finder completed" count=1
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=DEBUG msg="Starting query workers" name=discovery uri=http://127.0.0.1:7148 workers=1
 level=INFO msg="Finding Prometheus servers using Prometheus API query" uri=http://127.0.0.1:7148 query=prometheus_ready
 level=DEBUG msg="Scheduling prometheus query" uri=http://127.0.0.1:7148 query=prometheus_ready

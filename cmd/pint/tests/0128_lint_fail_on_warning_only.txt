@@ -11,6 +11,7 @@ groups:
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=INFO msg="Problems found" Warning=1
 level=INFO msg="1 problem(s) not visible because of --min-severity=bug flag"
 level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Warning or higher"

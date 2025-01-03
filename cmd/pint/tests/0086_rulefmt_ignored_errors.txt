@@ -4,6 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=5 workers=10 online=true
 rules/strict.yml:4 Fatal: This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`. (yaml/parse)
  4 |   - expr: MissingAlertOrRecord
 

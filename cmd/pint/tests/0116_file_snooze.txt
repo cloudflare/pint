@@ -10,6 +10,7 @@ level=DEBUG msg="Check snoozed by comment" check=promql/aggregate(job:true) matc
 level=DEBUG msg="Check snoozed by comment" check=alerts/for match=alerts/for until="2099-11-28T10:24:18Z"
 level=DEBUG msg="File parsed" path=rules/0001.yml rules=2
 level=DEBUG msg="Glob finder completed" count=2
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum:job lines=4-5 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=sum:job

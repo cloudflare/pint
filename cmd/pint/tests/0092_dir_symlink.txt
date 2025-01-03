@@ -11,6 +11,7 @@ cmp stderr stderr.txt
 level=INFO msg="Finding all rules to check" paths=["rules","linked","rules/src/rule.yaml"]
 level=DEBUG msg="File parsed" path=rules/src/rule.yaml rules=1
 level=DEBUG msg="Glob finder completed" count=1
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/src/rule.yaml record=down lines=4-5 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/src/rule.yaml rule=down

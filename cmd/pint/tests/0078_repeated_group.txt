@@ -5,6 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 4: duplicated group name" path=rules/strict.yml lines=1-5
+level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 rules/strict.yml:4 Fatal: duplicated group name (yaml/parse)
  4 | - name: foo
 

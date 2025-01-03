@@ -189,10 +189,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 		}
 		if entry.Owner == "" {
 			reports = append(reports, reporter.Report{
-				Path: discovery.Path{
-					Name:          entry.Path.Name,
-					SymlinkTarget: entry.Path.SymlinkTarget,
-				},
+				Path:          entry.Path,
 				ModifiedLines: entry.ModifiedLines,
 				Rule:          entry.Rule,
 				Problem: checks.Problem{
@@ -211,10 +208,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 			}
 		}
 		reports = append(reports, reporter.Report{
-			Path: discovery.Path{
-				Name:          entry.Path.Name,
-				SymlinkTarget: entry.Path.SymlinkTarget,
-			},
+			Path:          entry.Path,
 			ModifiedLines: entry.ModifiedLines,
 			Rule:          entry.Rule,
 			Problem: checks.Problem{

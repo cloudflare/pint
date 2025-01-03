@@ -5,6 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 rules/01.yml:4 Bug: alerting rule name must match `^rec:.+$`. (rule/name)
  4 |   - alert: foo
 

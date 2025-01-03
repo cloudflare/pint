@@ -5,6 +5,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 ##teamcity[testSuiteStarted name='alerts/comparison']
 ##teamcity[testSuiteStarted name='Warning']
 ##teamcity[testStarted name='rules/0001.yml:5']

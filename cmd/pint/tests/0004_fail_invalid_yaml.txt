@@ -6,6 +6,7 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 4: did not find expected key" path=rules/bad.yaml lines=1-7
+level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 rules/bad.yaml:4 Fatal: did not find expected key (yaml/parse)
  4 | 
 
