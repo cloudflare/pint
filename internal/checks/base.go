@@ -149,13 +149,13 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 
 	switch {
 	case promapi.IsUnsupportedError(err):
-		text = fmt.Sprintf("Couldn't run %q checks on %s because it's %s.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run `%s` checks on %s because it's %s.", reporter, promDesc, err)
 		severity = Warning
 	case promapi.IsQueryTooExpensive(err):
-		text = fmt.Sprintf("Couldn't run %q checks on %s because some queries are too expensive: `%s`.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run `%s` checks on %s because some queries are too expensive: `%s`.", reporter, promDesc, err)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("Couldn't run %q checks due to %s connection error: `%s`.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run `%s` checks due to %s connection error: `%s`.", reporter, promDesc, err)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug

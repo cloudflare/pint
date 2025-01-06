@@ -17,7 +17,7 @@ level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/fo
 level=DEBUG msg="Scheduling Prometheus metrics metadata query" uri=http://127.0.0.1:7103 metric=foo
 level=DEBUG msg="Getting prometheus metrics metadata" uri=http://127.0.0.1:7103 metric=foo
 level=ERROR msg="Query returned an error" err="failed to query Prometheus metrics metadata: Get \"http://127.0.0.1:7103/api/v1/metadata?metric=foo\": dial tcp 127.0.0.1:7103: connect: connection refused" uri=http://127.0.0.1:7103 query=foo
-rules/0001.yml:8 Warning: Couldn't run "promql/counter" checks due to `prom` Prometheus server at http://127.0.0.1:7103 connection error: `connection refused`. (promql/counter)
+rules/0001.yml:8 Warning: Couldn't run `promql/counter` checks due to `prom` Prometheus server at http://127.0.0.1:7103 connection error: `connection refused`. (promql/counter)
  8 |   expr: sum(foo) without(job)
 
 level=INFO msg="Problems found" Warning=1
