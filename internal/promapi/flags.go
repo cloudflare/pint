@@ -71,15 +71,15 @@ func (q flagsQuery) CacheTTL() time.Duration {
 	return time.Minute * 10
 }
 
-func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
-	slog.Debug("Scheduling Prometheus flags query", slog.String("uri", p.safeURI))
+func (prom *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
+	slog.Debug("Scheduling Prometheus flags query", slog.String("uri", prom.safeURI))
 
-	p.locker.lock(APIPathFlags)
-	defer p.locker.unlock(APIPathFlags)
+	prom.locker.lock(APIPathFlags)
+	defer prom.locker.unlock(APIPathFlags)
 
 	resultChan := make(chan queryResult)
-	p.queries <- queryRequest{
-		query:  flagsQuery{prom: p, ctx: ctx, timestamp: time.Now()},
+	prom.queries <- queryRequest{
+		query:  flagsQuery{prom: prom, ctx: ctx, timestamp: time.Now()},
 		result: resultChan,
 	}
 
@@ -89,7 +89,7 @@ func (p *Prometheus) Flags(ctx context.Context) (*FlagsResult, error) {
 	}
 
 	r := FlagsResult{
-		URI:   p.publicURI,
+		URI:   prom.publicURI,
 		Flags: result.value.(v1.FlagsResult),
 	}
 

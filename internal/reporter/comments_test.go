@@ -787,7 +787,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
@@ -807,7 +807,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				time.Sleep(time.Second * 2)
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
@@ -826,7 +826,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				_, _ = w.Write([]byte("OK"))
 			}),
 			errorHandler: func(err error) error {
@@ -845,7 +845,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			maxComments: 50,
 			reports:     []Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				_, _ = w.Write([]byte("{}"))
 			}),
 			errorHandler: func(err error) error {

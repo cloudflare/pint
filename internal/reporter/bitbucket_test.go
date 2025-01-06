@@ -125,7 +125,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
@@ -152,7 +152,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 				time.Sleep(time.Second * 2)
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
@@ -178,7 +178,7 @@ func TestBitBucketReporter(t *testing.T) {
 				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-				w.WriteHeader(400)
+				w.WriteHeader(http.StatusBadRequest)
 				time.Sleep(time.Second * 2)
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
@@ -196,10 +196,10 @@ func TestBitBucketReporter(t *testing.T) {
 			report:      emptyReport,
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method == http.MethodDelete {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte("Internal error"))
 			}),
 			errorHandler: func(err error) error {
@@ -215,7 +215,7 @@ func TestBitBucketReporter(t *testing.T) {
 			report:      emptyReport,
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
@@ -224,12 +224,12 @@ func TestBitBucketReporter(t *testing.T) {
 						Values:     []reporter.BitBucketPullRequest{},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 					return
 				}
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte("Internal error"))
 			}),
 			errorHandler: func(err error) error {
@@ -374,7 +374,7 @@ func TestBitBucketReporter(t *testing.T) {
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests" {
@@ -383,16 +383,16 @@ func TestBitBucketReporter(t *testing.T) {
 						Values:     []reporter.BitBucketPullRequest{},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 					return
 				}
 				if r.Method == http.MethodDelete {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte("Internal error"))
 			}),
 			errorHandler: func(err error) error {
@@ -408,10 +408,10 @@ func TestBitBucketReporter(t *testing.T) {
 			report:      emptyReport,
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				if r.Method != http.MethodGet {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte("Internal error"))
 			}),
 			errorHandler: func(err error) error {
@@ -445,16 +445,16 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
 				if strings.HasSuffix(r.URL.Path, "/changes") {
-					w.WriteHeader(500)
+					w.WriteHeader(http.StatusInternalServerError)
 					_, _ = w.Write([]byte("Internal error"))
 					return
 				}
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get pull request changes from BitBucket: GET request failed" {
@@ -487,7 +487,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -497,16 +497,16 @@ func TestBitBucketReporter(t *testing.T) {
 						Values:     []reporter.BitBucketPullRequestChange{},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
 				if r.URL.Path == "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities" {
-					w.WriteHeader(500)
+					w.WriteHeader(http.StatusInternalServerError)
 					_, _ = w.Write([]byte("Internal error"))
 					return
 				}
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get pull request comments from BitBucket: GET request failed" {
@@ -1242,7 +1242,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -1258,7 +1258,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -1305,7 +1305,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write(data)
 					return
 				}
@@ -1336,20 +1336,20 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write(data)
 					return
 				}
 				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
 				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte("pint_user"))
 					return
 				}
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 			}),
 			errorHandler: func(err error) error {
 				if err != nil {
@@ -1382,7 +1382,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -1398,7 +1398,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -1408,7 +1408,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Values:     []reporter.BitBucketPullRequestActivity{},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write(data)
 					return
 				}
@@ -1439,19 +1439,19 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write(data)
 					return
 				}
 				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
 				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(500)
+					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 			}),
 			errorHandler: func(err error) error {
 				if err.Error() != "failed to get pull request comments from BitBucket: GET request failed" {
@@ -1503,7 +1503,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -1519,7 +1519,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, err = w.Write(data)
 					assert.NoError(t, err)
 				}
@@ -1566,7 +1566,7 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write(data)
 					return
 				}
@@ -1597,24 +1597,24 @@ func TestBitBucketReporter(t *testing.T) {
 						},
 					})
 					assert.NoError(t, err)
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write(data)
 					return
 				}
 				if r.URL.Path == "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
 				if r.URL.Path == "/plugins/servlet/applinks/whoami" {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					_, _ = w.Write([]byte("pint_user"))
 					return
 				}
 				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002" && r.Method == http.MethodDelete {
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					return
 				}
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 			}),
 			errorHandler: func(err error) error {
 				if err != nil && err.Error() == "failed to create BitBucket pull request comments: POST request failed" {
@@ -1947,7 +1947,7 @@ func TestBitBucketReporter(t *testing.T) {
 					defer r.Body.Close()
 
 					if r.Method == http.MethodDelete {
-						w.WriteHeader(200)
+						w.WriteHeader(http.StatusOK)
 						return
 					}
 
@@ -1959,7 +1959,7 @@ func TestBitBucketReporter(t *testing.T) {
 
 						data, err := json.Marshal(v)
 						assert.NoError(t, err)
-						w.WriteHeader(200)
+						w.WriteHeader(http.StatusOK)
 						_, err = w.Write(data)
 						assert.NoError(t, err)
 						return
@@ -1981,19 +1981,19 @@ func TestBitBucketReporter(t *testing.T) {
 					case "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests":
 						data, err := json.Marshal(tc.pullRequests)
 						assert.NoError(t, err)
-						w.WriteHeader(200)
+						w.WriteHeader(http.StatusOK)
 						_, err = w.Write(data)
 						assert.NoError(t, err)
 					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes":
 						data, err := json.Marshal(tc.pullRequestChanges)
 						assert.NoError(t, err)
-						w.WriteHeader(200)
+						w.WriteHeader(http.StatusOK)
 						_, err = w.Write(data)
 						assert.NoError(t, err)
 					case "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities":
 						data, err := json.Marshal(tc.pullRequestActivities)
 						assert.NoError(t, err)
-						w.WriteHeader(200)
+						w.WriteHeader(http.StatusOK)
 						_, err = w.Write(data)
 						assert.NoError(t, err)
 					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments":
@@ -2004,11 +2004,11 @@ func TestBitBucketReporter(t *testing.T) {
 						assert.Equal(t, tc.pullRequestComments[commentIndex], comment)
 						commentIndex++
 					case "/plugins/servlet/applinks/whoami":
-						w.WriteHeader(200)
+						w.WriteHeader(http.StatusOK)
 						_, err := w.Write([]byte("pint_user"))
 						assert.NoError(t, err)
 					default:
-						w.WriteHeader(500)
+						w.WriteHeader(http.StatusInternalServerError)
 						_, _ = w.Write([]byte("Unhandled path: " + r.URL.Path))
 						t.Errorf("Unhandled path: %s", r.URL.Path)
 					}

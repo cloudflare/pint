@@ -109,7 +109,7 @@ func TestRange(t *testing.T) {
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Minute, diff)
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
 			},
@@ -150,7 +150,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %.2f", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				values = append(values, fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()))
@@ -182,7 +182,7 @@ func TestRange(t *testing.T) {
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Hour, diff)
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
 			},
@@ -211,7 +211,7 @@ func TestRange(t *testing.T) {
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Hour*2, diff)
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
 			},
@@ -252,7 +252,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %.2f", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				for i := float64(timeParse("2022-06-14T16:34:00Z").Unix()); i <= float64(timeParse("2022-06-14T18:35:00Z").Unix()); i += 60 {
@@ -308,7 +308,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %.2f", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				for i := start; i < end; i += 300 {
@@ -359,7 +359,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %.2f", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`
 					{
@@ -440,7 +440,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %.2f", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				for i := start; i < end; i += 60 {
@@ -490,7 +490,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %d", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				for i := start; i < end; i += 300 {
@@ -522,7 +522,7 @@ func TestRange(t *testing.T) {
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
 					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					w.Header().Set("Content-Type", "application/json")
 					var values []string
 					for i := start; i <= end; i += 300 {
@@ -533,7 +533,7 @@ func TestRange(t *testing.T) {
 						strings.Join(values, ","))))
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
 					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
-					w.WriteHeader(503)
+					w.WriteHeader(http.StatusServiceUnavailable)
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write([]byte(`{
                                        "status": "error",
@@ -569,7 +569,7 @@ func TestRange(t *testing.T) {
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Minute*5, diff)
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{
 					"status":"success",
@@ -633,7 +633,7 @@ func TestRange(t *testing.T) {
 					t.Fatalf("unknown start: %.2f", start)
 				}
 
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				for i := start; i < end; i += 60 {

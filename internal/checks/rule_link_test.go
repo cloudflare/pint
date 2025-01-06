@@ -16,33 +16,33 @@ func TestRuleLinkCheck(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Header.Get("X-Host") {
 		case "200.example.com":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			_, _ = w.Write([]byte(`OK`))
 		case "400.example.com":
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			_, _ = w.Write([]byte(`Bad request`))
 		case "404.example.com":
-			w.WriteHeader(404)
+			w.WriteHeader(http.StatusNotFound)
 			_, _ = w.Write([]byte(`Not found`))
 		case "headers.example.com":
 			if r.Header.Get("X-Auth") != "mykey" {
-				w.WriteHeader(403)
+				w.WriteHeader(http.StatusForbidden)
 				_, _ = w.Write([]byte(`Access denied`))
 			} else {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				_, _ = w.Write([]byte(`OK`))
 			}
 		case "rewrite.example.com":
 			if r.URL.Path != "/rewrite" {
-				w.WriteHeader(500)
+				w.WriteHeader(http.StatusInternalServerError)
 				_, _ = w.Write([]byte(`Link not rewritten`))
 			} else {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				_, _ = w.Write([]byte(`OK`))
 			}
 		default:
 			t.Logf("Invalid X-Host: %s", r.Header.Get("X-Host"))
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 		}
 	}))
 	defer srv.Close()

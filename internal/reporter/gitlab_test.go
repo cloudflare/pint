@@ -86,7 +86,7 @@ func TestGitLabReporter(t *testing.T) {
 			maxComments: 50,
 			reports:     []reporter.Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
 				case "/api/v4/user":
 					_, _ = w.Write([]byte(`{"id": 123}`))
@@ -107,7 +107,7 @@ func TestGitLabReporter(t *testing.T) {
 			maxComments: 50,
 			reports:     []reporter.Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
 				case "/api/v4/user":
 					if r.Method == http.MethodGet {
@@ -193,10 +193,10 @@ func TestGitLabReporter(t *testing.T) {
 						_, _ = w.Write([]byte(`{"id": 123}`))
 					}
 				case "/api/v4/projects/123/merge_requests":
-					w.WriteHeader(500)
+					w.WriteHeader(http.StatusInternalServerError)
 					_, _ = w.Write([]byte("Mock error"))
 				default:
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					if r.Method == http.MethodGet {
 						_, _ = w.Write([]byte(`[]`))
 					}
@@ -220,10 +220,10 @@ func TestGitLabReporter(t *testing.T) {
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/api/v4/user":
-					w.WriteHeader(500)
+					w.WriteHeader(http.StatusInternalServerError)
 					_, _ = w.Write([]byte("Mock error"))
 				default:
-					w.WriteHeader(200)
+					w.WriteHeader(http.StatusOK)
 					if r.Method == http.MethodGet {
 						_, _ = w.Write([]byte(`[]`))
 					}
@@ -294,7 +294,7 @@ func TestGitLabReporter(t *testing.T) {
 				},
 			},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
 				case "/api/v4/user":
 					if r.Method == http.MethodGet {
@@ -336,7 +336,7 @@ func TestGitLabReporter(t *testing.T) {
 			maxComments: 1,
 			reports:     []reporter.Report{fooReport},
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(200)
+				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
 				case "/api/v4/user":
 					if r.Method == http.MethodGet {
@@ -540,7 +540,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 
 func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff string, t *testing.T) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
+		w.WriteHeader(http.StatusOK)
 		switch r.URL.Path {
 		case "/api/v4/user":
 			if r.Method == http.MethodGet {
