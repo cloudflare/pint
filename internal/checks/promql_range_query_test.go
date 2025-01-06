@@ -2,6 +2,7 @@ package checks_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -90,6 +91,31 @@ func TestRangeQueryCheck(t *testing.T) {
 					resp: flagsResponse{flags: map[string]string{
 						"storage.tsdb.retention.time": "abc",
 					}},
+				},
+			},
+		},
+		{
+			description: "flag unsupported",
+			content:     "- record: foo\n  expr: rate(foo[30d])\n",
+			checker:     newRangeQueryCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "promql/range_query",
+						Text:     checkUnsupported(checks.RangeQueryCheckName, "prom", uri, promapi.APIPathFlags),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireFlagsPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
 				},
 			},
 		},

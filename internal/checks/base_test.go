@@ -292,6 +292,16 @@ var (
 	requireMetadataPath   = requestPathCond{path: promapi.APIPathMetadata}
 )
 
+type httpResponse struct {
+	body string
+	code int
+}
+
+func (hr httpResponse) respond(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(hr.code)
+	_, _ = w.Write([]byte(hr.body))
+}
+
 type promError struct {
 	errorType v1.ErrorType
 	err       string
@@ -323,7 +333,7 @@ type vectorResponse struct {
 }
 
 func (vr vectorResponse) respond(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
 		Status string `json:"status"`
@@ -376,7 +386,7 @@ func (mr matrixResponse) respond(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
 		Status string `json:"status"`
@@ -409,7 +419,7 @@ type configResponse struct {
 }
 
 func (cr configResponse) respond(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
 		Status string          `json:"status"`
@@ -430,7 +440,7 @@ type flagsResponse struct {
 }
 
 func (fg flagsResponse) respond(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	result := struct {
 		Data   v1.FlagsResult `json:"data"`
@@ -451,7 +461,7 @@ type metadataResponse struct {
 }
 
 func (mr metadataResponse) respond(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(200)
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	// _, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
 	result := struct {
@@ -585,4 +595,8 @@ func checkErrorUnableToRun(c, name, uri, err string) string {
 
 func checkErrorTooExpensiveToRun(c, name, uri, err string) string {
 	return fmt.Sprintf("Couldn't run %q checks on `%s` Prometheus server at %s because some queries are too expensive: `%s`.", c, name, uri, err)
+}
+
+func checkUnsupported(c, name, uri, path string) string {
+	return fmt.Sprintf("Couldn't run %q checks on `%s` Prometheus server at %s because it's unsupported: this server doesn't seem to support `%s` API endpoint.", c, name, uri, path)
 }

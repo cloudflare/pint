@@ -2,6 +2,7 @@ package checks_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -266,6 +267,31 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 				}
+			},
+		},
+		{
+			description: "404",
+			content:     "- alert: foo\n  expr: absent(foo)\n",
+			checker:     newAlertsAbsentCheck,
+			prometheus:  newSimpleProm,
+			problems: func(s string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.AlertsAbsentCheckName,
+						Text:     checkUnsupported(checks.AlertsAbsentCheckName, "prom", s, promapi.APIPathConfig),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
+				},
 			},
 		},
 	}

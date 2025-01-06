@@ -15,6 +15,14 @@ import (
 	"github.com/prymitive/current"
 )
 
+func IsUnsupportedError(err error) bool {
+	var e1 APIError
+	if ok := errors.As(err, &e1); ok {
+		return e1.ErrorType == ErrAPIUnsupported
+	}
+	return false
+}
+
 func IsUnavailableError(err error) bool {
 	var e1 APIError
 	if ok := errors.As(err, &e1); ok {
@@ -50,8 +58,9 @@ func (e APIError) Error() string {
 }
 
 const (
-	ErrUnknown    v1.ErrorType = "unknown"
-	ErrJSONStream v1.ErrorType = "json_stream"
+	ErrUnknown        v1.ErrorType = "unknown"
+	ErrJSONStream     v1.ErrorType = "json_stream"
+	ErrAPIUnsupported v1.ErrorType = "unsupported"
 )
 
 func decodeErrorType(s string) v1.ErrorType {
@@ -104,6 +113,18 @@ func decodeError(err error) string {
 
 func tryDecodingAPIError(resp *http.Response) error {
 	slog.Debug("Trying to parse Prometheus error response", slog.Int("code", resp.StatusCode))
+
+	if resp.StatusCode == http.StatusNotFound {
+		apiPath := "some API endpoints"
+		if resp.Request != nil {
+			apiPath = "`" + resp.Request.URL.Path + "` API endpoint"
+		}
+		return APIError{
+			Status:    "",
+			ErrorType: ErrAPIUnsupported,
+			Err:       "this server doesn't seem to support " + apiPath,
+		}
+	}
 
 	var status, errType, errText string
 	decoder := current.Object(

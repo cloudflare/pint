@@ -3,6 +3,7 @@ package checks_test
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -524,6 +525,45 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireMetadataPath},
 					resp:  metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "metadata unsupported",
+			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "promql/rate",
+						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Details:  checks.RateCheckDetails,
+						Severity: checks.Bug,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "promql/rate",
+						Text:     checkUnsupported(checks.RateCheckName, "prom", uri, promapi.APIPathMetadata),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{requireMetadataPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
 				},
 			},
 		},
