@@ -77,16 +77,16 @@ func (q metadataQuery) CacheTTL() time.Duration {
 	return time.Minute * 10
 }
 
-func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
-	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", p.safeURI), slog.String("metric", metric))
+func (prom *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
+	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", prom.safeURI), slog.String("metric", metric))
 
 	key := APIPathMetadata + metric
-	p.locker.lock(key)
-	defer p.locker.unlock(key)
+	prom.locker.lock(key)
+	defer prom.locker.unlock(key)
 
 	resultChan := make(chan queryResult)
-	p.queries <- queryRequest{
-		query:  metadataQuery{prom: p, ctx: ctx, metric: metric, timestamp: time.Now()},
+	prom.queries <- queryRequest{
+		query:  metadataQuery{prom: prom, ctx: ctx, metric: metric, timestamp: time.Now()},
 		result: resultChan,
 	}
 
@@ -96,7 +96,7 @@ func (p *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResu
 	}
 
 	metadata := MetadataResult{
-		URI:      p.publicURI,
+		URI:      prom.publicURI,
 		Metadata: result.value.(map[string][]v1.Metadata)[metric],
 	}
 

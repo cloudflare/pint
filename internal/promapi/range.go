@@ -96,7 +96,7 @@ type RangeQueryTimes interface {
 	String() string
 }
 
-func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (*RangeQueryResult, error) {
+func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (*RangeQueryResult, error) {
 	start := params.Start()
 	end := params.End()
 	lookback := params.Dur()
@@ -112,7 +112,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	}
 
 	slog.Debug("Scheduling prometheus range query",
-		slog.String("uri", p.safeURI),
+		slog.String("uri", prom.safeURI),
 		slog.String("query", expr),
 		slog.String("lookback", output.HumanizeDuration(lookback)),
 		slog.String("step", output.HumanizeDuration(step)),
@@ -121,8 +121,8 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	)
 
 	key := fmt.Sprintf("%s/%s/%s", APIPathQueryRange, expr, params.String())
-	p.locker.lock(key)
-	defer p.locker.unlock(key)
+	prom.locker.lock(key)
+	defer prom.locker.unlock(key)
 
 	var wg sync.WaitGroup
 	var lastErr error
@@ -134,7 +134,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	for _, s := range slices {
 		query := queryRequest{ // nolint:exhaustruct
 			query: rangeQuery{
-				prom: p,
+				prom: prom,
 				ctx:  ctx,
 				expr: expr,
 				r: v1.Range{
@@ -150,7 +150,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 		go func() {
 			var result queryResult
 			query.result = make(chan queryResult)
-			p.queries <- query
+			prom.queries <- query
 			result = <-query.result
 			results <- result
 
@@ -166,7 +166,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 	}()
 
 	merged := RangeQueryResult{ // nolint:exhaustruct
-		URI: p.publicURI,
+		URI: prom.publicURI,
 		Series: SeriesTimeRanges{ // nolint:exhaustruct
 			From:  start,
 			Until: end,
@@ -205,7 +205,7 @@ func (p *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQu
 
 	slog.Debug(
 		"Parsed range response",
-		slog.String("uri", p.safeURI),
+		slog.String("uri", prom.safeURI),
 		slog.String("query", expr),
 		slog.Int("samples", len(merged.Series.Ranges)),
 	)

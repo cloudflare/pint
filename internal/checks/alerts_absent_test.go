@@ -294,6 +294,31 @@ func TestAlertsAbsentCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "600",
+			content:     "- alert: foo\n  expr: absent(foo)\n",
+			checker:     newAlertsAbsentCheck,
+			prometheus:  newSimpleProm,
+			problems: func(s string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.AlertsAbsentCheckName,
+						Text:     checkErrorBadData("prom", s, "bad_response: 600 status code 600"),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  httpResponse{code: 600, body: "Bogus error code"},
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

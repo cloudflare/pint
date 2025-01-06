@@ -878,14 +878,14 @@ func TestGithubReporter(t *testing.T) {
 				handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					auth := r.Header["Authorization"]
 					if len(auth) == 0 {
-						w.WriteHeader(500)
+						w.WriteHeader(http.StatusInternalServerError)
 						_, _ = w.Write([]byte("No token"))
 						t.Fatal("got a request with no token")
 						return
 					}
 					token := auth[0]
 					if token != "Bearer "+tc.token {
-						w.WriteHeader(500)
+						w.WriteHeader(http.StatusInternalServerError)
 						_, _ = w.Write([]byte("Invalid token"))
 						t.Fatalf("got a request with invalid token (got %s)", token)
 					}

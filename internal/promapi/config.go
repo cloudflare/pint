@@ -88,19 +88,19 @@ func (q configQuery) CacheTTL() time.Duration {
 	return q.cacheTTL
 }
 
-func (p *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*ConfigResult, error) {
-	slog.Debug("Scheduling Prometheus configuration query", slog.String("uri", p.safeURI))
+func (prom *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*ConfigResult, error) {
+	slog.Debug("Scheduling Prometheus configuration query", slog.String("uri", prom.safeURI))
 
-	p.locker.lock(APIPathConfig)
-	defer p.locker.unlock(APIPathConfig)
+	prom.locker.lock(APIPathConfig)
+	defer prom.locker.unlock(APIPathConfig)
 
 	if cacheTTL == 0 {
 		cacheTTL = time.Minute
 	}
 
 	resultChan := make(chan queryResult)
-	p.queries <- queryRequest{
-		query:  configQuery{prom: p, ctx: ctx, timestamp: time.Now(), cacheTTL: cacheTTL},
+	prom.queries <- queryRequest{
+		query:  configQuery{prom: prom, ctx: ctx, timestamp: time.Now(), cacheTTL: cacheTTL},
 		result: resultChan,
 	}
 
@@ -110,7 +110,7 @@ func (p *Prometheus) Config(ctx context.Context, cacheTTL time.Duration) (*Confi
 	}
 
 	r := ConfigResult{
-		URI:    p.publicURI,
+		URI:    prom.publicURI,
 		Config: result.value.(PrometheusConfig),
 	}
 

@@ -82,16 +82,16 @@ func (q instantQuery) CacheTTL() time.Duration {
 	return time.Minute * 5
 }
 
-func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
-	slog.Debug("Scheduling prometheus query", slog.String("uri", p.safeURI), slog.String("query", expr))
+func (prom *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
+	slog.Debug("Scheduling prometheus query", slog.String("uri", prom.safeURI), slog.String("query", expr))
 
 	key := APIPathQuery + expr
-	p.locker.lock(key)
-	defer p.locker.unlock(key)
+	prom.locker.lock(key)
+	defer prom.locker.unlock(key)
 
 	resultChan := make(chan queryResult)
-	p.queries <- queryRequest{
-		query:  instantQuery{prom: p, ctx: ctx, expr: expr, timestamp: time.Now()},
+	prom.queries <- queryRequest{
+		query:  instantQuery{prom: prom, ctx: ctx, expr: expr, timestamp: time.Now()},
 		result: resultChan,
 	}
 
@@ -101,11 +101,11 @@ func (p *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, erro
 	}
 
 	qr := QueryResult{
-		URI:    p.publicURI,
+		URI:    prom.publicURI,
 		Series: result.value.([]Sample),
 		Stats:  result.stats,
 	}
-	slog.Debug("Parsed response", slog.String("uri", p.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
+	slog.Debug("Parsed response", slog.String("uri", prom.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
 
 	return &qr, nil
 }

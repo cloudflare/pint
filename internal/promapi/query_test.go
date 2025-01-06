@@ -24,7 +24,7 @@ func TestQuery(t *testing.T) {
 
 		switch query {
 		case "empty":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
@@ -34,7 +34,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "single_result":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
@@ -44,7 +44,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "three_results":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
@@ -58,7 +58,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "once":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
@@ -68,7 +68,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "matrix":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"success",
@@ -78,7 +78,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "timeout":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{
@@ -89,7 +89,7 @@ func TestQuery(t *testing.T) {
 				}
 			}`))
 		case "overload":
-			w.WriteHeader(422)
+			w.WriteHeader(http.StatusUnprocessableEntity)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 					"status":"error",
@@ -97,7 +97,7 @@ func TestQuery(t *testing.T) {
 					"error":"query processing would load too many samples into memory in query execution"
 				}`))
 		case "stats":
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 					"status":"success",
@@ -121,7 +121,7 @@ func TestQuery(t *testing.T) {
 					}
 				}`))
 		default:
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{
 				"status":"error",

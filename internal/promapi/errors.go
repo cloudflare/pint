@@ -158,7 +158,7 @@ func tryDecodingAPIError(resp *http.Response) error {
 		case 5:
 			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: resp.Status}
 		}
-		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("bad response code: %d", resp.StatusCode)}
+		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: resp.Status}
 	}
 
 	return APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}

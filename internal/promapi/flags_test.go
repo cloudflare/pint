@@ -19,31 +19,31 @@ func TestFlags(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/default" + promapi.APIPathFlags:
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
 		case "/foo" + promapi.APIPathFlags:
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"foo":"bar"}}`))
 		case "/once" + promapi.APIPathFlags:
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
 		case "/slow" + promapi.APIPathFlags:
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			time.Sleep(time.Second * 2)
 			_, _ = w.Write([]byte(`{"status":"success","data":{}}`))
 		case "/error" + promapi.APIPathFlags:
-			w.WriteHeader(500)
+			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = w.Write([]byte("fake error\n"))
 		case "/badYaml" + promapi.APIPathFlags:
-			w.WriteHeader(200)
+			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"success","data":{"xxx"}}`))
 		default:
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
 			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
 		}
