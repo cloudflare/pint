@@ -3,6 +3,7 @@ package checks_test
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -4176,6 +4177,60 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireRangeQueryPath},
 					resp:  respondWithEmptyMatrix(),
+				},
+			},
+		},
+		{
+			description: "unsupported query",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
+				},
+			},
+		},
+		{
+			description: "unsupported range query",
+			content:     "- record: foo\n  expr: sum(foo)\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{requireRangeQueryPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
 				},
 			},
 		},

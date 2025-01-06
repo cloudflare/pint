@@ -115,14 +115,25 @@ func tryDecodingAPIError(resp *http.Response) error {
 	slog.Debug("Trying to parse Prometheus error response", slog.Int("code", resp.StatusCode))
 
 	if resp.StatusCode == http.StatusNotFound {
-		apiPath := "some API endpoints"
+		var apiPath string
+		msg := "some API endpoints"
 		if resp.Request != nil {
-			apiPath = "`" + resp.Request.URL.Path + "` API endpoint"
+			switch {
+			case strings.HasSuffix(resp.Request.URL.Path, APIPathConfig):
+				apiPath = APIPathConfig
+			case strings.HasSuffix(resp.Request.URL.Path, APIPathFlags):
+				apiPath = APIPathFlags
+			case strings.HasSuffix(resp.Request.URL.Path, APIPathMetadata):
+				apiPath = APIPathMetadata
+			}
+			msg = "`" + apiPath + "` API endpoint"
 		}
-		return APIError{
-			Status:    "",
-			ErrorType: ErrAPIUnsupported,
-			Err:       "this server doesn't seem to support " + apiPath,
+		if apiPath != "" {
+			return APIError{
+				Status:    "",
+				ErrorType: ErrAPIUnsupported,
+				Err:       "this server doesn't seem to support " + msg,
+			}
 		}
 	}
 
@@ -143,9 +154,9 @@ func tryDecodingAPIError(resp *http.Response) error {
 	if err := decoder.Stream(dec); err != nil {
 		switch resp.StatusCode / 100 {
 		case 4:
-			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: fmt.Sprintf("client error: %d", resp.StatusCode)}
+			return APIError{Status: "error", ErrorType: v1.ErrClient, Err: resp.Status}
 		case 5:
-			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: fmt.Sprintf("server error: %d", resp.StatusCode)}
+			return APIError{Status: "error", ErrorType: v1.ErrServer, Err: resp.Status}
 		}
 		return APIError{Status: "error", ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("bad response code: %d", resp.StatusCode)}
 	}
