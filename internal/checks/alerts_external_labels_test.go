@@ -2,6 +2,7 @@ package checks_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -152,6 +153,19 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  external_labels:\n    bob: foo\n"},
+				},
+			},
+		},
+		{
+			description: "config 404",
+			content:     content,
+			checker:     newAlertsExternalLabelsCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
 				},
 			},
 		},

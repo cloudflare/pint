@@ -293,3 +293,36 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) (er
 
 	return nil
 }
+
+func makePrometheusDetailsComment(s Summary) string {
+	pds := s.GetPrometheusDetails()
+	if len(pds) == 0 {
+		return ""
+	}
+
+	var buf strings.Builder
+	buf.WriteString(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
+This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
+Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
+Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
+
+`)
+	for _, pd := range pds {
+		buf.WriteString("- `")
+		buf.WriteString(pd.Name)
+		buf.WriteString("`\n")
+		for _, dc := range pd.DisabledChecks {
+			buf.WriteString("  - `")
+			buf.WriteString(dc.API)
+			buf.WriteString("` is unsupported, disabled checks:\n")
+			for _, name := range dc.Checks {
+				buf.WriteString("    - [")
+				buf.WriteString(name)
+				buf.WriteString("](https://cloudflare.github.io/pint/checks/")
+				buf.WriteString(name)
+				buf.WriteString(".html)\n")
+			}
+		}
+	}
+	return buf.String()
+}

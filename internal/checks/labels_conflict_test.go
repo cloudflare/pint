@@ -183,19 +183,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: up == 0\n  labels:\n    foo: bar\n",
 			checker:     newLabelsConflict,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
-						Reporter: checks.LabelsConflictCheckName,
-						Text:     checkUnsupported(checks.LabelsConflictCheckName, "prom", uri, promapi.APIPathConfig),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},

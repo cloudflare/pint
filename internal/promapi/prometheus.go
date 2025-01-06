@@ -18,6 +18,8 @@ import (
 	"go.uber.org/ratelimit"
 )
 
+var ErrUnsupported = errors.New("unsupported API")
+
 type PrometheusContextKey string
 
 const (
@@ -89,11 +91,48 @@ func sanitizeURI(s string) string {
 	return s
 }
 
+type unsupporedAPIs struct {
+	mtx        sync.RWMutex
+	noConfig   bool
+	noFlags    bool
+	noMetadata bool
+}
+
+func (ua *unsupporedAPIs) isSupported(s string) bool {
+	ua.mtx.RLock()
+	defer ua.mtx.RUnlock()
+	switch s {
+	case APIPathConfig:
+		return !ua.noConfig
+	case APIPathFlags:
+		return !ua.noFlags
+	case APIPathMetadata:
+		return !ua.noMetadata
+	default:
+		return true
+	}
+}
+
+func (ua *unsupporedAPIs) disable(s string) {
+	slog.Debug("Disabling unsupported API", slog.String("api", s))
+	ua.mtx.Lock()
+	defer ua.mtx.Unlock()
+	switch s {
+	case APIPathConfig:
+		ua.noConfig = true
+	case APIPathFlags:
+		ua.noFlags = true
+	case APIPathMetadata:
+		ua.noMetadata = true
+	}
+}
+
 type Prometheus struct {
 	rateLimiter ratelimit.Limiter
 	headers     map[string]string
 	cache       *queryCache
 	locker      *partitionLocker
+	apis        *unsupporedAPIs
 	queries     chan queryRequest
 	client      http.Client
 	name        string
@@ -118,7 +157,7 @@ func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeo
 		publicURI = safeURI
 	}
 
-	prom := Prometheus{ // nolint:exhaustruct
+	prom := Prometheus{ // nolint: exhaustruct
 		name:        name,
 		unsafeURI:   uri,
 		safeURI:     safeURI,
@@ -129,6 +168,7 @@ func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeo
 		locker:      newPartitionLocker((&sync.Mutex{})),
 		rateLimiter: ratelimit.New(rl),
 		concurrency: concurrency,
+		apis:        &unsupporedAPIs{}, // nolint: exhaustruct
 	}
 
 	return &prom
@@ -211,6 +251,10 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 		}
 	}
 
+	if !prom.apis.isSupported(job.query.Endpoint()) {
+		return queryResult{err: ErrUnsupported} // nolint: exhaustruct
+	}
+
 	prometheusQueriesTotal.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 	prometheusQueriesRunning.WithLabelValues(prom.name, job.query.Endpoint()).Inc()
 
@@ -223,6 +267,16 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 			return result
 		}
 		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
+		if isUnsupportedError(result.err) {
+			prom.apis.disable(job.query.Endpoint())
+			slog.Warn(
+				"Looks like this server doesn't support some Prometheus API endpoints, all checks using this API will be disabled",
+				slog.String("name", prom.name),
+				slog.String("uri", prom.safeURI),
+				slog.String("api", job.query.Endpoint()),
+			)
+			return queryResult{err: ErrUnsupported} // nolint: exhaustruct
+		}
 		slog.Error(
 			"Query returned an error",
 			slog.Any("err", result.err),

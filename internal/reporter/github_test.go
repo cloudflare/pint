@@ -2,6 +2,7 @@ package reporter_test
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,16 +12,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-func TestGithubReporter(t *testing.T) {
+func TestGitHubReporter(t *testing.T) {
 	type testCaseT struct {
 		httpHandler http.Handler
 		error       func(uri string) string
@@ -30,7 +33,7 @@ func TestGithubReporter(t *testing.T) {
 		owner       string
 		repo        string
 		token       string
-		reports     []reporter.Report
+		summary     reporter.Summary
 		prNum       int
 		maxComments int
 		timeout     time.Duration
@@ -43,6 +46,10 @@ func TestGithubReporter(t *testing.T) {
 - record: sum errors
   expr: sum(errors) by (job)
 `))
+
+	summaryWithDetails := reporter.NewSummary([]reporter.Report{})
+	summaryWithDetails.MarkCheckDisabled("prom1", promapi.APIPathConfig, []string{"check1", "check3", "check2"})
+	summaryWithDetails.MarkCheckDisabled("prom2", promapi.APIPathMetadata, []string{"check1"})
 
 	for _, tc := range []testCaseT{
 		{
@@ -64,7 +71,7 @@ func TestGithubReporter(t *testing.T) {
 			error: func(uri string) string {
 				return fmt.Sprintf("failed to list pull request files: GET %s/api/v3/repos/foo/bar/pulls/123/files: 400  []", uri)
 			},
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -84,7 +91,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "list pull reviews timeout",
@@ -106,7 +113,7 @@ func TestGithubReporter(t *testing.T) {
 			error: func(_ string) string {
 				return "failed to list pull request reviews: context deadline exceeded"
 			},
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "$1",
@@ -125,7 +132,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "list reviews error",
@@ -146,7 +153,7 @@ func TestGithubReporter(t *testing.T) {
 			error: func(uri string) string {
 				return fmt.Sprintf("failed to list pull request reviews: GET %s/api/v3/repos/foo/bar/pulls/123/reviews: 400  []", uri)
 			},
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -166,7 +173,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "no problems",
@@ -176,7 +183,7 @@ func TestGithubReporter(t *testing.T) {
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			reports:     []reporter.Report{},
+			summary:     reporter.NewSummary([]reporter.Report{}),
 		},
 		{
 			description: "happy path",
@@ -186,7 +193,7 @@ func TestGithubReporter(t *testing.T) {
 			prNum:       123,
 			maxComments: 50,
 			timeout:     time.Second,
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -206,7 +213,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "error crating review",
@@ -227,7 +234,7 @@ func TestGithubReporter(t *testing.T) {
 			error: func(uri string) string {
 				return fmt.Sprintf("failed to create pull request review: POST %s/api/v3/repos/foo/bar/pulls/123/reviews: 502  []", uri)
 			},
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -247,7 +254,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "error updating existing review",
@@ -272,7 +279,7 @@ func TestGithubReporter(t *testing.T) {
 			error: func(uri string) string {
 				return fmt.Sprintf("failed to update pull request review: PUT %s/api/v3/repos/foo/bar/pulls/123/reviews/1: 502  []", uri)
 			},
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -292,7 +299,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "update existing review",
@@ -313,7 +320,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -333,7 +340,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "maxComments 2",
@@ -365,7 +372,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -442,7 +449,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "maxComments 2, too many comments comment error",
@@ -472,7 +479,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -549,7 +556,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "general comment error",
@@ -583,7 +590,7 @@ func TestGithubReporter(t *testing.T) {
 			error: func(uri string) string {
 				return fmt.Sprintf("failed to create general comment: POST %s/api/v3/repos/foo/bar/issues/123/comments: 500  []", uri)
 			},
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -660,7 +667,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "modified line",
@@ -694,7 +701,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -714,7 +721,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "unmodified line",
@@ -748,7 +755,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -768,7 +775,7 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "removed line",
@@ -802,7 +809,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -823,7 +830,7 @@ func TestGithubReporter(t *testing.T) {
 						Anchor:   checks.AnchorBefore,
 					},
 				},
-			},
+			}),
 		},
 		{
 			description: "review comment",
@@ -844,7 +851,7 @@ func TestGithubReporter(t *testing.T) {
 				}
 				_, _ = w.Write([]byte(""))
 			}),
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						Name:          "foo.txt",
@@ -864,7 +871,72 @@ func TestGithubReporter(t *testing.T) {
 						Severity: checks.Fatal,
 					},
 				},
-			},
+			}),
+		},
+		{
+			description: "prometheus details",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					expected := `### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+:heavy_check_mark: No problems found
+<details><summary>Stats</summary>
+<p>
+
+| Stat | Value |
+| --- | --- |
+| Version | v0.0.0 |
+| Number of rules parsed | 0 |
+| Number of rules checked | 0 |
+| Number of problems found | 0 |
+| Number of offline checks | 0 |
+| Number of online checks | 0 |
+| Checks duration | 0 |
+
+</p>
+</details>
+
+<details><summary>Problems</summary>
+<p>
+
+No problems reported
+</p>
+</details>
+
+Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
+This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
+Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
+Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
+
+- ` + "`prom1`" + `
+  - ` + "`/api/v1/status/config` " + `is unsupported, disabled checks:
+    - [check1](https://cloudflare.github.io/pint/checks/check1.html)
+    - [check2](https://cloudflare.github.io/pint/checks/check2.html)
+    - [check3](https://cloudflare.github.io/pint/checks/check3.html)
+- ` + "`prom2`" + `
+  - ` + "`/api/v1/metadata` " + `is unsupported, disabled checks:
+    - [check1](https://cloudflare.github.io/pint/checks/check1.html)
+`
+					body, _ := io.ReadAll(r.Body)
+					type jr struct {
+						Body string
+					}
+					var r jr
+					_ = json.Unmarshal(body, &r)
+					if diff := cmp.Diff(expected, r.Body); diff != "" {
+						t.Error(diff)
+						w.WriteHeader(http.StatusBadRequest)
+						return
+					}
+					_, _ = w.Write([]byte(`{}`))
+				}
+			}),
+			summary: summaryWithDetails,
 		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
@@ -907,7 +979,7 @@ func TestGithubReporter(t *testing.T) {
 			)
 			require.NoError(t, err)
 
-			err = reporter.Submit(context.Background(), reporter.NewSummary(tc.reports), r)
+			err = reporter.Submit(context.Background(), tc.summary, r)
 			if tc.error == nil {
 				require.NoError(t, err)
 			} else {

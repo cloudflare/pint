@@ -99,19 +99,7 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[30d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "promql/range_query",
-						Text:     checkUnsupported(checks.RangeQueryCheckName, "prom", uri, promapi.APIPathFlags),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},

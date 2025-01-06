@@ -2,6 +2,8 @@ package reporter_test
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"io"
 	"log/slog"
 	"net/http"
@@ -11,16 +13,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/neilotoole/slogt"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/promapi"
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
 func TestGitLabReporterBadBaseURI(t *testing.T) {
+	slog.SetDefault(slogt.New(t))
 	_, err := reporter.NewGitLabReporter(
 		"v0.0.0",
 		"branch",
@@ -44,7 +49,7 @@ func TestGitLabReporter(t *testing.T) {
 		branch      string
 		token       string
 
-		reports     []reporter.Report
+		summary     reporter.Summary
 		timeout     time.Duration
 		project     int
 		maxComments int
@@ -76,6 +81,10 @@ func TestGitLabReporter(t *testing.T) {
 	}
 	fooDiff := `@@ -1,4 +1,6 @@\n- record: target is down\n-  expr: up == 0\n+  expr: up == 1\n+  labels:\n+    foo: bar\n- record: sum errors\nexpr: sum(errors) by (job)\n`
 
+	summaryWithDetails := reporter.NewSummary([]reporter.Report{})
+	summaryWithDetails.MarkCheckDisabled("prom1", promapi.APIPathConfig, []string{"check1", "check3", "check2"})
+	summaryWithDetails.MarkCheckDisabled("prom2", promapi.APIPathMetadata, []string{"check1"})
+
 	testCases := []testCaseT{
 		{
 			description: "empty list of merge requests",
@@ -84,7 +93,7 @@ func TestGitLabReporter(t *testing.T) {
 			timeout:     time.Second,
 			project:     123,
 			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
@@ -105,7 +114,7 @@ func TestGitLabReporter(t *testing.T) {
 			timeout:     time.Second,
 			project:     123,
 			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
@@ -185,7 +194,7 @@ func TestGitLabReporter(t *testing.T) {
 			timeout:     time.Minute,
 			project:     123,
 			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/api/v4/user":
@@ -216,7 +225,7 @@ func TestGitLabReporter(t *testing.T) {
 			timeout:     time.Minute,
 			project:     123,
 			maxComments: 50,
-			reports:     []reporter.Report{fooReport},
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				switch r.URL.Path {
 				case "/api/v4/user":
@@ -243,7 +252,7 @@ func TestGitLabReporter(t *testing.T) {
 			timeout:     time.Second,
 			project:     123,
 			maxComments: 1,
-			reports: []reporter.Report{
+			summary: reporter.NewSummary([]reporter.Report{
 				{
 					Path: discovery.Path{
 						SymlinkTarget: "foo.txt",
@@ -292,7 +301,7 @@ func TestGitLabReporter(t *testing.T) {
 						Anchor:   checks.AnchorAfter,
 					},
 				},
-			},
+			}),
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
@@ -334,7 +343,7 @@ func TestGitLabReporter(t *testing.T) {
 			timeout:     time.Second,
 			project:     123,
 			maxComments: 1,
-			reports:     []reporter.Report{fooReport},
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
 			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				switch r.URL.Path {
@@ -361,13 +370,315 @@ func TestGitLabReporter(t *testing.T) {
 					if r.Method == http.MethodGet {
 						_, _ = w.Write([]byte(`[]`))
 					} else {
-
 						_, _ = w.Write([]byte(`ERROR`))
 						t.FailNow()
 					}
 				}
 			}),
 			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "disabled checks",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Second,
+			project:     123,
+			maxComments: 10,
+			summary:     summaryWithDetails,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				switch r.URL.Path {
+				case "/api/v4/user":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`{"id": 123}`))
+					}
+				case "/api/v4/projects/123/merge_requests":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"iid":1}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/diffs":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/versions":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[
+{"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
+{"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
+]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/discussions":
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[]`))
+					} else {
+						expected := `Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
+This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
+Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
+Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
+
+- ` + "`prom1`" + `
+  - ` + "`/api/v1/status/config` " + `is unsupported, disabled checks:
+    - [check1](https://cloudflare.github.io/pint/checks/check1.html)
+    - [check2](https://cloudflare.github.io/pint/checks/check2.html)
+    - [check3](https://cloudflare.github.io/pint/checks/check3.html)
+- ` + "`prom2`" + `
+  - ` + "`/api/v1/metadata` " + `is unsupported, disabled checks:
+    - [check1](https://cloudflare.github.io/pint/checks/check1.html)
+`
+						body, _ := io.ReadAll(r.Body)
+						type jr struct {
+							Body string
+						}
+						var r jr
+						_ = json.Unmarshal(body, &r)
+						if diff := cmp.Diff(expected, r.Body); diff != "" {
+							t.Error(diff)
+							w.WriteHeader(http.StatusBadRequest)
+							return
+						}
+						_, _ = w.Write([]byte(`{}`))
+					}
+				}
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "general comment already present",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Second,
+			project:     123,
+			maxComments: 1,
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{1},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{2},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{3},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			}),
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/v4/user":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`{"id": 123}`))
+					}
+				case "/api/v4/projects/123/merge_requests":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"iid":1}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/diffs":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/versions":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[
+{"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
+{"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
+]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/discussions":
+					if r.Method == http.MethodGet {
+						w.WriteHeader(http.StatusOK)
+						_, _ = w.Write([]byte(`[
+{"id":"100","notes":[
+	{"id":101,
+	 "system":true,
+	 "author":{"id":123},
+	 "body":"system message"
+	}
+]},
+{"id":"200","system":false,"notes":[
+	{"id":201,
+	"system":false,
+	"author":{"id":321},
+	"position":{"base_sha": "base","start_sha": "start","head_sha": "head","old_path": "foo.txt","new_path": "foo.txt","position_type": "text","new_line": 2},
+	"body":"different user"
+   }
+]},
+{"id":"300","system":false,"notes":[
+	{"id":301,
+	"system":false,
+	"author":{"id":123},
+	"position":{"base_sha": "base","start_sha": "start","head_sha": "head","old_path": "foo.txt","new_path": "foo.txt","position_type": "text","new_line": 2},
+	"body":"stale comment"
+   }
+]},
+{"id":"400","notes":[
+	{"id":401,
+	"system":false,
+	"author":{"id":123},
+	"body":"This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR."}
+]}
+]`))
+					} else {
+						body, _ := io.ReadAll(r.Body)
+						type jr struct {
+							Body string
+						}
+						var r jr
+						_ = json.Unmarshal(body, &r)
+
+						if r.Body == "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR." {
+							w.WriteHeader(http.StatusBadRequest)
+							_, _ = w.Write([]byte(`{"error": "foo"}`))
+							t.FailNow()
+						} else {
+							w.WriteHeader(http.StatusOK)
+							_, _ = w.Write([]byte(`{}`))
+						}
+					}
+				}
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "general comment already present / error",
+			branch:      "fakeBranch",
+			token:       "fakeToken",
+			timeout:     time.Second,
+			project:     123,
+			maxComments: 1,
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{1},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{2},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{3},
+					Rule:          mockRules[0],
+					Problem: checks.Problem{
+						Reporter: "foo",
+						Text:     "foo error",
+						Details:  "foo details",
+						Lines:    parser.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			}),
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				switch r.URL.Path {
+				case "/api/v4/user":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`{"id": 123}`))
+					}
+				case "/api/v4/projects/123/merge_requests":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"iid":1}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/diffs":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/versions":
+					w.WriteHeader(http.StatusOK)
+					if r.Method == http.MethodGet {
+						_, _ = w.Write([]byte(`[
+{"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
+{"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
+]`))
+					}
+				case "/api/v4/projects/123/merge_requests/1/discussions":
+					w.WriteHeader(http.StatusBadRequest)
+					_, _ = w.Write([]byte(`{"error": "foo"}`))
+				}
+			}),
+			errorHandler: func(err error) error {
+				if err == nil {
+					return errors.New("expected list discussions to fail")
+				}
+				if strings.HasSuffix(err.Error(), `/api/v4/projects/123/merge_requests/1/discussions: 400 {error: foo}`) {
+					return nil
+				}
 				return err
 			},
 		},
@@ -390,8 +701,7 @@ func TestGitLabReporter(t *testing.T) {
 				tc.maxComments,
 			)
 			if err == nil {
-				summary := reporter.NewSummary(tc.reports)
-				err = reporter.Submit(context.Background(), summary, r)
+				err = reporter.Submit(context.Background(), tc.summary, r)
 				require.NoError(t, tc.errorHandler(err))
 			}
 			require.NoError(t, tc.errorHandler(err))

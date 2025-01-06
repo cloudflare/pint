@@ -380,6 +380,10 @@ func formatGHReviewBody(version string, summary Summary) string {
 	}
 	b.WriteString("\n</p>\n</details>\n\n")
 
+	if details := makePrometheusDetailsComment(summary); details != "" {
+		b.WriteString(details)
+	}
+
 	return b.String()
 }
 

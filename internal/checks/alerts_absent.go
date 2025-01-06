@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -72,6 +73,10 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 
 	cfg, err := c.prom.Config(ctx, 0)
 	if err != nil {
+		if errors.Is(err, promapi.ErrUnsupported) {
+			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
+			return problems
+		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
