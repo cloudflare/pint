@@ -82,7 +82,7 @@ func TestFlags(t *testing.T) {
 		{
 			prefix:  "/error",
 			timeout: time.Second,
-			err:     "server_error: server error: 500",
+			err:     "server_error: 500 Internal Server Error",
 		},
 		{
 			prefix:  "/badYaml",
