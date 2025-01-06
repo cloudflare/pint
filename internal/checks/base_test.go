@@ -590,13 +590,13 @@ func checkErrorBadData(name, uri, err string) string {
 }
 
 func checkErrorUnableToRun(c, name, uri, err string) string {
-	return fmt.Sprintf("Couldn't run %q checks due to `%s` Prometheus server at %s connection error: `%s`.", c, name, uri, err)
+	return fmt.Sprintf("Couldn't run `%s` checks due to `%s` Prometheus server at %s connection error: `%s`.", c, name, uri, err)
 }
 
 func checkErrorTooExpensiveToRun(c, name, uri, err string) string {
-	return fmt.Sprintf("Couldn't run %q checks on `%s` Prometheus server at %s because some queries are too expensive: `%s`.", c, name, uri, err)
+	return fmt.Sprintf("Couldn't run `%s` checks on `%s` Prometheus server at %s because some queries are too expensive: `%s`.", c, name, uri, err)
 }
 
 func checkUnsupported(c, name, uri, path string) string {
-	return fmt.Sprintf("Couldn't run %q checks on `%s` Prometheus server at %s because it's unsupported: this server doesn't seem to support `%s` API endpoint.", c, name, uri, path)
+	return fmt.Sprintf("Couldn't run `%s` checks on `%s` Prometheus server at %s because it's unsupported: this server doesn't seem to support `%s` API endpoint.", c, name, uri, path)
 }
