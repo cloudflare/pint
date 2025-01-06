@@ -132,7 +132,7 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 
 	results := make(chan queryResult, len(slices))
 	for _, s := range slices {
-		query := queryRequest{ // nolint:exhaustruct
+		query := queryRequest{ // nolint: exhaustruct
 			query: rangeQuery{
 				prom: prom,
 				ctx:  ctx,
@@ -165,9 +165,9 @@ func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params Rang
 		close(results)
 	}()
 
-	merged := RangeQueryResult{ // nolint:exhaustruct
+	merged := RangeQueryResult{ // nolint: exhaustruct
 		URI: prom.publicURI,
-		Series: SeriesTimeRanges{ // nolint:exhaustruct
+		Series: SeriesTimeRanges{ // nolint: exhaustruct
 			From:  start,
 			Until: end,
 			Step:  step,

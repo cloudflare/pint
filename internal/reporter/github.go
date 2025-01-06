@@ -69,7 +69,7 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 	)
 
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token}, // nolint:exhaustruct
+		&oauth2.Token{AccessToken: token}, // nolint: exhaustruct
 	)
 	tc := oauth2.NewClient(context.Background(), ts)
 

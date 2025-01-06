@@ -59,7 +59,7 @@ type Summary struct {
 }
 
 func NewSummary(reports []Report) Summary {
-	return Summary{reports: reports} // nolint:exhaustruct
+	return Summary{reports: reports} // nolint: exhaustruct
 }
 
 func (s *Summary) Report(reps ...Report) {

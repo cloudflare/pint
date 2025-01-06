@@ -317,7 +317,7 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 
 	if gh == nil {
 		isNil = true
-		gh = &config.GitHub{Timeout: time.Minute.String()} // nolint:exhaustruct
+		gh = &config.GitHub{Timeout: time.Minute.String()} // nolint: exhaustruct
 	}
 
 	if repo := os.Getenv("GITHUB_REPOSITORY"); repo != "" {

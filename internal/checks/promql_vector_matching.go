@@ -320,5 +320,5 @@ func (ls labelSets) getFirstNonOverlap(bs labelSets) (labelSet, labelSet) {
 			}
 		}
 	}
-	return labelSet{}, labelSet{} // nolint:exhaustruct
+	return labelSet{}, labelSet{} // nolint: exhaustruct
 }

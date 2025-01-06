@@ -670,7 +670,7 @@ func (bb bitBucketAPI) limitComments(src []BitBucketPendingComment) []BitBucketP
 		Text: fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
 %d comments were skipped and won't be visibile on this PR.`, len(src), bb.maxComments, len(src)-bb.maxComments),
 		Severity: "NORMAL",
-		Anchor: BitBucketPendingCommentAnchor{ // nolint:exhaustruct
+		Anchor: BitBucketPendingCommentAnchor{ // nolint: exhaustruct
 			DiffType: "EFFECTIVE",
 		},
 	})
