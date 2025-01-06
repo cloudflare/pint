@@ -1,3 +1,4 @@
+http response prometheus /api/v1/metadata 403 Auth Needed
 http slow-response prometheus /api/v1/status/config 100ms 500 Fatal Error
 http slow-response prometheus /api/v1/query 400ms 200 {"status":"error","errorType":"bad_data","error":"bogus query"}
 http start prometheus 127.0.0.1:7054
@@ -162,7 +163,7 @@ pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason=
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
-pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/client_error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/unsupported"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom2",reason="connection/error"}
 # HELP pint_rule_file_owner This is a boolean metric that describes who is the configured owner for given rule file
 # TYPE pint_rule_file_owner gauge

@@ -2,6 +2,7 @@ package checks_test
 
 import (
 	"fmt"
+	"net/http"
 	"testing"
 	"time"
 
@@ -174,6 +175,31 @@ func TestLabelsConflictCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireConfigPath},
 					resp:  configResponse{yaml: "global:\n  external_labels:\n    bob: bob\n"},
+				},
+			},
+		},
+		{
+			description: "flags unsupported",
+			content:     "- record: foo\n  expr: up == 0\n  labels:\n    foo: bar\n",
+			checker:     newLabelsConflict,
+			prometheus:  newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  4,
+						},
+						Reporter: checks.LabelsConflictCheckName,
+						Text:     checkUnsupported(checks.LabelsConflictCheckName, "prom", uri, promapi.APIPathConfig),
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
 				},
 			},
 		},

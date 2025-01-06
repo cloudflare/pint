@@ -6,6 +6,15 @@
 
 - When running `pint watch` command `/health` HTTP endpoint can now be used for liveness probes.
 
+### Changed
+
+- Report warnings instead of errors if Prometheus server used for checks doesn't support these API
+  endpoints:
+
+  - `/api/v1/status/config`
+  - `/api/v1/status/flags`
+  - `/api/v1/metadata`
+
 ## v0.69.1
 
 ### Fixed

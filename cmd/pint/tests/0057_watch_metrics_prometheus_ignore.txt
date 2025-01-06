@@ -1,3 +1,4 @@
+http response prometheus /api/v1/metadata 403 Auth Needed
 http slow-response prometheus /api/v1/status/config 100ms 500 Fatal error
 http slow-response prometheus /api/v1/query 200ms 400 {"status":"error","errorType":"bad_data","error":"bogus query"}
 http start prometheus 127.0.0.1:7057
@@ -149,7 +150,7 @@ pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom1",reason=
 pint_prometheus_query_errors_total{endpoint="/api/v1/query",name="prom2",reason="connection/error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom1",reason="api/server_error"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/config",name="prom2",reason="connection/error"}
-pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/client_error"}
+pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom1",reason="api/unsupported"}
 pint_prometheus_query_errors_total{endpoint="/api/v1/status/flags",name="prom2",reason="connection/error"}
 # HELP pint_rules_parsed_total Total number of rules parsed since startup
 # TYPE pint_rules_parsed_total counter
