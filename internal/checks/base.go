@@ -148,9 +148,6 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 	}
 
 	switch {
-	case promapi.IsUnsupportedError(err):
-		text = fmt.Sprintf("Couldn't run `%s` checks on %s because it's %s.", reporter, promDesc, err)
-		severity = Warning
 	case promapi.IsQueryTooExpensive(err):
 		text = fmt.Sprintf("Couldn't run `%s` checks on %s because some queries are too expensive: `%s`.", reporter, promDesc, err)
 		severity = Warning

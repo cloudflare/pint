@@ -312,13 +312,16 @@ func (ls labelSets) overlaps(bs labelSets) bool {
 	return false
 }
 
-func (ls labelSets) getFirstNonOverlap(bs labelSets) (labelSet, labelSet) {
+func (ls labelSets) getFirstNonOverlap(bs labelSets) (l, r labelSet) {
 	for _, a := range ls {
 		for _, b := range bs {
 			if !a.isEqual(b) {
-				return a, b
+				l = a
+				r = b
+				goto DONE
 			}
 		}
 	}
-	return labelSet{}, labelSet{} // nolint:exhaustruct
+DONE:
+	return l, r
 }

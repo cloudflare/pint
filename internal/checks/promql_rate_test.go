@@ -545,15 +545,6 @@ func TestRateCheck(t *testing.T) {
 						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
-					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: "promql/rate",
-						Text:     checkUnsupported(checks.RateCheckName, "prom", uri, promapi.APIPathMetadata),
-						Severity: checks.Warning,
-					},
 				}
 			},
 			mocks: []*prometheusMock{
@@ -928,6 +919,85 @@ func TestRateCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireMetadataPath,
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+			},
+		},
+		{
+			description: "config 404",
+			content:     "- alert: my alert\n  expr: rate(my:sum[5m])\n",
+			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  httpResponse{code: http.StatusNotFound, body: "Not Found"},
+				},
+			},
+		},
+		{
+			description: "metadata 404",
+			content: `
+- alert: Plexi_Worker_High_Signing_Latency
+  expr: |
+    sum(
+      rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
+    ) by (environment, namespace)
+    /
+    sum(
+      rate(global:response_time_count{namespace!~"test[.].+"}[15m])
+    ) by (environment, namespace)
+    > 3000
+`,
+			checker:    newRateCheck,
+			prometheus: newSimpleProm,
+			entries: mustParseContent(`
+- record: global:response_time_sum
+  expr: sum(response_time_sum:rate2m)
+- record: response_time_sum:rate2m
+  expr: rate(response_time_sum[2m])
+`),
+			problems: noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 53s\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "global:response_time_sum"},
+					},
+					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "response_time_sum:rate2m"},
+					},
+					resp: httpResponse{code: http.StatusNotFound, body: "Not Found"},
+				},
+			},
+		},
+		{
+			description: "rate over non aggregate",
+			content:     "- alert: my alert\n  expr: rate(my:foo[5m])\n",
+			entries:     mustParseContent("- record: my:foo\n  expr: foo / foo\n"),
+			checker:     newRateCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  scrape_interval: 1m\n"},
+				},
+				{
+					conds: []requestCondition{
+						requireMetadataPath,
+						formCond{"metric", "my:foo"},
 					},
 					resp: metadataResponse{metadata: map[string][]v1.Metadata{}},
 				},

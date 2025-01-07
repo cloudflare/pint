@@ -2,8 +2,11 @@ package promapi
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"regexp"
+	"slices"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -43,7 +46,32 @@ func cacheCleaner(cache *queryCache, interval time.Duration, quit chan bool) {
 	}
 }
 
+type disabledChecks struct {
+	// Key is the name of the unsupported API, value is the list of checks disabled because of it.
+	apis map[string][]string
+	mtx  sync.Mutex
+}
+
+func (dc *disabledChecks) disable(api, check string) {
+	dc.mtx.Lock()
+	if _, ok := dc.apis[api]; !ok {
+		dc.apis[api] = []string{}
+	}
+	if !slices.Contains(dc.apis[api], check) {
+		dc.apis[api] = append(dc.apis[api], check)
+	}
+	dc.mtx.Unlock()
+}
+
+func (dc *disabledChecks) read() map[string][]string {
+	dc.mtx.Lock()
+	defer dc.mtx.Unlock()
+	return dc.apis
+}
+
 type FailoverGroup struct {
+	disabledChecks disabledChecks
+
 	name           string
 	uri            string
 	servers        []*Prometheus
@@ -59,15 +87,16 @@ type FailoverGroup struct {
 }
 
 func NewFailoverGroup(name, uri string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
-	return &FailoverGroup{ // nolint:exhaustruct
-		name:         name,
-		uri:          uri,
-		servers:      servers,
-		strictErrors: strictErrors,
-		uptimeMetric: uptimeMetric,
-		pathsInclude: include,
-		pathsExclude: exclude,
-		tags:         tags,
+	return &FailoverGroup{ // nolint: exhaustruct
+		name:           name,
+		uri:            uri,
+		servers:        servers,
+		strictErrors:   strictErrors,
+		uptimeMetric:   uptimeMetric,
+		pathsInclude:   include,
+		pathsExclude:   exclude,
+		tags:           tags,
+		disabledChecks: disabledChecks{apis: map[string][]string{}}, // nolint: exhaustruct
 	}
 }
 
@@ -77,6 +106,14 @@ func (fg *FailoverGroup) Name() string {
 
 func (fg *FailoverGroup) URI() string {
 	return fg.uri
+}
+
+func (fg *FailoverGroup) DisableCheck(api, s string) {
+	fg.disabledChecks.disable(api, s)
+}
+
+func (fg *FailoverGroup) GetDisabledChecks() map[string][]string {
+	return fg.disabledChecks.read()
 }
 
 func (fg *FailoverGroup) Include() []string {
@@ -190,7 +227,7 @@ func (fg *FailoverGroup) Config(ctx context.Context, cacheTTL time.Duration) (cf
 		if err == nil {
 			return cfg, nil
 		}
-		if !IsUnavailableError(err) {
+		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
 			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 		}
 	}
@@ -243,7 +280,7 @@ func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata 
 		if err == nil {
 			return metadata, nil
 		}
-		if !IsUnavailableError(err) {
+		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
 			return metadata, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 		}
 	}
@@ -258,7 +295,7 @@ func (fg *FailoverGroup) Flags(ctx context.Context) (flags *FlagsResult, err err
 		if err == nil {
 			return flags, nil
 		}
-		if !IsUnavailableError(err) {
+		if !IsUnavailableError(err) && !errors.Is(err, ErrUnsupported) {
 			return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 		}
 	}

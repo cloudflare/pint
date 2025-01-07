@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
@@ -99,6 +100,10 @@ LOOP:
 
 		metadata, err := c.prom.Metadata(ctx, selector.Name)
 		if err != nil {
+			if errors.Is(err, promapi.ErrUnsupported) {
+				c.prom.DisableCheck(promapi.APIPathMetadata, c.Reporter())
+				return problems
+			}
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 			problems = append(problems, Problem{
 				Lines:    expr.Value.Lines,

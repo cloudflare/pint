@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/discovery"
@@ -56,6 +57,10 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 
 	cfg, err := c.prom.Config(ctx, 0)
 	if err != nil {
+		if errors.Is(err, promapi.ErrUnsupported) {
+			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
+			return problems
+		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
 			Lines:    labels.Lines,

@@ -49,7 +49,18 @@ func (r Report) isEqual(nr Report) bool {
 	return true
 }
 
+type DisabledChecks struct {
+	API    string
+	Checks []string
+}
+
+type PrometheusDetails struct {
+	Name           string
+	DisabledChecks []DisabledChecks
+}
+
 type Summary struct {
+	promDetails    map[string]PrometheusDetails
 	reports        []Report
 	OfflineChecks  int64
 	OnlineChecks   int64
@@ -59,7 +70,37 @@ type Summary struct {
 }
 
 func NewSummary(reports []Report) Summary {
-	return Summary{reports: reports} // nolint:exhaustruct
+	return Summary{reports: reports} // nolint: exhaustruct
+}
+
+func (s *Summary) MarkCheckDisabled(prom, api string, checks []string) {
+	if s.promDetails == nil {
+		s.promDetails = map[string]PrometheusDetails{}
+	}
+	if _, ok := s.promDetails[prom]; !ok {
+		s.promDetails[prom] = PrometheusDetails{} // nolint: exhaustruct
+	}
+	s.promDetails[prom] = PrometheusDetails{
+		Name:           prom,
+		DisabledChecks: append(s.promDetails[prom].DisabledChecks, DisabledChecks{API: api, Checks: checks}),
+	}
+}
+
+func (s *Summary) GetPrometheusDetails() []PrometheusDetails {
+	pd := make([]PrometheusDetails, 0, len(s.promDetails))
+	for _, p := range s.promDetails {
+		for idx := range p.DisabledChecks {
+			slices.Sort(p.DisabledChecks[idx].Checks)
+		}
+		slices.SortFunc(p.DisabledChecks, func(a, b DisabledChecks) int {
+			return cmp.Compare(a.API, b.API)
+		})
+		pd = append(pd, p)
+	}
+	slices.SortFunc(pd, func(a, b PrometheusDetails) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+	return pd
 }
 
 func (s *Summary) Report(reps ...Report) {

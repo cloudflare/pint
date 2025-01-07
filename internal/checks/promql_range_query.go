@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -77,6 +78,10 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 
 	flags, err := c.prom.Flags(ctx)
 	if err != nil {
+		if errors.Is(err, promapi.ErrUnsupported) {
+			c.prom.DisableCheck(promapi.APIPathFlags, c.Reporter())
+			return problems
+		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,

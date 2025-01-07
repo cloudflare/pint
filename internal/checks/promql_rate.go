@@ -2,6 +2,7 @@ package checks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"slices"
 	"time"
@@ -69,6 +70,10 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 
 	cfg, err := c.prom.Config(ctx, 0)
 	if err != nil {
+		if errors.Is(err, promapi.ErrUnsupported) {
+			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
+			return problems
+		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
@@ -119,6 +124,9 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 				done.values = append(done.values, s.Name)
 				metadata, err := c.prom.Metadata(ctx, s.Name)
 				if err != nil {
+					if errors.Is(err, promapi.ErrUnsupported) {
+						continue
+					}
 					text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 					problems = append(problems, exprProblem{
 						text:     text,
@@ -152,6 +160,9 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 							for _, vs := range src.Selectors {
 								metadata, err := c.prom.Metadata(ctx, vs.Name)
 								if err != nil {
+									if errors.Is(err, promapi.ErrUnsupported) {
+										continue
+									}
 									text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 									problems = append(problems, exprProblem{
 										text:     text,

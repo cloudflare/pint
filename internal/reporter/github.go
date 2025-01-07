@@ -69,7 +69,7 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 	)
 
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token}, // nolint:exhaustruct
+		&oauth2.Token{AccessToken: token}, // nolint: exhaustruct
 	)
 	tc := oauth2.NewClient(context.Background(), ts)
 
@@ -379,6 +379,10 @@ func formatGHReviewBody(version string, summary Summary) string {
 		b.WriteString("No problems reported")
 	}
 	b.WriteString("\n</p>\n</details>\n\n")
+
+	if details := makePrometheusDetailsComment(summary); details != "" {
+		b.WriteString(details)
+	}
 
 	return b.String()
 }

@@ -124,6 +124,62 @@ func TestVectorMatchingCheck(t *testing.T) {
 			},
 		},
 		{
+			description: "one to one matching / match",
+			content:     "- record: foo\n  expr: foo / bar\n",
+			checker:     newVectorMatchingCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(foo / bar)"},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(foo) without(__name__)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+							}),
+							generateSample(map[string]string{
+								"instance": "bbb",
+								"job":      "bbb",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(bar) without(__name__)"},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "aaa",
+								"job":      "bbb",
+							}),
+							generateSample(map[string]string{
+								"instance": "bbb",
+								"job":      "bbb",
+							}),
+							generateSample(map[string]string{
+								"instance": "ccc",
+								"job":      "bbb",
+							}),
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "ignore missing left side",
 			content:     "- record: foo\n  expr: xxx / foo\n",
 			checker:     newVectorMatchingCheck,

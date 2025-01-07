@@ -283,7 +283,7 @@ type problemCollector struct {
 }
 
 func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks.Severity, maxProblems int) *problemCollector {
-	return &problemCollector{ // nolint:exhaustruct
+	return &problemCollector{ // nolint: exhaustruct
 		finder:     f,
 		cfg:        cfg,
 		fileOwners: map[string]string{},

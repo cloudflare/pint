@@ -15,7 +15,7 @@ import (
 	"github.com/prymitive/current"
 )
 
-func IsUnsupportedError(err error) bool {
+func isUnsupportedError(err error) bool {
 	var e1 APIError
 	if ok := errors.As(err, &e1); ok {
 		return e1.ErrorType == ErrAPIUnsupported

@@ -123,6 +123,22 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 	summary.OnlineChecks = onlineChecksCount.Load()
 	summary.OfflineChecks = offlineChecksCount.Load()
 
+	for _, prom := range gen.Servers() {
+		for api, names := range prom.GetDisabledChecks() {
+			summary.MarkCheckDisabled(prom.Name(), api, names)
+		}
+	}
+	for _, pd := range summary.GetPrometheusDetails() {
+		for _, dc := range pd.DisabledChecks {
+			slog.Warn(
+				"Some checks were disabled because configured server doesn't seem to support all Prometheus APIs",
+				slog.String("prometheus", pd.Name),
+				slog.String("api", dc.API),
+				slog.Any("checks", dc.Checks),
+			)
+		}
+	}
+
 	lastRunTime.SetToCurrentTime()
 
 	return summary, nil

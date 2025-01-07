@@ -57,6 +57,10 @@ type gitlabMR struct {
 	mrID    int
 }
 
+func (glmr gitlabMR) String() string {
+	return strconv.Itoa(glmr.mrID)
+}
+
 type gitlabComment struct {
 	discussionID string
 	baseSHA      string
@@ -144,12 +148,17 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs []error) (err error) {
 	mr := dst.(gitlabMR)
 	if gl.maxComments > 0 && len(s.reports) > gl.maxComments {
-		if err = gl.generalComment(ctx, mr.mrID, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
+		if err = gl.generalComment(ctx, mr, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
 			errs = append(errs, fmt.Errorf("failed to create general comment: %w", err))
 		}
 	}
 	if len(errs) > 0 {
-		if err = gl.generalComment(ctx, mr.mrID, errsToComment(errs)); err != nil {
+		if err = gl.generalComment(ctx, mr, errsToComment(errs)); err != nil {
+			return fmt.Errorf("failed to create general comment: %w", err)
+		}
+	}
+	if details := makePrometheusDetailsComment(s); details != "" {
+		if err = gl.generalComment(ctx, mr, details); err != nil {
 			return fmt.Errorf("failed to create general comment: %w", err)
 		}
 	}
@@ -325,15 +334,35 @@ func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int) ([]*git
 	return discs, err
 }
 
-func (gl GitLabReporter) generalComment(ctx context.Context, mrNum int, msg string) error {
-	opt := gitlab.CreateMergeRequestDiscussionOptions{
-		Body: gitlab.Ptr(msg),
-	}
+func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg string) error {
 	slog.Debug("Creating a PR comment", slog.String("body", msg))
+
+	discs, err := gl.getDiscussions(ctx, mr.mrID)
+	if err != nil {
+		return err
+	}
+	for _, disc := range discs {
+		for _, note := range disc.Notes {
+			if note.System {
+				continue
+			}
+			if note.Author.ID != mr.userID {
+				continue
+			}
+			if note.Position != nil {
+				continue
+			}
+			if note.Body == msg {
+				slog.Debug("Comment already exits", slog.String("body", msg))
+				return nil
+			}
+		}
+	}
 
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
-	_, _, err := gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mrNum, &opt, gitlab.WithContext(reqCtx))
+	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: gitlab.Ptr(msg)}
+	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, &opt, gitlab.WithContext(reqCtx))
 	return err
 }
 

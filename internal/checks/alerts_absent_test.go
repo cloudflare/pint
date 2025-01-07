@@ -274,19 +274,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: absent(foo)\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
-			problems: func(s string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
-						Reporter: checks.AlertsAbsentCheckName,
-						Text:     checkUnsupported(checks.AlertsAbsentCheckName, "prom", s, promapi.APIPathConfig),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},

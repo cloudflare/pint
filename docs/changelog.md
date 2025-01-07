@@ -8,8 +8,11 @@
 
 ### Changed
 
-- Report warnings instead of errors if Prometheus server used for checks doesn't support these API
-  endpoints:
+- When pint runs online checks against Thanos or other service that implements some, but not all, Prometheus APIs
+  it would reports errors due to some API requests returning `404 Not Found` HTTP errors.
+  Now pint will automatically disable checks that rely on Prometheus API endpoints that are not supported
+  and create a summary comment (when running `pint ci`) that lists disabled checks.
+  This applies to these API endpoints:
 
   - `/api/v1/status/config`
   - `/api/v1/status/flags`
