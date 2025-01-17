@@ -55,7 +55,13 @@ func TestParserSettings(t *testing.T) {
 			conf: Parser{
 				Schema: "xxx",
 			},
-			err: errors.New("unsupported parser scheme: xxx"),
+			err: errors.New("unsupported parser schema: xxx"),
+		},
+		{
+			conf: Parser{
+				Names: "xxx",
+			},
+			err: errors.New("unsupported parser names: xxx"),
 		},
 	}
 

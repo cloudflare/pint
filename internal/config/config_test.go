@@ -2344,6 +2344,14 @@ func TestConfigErrors(t *testing.T) {
 			err:    "error parsing regexp: invalid nested repetition operator: `++`",
 		},
 		{
+			config: `parser {schema = "foo"}`,
+			err:    "unsupported parser schema: foo",
+		},
+		{
+			config: `parser {names = "foo"}`,
+			err:    "unsupported parser names: foo",
+		},
+		{
 			config: `repository {
   bitbucket {
     project    = ""
