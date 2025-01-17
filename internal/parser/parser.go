@@ -35,7 +35,8 @@ const (
 	ThanosSchema
 )
 
-func NewParser(isStrict bool, schema Schema) Parser {
+func NewParser(isStrict bool, schema Schema, names model.ValidationScheme) Parser {
+	model.NameValidationScheme = names
 	return Parser{
 		isStrict: isStrict,
 		schema:   schema,

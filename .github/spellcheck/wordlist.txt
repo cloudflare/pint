@@ -59,6 +59,7 @@ unmarshal
 uptime
 URI
 URIs
+utf
 UTF
 validator
 VCS

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/config"
@@ -27,6 +28,7 @@ func BenchmarkFindEntries(b *testing.B) {
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
 		parser.PrometheusSchema,
+		model.UTF8Validation,
 		nil,
 	)
 	for n := 0; n < b.N; n++ {
@@ -41,6 +43,7 @@ func BenchmarkCheckRules(b *testing.B) {
 		[]string{"bench/rules"},
 		git.NewPathFilter(nil, nil, nil),
 		parser.PrometheusSchema,
+		model.UTF8Validation,
 		nil,
 	)
 	entries, err := finder.Find()

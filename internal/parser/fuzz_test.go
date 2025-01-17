@@ -3,6 +3,8 @@ package parser_test
 import (
 	"testing"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -276,7 +278,7 @@ labels:
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
-	p := parser.NewParser(false, parser.PrometheusSchema)
+	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	f.Fuzz(func(t *testing.T, s string) {
 		t.Logf("Parsing: [%s]\n", s)
 		_, _ = p.Parse([]byte(s))

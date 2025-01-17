@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
@@ -102,14 +104,15 @@ func actionCI(c *cli.Context) error {
 	)
 
 	schema := parseSchema(meta.cfg.Parser.Schema)
+	names := parseNames(meta.cfg.Parser.Names)
 	allowedOwners := meta.cfg.Owners.CompileAllowed()
 	var entries []discovery.Entry
-	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, allowedOwners).Find()
+	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, names, allowedOwners).Find()
 	if err != nil {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema, allowedOwners).Find(entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema, names, allowedOwners).Find(entries)
 	if err != nil {
 		return err
 	}
@@ -358,4 +361,11 @@ func parseSchema(s string) parser.Schema {
 		return parser.ThanosSchema
 	}
 	return parser.PrometheusSchema
+}
+
+func parseNames(s string) model.ValidationScheme {
+	if s == config.NamesLegacy {
+		return model.LegacyValidation
+	}
+	return model.UTF8Validation
 }

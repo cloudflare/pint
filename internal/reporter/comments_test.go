@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/neilotoole/slogt"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -73,7 +74,7 @@ func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool
 }
 
 func TestCommenter(t *testing.T) {
-	p := parser.NewParser(false, parser.PrometheusSchema)
+	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0
@@ -752,7 +753,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 		maxComments int
 	}
 
-	p := parser.NewParser(false, parser.PrometheusSchema)
+	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

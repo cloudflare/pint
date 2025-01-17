@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -20,6 +22,7 @@ func NewGitBranchFinder(
 	baseBranch string,
 	maxCommits int,
 	schema parser.Schema,
+	names model.ValidationScheme,
 	allowedOwners []*regexp.Regexp,
 ) GitBranchFinder {
 	return GitBranchFinder{
@@ -28,6 +31,7 @@ func NewGitBranchFinder(
 		baseBranch:    baseBranch,
 		maxCommits:    maxCommits,
 		schema:        schema,
+		names:         names,
 		allowedOwners: allowedOwners,
 	}
 }
@@ -39,6 +43,7 @@ type GitBranchFinder struct {
 	allowedOwners []*regexp.Regexp
 	maxCommits    int
 	schema        parser.Schema
+	names         model.ValidationScheme
 }
 
 func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
@@ -60,13 +65,13 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 	}
 
 	for _, change := range changes {
+		p := parser.NewParser(!f.filter.IsRelaxed(change.Path.Before.Name), f.schema, f.names)
 		var entriesBefore, entriesAfter []Entry
 		entriesBefore, err = readRules(
 			change.Path.Before.EffectivePath(),
 			change.Path.Before.Name,
 			bytes.NewReader(change.Body.Before),
-			!f.filter.IsRelaxed(change.Path.Before.Name),
-			f.schema,
+			p,
 			nil,
 		)
 		if err != nil {
@@ -76,8 +81,7 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			change.Path.After.EffectivePath(),
 			change.Path.After.Name,
 			bytes.NewReader(change.Body.After),
-			!f.filter.IsRelaxed(change.Path.After.Name),
-			f.schema,
+			p,
 			f.allowedOwners,
 		)
 		if err != nil {
