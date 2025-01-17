@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": unsupported parser scheme: bogus"
+level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": unsupported parser schema: bogus"
 -- rules/1.yml --
 groups:
 - name: foo

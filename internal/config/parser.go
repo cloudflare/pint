@@ -40,7 +40,7 @@ func (p Parser) validate() error {
 	case SchemaPrometheus:
 	case SchemaThanos:
 	default:
-		return fmt.Errorf("unsupported parser scheme: %s", s)
+		return fmt.Errorf("unsupported parser schema: %s", s)
 	}
 
 	switch n := p.getNames(); n {
