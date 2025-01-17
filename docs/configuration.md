@@ -65,6 +65,7 @@ Syntax:
 ```js
 parser {
   schema  = "prometheus|thanos"
+  names   = "legacy|utf-8"
   include = [ "(.*)", ... ]
   exclude = [ "(.*)", ... ]
   relaxed = [ "(.*)", ... ]
@@ -81,6 +82,9 @@ parser {
   in [Thanos Rule](https://thanos.io/tip/components/rule.md/) docs, which currently allows for setting
   an extra key on the rule group object - `partial_response_strategy`.
   Default value is `prometheus`.
+- `names` - validation scheme for label names. This control if Prometheus libraries are
+  allowing UTF-8 in label **names** or not. See [utf-8 guide](https://prometheus.io/docs/guides/utf8/).
+  Default value is `utf-8`.
 - `include` - list of regexp patterns to check when running checks. Only files
   matching those regexp rules will be checked, other modified files will be ignored.
 - `exclude` - list of regexp patterns to ignore when running checks.

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser"
@@ -24,7 +25,7 @@ func (r failingReader) Read(_ []byte) (int, error) {
 
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
-		p := parser.NewParser(false, parser.PrometheusSchema)
+		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
 		if err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
@@ -338,7 +339,8 @@ groups:
 			fmt.Sprintf("rPath=%s sPath=%s strict=%v title=%s", tc.reportedPath, tc.sourcePath, tc.isStrict, tc.title),
 			func(t *testing.T) {
 				r := tc.sourceFunc(t)
-				entries, err := readRules(tc.reportedPath, tc.sourcePath, r, tc.isStrict, parser.PrometheusSchema, nil)
+				p := parser.NewParser(tc.isStrict, parser.PrometheusSchema, model.UTF8Validation)
+				entries, err := readRules(tc.reportedPath, tc.sourcePath, r, p, nil)
 				if tc.err != "" {
 					require.EqualError(t, err, tc.err)
 				} else {

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/neilotoole/slogt"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -41,7 +42,7 @@ func TestBitBucketReporter(t *testing.T) {
 		pullRequestActivities reporter.BitBucketPullRequestActivities
 	}
 
-	p := parser.NewParser(false, parser.PrometheusSchema)
+	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	mockRules, _ := p.Parse([]byte(`
 - record: target is down
   expr: up == 0

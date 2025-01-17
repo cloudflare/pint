@@ -9,15 +9,18 @@ import (
 	"path/filepath"
 	"regexp"
 
+	"github.com/prometheus/common/model"
+
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-func NewGlobFinder(patterns []string, filter git.PathFilter, schema parser.Schema, allowedOwners []*regexp.Regexp) GlobFinder {
+func NewGlobFinder(patterns []string, filter git.PathFilter, schema parser.Schema, names model.ValidationScheme, allowedOwners []*regexp.Regexp) GlobFinder {
 	return GlobFinder{
 		patterns:      patterns,
 		filter:        filter,
 		schema:        schema,
+		names:         names,
 		allowedOwners: allowedOwners,
 	}
 }
@@ -27,6 +30,7 @@ type GlobFinder struct {
 	patterns      []string
 	allowedOwners []*regexp.Regexp
 	schema        parser.Schema
+	names         model.ValidationScheme
 }
 
 func (f GlobFinder) Find() (entries []Entry, err error) {
@@ -72,7 +76,8 @@ func (f GlobFinder) Find() (entries []Entry, err error) {
 		if err != nil {
 			return nil, err
 		}
-		el, err := readRules(fp.target, fp.path, fd, !f.filter.IsRelaxed(fp.target), f.schema, f.allowedOwners)
+		p := parser.NewParser(!f.filter.IsRelaxed(fp.target), f.schema, f.names)
+		el, err := readRules(fp.target, fp.path, fd, p, f.allowedOwners)
 		if err != nil {
 			fd.Close()
 			return nil, fmt.Errorf("invalid file syntax: %w", err)

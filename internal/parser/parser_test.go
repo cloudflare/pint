@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/comments"
@@ -20,6 +21,7 @@ func TestParse(t *testing.T) {
 		output  []parser.Rule
 		strict  bool
 		schema  parser.Schema
+		names   model.ValidationScheme
 	}
 
 	testCases := []testCaseT{
@@ -1330,6 +1332,51 @@ data:
 				{
 					Lines: parser.LineRange{First: 2, Last: 3},
 					Error: parser.ParseError{Err: errors.New("invalid recording rule name: invalid metric name"), Line: 2},
+				},
+			},
+		},
+		{
+			content: []byte(`
+- record: utf-8 enabled name
+  expr: bar
+  labels:
+    "a b c": bar
+`),
+			names: model.UTF8Validation,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines: parser.LineRange{First: 2, Last: 2},
+							Value: "utf-8 enabled name",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines: parser.LineRange{First: 3, Last: 3},
+								Value: "bar",
+							},
+						},
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Lines: parser.LineRange{First: 4, Last: 4},
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Lines: parser.LineRange{First: 5, Last: 5},
+										Value: "a b c",
+									},
+									Value: &parser.YamlNode{
+										Lines: parser.LineRange{First: 5, Last: 5},
+										Value: "bar",
+									},
+								},
+							},
+							Lines: parser.LineRange{First: 4, Last: 5},
+						},
+					},
 				},
 			},
 		},
@@ -3030,7 +3077,7 @@ groups:
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			t.Logf("\n--- Content ---%s--- END ---", tc.content)
 
-			p := parser.NewParser(tc.strict, tc.schema)
+			p := parser.NewParser(tc.strict, tc.schema, tc.names)
 			output, err := p.Parse(tc.content)
 
 			if tc.err != "" {

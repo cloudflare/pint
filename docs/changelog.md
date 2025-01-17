@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.71.0
+
+### Added
+
+- Added `names` option to the `parser` block, which controls how does Prometheus validates
+  label names.
+
 ## v0.70.0
 
 ### Added

@@ -84,6 +84,7 @@ func actionLint(c *cli.Context) error {
 			config.MustCompileRegexes(meta.cfg.Parser.Relaxed...),
 		),
 		parseSchema(meta.cfg.Parser.Schema),
+		parseNames(meta.cfg.Parser.Names),
 		allowedOwners,
 	)
 	entries, err := finder.Find()

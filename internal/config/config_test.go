@@ -9,6 +9,7 @@ import (
 
 	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -159,7 +160,7 @@ func TestSetDisabledChecks(t *testing.T) {
 }
 
 func newRule(t *testing.T, content string) parser.Rule {
-	p := parser.NewParser(false, parser.PrometheusSchema)
+	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	rules, err := p.Parse([]byte(content))
 	if err != nil {
 		t.Error(err)
