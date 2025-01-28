@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
-	github.com/gkampitakis/go-snaps v0.5.8
+	github.com/gkampitakis/go-snaps v0.5.9
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v68 v68.0.0
 	github.com/hashicorp/hcl/v2 v2.23.0
