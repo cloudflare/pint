@@ -143,7 +143,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	selectors := utils.HasVectorSelector(expr.Query)
 
 	done := map[string]bool{}
-	for _, selector := range getNonFallbackSelectors(expr.Query) {
+	for _, selector := range getNonFallbackSelectors(expr) {
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
@@ -186,7 +186,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				if arEntry != nil {
 					slog.Debug(
 						"Metric is provided by alerting rule",
-						slog.String("selector", (&selector).String()),
+						slog.String("selector", selector.String()),
 						slog.String("path", arEntry.Path.Name),
 					)
 				} else {
@@ -218,14 +218,14 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		}
 
 		// 1. If foo{bar, baz} is there -> GOOD
-		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()))
+		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", selector.String()))
 		count, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
 		if err != nil {
 			problems = append(problems, c.queryProblem(err, expr))
 			continue
 		}
 		if count > 0 {
-			slog.Debug("Found series, skipping further checks", slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()))
+			slog.Debug("Found series, skipping further checks", slog.String("check", c.Reporter()), slog.String("selector", selector.String()))
 			continue
 		}
 
@@ -376,7 +376,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				slog.Debug(
 					"Series disappeared from prometheus but for less then configured min-age",
 					slog.String("check", c.Reporter()),
-					slog.String("selector", (&selector).String()),
+					slog.String("selector", selector.String()),
 					slog.String("min-age", output.HumanizeDuration(minAge)),
 					slog.String("last-seen", sinceDesc(newest(trs.Series.Ranges))),
 				)
@@ -444,7 +444,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 					Severity: severity,
 				})
 				slog.Debug("No historical series matching filter used in the query",
-					slog.String("check", c.Reporter()), slog.String("selector", (&selector).String()), slog.String("matcher", lm.String()))
+					slog.String("check", c.Reporter()), slog.String("selector", selector.String()), slog.String("matcher", lm.String()))
 				continue
 			}
 
@@ -482,7 +482,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 					slog.Debug(
 						"Series disappeared from prometheus but for less then configured min-age",
 						slog.String("check", c.Reporter()),
-						slog.String("selector", (&selector).String()),
+						slog.String("selector", selector.String()),
 						slog.String("min-age", output.HumanizeDuration(minAge)),
 						slog.String("last-seen", sinceDesc(newest(trsLabel.Series.Ranges))),
 					)
@@ -507,7 +507,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				slog.Debug(
 					"Series matching filter disappeared from prometheus",
 					slog.String("check", c.Reporter()),
-					slog.String("selector", (&selector).String()),
+					slog.String("selector", selector.String()),
 					slog.String("matcher", lm.String()),
 				)
 				continue
@@ -528,7 +528,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				slog.Debug(
 					"Series matching filter are only sometimes present",
 					slog.String("check", c.Reporter()),
-					slog.String("selector", (&selector).String()),
+					slog.String("selector", selector.String()),
 					slog.String("matcher", lm.String()),
 				)
 			}
@@ -686,7 +686,7 @@ func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int,
 	return series, nil
 }
 
-func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelector) (minAge time.Duration, problems []Problem) {
+func (c SeriesCheck) getMinAge(rule parser.Rule, selector *promParser.VectorSelector) (minAge time.Duration, problems []Problem) {
 	minAge = time.Hour * 2
 	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
 		matcher, key, value := parseRuleSet(ruleSet.Value)
@@ -716,7 +716,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector promParser.VectorSelec
 	return minAge, problems
 }
 
-func (c SeriesCheck) isLabelValueIgnored(settings *PromqlSeriesSettings, rule parser.Rule, selector promParser.VectorSelector, labelName string) bool {
+func (c SeriesCheck) isLabelValueIgnored(settings *PromqlSeriesSettings, rule parser.Rule, selector *promParser.VectorSelector, labelName string) bool {
 	for matcher, names := range settings.IgnoreLabelsValue {
 		isMatch, _ := matchSelectorToMetric(selector, matcher)
 		if !isMatch {
@@ -739,7 +739,7 @@ func (c SeriesCheck) isLabelValueIgnored(settings *PromqlSeriesSettings, rule pa
 			}
 		}
 		if labelName == value {
-			slog.Debug("Label check disabled by comment", slog.String("selector", (&selector).String()), slog.String("label", labelName))
+			slog.Debug("Label check disabled by comment", slog.String("selector", selector.String()), slog.String("label", labelName))
 			return true
 		}
 	}
@@ -760,36 +760,51 @@ func (c SeriesCheck) textAndSeverity(settings *PromqlSeriesSettings, name, text 
 	return text, s
 }
 
-func getNonFallbackSelectors(n *parser.PromQLNode) (selectors []promParser.VectorSelector) {
-LOOP:
-	for _, vs := range parser.WalkDownExpr[*promParser.VectorSelector](n) {
-		for _, bin := range parser.WalkUpExpr[*promParser.BinaryExpr](vs.Parent) {
-			if binExp := bin.Expr.(*promParser.BinaryExpr); binExp.Op != promParser.LOR {
+func selectorWithoutOffset(vs *promParser.VectorSelector) *promParser.VectorSelector {
+	if vs.OriginalOffset == 0 {
+		return vs
+	}
+
+	s := &promParser.VectorSelector{}
+	*s = *vs
+	s.Offset = 0
+	s.OriginalOffset = 0
+	return s
+}
+
+func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.VectorSelector) {
+	var hasVectorFallback bool
+	sources := utils.LabelsSource(n.Value.Value, n.Query.Expr)
+	for _, ls := range sources {
+		if ls.AlwaysReturns && len(ls.ReturnedNumbers) > 0 {
+			hasVectorFallback = true
+			break
+		}
+	}
+	for _, ls := range sources {
+		if !hasVectorFallback {
+			for _, s := range ls.Selectors {
+				selectors = append(selectors, selectorWithoutOffset(s))
+			}
+		}
+		for _, js := range ls.Joins {
+			for _, s := range js.Selectors {
+				selectors = append(selectors, selectorWithoutOffset(s))
+			}
+		}
+		for _, us := range ls.Unless {
+			if !us.IsConditional {
 				continue
 			}
-			for _, vec := range parser.WalkDownExpr[*promParser.Call](bin) {
-				if vecCall := vec.Expr.(*promParser.Call); vecCall.Func.Name == "vector" {
-					// vector seletor is under (...) OR vector()
-					// ignore it
-					slog.Debug(
-						"Metric uses vector() fallback value, ignore",
-						slog.String("selector", (vs.Expr.String())),
-					)
-					continue LOOP
-				}
+			for _, s := range us.Selectors {
+				selectors = append(selectors, selectorWithoutOffset(s))
 			}
 		}
-		// copy node without offset
-		nc := promParser.VectorSelector{
-			Name:          vs.Expr.(*promParser.VectorSelector).Name,
-			LabelMatchers: vs.Expr.(*promParser.VectorSelector).LabelMatchers,
-		}
-		selectors = append(selectors, nc)
 	}
 	return selectors
 }
 
-func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
+func stripLabels(selector *promParser.VectorSelector) promParser.VectorSelector {
 	s := promParser.VectorSelector{
 		Name:          selector.Name,
 		LabelMatchers: []*labels.Matcher{},
@@ -805,7 +820,7 @@ func stripLabels(selector promParser.VectorSelector) promParser.VectorSelector {
 	return s
 }
 
-func isDisabled(rule parser.Rule, selector promParser.VectorSelector) bool {
+func isDisabled(rule parser.Rule, selector *promParser.VectorSelector) bool {
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
 		if strings.HasPrefix(disable.Match, SeriesCheckName+"(") && strings.HasSuffix(disable.Match, ")") {
 			cs := strings.TrimSuffix(strings.TrimPrefix(disable.Match, SeriesCheckName+"("), ")")
@@ -823,7 +838,7 @@ func isDisabled(rule parser.Rule, selector promParser.VectorSelector) bool {
 	return false
 }
 
-func matchSelectorToMetric(selector promParser.VectorSelector, metric string) (bool, bool) {
+func matchSelectorToMetric(selector *promParser.VectorSelector, metric string) (bool, bool) {
 	// Try full string or name match first.
 	if metric == selector.String() || metric == selector.Name {
 		return true, true
@@ -889,7 +904,7 @@ func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []
 			continue
 		}
 		for _, selector := range selectors {
-			isMatch, ok := matchSelectorToMetric(selector, match)
+			isMatch, ok := matchSelectorToMetric(&selector, match)
 			if !ok {
 				continue
 			}
@@ -912,7 +927,7 @@ func orphanedRuleSetComments(rule parser.Rule, selectors []promParser.VectorSele
 		matcher, key, value := parseRuleSet(ruleSet.Value)
 		for _, selector := range selectors {
 			if matcher != "" {
-				isMatch, _ := matchSelectorToMetric(selector, matcher)
+				isMatch, _ := matchSelectorToMetric(&selector, matcher)
 				if !isMatch {
 					continue
 				}

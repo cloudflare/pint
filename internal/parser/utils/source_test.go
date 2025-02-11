@@ -3,7 +3,6 @@ package utils_test
 import (
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -11,31 +10,20 @@ import (
 	"github.com/cloudflare/pint/internal/parser/utils"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
-	"github.com/prometheus/prometheus/promql/parser/posrange"
 )
+
+func mustParse[T any](t *testing.T, s string, offset int) T {
+	m, err := promParser.ParseExpr(strings.Repeat(" ", offset) + s)
+	require.NoErrorf(t, err, "failed to parse vector selector: %s", s)
+	n, ok := m.(T)
+	require.True(t, ok, "failed to convert %q to %t\n", s, n)
+	return n
+}
 
 func TestLabelsSource(t *testing.T) {
 	type testCaseT struct {
 		expr   string
 		output []utils.Source
-	}
-
-	mustParseVector := func(s string, offset int) *promParser.VectorSelector {
-		m, err := promParser.ParseExpr(s)
-		require.NoErrorf(t, err, "failed to parse vector selector: %s", s)
-		v := m.(*promParser.VectorSelector)
-		v.PosRange.Start += posrange.Pos(offset)
-		v.PosRange.End += posrange.Pos(offset)
-		return v
-	}
-
-	mustParseMatrix := func(s string, offset int) *promParser.MatrixSelector {
-		e, err := promParser.ParseExpr(s)
-		require.NoErrorf(t, err, "failed to parse matrix selector: %s", s)
-		m := e.(*promParser.MatrixSelector)
-		m.VectorSelector = mustParseVector(m.VectorSelector.String(), offset)
-		m.EndPos += posrange.Pos(offset)
-		return m
 	}
 
 	testCases := []testCaseT{
@@ -91,6 +79,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "2",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -110,6 +99,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "2",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -129,6 +119,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "2",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -147,6 +138,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "2",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -166,6 +158,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "2",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -185,6 +178,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "20",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -214,7 +208,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 1),
+						mustParse[*promParser.VectorSelector](t, "foo", 1),
 					},
 				},
 				{
@@ -222,7 +216,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("bar", 8),
+						mustParse[*promParser.VectorSelector](t, "bar", 8),
 					},
 				},
 			},
@@ -235,7 +229,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 1),
+						mustParse[*promParser.VectorSelector](t, "foo", 1),
 					},
 				},
 				{
@@ -251,29 +245,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "vector(2)",
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.NumberLiteral{
-								Val: 2,
-								PosRange: posrange.PositionRange{
-									Start: 15,
-									End:   16,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 8,
-							End:   17,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, "vector(2)", 8),
 				},
 			},
 		},
@@ -285,7 +257,33 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 1),
+						mustParse[*promParser.VectorSelector](t, "foo", 1),
+					},
+					Joins: []utils.Source{
+						{
+							Type:            utils.FuncSource,
+							Returns:         promParser.ValueTypeVector,
+							Operation:       "vector",
+							FixedLabels:     true,
+							AlwaysReturns:   true,
+							ReturnedNumbers: []float64{2},
+							Call:            mustParse[*promParser.Call](t, "vector(2)", 22),
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Calling `vector()` will return a vector value with no labels.",
+									Fragment: "vector(2)",
+								},
+							},
+						},
+						{
+							Type:      utils.SelectorSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: promParser.CardManyToMany.String(),
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, "bar", 35),
+							},
+							IsDead: true,
+						},
 					},
 				},
 				{
@@ -301,27 +299,31 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "vector(5)",
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.NumberLiteral{
-								Val: 5,
-								PosRange: posrange.PositionRange{
-									Start: 15,
-									End:   16,
+					Call: mustParse[*promParser.Call](t, "vector(5)", 8),
+					Joins: []utils.Source{
+						{
+							Type:            utils.FuncSource,
+							Returns:         promParser.ValueTypeVector,
+							Operation:       "vector",
+							FixedLabels:     true,
+							AlwaysReturns:   true,
+							ReturnedNumbers: []float64{2},
+							Call:            mustParse[*promParser.Call](t, "vector(2)", 22),
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Calling `vector()` will return a vector value with no labels.",
+									Fragment: "vector(2)",
 								},
 							},
 						},
-						PosRange: posrange.PositionRange{
-							Start: 8,
-							End:   17,
+						{
+							Type:      utils.SelectorSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: promParser.CardManyToMany.String(),
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, "bar", 35),
+							},
+							IsDead: true,
 						},
 					},
 				},
@@ -342,6 +344,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "1",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -360,6 +363,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: "20",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -387,7 +391,19 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 0),
+						mustParse[*promParser.VectorSelector](t, "foo", 0),
+					},
+				},
+			},
+		},
+		{
+			expr: "foo offset 5m",
+			output: []utils.Source{
+				{
+					Type:    utils.SelectorSource,
+					Returns: promParser.ValueTypeVector,
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, "foo offset 5m", 0),
 					},
 				},
 			},
@@ -399,7 +415,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="bar"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="bar"}`, 0),
 					},
 					GuaranteedLabels: []string{"job"},
 				},
@@ -412,7 +428,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="bar"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="bar"}`, 0),
 					},
 					Operation:        promParser.CardManyToMany.String(),
 					GuaranteedLabels: []string{"job"},
@@ -421,7 +437,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar{job="foo"}`, 18),
+						mustParse[*promParser.VectorSelector](t, `bar{job="foo"}`, 18),
 					},
 					Operation:        promParser.CardManyToMany.String(),
 					GuaranteedLabels: []string{"job"},
@@ -435,7 +451,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{a="bar"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{a="bar"}`, 0),
 					},
 					Operation:        promParser.CardManyToMany.String(),
 					GuaranteedLabels: []string{"a"},
@@ -444,7 +460,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar{b="foo"}`, 16),
+						mustParse[*promParser.VectorSelector](t, `bar{b="foo"}`, 16),
 					},
 					Operation:        promParser.CardManyToMany.String(),
 					GuaranteedLabels: []string{"b"},
@@ -458,7 +474,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 0),
+						mustParse[*promParser.VectorSelector](t, "foo", 0),
 					},
 				},
 			},
@@ -470,7 +486,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("prometheus_build_info", 0),
+						mustParse[*promParser.VectorSelector](t, "prometheus_build_info", 0),
 					},
 				},
 			},
@@ -483,46 +499,9 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "deriv",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("distance_covered_meters_total", 11),
+						mustParse[*promParser.VectorSelector](t, "distance_covered_meters_total", 11),
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "deriv",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeMatrix,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.SubqueryExpr{
-								Expr: &promParser.Call{
-									Func: &promParser.Function{
-										Name: "rate",
-										ArgTypes: []promParser.ValueType{
-											promParser.ValueTypeMatrix,
-										},
-										Variadic:   0,
-										ReturnType: promParser.ValueTypeVector,
-									},
-									Args: promParser.Expressions{
-										mustParseMatrix(`distance_covered_meters_total[1m]`, 11),
-									},
-									PosRange: posrange.PositionRange{
-										Start: 6,
-										End:   45,
-									},
-								},
-								Range:  time.Minute * 5,
-								Step:   time.Minute,
-								EndPos: posrange.Pos(52),
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   53,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, "deriv(rate(distance_covered_meters_total[1m])[5m:1m])", 0),
 				},
 			},
 		},
@@ -533,7 +512,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 0),
+						mustParse[*promParser.VectorSelector](t, "foo", 0),
 					},
 				},
 			},
@@ -545,7 +524,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 0),
+						mustParse[*promParser.VectorSelector](t, "foo", 0),
 					},
 				},
 			},
@@ -557,7 +536,7 @@ func TestLabelsSource(t *testing.T) {
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 1),
+						mustParse[*promParser.VectorSelector](t, "foo", 1),
 					},
 				},
 			},
@@ -570,7 +549,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -583,6 +562,27 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `sum(foo{job="myjob"}) > 20`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo{job="myjob"})`,
+						},
+					},
+					IsConditional: true,
+				},
+			},
+		},
+		{
 			expr: `sum(foo{job="myjob"}) without(job)`,
 			output: []utils.Source{
 				{
@@ -590,7 +590,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -610,7 +610,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo`, 4),
 					},
 					IncludedLabels: []string{"job"},
 					FixedLabels:    true,
@@ -631,7 +631,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
@@ -646,6 +646,21 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `abs(foo{job="myjob"} offset 5m)`,
+			output: []utils.Source{
+				{
+					Type:      utils.FuncSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "abs",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"} offset 5m`, 4),
+					},
+					Call:             mustParse[*promParser.Call](t, `abs(foo{job="myjob"} offset 5m)`, 0),
+					GuaranteedLabels: []string{"job"},
+				},
+			},
+		},
+		{
 			expr: `abs(foo{job="myjob"} or bar{cluster="dev"})`,
 			output: []utils.Source{
 				{
@@ -653,33 +668,20 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "abs",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
-						mustParseVector(`bar{cluster="dev"}`, 24),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "abs",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.BinaryExpr{
-								Op:  promParser.LOR,
-								LHS: mustParseVector(`foo{job="myjob"}`, 4),
-								RHS: mustParseVector(`bar{cluster="dev"}`, 24),
-								VectorMatching: &promParser.VectorMatching{
-									Card: promParser.CardManyToMany,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   43,
-						},
+					GuaranteedLabels: []string{"job"},
+					Call:             mustParse[*promParser.Call](t, `abs(foo{job="myjob"} or bar{cluster="dev"})`, 0),
+				},
+				{
+					Type:      utils.FuncSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "abs",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `bar{cluster="dev"}`, 24),
 					},
+					Call:             mustParse[*promParser.Call](t, `abs(foo{job="myjob"} or bar{cluster="dev"})`, 0),
+					GuaranteedLabels: []string{"cluster"},
 				},
 			},
 		},
@@ -691,7 +693,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					GuaranteedLabels: []string{"job"},
 					ExcludedLabels:   []string{"instance"},
@@ -707,7 +709,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar{cluster="dev"}`, 24),
+						mustParse[*promParser.VectorSelector](t, `bar{cluster="dev"}`, 24),
 					},
 					GuaranteedLabels: []string{"cluster"},
 					ExcludedLabels:   []string{"instance"},
@@ -728,7 +730,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					GuaranteedLabels: []string{"job"},
 					ExcludedLabels:   []string{"instance"},
@@ -749,13 +751,30 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "min",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: `min(foo{job="myjob"})`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:      utils.AggregateSource,
+							Operation: "max",
+							Returns:   promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
+							},
+							FixedLabels: true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation that removes all labels.",
+									Fragment: `max(foo{job="myjob"})`,
+								},
+							},
 						},
 					},
 				},
@@ -769,13 +788,30 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "max",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: `max(foo{job="myjob"})`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:      utils.AggregateSource,
+							Operation: "min",
+							Returns:   promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
+							},
+							FixedLabels: true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation that removes all labels.",
+									Fragment: `min(foo{job="myjob"})`,
+								},
+							},
 						},
 					},
 				},
@@ -789,7 +825,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "avg",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					},
 					GuaranteedLabels: []string{"job"},
 					IncludedLabels:   []string{"job"},
@@ -811,7 +847,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "group",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 6),
+						mustParse[*promParser.VectorSelector](t, `foo`, 6),
 					},
 					IncludedLabels: []string{"job"},
 					FixedLabels:    true,
@@ -832,7 +868,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "stddev",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 12),
+						mustParse[*promParser.VectorSelector](t, `foo`, 12),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -852,7 +888,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "stdvar",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 12),
+						mustParse[*promParser.VectorSelector](t, `foo`, 12),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -872,25 +908,9 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "stddev_over_time",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 17),
+						mustParse[*promParser.VectorSelector](t, `foo`, 17),
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "stddev_over_time",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeMatrix,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseMatrix(`foo[5m]`, 17),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   25,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `stddev_over_time(foo[5m])`, 0),
 				},
 			},
 		},
@@ -902,25 +922,9 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "stdvar_over_time",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 17),
+						mustParse[*promParser.VectorSelector](t, `foo`, 17),
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "stdvar_over_time",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeMatrix,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseMatrix(`foo[5m]`, 17),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   25,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `stdvar_over_time(foo[5m])`, 0),
 				},
 			},
 		},
@@ -932,7 +936,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "quantile",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 19),
+						mustParse[*promParser.VectorSelector](t, `foo`, 19),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -952,7 +956,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count_values",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`build_version`, 24),
+						mustParse[*promParser.VectorSelector](t, `build_version`, 24),
 					},
 					GuaranteedLabels: []string{"version"},
 					IncludedLabels:   []string{"version"},
@@ -974,7 +978,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count_values",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`build_version`, 24),
+						mustParse[*promParser.VectorSelector](t, `build_version`, 24),
 					},
 					IncludedLabels:   []string{"version"},
 					GuaranteedLabels: []string{"version"},
@@ -996,7 +1000,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count_values",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`build_version{job="foo"}`, 24),
+						mustParse[*promParser.VectorSelector](t, `build_version{job="foo"}`, 24),
 					},
 					IncludedLabels:   []string{"version"},
 					GuaranteedLabels: []string{"version"},
@@ -1018,7 +1022,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count_values",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`build_version`, 24),
+						mustParse[*promParser.VectorSelector](t, `build_version`, 24),
 					},
 					GuaranteedLabels: []string{"version"},
 					IncludedLabels:   []string{"job", "version"},
@@ -1040,9 +1044,10 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "topk",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 9),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 9),
 					},
 					GuaranteedLabels: []string{"job"},
+					IsConditional:    true,
 				},
 			},
 		},
@@ -1054,7 +1059,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "topk",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 9),
+						mustParse[*promParser.VectorSelector](t, `foo`, 9),
 					},
 				},
 				{
@@ -1062,7 +1067,7 @@ func TestLabelsSource(t *testing.T) {
 					Operation: "topk",
 					Returns:   promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar`, 16),
+						mustParse[*promParser.VectorSelector](t, `bar`, 16),
 					},
 				},
 			},
@@ -1075,25 +1080,9 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "rate",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 5),
+						mustParse[*promParser.VectorSelector](t, `foo`, 5),
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "rate",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeMatrix,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseMatrix(`foo[10m]`, 5),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   14,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `rate(foo[10m])`, 0),
 				},
 			},
 		},
@@ -1105,7 +1094,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 9),
+						mustParse[*promParser.VectorSelector](t, `foo`, 9),
 					},
 					ExcludedLabels: []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1125,9 +1114,18 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardOneToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					},
 					GuaranteedLabels: []string{"job"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 17),
+							},
+						},
+					},
 				},
 			},
 		},
@@ -1139,7 +1137,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardOneToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					},
 					GuaranteedLabels: []string{"job"},
 					IncludedLabels:   []string{"instance"},
@@ -1148,6 +1146,15 @@ func TestLabelsSource(t *testing.T) {
 						"": {
 							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
 							Fragment: `foo{job="foo"} * on(instance) bar`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 30),
+							},
 						},
 					},
 				},
@@ -1161,10 +1168,19 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					},
 					IncludedLabels:   []string{"bar", "instance"},
 					GuaranteedLabels: []string{"job"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 46),
+							},
+						},
+					},
 				},
 			},
 		},
@@ -1176,10 +1192,20 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					},
 					IncludedLabels:   []string{"cluster", "instance"},
 					GuaranteedLabels: []string{"job"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar{cluster="bar", ignored="true"}`, 50),
+							},
+							GuaranteedLabels: []string{"cluster", "ignored"},
+						},
+					},
 				},
 			},
 		},
@@ -1191,10 +1217,20 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardOneToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar{cluster="bar"}`, 63),
+						mustParse[*promParser.VectorSelector](t, `bar{cluster="bar"}`, 63),
 					},
 					IncludedLabels:   []string{"job", "instance"},
 					GuaranteedLabels: []string{"cluster"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `foo{job="foo", ignored="true"}`, 0),
+							},
+							GuaranteedLabels: []string{"job", "ignored"},
+						},
+					},
 				},
 			},
 		},
@@ -1206,13 +1242,22 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 6),
+						mustParse[*promParser.VectorSelector](t, `foo`, 6),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: `count(foo / bar)`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 12),
+							},
 						},
 					},
 				},
@@ -1226,13 +1271,23 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`up{job="a"}`, 6),
+						mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: `count(up{job="a"} / on () up{job="b"})`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `up{job="b"}`, 26),
+							},
+							GuaranteedLabels: []string{"job"},
 						},
 					},
 				},
@@ -1246,13 +1301,23 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`up{job="a"}`, 6),
+						mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: `count(up{job="a"} / on (env) up{job="b"})`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `up{job="b"}`, 29),
+							},
+							GuaranteedLabels: []string{"job"},
 						},
 					},
 				},
@@ -1266,9 +1331,18 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo", instance="1"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo", instance="1"}`, 0),
 					},
 					GuaranteedLabels: []string{"job", "instance"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 33),
+							},
+						},
+					},
 				},
 			},
 		},
@@ -1280,10 +1354,19 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo", instance="1"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo", instance="1"}`, 0),
 					},
 					IncludedLabels:   []string{"cluster"},
 					GuaranteedLabels: []string{"job", "instance"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 45),
+							},
+						},
+					},
 				},
 			},
 		},
@@ -1295,7 +1378,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "topk",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 9),
+						mustParse[*promParser.VectorSelector](t, `foo`, 9),
 					},
 				},
 			},
@@ -1308,7 +1391,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "topk",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 9),
+						mustParse[*promParser.VectorSelector](t, `foo`, 9),
 					},
 				},
 			},
@@ -1321,7 +1404,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "topk",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 9),
+						mustParse[*promParser.VectorSelector](t, `foo`, 9),
 					},
 				},
 			},
@@ -1334,7 +1417,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "bottomk",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 21),
+						mustParse[*promParser.VectorSelector](t, `foo`, 21),
 					},
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1354,7 +1437,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo`, 0),
 					},
 				},
 				{
@@ -1362,7 +1445,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar`, 7),
+						mustParse[*promParser.VectorSelector](t, `bar`, 7),
 					},
 				},
 			},
@@ -1375,7 +1458,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo`, 0),
 					},
 				},
 				{
@@ -1383,7 +1466,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar`, 7),
+						mustParse[*promParser.VectorSelector](t, `bar`, 7),
 					},
 				},
 				{
@@ -1391,7 +1474,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`baz`, 14),
+						mustParse[*promParser.VectorSelector](t, `baz`, 14),
 					},
 				},
 			},
@@ -1404,7 +1487,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 1),
+						mustParse[*promParser.VectorSelector](t, `foo`, 1),
 					},
 				},
 				{
@@ -1412,7 +1495,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar`, 8),
+						mustParse[*promParser.VectorSelector](t, `bar`, 8),
 					},
 				},
 				{
@@ -1420,7 +1503,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`baz`, 16),
+						mustParse[*promParser.VectorSelector](t, `baz`, 16),
 					},
 				},
 			},
@@ -1433,7 +1516,68 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 0),
+						mustParse[*promParser.VectorSelector](t, `foo`, 0),
+					},
+					Unless: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo unless bar > 5`,
+			output: []utils.Source{
+				{
+					Type:      utils.SelectorSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: promParser.CardManyToMany.String(),
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `foo`, 0),
+					},
+					Unless: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							},
+							IsConditional: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo unless bar unless baz`,
+			output: []utils.Source{
+				{
+					Type:      utils.SelectorSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: promParser.CardManyToMany.String(),
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `foo`, 0),
+					},
+					Unless: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							},
+						},
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `baz`, 22),
+							},
+						},
 					},
 				},
 			},
@@ -1446,7 +1590,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`up{job="foo", cluster="dev"}`, 10),
+						mustParse[*promParser.VectorSelector](t, `up{job="foo", cluster="dev"}`, 10),
 					},
 					ExcludedLabels: []string{"job", "cluster"}, // FIXME empty
 					FixedLabels:    true,
@@ -1464,6 +1608,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`,
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -1482,21 +1627,7 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `year()`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "year",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   1,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   6,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `year()`, 0),
 				},
 			},
 		},
@@ -1508,25 +1639,9 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "year",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 5),
+						mustParse[*promParser.VectorSelector](t, "foo", 5),
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "year",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   1,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector("foo", 5),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   9,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `year(foo)`, 0),
 				},
 			},
 		},
@@ -1538,49 +1653,10 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: "label_join",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`up{job="api-server",src1="a",src2="b",src3="c"}`, 11),
+						mustParse[*promParser.VectorSelector](t, `up{job="api-server",src1="a",src2="b",src3="c"}`, 11),
 					},
 					GuaranteedLabels: []string{"job", "src1", "src2", "src3", "foo"},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "label_join",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-							},
-							Variadic:   -1,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`up{job="api-server",src1="a",src2="b",src3="c"}`, 11),
-							&promParser.StringLiteral{
-								Val:      "foo",
-								PosRange: posrange.PositionRange{Start: 60, End: 65},
-							},
-							&promParser.StringLiteral{
-								Val:      ",",
-								PosRange: posrange.PositionRange{Start: 67, End: 70},
-							},
-							&promParser.StringLiteral{
-								Val:      "src1",
-								PosRange: posrange.PositionRange{Start: 72, End: 78},
-							},
-							&promParser.StringLiteral{
-								Val:      "src2",
-								PosRange: posrange.PositionRange{Start: 80, End: 86},
-							},
-							&promParser.StringLiteral{
-								Val:      "src3",
-								PosRange: posrange.PositionRange{Start: 88, End: 94},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   95,
-						},
-					},
+					Call:             mustParse[*promParser.Call](t, `label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")`, 0),
 				},
 			},
 		},
@@ -1599,10 +1675,37 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo:sum`, 8),
+						mustParse[*promParser.VectorSelector](t, `foo:sum`, 8),
 					},
 					IncludedLabels: []string{"notify", "job"},
 					ExcludeReason:  map[string]utils.ExcludedLabel{},
+					IsConditional:  false, // FIXME should be true
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `job:notify`, 68),
+							},
+						},
+						{
+							Type:      utils.AggregateSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: "sum",
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `foo:count`, 97),
+							},
+							IncludedLabels: []string{"job"},
+							FixedLabels:    true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+									Fragment: `sum(foo:count) by(job)`,
+								},
+							},
+							IsConditional: true,
+						},
+					},
 				},
 			},
 		},
@@ -1614,7 +1717,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardOneToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`container_file_descriptors`, 0),
+						mustParse[*promParser.VectorSelector](t, `container_file_descriptors`, 0),
 					},
 					IncludedLabels: []string{"instance", "app_name"},
 					FixedLabels:    true,
@@ -1622,6 +1725,16 @@ sum(foo:count) by(job) > 20`,
 						"": {
 							Reason:   "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
 							Fragment: `container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 53),
+							},
+							GuaranteedLabels: []string{"ulimit"},
 						},
 					},
 				},
@@ -1635,9 +1748,19 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`container_file_descriptors`, 0),
+						mustParse[*promParser.VectorSelector](t, `container_file_descriptors`, 0),
 					},
 					IncludedLabels: []string{"instance", "app_name"},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 66),
+							},
+							GuaranteedLabels: []string{"ulimit"},
+						},
+					},
 				},
 			},
 		},
@@ -1649,7 +1772,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="bar"}`, 7),
+						mustParse[*promParser.VectorSelector](t, `foo{job="bar"}`, 7),
 					},
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
@@ -1660,23 +1783,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(foo{job="bar"})`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo{job="bar"}`, 7),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   22,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent(foo{job="bar"})`, 0),
 				},
 			},
 		},
@@ -1688,7 +1795,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="bar", cluster!="dev", instance=~".+", env="prod"}`, 7),
+						mustParse[*promParser.VectorSelector](t, `foo{job="bar", cluster!="dev", instance=~".+", env="prod"}`, 7),
 					},
 					IncludedLabels:   []string{"job", "env"},
 					GuaranteedLabels: []string{"job", "env"},
@@ -1699,23 +1806,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo{job="bar", cluster!="dev", instance=~".+", env="prod"}`, 7),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   66,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`, 0),
 				},
 			},
 		},
@@ -1727,7 +1818,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 11),
+						mustParse[*promParser.VectorSelector](t, `foo`, 11),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1736,31 +1827,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(sum(foo) by(job, instance))`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.AggregateExpr{
-								Op:       promParser.SUM,
-								Expr:     mustParseVector("foo", 11),
-								Grouping: []string{"job", "instance"},
-								PosRange: posrange.PositionRange{
-									Start: 7,
-									End:   33,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   34,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent(sum(foo) by(job, instance))`, 0),
 				},
 			},
 		},
@@ -1772,7 +1839,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="prometheus", xxx="1"}`, 7),
+						mustParse[*promParser.VectorSelector](t, `foo{job="prometheus", xxx="1"}`, 7),
 					},
 					IncludedLabels:   []string{"job", "xxx"},
 					GuaranteedLabels: []string{"job", "xxx"},
@@ -1783,21 +1850,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(foo{job="prometheus", xxx="1"})`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
+					Call: mustParse[*promParser.Call](t, `absent(foo{job="prometheus", xxx="1"})`, 0),
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, "prometheus_build_info", 51),
 							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo{job="prometheus", xxx="1"}`, 7),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   38,
 						},
 					},
 				},
@@ -1811,7 +1871,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 8),
+						mustParse[*promParser.VectorSelector](t, `foo`, 8),
 					},
 					IncludedLabels: []string{"notjob"},
 					FixedLabels:    true,
@@ -1832,7 +1892,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "count",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`node_exporter_build_info`, 6),
+						mustParse[*promParser.VectorSelector](t, `node_exporter_build_info`, 6),
 					},
 					IncludedLabels: []string{"instance", "version", "foo"}, // FIXME foo shouldn't be there because count() doesn't produce it
 					FixedLabels:    true,
@@ -1840,6 +1900,25 @@ sum(foo:count) by(job) > 20`,
 						"": {
 							Reason:   "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
 							Fragment: `count(node_exporter_build_info) by (instance, version)`,
+						},
+					},
+					IsConditional: true,
+					Joins: []utils.Source{
+						{
+							Type:      utils.AggregateSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: "count",
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, "deb_package_version", 106),
+							},
+							IncludedLabels: []string{"instance", "version", "package"},
+							FixedLabels:    true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.",
+									Fragment: `count(deb_package_version) by (instance, version, package)`,
+								},
+							},
 						},
 					},
 				},
@@ -1853,7 +1932,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 7),
+						mustParse[*promParser.VectorSelector](t, `foo`, 7),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1862,30 +1941,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(foo)`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo`, 7),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   11,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent(foo)`, 0),
 				},
 				{
 					Type:      utils.FuncSource,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar`, 22),
+						mustParse[*promParser.VectorSelector](t, `bar`, 22),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1894,23 +1957,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(bar)`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`bar`, 22),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 15,
-							End:   26,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent(bar)`, 15),
 				},
 			},
 		},
@@ -1922,7 +1969,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent_over_time",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 17),
+						mustParse[*promParser.VectorSelector](t, `foo`, 17),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1931,30 +1978,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent_over_time(foo[5m])`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent_over_time",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeMatrix,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseMatrix(`foo[5m]`, 17),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   25,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent_over_time(foo[5m])`, 0),
 				},
 				{
 					Type:      utils.FuncSource,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`bar`, 36),
+						mustParse[*promParser.VectorSelector](t, `bar`, 36),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1963,23 +1994,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(bar)`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`bar`, 36),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 29,
-							End:   40,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `absent(bar)`, 29),
 				},
 			},
 		},
@@ -1991,7 +2006,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="xxx"}`, 44),
+						mustParse[*promParser.VectorSelector](t, `foo{job="xxx"}`, 44),
 					},
 					IncludedLabels:   []string{"job", "cluster", "env"},
 					GuaranteedLabels: []string{"job"},
@@ -2002,21 +2017,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(foo{job="xxx"})`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
+					Call: mustParse[*promParser.Call](t, `absent(foo{job="xxx"})`, 37),
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, "bar", 0),
 							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo{job="xxx"}`, 44),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 37,
-							End:   59,
 						},
 					},
 				},
@@ -2030,7 +2038,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "absent",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="xxx"}`, 32),
+						mustParse[*promParser.VectorSelector](t, `foo{job="xxx"}`, 32),
 					},
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
@@ -2041,21 +2049,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `absent(foo{job="xxx"})`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "absent",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
+					Call: mustParse[*promParser.Call](t, `absent(foo{job="xxx"})`, 25),
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, "bar", 0),
 							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo{job="xxx"}`, 32),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 25,
-							End:   47,
 						},
 					},
 				},
@@ -2077,29 +2078,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `vector(1)`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.NumberLiteral{
-								Val: 1,
-								PosRange: posrange.PositionRange{
-									Start: 7,
-									End:   8,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   9,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `vector(1)`, 0),
 				},
 			},
 		},
@@ -2118,39 +2097,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `vector(scalar(foo))`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.Call{
-								Func: &promParser.Function{
-									Name: "scalar",
-									ArgTypes: []promParser.ValueType{
-										promParser.ValueTypeVector,
-									},
-									Variadic:   0,
-									ReturnType: promParser.ValueTypeScalar,
-								},
-								Args: promParser.Expressions{
-									mustParseVector("foo", 14),
-								},
-								PosRange: posrange.PositionRange{
-									Start: 7,
-									End:   18,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   19,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `vector(scalar(foo))`, 0),
 				},
 			},
 		},
@@ -2169,40 +2116,8 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `vector(0.0  >= bool 0.5)`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.BinaryExpr{
-								Op: promParser.GTE,
-								LHS: &promParser.NumberLiteral{
-									Val: 0,
-									PosRange: posrange.PositionRange{
-										Start: 7,
-										End:   10,
-									},
-								},
-								RHS: &promParser.NumberLiteral{
-									Val: 0.5,
-									PosRange: posrange.PositionRange{
-										Start: 20,
-										End:   23,
-									},
-								},
-								ReturnBool: true,
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   24,
-						},
-					},
+					Call:          mustParse[*promParser.Call](t, `vector(0.0  >= bool 0.5)`, 0),
+					IsConditional: true,
 				},
 			},
 		},
@@ -2214,26 +2129,10 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum_over_time",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="myjob"}`, 14),
+						mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 14),
 					},
 					GuaranteedLabels: []string{"job"},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "sum_over_time",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeMatrix,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseMatrix(`foo{job="myjob"}[5m]`, 14),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   35,
-						},
-					},
+					Call:             mustParse[*promParser.Call](t, `sum_over_time(foo{job="myjob"}[5m])`, 0),
 				},
 			},
 		},
@@ -2252,21 +2151,7 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `days_in_month()`,
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "days_in_month",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   1,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   15,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, `days_in_month()`, 0),
 				},
 			},
 		},
@@ -2278,26 +2163,10 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "days_in_month",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo{job="foo"}`, 14),
+						mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 14),
 					},
 					GuaranteedLabels: []string{"job"},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "days_in_month",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-							},
-							Variadic:   1,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`foo{job="foo"}`, 14),
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   29,
-						},
-					},
+					Call:             mustParse[*promParser.Call](t, `days_in_month(foo{job="foo"})`, 0),
 				},
 			},
 		},
@@ -2309,56 +2178,32 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "label_replace",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`up{job="api-server",service="a:c"}`, 14),
+						mustParse[*promParser.VectorSelector](t, `up{job="api-server",service="a:c"}`, 14),
 					},
 					GuaranteedLabels: []string{"job", "service", "foo"},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "label_replace",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							mustParseVector(`up{job="api-server",service="a:c"}`, 14),
-							&promParser.StringLiteral{
-								Val: "foo",
-								PosRange: posrange.PositionRange{
-									Start: 50,
-									End:   55,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "$1",
-								PosRange: posrange.PositionRange{
-									Start: 57,
-									End:   61,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "service",
-								PosRange: posrange.PositionRange{
-									Start: 63,
-									End:   72,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "(.*):.*",
-								PosRange: posrange.PositionRange{
-									Start: 74,
-									End:   83,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   84,
+					Call:             mustParse[*promParser.Call](t, `label_replace(up{job="api-server",service="a:c"}, "foo", "$1", "service", "(.*):.*")`, 0),
+				},
+			},
+		},
+		{
+			expr: `label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")`,
+			output: []utils.Source{
+				{
+					Type:      utils.FuncSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "label_replace",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `pod_status`, 28),
+					},
+					FixedLabels:      true,
+					IsConditional:    true,
+					IncludedLabels:   []string{"pod"},
+					GuaranteedLabels: []string{"cluster"},
+					Call:             mustParse[*promParser.Call](t, `label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")`, 0),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.",
+							Fragment: `sum by (pod) (pod_status)`,
 						},
 					},
 				},
@@ -2371,8 +2216,9 @@ sum(foo:count) by(job) > 20`,
 					Type:    utils.SelectorSource,
 					Returns: promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("my_metric", 10),
+						mustParse[*promParser.VectorSelector](t, "my_metric", 10),
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -2384,7 +2230,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardOneToOne.String(),
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`up{instance="a", job="prometheus"}`, 0),
+						mustParse[*promParser.VectorSelector](t, `up{instance="a", job="prometheus"}`, 0),
 					},
 					GuaranteedLabels: []string{"instance"},
 					ExcludedLabels:   []string{"job"},
@@ -2392,6 +2238,16 @@ sum(foo:count) by(job) > 20`,
 						"job": {
 							Reason:   "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
 							Fragment: `up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:    utils.SelectorSource,
+							Returns: promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `up{instance="a", job="pint"}`, 51),
+							},
+							GuaranteedLabels: []string{"instance", "job"},
 						},
 					},
 				},
@@ -2412,7 +2268,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Returns:   promParser.ValueTypeVector,
 					Operation: "avg",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}`, 41),
+						mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}`, 41),
 					},
 					ExcludedLabels: []string{"router", "colo_id", "instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2429,13 +2285,14 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
 						},
 					},
+					IsConditional: true,
 				},
 				{
 					Type:      utils.AggregateSource,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
+						mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
 					},
 					GuaranteedLabels: []string{"cidr_use_case"},
 					ExcludedLabels:   []string{"router", "colo_id", "instance"},
@@ -2458,13 +2315,31 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 							Fragment: "sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~\".*tier1.*\"})\n< on() count(colo_router_tier:disabled_pops:max{tier=\"1\",router=~\"edge.*\"}) * 0.4",
 						},
 					},
+					IsConditional: true,
+					Joins: []utils.Source{
+						{
+							Type:      utils.AggregateSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: "count",
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
+							},
+							FixedLabels: true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation that removes all labels.",
+									Fragment: `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`,
+								},
+							},
+						},
+					},
 				},
 				{
 					Type:      utils.AggregateSource,
 					Returns:   promParser.ValueTypeVector,
 					Operation: "avg",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}`, 343),
+						mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}`, 343),
 					},
 					GuaranteedLabels: []string{"cidr_use_case"},
 					ExcludedLabels:   []string{"router", "colo_id", "instance"},
@@ -2482,6 +2357,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -2493,67 +2369,11 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Returns:   promParser.ValueTypeVector,
 					Operation: "label_replace",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 18),
+						mustParse[*promParser.VectorSelector](t, `foo`, 18),
 					},
 					GuaranteedLabels: []string{"instance"},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "label_replace",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeVector,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-								promParser.ValueTypeString,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.AggregateExpr{
-								Op:       promParser.SUM,
-								Expr:     mustParseVector("foo", 18),
-								Grouping: []string{"instance"},
-								Without:  true,
-								PosRange: posrange.PositionRange{
-									Start: 14,
-									End:   40,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "instance",
-								PosRange: posrange.PositionRange{
-									Start: 42,
-									End:   52,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "none",
-								PosRange: posrange.PositionRange{
-									Start: 54,
-									End:   60,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "",
-								PosRange: posrange.PositionRange{
-									Start: 62,
-									End:   64,
-								},
-							},
-							&promParser.StringLiteral{
-								Val: "",
-								PosRange: posrange.PositionRange{
-									Start: 66,
-									End:   68,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   69,
-						},
-					},
+					ExcludeReason:    map[string]utils.ExcludedLabel{},
+					Call:             mustParse[*promParser.Call](t, `label_replace(sum(foo) without(instance), "instance", "none", "", "")`, 0),
 				},
 			},
 		},
@@ -2570,7 +2390,7 @@ sum by (region, target, colo_name) (
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`probe_success{job="abc"}`, 56),
+						mustParse[*promParser.VectorSelector](t, `probe_success{job="abc"}`, 56),
 					},
 					IncludedLabels: []string{"region", "target", "colo_name"},
 					FixedLabels:    true,
@@ -2580,6 +2400,7 @@ sum by (region, target, colo_name) (
 							Fragment: "sum by (region, target, colo_name) (\n    sum_over_time(probe_success{job=\"abc\"}[5m])\n\tor\n\tvector(1)\n)",
 						},
 					},
+					IsConditional: true,
 				},
 				{
 					Type:            utils.AggregateSource,
@@ -2595,6 +2416,7 @@ sum by (region, target, colo_name) (
 							Fragment: "vector(1)",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -2614,36 +2436,14 @@ sum by (region, target, colo_name) (
 							Fragment: "vector(1)",
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.NumberLiteral{
-								Val: 1,
-								PosRange: posrange.PositionRange{
-									Start: 7,
-									End:   8,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   9,
-						},
-					},
+					Call: mustParse[*promParser.Call](t, "vector(1)", 0),
 				},
 				{
 					Type:      utils.SelectorSource,
 					Operation: promParser.CardManyToMany.String(),
 					Returns:   promParser.ValueTypeVector,
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector("foo", 13),
+						mustParse[*promParser.VectorSelector](t, "foo", 13),
 					},
 					IsDead: true,
 				},
@@ -2666,29 +2466,8 @@ sum by (region, target, colo_name) (
 							Fragment: "vector(0)",
 						},
 					},
-					Call: &promParser.Call{
-						Func: &promParser.Function{
-							Name: "vector",
-							ArgTypes: []promParser.ValueType{
-								promParser.ValueTypeScalar,
-							},
-							Variadic:   0,
-							ReturnType: promParser.ValueTypeVector,
-						},
-						Args: promParser.Expressions{
-							&promParser.NumberLiteral{
-								Val: 0,
-								PosRange: posrange.PositionRange{
-									Start: 7,
-									End:   8,
-								},
-							},
-						},
-						PosRange: posrange.PositionRange{
-							Start: 0,
-							End:   9,
-						},
-					},
+					Call:          mustParse[*promParser.Call](t, "vector(0)", 0),
+					IsConditional: true,
 				},
 			},
 		},
@@ -2700,7 +2479,7 @@ sum by (region, target, colo_name) (
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 4),
+						mustParse[*promParser.VectorSelector](t, `foo`, 4),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2709,6 +2488,7 @@ sum by (region, target, colo_name) (
 							Fragment: `sum(foo or vector(0))`,
 						},
 					},
+					IsConditional: true,
 				},
 				{
 					Type:            utils.AggregateSource,
@@ -2724,6 +2504,7 @@ sum by (region, target, colo_name) (
 							Fragment: "sum(foo or vector(0))",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -2735,7 +2516,7 @@ sum by (region, target, colo_name) (
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 5),
+						mustParse[*promParser.VectorSelector](t, `foo`, 5),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2744,6 +2525,7 @@ sum by (region, target, colo_name) (
 							Fragment: `sum(foo or vector(1))`,
 						},
 					},
+					IsConditional: true,
 				},
 				{
 					Type:            utils.AggregateSource,
@@ -2759,6 +2541,7 @@ sum by (region, target, colo_name) (
 							Fragment: "sum(foo or vector(1))",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -2770,7 +2553,7 @@ sum by (region, target, colo_name) (
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 5),
+						mustParse[*promParser.VectorSelector](t, `foo`, 5),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2779,6 +2562,7 @@ sum by (region, target, colo_name) (
 							Fragment: `sum(foo or vector(1))`,
 						},
 					},
+					IsConditional: true,
 				},
 				{
 					Type:            utils.AggregateSource,
@@ -2793,6 +2577,7 @@ sum by (region, target, colo_name) (
 							Fragment: "sum(foo or vector(1))",
 						},
 					},
+					IsConditional: true,
 				},
 			},
 		},
@@ -2804,7 +2589,7 @@ sum by (region, target, colo_name) (
 					Returns:   promParser.ValueTypeVector,
 					Operation: "sum",
 					Selectors: []*promParser.VectorSelector{
-						mustParseVector(`foo`, 5),
+						mustParse[*promParser.VectorSelector](t, `foo`, 5),
 					},
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2813,6 +2598,7 @@ sum by (region, target, colo_name) (
 							Fragment: `sum(foo or vector(2))`,
 						},
 					},
+					IsConditional: true,
 				},
 				{
 					Type:            utils.AggregateSource,
@@ -2828,6 +2614,210 @@ sum by (region, target, colo_name) (
 							Fragment: "sum(foo or vector(2))",
 						},
 					},
+					IsConditional: true,
+				},
+			},
+		},
+		{
+			expr: `
+(sum(sometimes{foo!="bar"} or vector(0)))
+or
+((bob > 10) or sum(foo) or vector(1))`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 6),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(sometimes{foo!="bar"} or vector(0)))`, // FIXME bogus )
+						},
+					},
+				},
+				{
+					Type:            utils.AggregateSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "sum",
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{0},
+					FixedLabels:     true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(sometimes{foo!="bar"} or vector(0)))`, // FIXME bogus )
+						},
+					},
+				},
+				{
+					Type:      utils.SelectorSource,
+					Operation: promParser.CardManyToMany.String(),
+					Returns:   promParser.ValueTypeVector,
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `bob`, 48),
+					},
+					IsConditional: true,
+				},
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `foo`, 65),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo)`,
+						},
+					},
+				},
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
+					FixedLabels:     true,
+					Call:            mustParse[*promParser.Call](t, "vector(1)", 73),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(1)",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `
+(
+	sum(sometimes{foo!="bar"})
+	or
+	vector(1)
+) and (
+	((bob > 10) or sum(bar))
+	or
+	notfound > 0
+)`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
+					},
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(sometimes{foo!="bar"})`,
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:      utils.SelectorSource,
+							Operation: promParser.CardManyToMany.String(),
+							Returns:   promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bob`, 57),
+							},
+							IsConditional: true,
+						},
+						{
+							Type:      utils.AggregateSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: "sum",
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 74),
+							},
+							FixedLabels: true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation that removes all labels.",
+									Fragment: `sum(bar))`, // FIXME bogus )
+								},
+							},
+						},
+						{
+							Type:      utils.SelectorSource,
+							Operation: promParser.CardManyToMany.String(),
+							Returns:   promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `notfound`, 85),
+							},
+							IsConditional: true,
+						},
+					},
+				},
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{1},
+					FixedLabels:     true,
+					Call:            mustParse[*promParser.Call](t, "vector(1)", 36),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(1)",
+						},
+					},
+					Joins: []utils.Source{
+						{
+							Type:      utils.SelectorSource,
+							Operation: promParser.CardManyToMany.String(),
+							Returns:   promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bob`, 57),
+							},
+							IsConditional: true,
+						},
+						{
+							Type:      utils.AggregateSource,
+							Returns:   promParser.ValueTypeVector,
+							Operation: "sum",
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `bar`, 74),
+							},
+							FixedLabels: true,
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Query is using aggregation that removes all labels.",
+									Fragment: `sum(bar))`, // FIXME bogus )
+								},
+							},
+						},
+						{
+							Type:      utils.SelectorSource,
+							Operation: promParser.CardManyToMany.String(),
+							Returns:   promParser.ValueTypeVector,
+							Selectors: []*promParser.VectorSelector{
+								mustParse[*promParser.VectorSelector](t, `notfound`, 85),
+							},
+							IsConditional: true,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "foo offset 5m > 5",
+			output: []utils.Source{
+				{
+					Type:    utils.SelectorSource,
+					Returns: promParser.ValueTypeVector,
+					Selectors: []*promParser.VectorSelector{
+						mustParse[*promParser.VectorSelector](t, "foo offset 5m", 0),
+					},
+					IsConditional: true,
 				},
 			},
 		},

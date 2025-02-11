@@ -28,6 +28,8 @@ type ExcludedLabel struct {
 }
 
 type Source struct {
+	Joins            []Source // Any other sources this source joins with.
+	Unless           []Source // Any other sources this source is suppressed by.
 	Selectors        []*promParser.VectorSelector
 	Call             *promParser.Call
 	ExcludeReason    map[string]ExcludedLabel // Reason why a label was excluded
@@ -41,6 +43,7 @@ type Source struct {
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 	IsDead           bool // True if this source cannot be reached and is dead code.
 	AlwaysReturns    bool // True if this source always returns results.
+	IsConditional    bool // True if this source is guarded by 'foo > 5' or other condition.
 }
 
 func LabelsSource(expr string, node promParser.Node) (src []Source) {
@@ -57,8 +60,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		src = append(src, parseBinOps(expr, n)...)
 
 	case *promParser.Call:
-		s = parseCall(expr, n)
-		src = append(src, s)
+		src = append(src, parseCall(expr, n)...)
 
 	case *promParser.MatrixSelector:
 		src = append(src, walkNode(expr, n.VectorSelector)...)
@@ -114,7 +116,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
 		s.Selectors = append(s.Selectors, n)
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, n)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, n)...)
 		src = append(src, s)
 
 	default:
@@ -143,6 +145,31 @@ func appendToSlice(dst []string, values ...string) []string {
 		}
 	}
 	return dst
+}
+
+func includeLabel(s Source, names ...string) Source {
+	s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, names...)
+	for _, name := range names {
+		delete(s.ExcludeReason, name)
+	}
+	s.IncludedLabels = appendToSlice(s.IncludedLabels, names...)
+	return s
+}
+
+func guaranteeLabel(s Source, names ...string) Source {
+	s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, names...)
+	for _, name := range names {
+		delete(s.ExcludeReason, name)
+	}
+	s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, names...)
+	return s
+}
+
+func excludeLabel(s Source, names ...string) Source {
+	s.ExcludedLabels = appendToSlice(s.ExcludedLabels, names...)
+	s.IncludedLabels = removeFromSlice(s.IncludedLabels, names...)
+	s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, names...)
+	return s
 }
 
 func setInMap(dst map[string]ExcludedLabel, key string, val ExcludedLabel) map[string]ExcludedLabel {
@@ -236,10 +263,8 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		for _, s = range parseAggregation(expr, n) {
 			s.Operation = "count_values"
 			// Param is the label to store the count value in.
-			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, n.Param.(*promParser.StringLiteral).Val)
-			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Param.(*promParser.StringLiteral).Val)
-			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.Param.(*promParser.StringLiteral).Val)
-			delete(s.ExcludeReason, n.Param.(*promParser.StringLiteral).Val)
+			s = includeLabel(s, n.Param.(*promParser.StringLiteral).Val)
+			s = guaranteeLabel(s, n.Param.(*promParser.StringLiteral).Val)
 			src = append(src, s)
 		}
 	case promParser.QUANTILE:
@@ -278,9 +303,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	var s Source
 	for _, s = range walkNode(expr, n.Expr) {
 		if n.Without {
-			s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.Grouping...)
-			s.IncludedLabels = removeFromSlice(s.IncludedLabels, n.Grouping...)
-			s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, n.Grouping...)
+			s = excludeLabel(s, n.Grouping...)
 			for _, name := range n.Grouping {
 				s.ExcludeReason = setInMap(
 					s.ExcludeReason,
@@ -307,10 +330,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			} else {
 				// Check if source of labels already fixes them.
 				if !s.FixedLabels {
-					s.IncludedLabels = appendToSlice(s.IncludedLabels, n.Grouping...)
-					for _, name := range n.Grouping {
-						s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, name)
-					}
+					s = includeLabel(s, n.Grouping...)
 					s.ExcludeReason = setInMap(
 						s.ExcludeReason,
 						"",
@@ -337,55 +357,36 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	return src
 }
 
-func parseCall(expr string, n *promParser.Call) (s Source) {
-	s.Type = FuncSource
-	s.Operation = n.Func.Name
-	s.Call = n
-
-	var vt promParser.ValueType
-	for i, e := range n.Args {
-		if i >= len(n.Func.ArgTypes) {
-			vt = n.Func.ArgTypes[len(n.Func.ArgTypes)-1]
-		} else {
-			vt = n.Func.ArgTypes[i]
-		}
-
-		// nolint: exhaustive
-		switch vt {
-		case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
-			for _, es := range walkNode(expr, e) {
-				s.Selectors = append(s.Selectors, es.Selectors...)
-			}
-		}
-	}
-
+func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
 	switch n.Func.Name {
 	case "abs", "sgn", "acos", "acosh", "asin", "asinh", "atan", "atanh", "cos", "cosh", "sin", "sinh", "tan", "tanh":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "ceil", "floor", "round":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "changes", "resets":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "clamp", "clamp_max", "clamp_min":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "absent", "absent_over_time":
 		s.Returns = promParser.ValueTypeVector
 		s.FixedLabels = true
+		s.IncludedLabels = nil
+		s.GuaranteedLabels = nil
 		for _, name := range labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, s.Selectors...) {
-			s.IncludedLabels = appendToSlice(s.IncludedLabels, name)
-			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, name)
+			s = includeLabel(s, name)
+			s = guaranteeLabel(s, name)
 		}
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
@@ -404,7 +405,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "days_in_month", "day_of_month", "day_of_week", "day_of_year", "hour", "minute", "month", "year":
 		s.Returns = promParser.ValueTypeVector
@@ -425,34 +426,34 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				},
 			)
 		} else {
-			s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+			s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 		}
 
 	case "deg", "rad", "ln", "log10", "log2", "sqrt", "exp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "delta", "idelta", "increase", "deriv", "irate", "rate":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "histogram_avg", "histogram_count", "histogram_sum", "histogram_stddev", "histogram_stdvar", "histogram_fraction", "histogram_quantile":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "holt_winters", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "label_replace", "label_join":
 		// One label added to the results.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, s.Call.Args[1].(*promParser.StringLiteral).Val)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, s.Call.Args[1].(*promParser.StringLiteral).Val)
 
 	case "pi":
 		s.Returns = promParser.ValueTypeScalar
@@ -506,7 +507,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "timestamp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s.GuaranteedLabels = appendToSlice(s.GuaranteedLabels, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
 
 	case "vector":
 		s.Returns = promParser.ValueTypeVector
@@ -534,6 +535,38 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	return s
 }
 
+func parseCall(expr string, n *promParser.Call) (src []Source) {
+	var vt promParser.ValueType
+	for i, e := range n.Args {
+		if i >= len(n.Func.ArgTypes) {
+			vt = n.Func.ArgTypes[len(n.Func.ArgTypes)-1]
+		} else {
+			vt = n.Func.ArgTypes[i]
+		}
+
+		switch vt {
+		case promParser.ValueTypeVector, promParser.ValueTypeMatrix:
+			for _, es := range walkNode(expr, e) {
+				es.Type = FuncSource
+				es.Operation = n.Func.Name
+				es.Call = n
+				src = append(src, parsePromQLFunc(es, expr, n))
+			}
+		case promParser.ValueTypeNone, promParser.ValueTypeScalar, promParser.ValueTypeString:
+		}
+	}
+
+	if len(src) == 0 {
+		var s Source
+		s.Type = FuncSource
+		s.Operation = n.Func.Name
+		s.Call = n
+		src = append(src, parsePromQLFunc(s, expr, n))
+	}
+
+	return src
+}
+
 func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	var s Source
 	switch {
@@ -546,7 +579,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		lhs := walkNode(expr, n.LHS)
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range lhs {
+			ls.IsConditional = n.Op.IsComparisonOperator()
 			for _, rs := range rhs {
+				rs.IsConditional = n.Op.IsComparisonOperator()
 				switch {
 				case ls.AlwaysReturns && rs.AlwaysReturns:
 					// Both sides always return something
@@ -569,15 +604,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		// foo{} +               bar{}
 		// foo{} + on(...)       bar{}
 		// foo{} + ignoring(...) bar{}
+		// foo{} /               bar{}
 	case n.VectorMatching.Card == promParser.CardOneToOne:
+		rhs := walkNode(expr, n.RHS)
 		for _, s = range walkNode(expr, n.LHS) {
 			if n.VectorMatching.On {
 				s.FixedLabels = true
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
-				s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.MatchingLabels...)
-				for _, name := range n.VectorMatching.MatchingLabels {
-					delete(s.ExcludeReason, name)
-				}
+				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 				s.ExcludeReason = setInMap(
 					s.ExcludeReason,
 					"",
@@ -596,9 +629,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					},
 				)
 			} else {
-				s.IncludedLabels = removeFromSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
-				s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, n.VectorMatching.MatchingLabels...)
-				s.ExcludedLabels = appendToSlice(s.ExcludedLabels, n.VectorMatching.MatchingLabels...)
+				s = excludeLabel(s, n.VectorMatching.MatchingLabels...)
 				for _, name := range n.VectorMatching.MatchingLabels {
 					s.ExcludeReason = setInMap(
 						s.ExcludeReason,
@@ -622,61 +653,54 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
+			s.Joins = append(s.Joins, rhs...)
+			s.IsConditional = n.Op.IsComparisonOperator()
 			src = append(src, s)
 		}
 
 		// foo{} + on(...)       group_left(...) bar{}
 		// foo{} + ignoring(...) group_left(...) bar{}
 	case n.VectorMatching.Card == promParser.CardOneToMany:
+		lhs := walkNode(expr, n.LHS)
 		for _, s = range walkNode(expr, n.RHS) {
-			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
+			s = includeLabel(s, n.VectorMatching.Include...)
 			if n.VectorMatching.On {
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
-				for _, name := range n.VectorMatching.MatchingLabels {
-					delete(s.ExcludeReason, name)
-				}
-			}
-			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
-			for _, name := range n.VectorMatching.Include {
-				delete(s.ExcludeReason, name)
+				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 			}
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
+			s.Joins = append(s.Joins, lhs...)
+			s.IsConditional = n.Op.IsComparisonOperator()
 			src = append(src, s)
 		}
 
 		// foo{} + on(...)       group_right(...) bar{}
 		// foo{} + ignoring(...) group_right(...) bar{}
 	case n.VectorMatching.Card == promParser.CardManyToOne:
+		rhs := walkNode(expr, n.RHS)
 		for _, s = range walkNode(expr, n.LHS) {
-			s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.Include...)
+			s = includeLabel(s, n.VectorMatching.Include...)
 			if n.VectorMatching.On {
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
-				for _, name := range n.VectorMatching.MatchingLabels {
-					delete(s.ExcludeReason, name)
-				}
-			}
-			s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, n.VectorMatching.Include...)
-			for _, name := range n.VectorMatching.Include {
-				delete(s.ExcludeReason, name)
+				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 			}
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
+			s.Joins = append(s.Joins, rhs...)
+			s.IsConditional = n.Op.IsComparisonOperator()
 			src = append(src, s)
 		}
 
 		// foo{} and on(...)       bar{}
 		// foo{} and ignoring(...) bar{}
+		// foo{} unless bar{}
 	case n.VectorMatching.Card == promParser.CardManyToMany:
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
+		rhs := walkNode(expr, n.RHS)
 		for _, s = range walkNode(expr, n.LHS) {
 			if n.VectorMatching.On {
-				s.IncludedLabels = appendToSlice(s.IncludedLabels, n.VectorMatching.MatchingLabels...)
-				for _, name := range n.VectorMatching.MatchingLabels {
-					delete(s.ExcludeReason, name)
-				}
+				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 			}
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
@@ -684,10 +708,16 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if !s.AlwaysReturns {
 				lhsCanBeEmpty = true
 			}
+			switch {
+			case n.Op == promParser.LUNLESS:
+				s.Unless = append(s.Unless, rhs...)
+			case n.Op != promParser.LOR:
+				s.Joins = append(s.Joins, rhs...)
+			}
 			src = append(src, s)
 		}
 		if n.Op == promParser.LOR {
-			for _, s = range walkNode(expr, n.RHS) {
+			for _, s = range rhs {
 				if s.Operation == "" {
 					s.Operation = n.VectorMatching.Card.String()
 				}

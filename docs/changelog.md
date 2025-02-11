@@ -7,6 +7,13 @@
 - Added `names` option to the `parser` block, which controls how does Prometheus validates
   label names.
 
+### Fixed
+
+- Improved the logic of [promql/series](checks/promql/series.md) check to skip checks on some selectors
+  which absence might be expected. For example using `foo unless bar` will now only have `foo`
+  tested while `bar` is ignored by this check. This is because the query implies that `bar`
+  might be present or missing and depending on that `foo` is evaluated.
+
 ## v0.70.0
 
 ### Added
