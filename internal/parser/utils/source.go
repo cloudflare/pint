@@ -30,7 +30,7 @@ type ExcludedLabel struct {
 type Source struct {
 	Joins            []Source // Any other sources this source joins with.
 	Unless           []Source // Any other sources this source is suppressed by.
-	Selectors        []*promParser.VectorSelector
+	Selector         *promParser.VectorSelector
 	Call             *promParser.Call
 	ExcludeReason    map[string]ExcludedLabel // Reason why a label was excluded
 	Operation        string
@@ -115,7 +115,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.VectorSelector:
 		s.Type = SelectorSource
 		s.Returns = promParser.ValueTypeVector
-		s.Selectors = append(s.Selectors, n)
+		s.Selector = n
 		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, n)...)
 		src = append(src, s)
 
@@ -182,32 +182,25 @@ func setInMap(dst map[string]ExcludedLabel, key string, val ExcludedLabel) map[s
 
 var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
 
-func labelsFromSelectors(matches []labels.MatchType, selectors ...*promParser.VectorSelector) (names []string) {
+func labelsFromSelectors(matches []labels.MatchType, selector *promParser.VectorSelector) (names []string) {
 	nameCount := map[string]int{}
 	var ok bool
-	for _, selector := range selectors {
-		// Any label used in positive filters is gurnateed to be present.
-		for _, lm := range selector.LabelMatchers {
-			if lm.Name == labels.MetricName {
-				continue
-			}
-
-			if !slices.Contains(matches, lm.Type) {
-				continue
-			}
-
-			names = appendToSlice(names, lm.Name)
-
-			if _, ok = nameCount[lm.Name]; !ok {
-				nameCount[lm.Name] = 0
-			}
-			nameCount[lm.Name]++
+	// Any label used in positive filters is gurnateed to be present.
+	for _, lm := range selector.LabelMatchers {
+		if lm.Name == labels.MetricName {
+			continue
 		}
-	}
-	for name, cnt := range nameCount {
-		if cnt != len(selectors) {
-			names = removeFromSlice(names, name)
+
+		if !slices.Contains(matches, lm.Type) {
+			continue
 		}
+
+		names = appendToSlice(names, lm.Name)
+
+		if _, ok = nameCount[lm.Name]; !ok {
+			nameCount[lm.Name] = 0
+		}
+		nameCount[lm.Name]++
 	}
 	return names
 }
@@ -362,29 +355,29 @@ func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
 	case "abs", "sgn", "acos", "acosh", "asin", "asinh", "atan", "atanh", "cos", "cosh", "sin", "sinh", "tan", "tanh":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "ceil", "floor", "round":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "changes", "resets":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "clamp", "clamp_max", "clamp_min":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "absent", "absent_over_time":
 		s.Returns = promParser.ValueTypeVector
 		s.FixedLabels = true
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
-		for _, name := range labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, s.Selectors...) {
+		for _, name := range labelsFromSelectors([]labels.MatchType{labels.MatchEqual}, s.Selector) {
 			s = includeLabel(s, name)
 			s = guaranteeLabel(s, name)
 		}
@@ -405,7 +398,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "days_in_month", "day_of_month", "day_of_week", "day_of_year", "hour", "minute", "month", "year":
 		s.Returns = promParser.ValueTypeVector
@@ -426,33 +419,33 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				},
 			)
 		} else {
-			s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+			s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 		}
 
 	case "deg", "rad", "ln", "log10", "log2", "sqrt", "exp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "delta", "idelta", "increase", "deriv", "irate", "rate":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "histogram_avg", "histogram_count", "histogram_sum", "histogram_stddev", "histogram_stdvar", "histogram_fraction", "histogram_quantile":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "holt_winters", "predict_linear":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "label_replace", "label_join":
 		// One label added to the results.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 		s = guaranteeLabel(s, s.Call.Args[1].(*promParser.StringLiteral).Val)
 
 	case "pi":
@@ -507,7 +500,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "timestamp":
 		// No change to labels.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selectors...)...)
+		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
 
 	case "vector":
 		s.Returns = promParser.ValueTypeVector

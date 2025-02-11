@@ -783,21 +783,21 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 	}
 	for _, ls := range sources {
 		if !hasVectorFallback {
-			for _, s := range ls.Selectors {
-				selectors = append(selectors, selectorWithoutOffset(s))
+			if ls.Selector != nil {
+				selectors = append(selectors, selectorWithoutOffset(ls.Selector))
 			}
 		}
 		for _, js := range ls.Joins {
-			for _, s := range js.Selectors {
-				selectors = append(selectors, selectorWithoutOffset(s))
+			if js.Selector != nil {
+				selectors = append(selectors, selectorWithoutOffset(js.Selector))
 			}
 		}
 		for _, us := range ls.Unless {
 			if !us.IsConditional {
 				continue
 			}
-			for _, s := range us.Selectors {
-				selectors = append(selectors, selectorWithoutOffset(s))
+			if us.Selector != nil {
+				selectors = append(selectors, selectorWithoutOffset(us.Selector))
 			}
 		}
 	}

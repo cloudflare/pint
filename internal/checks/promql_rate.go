@@ -157,8 +157,8 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 							if src.Type != utils.AggregateSource {
 								continue
 							}
-							for _, vs := range src.Selectors {
-								metadata, err := c.prom.Metadata(ctx, vs.Name)
+							if src.Selector != nil {
+								metadata, err := c.prom.Metadata(ctx, src.Selector.Name)
 								if err != nil {
 									if errors.Is(err, promapi.ErrUnsupported) {
 										continue
@@ -186,7 +186,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 								}
 								problems = append(problems, exprProblem{
 									text: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
-										src.Operation, node.Expr, src.Operation, vs),
+										src.Operation, node.Expr, src.Operation, src.Selector),
 									details: fmt.Sprintf(
 										"You can only calculate `rate()` directly from a counter metric. "+
 											"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
