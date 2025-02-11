@@ -31,10 +31,7 @@ jobs:
       - name: Check for local changes
         run: git diff --exit-code
 
-      # Codecov reporting is unreliable.
-      # Re-run report 3 times to have a better
-      # chance of success.
-      - name: Report code coverage (1)
+      - name: Report code coverage
         uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3 # v5.3.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -43,19 +40,3 @@ jobs:
           handle_no_reports_found: true
         continue-on-error: true
 
-      - name: Report code coverage (2)
-        uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3 # v5.3.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./.cover/coverage.out
-          fail_ci_if_error: true
-          handle_no_reports_found: true
-        continue-on-error: true
-
-      - name: Report code coverage (3)
-        uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3 # v5.3.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./.cover/coverage.out
-          fail_ci_if_error: true
-          handle_no_reports_found: true

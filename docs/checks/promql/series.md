@@ -21,6 +21,10 @@ to determine why, by checking if:
 - `my_metric` has any series with `foo` label
 - `my_metric` has any series matching `foo="bar"`
 
+## Ignored cases
+
+### vector() fallback
+
 Metrics that are wrapped in `... or vector(0)` won't be checked, since
 the intention of adding `or vector(0)` is to provide a fallback value
 when there are no matching time series.
@@ -30,6 +34,17 @@ Example:
 - alert: Foo
   expr: sum(my_metric or vector(0)) > 1
 ```
+
+### foo unless bar
+
+In a query using `foo unless bar` only `foo` selector will be tested, since
+this query implies that the presence of `bar` is not guaranteed.
+`bar` is only tested for being present and so it's likely that it might be missing.
+
+Note that using `foo unless bar > 5` doesn't follow the same pattern and will have
+both `foo` and `bar` tested by this check
+Having `bar > 5` means it's assumed to be always present as we're testing it's value,
+rather than it's existence.
 
 ## Common problems
 

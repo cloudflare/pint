@@ -443,7 +443,7 @@ func checkQueryLabels(query, labelName, labelValue string, src []utils.Source) (
 					if s.IsDead {
 						continue
 					}
-					if s.FixedLabels && !slices.Contains(s.IncludedLabels, v[1]) {
+					if s.FixedLabels && !slices.Contains(s.IncludedLabels, v[1]) && !slices.Contains(s.GuaranteedLabels, v[1]) {
 						problems = append(problems, textForProblem(query, v[1], "", s, Bug))
 						goto NEXT
 					}

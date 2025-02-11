@@ -4234,6 +4234,45 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "foo unless bar",
+			content:     "- record: foo\n  expr: foo unless bar\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(foo)"},
+					},
+					resp: respondWithSingleInstantVector(),
+				},
+			},
+		},
+		{
+			description: "foo unless bar > 5",
+			content:     "- record: foo\n  expr: foo unless bar > 5\n",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(foo)"},
+					},
+					resp: respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(bar)"},
+					},
+					resp: respondWithSingleInstantVector(),
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
