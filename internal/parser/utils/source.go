@@ -183,6 +183,9 @@ func setInMap(dst map[string]ExcludedLabel, key string, val ExcludedLabel) map[s
 var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
 
 func labelsFromSelectors(matches []labels.MatchType, selector *promParser.VectorSelector) (names []string) {
+	if selector == nil {
+		return nil
+	}
 	nameCount := map[string]int{}
 	var ok bool
 	// Any label used in positive filters is gurnateed to be present.

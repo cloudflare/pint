@@ -2533,6 +2533,155 @@ or
 				},
 			},
 		},
+		{
+			expr: `
+(rate(metric2[5m]) or vector(0)) +
+(rate(metric1[5m]) or vector(1)) +
+(rate(metric3{log_name="samplerd"}[5m]) or vector(2)) > 0
+`,
+			output: []utils.Source{
+				{
+					Type:          utils.FuncSource,
+					Operation:     "rate",
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "metric2", 7),
+					Call:          mustParse[*promParser.Call](t, "rate(metric2[5m])", 2),
+					IsConditional: true,
+					Joins: []utils.Source{
+						{
+							Type:      utils.FuncSource,
+							Operation: "rate",
+							Returns:   promParser.ValueTypeVector,
+							Selector:  mustParse[*promParser.VectorSelector](t, "metric1", 42),
+							Call:      mustParse[*promParser.Call](t, "rate(metric1[5m])", 37),
+						},
+						{
+							Type:            utils.FuncSource,
+							Returns:         promParser.ValueTypeVector,
+							Operation:       "vector",
+							AlwaysReturns:   true,
+							ReturnedNumbers: []float64{1},
+							FixedLabels:     true,
+							Call:            mustParse[*promParser.Call](t, "vector(1)", 58),
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Calling `vector()` will return a vector value with no labels.",
+									Fragment: "vector(1)",
+								},
+							},
+						},
+						{
+							Type:             utils.FuncSource,
+							Operation:        "rate",
+							Returns:          promParser.ValueTypeVector,
+							Selector:         mustParse[*promParser.VectorSelector](t, `metric3{log_name="samplerd"}`, 77),
+							Call:             mustParse[*promParser.Call](t, `rate(metric3{log_name="samplerd"}[5m])`, 72),
+							GuaranteedLabels: []string{"log_name"},
+						},
+						{
+							Type:            utils.FuncSource,
+							Returns:         promParser.ValueTypeVector,
+							Operation:       "vector",
+							AlwaysReturns:   true,
+							ReturnedNumbers: []float64{2},
+							FixedLabels:     true,
+							Call:            mustParse[*promParser.Call](t, "vector(2)", 114),
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Calling `vector()` will return a vector value with no labels.",
+									Fragment: "vector(2)",
+								},
+							},
+						},
+					},
+				},
+				{
+					Type:            utils.FuncSource,
+					Returns:         promParser.ValueTypeVector,
+					Operation:       "vector",
+					AlwaysReturns:   true,
+					ReturnedNumbers: []float64{0},
+					FixedLabels:     true,
+					Call:            mustParse[*promParser.Call](t, "vector(0)", 23),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(0)",
+						},
+					},
+					IsConditional: true,
+					IsDead:        true,
+					Joins: []utils.Source{
+						{
+							Type:      utils.FuncSource,
+							Operation: "rate",
+							Returns:   promParser.ValueTypeVector,
+							Selector:  mustParse[*promParser.VectorSelector](t, "metric1", 42),
+							Call:      mustParse[*promParser.Call](t, "rate(metric1[5m])", 37),
+						},
+						{
+							Type:            utils.FuncSource,
+							Returns:         promParser.ValueTypeVector,
+							Operation:       "vector",
+							AlwaysReturns:   true,
+							ReturnedNumbers: []float64{1},
+							FixedLabels:     true,
+							Call:            mustParse[*promParser.Call](t, "vector(1)", 58),
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Calling `vector()` will return a vector value with no labels.",
+									Fragment: "vector(1)",
+								},
+							},
+						},
+						{
+							Type:             utils.FuncSource,
+							Operation:        "rate",
+							Returns:          promParser.ValueTypeVector,
+							Selector:         mustParse[*promParser.VectorSelector](t, `metric3{log_name="samplerd"}`, 77),
+							Call:             mustParse[*promParser.Call](t, `rate(metric3{log_name="samplerd"}[5m])`, 72),
+							GuaranteedLabels: []string{"log_name"},
+						},
+						{
+							Type:            utils.FuncSource,
+							Returns:         promParser.ValueTypeVector,
+							Operation:       "vector",
+							AlwaysReturns:   true,
+							ReturnedNumbers: []float64{2},
+							FixedLabels:     true,
+							Call:            mustParse[*promParser.Call](t, "vector(2)", 114),
+							ExcludeReason: map[string]utils.ExcludedLabel{
+								"": {
+									Reason:   "Calling `vector()` will return a vector value with no labels.",
+									Fragment: "vector(2)",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")`,
+			output: []utils.Source{
+				{
+					Type:             utils.FuncSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        "label_replace",
+					AlwaysReturns:    true,
+					FixedLabels:      true,
+					ReturnedNumbers:  []float64{1},
+					GuaranteedLabels: []string{"nexthop_tag"},
+					Call:             mustParse[*promParser.Call](t, `label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")`, 0),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(1)",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

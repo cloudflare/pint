@@ -3896,10 +3896,43 @@ func TestSeriesCheck(t *testing.T) {
 `,
 			checker:    newSeriesCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  10,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText("promql/series(metric1)"),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  10,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText("promql/series(metric2)"),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 6,
+							Last:  10,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedDisableText("promql/series(metric3)"),
+						Details:  checks.SeriesCheckUnusedDisableComment,
+						Severity: checks.Warning,
+					},
+				}
+			},
 		},
 		{
-			description: "unused rule/set comment",
+			description: "unused rule/set comment or vector",
 			content: `
 - alert : Foo
   # pint rule/set promql/series(mymetric) ignore/label-value action
@@ -3916,11 +3949,52 @@ func TestSeriesCheck(t *testing.T) {
 							Last:  5,
 						},
 						Reporter: checks.SeriesCheckName,
+						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value action"),
+						Details:  checks.SeriesCheckUnusedRuleSetComment,
+						Severity: checks.Warning,
+					},
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.SeriesCheckName,
 						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
 						Details:  checks.SeriesCheckUnusedRuleSetComment,
 						Severity: checks.Warning,
 					},
 				}
+			},
+		},
+		{
+			description: "unused rule/set comment",
+			content: `
+- alert : Foo
+  # pint rule/set promql/series(mymetric) ignore/label-value action
+  # pint rule/set promql/series(mymetric) ignore/label-value type
+  expr: (rate(mymetric{action="failure"}[2m])) > 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			problems: func(_ string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
+						Details:  checks.SeriesCheckUnusedRuleSetComment,
+						Severity: checks.Warning,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireQueryPath},
+					resp:  respondWithSingleInstantVector(),
+				},
 			},
 		},
 		{

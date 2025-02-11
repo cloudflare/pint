@@ -89,8 +89,8 @@ To fully validate your changes it's best to first deploy the rules that generate
 	SeriesCheckCommonProblemDetails = `[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.`
 	SeriesCheckMinAgeDetails        = `You have a comment that tells pint how long can a metric be missing before it warns you about it but this comment is not formatted correctly.
 [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#min-age) to see supported syntax.`
-	SeriesCheckUnusedDisableComment = "One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax."
-	SeriesCheckUnusedRuleSetComment = "One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets labels that are used in the rule query.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax."
+	SeriesCheckUnusedDisableComment = "One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax."
+	SeriesCheckUnusedRuleSetComment = "One of the `# pint rule/set promql/series` comments used in this rule doesn't have any effect. Make sure that the comment targets series and labels that are used in the rule query and are not already ignored.\n[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value) for docs about comment syntax."
 )
 
 func NewSeriesCheck(prom *promapi.FailoverGroup) SeriesCheck {
@@ -140,10 +140,10 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 	params := promapi.NewRelativeRange(settings.lookbackRangeDuration, settings.lookbackStepDuration)
 
-	selectors := utils.HasVectorSelector(expr.Query)
+	selectors := getNonFallbackSelectors(expr)
 
 	done := map[string]bool{}
-	for _, selector := range getNonFallbackSelectors(expr) {
+	for _, selector := range selectors {
 		if _, ok := done[selector.String()]; ok {
 			continue
 		}
@@ -772,24 +772,29 @@ func selectorWithoutOffset(vs *promParser.VectorSelector) *promParser.VectorSele
 	return s
 }
 
-func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.VectorSelector) {
-	var hasVectorFallback bool
-	sources := utils.LabelsSource(n.Value.Value, n.Query.Expr)
-	for _, ls := range sources {
+func sourceHasFallback(src []utils.Source) bool {
+	for _, ls := range src {
 		if ls.AlwaysReturns && len(ls.ReturnedNumbers) > 0 {
-			hasVectorFallback = true
-			break
+			return true
 		}
 	}
+	return false
+}
+
+func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.VectorSelector) {
+	sources := utils.LabelsSource(n.Value.Value, n.Query.Expr)
+	hasVectorFallback := sourceHasFallback(sources)
 	for _, ls := range sources {
 		if !hasVectorFallback {
 			if ls.Selector != nil {
 				selectors = append(selectors, selectorWithoutOffset(ls.Selector))
 			}
 		}
-		for _, js := range ls.Joins {
-			if js.Selector != nil {
-				selectors = append(selectors, selectorWithoutOffset(js.Selector))
+		if !sourceHasFallback(ls.Joins) {
+			for _, js := range ls.Joins {
+				if js.Selector != nil {
+					selectors = append(selectors, selectorWithoutOffset(js.Selector))
+				}
 			}
 		}
 		for _, us := range ls.Unless {
@@ -880,7 +885,7 @@ func parseRuleSet(s string) (matcher, key, value string) {
 	return matcher, key, value
 }
 
-func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []promParser.VectorSelector) (orhpaned []comments.Disable) {
+func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []*promParser.VectorSelector) (orhpaned []comments.Disable) {
 	var promNames, promTags []string
 	if val := ctx.Value(promapi.AllPrometheusServers); val != nil {
 		for _, server := range val.([]*promapi.FailoverGroup) {
@@ -904,7 +909,7 @@ func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []
 			continue
 		}
 		for _, selector := range selectors {
-			isMatch, ok := matchSelectorToMetric(&selector, match)
+			isMatch, ok := matchSelectorToMetric(selector, match)
 			if !ok {
 				continue
 			}
@@ -921,13 +926,13 @@ func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []
 	return orhpaned
 }
 
-func orphanedRuleSetComments(rule parser.Rule, selectors []promParser.VectorSelector) (orhpaned []comments.RuleSet) {
+func orphanedRuleSetComments(rule parser.Rule, selectors []*promParser.VectorSelector) (orhpaned []comments.RuleSet) {
 	for _, ruleSet := range comments.Only[comments.RuleSet](rule.Comments, comments.RuleSetType) {
 		var wasUsed bool
 		matcher, key, value := parseRuleSet(ruleSet.Value)
 		for _, selector := range selectors {
 			if matcher != "" {
-				isMatch, _ := matchSelectorToMetric(&selector, matcher)
+				isMatch, _ := matchSelectorToMetric(selector, matcher)
 				if !isMatch {
 					continue
 				}
