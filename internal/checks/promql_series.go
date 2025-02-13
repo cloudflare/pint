@@ -774,7 +774,16 @@ func selectorWithoutOffset(vs *promParser.VectorSelector) *promParser.VectorSele
 
 func sourceHasFallback(src []utils.Source) bool {
 	for _, ls := range src {
-		if ls.AlwaysReturns && len(ls.ReturnedNumbers) > 0 {
+		if ls.AlwaysReturns {
+			return true
+		}
+	}
+	return false
+}
+
+func joinHasFallback(src []utils.Join) bool {
+	for _, ls := range src {
+		if ls.Src.AlwaysReturns {
 			return true
 		}
 	}
@@ -790,19 +799,19 @@ func getNonFallbackSelectors(n parser.PromQLExpr) (selectors []*promParser.Vecto
 				selectors = append(selectors, selectorWithoutOffset(ls.Selector))
 			}
 		}
-		if !sourceHasFallback(ls.Joins) {
+		if !joinHasFallback(ls.Joins) {
 			for _, js := range ls.Joins {
-				if js.Selector != nil {
-					selectors = append(selectors, selectorWithoutOffset(js.Selector))
+				if js.Src.Selector != nil {
+					selectors = append(selectors, selectorWithoutOffset(js.Src.Selector))
 				}
 			}
 		}
 		for _, us := range ls.Unless {
-			if !us.IsConditional {
+			if !us.Src.IsConditional {
 				continue
 			}
-			if us.Selector != nil {
-				selectors = append(selectors, selectorWithoutOffset(us.Selector))
+			if us.Src.Selector != nil {
+				selectors = append(selectors, selectorWithoutOffset(us.Src.Selector))
 			}
 		}
 	}

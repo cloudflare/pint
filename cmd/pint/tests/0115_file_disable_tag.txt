@@ -13,7 +13,7 @@ level=DEBUG msg="Starting query workers" name=prom uri=http://127.0.0.1:7103 wor
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=1
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=colo:test1 lines=6-8 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","alerts/external_labels(prom)","promql/counter(prom)","alerts/absent(prom)"] path=rules/0001.yml rule=colo:test1
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","alerts/external_labels(prom)","promql/counter(prom)","alerts/absent(prom)"] path=rules/0001.yml rule=colo:test1
 level=DEBUG msg="Scheduling Prometheus metrics metadata query" uri=http://127.0.0.1:7103 metric=foo
 level=DEBUG msg="Getting prometheus metrics metadata" uri=http://127.0.0.1:7103 metric=foo
 level=ERROR msg="Query returned an error" err="failed to query Prometheus metrics metadata: Get \"http://127.0.0.1:7103/api/v1/metadata?metric=foo\": dial tcp 127.0.0.1:7103: connect: connection refused" uri=http://127.0.0.1:7103 query=foo

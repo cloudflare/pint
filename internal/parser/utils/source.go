@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	"github.com/prometheus/prometheus/promql/parser/posrange"
 )
+
+var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
 
 type SourceType int
 
@@ -27,23 +30,56 @@ type ExcludedLabel struct {
 	Fragment string
 }
 
+type Join struct {
+	Src Source
+}
+
 type Source struct {
-	Joins            []Source // Any other sources this source joins with.
-	Unless           []Source // Any other sources this source is suppressed by.
-	Selector         *promParser.VectorSelector
-	Call             *promParser.Call
-	ExcludeReason    map[string]ExcludedLabel // Reason why a label was excluded
+	Selector         *promParser.VectorSelector // Vector selector used for this source.
+	Call             *promParser.Call           // Most outer call used inside this source.
+	Aggregation      *promParser.AggregateExpr  // Most outer aggregation expression used inside this source.
+	ExcludeReason    map[string]ExcludedLabel   // Reason why a label was excluded
 	Operation        string
+	IsDeadReason     string
 	Returns          promParser.ValueType
-	ReturnedNumbers  []float64 // If AlwaysReturns=true this is the number that's returned
-	IncludedLabels   []string  // Labels that are included by filters, they will be present if exist on source series (by).
-	ExcludedLabels   []string  // Labels guaranteed to be excluded from the results (without).
-	GuaranteedLabels []string  // Labels guaranteed to be present on the results (matchers).
+	Joins            []Join   // Any other sources this source joins with.
+	Unless           []Join   // Any other sources this source is suppressed by.
+	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
+	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
+	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
+	ReturnedNumber   float64  // If AlwaysReturns=true this is the number that's returned
 	Type             SourceType
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 	IsDead           bool // True if this source cannot be reached and is dead code.
 	AlwaysReturns    bool // True if this source always returns results.
 	IsConditional    bool // True if this source is guarded by 'foo > 5' or other condition.
+}
+
+func (s Source) Fragment(expr string) string {
+	switch {
+	case s.Type == FuncSource && s.Call != nil:
+		return getQueryFragment(expr, s.Call.PosRange)
+	case s.Call != nil:
+		return getQueryFragment(expr, s.Call.PosRange)
+	case s.Type == AggregateSource && s.Aggregation != nil:
+		return getQueryFragment(expr, s.Aggregation.PosRange)
+	case s.Selector != nil:
+		return getQueryFragment(expr, s.Selector.PosRange)
+	default:
+		return ""
+	}
+}
+
+type Visitor func(s Source)
+
+func (s Source) WalkSources(fn Visitor) {
+	fn(s)
+	for _, j := range s.Joins {
+		j.Src.WalkSources(fn)
+	}
+	for _, u := range s.Unless {
+		u.Src.WalkSources(fn)
+	}
 }
 
 func LabelsSource(expr string, node promParser.Node) (src []Source) {
@@ -71,7 +107,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.NumberLiteral:
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
-		s.ReturnedNumbers = append(s.ReturnedNumbers, n.Val)
+		s.ReturnedNumber = n.Val
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
@@ -165,6 +201,17 @@ func guaranteeLabel(s Source, names ...string) Source {
 	return s
 }
 
+func restrictGuaranteedLabels(s Source, names []string) Source {
+	todo := []string{}
+	for _, name := range s.GuaranteedLabels {
+		if !slices.Contains(names, name) {
+			todo = append(todo, name)
+		}
+	}
+	s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, todo...)
+	return s
+}
+
 func excludeLabel(s Source, names ...string) Source {
 	s.ExcludedLabels = appendToSlice(s.ExcludedLabels, names...)
 	s.IncludedLabels = removeFromSlice(s.IncludedLabels, names...)
@@ -179,8 +226,6 @@ func setInMap(dst map[string]ExcludedLabel, key string, val ExcludedLabel) map[s
 	dst[key] = val
 	return dst
 }
-
-var guaranteedLabelsMatches = []labels.MatchType{labels.MatchEqual, labels.MatchRegexp}
 
 func labelsFromSelectors(matches []labels.MatchType, selector *promParser.VectorSelector) (names []string) {
 	if selector == nil {
@@ -212,51 +257,61 @@ func getQueryFragment(expr string, pos posrange.PositionRange) string {
 	return expr[pos.Start:pos.End]
 }
 
+// FIXME Aggregations strip __name__.
 func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	var s Source
 	switch n.Op {
 	case promParser.SUM:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "sum"
 			src = append(src, s)
 		}
 	case promParser.MIN:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "min"
 			src = append(src, s)
 		}
 	case promParser.MAX:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "max"
 			src = append(src, s)
 		}
 	case promParser.AVG:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "avg"
 			src = append(src, s)
 		}
 	case promParser.GROUP:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "group"
 			src = append(src, s)
 		}
 	case promParser.STDDEV:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "stddev"
 			src = append(src, s)
 		}
 	case promParser.STDVAR:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "stdvar"
 			src = append(src, s)
 		}
 	case promParser.COUNT:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "count"
 			src = append(src, s)
 		}
 	case promParser.COUNT_VALUES:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "count_values"
 			// Param is the label to store the count value in.
 			s = includeLabel(s, n.Param.(*promParser.StringLiteral).Val)
@@ -265,18 +320,21 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		}
 	case promParser.QUANTILE:
 		for _, s = range parseAggregation(expr, n) {
+			s.Aggregation = n
 			s.Operation = "quantile"
 			src = append(src, s)
 		}
 	case promParser.TOPK:
 		for _, s = range walkNode(expr, n.Expr) {
 			s.Type = AggregateSource
+			s.Aggregation = n
 			s.Operation = "topk"
 			src = append(src, s)
 		}
 	case promParser.BOTTOMK:
 		for _, s = range walkNode(expr, n.Expr) {
 			s.Type = AggregateSource
+			s.Aggregation = n
 			s.Operation = "bottomk"
 			src = append(src, s)
 		}
@@ -337,17 +395,12 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 						},
 					)
 				}
-				for _, name := range s.GuaranteedLabels {
-					if !slices.Contains(n.Grouping, name) {
-						s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, name)
-					}
-				}
+				s = restrictGuaranteedLabels(s, n.Grouping)
 			}
 			s.FixedLabels = true
 		}
 		s.Type = AggregateSource
 		s.Returns = promParser.ValueTypeVector
-		s.Call = nil
 		src = append(src, s)
 	}
 	return src
@@ -512,7 +565,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.FixedLabels = true
 		s.AlwaysReturns = true
 		if v, ok := n.Args[0].(*promParser.NumberLiteral); ok {
-			s.ReturnedNumbers = append(s.ReturnedNumbers, v.Val)
+			s.ReturnedNumber = v.Val
 		}
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
@@ -581,11 +634,12 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				switch {
 				case ls.AlwaysReturns && rs.AlwaysReturns:
 					// Both sides always return something
-					for i, lv := range ls.ReturnedNumbers {
-						for _, rv := range rs.ReturnedNumbers {
-							ls.ReturnedNumbers[i], ls.IsDead = calculateStaticReturn(lv, rv, n.Op, ls.IsDead)
-						}
-					}
+					ls.ReturnedNumber, ls.IsDead, ls.IsDeadReason = calculateStaticReturn(
+						expr,
+						ls, rs,
+						n.Op,
+						ls.IsDead,
+					)
 					src = append(src, ls)
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
 					// Use labels from LHS
@@ -649,30 +703,52 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
-			s.Joins = append(s.Joins, rhs...)
-			s.IsConditional = n.Op.IsComparisonOperator()
-			src = append(src, s)
-		}
-
-		// foo{} + on(...)       group_left(...) bar{}
-		// foo{} + ignoring(...) group_left(...) bar{}
-	case n.VectorMatching.Card == promParser.CardOneToMany:
-		lhs := walkNode(expr, n.LHS)
-		for _, s = range walkNode(expr, n.RHS) {
-			s = includeLabel(s, n.VectorMatching.Include...)
-			if n.VectorMatching.On {
-				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
+			for _, rs := range rhs {
+				if ok, s := canJoin(s, rs, n.VectorMatching); !ok {
+					rs.IsDead = true
+					rs.IsDeadReason = s
+				}
+				s.Joins = append(s.Joins, Join{
+					Src: rs,
+				})
 			}
-			if s.Operation == "" {
-				s.Operation = n.VectorMatching.Card.String()
-			}
-			s.Joins = append(s.Joins, lhs...)
 			s.IsConditional = n.Op.IsComparisonOperator()
 			src = append(src, s)
 		}
 
 		// foo{} + on(...)       group_right(...) bar{}
 		// foo{} + ignoring(...) group_right(...) bar{}
+	case n.VectorMatching.Card == promParser.CardOneToMany:
+		lhs := walkNode(expr, n.LHS)
+		for _, s = range walkNode(expr, n.RHS) {
+			s = includeLabel(s, n.VectorMatching.Include...)
+			// If we have:
+			// foo * on(instance) group_left(a,b) bar{x="y"}
+			// then only group_left() labels will be included.
+			if n.VectorMatching.On {
+				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
+			}
+			if s.Operation == "" {
+				s.Operation = n.VectorMatching.Card.String()
+			}
+			for _, ls := range lhs {
+				if n.VectorMatching.On {
+					ls = restrictGuaranteedLabels(ls, n.VectorMatching.Include)
+				}
+				if ok, s := canJoin(s, ls, n.VectorMatching); !ok {
+					ls.IsDead = true
+					ls.IsDeadReason = s
+				}
+				s.Joins = append(s.Joins, Join{
+					Src: ls,
+				})
+			}
+			s.IsConditional = n.Op.IsComparisonOperator()
+			src = append(src, s)
+		}
+
+		// foo{} + on(...)       group_left(...) bar{}
+		// foo{} + ignoring(...) group_left(...) bar{}
 	case n.VectorMatching.Card == promParser.CardManyToOne:
 		rhs := walkNode(expr, n.RHS)
 		for _, s = range walkNode(expr, n.LHS) {
@@ -683,7 +759,18 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
-			s.Joins = append(s.Joins, rhs...)
+			for _, rs := range rhs {
+				if n.VectorMatching.On {
+					rs = restrictGuaranteedLabels(rs, n.VectorMatching.Include)
+				}
+				if ok, s := canJoin(s, rs, n.VectorMatching); !ok {
+					rs.IsDead = true
+					rs.IsDeadReason = s
+				}
+				s.Joins = append(s.Joins, Join{
+					Src: rs,
+				})
+			}
 			s.IsConditional = n.Op.IsComparisonOperator()
 			src = append(src, s)
 		}
@@ -704,11 +791,26 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if !s.AlwaysReturns {
 				lhsCanBeEmpty = true
 			}
-			switch {
-			case n.Op == promParser.LUNLESS:
-				s.Unless = append(s.Unless, rhs...)
-			case n.Op != promParser.LOR:
-				s.Joins = append(s.Joins, rhs...)
+			for _, rs := range rhs {
+				if ok, s := canJoin(s, rs, n.VectorMatching); !ok {
+					rs.IsDead = true
+					rs.IsDeadReason = s
+				}
+				switch {
+				case n.Op == promParser.LUNLESS:
+					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns {
+						s.IsDead = true
+						s.IsDeadReason = "this query will never return anything because the `unless` query always returns something"
+					}
+					s.Unless = append(s.Unless, Join{
+						Src: rs,
+					})
+				case n.Op != promParser.LOR:
+
+					s.Joins = append(s.Joins, Join{
+						Src: rs,
+					})
+				}
 			}
 			src = append(src, s)
 		}
@@ -720,6 +822,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				// If LHS can NOT be empty then RHS is dead code.
 				if !lhsCanBeEmpty {
 					s.IsDead = true
+					s.IsDeadReason = "the left hand side always returs something and so the right hand side is never used"
 				}
 				src = append(src, s)
 			}
@@ -728,44 +831,97 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	return src
 }
 
-func calculateStaticReturn(lv, rv float64, op promParser.ItemType, isDead bool) (float64, bool) {
+func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {
+	var side string
+	if vm.Card == promParser.CardOneToMany {
+		side = "left"
+	} else {
+		side = "right"
+	}
+
+	switch {
+	case vm.On && len(vm.MatchingLabels) == 0: // ls on() unless rs
+		return true, ""
+	case vm.On: // ls on(...) unless rs
+		for _, name := range vm.MatchingLabels {
+			if canHaveLabels(ls, name) && !canHaveLabels(rs, name) {
+				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`", side, name)
+			}
+		}
+	default: // ls unless rs
+		for _, name := range ls.GuaranteedLabels {
+			if canHaveLabels(ls, name) && !canHaveLabels(rs, name) {
+				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will", side, name)
+			}
+		}
+	}
+	return true, ""
+}
+
+func canHaveLabels(s Source, name string) bool {
+	if slices.Contains(s.ExcludedLabels, name) {
+		return false
+	}
+	if slices.Contains(s.IncludedLabels, name) {
+		return true
+	}
+	if slices.Contains(s.GuaranteedLabels, name) {
+		return true
+	}
+	return !s.FixedLabels
+}
+
+func ftos(v float64) string {
+	return strconv.FormatFloat(v, 'f', -1, 64)
+}
+
+func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, isDead bool) (float64, bool, string) {
+	lf := ls.Fragment(expr)
+	rf := rs.Fragment(expr)
+	var cmpPrefix string
+	if lf != "" && rf != "" {
+		cmpPrefix = fmt.Sprintf("`%s %s %s` always evaluates to", lf, op, rf)
+	} else {
+		cmpPrefix = "this query always evaluates to"
+	}
+	cmpSuffix := "which is not possible, so it will never return anything"
 	switch op {
 	case promParser.EQLC:
-		if lv != rv {
-			return lv, true
+		if ls.ReturnedNumber != rs.ReturnedNumber {
+			return ls.ReturnedNumber, true, fmt.Sprintf("%s `%s == %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix)
 		}
 	case promParser.NEQ:
-		if lv == rv {
-			return lv, true
+		if ls.ReturnedNumber == rs.ReturnedNumber {
+			return ls.ReturnedNumber, true, fmt.Sprintf("%s `%s != %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix)
 		}
 	case promParser.LTE:
-		if lv > rv {
-			return lv, true
+		if ls.ReturnedNumber > rs.ReturnedNumber {
+			return ls.ReturnedNumber, true, fmt.Sprintf("%s `%s <= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix)
 		}
 	case promParser.LSS:
-		if lv >= rv {
-			return lv, true
+		if ls.ReturnedNumber >= rs.ReturnedNumber {
+			return ls.ReturnedNumber, true, fmt.Sprintf("%s `%s < %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix)
 		}
 	case promParser.GTE:
-		if lv < rv {
-			return lv, true
+		if ls.ReturnedNumber < rs.ReturnedNumber {
+			return ls.ReturnedNumber, true, fmt.Sprintf("%s `%s >= %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix)
 		}
 	case promParser.GTR:
-		if lv <= rv {
-			return lv, true
+		if ls.ReturnedNumber <= rs.ReturnedNumber {
+			return ls.ReturnedNumber, true, fmt.Sprintf("%s `%s > %s` %s", cmpPrefix, ftos(ls.ReturnedNumber), ftos(rs.ReturnedNumber), cmpSuffix)
 		}
 	case promParser.ADD:
-		return lv + rv, isDead
+		return ls.ReturnedNumber + rs.ReturnedNumber, isDead, ""
 	case promParser.SUB:
-		return lv - rv, isDead
+		return ls.ReturnedNumber - rs.ReturnedNumber, isDead, ""
 	case promParser.MUL:
-		return lv * rv, isDead
+		return ls.ReturnedNumber * rs.ReturnedNumber, isDead, ""
 	case promParser.DIV:
-		return lv / rv, isDead
+		return ls.ReturnedNumber / rs.ReturnedNumber, isDead, ""
 	case promParser.MOD:
-		return math.Mod(lv, rv), isDead
+		return math.Mod(ls.ReturnedNumber, rs.ReturnedNumber), isDead, ""
 	case promParser.POW:
-		return math.Pow(lv, rv), isDead
+		return math.Pow(ls.ReturnedNumber, rs.ReturnedNumber), isDead, ""
 	}
-	return lv, isDead
+	return ls.ReturnedNumber, isDead, ""
 }

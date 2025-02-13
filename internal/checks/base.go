@@ -21,6 +21,7 @@ var (
 		LabelsConflictCheckName,
 		AggregationCheckName,
 		ComparisonCheckName,
+		ImpossibleCheckName,
 		FragileCheckName,
 		RangeQueryCheckName,
 		RateCheckName,

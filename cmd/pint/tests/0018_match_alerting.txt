@@ -11,9 +11,9 @@ level=DEBUG msg="Glob finder completed" count=2
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=colo:recording lines=1-2 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/0001.yml rule=colo:recording
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible"] path=rules/0001.yml rule=colo:recording
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=colo:alerting lines=4-5 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/0001.yml rule=colo:alerting
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/aggregate(job:true)"] path=rules/0001.yml rule=colo:alerting
 rules/0001.yml:5 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
  5 |   expr: sum(bar) without(job)
 
