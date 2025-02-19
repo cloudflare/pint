@@ -7,6 +7,7 @@
 - Added `names` option to the `parser` block, which controls how does Prometheus validates
   label names.
 - Added [promql/impossible](checks/promql/impossible.md) check.
+- Added `ignoreMatchingElsewhere` option to [promql/series](checks/promql/series.md) check.
 
 ### Fixed
 

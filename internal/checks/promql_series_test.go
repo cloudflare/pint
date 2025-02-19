@@ -4347,6 +4347,256 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "metric missing but found on others / ignoreMatchingElsewhere match",
+			content: `
+- record: foo
+  expr: sum(foo)
+`,
+			checker: newSeriesCheck,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					IgnoreMatchingElsewhere: []string{`{job="bar"}`},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			otherProms: func(uri string) []*promapi.FailoverGroup {
+				var proms []*promapi.FailoverGroup
+				for i := range 30 {
+					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				}
+				return proms
+			},
+			prometheus: newSimpleProm,
+			problems:   noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: `foo`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "instance1",
+								"job":      "foo",
+							}),
+							generateSample(map[string]string{
+								"instance": "instance2",
+								"job":      "foo",
+							}),
+							generateSample(map[string]string{
+								"instance": "instance3",
+								"job":      "bar",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "metric missing but found on others / ignoreMatchingElsewhere mismatch",
+			content: `
+- record: foo
+  expr: sum(foo)
+`,
+			checker: newSeriesCheck,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					IgnoreMatchingElsewhere: []string{`{job="bar"}`},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			otherProms: func(uri string) []*promapi.FailoverGroup {
+				var proms []*promapi.FailoverGroup
+				for i := range 30 {
+					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				}
+				return proms
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "foo", "1w"),
+						Details: fmt.Sprintf("`foo` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=foo)\n- [prom1](%s/other/graph?g0.expr=foo)\n- [prom2](%s/other/graph?g0.expr=foo)\n- [prom3](%s/other/graph?g0.expr=foo)\n- [prom4](%s/other/graph?g0.expr=foo)\n- [prom5](%s/other/graph?g0.expr=foo)\n- [prom6](%s/other/graph?g0.expr=foo)\n- [prom7](%s/other/graph?g0.expr=foo)\n- [prom8](%s/other/graph?g0.expr=foo)\n- [prom9](%s/other/graph?g0.expr=foo)\n- and 20 other server(s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n",
+							uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: `foo`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "instance1",
+								"job":      "foo",
+							}),
+							generateSample(map[string]string{
+								"instance": "instance2",
+								"job":      "foo",
+							}),
+							generateSample(map[string]string{
+								"instance": "instance3",
+								"job":      "bar1",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
+		{
+			description: "metric missing but found on others / ignoreMatchingElsewhere error",
+			content: `
+- record: foo
+  expr: sum(foo)
+`,
+			checker: newSeriesCheck,
+			ctx: func(ctx context.Context, _ string) context.Context {
+				s := checks.PromqlSeriesSettings{
+					IgnoreMatchingElsewhere: []string{`{job="bar"}`},
+				}
+				if err := s.Validate(); err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				return context.WithValue(ctx, checks.SettingsKey(checks.SeriesCheckName), &s)
+			},
+			otherProms: func(uri string) []*promapi.FailoverGroup {
+				var proms []*promapi.FailoverGroup
+				for i := range 30 {
+					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+				}
+				return proms
+			},
+			prometheus: newSimpleProm,
+			problems: func(uri string) []checks.Problem {
+				return []checks.Problem{
+					{
+						Lines: parser.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: checks.SeriesCheckName,
+						Text:     noMetricText("prom", uri, "foo", "1w"),
+						Details: fmt.Sprintf("`foo` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=foo)\n- [prom1](%s/other/graph?g0.expr=foo)\n- [prom2](%s/other/graph?g0.expr=foo)\n- [prom3](%s/other/graph?g0.expr=foo)\n- [prom4](%s/other/graph?g0.expr=foo)\n- [prom5](%s/other/graph?g0.expr=foo)\n- [prom6](%s/other/graph?g0.expr=foo)\n- [prom7](%s/other/graph?g0.expr=foo)\n- [prom8](%s/other/graph?g0.expr=foo)\n- [prom9](%s/other/graph?g0.expr=foo)\n- and 20 other server(s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n",
+							uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
+						Severity: checks.Bug,
+					},
+				}
+			},
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+						formCond{key: "query", value: `foo`},
+					},
+					resp: respondWithInternalError(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(foo)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }

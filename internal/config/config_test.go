@@ -2610,6 +2610,12 @@ func TestConfigErrors(t *testing.T) {
 			err:    `unknown unit "x" in duration "1x"`,
 		},
 		{
+			config: `check "promql/series" {
+  ignoreMatchingElsewhere = ["a b c"]
+}`,
+			err: `"a b c" is not a valid PromQL metric selector: 1:3: parse error: unexpected identifier "b"`,
+		},
+		{
 			config: `rule {
   link ".+++" {}
 }`,

@@ -156,11 +156,12 @@ Syntax:
 
 ```js
 check "promql/series" {
-  lookbackRange     = "7d"
-  lookbackStep      = "5m"
-  ignoreMetrics     = [ "(.*)", ... ]
-  ignoreLabelsValue = { "...": [ "...", ... ] }
-  fallbackTimeout   = "5m"
+  lookbackRange           = "7d"
+  lookbackStep            = "5m"
+  ignoreMetrics           = [ "(.*)", ... ]
+  ignoreMatchingElsewhere = [ "(.*)", ... ]
+  ignoreLabelsValue       = { "...": [ "...", ... ] }
+  fallbackTimeout         = "5m"
 }
 ```
 
@@ -178,6 +179,9 @@ check "promql/series" {
 - `ignoreMetrics` - list of regexp matchers, if a metric is missing from Prometheus
   but the name matches any of provided regexp matchers then pint will only report a
   warning, instead of a bug level report.
+- `ignoreMatchingElsewhere` - list of [metric selectors](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors), when `promql/series` validates if `foo` is present on Prometheus
+  `promA` but if finds it on another Prometheus (`promB`) and the time series found on `promB`
+  match any of the selector specified here, then pint won't report `foo` as missing.
 - `ignoreLabelsValue` - allows to configure a global list of label **names** for which pint
   should **NOT** report problems if there's a query that uses a **value** that does not exist.
   This can be also set per rule using `# pint rule/set promql/series ignore/label-value $labelName`
@@ -246,6 +250,36 @@ check "promql/series" {
 
 You can only use label matchers that would match the selector from the query itself, not from the time series
 the query would return. This whole logic applies only to the query, not to the results of it.
+
+Sometimes metrics come from sources that don't guarantee that metrics are always present, for example
+[pushgateway](https://github.com/prometheus/pushgateway) will only have metrics if they were pushed to it.
+If such metrics are missing everywhere we can't tell why, but if they are present on other Prometheus servers
+and they come from `{job="pushgateway"}` there, then that gives us signal that pushgateway is the source of this
+metric and so we can ignore them.
+Let's say we have a query using `my_service_errors_total{env="prod"}` and three Prometheus servers configured
+(`promA`, `promB`, `promC`). Both `promA` and `promC` do have this metric present with these labels:
+
+- `promA` - `my_service_errors_total{env="prod", job="pushgateway", instance="foo", reason="bad request"}`
+- `promC` - `my_service_errors_total{env="prod", job="pushgateway", instance="bar", reason="not found"}`
+
+but `promB` does have any time series for `my_service_errors_total` at all.
+We also have this configuration for pint:
+
+```js
+check "promql/series" {
+  ignoreMatchingElsewhere = {
+    "{job=\"pushgateway\"}"
+  }
+}
+```
+
+When pint checks validates the rule using this query it will runs `promql/series`
+three time - once for `promA`, once for `promB` and once for `promC`.
+When it runs on `promB` it doesn't find `my_service_errors_total{env="prod"}` present, so it checks
+`promA` and `promB` to tell you if it's present there. Since `promA` has `my_service_errors_total{env="prod"}`
+time series present pint will next check if these time series match any of the selectors from `ignoreMatchingElsewhere`.
+`my_service_errors_total{env="prod", job="pushgateway", instance="foo", reason="bad request"}` matches `{job="pushgateway"}`
+so pint decided NOT to report that `foo` is missing on `promB`.
 
 ### min-age
 

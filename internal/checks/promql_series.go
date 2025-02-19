@@ -23,15 +23,16 @@ import (
 )
 
 type PromqlSeriesSettings struct {
-	IgnoreLabelsValue     map[string][]string `hcl:"ignoreLabelsValue,optional" json:"ignoreLabelsValue,omitempty"`
-	LookbackRange         string              `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
-	LookbackStep          string              `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
-	IgnoreMetrics         []string            `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
-	FallbackTimeout       string              `hcl:"fallbackTimeout,optional" json:"fallbackTimeout,omitempty"`
-	ignoreMetricsRe       []*regexp.Regexp
-	lookbackRangeDuration time.Duration
-	lookbackStepDuration  time.Duration
-	fallbackTimeout       time.Duration
+	IgnoreLabelsValue       map[string][]string `hcl:"ignoreLabelsValue,optional" json:"ignoreLabelsValue,omitempty"`
+	LookbackRange           string              `hcl:"lookbackRange,optional" json:"lookbackRange,omitempty"`
+	LookbackStep            string              `hcl:"lookbackStep,optional" json:"lookbackStep,omitempty"`
+	IgnoreMetrics           []string            `hcl:"ignoreMetrics,optional" json:"ignoreMetrics,omitempty"`
+	IgnoreMatchingElsewhere []string            `hcl:"ignoreMatchingElsewhere,optional" json:"ignoreMatchingElsewhere,omitempty"`
+	FallbackTimeout         string              `hcl:"fallbackTimeout,optional" json:"fallbackTimeout,omitempty"`
+	ignoreMetricsRe         []*regexp.Regexp
+	lookbackRangeDuration   time.Duration
+	lookbackStepDuration    time.Duration
+	fallbackTimeout         time.Duration
 }
 
 func (c *PromqlSeriesSettings) Validate() error {
@@ -71,6 +72,12 @@ func (c *PromqlSeriesSettings) Validate() error {
 	}
 
 	for selector := range c.IgnoreLabelsValue {
+		if _, err := promParser.ParseMetricSelector(selector); err != nil {
+			return fmt.Errorf("%q is not a valid PromQL metric selector: %w", selector, err)
+		}
+	}
+
+	for _, selector := range c.IgnoreMatchingElsewhere {
 		if _, err := promParser.ParseMetricSelector(selector); err != nil {
 			return fmt.Errorf("%q is not a valid PromQL metric selector: %w", selector, err)
 		}
@@ -310,13 +317,15 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				),
 				Bug,
 			)
-			problems = append(problems, Problem{
-				Lines:    expr.Value.Lines,
-				Reporter: c.Reporter(),
-				Text:     text,
-				Details:  c.checkOtherServer(ctx, selector.String(), settings.fallbackTimeout),
-				Severity: severity,
-			})
+			if details, shouldReport := c.checkOtherServer(ctx, selector.String(), settings); shouldReport {
+				problems = append(problems, Problem{
+					Lines:    expr.Value.Lines,
+					Reporter: c.Reporter(),
+					Text:     text,
+					Details:  details,
+					Severity: severity,
+				})
+			}
 			slog.Debug("No historical series for base metric", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 			continue
 		}
@@ -578,7 +587,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	return problems
 }
 
-func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout time.Duration) string {
+func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, settings *PromqlSeriesSettings) (string, bool) {
 	var servers []*promapi.FailoverGroup
 	if val := ctx.Value(promapi.AllPrometheusServers); val != nil {
 		for _, s := range val.([]*promapi.FailoverGroup) {
@@ -590,7 +599,7 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 	}
 
 	if len(servers) == 0 {
-		return SeriesCheckCommonProblemDetails
+		return SeriesCheckCommonProblemDetails, true
 	}
 
 	var suffix string
@@ -602,13 +611,13 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 	start := time.Now()
 	var tested, matches, skipped int
 	for _, prom := range servers {
-		if time.Since(start) >= timeout {
+		if time.Since(start) >= settings.fallbackTimeout {
 			slog.Debug("Time limit reached for checking if metric exists on any other Prometheus server",
 				slog.String("check", c.Reporter()),
 				slog.String("selector", query),
 			)
 			suffix = fmt.Sprintf("\npint tried to check %d server(s) but stopped after checking %d server(s) due to reaching time limit (%s).\n",
-				len(servers), tested, output.HumanizeDuration(timeout))
+				len(servers), tested, output.HumanizeDuration(settings.fallbackTimeout))
 			break
 		}
 
@@ -632,6 +641,13 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 		uri := prom.URI()
 
 		if series > 0 {
+			for _, selector := range settings.IgnoreMatchingElsewhere {
+				m, _ := promParser.ParseMetricSelector(selector)
+				if c.hasSeriesWithSelector(ctx, prom, query, m) {
+					return "", false
+				}
+			}
+
 			matches++
 			if matches > 10 {
 				skipped++
@@ -656,10 +672,32 @@ func (c SeriesCheck) checkOtherServer(ctx context.Context, query string, timeout
 	buf.WriteString("\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n")
 
 	if matches > 0 {
-		return buf.String()
+		return buf.String(), true
 	}
 
-	return SeriesCheckCommonProblemDetails
+	return SeriesCheckCommonProblemDetails, true
+}
+
+func (c SeriesCheck) hasSeriesWithSelector(ctx context.Context, prom *promapi.FailoverGroup, query string, matchers []*labels.Matcher) bool {
+	qr, err := prom.Query(ctx, query)
+	if err != nil {
+		return false
+	}
+
+	for _, s := range qr.Series {
+		var seriesMatches bool
+		for _, m := range matchers {
+			s.Labels.Range(func(l labels.Label) {
+				if m.Name == l.Name && m.Matches(l.Value) {
+					seriesMatches = true
+				}
+			})
+		}
+		if seriesMatches {
+			return true
+		}
+	}
+	return false
 }
 
 func (c SeriesCheck) queryProblem(err error, expr parser.PromQLExpr) Problem {
