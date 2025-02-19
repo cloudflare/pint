@@ -292,7 +292,7 @@ func TestLabelsSource(t *testing.T) {
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
-					ReturnedNumber: 5, // FIXME should be 10 really but it's one-to-one binops
+					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -1115,13 +1115,12 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo"} * on(instance) bar`,
 			output: []utils.Source{
 				{
-					Type:             utils.SelectorSource,
-					Returns:          promParser.ValueTypeVector,
-					Operation:        promParser.CardOneToOne.String(),
-					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
-					GuaranteedLabels: []string{"job"},
-					IncludedLabels:   []string{"instance"},
-					FixedLabels:      true,
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      promParser.CardOneToOne.String(),
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
+					IncludedLabels: []string{"instance"},
+					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
@@ -2387,6 +2386,48 @@ sum by (region, target, colo_name) (
 			},
 		},
 		{
+			expr: `vector(0) > vector(1)`,
+			output: []utils.Source{
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 0,
+					IsDead:         true,
+					IsDeadReason:   "`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything",
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(0)",
+						},
+					},
+					Call:          mustParse[*promParser.Call](t, "vector(0)", 0),
+					IsConditional: true,
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								FixedLabels:    true,
+								AlwaysReturns:  true,
+								ReturnedNumber: 1,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(1)",
+									},
+								},
+								Call: mustParse[*promParser.Call](t, "vector(1)", 12),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `sum(foo or vector(0)) > 0`,
 			output: []utils.Source{
 				{
@@ -2815,7 +2856,7 @@ or
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "vector",
 					AlwaysReturns:  true,
-					ReturnedNumber: 0,
+					ReturnedNumber: 3,
 					FixedLabels:    true,
 					Call:           mustParse[*promParser.Call](t, "vector(0)", 23),
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2825,8 +2866,6 @@ or
 						},
 					},
 					IsConditional: true,
-					IsDead:        true,
-					IsDeadReason:  "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
@@ -3180,6 +3219,45 @@ unless
 			},
 		},
 		{
+			expr: `foo{a="1"} * on(instance) sum(bar{b="2"})`,
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      promParser.CardOneToOne.String(),
+					IncludedLabels: []string{"instance"},
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					FixedLabels:    true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: `foo{a="1"} * on(instance) sum(bar{b="2"})`,
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Operation:   "sum",
+								Returns:     promParser.ValueTypeVector,
+								FixedLabels: true,
+								Selector:    mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 30),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 26),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `sum(bar{b="2"})`,
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"})`,
 			output: []utils.Source{
 				{
@@ -3468,4 +3546,53 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	output := utils.LabelsSource("fake_call()", n.Expr)
 	require.Len(t, output, 1)
 	require.Nil(t, output[0].Call, "no call should have been detected in fake function")
+}
+
+func TestSourceFragment(t *testing.T) {
+	type testCaseT struct {
+		expr      string
+		fragments []string
+	}
+
+	testCases := []testCaseT{
+		{
+			expr:      "1",
+			fragments: []string{""},
+		},
+		{
+			expr:      `"foo"`,
+			fragments: []string{""},
+		},
+		{
+			expr:      `foo`,
+			fragments: []string{"foo"},
+		},
+		{
+			expr:      `foo{job="bar"}`,
+			fragments: []string{`foo{job="bar"}`},
+		},
+		{
+			expr:      `rate(foo{job="bar"}[5m])`,
+			fragments: []string{`rate(foo{job="bar"}[5m])`},
+		},
+		{
+			expr:      `sum(foo{job="bar"})`,
+			fragments: []string{`sum(foo{job="bar"})`},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.expr, func(t *testing.T) {
+			n, err := parser.DecodeExpr(tc.expr)
+			if err != nil {
+				t.Error(err)
+				t.FailNow()
+			}
+			var got []string
+			for _, src := range utils.LabelsSource(tc.expr, n.Expr) {
+				got = append(got, src.Fragment(tc.expr))
+			}
+			require.Equal(t, tc.fragments, got)
+		})
+	}
 }

@@ -203,6 +203,17 @@ func includeLabel(s Source, names ...string) Source {
 	return s
 }
 
+func restrictIncludedLabels(s Source, names []string) Source {
+	todo := []string{}
+	for _, name := range s.IncludedLabels {
+		if !slices.Contains(names, name) {
+			todo = append(todo, name)
+		}
+	}
+	s.IncludedLabels = removeFromSlice(s.IncludedLabels, todo...)
+	return s
+}
+
 func guaranteeLabel(s Source, names ...string) Source {
 	s.ExcludedLabels = removeFromSlice(s.ExcludedLabels, names...)
 	for _, name := range names {
@@ -256,16 +267,12 @@ func labelsFromSelectors(matches []labels.MatchType, selector *promParser.Vector
 }
 
 func labelsWithEmptyValueSelector(selector *promParser.VectorSelector) (names []string) {
-	if selector == nil {
-		return nil
-	}
 	for _, lm := range selector.LabelMatchers {
 		if lm.Name == labels.MetricName {
 			continue
 		}
 		if lm.Type == labels.MatchEqual && lm.Value == "" {
 			names = appendToSlice(names, lm.Name)
-
 		}
 	}
 	return names
@@ -679,6 +686,10 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if n.VectorMatching.On {
 				s.FixedLabels = true
 				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
+				if len(n.VectorMatching.MatchingLabels) > 0 {
+					s = restrictIncludedLabels(s, n.VectorMatching.MatchingLabels)
+					s = restrictGuaranteedLabels(s, n.VectorMatching.MatchingLabels)
+				}
 				s.ExcludeReason = setInMap(
 					s.ExcludeReason,
 					"",
@@ -716,6 +727,18 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 							),
 						},
 					)
+				}
+				for _, rs := range rhs {
+					rs.IsConditional = n.Op.IsComparisonOperator()
+					if s.AlwaysReturns && rs.AlwaysReturns {
+						// Both sides always return something
+						s.ReturnedNumber, s.IsDead, s.IsDeadReason = calculateStaticReturn(
+							expr,
+							s, rs,
+							n.Op,
+							s.IsDead,
+						)
+					}
 				}
 			}
 			if s.Operation == "" {
