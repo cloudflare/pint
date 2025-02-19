@@ -481,6 +481,13 @@ func TestRegexpCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   noProblems,
 		},
+		{
+			description: "code=~5.*",
+			content:     "- record: foo\n  expr: foo{code=~\"5.*\"}\n",
+			checker:     newRegexpCheck,
+			prometheus:  noProm,
+			problems:    noProblems,
+		},
 	}
 	runTests(t, testCases)
 }
