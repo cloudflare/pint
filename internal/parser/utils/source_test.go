@@ -31,11 +31,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: "1",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -49,11 +49,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: "1 / 5",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{0.2},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 0.2,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -67,12 +67,13 @@ func TestLabelsSource(t *testing.T) {
 			expr: "(2 ^ 5) == bool 5",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					IsDead:          true,
-					ReturnedNumbers: []float64{32},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `32 == 5` which is not possible, so it will never return anything",
+					ReturnedNumber: 32,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -87,12 +88,13 @@ func TestLabelsSource(t *testing.T) {
 			expr: "(2 ^ 5 + 11) % 5 <= bool 2",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					IsDead:          true,
-					ReturnedNumbers: []float64{3},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `3 <= 2` which is not possible, so it will never return anything",
+					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -107,12 +109,13 @@ func TestLabelsSource(t *testing.T) {
 			expr: "(2 ^ 5 + 11) % 5 >= bool 20",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					IsDead:          true,
-					ReturnedNumbers: []float64{3},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `3 >= 20` which is not possible, so it will never return anything",
+					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -127,11 +130,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: "(2 ^ 5 + 11) % 5 <= bool 3",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{3},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -146,12 +149,13 @@ func TestLabelsSource(t *testing.T) {
 			expr: "(2 ^ 5 + 11) % 5 < bool 1",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					IsDead:          true,
-					ReturnedNumbers: []float64{3},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `3 < 1` which is not possible, so it will never return anything",
+					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -166,12 +170,13 @@ func TestLabelsSource(t *testing.T) {
 			expr: "20 - 15 < bool 1",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					IsDead:          true,
-					ReturnedNumbers: []float64{5},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `5 < 1` which is not possible, so it will never return anything",
+					ReturnedNumber: 5,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -186,11 +191,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: "2 * 5",
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{10},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -227,12 +232,12 @@ func TestLabelsSource(t *testing.T) {
 					Selector:  mustParse[*promParser.VectorSelector](t, "foo", 1),
 				},
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{10},
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -251,38 +256,43 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selector:  mustParse[*promParser.VectorSelector](t, "foo", 1),
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:            utils.FuncSource,
-							Returns:         promParser.ValueTypeVector,
-							Operation:       "vector",
-							FixedLabels:     true,
-							AlwaysReturns:   true,
-							ReturnedNumbers: []float64{2},
-							Call:            mustParse[*promParser.Call](t, "vector(2)", 22),
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Calling `vector()` will return a vector value with no labels.",
-									Fragment: "vector(2)",
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								FixedLabels:    true,
+								AlwaysReturns:  true,
+								ReturnedNumber: 2,
+								Call:           mustParse[*promParser.Call](t, "vector(2)", 22),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(2)",
+									},
 								},
 							},
 						},
 						{
-							Type:      utils.SelectorSource,
-							Returns:   promParser.ValueTypeVector,
-							Operation: promParser.CardManyToMany.String(),
-							Selector:  mustParse[*promParser.VectorSelector](t, "bar", 35),
-							IsDead:    true,
+							Src: utils.Source{
+								Type:         utils.SelectorSource,
+								Returns:      promParser.ValueTypeVector,
+								Operation:    promParser.CardManyToMany.String(),
+								Selector:     mustParse[*promParser.VectorSelector](t, "bar", 35),
+								IsDead:       true,
+								IsDeadReason: "the left hand side always returs something and so the right hand side is never used",
+							},
 						},
 					},
 				},
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{5}, // FIXME should be 10 really but it's one-to-one binops
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -290,28 +300,33 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					Call: mustParse[*promParser.Call](t, "vector(5)", 8),
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:            utils.FuncSource,
-							Returns:         promParser.ValueTypeVector,
-							Operation:       "vector",
-							FixedLabels:     true,
-							AlwaysReturns:   true,
-							ReturnedNumbers: []float64{2},
-							Call:            mustParse[*promParser.Call](t, "vector(2)", 22),
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Calling `vector()` will return a vector value with no labels.",
-									Fragment: "vector(2)",
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								FixedLabels:    true,
+								AlwaysReturns:  true,
+								ReturnedNumber: 2,
+								Call:           mustParse[*promParser.Call](t, "vector(2)", 22),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(2)",
+									},
 								},
 							},
 						},
 						{
-							Type:      utils.SelectorSource,
-							Returns:   promParser.ValueTypeVector,
-							Operation: promParser.CardManyToMany.String(),
-							Selector:  mustParse[*promParser.VectorSelector](t, "bar", 35),
-							IsDead:    true,
+							Src: utils.Source{
+								Type:         utils.SelectorSource,
+								Returns:      promParser.ValueTypeVector,
+								Operation:    promParser.CardManyToMany.String(),
+								Selector:     mustParse[*promParser.VectorSelector](t, "bar", 35),
+								IsDead:       true,
+								IsDeadReason: "the left hand side always returs something and so the right hand side is never used",
+							},
 						},
 					},
 				},
@@ -321,11 +336,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: `1 > bool 0`,
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -340,11 +355,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: `20 > bool 10`,
 			output: []utils.Source{
 				{
-					Type:            utils.NumberSource,
-					Returns:         promParser.ValueTypeScalar,
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{20},
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 20,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "This returns a number value with no labels.",
@@ -404,6 +419,23 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `foo{job=""}`,
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job=""}`, 0),
+					ExcludedLabels: []string{"job"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"job": {
+							Reason:   "Query uses `{job=\"\"}` selector which will filter out any time series with the `job` label set.",
+							Fragment: `foo{job=""}`,
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `foo{job="bar"} or bar{job="foo"}`,
 			output: []utils.Source{
 				{
@@ -446,7 +478,7 @@ func TestLabelsSource(t *testing.T) {
 			output: []utils.Source{
 				{
 					Type:     utils.SelectorSource,
-					Returns:  promParser.ValueTypeVector,
+					Returns:  promParser.ValueTypeVector, // FIXME Matrix ??
 					Selector: mustParse[*promParser.VectorSelector](t, "foo", 0),
 				},
 			},
@@ -511,11 +543,31 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"})`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: `sum(foo{job="myjob"})`,
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `sum(count(foo{job="myjob"}) by(instance))`,
+			output: []utils.Source{
+				{
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "sum",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 10),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(count(foo{job="myjob"}) by(instance))`, 0),
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(count(foo{job="myjob"}) by(instance))`,
 						},
 					},
 				},
@@ -529,6 +581,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"})`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -548,6 +601,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"}) without(job)`, 0),
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
@@ -566,6 +620,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo) by(job)`, 0),
 					IncludedLabels: []string{"job"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -585,6 +640,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "sum",
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"}) by(job)`, 0),
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
 					FixedLabels:      true,
@@ -639,6 +695,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "sum",
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} or bar{cluster="dev"}) without(instance)`, 0),
 					GuaranteedLabels: []string{"job"},
 					ExcludedLabels:   []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -653,6 +710,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "sum",
 					Selector:         mustParse[*promParser.VectorSelector](t, `bar{cluster="dev"}`, 24),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} or bar{cluster="dev"}) without(instance)`, 0),
 					GuaranteedLabels: []string{"cluster"},
 					ExcludedLabels:   []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -672,6 +730,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "sum",
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"}) without(instance)`, 0),
 					GuaranteedLabels: []string{"job"},
 					ExcludedLabels:   []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -691,6 +750,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "min",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `min(foo{job="myjob"})`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -698,17 +758,20 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `min(foo{job="myjob"})`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:        utils.AggregateSource,
-							Operation:   "max",
-							Returns:     promParser.ValueTypeVector,
-							Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
-							FixedLabels: true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation that removes all labels.",
-									Fragment: `max(foo{job="myjob"})`,
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Operation:   "max",
+								Returns:     promParser.ValueTypeVector,
+								Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `max(foo{job="myjob"})`, 24),
+								FixedLabels: true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `max(foo{job="myjob"})`,
+									},
 								},
 							},
 						},
@@ -724,6 +787,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "max",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `max(foo{job="myjob"})`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -731,17 +795,20 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `max(foo{job="myjob"})`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:        utils.AggregateSource,
-							Operation:   "min",
-							Returns:     promParser.ValueTypeVector,
-							Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
-							FixedLabels: true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation that removes all labels.",
-									Fragment: `min(foo{job="myjob"})`,
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Operation:   "min",
+								Returns:     promParser.ValueTypeVector,
+								Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `min(foo{job="myjob"})`, 24),
+								FixedLabels: true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `min(foo{job="myjob"})`,
+									},
 								},
 							},
 						},
@@ -757,6 +824,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "avg",
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `avg(foo{job="myjob"}) by(job)`, 0),
 					GuaranteedLabels: []string{"job"},
 					IncludedLabels:   []string{"job"},
 					FixedLabels:      true,
@@ -777,6 +845,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "group",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 6),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `group(foo) by(job)`, 0),
 					IncludedLabels: []string{"job"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -796,6 +865,8 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "stddev",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 12),
+					Call:        mustParse[*promParser.Call](t, "rate(foo[5m])", 7),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `stddev(rate(foo[5m]))`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -814,6 +885,8 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "stdvar",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 12),
+					Call:        mustParse[*promParser.Call](t, "rate(foo[5m])", 7),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `stdvar(rate(foo[5m]))`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -856,6 +929,8 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "quantile",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 19),
+					Call:        mustParse[*promParser.Call](t, "rate(foo[5m])", 14),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `quantile(0.9, rate(foo[5m]))`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -874,6 +949,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "count_values",
 					Selector:         mustParse[*promParser.VectorSelector](t, `build_version`, 24),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `count_values("version", build_version)`, 0),
 					GuaranteedLabels: []string{"version"},
 					IncludedLabels:   []string{"version"},
 					FixedLabels:      true,
@@ -894,6 +970,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "count_values",
 					Selector:         mustParse[*promParser.VectorSelector](t, `build_version`, 24),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `count_values("version", build_version) without(job)`, 0),
 					IncludedLabels:   []string{"version"},
 					GuaranteedLabels: []string{"version"},
 					ExcludedLabels:   []string{"job"},
@@ -914,6 +991,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "count_values",
 					Selector:         mustParse[*promParser.VectorSelector](t, `build_version{job="foo"}`, 24),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `count_values("version", build_version{job="foo"}) without(job)`, 0),
 					IncludedLabels:   []string{"version"},
 					GuaranteedLabels: []string{"version"},
 					ExcludedLabels:   []string{"job"},
@@ -934,6 +1012,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "count_values",
 					Selector:         mustParse[*promParser.VectorSelector](t, `build_version`, 24),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `count_values("version", build_version) by(job)`, 0),
 					GuaranteedLabels: []string{"version"},
 					IncludedLabels:   []string{"job", "version"},
 					FixedLabels:      true,
@@ -954,6 +1033,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "topk",
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 9),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `topk(10, foo{job="myjob"})`, 0),
 					GuaranteedLabels: []string{"job"},
 					IsConditional:    true,
 				},
@@ -963,16 +1043,18 @@ func TestLabelsSource(t *testing.T) {
 			expr: `topk(10, foo or bar)`,
 			output: []utils.Source{
 				{
-					Type:      utils.AggregateSource,
-					Returns:   promParser.ValueTypeVector,
-					Operation: "topk",
-					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "topk",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `topk(10, foo or bar)`, 0),
 				},
 				{
-					Type:      utils.AggregateSource,
-					Operation: "topk",
-					Returns:   promParser.ValueTypeVector,
-					Selector:  mustParse[*promParser.VectorSelector](t, `bar`, 16),
+					Type:        utils.AggregateSource,
+					Operation:   "topk",
+					Returns:     promParser.ValueTypeVector,
+					Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 16),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `topk(10, foo or bar)`, 0),
 				},
 			},
 		},
@@ -996,6 +1078,8 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Call:           mustParse[*promParser.Call](t, "rate(foo[10m])", 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(rate(foo[10m])) without(instance)`, 0),
 					ExcludedLabels: []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
@@ -1015,11 +1099,13 @@ func TestLabelsSource(t *testing.T) {
 					Operation:        promParser.CardOneToOne.String(),
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					GuaranteedLabels: []string{"job"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 17),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 17),
+							},
 						},
 					},
 				},
@@ -1029,24 +1115,25 @@ func TestLabelsSource(t *testing.T) {
 			expr: `foo{job="foo"} * on(instance) bar`,
 			output: []utils.Source{
 				{
-					Type:             utils.SelectorSource,
-					Returns:          promParser.ValueTypeVector,
-					Operation:        promParser.CardOneToOne.String(),
-					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
-					GuaranteedLabels: []string{"job"},
-					IncludedLabels:   []string{"instance"},
-					FixedLabels:      true,
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      promParser.CardOneToOne.String(),
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
+					IncludedLabels: []string{"instance"},
+					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
 							Fragment: `foo{job="foo"} * on(instance) bar`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 30),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 30),
+							},
 						},
 					},
 				},
@@ -1062,11 +1149,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					IncludedLabels:   []string{"bar", "instance"},
 					GuaranteedLabels: []string{"job"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 46),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 46),
+							},
 						},
 					},
 				},
@@ -1082,12 +1171,14 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo"}`, 0),
 					IncludedLabels:   []string{"cluster", "instance"},
 					GuaranteedLabels: []string{"job"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `bar{cluster="bar", ignored="true"}`, 50),
-							GuaranteedLabels: []string{"cluster", "ignored"},
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{cluster="bar", ignored="true"}`, 50),
+								GuaranteedLabels: []string{"cluster"},
+							},
 						},
 					},
 				},
@@ -1103,12 +1194,14 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `bar{cluster="bar"}`, 63),
 					IncludedLabels:   []string{"job", "instance"},
 					GuaranteedLabels: []string{"cluster"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo", ignored="true"}`, 0),
-							GuaranteedLabels: []string{"job", "ignored"},
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo", ignored="true"}`, 0),
+								GuaranteedLabels: []string{"job"},
+							},
 						},
 					},
 				},
@@ -1122,6 +1215,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "count",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 6),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `count(foo / bar)`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1129,11 +1223,13 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `count(foo / bar)`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 12),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 12),
+							},
 						},
 					},
 				},
@@ -1147,6 +1243,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "count",
 					Selector:    mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `count(up{job="a"} / on () up{job="b"})`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1154,12 +1251,14 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `count(up{job="a"} / on () up{job="b"})`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `up{job="b"}`, 26),
-							GuaranteedLabels: []string{"job"},
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `up{job="b"}`, 26),
+								GuaranteedLabels: []string{"job"},
+							},
 						},
 					},
 				},
@@ -1173,6 +1272,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "count",
 					Selector:    mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `count(up{job="a"} / on (env) up{job="b"})`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1180,12 +1280,14 @@ func TestLabelsSource(t *testing.T) {
 							Fragment: `count(up{job="a"} / on (env) up{job="b"})`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `up{job="b"}`, 29),
-							GuaranteedLabels: []string{"job"},
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `up{job="b"}`, 29),
+								GuaranteedLabels: []string{"job"},
+							},
 						},
 					},
 				},
@@ -1200,11 +1302,13 @@ func TestLabelsSource(t *testing.T) {
 					Operation:        promParser.CardManyToMany.String(),
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo", instance="1"}`, 0),
 					GuaranteedLabels: []string{"job", "instance"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 33),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 33),
+							},
 						},
 					},
 				},
@@ -1220,11 +1324,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo", instance="1"}`, 0),
 					IncludedLabels:   []string{"cluster"},
 					GuaranteedLabels: []string{"job", "instance"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 45),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 45),
+							},
 						},
 					},
 				},
@@ -1234,10 +1340,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: `topk(10, foo)`,
 			output: []utils.Source{
 				{
-					Type:      utils.AggregateSource,
-					Returns:   promParser.ValueTypeVector,
-					Operation: "topk",
-					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "topk",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `topk(10, foo)`, 0),
 				},
 			},
 		},
@@ -1245,10 +1352,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: `topk(10, foo) without(cluster)`,
 			output: []utils.Source{
 				{
-					Type:      utils.AggregateSource,
-					Returns:   promParser.ValueTypeVector,
-					Operation: "topk",
-					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "topk",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `topk(10, foo) without(cluster)`, 0),
 				},
 			},
 		},
@@ -1256,10 +1364,11 @@ func TestLabelsSource(t *testing.T) {
 			expr: `topk(10, foo) by(cluster)`,
 			output: []utils.Source{
 				{
-					Type:      utils.AggregateSource,
-					Returns:   promParser.ValueTypeVector,
-					Operation: "topk",
-					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "topk",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 9),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `topk(10, foo) by(cluster)`, 0),
 				},
 			},
 		},
@@ -1271,6 +1380,8 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "bottomk",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 21),
+					Call:           mustParse[*promParser.Call](t, "rate(foo[5m])", 16),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `bottomk(10, sum(rate(foo[5m])) without(job))`, 0),
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
@@ -1352,11 +1463,13 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 0),
-					Unless: []utils.Source{
+					Unless: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							},
 						},
 					},
 				},
@@ -1370,12 +1483,14 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 0),
-					Unless: []utils.Source{
+					Unless: []utils.Join{
 						{
-							Type:          utils.SelectorSource,
-							Returns:       promParser.ValueTypeVector,
-							Selector:      mustParse[*promParser.VectorSelector](t, `bar`, 11),
-							IsConditional: true,
+							Src: utils.Source{
+								Type:          utils.SelectorSource,
+								Returns:       promParser.ValueTypeVector,
+								Selector:      mustParse[*promParser.VectorSelector](t, `bar`, 11),
+								IsConditional: true,
+							},
 						},
 					},
 				},
@@ -1389,16 +1504,20 @@ func TestLabelsSource(t *testing.T) {
 					Returns:   promParser.ValueTypeVector,
 					Operation: promParser.CardManyToMany.String(),
 					Selector:  mustParse[*promParser.VectorSelector](t, `foo`, 0),
-					Unless: []utils.Source{
+					Unless: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar`, 11),
+							},
 						},
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `baz`, 22),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `baz`, 22),
+							},
 						},
 					},
 				},
@@ -1412,6 +1531,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "count",
 					Selector:       mustParse[*promParser.VectorSelector](t, `up{job="foo", cluster="dev"}`, 10),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`, 0),
 					ExcludedLabels: []string{"job", "cluster"}, // FIXME empty
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1491,29 +1611,35 @@ sum(foo:count) by(job) > 20`,
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo:sum`, 8),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo:sum > 0) without(notify)`, 4),
 					IncludedLabels: []string{"notify", "job"},
 					ExcludeReason:  map[string]utils.ExcludedLabel{},
 					IsConditional:  false, // FIXME should be true
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, `job:notify`, 68),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `job:notify`, 68),
+							},
 						},
 						{
-							Type:           utils.AggregateSource,
-							Returns:        promParser.ValueTypeVector,
-							Operation:      "sum",
-							Selector:       mustParse[*promParser.VectorSelector](t, `foo:count`, 97),
-							IncludedLabels: []string{"job"},
-							FixedLabels:    true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-									Fragment: `sum(foo:count) by(job)`,
+							Src: utils.Source{
+								Type:           utils.AggregateSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "sum",
+								Selector:       mustParse[*promParser.VectorSelector](t, `foo:count`, 97),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo:count) by(job)`, 93),
+								IncludedLabels: []string{"job"},
+								FixedLabels:    true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+										Fragment: `sum(foo:count) by(job)`,
+									},
 								},
+								IsConditional: true,
 							},
-							IsConditional: true,
 						},
 					},
 				},
@@ -1535,12 +1661,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 53),
-							GuaranteedLabels: []string{"ulimit"},
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 53),
+								GuaranteedLabels: []string{"ulimit"},
+							},
 						},
 					},
 				},
@@ -1555,12 +1683,13 @@ sum(foo:count) by(job) > 20`,
 					Operation:      promParser.CardManyToOne.String(),
 					Selector:       mustParse[*promParser.VectorSelector](t, `container_file_descriptors`, 0),
 					IncludedLabels: []string{"instance", "app_name"},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 66),
-							GuaranteedLabels: []string{"ulimit"},
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 66),
+							},
 						},
 					},
 				},
@@ -1616,6 +1745,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "absent",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 11),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo) by(job, instance)`, 7),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1645,11 +1775,13 @@ sum(foo:count) by(job) > 20`,
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="prometheus", xxx="1"})`, 0),
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, "prometheus_build_info", 51),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "prometheus_build_info", 51),
+							},
 						},
 					},
 				},
@@ -1663,6 +1795,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 8),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo) by(notjob)`, 4),
 					IncludedLabels: []string{"notjob"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -1682,7 +1815,8 @@ sum(foo:count) by(job) > 20`,
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "count",
 					Selector:       mustParse[*promParser.VectorSelector](t, `node_exporter_build_info`, 6),
-					IncludedLabels: []string{"instance", "version", "foo"}, // FIXME foo shouldn't be there because count() doesn't produce it
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(node_exporter_build_info) by (instance, version)`, 0),
+					IncludedLabels: []string{"instance", "version", "foo"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1691,18 +1825,21 @@ sum(foo:count) by(job) > 20`,
 						},
 					},
 					IsConditional: true,
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:           utils.AggregateSource,
-							Returns:        promParser.ValueTypeVector,
-							Operation:      "count",
-							Selector:       mustParse[*promParser.VectorSelector](t, "deb_package_version", 106),
-							IncludedLabels: []string{"instance", "version", "package"},
-							FixedLabels:    true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.",
-									Fragment: `count(deb_package_version) by (instance, version, package)`,
+							Src: utils.Source{
+								Type:           utils.AggregateSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "count",
+								Selector:       mustParse[*promParser.VectorSelector](t, "deb_package_version", 106),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(deb_package_version) by (instance, version, package)`, 100),
+								IncludedLabels: []string{"instance", "version", "package"},
+								FixedLabels:    true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.",
+										Fragment: `count(deb_package_version) by (instance, version, package)`,
+									},
 								},
 							},
 						},
@@ -1794,11 +1931,13 @@ sum(foo:count) by(job) > 20`,
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="xxx"})`, 37),
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, "bar", 0),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 0),
+							},
 						},
 					},
 				},
@@ -1822,11 +1961,13 @@ sum(foo:count) by(job) > 20`,
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="xxx"})`, 25),
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:     utils.SelectorSource,
-							Returns:  promParser.ValueTypeVector,
-							Selector: mustParse[*promParser.VectorSelector](t, "bar", 0),
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 0),
+							},
 						},
 					},
 				},
@@ -1836,12 +1977,12 @@ sum(foo:count) by(job) > 20`,
 			expr: "vector(1)",
 			output: []utils.Source{
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -1880,6 +2021,8 @@ sum(foo:count) by(job) > 20`,
 					Operation:     "vector",
 					FixedLabels:   true,
 					AlwaysReturns: true,
+					IsDead:        true,
+					IsDeadReason:  "this query always evaluates to `0 == 1` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -1957,6 +2100,7 @@ sum(foo:count) by(job) > 20`,
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "label_replace",
 					Selector:         mustParse[*promParser.VectorSelector](t, `pod_status`, 28),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum by (pod) (pod_status)`, 14),
 					FixedLabels:      true,
 					IsConditional:    true,
 					IncludedLabels:   []string{"pod"},
@@ -1998,12 +2142,14 @@ sum(foo:count) by(job) > 20`,
 							Fragment: `up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:             utils.SelectorSource,
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `up{instance="a", job="pint"}`, 51),
-							GuaranteedLabels: []string{"instance", "job"},
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `up{instance="a", job="pint"}`, 51),
+								GuaranteedLabels: []string{"instance", "job"},
+							},
 						},
 					},
 				},
@@ -2020,10 +2166,12 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 `,
 			output: []utils.Source{
 				{
-					Type:           utils.AggregateSource,
-					Returns:        promParser.ValueTypeVector,
-					Operation:      "avg",
-					Selector:       mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}`, 41),
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "avg",
+					Selector:    mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}`, 41),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`, 1),
+
 					ExcludedLabels: []string{"router", "colo_id", "instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
@@ -2042,13 +2190,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					IsConditional: true,
 				},
 				{
-					Type:             utils.AggregateSource,
-					Returns:          promParser.ValueTypeVector,
-					Operation:        "sum",
-					Selector:         mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
-					GuaranteedLabels: []string{"cidr_use_case"},
-					ExcludedLabels:   []string{"router", "colo_id", "instance"},
-					FixedLabels:      true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`, 115),
+					ExcludedLabels: []string{"router", "colo_id", "instance"},
+					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
 							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
@@ -2068,17 +2216,20 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 						},
 					},
 					IsConditional: true,
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:        utils.AggregateSource,
-							Returns:     promParser.ValueTypeVector,
-							Operation:   "count",
-							Selector:    mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
-							FixedLabels: true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation that removes all labels.",
-									Fragment: `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`,
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Returns:     promParser.ValueTypeVector,
+								Operation:   "count",
+								Selector:    mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
+								FixedLabels: true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`,
+									},
 								},
 							},
 						},
@@ -2089,6 +2240,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "avg",
 					Selector:         mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}`, 343),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`, 303),
 					GuaranteedLabels: []string{"cidr_use_case"},
 					ExcludedLabels:   []string{"router", "colo_id", "instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2117,6 +2269,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "label_replace",
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo`, 18),
+					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo) without(instance)`, 14),
 					GuaranteedLabels: []string{"instance"},
 					ExcludeReason:    map[string]utils.ExcludedLabel{},
 					Call:             mustParse[*promParser.Call](t, `label_replace(sum(foo) without(instance), "instance", "none", "", "")`, 0),
@@ -2132,10 +2285,17 @@ sum by (region, target, colo_name) (
 ) == 0`,
 			output: []utils.Source{
 				{
-					Type:           utils.AggregateSource,
-					Returns:        promParser.ValueTypeVector,
-					Operation:      "sum",
-					Selector:       mustParse[*promParser.VectorSelector](t, `probe_success{job="abc"}`, 56),
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Selector:  mustParse[*promParser.VectorSelector](t, `probe_success{job="abc"}`, 56),
+					Call:      mustParse[*promParser.Call](t, `sum_over_time(probe_success{job="abc"}[5m])`, 42),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `
+sum by (region, target, colo_name) (
+    sum_over_time(probe_success{job="abc"}[5m])
+	or
+	vector(1)
+)`, 0), // FIXME 0? should be 1
 					IncludedLabels: []string{"region", "target", "colo_name"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2147,13 +2307,21 @@ sum by (region, target, colo_name) (
 					IsConditional: true,
 				},
 				{
-					Type:            utils.AggregateSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "sum",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					IsDead:          true,
-					ReturnedNumbers: []float64{1},
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Call:      mustParse[*promParser.Call](t, `vector(1)`, 91),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `
+sum by (region, target, colo_name) (
+    sum_over_time(probe_success{job="abc"}[5m])
+	or
+	vector(1)
+)`, 0), // FIXME 0? should be 1
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `1 == 0` which is not possible, so it will never return anything",
+					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -2168,12 +2336,12 @@ sum by (region, target, colo_name) (
 			expr: `vector(1) or foo`,
 			output: []utils.Source{
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -2183,11 +2351,12 @@ sum by (region, target, colo_name) (
 					Call: mustParse[*promParser.Call](t, "vector(1)", 0),
 				},
 				{
-					Type:      utils.SelectorSource,
-					Operation: promParser.CardManyToMany.String(),
-					Returns:   promParser.ValueTypeVector,
-					Selector:  mustParse[*promParser.VectorSelector](t, "foo", 13),
-					IsDead:    true,
+					Type:         utils.SelectorSource,
+					Operation:    promParser.CardManyToMany.String(),
+					Returns:      promParser.ValueTypeVector,
+					Selector:     mustParse[*promParser.VectorSelector](t, "foo", 13),
+					IsDead:       true,
+					IsDeadReason: "the left hand side always returs something and so the right hand side is never used",
 				},
 			},
 		},
@@ -2195,13 +2364,14 @@ sum by (region, target, colo_name) (
 			expr: `vector(0) > 0`,
 			output: []utils.Source{
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{0},
-					IsDead:          true,
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 0,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -2214,6 +2384,48 @@ sum by (region, target, colo_name) (
 			},
 		},
 		{
+			expr: `vector(0) > vector(1)`,
+			output: []utils.Source{
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 0,
+					IsDead:         true,
+					IsDeadReason:   "`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything",
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Calling `vector()` will return a vector value with no labels.",
+							Fragment: "vector(0)",
+						},
+					},
+					Call:          mustParse[*promParser.Call](t, "vector(0)", 0),
+					IsConditional: true,
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								FixedLabels:    true,
+								AlwaysReturns:  true,
+								ReturnedNumber: 1,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(1)",
+									},
+								},
+								Call: mustParse[*promParser.Call](t, "vector(1)", 12),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `sum(foo or vector(0)) > 0`,
 			output: []utils.Source{
 				{
@@ -2221,6 +2433,7 @@ sum by (region, target, colo_name) (
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(0))`, 0),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2231,13 +2444,16 @@ sum by (region, target, colo_name) (
 					IsConditional: true,
 				},
 				{
-					Type:            utils.AggregateSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "sum",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{0},
-					IsDead:          true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Call:           mustParse[*promParser.Call](t, `vector(0)`, 11),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(0))`, 0),
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 0,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
@@ -2256,6 +2472,7 @@ sum by (region, target, colo_name) (
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 5),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2266,13 +2483,16 @@ sum by (region, target, colo_name) (
 					IsConditional: true,
 				},
 				{
-					Type:            utils.AggregateSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "sum",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
-					IsDead:          true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Call:           mustParse[*promParser.Call](t, `vector(1)`, 12),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `1 == 2` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
@@ -2291,6 +2511,7 @@ sum by (region, target, colo_name) (
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 5),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2301,12 +2522,14 @@ sum by (region, target, colo_name) (
 					IsConditional: true,
 				},
 				{
-					Type:            utils.AggregateSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "sum",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Call:           mustParse[*promParser.Call](t, `vector(1)`, 12),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
@@ -2325,6 +2548,7 @@ sum by (region, target, colo_name) (
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 5),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(2))`, 1),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2335,13 +2559,16 @@ sum by (region, target, colo_name) (
 					IsConditional: true,
 				},
 				{
-					Type:            utils.AggregateSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "sum",
-					FixedLabels:     true,
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{2},
-					IsDead:          true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Call:           mustParse[*promParser.Call](t, `vector(2)`, 12),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(2))`, 1),
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					ReturnedNumber: 2,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `2 != 2` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
@@ -2353,8 +2580,7 @@ sum by (region, target, colo_name) (
 			},
 		},
 		{
-			expr: `
-(sum(sometimes{foo!="bar"} or vector(0)))
+			expr: `(sum(sometimes{foo!="bar"} or vector(0)))
 or
 ((bob > 10) or sum(foo) or vector(1))`,
 			output: []utils.Source{
@@ -2362,7 +2588,9 @@ or
 					Type:        utils.AggregateSource,
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 6),
+					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 5),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
+
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2372,12 +2600,14 @@ or
 					},
 				},
 				{
-					Type:            utils.AggregateSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "sum",
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{0},
-					FixedLabels:     true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Call:           mustParse[*promParser.Call](t, `vector(0)`, 30),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
+					AlwaysReturns:  true,
+					ReturnedNumber: 0,
+					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
@@ -2389,14 +2619,15 @@ or
 					Type:          utils.SelectorSource,
 					Operation:     promParser.CardManyToMany.String(),
 					Returns:       promParser.ValueTypeVector,
-					Selector:      mustParse[*promParser.VectorSelector](t, `bob`, 48),
+					Selector:      mustParse[*promParser.VectorSelector](t, `bob`, 47),
 					IsConditional: true,
 				},
 				{
 					Type:        utils.AggregateSource,
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 65),
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 64),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo)`, 60),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2406,13 +2637,13 @@ or
 					},
 				},
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
-					FixedLabels:     true,
-					Call:            mustParse[*promParser.Call](t, "vector(1)", 73),
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
+					FixedLabels:    true,
+					Call:           mustParse[*promParser.Call](t, "vector(1)", 72),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -2439,6 +2670,7 @@ or
 					Returns:     promParser.ValueTypeVector,
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2446,77 +2678,91 @@ or
 							Fragment: `sum(sometimes{foo!="bar"})`,
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:          utils.SelectorSource,
-							Operation:     promParser.CardManyToMany.String(),
-							Returns:       promParser.ValueTypeVector,
-							Selector:      mustParse[*promParser.VectorSelector](t, `bob`, 57),
-							IsConditional: true,
+							Src: utils.Source{
+								Type:          utils.SelectorSource,
+								Operation:     promParser.CardManyToMany.String(),
+								Returns:       promParser.ValueTypeVector,
+								Selector:      mustParse[*promParser.VectorSelector](t, `bob`, 57),
+								IsConditional: true,
+							},
 						},
 						{
-							Type:        utils.AggregateSource,
-							Returns:     promParser.ValueTypeVector,
-							Operation:   "sum",
-							Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 74),
-							FixedLabels: true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation that removes all labels.",
-									Fragment: `sum(bar))`, // FIXME bogus )
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Returns:     promParser.ValueTypeVector,
+								Operation:   "sum",
+								Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 74),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar )`, 70),
+								FixedLabels: true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `sum(bar))`, // FIXME bogus )
+									},
 								},
 							},
 						},
 						{
-							Type:          utils.SelectorSource,
-							Operation:     promParser.CardManyToMany.String(),
-							Returns:       promParser.ValueTypeVector,
-							Selector:      mustParse[*promParser.VectorSelector](t, `notfound`, 85),
-							IsConditional: true,
+							Src: utils.Source{
+								Type:          utils.SelectorSource,
+								Operation:     promParser.CardManyToMany.String(),
+								Returns:       promParser.ValueTypeVector,
+								Selector:      mustParse[*promParser.VectorSelector](t, `notfound`, 85),
+								IsConditional: true,
+							},
 						},
 					},
 				},
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{1},
-					FixedLabels:     true,
-					Call:            mustParse[*promParser.Call](t, "vector(1)", 36),
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					ReturnedNumber: 1,
+					FixedLabels:    true,
+					Call:           mustParse[*promParser.Call](t, "vector(1)", 36),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
 							Fragment: "vector(1)",
 						},
 					},
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:          utils.SelectorSource,
-							Operation:     promParser.CardManyToMany.String(),
-							Returns:       promParser.ValueTypeVector,
-							Selector:      mustParse[*promParser.VectorSelector](t, `bob`, 57),
-							IsConditional: true,
+							Src: utils.Source{
+								Type:          utils.SelectorSource,
+								Operation:     promParser.CardManyToMany.String(),
+								Returns:       promParser.ValueTypeVector,
+								Selector:      mustParse[*promParser.VectorSelector](t, `bob`, 57),
+								IsConditional: true,
+							},
 						},
 						{
-							Type:        utils.AggregateSource,
-							Returns:     promParser.ValueTypeVector,
-							Operation:   "sum",
-							Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 74),
-							FixedLabels: true,
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Query is using aggregation that removes all labels.",
-									Fragment: `sum(bar))`, // FIXME bogus )
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Returns:     promParser.ValueTypeVector,
+								Operation:   "sum",
+								Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 74),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar )`, 70), // FIXME extra end
+								FixedLabels: true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `sum(bar))`, // FIXME bogus )
+									},
 								},
 							},
 						},
 						{
-							Type:          utils.SelectorSource,
-							Operation:     promParser.CardManyToMany.String(),
-							Returns:       promParser.ValueTypeVector,
-							Selector:      mustParse[*promParser.VectorSelector](t, `notfound`, 85),
-							IsConditional: true,
+							Src: utils.Source{
+								Type:          utils.SelectorSource,
+								Operation:     promParser.CardManyToMany.String(),
+								Returns:       promParser.ValueTypeVector,
+								Selector:      mustParse[*promParser.VectorSelector](t, `notfound`, 85),
+								IsConditional: true,
+							},
 						},
 					},
 				},
@@ -2547,62 +2793,70 @@ or
 					Selector:      mustParse[*promParser.VectorSelector](t, "metric2", 7),
 					Call:          mustParse[*promParser.Call](t, "rate(metric2[5m])", 2),
 					IsConditional: true,
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:      utils.FuncSource,
-							Operation: "rate",
-							Returns:   promParser.ValueTypeVector,
-							Selector:  mustParse[*promParser.VectorSelector](t, "metric1", 42),
-							Call:      mustParse[*promParser.Call](t, "rate(metric1[5m])", 37),
+							Src: utils.Source{
+								Type:      utils.FuncSource,
+								Operation: "rate",
+								Returns:   promParser.ValueTypeVector,
+								Selector:  mustParse[*promParser.VectorSelector](t, "metric1", 42),
+								Call:      mustParse[*promParser.Call](t, "rate(metric1[5m])", 37),
+							},
 						},
 						{
-							Type:            utils.FuncSource,
-							Returns:         promParser.ValueTypeVector,
-							Operation:       "vector",
-							AlwaysReturns:   true,
-							ReturnedNumbers: []float64{1},
-							FixedLabels:     true,
-							Call:            mustParse[*promParser.Call](t, "vector(1)", 58),
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Calling `vector()` will return a vector value with no labels.",
-									Fragment: "vector(1)",
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								ReturnedNumber: 1,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(1)", 58),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(1)",
+									},
 								},
 							},
 						},
 						{
-							Type:             utils.FuncSource,
-							Operation:        "rate",
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `metric3{log_name="samplerd"}`, 77),
-							Call:             mustParse[*promParser.Call](t, `rate(metric3{log_name="samplerd"}[5m])`, 72),
-							GuaranteedLabels: []string{"log_name"},
+							Src: utils.Source{
+								Type:             utils.FuncSource,
+								Operation:        "rate",
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `metric3{log_name="samplerd"}`, 77),
+								Call:             mustParse[*promParser.Call](t, `rate(metric3{log_name="samplerd"}[5m])`, 72),
+								GuaranteedLabels: []string{"log_name"},
+							},
 						},
 						{
-							Type:            utils.FuncSource,
-							Returns:         promParser.ValueTypeVector,
-							Operation:       "vector",
-							AlwaysReturns:   true,
-							ReturnedNumbers: []float64{2},
-							FixedLabels:     true,
-							Call:            mustParse[*promParser.Call](t, "vector(2)", 114),
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Calling `vector()` will return a vector value with no labels.",
-									Fragment: "vector(2)",
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								ReturnedNumber: 2,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(2)", 114),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(2)",
+									},
 								},
 							},
 						},
 					},
 				},
 				{
-					Type:            utils.FuncSource,
-					Returns:         promParser.ValueTypeVector,
-					Operation:       "vector",
-					AlwaysReturns:   true,
-					ReturnedNumbers: []float64{0},
-					FixedLabels:     true,
-					Call:            mustParse[*promParser.Call](t, "vector(0)", 23),
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					ReturnedNumber: 3,
+					FixedLabels:    true,
+					Call:           mustParse[*promParser.Call](t, "vector(0)", 23),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
@@ -2610,50 +2864,57 @@ or
 						},
 					},
 					IsConditional: true,
-					IsDead:        true,
-					Joins: []utils.Source{
+					Joins: []utils.Join{
 						{
-							Type:      utils.FuncSource,
-							Operation: "rate",
-							Returns:   promParser.ValueTypeVector,
-							Selector:  mustParse[*promParser.VectorSelector](t, "metric1", 42),
-							Call:      mustParse[*promParser.Call](t, "rate(metric1[5m])", 37),
+							Src: utils.Source{
+								Type:      utils.FuncSource,
+								Operation: "rate",
+								Returns:   promParser.ValueTypeVector,
+								Selector:  mustParse[*promParser.VectorSelector](t, "metric1", 42),
+								Call:      mustParse[*promParser.Call](t, "rate(metric1[5m])", 37),
+							},
 						},
 						{
-							Type:            utils.FuncSource,
-							Returns:         promParser.ValueTypeVector,
-							Operation:       "vector",
-							AlwaysReturns:   true,
-							ReturnedNumbers: []float64{1},
-							FixedLabels:     true,
-							Call:            mustParse[*promParser.Call](t, "vector(1)", 58),
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Calling `vector()` will return a vector value with no labels.",
-									Fragment: "vector(1)",
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								ReturnedNumber: 1,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(1)", 58),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(1)",
+									},
 								},
 							},
 						},
 						{
-							Type:             utils.FuncSource,
-							Operation:        "rate",
-							Returns:          promParser.ValueTypeVector,
-							Selector:         mustParse[*promParser.VectorSelector](t, `metric3{log_name="samplerd"}`, 77),
-							Call:             mustParse[*promParser.Call](t, `rate(metric3{log_name="samplerd"}[5m])`, 72),
-							GuaranteedLabels: []string{"log_name"},
+							Src: utils.Source{
+								Type:             utils.FuncSource,
+								Operation:        "rate",
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `metric3{log_name="samplerd"}`, 77),
+								Call:             mustParse[*promParser.Call](t, `rate(metric3{log_name="samplerd"}[5m])`, 72),
+								GuaranteedLabels: []string{"log_name"},
+							},
 						},
 						{
-							Type:            utils.FuncSource,
-							Returns:         promParser.ValueTypeVector,
-							Operation:       "vector",
-							AlwaysReturns:   true,
-							ReturnedNumbers: []float64{2},
-							FixedLabels:     true,
-							Call:            mustParse[*promParser.Call](t, "vector(2)", 114),
-							ExcludeReason: map[string]utils.ExcludedLabel{
-								"": {
-									Reason:   "Calling `vector()` will return a vector value with no labels.",
-									Fragment: "vector(2)",
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								ReturnedNumber: 2,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(2)", 114),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(2)",
+									},
 								},
 							},
 						},
@@ -2670,13 +2931,600 @@ or
 					Operation:        "label_replace",
 					AlwaysReturns:    true,
 					FixedLabels:      true,
-					ReturnedNumbers:  []float64{1},
+					ReturnedNumber:   1,
 					GuaranteedLabels: []string{"nexthop_tag"},
 					Call:             mustParse[*promParser.Call](t, `label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")`, 0),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Calling `vector()` will return a vector value with no labels.",
 							Fragment: "vector(1)",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `(sum(foo{job="myjob"}))`,
+			output: []utils.Source{
+				{
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "sum",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 5),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} )`, 1),
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: `sum(foo{job="myjob"}))`, // FIXME bogus )
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `(-foo{job="myjob"})`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 2),
+					GuaranteedLabels: []string{"job"},
+				},
+			},
+		},
+		{
+			expr: "\n((( group(vector(0)) ))) > 0",
+			output: []utils.Source{
+				{
+					Type:           utils.AggregateSource,
+					Operation:      "group",
+					Returns:        promParser.ValueTypeVector,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+					ReturnedNumber: 0,
+					Call:           mustParse[*promParser.Call](t, `vector(0)`, 11),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, "group(vector(0)  )", 5), // FIXME
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation that removes all labels.",
+							Fragment: "group(vector(0)) )", // FIXME bogus )
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "1 > bool 5",
+			output: []utils.Source{
+				{
+					Type:           utils.NumberSource,
+					Returns:        promParser.ValueTypeScalar,
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `1 > 5` which is not possible, so it will never return anything",
+					ReturnedNumber: 1,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "This returns a number value with no labels.",
+							Fragment: "1",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `prometheus_ready{job="prometheus"} unless vector(0)`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Operation:        promParser.CardManyToMany.String(),
+					Returns:          promParser.ValueTypeVector,
+					Selector:         mustParse[*promParser.VectorSelector](t, `prometheus_ready{job="prometheus"}`, 0),
+					GuaranteedLabels: []string{"job"},
+					Unless: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								ReturnedNumber: 0,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(0)", 42),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(0)",
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `prometheus_ready{job="prometheus"} unless on() vector(0)`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Operation:        promParser.CardManyToMany.String(),
+					Returns:          promParser.ValueTypeVector,
+					IsDead:           true,
+					IsDeadReason:     "this query will never return anything because the `unless` query always returns something",
+					Selector:         mustParse[*promParser.VectorSelector](t, `prometheus_ready{job="prometheus"}`, 0),
+					GuaranteedLabels: []string{"job"},
+					Unless: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								ReturnedNumber: 0,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(0)", 47),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(0)",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `prometheus_ready{job="prometheus"} unless on(job) vector(0)`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Operation:        promParser.CardManyToMany.String(),
+					Returns:          promParser.ValueTypeVector,
+					Selector:         mustParse[*promParser.VectorSelector](t, `prometheus_ready{job="prometheus"}`, 0),
+					IncludedLabels:   []string{"job"},
+					GuaranteedLabels: []string{"job"},
+					Unless: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.FuncSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "vector",
+								AlwaysReturns:  true,
+								IsDead:         true,
+								IsDeadReason:   "the right hand side will never be matched because it doesn't have the `job` label from `on(...)`",
+								ReturnedNumber: 0,
+								FixedLabels:    true,
+								Call:           mustParse[*promParser.Call](t, "vector(0)", 50),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Calling `vector()` will return a vector value with no labels.",
+										Fragment: "vector(0)",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `
+max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})
+unless
+	sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})
+  	* on (instance) group_left (cluster)
+    cf_node_role{kubernetes_role="master",role="kubernetes"}
+`,
+			output: []utils.Source{
+				{
+					Type:           utils.AggregateSource,
+					Operation:      "max",
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, `cf_node_role{kubernetes_role="master",role="kubernetes"}`, 29),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})`, 1),
+					FixedLabels:    true,
+					IncludedLabels: []string{"instance", "cluster"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
+							Fragment: `max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})`,
+						},
+					},
+					Unless: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.AggregateSource,
+								Operation:      "sum",
+								Returns:        promParser.ValueTypeVector,
+								Selector:       mustParse[*promParser.VectorSelector](t, `node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"}`, 132),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})`, 95),
+								FixedLabels:    true,
+								IncludedLabels: []string{"instance", "cluster"},
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
+										Fragment: `sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})`,
+									},
+								},
+								Joins: []utils.Join{
+									{
+										Src: utils.Source{
+											Type:     utils.SelectorSource,
+											Returns:  promParser.ValueTypeVector,
+											Selector: mustParse[*promParser.VectorSelector](t, `cf_node_role{kubernetes_role="master",role="kubernetes"}`, 247),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on() bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:        utils.SelectorSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   promParser.CardOneToOne.String(),
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: `foo{a="1"} * on() bar{b="2"}`,
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								GuaranteedLabels: []string{"b"},
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 18),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on(instance) group_left(c,d) bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        promParser.CardManyToOne.String(),
+					IncludedLabels:   []string{"c", "d", "instance"},
+					GuaranteedLabels: []string{"a"},
+					Selector:         mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 42),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on(instance) group_right(c,d) bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        promParser.CardOneToMany.String(),
+					IncludedLabels:   []string{"c", "d", "instance"},
+					GuaranteedLabels: []string{"b"},
+					Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 43),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on(instance) sum(bar{b="2"})`,
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      promParser.CardOneToOne.String(),
+					IncludedLabels: []string{"instance"},
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					FixedLabels:    true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: `foo{a="1"} * on(instance) sum(bar{b="2"})`,
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Operation:   "sum",
+								Returns:     promParser.ValueTypeVector,
+								FixedLabels: true,
+								Selector:    mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 30),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 26),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `sum(bar{b="2"})`,
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"})`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        promParser.CardManyToOne.String(),
+					IncludedLabels:   []string{"c", "d", "instance"},
+					GuaranteedLabels: []string{"a"},
+					Selector:         mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Operation:   "sum",
+								Returns:     promParser.ValueTypeVector,
+								FixedLabels: true,
+								Selector:    mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 42),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `sum(bar{b="2"})`,
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `sum(foo{a="1"}) * on(instance) group_right(c,d) bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        promParser.CardOneToMany.String(),
+					IncludedLabels:   []string{"c", "d", "instance"},
+					GuaranteedLabels: []string{"b"},
+					Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 48),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:        utils.AggregateSource,
+								Operation:   "sum",
+								Returns:     promParser.ValueTypeVector,
+								FixedLabels: true,
+								Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"})`, 0),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation that removes all labels.",
+										Fragment: `sum(foo{a="1"})`,
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the left hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on(instance) group_left(c,d) sum(bar{b="2"}) without(instance)`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        promParser.CardManyToOne.String(),
+					IncludedLabels:   []string{"c", "d", "instance"},
+					GuaranteedLabels: []string{"a"},
+					Selector:         mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.AggregateSource,
+								Operation:      "sum",
+								Returns:        promParser.ValueTypeVector,
+								Selector:       mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"}) without(instance)`, 42),
+								ExcludedLabels: []string{"instance"},
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"instance": {
+										Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+										Fragment: `sum(bar{b="2"}) without(instance)`,
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `sum(foo{a="1"}) without(instance) * on(instance) group_right(c,d) bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:             utils.SelectorSource,
+					Returns:          promParser.ValueTypeVector,
+					Operation:        promParser.CardOneToMany.String(),
+					IncludedLabels:   []string{"c", "d", "instance"},
+					GuaranteedLabels: []string{"b"},
+					Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 66),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:           utils.AggregateSource,
+								Operation:      "sum",
+								Returns:        promParser.ValueTypeVector,
+								Selector:       mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) without(instance)`, 0),
+								ExcludedLabels: []string{"instance"},
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"instance": {
+										Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+										Fragment: `sum(foo{a="1"}) without(instance)`,
+									},
+								},
+								IsDead:       true,
+								IsDeadReason: "the left hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `
+ max without (source_instance) (
+   increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
+     increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
+   )
+   and on(device, instance) absent(node_disk_info)
+ ) * on(instance) group_left(group) label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")
+`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "max",
+					Selector:  mustParse[*promParser.VectorSelector](t, `kernel_device_io_errors_total{device!~"loop.+"}`, 46),
+					Call:      mustParse[*promParser.Call](t, `increase(kernel_device_io_errors_total{device!~"loop.+"}[120m])`, 37),
+					Aggregation: mustParse[*promParser.AggregateExpr](t,
+						`max without (source_instance) (
+   increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
+     increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
+   )
+   and on(device, instance) absent(node_disk_info)
+ )`, 2),
+					IncludedLabels: []string{"instance", "device", "group"},
+					ExcludedLabels: []string{"source_instance"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"source_instance": {
+							Reason:   "Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.",
+							Fragment: "max without (source_instance) (\n   increase(kernel_device_io_errors_total{device!~\"loop.+\"}[120m]) > 3 unless on(instance, device) (\n     increase(kernel_device_io_soft_errors_total{device!~\"loop.+\"}[125m])*2 > increase(kernel_device_io_errors_total[120m])\n   )\n   and on(device, instance) absent(node_disk_info)\n )",
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:         utils.FuncSource,
+								Returns:      promParser.ValueTypeVector,
+								Operation:    "absent",
+								FixedLabels:  true,
+								Selector:     mustParse[*promParser.VectorSelector](t, `node_disk_info`, 299),
+								Call:         mustParse[*promParser.Call](t, `absent(node_disk_info)`, 292),
+								IsDead:       true,
+								IsDeadReason: "the right hand side will never be matched because it doesn't have the `device` label from `on(...)`",
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+										Fragment: `absent(node_disk_info)`,
+									},
+								},
+							},
+						},
+						{
+							Src: utils.Source{
+								Type:      utils.FuncSource,
+								Returns:   promParser.ValueTypeVector,
+								Operation: "label_replace",
+								Selector:  mustParse[*promParser.VectorSelector](t, `salt_highstate_runner_configured_minions`, 365),
+								Call:      mustParse[*promParser.Call](t, `label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")`, 351),
+							},
+						},
+					},
+					Unless: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:          utils.FuncSource,
+								Returns:       promParser.ValueTypeVector,
+								Operation:     "increase",
+								IsConditional: true,
+								Selector:      mustParse[*promParser.VectorSelector](t, `kernel_device_io_soft_errors_total{device!~"loop.+"}`, 149),
+								Call:          mustParse[*promParser.Call](t, `increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])`, 140),
+								Joins: []utils.Join{
+									{
+										Src: utils.Source{
+											Type:      utils.FuncSource,
+											Returns:   promParser.ValueTypeVector,
+											Operation: "increase",
+											Selector:  mustParse[*promParser.VectorSelector](t, `kernel_device_io_errors_total`, 222),
+											Call:      mustParse[*promParser.Call](t, `increase(kernel_device_io_errors_total[120m])`, 213),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `sum(foo{a="1"}) by(job) * on() bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "sum",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) by(job)`, 0),
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: `sum(foo{a="1"}) by(job) * on() bar{b="2"}`,
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								GuaranteedLabels: []string{"b"},
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 31),
+							},
 						},
 					},
 				},
@@ -2753,4 +3601,53 @@ func TestLabelsSourceCallCoverageFail(t *testing.T) {
 	output := utils.LabelsSource("fake_call()", n.Expr)
 	require.Len(t, output, 1)
 	require.Nil(t, output[0].Call, "no call should have been detected in fake function")
+}
+
+func TestSourceFragment(t *testing.T) {
+	type testCaseT struct {
+		expr      string
+		fragments []string
+	}
+
+	testCases := []testCaseT{
+		{
+			expr:      "1",
+			fragments: []string{""},
+		},
+		{
+			expr:      `"foo"`,
+			fragments: []string{""},
+		},
+		{
+			expr:      `foo`,
+			fragments: []string{"foo"},
+		},
+		{
+			expr:      `foo{job="bar"}`,
+			fragments: []string{`foo{job="bar"}`},
+		},
+		{
+			expr:      `rate(foo{job="bar"}[5m])`,
+			fragments: []string{`rate(foo{job="bar"}[5m])`},
+		},
+		{
+			expr:      `sum(foo{job="bar"})`,
+			fragments: []string{`sum(foo{job="bar"})`},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.expr, func(t *testing.T) {
+			n, err := parser.DecodeExpr(tc.expr)
+			if err != nil {
+				t.Error(err)
+				t.FailNow()
+			}
+			var got []string
+			for _, src := range utils.LabelsSource(tc.expr, n.Expr) {
+				got = append(got, src.Fragment(tc.expr))
+			}
+			require.Equal(t, tc.fragments, got)
+		})
+	}
 }

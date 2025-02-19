@@ -124,6 +124,7 @@ func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRul
 		baseParsedRule(match, checks.FragileCheckName, checks.NewFragileCheck(), nil),
 		baseParsedRule(match, checks.RegexpCheckName, checks.NewRegexpCheck(), nil),
 		baseParsedRule(match, checks.RuleDependencyCheckName, checks.NewRuleDependencyCheck(), nil),
+		baseParsedRule(match, checks.ImpossibleCheckName, checks.NewImpossibleCheck(), nil),
 	)
 
 	for _, p := range proms {

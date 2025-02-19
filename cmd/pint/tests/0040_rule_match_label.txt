@@ -11,13 +11,13 @@ level=DEBUG msg="Glob finder completed" count=4
 level=INFO msg="Checking Prometheus rules" entries=4 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/rules.yml record=ignore lines=1-2 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible"] path=rules/rules.yml rule=ignore
 level=DEBUG msg="Found recording rule" path=rules/rules.yml record=match lines=4-7 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
 level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=ignore lines=9-10 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp"] path=rules/rules.yml rule=ignore
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible"] path=rules/rules.yml rule=ignore
 level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=match lines=12-15 state=noop
-level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
+level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
 rules/rules.yml:5 Warning: `job` label is required and should be preserved when aggregating `^.*$` rules, use `by(job, ...)`. (promql/aggregate)
  5 |   expr: sum(foo)
 

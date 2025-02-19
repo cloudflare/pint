@@ -9,7 +9,6 @@ linters:
     - revive
     - misspell
     - promlinter
-    - tenv
     - errorlint
     - errname
     - predeclared
