@@ -14,6 +14,7 @@
   which absence might be expected. For example using `foo unless bar` will now only have `foo`
   tested while `bar` is ignored by this check. This is because the query implies that `bar`
   might be present or missing and depending on that `foo` is evaluated.
+- Don't report regexp matchers with only digits in them (`{code=~"5.*"}`) as smelly in [promql/regexp](checks/promql/regexp.md) check.
 
 ## v0.70.0
 

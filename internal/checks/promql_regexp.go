@@ -7,6 +7,7 @@ import (
 	"regexp/syntax"
 	"slices"
 	"strings"
+	"unicode"
 
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
@@ -105,10 +106,10 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			// If it's not then it's a regexp match and we need to wrap it in ^...$.
 			re := lm.GetRegexString()
 			if regexp.QuoteMeta(re) != re {
-				re = "^(?:" + re + ")$"
+				re = "^(?s:" + re + ")$"
 			}
 
-			var hasFlags, isUseful, isWildcard, isLiteral, isBad, isSmelly bool
+			var hasFlags, isUseful, isWildcard, isLiteral, isBad, isSmelly, hasNonDigits bool
 			var beginText, endText int
 			var lastOp syntax.Op
 			r, _ := syntax.Parse(re, syntax.Perl)
@@ -118,7 +119,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				if s.Flags > 0 && s.Flags != syntax.Perl {
 					hasFlags = true
 				}
-				if isOpSmelly(s.Op, lastOp) {
+				if isOpSmelly(s.Op, lastOp) && hasNonDigits {
 					isSmelly = true
 				}
 				// nolint: exhaustive
@@ -128,6 +129,11 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				case syntax.OpEndText:
 					endText++
 				case syntax.OpLiteral:
+					for _, r := range s.Rune {
+						if !unicode.IsDigit(r) {
+							hasNonDigits = true
+						}
+					}
 					isLiteral = true
 				case syntax.OpEmptyMatch:
 					// pass
