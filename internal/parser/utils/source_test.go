@@ -3501,6 +3501,35 @@ unless
 				},
 			},
 		},
+		{
+			expr: `sum(foo{a="1"}) by(job) * on() bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:        utils.AggregateSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   "sum",
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) by(job)`, 0),
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: `sum(foo{a="1"}) by(job) * on() bar{b="2"}`,
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								GuaranteedLabels: []string{"b"},
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 31),
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
