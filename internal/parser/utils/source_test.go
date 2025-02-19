@@ -419,6 +419,23 @@ func TestLabelsSource(t *testing.T) {
 			},
 		},
 		{
+			expr: `foo{job=""}`,
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job=""}`, 0),
+					ExcludedLabels: []string{"job"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"job": {
+							Reason:   "Query uses `{job=\"\"}` selector which will filter out any time series with the `job` label set.",
+							Fragment: `foo{job=""}`,
+						},
+					},
+				},
+			},
+		},
+		{
 			expr: `foo{job="bar"} or bar{job="foo"}`,
 			output: []utils.Source{
 				{

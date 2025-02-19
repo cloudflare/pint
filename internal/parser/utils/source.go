@@ -153,6 +153,17 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Returns = promParser.ValueTypeVector
 		s.Selector = n
 		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, n)...)
+		for _, name := range labelsWithEmptyValueSelector(n) {
+			s = excludeLabel(s, name)
+			s.ExcludeReason = setInMap(
+				s.ExcludeReason,
+				name,
+				ExcludedLabel{
+					Reason:   fmt.Sprintf("Query uses `{%s=\"\"}` selector which will filter out any time series with the `%s` label set.", name, name),
+					Fragment: getQueryFragment(expr, n.PosRange),
+				},
+			)
+		}
 		src = append(src, s)
 
 	default:
@@ -231,24 +242,31 @@ func labelsFromSelectors(matches []labels.MatchType, selector *promParser.Vector
 	if selector == nil {
 		return nil
 	}
-	nameCount := map[string]int{}
-	var ok bool
 	// Any label used in positive filters is gurnateed to be present.
 	for _, lm := range selector.LabelMatchers {
 		if lm.Name == labels.MetricName {
 			continue
 		}
-
 		if !slices.Contains(matches, lm.Type) {
 			continue
 		}
-
 		names = appendToSlice(names, lm.Name)
+	}
+	return names
+}
 
-		if _, ok = nameCount[lm.Name]; !ok {
-			nameCount[lm.Name] = 0
+func labelsWithEmptyValueSelector(selector *promParser.VectorSelector) (names []string) {
+	if selector == nil {
+		return nil
+	}
+	for _, lm := range selector.LabelMatchers {
+		if lm.Name == labels.MetricName {
+			continue
 		}
-		nameCount[lm.Name]++
+		if lm.Type == labels.MatchEqual && lm.Value == "" {
+			names = appendToSlice(names, lm.Name)
+
+		}
 	}
 	return names
 }
