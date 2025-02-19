@@ -2190,15 +2190,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					IsConditional: true,
 				},
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`, 115),
-
-					GuaranteedLabels: []string{"cidr_use_case"},
-					ExcludedLabels:   []string{"router", "colo_id", "instance"},
-					FixedLabels:      true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`, 115),
+					ExcludedLabels: []string{"router", "colo_id", "instance"},
+					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
 							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
@@ -3168,6 +3166,34 @@ unless
 										},
 									},
 								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `foo{a="1"} * on() bar{b="2"}`,
+			output: []utils.Source{
+				{
+					Type:        utils.SelectorSource,
+					Returns:     promParser.ValueTypeVector,
+					Operation:   promParser.CardOneToOne.String(),
+					Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+					FixedLabels: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: `foo{a="1"} * on() bar{b="2"}`,
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								GuaranteedLabels: []string{"b"},
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 18),
 							},
 						},
 					},

@@ -686,10 +686,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if n.VectorMatching.On {
 				s.FixedLabels = true
 				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
-				if len(n.VectorMatching.MatchingLabels) > 0 {
-					s = restrictIncludedLabels(s, n.VectorMatching.MatchingLabels)
-					s = restrictGuaranteedLabels(s, n.VectorMatching.MatchingLabels)
-				}
+				s = restrictIncludedLabels(s, n.VectorMatching.MatchingLabels)
+				s = restrictGuaranteedLabels(s, n.VectorMatching.MatchingLabels)
 				s.ExcludeReason = setInMap(
 					s.ExcludeReason,
 					"",
