@@ -293,9 +293,6 @@ rules.yml:32-33 Bug: `rule/owner` comments are required in all files, please add
 rules.yml:33 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
  33 |     expr: errors / sum(requests) without(rack)
 
-rules.yml:33 Warning: Aggregation using `without()` can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using `by()` to ensure consistent labels. (promql/fragile)
- 33 |     expr: errors / sum(requests) without(rack)
-
 rules.yml:35-36 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
  35 |   - record: regexp
  36 |     expr: sum(no_such_metric{job=~"fake"})
@@ -331,9 +328,6 @@ rules.yml:38-39 Bug: `rule/owner` comments are required in all files, please add
  39 |     expr: errors / sum(requests) without(rack)
 
 rules.yml:39 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
- 39 |     expr: errors / sum(requests) without(rack)
-
-rules.yml:39 Warning: Aggregation using `without()` can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using `by()` to ensure consistent labels. (promql/fragile)
  39 |     expr: errors / sum(requests) without(rack)
 
 level=ERROR msg="Fatal error" err="submitting reports: fatal error(s) reported"

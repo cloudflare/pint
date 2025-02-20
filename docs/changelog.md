@@ -9,6 +9,10 @@
 - Added [promql/impossible](checks/promql/impossible.md) check.
 - Added `ignoreMatchingElsewhere` option to [promql/series](checks/promql/series.md) check.
 
+### Changed
+
+- Removed aggregation checks from the [promql/fragile](checks/promql/fragile.md) check - #1289.
+
 ### Fixed
 
 - Improved the logic of [promql/series](checks/promql/series.md) check to skip checks on some selectors
