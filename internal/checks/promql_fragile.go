@@ -54,16 +54,6 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 		return nil
 	}
 
-	for _, problem := range c.checkAggregation(expr.Value.Value, expr.Query) {
-		problems = append(problems, Problem{
-			Lines:    expr.Value.Lines,
-			Reporter: c.Reporter(),
-			Text:     problem.text,
-			Details:  problem.details,
-			Severity: problem.severity,
-		})
-	}
-
 	if rule.AlertingRule != nil {
 		for _, problem := range c.checkSampling(expr.Value.Value, expr.Query.Expr) {
 			problems = append(problems, Problem{
@@ -74,54 +64,6 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 				Severity: problem.severity,
 			})
 		}
-	}
-
-	return problems
-}
-
-func (c FragileCheck) checkAggregation(query string, node *parser.PromQLNode) (problems []exprProblem) {
-	if n := utils.HasOuterBinaryExpr(node); n != nil && n.Op != promParser.LOR && n.Op != promParser.LUNLESS {
-		if n.VectorMatching != nil && n.VectorMatching.On {
-			goto NEXT
-		}
-		if _, ok := n.LHS.(*promParser.NumberLiteral); ok {
-			goto NEXT
-		}
-		if _, ok := n.RHS.(*promParser.NumberLiteral); ok {
-			goto NEXT
-		}
-		var isFragile bool
-		for _, child := range node.Children {
-			for _, src := range utils.LabelsSource(query, child.Expr) {
-				if src.Type == utils.AggregateSource && !src.FixedLabels {
-					isFragile = true
-				}
-			}
-		}
-		if !isFragile {
-			goto NEXT
-		}
-
-		// don't report any issues if query uses same metric for both sides
-		series := map[string]struct{}{}
-		for _, ac := range node.Children {
-			for _, vs := range utils.HasVectorSelector(ac) {
-				series[vs.Name] = struct{}{}
-			}
-		}
-		if len(series) >= 2 {
-			p := exprProblem{
-				text:     "Aggregation using `without()` can be fragile when used inside binary expression because both sides must have identical sets of labels to produce any results, adding or removing labels to metrics used here can easily break the query, consider aggregating using `by()` to ensure consistent labels.",
-				severity: Warning,
-			}
-			problems = append(problems, p)
-			return problems
-		}
-	}
-
-NEXT:
-	for _, child := range node.Children {
-		problems = append(problems, c.checkAggregation(query, child)...)
 	}
 
 	return problems
