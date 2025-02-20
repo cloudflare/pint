@@ -252,8 +252,8 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 	if exprPart != nil && exprPart.Value.Lines.First != exprPart.Value.Lines.Last {
 		contentLines := strings.Split(string(content), "\n")
 		for {
-			start := exprPart.Value.Lines.First
-			end := exprPart.Value.Lines.Last
+			start := exprPart.Value.Lines.First - offset
+			end := exprPart.Value.Lines.Last - offset
 			if end > len(contentLines) {
 				end--
 			}
