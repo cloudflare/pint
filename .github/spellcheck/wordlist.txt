@@ -41,6 +41,7 @@ promql
 PromQL
 PRs
 prymitive
+pushgateway
 rulefmt
 samber
 SNI
