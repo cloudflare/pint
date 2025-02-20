@@ -1,0 +1,255 @@
+exec pint --no-color lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=9 workers=10 online=true
+rules/1.yaml:149-150 Warning: `summary` annotation is required. (alerts/annotation)
+ 149 |             annotations:
+ 150 |               description: Thanos Ruler has not been able to reload its configuration.
+
+level=INFO msg="Problems found" Warning=1
+-- .pint.hcl --
+parser {
+  relaxed = [".*"]
+}
+rule {
+  match {
+    kind = "alerting"
+  }
+  annotation "summary" {
+    severity = "warning"
+    required = true
+  }
+}
+
+-- rules/1.yaml --
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: thanos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ruler-core
+      component: ruler
+  serviceName: thanos-ruler
+  template:
+    metadata:
+      labels:
+        app: ruler-core
+        component: ruler
+    spec:
+      containers:
+        - args:
+            - --log.format=json
+            - --http-address=0.0.0.0:10902
+            - --grpc-address=0.0.0.0:10901
+            - --eval-interval=1m
+            - |
+              --tracing.config=
+              type: JAEGER
+              config:
+                sampler_param: 0.01
+                sampler_type: probabilistic
+          command:
+            - /bin/thanos
+            - rule
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: 10902
+            initialDelaySeconds: 30
+            terminationGracePeriodSeconds: 300
+            timeoutSeconds: 5
+          name: ruler
+          ports:
+            - containerPort: 10902
+              name: http-metrics
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: 10902
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "4"
+              memory: 4G
+            requests:
+              cpu: "4"
+              memory: 4G
+        - args:
+            - --config=/rules/current/.pint.hcl
+            - watch
+            - --listen=:10904
+            - --max-problems=50
+            - glob
+            - /rules/current/rules/*
+          command:
+            - /usr/local/bin/pint
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 10904
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          name: pint
+          ports:
+            - containerPort: 10904
+              name: pint
+          resources:
+            limits:
+              cpu: "1"
+              memory: 256Mi
+            requests:
+              cpu: "1"
+              memory: 256Mi
+          volumeMounts:
+            - mountPath: /rules
+              name: rules
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    prometheus.cfplat.com/rules: "true"
+  name: ruler-core-ruler
+  namespace: thanos
+data:
+  rules: |
+    groups:
+      - name: ruler-health-alerts
+        rules:
+          - alert: Thanos_Rule_Queue_Is_Dropping_Alerts
+            expr: rate(thanos_alert_queue_alerts_dropped_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler is failing to queue alerts.
+          - alert: Thanos_Rule_Sender_Is_Dropping_Alerts
+            expr: rate(thanos_alert_sender_alerts_dropped_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler is failing to send alerts.
+          - alert: Thanos_Rule_High_Rule_Evaluation_Failures
+            expr: |2-
+              
+                                  (
+                                    sum(rate(prometheus_rule_evaluation_failures_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                    by (job,kubernetes_name,pod, pod_app, pod_component)
+                                  /
+                                    sum(rate(prometheus_rule_evaluations_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]))
+                                    by (job,kubernetes_name,pod, pod_app, pod_component)
+                                  * 100 > 5
+                                  )
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler is failing to evaluate {{ $value | humanize }}% of rules.
+          - alert: Thanos_Rule_High_Rule_Evaluation_Warnings
+            expr: rate(thanos_rule_evaluation_with_warnings_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0
+            for: 30m
+            labels:
+              priority: "4"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler has high number of evaluation warnings.
+          - alert: Thanos_Rule_Config_Reload_Failed
+            expr: max_over_time(thanos_rule_config_last_reload_successful{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[10m]) < 1
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              description: Thanos Ruler has not been able to reload its configuration.
+          - alert: Thanos_Rule_No_Evaluations
+            expr: |2-
+              
+                                  label_replace(
+                                    (
+                                      (time() - prometheus_rule_group_last_evaluation_timestamp_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"})
+                                      >
+                                      (prometheus_rule_group_interval_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"} * 10)
+                                  ), "rule_group_name", "$1", "rule_group", ".*;(.+)")
+            for: 5m
+            labels:
+              priority: "3"
+              notify: chat-obs-metrics
+            annotations:
+              summary: Thanos Ruler did not evalute {{ $labels.rule_group_name }} for multiple intervals.
+          - alert: Thanos_Rule_Evaluations_Are_Failing
+            expr: |2-
+              
+                                  label_replace(
+                                    label_replace(
+                                      rate(prometheus_rule_evaluation_failures_total{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[2m]) > 0,
+                                      "rule_group_name", "$1",
+                                      "rule_group", ".*;(.+)"
+                                    ),
+                                    "filename", "$1",
+                                    "rule_group", ".*/current/rules/(.+);.+"
+                                  )
+                                  * on(filename, node) group_left(owner)
+                                  label_replace(pint_rule_file_owner, "filename", "$1", "filename", "/rules/.*/rules/(.+)")
+            for: 15m
+            labels:
+              priority: "3"
+              notify: "{{ $labels.owner }}"
+            annotations:
+              summary: Thanos Ruler failed to execute rules in rule group {{ $labels.rule_group_name }} in {{ $labels.filename }} for the last 15 minutes or more. All affected alerts won't work until this is resolved.
+          - alert: Thanos_Rule_Evaluation_Latency_Is_High
+            expr: |2-
+              
+                                  label_replace(
+                                    label_replace(
+                                      (
+                                        prometheus_rule_group_last_duration_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}
+                                        >=
+                                        prometheus_rule_group_interval_seconds{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}
+                                      ),
+                                      "rule_group_name", "$1",
+                                      "rule_group", ".*;(.+)"
+                                    ),
+                                    "filename", "$1",
+                                    "rule_group", ".*/current/rules/(.+);.+"
+                                  )
+                                  * on(filename, node) group_left(owner)
+                                  label_replace(pint_rule_file_owner, "filename", "$1", "filename", "/rules/.*/rules/(.+)")
+            for: 15m
+            labels:
+              priority: "4"
+              notify: "{{ $labels.owner }}"
+            annotations:
+              summary: Thanos Ruler has higher evaluation latency than interval for rule group {{ $labels.rule_group_name }} in {{ $labels.filename }}. Alert query is too expensive to keep up with how frequently it runs.
+          - alert: Prometheus_Rule_Failed_Checks
+            expr: |2-
+              
+                                sum(
+                                  pint_problem{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}
+                                ) without(instance, problem) > 0
+            for: 4h
+            labels:
+              priority: "4"
+              notify: "{{ $labels.owner }}"
+            annotations:
+              summary: |2-
+                
+                                      {{ with printf "pint_problem{kubernetes_namespace='thanos', pod_app='ruler-core', pod_component='ruler', filename='%s', name='%s', owner='%s', reporter='%s'}" .Labels.filename .Labels.name .Labels.owner .Labels.reporter | query }}
+                                        {{ . | first | label "problem" }}
+                                      {{ end }}
+              help: pint detected a problem with {{ $labels.name }} rule on {{ $externalLabels.prometheus }}, this means that a rule might be trying to query non-existent metrics or deployed to the wrong server
+              docs: https://cloudflare.github.io/pint/checks/{{ $labels.reporter }}.html
