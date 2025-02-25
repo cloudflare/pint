@@ -4,12 +4,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 
+	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
+	"github.com/prometheus/prometheus/promql/parser/posrange"
 )
 
 func mustParse[T any](t *testing.T, s string, offset int) T {
@@ -38,8 +42,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "1",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 				},
@@ -56,8 +59,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 0.2,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "1",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 				},
@@ -76,8 +78,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 32,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "2",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -97,8 +98,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "2",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -118,8 +118,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "2",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -137,8 +136,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "2",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -158,8 +156,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "2",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -179,8 +176,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 5,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "20",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -198,8 +194,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "2",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 				},
@@ -240,8 +235,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(2)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, "vector(2)", 8),
@@ -268,8 +262,7 @@ func TestLabelsSource(t *testing.T) {
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 22),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(2)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -295,8 +288,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(5)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, "vector(5)", 8),
@@ -312,8 +304,7 @@ func TestLabelsSource(t *testing.T) {
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 22),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(2)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -343,8 +334,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "1",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -362,8 +352,7 @@ func TestLabelsSource(t *testing.T) {
 					ReturnedNumber: 20,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "20",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -380,8 +369,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a string value with no labels.",
-							Fragment: `"test"`,
+							Reason: "This query returns a string value with no labels.",
 						},
 					},
 				},
@@ -428,8 +416,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
-							Reason:   "Query uses `{job=\"\"}` selector which will filter out any time series with the `job` label set.",
-							Fragment: `foo{job=""}`,
+							Reason: "Query uses `{job=\"\"}` selector which will filter out any time series with the `job` label set.",
 						},
 					},
 				},
@@ -547,8 +534,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo{job="myjob"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -566,8 +552,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(count(foo{job="myjob"}) by(instance))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -585,8 +570,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo{job="myjob"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -605,8 +589,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
-							Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum(foo{job="myjob"}) without(job)`,
+							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -625,8 +608,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `sum(foo) by(job)`,
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -646,8 +628,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `sum(foo{job="myjob"}) by(job)`,
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -700,8 +681,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels:   []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
-							Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum(foo{job="myjob"} or bar{cluster="dev"}) without(instance)`,
+							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -715,8 +695,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels:   []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
-							Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum(foo{job="myjob"} or bar{cluster="dev"}) without(instance)`,
+							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -735,8 +714,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels:   []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
-							Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum(foo{job="myjob"}) without(instance)`,
+							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -754,8 +732,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `min(foo{job="myjob"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -769,8 +746,7 @@ func TestLabelsSource(t *testing.T) {
 								FixedLabels: true,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `max(foo{job="myjob"})`,
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 							},
@@ -791,8 +767,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `max(foo{job="myjob"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -806,8 +781,7 @@ func TestLabelsSource(t *testing.T) {
 								FixedLabels: true,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `min(foo{job="myjob"})`,
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 							},
@@ -830,8 +804,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `avg(foo{job="myjob"}) by(job)`,
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -850,8 +823,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `group(foo) by(job)`,
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -870,8 +842,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `stddev(rate(foo[5m]))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -890,8 +861,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `stdvar(rate(foo[5m]))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -934,8 +904,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `quantile(0.9, rate(foo[5m]))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -955,8 +924,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `count_values("version", build_version)`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -976,8 +944,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels:   []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
-							Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `count_values("version", build_version) without(job)`,
+							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -997,8 +964,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels:   []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
-							Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `count_values("version", build_version{job="foo"}) without(job)`,
+							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -1018,8 +984,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `count_values("version", build_version) by(job)`,
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -1083,8 +1048,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels: []string{"instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
-							Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum(rate(foo[10m])) without(instance)`,
+							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -1123,8 +1087,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
-							Fragment: `foo{job="foo"} * on(instance) bar`,
+							Reason: "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1219,8 +1182,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `count(foo / bar)`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1247,8 +1209,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `count(up{job="a"} / on () up{job="b"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1276,8 +1237,7 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `count(up{job="a"} / on (env) up{job="b"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1385,8 +1345,7 @@ func TestLabelsSource(t *testing.T) {
 					ExcludedLabels: []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
-							Reason:   "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum(rate(foo[5m])) without(job)`,
+							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 				},
@@ -1536,16 +1495,13 @@ func TestLabelsSource(t *testing.T) {
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `sum(up{job="foo", cluster="dev"}) by(job, cluster)`,
+							Reason: "Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.",
 						},
 						"job": {
-							Reason:   "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`,
+							Reason: "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"cluster": {
-							Reason:   "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`,
+							Reason: "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 					IsConditional: true,
@@ -1563,8 +1519,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `year()` with no arguments will return an empty time series with no labels.",
-							Fragment: `year()`,
+							Reason: "Calling `year()` with no arguments will return an empty time series with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `year()`, 0),
@@ -1634,8 +1589,7 @@ sum(foo:count) by(job) > 20`,
 								FixedLabels:    true,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
-										Fragment: `sum(foo:count) by(job)`,
+										Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 									},
 								},
 								IsConditional: true,
@@ -1657,8 +1611,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
-							Fragment: `container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}`,
+							Reason: "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1708,8 +1661,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(foo{job="bar"})`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="bar"})`, 0),
@@ -1729,8 +1681,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`, 0),
@@ -1749,8 +1700,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(sum(foo) by(job, instance))`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(sum(foo) by(job, instance))`, 0),
@@ -1770,8 +1720,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(foo{job="prometheus", xxx="1"})`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="prometheus", xxx="1"})`, 0),
@@ -1800,8 +1749,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `sum(foo) by(notjob)`,
+							Reason: "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -1820,8 +1768,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `count(node_exporter_build_info) by (instance, version)`,
+							Reason: "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 					IsConditional: true,
@@ -1837,8 +1784,7 @@ sum(foo:count) by(job) > 20`,
 								FixedLabels:    true,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.",
-										Fragment: `count(deb_package_version) by (instance, version, package)`,
+										Reason: "Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.",
 									},
 								},
 							},
@@ -1858,8 +1804,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(foo)`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo)`, 0),
@@ -1872,8 +1817,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(bar)`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(bar)`, 15),
@@ -1891,8 +1835,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent_over_time(foo[5m])`,
+							Reason: "The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent_over_time(foo[5m])`, 0),
@@ -1905,8 +1848,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(bar)`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(bar)`, 29),
@@ -1926,8 +1868,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(foo{job="xxx"})`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="xxx"})`, 37),
@@ -1956,8 +1897,7 @@ sum(foo:count) by(job) > 20`,
 					FixedLabels:      true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							Fragment: `absent(foo{job="xxx"})`,
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="xxx"})`, 25),
@@ -1985,8 +1925,7 @@ sum(foo:count) by(job) > 20`,
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: `vector(1)`,
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `vector(1)`, 0),
@@ -2004,8 +1943,7 @@ sum(foo:count) by(job) > 20`,
 					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: `vector(scalar(foo))`,
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `vector(scalar(foo))`, 0),
@@ -2025,8 +1963,7 @@ sum(foo:count) by(job) > 20`,
 					IsDeadReason:  "this query always evaluates to `0 == 1` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: `vector(0.0  >= bool 0.5)`,
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call:          mustParse[*promParser.Call](t, `vector(0.0  >= bool 0.5)`, 0),
@@ -2058,8 +1995,7 @@ sum(foo:count) by(job) > 20`,
 					AlwaysReturns: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `days_in_month()` with no arguments will return an empty time series with no labels.",
-							Fragment: `days_in_month()`,
+							Reason: "Calling `days_in_month()` with no arguments will return an empty time series with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `days_in_month()`, 0),
@@ -2108,8 +2044,7 @@ sum(foo:count) by(job) > 20`,
 					Call:             mustParse[*promParser.Call](t, `label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")`, 0),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `sum by (pod) (pod_status)`,
+							Reason: "Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 				},
@@ -2138,8 +2073,7 @@ sum(foo:count) by(job) > 20`,
 					ExcludedLabels:   []string{"job"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
-							Reason:   "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
-							Fragment: `up{instance="a", job="prometheus"} * ignoring(job) up{instance="a", job="pint"}`,
+							Reason: "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -2175,16 +2109,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					ExcludedLabels: []string{"router", "colo_id", "instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"colo_id": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"instance": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 					IsConditional: true,
@@ -2199,20 +2130,16 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"colo_id": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"instance": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"": {
-							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
-							Fragment: "sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~\".*tier1.*\"})\n< on() count(colo_router_tier:disabled_pops:max{tier=\"1\",router=~\"edge.*\"}) * 0.4",
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					IsConditional: true,
@@ -2227,8 +2154,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 								FixedLabels: true,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`,
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 							},
@@ -2245,16 +2171,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					ExcludedLabels:   []string{"router", "colo_id", "instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"colo_id": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 						"instance": {
-							Reason:   "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`,
+							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 					IsConditional: true,
@@ -2300,8 +2223,7 @@ sum by (region, target, colo_name) (
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: "sum by (region, target, colo_name) (\n    sum_over_time(probe_success{job=\"abc\"}[5m])\n\tor\n\tvector(1)\n)",
+							Reason: "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 					IsConditional: true,
@@ -2324,8 +2246,7 @@ sum by (region, target, colo_name) (
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(1)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -2344,8 +2265,7 @@ sum by (region, target, colo_name) (
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(1)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, "vector(1)", 0),
@@ -2374,8 +2294,7 @@ sum by (region, target, colo_name) (
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(0)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call:          mustParse[*promParser.Call](t, "vector(0)", 0),
@@ -2397,8 +2316,7 @@ sum by (region, target, colo_name) (
 					IsDeadReason:   "`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(0)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Call:          mustParse[*promParser.Call](t, "vector(0)", 0),
@@ -2414,8 +2332,7 @@ sum by (region, target, colo_name) (
 								ReturnedNumber: 1,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(1)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 								Call: mustParse[*promParser.Call](t, "vector(1)", 12),
@@ -2437,8 +2354,7 @@ sum by (region, target, colo_name) (
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo or vector(0))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2456,8 +2372,7 @@ sum by (region, target, colo_name) (
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: "sum(foo or vector(0))",
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2476,8 +2391,7 @@ sum by (region, target, colo_name) (
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo or vector(1))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2495,8 +2409,7 @@ sum by (region, target, colo_name) (
 					IsDeadReason:   "this query always evaluates to `1 == 2` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: "sum(foo or vector(1))",
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2515,8 +2428,7 @@ sum by (region, target, colo_name) (
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo or vector(1))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2532,8 +2444,7 @@ sum by (region, target, colo_name) (
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: "sum(foo or vector(1))",
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2552,8 +2463,7 @@ sum by (region, target, colo_name) (
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo or vector(2))`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2571,8 +2481,7 @@ sum by (region, target, colo_name) (
 					IsDeadReason:   "this query always evaluates to `2 != 2` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: "sum(foo or vector(2))",
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -2595,7 +2504,7 @@ or
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(sometimes{foo!="bar"} or vector(0)))`, // FIXME bogus )
+							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
 						},
 					},
 				},
@@ -2611,7 +2520,7 @@ or
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(sometimes{foo!="bar"} or vector(0)))`, // FIXME bogus )
+							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
 						},
 					},
 				},
@@ -2631,8 +2540,7 @@ or
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo)`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 				},
@@ -2646,8 +2554,7 @@ or
 					Call:           mustParse[*promParser.Call](t, "vector(1)", 72),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(1)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 				},
@@ -2674,8 +2581,7 @@ or
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(sometimes{foo!="bar"})`,
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -2699,7 +2605,7 @@ or
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `sum(bar))`, // FIXME bogus )
+										Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
 									},
 								},
 							},
@@ -2725,8 +2631,7 @@ or
 					Call:           mustParse[*promParser.Call](t, "vector(1)", 36),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(1)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					Joins: []utils.Join{
@@ -2750,7 +2655,7 @@ or
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `sum(bar))`, // FIXME bogus )
+										Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
 									},
 								},
 							},
@@ -2814,8 +2719,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(1)", 58),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(1)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -2841,8 +2745,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 114),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(2)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -2859,8 +2762,7 @@ or
 					Call:           mustParse[*promParser.Call](t, "vector(0)", 23),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(0)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -2885,8 +2787,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(1)", 58),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(1)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -2912,8 +2813,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 114),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(2)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -2936,8 +2836,7 @@ or
 					Call:             mustParse[*promParser.Call](t, `label_replace(vector(1), "nexthop_tag", "$1", "nexthop", "(.+)")`, 0),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Calling `vector()` will return a vector value with no labels.",
-							Fragment: "vector(1)",
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 				},
@@ -2956,7 +2855,7 @@ or
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: `sum(foo{job="myjob"}))`, // FIXME bogus )
+							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
 						},
 					},
 				},
@@ -2991,7 +2890,7 @@ or
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
-							Fragment: "group(vector(0)) )", // FIXME bogus )
+							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
 						},
 					},
 				},
@@ -3011,8 +2910,7 @@ or
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "This returns a number value with no labels.",
-							Fragment: "1",
+							Reason: "This query returns a number value with no labels.",
 						},
 					},
 				},
@@ -3039,8 +2937,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(0)", 42),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(0)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 								IsDead:       true,
@@ -3074,8 +2971,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(0)", 47),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(0)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -3108,8 +3004,7 @@ or
 								Call:           mustParse[*promParser.Call](t, "vector(0)", 50),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Calling `vector()` will return a vector value with no labels.",
-										Fragment: "vector(0)",
+										Reason: "Calling `vector()` will return a vector value with no labels.",
 									},
 								},
 							},
@@ -3137,8 +3032,7 @@ unless
 					IncludedLabels: []string{"instance", "cluster"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
-							Fragment: `max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})`,
+							Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 					Unless: []utils.Join{
@@ -3153,8 +3047,7 @@ unless
 								IncludedLabels: []string{"instance", "cluster"},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
-										Fragment: `sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})`,
+										Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
 									},
 								},
 								Joins: []utils.Join{
@@ -3183,8 +3076,7 @@ unless
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
-							Fragment: `foo{a="1"} * on() bar{b="2"}`,
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3256,8 +3148,7 @@ unless
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
-							Fragment: `foo{a="1"} * on(instance) sum(bar{b="2"})`,
+							Reason: "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3271,8 +3162,7 @@ unless
 								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 26),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `sum(bar{b="2"})`,
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 								IsDead:       true,
@@ -3304,8 +3194,7 @@ unless
 								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 42),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `sum(bar{b="2"})`,
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 								IsDead:       true,
@@ -3337,8 +3226,7 @@ unless
 								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"})`, 0),
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation that removes all labels.",
-										Fragment: `sum(foo{a="1"})`,
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 								IsDead:       true,
@@ -3370,8 +3258,7 @@ unless
 								ExcludedLabels: []string{"instance"},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"instance": {
-										Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
-										Fragment: `sum(bar{b="2"}) without(instance)`,
+										Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 									},
 								},
 								IsDead:       true,
@@ -3403,8 +3290,7 @@ unless
 								ExcludedLabels: []string{"instance"},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"instance": {
-										Reason:   "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
-										Fragment: `sum(foo{a="1"}) without(instance)`,
+										Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 									},
 								},
 								IsDead:       true,
@@ -3442,8 +3328,7 @@ unless
 					ExcludedLabels: []string{"source_instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"source_instance": {
-							Reason:   "Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.",
-							Fragment: "max without (source_instance) (\n   increase(kernel_device_io_errors_total{device!~\"loop.+\"}[120m]) > 3 unless on(instance, device) (\n     increase(kernel_device_io_soft_errors_total{device!~\"loop.+\"}[125m])*2 > increase(kernel_device_io_errors_total[120m])\n   )\n   and on(device, instance) absent(node_disk_info)\n )",
+							Reason: "Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3459,8 +3344,7 @@ unless
 								IsDeadReason: "the right hand side will never be matched because it doesn't have the `device` label from `on(...)`",
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-										Fragment: `absent(node_disk_info)`,
+										Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 									},
 								},
 							},
@@ -3513,8 +3397,7 @@ unless
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason:   "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
-							Fragment: `sum(foo{a="1"}) by(job) * on() bar{b="2"}`,
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3541,8 +3424,13 @@ unless
 			}
 			output := utils.LabelsSource(tc.expr, n.Expr)
 			require.Len(t, output, len(tc.output))
-			for i := range len(tc.output) {
-				require.EqualExportedValues(t, tc.output[i], output[i], "Mismatch at index %d", i)
+			if diff := cmp.Diff(tc.output, output,
+				cmpopts.EquateNaNs(),
+				cmpopts.IgnoreUnexported(labels.Matcher{}),
+				cmpopts.IgnoreFields(utils.ExcludedLabel{}, "Fragment"),
+			); diff != "" {
+				t.Errorf("utils.LabelsSource() returned wrong output (-want +got):\n%s", diff)
+				return
 			}
 		})
 	}
