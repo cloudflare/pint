@@ -133,7 +133,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr.Value.Value, label.Key.Value, label.Value.Value, src) {
+			for _, problem := range checkQueryLabels(label.Key.Value, label.Value.Value, src) {
 				problems = append(problems, Problem{
 					Lines: parser.LineRange{
 						First: label.Key.Lines.First,
@@ -163,7 +163,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr.Value.Value, annotation.Key.Value, annotation.Value.Value, src) {
+			for _, problem := range checkQueryLabels(annotation.Key.Value, annotation.Value.Value, src) {
 				problems = append(problems, Problem{
 					Lines: parser.LineRange{
 						First: annotation.Key.Lines.First,
@@ -425,7 +425,7 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func checkQueryLabels(query, labelName, labelValue string, src []utils.Source) (problems []exprProblem) {
+func checkQueryLabels(labelName, labelValue string, src []utils.Source) (problems []exprProblem) {
 	vars, aliases, ok := findTemplateVariables(labelName, labelValue)
 	if !ok {
 		return nil
@@ -450,11 +450,11 @@ func checkQueryLabels(query, labelName, labelValue string, src []utils.Source) (
 						continue
 					}
 					if s.FixedLabels {
-						problems = append(problems, textForProblem(query, v[1], "", s, Bug))
+						problems = append(problems, textForProblem(v[1], "", s, Bug))
 						goto NEXT
 					}
 					if slices.Contains(s.ExcludedLabels, v[1]) {
-						problems = append(problems, textForProblem(query, v[1], v[1], s, Bug))
+						problems = append(problems, textForProblem(v[1], v[1], s, Bug))
 						goto NEXT
 					}
 				}
@@ -467,14 +467,10 @@ func checkQueryLabels(query, labelName, labelValue string, src []utils.Source) (
 	return problems
 }
 
-func textForProblem(query, label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
-	details := src.ExcludeReason[reasonLabel].Reason
-	if query != src.ExcludeReason[reasonLabel].Fragment {
-		details = fmt.Sprintf("%s\nQuery fragment causing this problem: `%s`.", details, src.ExcludeReason[reasonLabel].Fragment)
-	}
+func textForProblem(label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
 	return exprProblem{
 		text:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
-		details:  details,
+		details:  src.ExcludeReason[reasonLabel].Reason,
 		severity: severity,
 	}
 }
