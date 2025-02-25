@@ -15,12 +15,14 @@ func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
 	switch {
 	case node.Value == "":
 		lr.First = node.Line + offset
+		lr.Last = node.Line + offset
 	case node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle:
 		lr.First = node.Line + 1 + offset
+		lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
 	default:
 		lr.First = node.Line + offset
+		lr.Last = node.Line + offset
 	}
-	lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
 	return lr
 }
 
@@ -48,8 +50,9 @@ func mergeComments(node *yaml.Node) (comments []string) {
 }
 
 type YamlNode struct {
-	Value string
-	Lines LineRange
+	Value  string
+	Lines  LineRange
+	Column int
 }
 
 func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
@@ -65,23 +68,25 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 	return true
 }
 
-func newYamlNode(node *yaml.Node, offset int) *YamlNode {
+func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int) *YamlNode {
 	n := YamlNode{
-		Lines: nodeLines(node, offset),
-		Value: nodeValue(node),
+		Lines:  nodeLines(node, offsetLine),
+		Value:  nodeValue(node),
+		Column: node.Column + offsetColumn,
 	}
 	return &n
 }
 
-func newYamlNodeWithKey(key, node *yaml.Node, offset int) *YamlNode {
-	keyLines := nodeLines(key, offset)
-	valLines := nodeLines(node, offset)
+func newYamlNodeWithKey(key, node *yaml.Node, offsetLine, offsetColumn int) *YamlNode {
+	keyLines := nodeLines(key, offsetLine)
+	valLines := nodeLines(node, offsetLine)
 	n := YamlNode{
 		Lines: LineRange{
 			First: min(keyLines.First, valLines.First),
 			Last:  max(keyLines.Last, valLines.Last),
 		},
-		Value: nodeValue(node),
+		Value:  nodeValue(node),
+		Column: node.Column + offsetColumn,
 	}
 	return &n
 }
@@ -128,13 +133,13 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 	return nil
 }
 
-func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
+func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int) *YamlMap {
 	ym := YamlMap{
-		Key:   newYamlNode(key, offset),
+		Key:   newYamlNode(key, offsetLine, offsetColumn),
 		Items: nil,
 		Lines: LineRange{
-			First: key.Line + offset,
-			Last:  key.Line + offset,
+			First: key.Line + offsetLine,
+			Last:  key.Line + offsetLine,
 		},
 	}
 
@@ -142,8 +147,8 @@ func newYamlMap(key, value *yaml.Node, offset int) *YamlMap {
 	for _, child := range value.Content {
 		if ckey != nil {
 			kv := YamlKeyValue{
-				Key:   newYamlNode(ckey, offset),
-				Value: newYamlNode(child, offset),
+				Key:   newYamlNode(ckey, offsetLine, offsetColumn),
+				Value: newYamlNode(child, offsetLine, offsetColumn),
 			}
 			if kv.Value.Lines.Last > ym.Lines.Last {
 				ym.Lines.Last = kv.Value.Lines.Last
@@ -162,9 +167,9 @@ func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 	return pqle.Value.Value == b.Value.Value
 }
 
-func newPromQLExpr(key, val *yaml.Node, offset int) *PromQLExpr {
+func newPromQLExpr(key, val *yaml.Node, offsetLine, offsetColumn int) *PromQLExpr {
 	expr := PromQLExpr{
-		Value:       newYamlNodeWithKey(key, val, offset),
+		Value:       newYamlNodeWithKey(key, val, offsetLine, offsetColumn),
 		SyntaxError: nil,
 		Query:       nil,
 	}

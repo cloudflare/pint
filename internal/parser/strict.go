@@ -227,6 +227,6 @@ func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
 		}
 	}
 
-	r, _ := parseRule(content, rule, 0)
+	r, _ := parseRule(content, rule, 0, 0)
 	return r, ParseError{}
 }
