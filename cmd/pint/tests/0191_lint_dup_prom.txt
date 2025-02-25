@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": prometheus server name must be unique, found two or more config blocks using \"prom\" name"
+level=ERROR msg="Execution completed with error(s)" err="failed to load config file \".pint.hcl\": prometheus server name must be unique, found two or more config blocks using \"prom\" name"
 -- rules.yml --
 -- .pint.hcl --
 prometheus "prom" {

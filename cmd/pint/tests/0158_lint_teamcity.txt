@@ -21,7 +21,7 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 ##teamcity[testSuiteFinished name='Fatal']
 ##teamcity[testSuiteFinished name='promql/syntax']
 level=INFO msg="Problems found" Fatal=1 Warning=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 groups:
 - name: test

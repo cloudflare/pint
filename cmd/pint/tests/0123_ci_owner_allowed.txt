@@ -34,7 +34,7 @@ rules.yml:7-8 Bug: This rule is set as owned by `bob` but `bob` doesn't match an
  7 |   - alert: Invalid
  8 |     expr: up == 0
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --
 groups:
 - name: foo

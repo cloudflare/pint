@@ -3,4 +3,4 @@
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=ERROR msg="Fatal error" err="at least one file or directory required"
+level=ERROR msg="Execution completed with error(s)" err="at least one file or directory required"

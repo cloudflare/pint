@@ -9,4 +9,4 @@ cmp stderr stderr.txt
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=0 workers=10 online=true
 level=INFO msg="No rules found, skipping Prometheus discovery"
-level=ERROR msg="Fatal error" err="invalid --fail-on value: unknown severity: xxx"
+level=ERROR msg="Execution completed with error(s)" err="invalid --fail-on value: unknown severity: xxx"

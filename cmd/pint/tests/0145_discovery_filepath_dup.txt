@@ -30,7 +30,7 @@ level=DEBUG msg="Starting query workers" name=prom1 uri=https://prom1-backup.exa
 level=DEBUG msg="Stopping query workers" name=prom2 uri=https://unique.example.com
 level=DEBUG msg="Stopping query workers" name=prom1 uri=https://prom1.example.com
 level=DEBUG msg="Stopping query workers" name=prom1 uri=https://prom1-backup.example.com
-level=ERROR msg="Fatal error" err="Duplicated name for Prometheus server definition: prom2"
+level=ERROR msg="Execution completed with error(s)" err="Duplicated name for Prometheus server definition: prom2"
 -- rules/0001.yml --
 groups:
 - name: foo

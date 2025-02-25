@@ -47,7 +47,7 @@ prom2.yml:10 Bug: `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't ha
 prom2.yml:21 Bug: `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w. (promql/series)
  21 |     expr: up == 0
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v0.yml --
 groups:
 - name: g1

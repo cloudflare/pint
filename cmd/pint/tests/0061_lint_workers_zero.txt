@@ -3,4 +3,4 @@
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=ERROR msg="Fatal error" err="--workers flag must be > 0"
+level=ERROR msg="Execution completed with error(s)" err="--workers flag must be > 0"

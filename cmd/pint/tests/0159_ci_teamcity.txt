@@ -45,7 +45,7 @@ level=INFO msg="Problems found" Fatal=1 Warning=1
 ##teamcity[testFinished name='b.yml:4']
 ##teamcity[testSuiteFinished name='Warning']
 ##teamcity[testSuiteFinished name='alerts/comparison']
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/a.yml --
 - record: rule1
   expr: sum(foo) bi()

@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": template: regexp:1:126: executing \"regexp\" at <nil>: nil is not a command"
+level=ERROR msg="Execution completed with error(s)" err="failed to load config file \".pint.hcl\": template: regexp:1:126: executing \"regexp\" at <nil>: nil is not a command"
 -- rules/0001.yml --
 - alert: Instance Is Down 1
   expr: up == 0

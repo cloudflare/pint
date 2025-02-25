@@ -19,4 +19,4 @@ rules/0001.yml:5 Bug: Unnecessary regexp match on static string `job=~"xxx"`, us
  5 |       expr: up{job=~"xxx"}
 
 level=INFO msg="Problems found" Bug=1 Warning=1
-level=ERROR msg="Fatal error" err="found 2 problem(s) with severity Warning or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Warning or higher"

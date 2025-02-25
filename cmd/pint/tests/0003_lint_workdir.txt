@@ -62,7 +62,7 @@ rules/0003.yaml:61 Information: Using the value of `rate(errors[5m])` inside thi
  61 |     summary: 'error rate: {{ $value }}'
 
 level=INFO msg="Problems found" Fatal=1 Bug=2 Warning=10 Information=1
-level=ERROR msg="Fatal error" err="found 2 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m
   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)

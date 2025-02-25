@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": .pint.hcl:5,14-14: Missing required argument; The argument \"name\" is required, but no definition was found."
+level=ERROR msg="Execution completed with error(s)" err="failed to load config file \".pint.hcl\": .pint.hcl:5,14-14: Missing required argument; The argument \"name\" is required, but no definition was found."
 -- rules/0001.yml --
 groups:
 - name: foo

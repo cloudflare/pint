@@ -53,7 +53,7 @@ cmp stderr stderr.txt
 [0m[97m 40 |   expr: sum(byinstance) by(instance)
 [0m
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Problems found"[0m [2mFatal=[0m[94m1[0m [2mWarning=[0m[94m10[0m
-[2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97m"Fatal error"[0m [2merr=[0m[91m"found 1 problem(s) with severity Bug or higher"[0m
+[2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97m"Execution completed with error(s)"[0m [2merr=[0m[91m"found 1 problem(s) with severity Bug or higher"[0m
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m
   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)

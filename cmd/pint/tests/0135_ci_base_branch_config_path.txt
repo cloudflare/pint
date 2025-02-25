@@ -30,7 +30,7 @@ level=DEBUG msg="File path is in the exclude list" path=.pint.hcl exclude=["^.pi
 level=DEBUG msg="File parsed" path=rules.yml rules=1
 level=DEBUG msg="Glob finder completed" count=1
 level=DEBUG msg="Running git command" args=["log","--reverse","--no-merges","--first-parent","--format=%H","--name-status","origin/main..HEAD"]
-level=ERROR msg="Fatal error" err="failed to get the list of modified files from git: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
+level=ERROR msg="Execution completed with error(s)" err="failed to get the list of modified files from git: fatal: ambiguous argument 'origin/main..HEAD': unknown revision or path not in the working tree.\nUse '--' to separate paths from revisions, like this:\n'git <command> [<revision>...] -- [<file>...]'\n"
 -- src/v1.yml --
 - record: rule1
   expr: sum(foo) by(job)

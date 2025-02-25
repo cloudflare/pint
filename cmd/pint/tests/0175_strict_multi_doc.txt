@@ -12,7 +12,7 @@ rules/strict.yml:13 Fatal: This rule is not a valid Prometheus rule: `multi-docu
  13 | ---
 
 level=INFO msg="Problems found" Fatal=2
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 ---
 groups:

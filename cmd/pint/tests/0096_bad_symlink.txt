@@ -7,4 +7,4 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=ERROR msg="Fatal error" err="rules/symlink.yml is a symlink but target file cannot be evaluated: lstat rules/../bad.yml: no such file or directory"
+level=ERROR msg="Execution completed with error(s)" err="rules/symlink.yml is a symlink but target file cannot be evaluated: lstat rules/../bad.yml: no such file or directory"

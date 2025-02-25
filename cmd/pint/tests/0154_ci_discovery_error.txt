@@ -17,7 +17,7 @@ exec git commit -am 'v2'
 
 ! exec pint --no-color -l debug ci
 ! stdout .
-stderr 'level=ERROR msg="Fatal error" err="filepath discovery error: lstat notfound: no such file or directory"'
+stderr 'level=ERROR msg="Execution completed with error\(s\)" err="filepath discovery error: lstat notfound: no such file or directory"'
 
 -- src/v1.yml --
 - alert: rule1

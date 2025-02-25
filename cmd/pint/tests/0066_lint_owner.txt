@@ -19,7 +19,7 @@ rules/3.yml:1-2 Bug: `rule/owner` comments are required in all files, please add
  2 |   expr: up{job="foo"} == 0
 
 level=INFO msg="Problems found" Bug=3
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 groups:
 - name: foo

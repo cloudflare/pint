@@ -11,7 +11,7 @@ rules/0001.yaml:2 Bug: `errors[1h1s]` selector is trying to query Prometheus for
  2 |   expr: sum(rate(errors[1h1s])) > 0.5
 
 level=INFO msg="Problems found" Bug=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yaml --
 - alert: Error Rate
   expr: sum(rate(errors[1h1s])) > 0.5

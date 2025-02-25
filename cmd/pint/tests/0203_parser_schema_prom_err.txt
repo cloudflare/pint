@@ -11,7 +11,7 @@ rules/1.yml:3 Fatal: partial_response_strategy is only valid when parser is conf
  3 |   partial_response_strategy: warn
 
 level=INFO msg="Problems found" Fatal=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 groups:
 - name: foo

@@ -4,4 +4,4 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=DEBUG msg="Running git command" args=["rev-parse","--abbrev-ref","HEAD"]
-level=ERROR msg="Fatal error" err="failed to get the name of current branch"
+level=ERROR msg="Execution completed with error(s)" err="failed to get the name of current branch"

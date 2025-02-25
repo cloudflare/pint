@@ -4230,7 +4230,7 @@ rules/template.yml:4-5 Bug: `severity` label is required. (rule/label)
  4 | - alert: Test Alert 2
  5 |   expr: up == 0
 
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- copy.sh --
 for I in `seq 1 263` ; do cp rules/template.yml rules/$I.yml ; done
 

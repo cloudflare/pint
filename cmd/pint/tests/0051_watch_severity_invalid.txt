@@ -3,4 +3,4 @@
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=ERROR msg="Fatal error" err="invalid --min-severity value: unknown severity: foo"
+level=ERROR msg="Execution completed with error(s)" err="invalid --min-severity value: unknown severity: foo"

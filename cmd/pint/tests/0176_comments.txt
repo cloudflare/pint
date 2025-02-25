@@ -20,7 +20,7 @@ rules/1.yml:15 Bug: `prom` Prometheus server at http://127.0.0.1:7176 didn't hav
  15 |     expr: up == 0
 
 level=INFO msg="Problems found" Bug=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 ---
 groups:

@@ -4,7 +4,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
-level=ERROR msg="Fatal error" err="failed to load config file \".pint.hcl\": invalid prometheus TLS configuration: open prom-ca.pem: no such file or directory"
+level=ERROR msg="Execution completed with error(s)" err="failed to load config file \".pint.hcl\": invalid prometheus TLS configuration: open prom-ca.pem: no such file or directory"
 -- rules/1.yml --
 groups:
 - name: foo

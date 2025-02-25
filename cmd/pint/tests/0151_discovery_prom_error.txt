@@ -19,7 +19,7 @@ level=DEBUG msg="Running prometheus query" uri=http://127.0.0.1:7151 query=prome
 level=DEBUG msg="Trying to parse Prometheus error response" code=500
 level=ERROR msg="Query returned an error" err="bogus query" uri=http://127.0.0.1:7151 query=prometheus_ready
 level=DEBUG msg="Stopping query workers" name=discovery uri=http://127.0.0.1:7151
-level=ERROR msg="Fatal error" err="prometheusQuery discovery failed to execute Prometheus query: bad_data: bogus query"
+level=ERROR msg="Execution completed with error(s)" err="prometheusQuery discovery failed to execute Prometheus query: bad_data: bogus query"
 -- rules/0001.yml --
 groups:
 - name: foo

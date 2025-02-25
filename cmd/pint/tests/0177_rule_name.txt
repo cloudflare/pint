@@ -10,7 +10,7 @@ rules/01.yml:4 Bug: alerting rule name must match `^rec:.+$`. (rule/name)
  4 |   - alert: foo
 
 level=INFO msg="Problems found" Bug=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/01.yml --
 groups:
 - name: foo

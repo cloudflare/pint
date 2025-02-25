@@ -9,7 +9,6 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"log/slog"
 	"math/big"
 	"net"
 	"net/http"
@@ -26,17 +25,9 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"pint": func() int {
-			app := newApp()
-			err := app.Run(os.Args)
-			if err != nil {
-				slog.Error("Fatal error", slog.Any("err", err))
-				return 1
-			}
-			return 0
-		},
-	}))
+	testscript.Main(m, map[string]func(){
+		"pint": main,
+	})
 }
 
 func TestScripts(t *testing.T) {
