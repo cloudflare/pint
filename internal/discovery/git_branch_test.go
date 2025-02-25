@@ -223,7 +223,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{},
-					Rule:          mustParse(4, "- record: up:count\n  expr: count(up == 1)\n"),
+					Rule:          mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -258,7 +258,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{6},
-					Rule:          mustParse(4, "- record: up:count\n  expr: count(up == 1)\n"),
+					Rule:          mustParse(4, "  - record: up:count\n    expr: count(up == 1)\n"),
 				},
 			},
 		},
@@ -473,7 +473,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{6},
-					Rule:          mustParse(4, "- record: up:count:1\n  expr: count(up == 1)\n"),
+					Rule:          mustParse(4, "  - record: up:count:1\n    expr: count(up == 1)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -482,7 +482,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{7},
-					Rule:          mustParse(6, "- record: up:count:2a\n  expr: count(up)\n"),
+					Rule:          mustParse(6, "  - record: up:count:2a\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Noop,
@@ -491,7 +491,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{},
-					Rule:          mustParse(8, "- record: up:count:3\n  expr: count(up)\n"),
+					Rule:          mustParse(8, "  - record: up:count:3\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Added,
@@ -500,7 +500,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{11, 12},
-					Rule:          mustParse(10, "- record: up:count:4\n  expr: count(up)\n"),
+					Rule:          mustParse(10, "  - record: up:count:4\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -509,7 +509,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{7},
-					Rule:          mustParse(6, "- record: up:count:2\n  expr: count(up)\n"),
+					Rule:          mustParse(6, "  - record: up:count:2\n    expr: count(up)\n"),
 				},
 			},
 		},
@@ -723,7 +723,7 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: nil,
-					Rule:          mustParse(4, "- record: up:count\n  expr: count(up)\n"),
+					Rule:          mustParse(4, "  - record: up:count\n    expr: count(up)\n"),
 				},
 				{
 					State: discovery.Removed,
@@ -1240,7 +1240,7 @@ groups:
 				got, err := json.MarshalIndent(entries, "", "  ")
 				require.NoError(t, err, "json(got)")
 				if diff := cmp.Diff(string(expected), string(got)); diff != "" {
-					t.Errorf("tc.finder.Find()() returned wrong output (-want +got):\n%s", diff)
+					t.Errorf("tc.finder.Find() returned wrong output (-want +got):\n%s", diff)
 					return
 				}
 			}

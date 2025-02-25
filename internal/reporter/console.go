@@ -3,7 +3,6 @@ package reporter
 import (
 	"fmt"
 	"io"
-	"log/slog"
 	"os"
 	"strings"
 
@@ -67,17 +66,8 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 
 			if report.Problem.Anchor == checks.AnchorAfter {
 				lines := strings.Split(content, "\n")
-				lastLine := report.Problem.Lines.Last
-				if lastLine > len(lines)-1 {
-					lastLine = len(lines) - 1
-					slog.Warn(
-						"Tried to read more lines than present in the source file, this is likely due to '\n' usage in some rules, see https://github.com/cloudflare/pint/issues/20 for details",
-						slog.String("path", report.Path.Name),
-					)
-				}
-
-				nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine)+1)
-				for i := report.Problem.Lines.First; i <= lastLine; i++ {
+				nrFmt := fmt.Sprintf("%%%dd", countDigits(report.Problem.Lines.Last)+1)
+				for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
 					buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
 				}
 			}
