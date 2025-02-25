@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"math"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -27,7 +28,7 @@ const (
 
 type ExcludedLabel struct {
 	Reason   string
-	Fragment string
+	Fragment posrange.PositionRange
 }
 
 type Join struct {
@@ -58,13 +59,13 @@ type Source struct {
 func (s Source) Fragment(expr string) string {
 	switch {
 	case s.Type == FuncSource && s.Call != nil:
-		return getQueryFragment(expr, s.Call.PosRange)
+		return GetQueryFragment(expr, s.Call.PosRange)
 	case s.Call != nil:
-		return getQueryFragment(expr, s.Call.PosRange)
+		return GetQueryFragment(expr, s.Call.PosRange)
 	case s.Type == AggregateSource && s.Aggregation != nil:
-		return getQueryFragment(expr, s.Aggregation.PosRange)
+		return GetQueryFragment(expr, s.Aggregation.PosRange)
 	case s.Selector != nil:
-		return getQueryFragment(expr, s.Selector.PosRange)
+		return GetQueryFragment(expr, s.Selector.PosRange)
 	default:
 		return ""
 	}
@@ -116,8 +117,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 			s.ExcludeReason,
 			"",
 			ExcludedLabel{
-				Reason:   "This returns a number value with no labels.",
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Reason:   "This query returns a number value with no labels.",
+				Fragment: n.PosRange,
 			},
 		)
 		src = append(src, s)
@@ -136,8 +137,8 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 			s.ExcludeReason,
 			"",
 			ExcludedLabel{
-				Reason:   "This returns a string value with no labels.",
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Reason:   "This query returns a string value with no labels.",
+				Fragment: n.PosRange,
 			},
 		)
 		src = append(src, s)
@@ -160,7 +161,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 				name,
 				ExcludedLabel{
 					Reason:   fmt.Sprintf("Query uses `{%s=\"\"}` selector which will filter out any time series with the `%s` label set.", name, name),
-					Fragment: getQueryFragment(expr, n.PosRange),
+					Fragment: n.PosRange,
 				},
 			)
 		}
@@ -278,7 +279,7 @@ func labelsWithEmptyValueSelector(selector *promParser.VectorSelector) (names []
 	return names
 }
 
-func getQueryFragment(expr string, pos posrange.PositionRange) string {
+func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 	return expr[pos.Start:pos.End]
 }
 
@@ -390,7 +391,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					ExcludedLabel{
 						Reason: fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
 							strings.Join(n.Grouping, ", ")),
-						Fragment: getQueryFragment(expr, n.PosRange),
+						Fragment: findPosition(expr, n.PosRange, "without"),
 					},
 				)
 			}
@@ -403,7 +404,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					"",
 					ExcludedLabel{
 						Reason:   "Query is using aggregation that removes all labels.",
-						Fragment: getQueryFragment(expr, n.PosRange),
+						Fragment: findPosition(expr, n.PosRange, "sum"),
 					},
 				)
 			} else {
@@ -416,7 +417,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 						ExcludedLabel{
 							Reason: fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
 								strings.Join(n.Grouping, ", ")),
-							Fragment: getQueryFragment(expr, n.PosRange),
+							Fragment: findPosition(expr, n.PosRange, "by"),
 						},
 					)
 				}
@@ -472,7 +473,7 @@ Since there are no matching time series there are also no labels. If some time s
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `+"`up`"+` metric instead.`,
 					n.Func.Name, n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: findPosition(expr, n.PosRange, n.Func.Name),
 			},
 		)
 
@@ -496,7 +497,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				ExcludedLabel{
 					Reason: fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
 						n.Func.Name),
-					Fragment: getQueryFragment(expr, n.PosRange),
+					Fragment: n.PosRange,
 				},
 			)
 		} else {
@@ -540,7 +541,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: n.PosRange,
 			},
 		)
 
@@ -555,7 +556,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: findPosition(expr, n.PositionRange(), n.Func.Name),
 			},
 		)
 
@@ -574,7 +575,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: n.PosRange,
 			},
 		)
 
@@ -589,15 +590,17 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
 		s.AlwaysReturns = true
-		if v, ok := n.Args[0].(*promParser.NumberLiteral); ok {
-			s.ReturnedNumber = v.Val
+		for _, vs := range walkNode(expr, n.Args[0]) {
+			if !math.IsNaN(vs.ReturnedNumber) {
+				s.ReturnedNumber = vs.ReturnedNumber
+			}
 		}
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: findPosition(expr, n.PosRange, n.Func.Name),
 			},
 		)
 
@@ -696,13 +699,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 							"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
-						Fragment: getQueryFragment(
-							expr,
-							posrange.PositionRange{
-								Start: n.LHS.PositionRange().Start,
-								End:   n.RHS.PositionRange().End,
-							},
-						),
+						Fragment: findPosition(expr, n.PositionRange(), "on"),
 					},
 				)
 			} else {
@@ -716,13 +713,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 								"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
 								n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 							),
-							Fragment: getQueryFragment(
-								expr,
-								posrange.PositionRange{
-									Start: n.LHS.PositionRange().Start,
-									End:   n.RHS.PositionRange().End,
-								},
-							),
+							Fragment: findPosition(expr, n.PositionRange(), "ignoring"),
 						},
 					)
 				}
@@ -963,4 +954,17 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 		return math.Pow(ls.ReturnedNumber, rs.ReturnedNumber), isDead, ""
 	}
 	return ls.ReturnedNumber, isDead, ""
+}
+
+// FIXME sum() on ().
+func findPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
+	re := regexp.MustCompile("(" + fn + ")[ \n\t]*\\(")
+	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
+	if idx == nil {
+		return within
+	}
+	return posrange.PositionRange{
+		Start: within.Start + posrange.Pos(idx[0]),
+		End:   within.Start + posrange.Pos(idx[1]-2),
+	}
 }
