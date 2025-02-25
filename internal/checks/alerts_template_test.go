@@ -295,7 +295,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation that removes all labels.\nQuery fragment causing this problem: `sum(foo)`.",
+						Details:  "Query is using aggregation that removes all labels.",
 						Severity: checks.Bug,
 					},
 				}
@@ -315,7 +315,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation that removes all labels.\nQuery fragment causing this problem: `sum(foo)`.",
+						Details:  "Query is using aggregation that removes all labels.",
 						Severity: checks.Bug,
 					},
 				}
@@ -335,7 +335,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.\nQuery fragment causing this problem: `sum(foo) without(job)`.",
+						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						Severity: checks.Bug,
 					},
 				}
@@ -355,7 +355,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.\nQuery fragment causing this problem: `sum(foo) without(job)`.",
+						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						Severity: checks.Bug,
 					},
 				}
@@ -375,7 +375,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.\nQuery fragment causing this problem: `sum(foo) without(job)`.",
+						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 						Severity: checks.Bug,
 					},
 				}
@@ -395,7 +395,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation that removes all labels.\nQuery fragment causing this problem: `sum(bar)`.",
+						Details:  "Query is using aggregation that removes all labels.",
 						Severity: checks.Bug,
 					},
 				}
@@ -415,7 +415,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.\nQuery fragment causing this problem: `sum(foo) by(notjob)`.",
+						Details:  "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
 						Severity: checks.Bug,
 					},
 				}
@@ -441,7 +441,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `ixtance` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.\nQuery fragment causing this problem: `count(build_info) by (instance, version)`.",
+						Details:  "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
 						Severity: checks.Bug,
 					},
 				}
@@ -497,7 +497,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 					{
@@ -507,7 +507,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 					{
@@ -517,7 +517,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `foo` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 					{
@@ -527,7 +527,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `xxx` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -647,7 +647,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo)`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -684,7 +684,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `cluster` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 					{
@@ -694,7 +694,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `env` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -731,7 +731,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `cluster` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 					{
@@ -741,7 +741,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `env` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						Severity: checks.Bug,
 					},
 				}
@@ -1257,7 +1257,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "This returns a number value with no labels.\nQuery fragment causing this problem: `1`.",
+						Details:  "This query returns a number value with no labels.",
 						Severity: checks.Bug,
 					},
 					{
@@ -1267,7 +1267,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "This returns a number value with no labels.\nQuery fragment causing this problem: `1`.",
+						Details:  "This query returns a number value with no labels.",
 						Severity: checks.Bug,
 					},
 				}
@@ -1368,7 +1368,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `prefix` label but the query results won't have this label.",
-						Details:  "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.\nQuery fragment causing this problem: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~\".*tier1.*\"}) < on() count(colo_router_tier:disabled_pops:max{tier=\"1\",router=~\"edge.*\"}) * 0.4`.",
+						Details:  "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
 						Severity: checks.Bug,
 					},
 				}
@@ -1432,7 +1432,7 @@ func TestTemplateCheck(t *testing.T) {
 						},
 						Reporter: checks.TemplateCheckName,
 						Text:     "Template is using `colo_name` label but the query results won't have this label.",
-						Details:  "Calling `vector()` will return a vector value with no labels.\nQuery fragment causing this problem: `vector(0)`.",
+						Details:  "Calling `vector()` will return a vector value with no labels.",
 						Severity: checks.Bug,
 					},
 				}
