@@ -41,7 +41,7 @@ level=INFO msg="Problems found" Bug=1
 renamed.yaml:2 Bug: `prom` Prometheus server at http://127.0.0.1:7171 didn't have any series for `foo` metric in the last 1w. (promql/series)
  2 |   expr: sum(foo)
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yaml --
 - record: rule1
   # pint disable promql/series

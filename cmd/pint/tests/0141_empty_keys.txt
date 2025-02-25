@@ -24,7 +24,7 @@ rules.yml:15 Fatal: This rule is not a valid Prometheus rule: `expr value cannot
  15 |         expr:
 
 level=INFO msg="Problems found" Fatal=6
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules.yml --
 groups:
   - name: rules

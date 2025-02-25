@@ -18,7 +18,7 @@ exec git commit -am 'v2'
 
 ! exec pint -l debug -d promql/series --no-color ci
 ! stdout .
-stderr 'level=ERROR msg="Fatal error" err="symlink.yml is a symlink but target file cannot be evaluated: lstat xxx.yml: no such file or directory"'
+stderr 'level=ERROR msg="Execution completed with error\(s\)" err="symlink.yml is a symlink but target file cannot be evaluated: lstat xxx.yml: no such file or directory"'
 
 -- src/v1.yml --
 groups:

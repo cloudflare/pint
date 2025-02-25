@@ -28,7 +28,7 @@ level=INFO msg="Problems found" Bug=1
 rules.yml:4 Bug: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
  4 |   expr: sum(foo)
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/rules.yml --
 - record: rule1
   expr: sum(foo) by(job)

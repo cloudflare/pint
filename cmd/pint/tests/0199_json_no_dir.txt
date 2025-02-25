@@ -5,7 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
-level=ERROR msg="Fatal error" err="open x/y/z/problems.json: no such file or directory"
+level=ERROR msg="Execution completed with error(s)" err="open x/y/z/problems.json: no such file or directory"
 -- rules/0001.yml --
 groups:
 - name: test

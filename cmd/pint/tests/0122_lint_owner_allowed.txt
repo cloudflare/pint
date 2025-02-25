@@ -26,7 +26,7 @@ rules/3.yml:1 Bug: This file is set as owned by `ax` but `ax` doesn't match any 
  1 | # pint file/owner ax
 
 level=INFO msg="Problems found" Bug=5
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 groups:
 - name: foo

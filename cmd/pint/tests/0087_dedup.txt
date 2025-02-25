@@ -18,7 +18,7 @@ rules/01.yml:13 Bug: Template is using `cluster` label but the query results won
  13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
 
 level=INFO msg="Problems found" Bug=3 Warning=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/01.yml --
 groups:
 - name: foo

@@ -24,7 +24,7 @@ level=WARN msg="Duplicated prometheus server with different include" name=prom-h
 level=INFO msg="Configured new Prometheus server" name=prom-ha uris=1 uptime=up tags=[] include=["^prom1$"] exclude=[]
 level=DEBUG msg="Starting query workers" name=prom-ha uri=https://prom1.example.com workers=16
 level=DEBUG msg="Stopping query workers" name=prom-ha uri=https://prom1.example.com
-level=ERROR msg="Fatal error" err="Duplicated name for Prometheus server definition: prom-ha"
+level=ERROR msg="Execution completed with error(s)" err="Duplicated name for Prometheus server definition: prom-ha"
 -- rules/0001.yml --
 groups:
 - name: foo

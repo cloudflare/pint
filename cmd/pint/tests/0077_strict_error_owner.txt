@@ -12,7 +12,7 @@ rules/strict.yml:4-7 Bug: `rule/owner` comments are required in all files, pleas
  7 |       foo: bar
 
 level=INFO msg="Problems found" Bug=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 groups:
 - name: foo

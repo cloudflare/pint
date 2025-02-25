@@ -10,7 +10,7 @@ rules/0002.yml:2 Bug: `job` label is required and should be preserved when aggre
  2 |   expr: sum(foo) without(job)
 
 level=INFO msg="Problems found" Bug=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - record: "colo:test1"
   expr: sum(foo) without(job)

@@ -21,7 +21,7 @@ rules/strict.yml:20 Fatal: Template failed to parse with this error: `function "
  20 |       dashboard: '{{ bogus }}'
 
 level=INFO msg="Problems found" Fatal=5
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --
 groups:
 - name: foo

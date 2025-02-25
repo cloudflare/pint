@@ -17,7 +17,7 @@ exec git commit -am 'v2'
 
 ! exec pint --no-color -l debug ci
 ! stdout .
-stderr 'level=ERROR msg="Fatal error" err="BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket"'
+stderr 'level=ERROR msg="Execution completed with error\(s\)" err="BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket"'
 
 -- src/v1.yml --
 - alert: rule1

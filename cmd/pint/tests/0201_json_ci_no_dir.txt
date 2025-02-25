@@ -24,7 +24,7 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=false
 level=INFO msg="Offline mode, skipping Prometheus discovery"
-level=ERROR msg="Fatal error" err="open x/y/z/report.json: no such file or directory"
+level=ERROR msg="Execution completed with error(s)" err="open x/y/z/report.json: no such file or directory"
 -- src/v1.yml --
 - alert: rule1
   expr: sum(foo) by(job)

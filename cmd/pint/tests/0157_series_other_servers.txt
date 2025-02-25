@@ -24,7 +24,7 @@ rules/1.yml:5 Bug: `prom1` Prometheus server at http://127.0.0.1:7157 didn't hav
  5 |     expr: only_on_prom2 == 0
 
 level=INFO msg="Problems found" Bug=1
-level=ERROR msg="Fatal error" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 groups:
 - name: foo

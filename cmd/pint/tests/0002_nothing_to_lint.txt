@@ -5,4 +5,4 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=ERROR msg="Fatal error" err="no matching files"
+level=ERROR msg="Execution completed with error(s)" err="no matching files"

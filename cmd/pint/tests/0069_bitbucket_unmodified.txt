@@ -43,7 +43,7 @@ rules.yml:5 Bug: Unnecessary regexp match on static string `job=~"xxx"`, use `jo
 rules.yml:6 Information: `0s` is the default value of `for`, consider removing this redundant line. (alerts/for)
  6 |   for: 0s
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --
 - alert: rule1a
   expr: sum(foo{job=~"xxx"}) by(job)

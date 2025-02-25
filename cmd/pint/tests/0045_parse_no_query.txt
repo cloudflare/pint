@@ -3,4 +3,4 @@
 cmp stderr stderr.txt
 
 -- stderr.txt --
-level=ERROR msg="Fatal error" err="a query string is required"
+level=ERROR msg="Execution completed with error(s)" err="a query string is required"

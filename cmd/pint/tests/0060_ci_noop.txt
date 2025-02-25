@@ -36,7 +36,7 @@ level=INFO msg="Problems found" Fatal=1
 b.yml:2 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected identifier "bi". (promql/syntax)
  2 |   expr: sum(foo) bi()
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/a.yml --
 - record: rule1
   expr: sum(foo) bi()

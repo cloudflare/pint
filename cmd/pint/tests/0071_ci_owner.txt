@@ -37,7 +37,7 @@ rules.yml:6-7 Bug: `rule/owner` comments are required in all files, please add a
  6 |     - alert: rule2
  7 |       expr: sum(foo) by(job) > 0
 
-level=ERROR msg="Fatal error" err="problems found"
+level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --
 - alert: rule1
     expr: sum(foo) by(job)
