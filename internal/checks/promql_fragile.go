@@ -59,7 +59,7 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 			problems = append(problems, Problem{
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Text:     problem.text,
+				Summary:  problem.summary,
 				Details:  problem.details,
 				Severity: problem.severity,
 			})
@@ -81,7 +81,7 @@ func (c FragileCheck) checkSampling(expr string, node promParser.Node) (problems
 			continue
 		}
 		problems = append(problems, exprProblem{
-			text:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+			summary:  fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
 			details:  FragileCheckSamplingDetails,
 			severity: Warning,
 		})

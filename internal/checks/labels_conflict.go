@@ -65,7 +65,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 		problems = append(problems, Problem{
 			Lines:    labels.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
@@ -80,7 +80,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
+					Summary:  c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Warning,
 				})

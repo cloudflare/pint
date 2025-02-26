@@ -60,14 +60,16 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		return problems
 	}
 
-	var hasAbsent bool
-	for _, s := range utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr) {
-		if s.Operation == "absent" {
-			hasAbsent = true
+	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr)
+	absentSources := make([]utils.Source, 0, len(src))
+	for _, s := range src {
+		if s.Operation != "absent" {
+			continue
 		}
+		absentSources = append(absentSources, s)
 	}
 
-	if !hasAbsent {
+	if len(absentSources) == 0 {
 		return problems
 	}
 
@@ -81,32 +83,56 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
 	}
 
+	var forVal time.Duration
 	if rule.AlertingRule.For != nil {
 		forDur, err := model.ParseDuration(rule.AlertingRule.For.Value)
 		if err != nil {
 			return problems
 		}
-		if time.Duration(forDur) >= cfg.Config.Global.ScrapeInterval*2 {
+		forVal = time.Duration(forDur)
+		if forVal >= cfg.Config.Global.ScrapeInterval*2 {
 			return problems
 		}
 	}
 
-	problems = append(problems, Problem{
-		Lines:    rule.AlertingRule.Expr.Value.Lines,
-		Reporter: c.Reporter(),
-		Text: fmt.Sprintf("Alert query is using absent() which might cause false positives when %s restarts, please add `for: %s` to avoid this.",
-			promText(c.prom.Name(), cfg.URI),
-			output.HumanizeDuration((cfg.Config.Global.ScrapeInterval * 2).Round(time.Minute)),
-		),
-		Details:  AlertsAbsentCheckDetails,
-		Severity: Warning,
-	})
+	for _, s := range absentSources {
+		var summary string
+		diags := []output.Diagnostic{
+			{
+				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+				Line:        rule.AlertingRule.Expr.Value.Lines.First,
+				FirstColumn: rule.AlertingRule.Expr.Value.Column + int(s.Call.PosRange.Start),
+				LastColumn:  rule.AlertingRule.Expr.Value.Column + int(s.Call.PosRange.End) - 1,
+			},
+		}
+		if forVal > 0 {
+			summary = "absent() based alert with insufficient for"
+			diags = append(diags, output.Diagnostic{
+				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
+					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+				Line:        rule.AlertingRule.For.Lines.First,
+				FirstColumn: rule.AlertingRule.For.Column,
+				LastColumn:  nodeLastColumn(rule.AlertingRule.For),
+			})
+		} else {
+			summary = "absent() based alert without for"
+		}
+
+		problems = append(problems, Problem{
+			Lines:       rule.AlertingRule.Expr.Value.Lines,
+			Reporter:    c.Reporter(),
+			Summary:     summary,
+			Details:     AlertsAbsentCheckDetails,
+			Severity:    Warning,
+			Diagnostics: diags,
+		})
+	}
 
 	return problems
 }

@@ -7,16 +7,13 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func newAlertsAbsentCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewAlertsAbsentCheck(prom)
-}
-
-func absentForNeeded(prom, uri, d string) string {
-	return fmt.Sprintf("Alert query is using absent() which might cause false positives when `%s` Prometheus server at %s restarts, please add `for: %s` to avoid this.", prom, uri, d)
 }
 
 func TestAlertsAbsentCheck(t *testing.T) {
@@ -60,7 +57,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: count(foo) > 5 or absent(foo)\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -68,9 +65,17 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     absentForNeeded("prom", uri, "2m"),
+						Summary:  "absent() based alert without for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 27,
+								LastColumn:  37,
+								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+							},
+						},
 					},
 				}
 			},
@@ -86,7 +91,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: absent(foo)\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -94,9 +99,17 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     absentForNeeded("prom", uri, "2m"),
+						Summary:  "absent() based alert without for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  19,
+								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+							},
+						},
 					},
 				}
 			},
@@ -112,7 +125,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: absent(foo)\n  for: 1m\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -120,9 +133,23 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     absentForNeeded("prom", uri, "2m"),
+						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  19,
+								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+							},
+							{
+								Line:        3,
+								FirstColumn: 8,
+								LastColumn:  9,
+								Message:     "Use a value that's at least twice Prometheus scrape interval (`1m`).",
+							},
+						},
 					},
 				}
 			},
@@ -138,7 +165,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: absent(foo)\n  for: 1m\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -146,9 +173,23 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     absentForNeeded("prom", uri, "2m"),
+						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  19,
+								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+							},
+							{
+								Line:        3,
+								FirstColumn: 8,
+								LastColumn:  9,
+								Message:     "Use a value that's at least twice Prometheus scrape interval (`53s`).",
+							},
+						},
 					},
 				}
 			},
@@ -164,7 +205,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: absent(foo)\n  for: 30s\n",
 			checker:     newAlertsAbsentCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
+			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
@@ -172,9 +213,23 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     absentForNeeded("prom", uri, "2m"),
+						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  19,
+								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+							},
+							{
+								Line:        3,
+								FirstColumn: 8,
+								LastColumn:  10,
+								Message:     "Use a value that's at least twice Prometheus scrape interval (`1m`).",
+							},
+						},
 					},
 				}
 			},
@@ -211,7 +266,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Warning,
 					},
 				}
@@ -236,7 +291,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
+						Summary:  checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
 						Severity: checks.Bug,
 					},
 				}
@@ -263,7 +318,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Bug,
 					},
 				}
@@ -295,7 +350,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Text:     checkErrorBadData("prom", s, "bad_response: 600 status code 600"),
+						Summary:  checkErrorBadData("prom", s, "bad_response: 600 status code 600"),
 						Severity: checks.Warning,
 					},
 				}

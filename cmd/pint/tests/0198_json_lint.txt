@@ -7,7 +7,7 @@ cmp report.json expected.json
   {
     "path": "rules/0001.yml",
     "reporter": "promql/aggregate",
-    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "problem": "required label is being removed via aggregation",
     "severity": "Warning",
     "lines": [
       2
@@ -16,7 +16,7 @@ cmp report.json expected.json
   {
     "path": "rules/0001.yml",
     "reporter": "promql/aggregate",
-    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
+    "problem": "label must be removed in aggregations",
     "severity": "Warning",
     "lines": [
       6
@@ -25,7 +25,7 @@ cmp report.json expected.json
   {
     "path": "rules/0002.yaml",
     "reporter": "promql/regexp",
-    "problem": "Unnecessary regexp match on static string `job=~\"foo\"`, use `job=\"foo\"` instead.",
+    "problem": "redundant regexp",
     "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
     "severity": "Bug",
     "lines": [
@@ -35,7 +35,7 @@ cmp report.json expected.json
   {
     "path": "rules/0002.yaml",
     "reporter": "promql/regexp",
-    "problem": "Unnecessary regexp match on static string `job!~\"foo\"`, use `job!=\"foo\"` instead.",
+    "problem": "redundant regexp",
     "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
     "severity": "Bug",
     "lines": [
@@ -45,7 +45,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
+    "problem": "label must be removed in aggregations",
     "severity": "Warning",
     "lines": [
       11
@@ -54,7 +54,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "problem": "required label is being removed via aggregation",
     "severity": "Warning",
     "lines": [
       11
@@ -63,7 +63,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/syntax",
-    "problem": "Prometheus failed to parse the query with this PromQL error: unexpected right parenthesis ')'.",
+    "problem": "PromQL syntax error",
     "details": "[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.",
     "severity": "Fatal",
     "lines": [
@@ -73,7 +73,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "problem": "required label is being removed via aggregation",
     "severity": "Warning",
     "lines": [
       23,
@@ -84,7 +84,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
+    "problem": "label must be removed in aggregations",
     "severity": "Warning",
     "lines": [
       29,
@@ -95,7 +95,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "problem": "required label is being removed via aggregation",
     "severity": "Warning",
     "lines": [
       29,
@@ -106,7 +106,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
+    "problem": "required label is being removed via aggregation",
     "severity": "Warning",
     "lines": [
       35,
@@ -117,7 +117,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, remove instance from `by()`.",
+    "problem": "label must be removed in aggregations",
     "severity": "Warning",
     "lines": [
       40
@@ -126,7 +126,7 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "promql/aggregate",
-    "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`.",
+    "problem": "required label is being removed via aggregation",
     "severity": "Warning",
     "lines": [
       40
@@ -135,9 +135,12 @@ cmp report.json expected.json
   {
     "path": "rules/0003.yaml",
     "reporter": "alerts/template",
-    "problem": "Using the value of `rate(errors[5m])` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.",
+    "problem": "use humanize filters for the results",
     "severity": "Information",
     "lines": [
+      58,
+      59,
+      60,
       61
     ]
   }

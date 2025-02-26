@@ -35,6 +35,8 @@ type Join struct {
 	Src Source
 }
 
+// FIXME remove Selector/Call/Aggregation?
+// Use a single parser.Node instead?
 type Source struct {
 	Selector         *promParser.VectorSelector // Vector selector used for this source.
 	Call             *promParser.Call           // Most outer call used inside this source.
@@ -48,7 +50,8 @@ type Source struct {
 	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
 	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
 	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
-	ReturnedNumber   float64  // If AlwaysReturns=true this is the number that's returned
+	Position         posrange.PositionRange
+	ReturnedNumber   float64 // If AlwaysReturns=true this is the number that's returned
 	Type             SourceType
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 	IsDead           bool // True if this source cannot be reached and is dead code.
@@ -69,6 +72,38 @@ func (s Source) Fragment(expr string) string {
 	default:
 		return ""
 	}
+}
+
+func (s Source) GetSmallestPosition() (pr posrange.PositionRange) {
+	pr.Start = s.Position.Start
+	pr.End = s.Position.End
+
+	if s.Selector != nil {
+		pr.Start = max(pr.Start, s.Selector.PosRange.Start)
+		pr.End = min(pr.End, s.Selector.PosRange.End)
+	}
+	if s.Call != nil {
+		pr.Start = max(pr.Start, s.Call.PosRange.Start)
+		pr.End = min(pr.End, s.Call.PosRange.End)
+	}
+	if s.Aggregation != nil {
+		pr.Start = max(pr.Start, s.Aggregation.PosRange.Start)
+		pr.End = min(pr.End, s.Aggregation.PosRange.End)
+	}
+	return pr
+}
+
+func (s Source) CanHaveLabel(name string) bool {
+	if slices.Contains(s.ExcludedLabels, name) {
+		return false
+	}
+	if slices.Contains(s.IncludedLabels, name) {
+		return true
+	}
+	if slices.Contains(s.GuaranteedLabels, name) {
+		return true
+	}
+	return !s.FixedLabels
 }
 
 type Visitor func(s Source)
@@ -121,6 +156,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 				Fragment: n.PosRange,
 			},
 		)
+		s.Position = n.PosRange
 		src = append(src, s)
 
 	case *promParser.ParenExpr:
@@ -141,6 +177,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 				Fragment: n.PosRange,
 			},
 		)
+		s.Position = n.PosRange
 		src = append(src, s)
 
 	case *promParser.UnaryExpr:
@@ -165,6 +202,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 				},
 			)
 		}
+		s.Position = n.PosRange
 		src = append(src, s)
 
 	default:
@@ -291,48 +329,56 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "sum"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.MIN:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "min"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.MAX:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "max"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.AVG:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "avg"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.GROUP:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "group"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.STDDEV:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "stddev"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.STDVAR:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "stdvar"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.COUNT:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "count"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.COUNT_VALUES:
@@ -342,12 +388,14 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			// Param is the label to store the count value in.
 			s = includeLabel(s, n.Param.(*promParser.StringLiteral).Val)
 			s = guaranteeLabel(s, n.Param.(*promParser.StringLiteral).Val)
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.QUANTILE:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "quantile"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.TOPK:
@@ -355,6 +403,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Type = AggregateSource
 			s.Aggregation = n
 			s.Operation = "topk"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.BOTTOMK:
@@ -362,6 +411,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Type = AggregateSource
 			s.Aggregation = n
 			s.Operation = "bottomk"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 		/*
@@ -638,6 +688,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 		s.Type = FuncSource
 		s.Operation = n.Func.Name
 		s.Call = n
+		s.Position = n.PosRange
 		src = append(src, parsePromQLFunc(s, expr, n))
 	}
 
@@ -836,7 +887,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Src: rs,
 					})
 				case n.Op != promParser.LOR:
-
 					s.Joins = append(s.Joins, Join{
 						Src: rs,
 					})
@@ -874,31 +924,18 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {
 		return true, ""
 	case vm.On: // ls on(...) unless rs
 		for _, name := range vm.MatchingLabels {
-			if canHaveLabels(ls, name) && !canHaveLabels(rs, name) {
+			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
 				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`", side, name)
 			}
 		}
 	default: // ls unless rs
 		for _, name := range ls.GuaranteedLabels {
-			if canHaveLabels(ls, name) && !canHaveLabels(rs, name) {
+			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
 				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will", side, name)
 			}
 		}
 	}
 	return true, ""
-}
-
-func canHaveLabels(s Source, name string) bool {
-	if slices.Contains(s.ExcludedLabels, name) {
-		return false
-	}
-	if slices.Contains(s.IncludedLabels, name) {
-		return true
-	}
-	if slices.Contains(s.GuaranteedLabels, name) {
-		return true
-	}
-	return !s.FixedLabels
 }
 
 func ftos(v float64) string {
@@ -958,7 +995,7 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 
 // FIXME sum() on ().
 func findPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
-	re := regexp.MustCompile("(" + fn + ")[ \n\t]*\\(")
+	re := regexp.MustCompile("(?i)(" + fn + ")[ \n\t]*\\(")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {
 		return within

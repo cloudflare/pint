@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -77,7 +78,15 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s key `%s` is not allowed to match `%s`.", kind, label.Key.Value, c.keyRe.anchored),
+			Summary:  "key not allowed",
+			Diagnostics: []output.Diagnostic{
+				{
+					Line:        label.Key.Lines.Last,
+					FirstColumn: label.Key.Column,
+					LastColumn:  nodeLastColumn(label.Key),
+					Message:     fmt.Sprintf("key is not allowed to match `%s`.", c.keyRe.anchored),
+				},
+			},
 			Severity: c.severity,
 		})
 	}
@@ -88,7 +97,15 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string
 				Last:  label.Value.Lines.Last,
 			},
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s value `%s` is not allowed to match `%s`.", kind, label.Value.Value, c.valueRe.anchored),
+			Summary:  "value not allowed",
+			Diagnostics: []output.Diagnostic{
+				{
+					Line:        label.Value.Lines.Last,
+					FirstColumn: label.Value.Column,
+					LastColumn:  nodeLastColumn(label.Value),
+					Message:     fmt.Sprintf("value is not allowed to match `%s`.", c.valueRe.anchored),
+				},
+			},
 			Severity: c.severity,
 		})
 	}

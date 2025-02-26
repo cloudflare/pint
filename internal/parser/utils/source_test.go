@@ -3428,6 +3428,7 @@ unless
 				cmpopts.EquateNaNs(),
 				cmpopts.IgnoreUnexported(labels.Matcher{}),
 				cmpopts.IgnoreFields(utils.ExcludedLabel{}, "Fragment"),
+				cmpopts.IgnoreFields(utils.Source{}, "Position"),
 			); diff != "" {
 				t.Errorf("utils.LabelsSource() returned wrong output (-want +got):\n%s", diff)
 				return

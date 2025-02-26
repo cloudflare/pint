@@ -96,7 +96,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
+			Summary:  fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
 			Severity: Bug,
 		})
 	}

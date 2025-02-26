@@ -12,8 +12,12 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=DEBUG msg="Generated all Prometheus servers" count=0
 level=DEBUG msg="Found recording rule" path=rules/0001.yml record=sum:job lines=2-3 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/aggregate(job:true)"] path=rules/0001.yml rule=sum:job
-rules/0001.yml:3 Bug: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
- 3 |   expr: sum(foo)
+Bug: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0001.yml:3
+2 | - record: sum:job
+3 |   expr: sum(foo)
+            ^^^ Query is using aggregation that removes all labels.
+                `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

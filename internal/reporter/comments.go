@@ -63,7 +63,7 @@ func makeComments(summary Summary) (comments []PendingComment) {
 		buf.WriteString("** check.\n\n")
 		for _, report := range reports {
 			buf.WriteString("------\n\n")
-			buf.WriteString(report.Problem.Text)
+			buf.WriteString(report.Problem.Summary)
 			buf.WriteString("\n\n")
 			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
@@ -134,7 +134,7 @@ func dedupReports(src []Report) (dst [][]Report) {
 			continue
 		}
 		// Skip this report if we have exact same message already
-		if dst[index][0].Problem.Text == report.Problem.Text && dst[index][0].Problem.Details == report.Problem.Details {
+		if dst[index][0].Problem.Summary == report.Problem.Summary && dst[index][0].Problem.Details == report.Problem.Details {
 			continue
 		}
 		dst[index] = append(dst[index], report)

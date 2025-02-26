@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/neilotoole/slogt"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
@@ -157,7 +158,9 @@ func runTests(t *testing.T, testCases []checkTest) {
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
 				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
-				require.Equal(t, tc.problems(uri), problems)
+				if diff := cmp.Diff(tc.problems(uri), problems); diff != "" {
+					t.Errorf("wrong problems (-want +got):\n%s", diff)
+				}
 			}
 			cancel()
 
