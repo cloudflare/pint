@@ -71,7 +71,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 			problems = append(problems, Problem{
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				Summary:  fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -91,7 +91,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Annotations.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+			Summary:  fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -103,7 +103,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 			problems = append(problems, Problem{
 				Lines:    rule.AlertingRule.Annotations.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				Summary:  fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -126,7 +126,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+			Summary:  fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -154,7 +154,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 			problems = append(problems, Problem{
 				Lines:    lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` annotation value `%s` is not one of valid values.", c.keyRe.original, value),
+				Summary:  fmt.Sprintf("`%s` annotation value `%s` is not one of valid values.", c.keyRe.original, value),
 				Details:  details.String(),
 				Severity: c.severity,
 			})

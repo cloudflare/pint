@@ -46,7 +46,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
 						Severity: checks.Bug,
 					},
 				}
@@ -71,7 +71,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     `Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"`,
+						Summary:  `Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"`,
 						Severity: checks.Warning,
 					},
 					{
@@ -80,7 +80,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     retentionToLow("prom", uri, "foo[30d]", "30d", "15d"),
+						Summary:  retentionToLow("prom", uri, "foo[30d]", "30d", "15d"),
 						Severity: checks.Warning,
 					},
 				}
@@ -133,7 +133,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
+						Summary:  retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
 						Severity: checks.Warning,
 					},
 				}
@@ -173,7 +173,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     retentionToLow("prom", uri, "foo[11d1h]", "11d1h", "11d"),
+						Summary:  retentionToLow("prom", uri, "foo[11d1h]", "11d1h", "11d"),
 						Severity: checks.Warning,
 					},
 				}
@@ -200,7 +200,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
+						Summary:  retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
 						Severity: checks.Warning,
 					},
 				}
@@ -253,7 +253,7 @@ func TestRangeQueryCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "promql/range_query",
-						Text:     "`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.",
+						Summary:  "`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.",
 						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
 					},

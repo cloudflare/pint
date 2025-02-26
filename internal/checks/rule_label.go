@@ -79,7 +79,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -93,7 +93,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Lines:    rule.RecordingRule.Labels.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -118,7 +118,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -138,7 +138,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Labels.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+			Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -150,7 +150,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 			problems = append(problems, Problem{
 				Lines:    rule.AlertingRule.Labels.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -173,7 +173,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.Line
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+			Summary:  fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -201,7 +201,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.Line
 			problems = append(problems, Problem{
 				Lines:    lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("`%s` label value `%s` is not one of valid values.", c.keyRe.original, value),
+				Summary:  fmt.Sprintf("`%s` label value `%s` is not one of valid values.", c.keyRe.original, value),
 				Details:  details.String(),
 				Severity: c.severity,
 			})

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -70,9 +71,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  23,
+								Message:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+							},
+						},
 					},
 				}
 			},
@@ -90,9 +99,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary regexp match on static string `job!~\"bar\"`, use `job!=\"bar\"` instead.",
+						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  23,
+								Message:     "Unnecessary regexp match on static string `job!~\"bar\"`, use `job!=\"bar\"` instead.",
+							},
+						},
 					},
 				}
 			},
@@ -110,9 +127,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary regexp match on static string `job=~\"\"`, use `job=\"\"` instead.",
+						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  20,
+								Message:     "Unnecessary regexp match on static string `job=~\"\"`, use `job=\"\"` instead.",
+							},
+						},
 					},
 				}
 			},
@@ -130,9 +155,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"^.+$\"` will result in `job=~\"^^.+$$\"`, remove regexp anchors `^` and/or `$`.",
+						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  24,
+								Message:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"^.+$\"` will result in `job=~\"^^.+$$\"`, remove regexp anchors `^` and/or `$`.",
+							},
+						},
 					},
 				}
 			},
@@ -150,9 +183,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"(foo|^.+)$\"` will result in `job=~\"^(foo|^.+)$$\"`, remove regexp anchors `^` and/or `$`.",
+						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  30,
+								Message:     "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"(foo|^.+)$\"` will result in `job=~\"^(foo|^.+)$$\"`, remove regexp anchors `^` and/or `$`.",
+							},
+						},
 					},
 				}
 			},
@@ -170,9 +211,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  23,
+								Message:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+							},
+						},
 					},
 				}
 			},
@@ -190,9 +239,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  23,
+								Message:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+							},
+						},
 					},
 					{
 						Lines: parser.LineRange{
@@ -200,9 +257,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 27,
+								LastColumn:  56,
+								Message:     "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
+							},
+						},
 					},
 				}
 			},
@@ -227,9 +292,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `foo` if you want to match on all `job` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  22,
+								Message:     "Use `foo` if you want to match on all `job` values.",
+							},
+						},
 					},
 				}
 			},
@@ -247,9 +320,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `foo{instance=\"bob\"}` if you want to match on all `job` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  53,
+								Message:     "Use `foo{instance=\"bob\"}` if you want to match on all `job` values.",
+							},
+						},
 					},
 					{
 						Lines: parser.LineRange{
@@ -257,9 +338,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `foo{instance=\"bob\"}` if you want to match on all `cluster` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  53,
+								Message:     "Use `foo{instance=\"bob\"}` if you want to match on all `cluster` values.",
+							},
+						},
 					},
 				}
 			},
@@ -280,9 +369,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `{instance=\"bob\"}` if you want to match on all `job` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 5,
+								LastColumn:  46,
+								Message:     "Use `{instance=\"bob\"}` if you want to match on all `job` values.",
+							},
+						},
 					},
 					{
 						Lines: parser.LineRange{
@@ -290,9 +387,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `{instance=\"bob\"}` if you want to match on all `cluster` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 5,
+								LastColumn:  46,
+								Message:     "Use `{instance=\"bob\"}` if you want to match on all `cluster` values.",
+							},
+						},
 					},
 				}
 			},
@@ -313,9 +418,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `job` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 5,
+								LastColumn:  67,
+								Message:     "Use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `job` values.",
+							},
+						},
 					},
 					{
 						Lines: parser.LineRange{
@@ -323,9 +436,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `cluster` values.",
+						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 5,
+								LastColumn:  67,
+								Message:     "Use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `cluster` values.",
+							},
+						},
 					},
 				}
 			},
@@ -350,9 +471,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
+						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  22,
+								Message:     "Use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
+							},
+						},
 					},
 				}
 			},
@@ -370,9 +499,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "Unnecessary wildcard regexp, simply use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
+						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  22,
+								Message:     "Use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
+							},
+						},
 					},
 				}
 			},
@@ -418,9 +555,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+						Summary:  "smelly regexp selector",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  35,
+								Message:     "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+							},
+						},
 					},
 				}
 			},
@@ -456,9 +601,17 @@ func TestRegexpCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RegexpCheckName,
-						Text:     "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+						Summary:  "smelly regexp selector",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        2,
+								FirstColumn: 9,
+								LastColumn:  35,
+								Message:     "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+							},
+						},
 					},
 				}
 			},

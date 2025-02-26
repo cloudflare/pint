@@ -53,7 +53,7 @@ func TestCheckstyleReporter(t *testing.T) {
 							Last:  6,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Details:  "mock details",
 						Severity: checks.Information,
 					},
@@ -83,7 +83,7 @@ func TestCheckstyleReporter(t *testing.T) {
 							Last:  6,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Severity: checks.Bug,
 					},
 				},
@@ -112,7 +112,7 @@ func TestCheckstyleReporter(t *testing.T) {
 							Last:  6,
 						},
 						Reporter: "mock",
-						Text: `mock text
+						Summary: `mock text
 		with [new lines] and pipe| chars that are 'quoted'
 		`,
 						Severity: checks.Bug,

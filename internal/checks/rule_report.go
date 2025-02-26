@@ -45,7 +45,7 @@ func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 	problems = append(problems, Problem{
 		Lines:    rule.Lines,
 		Reporter: c.Reporter(),
-		Text:     c.comment,
+		Summary:  c.comment,
 		Severity: c.severity,
 	})
 	return problems

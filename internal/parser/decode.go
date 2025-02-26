@@ -9,7 +9,7 @@ import (
 
 type PromQLExpr struct {
 	Value       *YamlNode
-	SyntaxError error
+	SyntaxError error // FIXME we need promParser.ParseErrors here
 	Query       *PromQLNode
 }
 

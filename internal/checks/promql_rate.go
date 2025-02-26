@@ -78,7 +78,7 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
@@ -89,7 +89,7 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     problem.text,
+			Summary:  problem.summary,
 			Details:  problem.details,
 			Severity: problem.severity,
 		})
@@ -107,7 +107,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 			}
 			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
 				p := exprProblem{
-					text: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
+					summary: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
 						n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 					details:  RateCheckDetails,
 					severity: Bug,
@@ -129,7 +129,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 					}
 					text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 					problems = append(problems, exprProblem{
-						text:     text,
+						summary:  text,
 						severity: severity,
 					})
 					continue
@@ -137,7 +137,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 				for _, m := range metadata.Metadata {
 					if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
 						problems = append(problems, exprProblem{
-							text: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
+							summary: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
 								n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
 							details:  RateCheckDetails,
 							severity: Bug,
@@ -165,7 +165,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 									}
 									text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 									problems = append(problems, exprProblem{
-										text:     text,
+										summary:  text,
 										severity: severity,
 									})
 									continue
@@ -185,7 +185,7 @@ func (c RateCheck) checkNode(ctx context.Context, node *parser.PromQLNode, entri
 									continue
 								}
 								problems = append(problems, exprProblem{
-									text: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
+									summary: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
 										src.Operation, node.Expr, src.Operation, src.Selector),
 									details: fmt.Sprintf(
 										"You can only calculate `rate()` directly from a counter metric. "+

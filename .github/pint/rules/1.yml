@@ -8,5 +8,9 @@ groups:
   - alert: Service Is Down
     expr: up{job="abc"} == 0
 
+  - alert: Service Is Missing
+    expr: absent({job="myjob"})
+    for: 0mabs
+
   - alert: Everything Is Down
     expr: up:sum == 0

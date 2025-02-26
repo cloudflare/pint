@@ -85,7 +85,7 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
+			Summary:  fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -95,7 +95,7 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 		problems = append(problems, Problem{
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
+			Summary:  fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})

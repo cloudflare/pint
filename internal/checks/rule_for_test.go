@@ -80,7 +80,7 @@ func TestRuleForCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/for",
-						Text:     forMin("for", "5m"),
+						Summary:  forMin("for", "5m"),
 						Severity: checks.Warning,
 					},
 				}
@@ -101,7 +101,7 @@ func TestRuleForCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/for",
-						Text:     forMax("for", "2m"),
+						Summary:  forMax("for", "2m"),
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
 					},
@@ -141,7 +141,7 @@ func TestRuleForCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/for",
-						Text:     forMin("keep_firing_for", "5m"),
+						Summary:  forMin("keep_firing_for", "5m"),
 						Severity: checks.Warning,
 					},
 				}

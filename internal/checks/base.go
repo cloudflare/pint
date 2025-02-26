@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -111,12 +112,13 @@ const (
 )
 
 type Problem struct {
-	Reporter string
-	Text     string
-	Details  string
-	Lines    parser.LineRange
-	Severity Severity
-	Anchor   Anchor
+	Reporter    string
+	Summary     string
+	Details     string
+	Diagnostics []output.Diagnostic
+	Lines       parser.LineRange
+	Severity    Severity
+	Anchor      Anchor
 }
 
 type CheckMeta struct {
@@ -133,8 +135,9 @@ type RuleChecker interface {
 }
 
 type exprProblem struct {
-	text     string
+	summary  string
 	details  string
+	diags    []output.Diagnostic
 	severity Severity
 }
 
@@ -168,4 +171,11 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 
 func promText(name, uri string) string {
 	return fmt.Sprintf("`%s` Prometheus server at %s", name, uri)
+}
+
+func nodeLastColumn(node *parser.YamlNode) int {
+	if node.Value == "" {
+		return node.Column
+	}
+	return node.Column + len(node.Value) - 1
 }

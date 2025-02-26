@@ -76,7 +76,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
@@ -102,7 +102,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
+			Summary:  fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -113,7 +113,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+			Summary:  fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -124,7 +124,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+			Summary:  fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -136,7 +136,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+			Summary:  fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 		})
@@ -147,7 +147,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
+			Summary:  fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
 			Details:  maybeComment(c.comment),
 			Severity: Information,
 		})

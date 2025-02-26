@@ -403,7 +403,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			name,
 			strings.ToLower(report.Problem.Severity.String()),
 			report.Problem.Reporter,
-			report.Problem.Text,
+			report.Problem.Summary,
 			report.Owner,
 		)
 

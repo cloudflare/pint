@@ -3,3 +3,10 @@ groups:
   rules:
   - record: up:sum
     expr: sum(up)
+
+  - record: up:sum
+    expr: sum(up{instance!="none", job=~"bob", job=~"^abc", cluster="dev"})
+
+  - record: up:sum
+    expr: |
+      sum(up{instance!="none", job=~"bob", job=~"^abc", cluster="dev"})

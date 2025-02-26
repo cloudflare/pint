@@ -2,9 +2,9 @@ package checks
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -46,8 +46,16 @@ func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Prometheus failed to parse the query with this PromQL error: %s.", expr.SyntaxError),
+			Summary:  "PromQL syntax error",
 			Details:  SyntaxCheckDetails,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     expr.SyntaxError.Error(),
+					Line:        expr.Value.Lines.First,
+					FirstColumn: expr.Value.Column,
+					LastColumn:  nodeLastColumn(expr.Value),
+				},
+			},
 			Severity: Fatal,
 		})
 	}

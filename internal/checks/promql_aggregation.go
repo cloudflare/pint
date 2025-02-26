@@ -3,12 +3,11 @@ package checks
 import (
 	"context"
 	"fmt"
-	"log/slog"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
-
-	promParser "github.com/prometheus/prometheus/promql/parser"
+	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
 const (
@@ -81,111 +80,58 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 		}
 	}
 
-	for _, problem := range c.checkNode(expr.Query) {
-		problems = append(problems, Problem{
-			Lines:    expr.Value.Lines,
-			Reporter: c.Reporter(),
-			Text:     problem.text,
-			Details:  maybeComment(c.comment),
-			Severity: c.severity,
-		})
+	nameDesc := "`" + c.nameRegex.anchored + "`"
+	if nameDesc == "`^.+$`" || nameDesc == "`^.*$`" {
+		nameDesc = "all"
 	}
 
-	return problems
-}
-
-func (c AggregationCheck) checkNode(node *parser.PromQLNode) (problems []exprProblem) {
-	if n, ok := node.Expr.(*promParser.AggregateExpr); ok {
-		switch n.Op {
-		case promParser.SUM:
-		case promParser.MIN:
-		case promParser.MAX:
-		case promParser.AVG:
-		case promParser.GROUP:
-		case promParser.STDDEV:
-		case promParser.STDVAR:
-		case promParser.COUNT:
-		case promParser.COUNT_VALUES:
-		case promParser.BOTTOMK:
-			goto NEXT
-		case promParser.TOPK:
-			goto NEXT
-		case promParser.QUANTILE:
-		default:
-			slog.Warn("Unsupported aggregation operation", slog.String("op", n.Op.String()))
+	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
+		if src.Type != utils.AggregateSource {
+			continue
 		}
-
-		if !n.Without && !c.keep && len(n.Grouping) == 0 {
-			// most outer aggregation is stripping a label that we want to get rid of
-			// we can skip further checks
-			return problems
+		if c.keep && !src.CanHaveLabel(c.label) {
+			el := src.LabelExcludeReason(c.label)
+			problems = append(problems, Problem{
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Summary:  "required label is being removed via aggregation",
+				Details:  maybeComment(c.comment),
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     el.Reason,
+						Line:        expr.Value.Lines.First,
+						FirstColumn: expr.Value.Column + int(el.Fragment.Start),
+						LastColumn:  expr.Value.Column + int(el.Fragment.End),
+					},
+					{
+						Message: fmt.Sprintf("`%s` label is required and should be preserved when aggregating %s rules.",
+							c.label, nameDesc),
+						Line:        expr.Value.Lines.First,
+						FirstColumn: expr.Value.Column + int(el.Fragment.Start),
+						LastColumn:  expr.Value.Column + int(el.Fragment.End),
+					},
+				},
+				Severity: c.severity,
+			})
 		}
-
-		var found bool
-		for _, g := range n.Grouping {
-			if g == c.label {
-				found = true
-				break
-			}
+		if !c.keep && src.CanHaveLabel(c.label) {
+			problems = append(problems, Problem{
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Summary:  "label must be removed in aggregations",
+				Details:  maybeComment(c.comment),
+				Diagnostics: []output.Diagnostic{
+					{
+						Message: fmt.Sprintf("`%s` label should be removed when aggregating %s rules.",
+							c.label, nameDesc),
+						Line:        expr.Value.Lines.First,
+						FirstColumn: expr.Value.Column + int(src.Position.Start),
+						LastColumn:  expr.Value.Column + int(src.Position.End) - 1,
+					},
+				},
+				Severity: c.severity,
+			})
 		}
-
-		if n.Without {
-			if found && c.keep {
-				problems = append(problems, exprProblem{
-					text: fmt.Sprintf("`%s` label is required and should be preserved when aggregating `%s` rules, remove %s from `without()`.", c.label, c.nameRegex.anchored, c.label),
-				})
-			}
-
-			if !found && !c.keep {
-				problems = append(problems, exprProblem{
-					text: fmt.Sprintf("`%s` label should be removed when aggregating `%s` rules, use `without(%s, ...)`.", c.label, c.nameRegex.anchored, c.label),
-				})
-			}
-
-			// most outer aggregation is stripping a label that we want to get rid of
-			// we can skip further checks
-			if found && !c.keep {
-				return problems
-			}
-		} else {
-			if found && !c.keep {
-				problems = append(problems, exprProblem{
-					text: fmt.Sprintf("`%s` label should be removed when aggregating `%s` rules, remove %s from `by()`.", c.label, c.nameRegex.anchored, c.label),
-				})
-			}
-
-			if !found && c.keep {
-				problems = append(problems, exprProblem{
-					text: fmt.Sprintf("`%s` label is required and should be preserved when aggregating `%s` rules, use `by(%s, ...)`.", c.label, c.nameRegex.anchored, c.label),
-				})
-			}
-
-			// most outer aggregation is stripping a label that we want to get rid of
-			// we can skip further checks
-			if !found && !c.keep {
-				return problems
-			}
-		}
-	}
-
-NEXT:
-	if n, ok := node.Expr.(*promParser.BinaryExpr); ok && n.VectorMatching != nil {
-		switch n.VectorMatching.Card {
-		case promParser.CardOneToOne:
-			// sum() + sum()
-		case promParser.CardManyToOne, promParser.CardManyToMany:
-			problems = append(problems, c.checkNode(node.Children[0])...)
-			return problems
-		case promParser.CardOneToMany:
-			problems = append(problems, c.checkNode(node.Children[1])...)
-			return problems
-		default:
-			slog.Warn("Unsupported VectorMatching operation", slog.String("matching", n.VectorMatching.Card.String()))
-		}
-	}
-
-	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(child)...)
 	}
 
 	return problems

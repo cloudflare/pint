@@ -64,7 +64,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 		problems = append(problems, Problem{
 			Lines:    rule.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
@@ -79,7 +79,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)), Severity: Bug,
+					Summary:  fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)), Severity: Bug,
 					Details: fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 				})
 			}
@@ -95,7 +95,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 						Last:  annotation.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+					Summary:  fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
 				})

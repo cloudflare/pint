@@ -41,7 +41,25 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			}
 			buf.Reset()
 
-			buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, report.Path.Name))
+			var color output.Color
+			switch {
+			case cr.noColor:
+				color = output.None
+			case report.Problem.Severity == checks.Bug:
+				color = output.Red
+			case report.Problem.Severity == checks.Fatal:
+				color = output.Red
+			case report.Problem.Severity == checks.Warning:
+				color = output.Yellow
+			case report.Problem.Severity == checks.Information:
+				color = output.Dim
+			}
+
+			buf.WriteString(output.MaybeColor(color, cr.noColor, report.Problem.Severity.String()+": "))
+			buf.WriteString(output.MaybeColor(output.Bold, cr.noColor, report.Problem.Summary))
+			buf.WriteString(output.MaybeColor(output.Magenta, cr.noColor, " ("+report.Problem.Reporter+")\n"))
+
+			buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, "  ---> "+report.Path.Name))
 			if report.Path.Name != report.Path.SymlinkTarget {
 				buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, " ~> "+report.Path.SymlinkTarget))
 			}
@@ -49,26 +67,18 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			if report.Problem.Anchor == checks.AnchorBefore {
 				buf.WriteString(output.MaybeColor(output.Red, cr.noColor, " (deleted)"))
 			}
-			buf.WriteRune(' ')
-
-			switch report.Problem.Severity {
-			case checks.Bug, checks.Fatal:
-				buf.WriteString(output.MaybeColor(output.Red, cr.noColor,
-					report.Problem.Severity.String()+": "+report.Problem.Text))
-			case checks.Warning:
-				buf.WriteString(output.MaybeColor(output.Yellow, cr.noColor,
-					report.Problem.Severity.String()+": "+report.Problem.Text))
-			case checks.Information:
-				buf.WriteString(output.MaybeColor(output.Black, cr.noColor,
-					report.Problem.Severity.String()+": "+report.Problem.Text))
-			}
-			buf.WriteString(output.MaybeColor(output.Magenta, cr.noColor, " ("+report.Problem.Reporter+")\n"))
+			buf.WriteRune('\n')
 
 			if report.Problem.Anchor == checks.AnchorAfter {
-				lines := strings.Split(content, "\n")
-				nrFmt := fmt.Sprintf("%%%dd", countDigits(report.Problem.Lines.Last)+1)
-				for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
-					buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
+				if len(report.Problem.Diagnostics) > 0 {
+					body := output.InjectDiagnostics(content, report.Problem.Diagnostics, color, report.Rule.Lines.First, report.Rule.Lines.Last)
+					buf.WriteString(output.MaybeColor(output.White, cr.noColor, body))
+				} else {
+					lines := strings.Split(content, "\n")
+					nrFmt := fmt.Sprintf("%%%dd", countDigits(report.Problem.Lines.Last)+1)
+					for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
+						buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
+					}
 				}
 			}
 

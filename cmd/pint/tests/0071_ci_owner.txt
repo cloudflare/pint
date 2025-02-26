@@ -26,14 +26,17 @@ cd ..
 cmp stderr stderr.txt
 
 -- stderr.txt --
-rules.yml:4-5 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+  ---> rules.yml:4-5
  4 |     - alert: rule1
  5 |       expr: sum(foo) by(job)
 
-rules.yml:5 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+  ---> rules.yml:5
  5 |       expr: sum(foo) by(job)
 
-rules.yml:6-7 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+  ---> rules.yml:6-7
  6 |     - alert: rule2
  7 |       expr: sum(foo) by(job) > 0
 

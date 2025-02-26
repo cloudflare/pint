@@ -65,7 +65,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 			problems = append(problems, Problem{
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Text:     problem.text,
+				Summary:  problem.summary,
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 			})
@@ -86,7 +86,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
@@ -99,7 +99,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 			problems = append(problems, Problem{
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
+				Summary:  fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
 				Severity: Warning,
 			})
 		} else {
@@ -116,7 +116,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     problem.text,
+			Summary:  problem.summary,
 			Severity: problem.severity,
 		})
 	}
@@ -128,7 +128,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, node *parser.PromQLNode,
 	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
 			problems = append(problems, exprProblem{
-				text: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
+				summary: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
 					node.Expr, model.Duration(n.Range), reason),
 				severity: Warning,
 			})

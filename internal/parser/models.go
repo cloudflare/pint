@@ -264,8 +264,8 @@ func (lr LineRange) Expand() []int {
 type Rule struct {
 	AlertingRule  *AlertingRule
 	RecordingRule *RecordingRule
-	Error         ParseError
 	Comments      []comments.Comment
+	Error         ParseError
 	Lines         LineRange
 }
 

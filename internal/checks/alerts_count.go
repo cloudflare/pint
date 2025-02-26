@@ -79,7 +79,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  text,
 			Severity: severity,
 		})
 		return problems
@@ -127,7 +127,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	problems = append(problems, Problem{
 		Lines:    rule.AlertingRule.Expr.Value.Lines,
 		Reporter: c.Reporter(),
-		Text:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
+		Summary:  fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
 		Details:  details,
 		Severity: c.severity,
 	})

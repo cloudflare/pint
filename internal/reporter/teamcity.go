@@ -56,13 +56,13 @@ func (tc TeamCityReporter) Submit(summary Summary) error {
 			buf.WriteString("##teamcity[testFailed name='")
 			buf.WriteString(tc.name(report))
 			buf.WriteString("' message='' details='")
-			buf.WriteString(tc.escape(report.Problem.Text))
+			buf.WriteString(tc.escape(report.Problem.Summary))
 			buf.WriteString("']\n")
 		} else {
 			buf.WriteString("##teamcity[testStdErr name='")
 			buf.WriteString(tc.name(report))
 			buf.WriteString("' out='")
-			buf.WriteString(tc.escape(report.Problem.Text))
+			buf.WriteString(tc.escape(report.Problem.Summary))
 			buf.WriteString("']\n")
 		}
 

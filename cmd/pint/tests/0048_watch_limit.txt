@@ -32,5 +32,5 @@ rule {
 }
 
 -- metrics.txt --
-pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",reporter="promql/syntax",severity="fatal"} 1
+pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error",reporter="promql/syntax",severity="fatal"} 1
 pint_problems 1

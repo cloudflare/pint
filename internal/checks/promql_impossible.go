@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -56,16 +57,19 @@ func (c ImpossibleCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 
 func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (problems []Problem) {
 	if s.IsDead {
-		fragment := s.Fragment(expr.Value.Value)
-		if fragment == "" {
-			fragment = "This"
-		} else {
-			fragment = "`" + fragment + "`"
-		}
+		pos := s.GetSmallestPosition()
 		problems = append(problems, Problem{
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fragment + " is dead code because " + s.IsDeadReason + ".",
+			Summary:  "dead code in query",
+			Diagnostics: []output.Diagnostic{
+				{
+					Line:        expr.Value.Lines.First,
+					FirstColumn: expr.Value.Column + int(pos.Start),
+					LastColumn:  expr.Value.Column + int(pos.End) - 1,
+					Message:     s.IsDeadReason,
+				},
+			},
 			Severity: Warning,
 		})
 	}

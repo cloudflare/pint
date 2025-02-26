@@ -16,7 +16,7 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 ##teamcity[testSuiteStarted name='promql/syntax']
 ##teamcity[testSuiteStarted name='Fatal']
 ##teamcity[testStarted name='rules/0001.yml:7']
-##teamcity[testFailed name='rules/0001.yml:7' message='' details='Prometheus failed to parse the query with this PromQL error: unexpected identifier "with".']
+##teamcity[testFailed name='rules/0001.yml:7' message='' details='PromQL syntax error']
 ##teamcity[testFinished name='rules/0001.yml:7']
 ##teamcity[testSuiteFinished name='Fatal']
 ##teamcity[testSuiteFinished name='promql/syntax']

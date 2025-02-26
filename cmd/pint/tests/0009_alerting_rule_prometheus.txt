@@ -6,15 +6,25 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
-rules/0001.yml:11-13 Bug: `link` annotation is required. (alerts/annotation)
+Bug: `link` annotation is required. (alerts/annotation)
+  ---> rules/0001.yml:11-13
  11 |     annotations:
  12 |       summary: "Instance {{ $labels.instance }} down"
  13 |       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
 
-rules/0001.yml:17 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
- 17 |     expr: sum by (instance) (http_inprogress_requests) > 0
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0001.yml:17
+16 |   - alert: APIHighRequestLatency
+17 |     expr: sum by (instance) (http_inprogress_requests) > 0
+                   ^^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                       `job` label is required and should be preserved when aggregating all rules.
+18 |     for: 10m
+19 |     annotations:
+20 |       summary: "High request latency on {{ $labels.instance }}"
+21 |       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
 
-rules/0001.yml:19-21 Bug: `link` annotation is required. (alerts/annotation)
+Bug: `link` annotation is required. (alerts/annotation)
+  ---> rules/0001.yml:19-21
  19 |     annotations:
  20 |       summary: "High request latency on {{ $labels.instance }}"
  21 |       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"

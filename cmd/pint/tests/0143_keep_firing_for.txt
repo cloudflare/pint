@@ -6,13 +6,16 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=4 workers=10 online=true
-rules/0001.yml:6 Bug: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m. (rule/for)
+Bug: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m. (rule/for)
+  ---> rules/0001.yml:6
  6 |   keep_firing_for: 3m
 
-rules/0001.yml:9 Bug: This alert rule must have a `keep_firing_for` field with a maximum duration of 10m. (rule/for)
+Bug: This alert rule must have a `keep_firing_for` field with a maximum duration of 10m. (rule/for)
+  ---> rules/0001.yml:9
  9 |   keep_firing_for: 13m
 
-rules/0001.yml:10 Bug: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m. (rule/for)
+Bug: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m. (rule/for)
+  ---> rules/0001.yml:10
  10 | - alert: none
 
 level=INFO msg="Problems found" Bug=3

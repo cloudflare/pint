@@ -141,7 +141,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDuplicateCheckName,
-						Text:     textDuplicateRule("fake.yml", 6),
+						Summary:  textDuplicateRule("fake.yml", 6),
 						Severity: checks.Bug,
 					},
 				}
@@ -193,7 +193,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDuplicateCheckName,
-						Text:     textDuplicateRule("fake.yml", 6),
+						Summary:  textDuplicateRule("fake.yml", 6),
 						Severity: checks.Bug,
 					},
 				}

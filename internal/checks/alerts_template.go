@@ -17,6 +17,7 @@ import (
 	promTemplate "github.com/prometheus/prometheus/template"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -116,7 +117,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+					Summary:  fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
 				})
@@ -128,7 +129,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     msg,
+					Summary:  msg,
 					Severity: Bug,
 				})
 			}
@@ -140,7 +141,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     problem.text,
+					Summary:  problem.summary,
 					Details:  problem.details,
 					Severity: problem.severity,
 				})
@@ -157,7 +158,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 						Last:  annotation.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+					Summary:  fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
 				})
@@ -170,22 +171,23 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 						Last:  annotation.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Text:     problem.text,
+					Summary:  problem.summary,
 					Details:  problem.details,
 					Severity: problem.severity,
 				})
 			}
 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
-				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr.Query) {
+				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value) {
 					problems = append(problems, Problem{
 						Lines: parser.LineRange{
-							First: annotation.Key.Lines.First,
-							Last:  annotation.Value.Lines.Last,
+							First: min(rule.AlertingRule.Expr.Value.Lines.First, annotation.Value.Lines.First),
+							Last:  max(rule.AlertingRule.Expr.Value.Lines.Last, annotation.Value.Lines.Last),
 						},
-						Reporter: c.Reporter(),
-						Text:     problem.text,
-						Severity: problem.severity,
+						Reporter:    c.Reporter(),
+						Summary:     problem.summary,
+						Severity:    problem.severity,
+						Diagnostics: problem.diags,
 					})
 				}
 			}
@@ -195,11 +197,25 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 	return problems
 }
 
-func (c TemplateCheck) checkHumanizeIsNeeded(node *parser.PromQLNode) (problems []exprProblem) {
-	for _, call := range utils.HasOuterRate(node) {
+func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlNode) (problems []exprProblem) {
+	for _, call := range utils.HasOuterRate(expr.Query) {
 		problems = append(problems, exprProblem{
-			text:     fmt.Sprintf("Using the value of `%s` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.", call),
-			details:  "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
+			summary: "use humanize filters for the results",
+			details: "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
+			diags: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
+					Line:        expr.Value.Lines.First,
+					FirstColumn: expr.Value.Column + int(call.PosRange.Start),
+					LastColumn:  expr.Value.Column + int(call.PosRange.End) - 1,
+				},
+				{
+					Message:     "Use one of humanize template functions to make the result more readable.",
+					Line:        ann.Lines.First,
+					FirstColumn: ann.Column,
+					LastColumn:  nodeLastColumn(ann),
+				},
+			},
 			severity: Information,
 		})
 	}
@@ -469,7 +485,7 @@ func checkQueryLabels(labelName, labelValue string, src []utils.Source) (problem
 
 func textForProblem(label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
 	return exprProblem{
-		text:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
+		summary:  fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
 		details:  src.ExcludeReason[reasonLabel].Reason,
 		severity: severity,
 	}

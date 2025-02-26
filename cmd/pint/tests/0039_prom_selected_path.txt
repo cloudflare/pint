@@ -18,8 +18,12 @@ level=DEBUG msg="Found recording rule" path=rules/0001.yml record=second lines=5
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/aggregate(job:true)"] path=rules/0001.yml rule=second
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=third lines=8-9 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible"] path=rules/0001.yml rule=third
-rules/0001.yml:6 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
- 6 |   expr: sum(bar)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0001.yml:6
+5 | - record: second
+6 |   expr: sum(bar)
+            ^^^ Query is using aggregation that removes all labels.
+                `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Warning=1
 level=DEBUG msg="Stopping query workers" name=disabled uri=http://127.0.0.1:123

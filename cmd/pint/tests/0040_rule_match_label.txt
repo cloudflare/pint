@@ -18,11 +18,23 @@ level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=ignore lines=9-
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible"] path=rules/rules.yml rule=ignore
 level=DEBUG msg="Found alerting rule" path=rules/rules.yml alert=match lines=12-15 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/aggregate(job:true)"] path=rules/rules.yml rule=match
-rules/rules.yml:5 Warning: `job` label is required and should be preserved when aggregating `^.*$` rules, use `by(job, ...)`. (promql/aggregate)
- 5 |   expr: sum(foo)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/rules.yml:5
+4 | - record: match
+5 |   expr: sum(foo)
+            ^^^ Query is using aggregation that removes all labels.
+                `job` label is required and should be preserved when aggregating all rules.
+6 |   labels:
+7 |     foo: bar
 
-rules/rules.yml:13 Warning: `job` label is required and should be preserved when aggregating `^.*$` rules, use `by(job, ...)`. (promql/aggregate)
- 13 |   expr: sum(foo) > 0
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/rules.yml:13
+12 | - alert: match
+13 |   expr: sum(foo) > 0
+             ^^^ Query is using aggregation that removes all labels.
+                 `job` label is required and should be preserved when aggregating all rules.
+14 |   labels:
+15 |     foo: bar
 
 level=INFO msg="Problems found" Warning=2
 -- rules/rules.yml --

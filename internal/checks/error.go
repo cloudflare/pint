@@ -72,7 +72,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				Last:  ignoreErr.Line,
 			},
 			Reporter: ignoreFileReporter,
-			Text:     ignoreErr.Error(),
+			Summary:  ignoreErr.Error(),
 			Severity: Information,
 		}
 
@@ -84,7 +84,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				Last:  commentErr.Line,
 			},
 			Reporter: pintCommentReporter,
-			Text:     "This comment is not a valid pint control comment: " + commentErr.Error(),
+			Summary:  "This comment is not a valid pint control comment: " + commentErr.Error(),
 			Severity: Warning,
 		}
 
@@ -96,7 +96,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				Last:  ownerErr.Line,
 			},
 			Reporter: discovery.RuleOwnerComment,
-			Text:     fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", ownerErr.Name, ownerErr.Name),
+			Summary:  fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", ownerErr.Name, ownerErr.Name),
 			Severity: Bug,
 		}
 
@@ -108,7 +108,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 				Last:  parseErr.Line,
 			},
 			Reporter: yamlParseReporter,
-			Text:     parseErr.Err.Error(),
+			Summary:  parseErr.Err.Error(),
 			Details: `pint cannot read this file because YAML parser returned an error.
 This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
@@ -128,7 +128,7 @@ If this file is a template that will be rendered into valid YAML then you can in
 				Last:  rule.Error.Line,
 			},
 			Reporter: yamlParseReporter,
-			Text:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
+			Summary:  fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
 			Details:  details,
 			Severity: Fatal,
 		}

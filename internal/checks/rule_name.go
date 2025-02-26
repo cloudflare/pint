@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -52,8 +53,16 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 		problems = append(problems, Problem{
 			Lines:    rule.AlertingRule.Alert.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("alerting rule name must match `%s`.", c.re.anchored),
+			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
+			Diagnostics: []output.Diagnostic{
+				{
+					Line:        rule.AlertingRule.Alert.Lines.Last,
+					FirstColumn: rule.AlertingRule.Alert.Column,
+					LastColumn:  nodeLastColumn(&rule.AlertingRule.Alert),
+					Message:     fmt.Sprintf("alerting rule name must match `%s`.", c.re.anchored),
+				},
+			},
 			Severity: c.severity,
 		})
 	}
@@ -61,8 +70,16 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 		problems = append(problems, Problem{
 			Lines:    rule.RecordingRule.Record.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("recording rule name must match `%s`.", c.re.anchored),
+			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
+			Diagnostics: []output.Diagnostic{
+				{
+					Line:        rule.RecordingRule.Record.Lines.Last,
+					FirstColumn: rule.RecordingRule.Record.Column,
+					LastColumn:  nodeLastColumn(&rule.RecordingRule.Record),
+					Message:     fmt.Sprintf("recording rule name must match `%s`.", c.re.anchored),
+				},
+			},
 			Severity: c.severity,
 		})
 	}
