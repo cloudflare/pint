@@ -76,7 +76,6 @@ cmp report.json expected.json
     "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
     "severity": "Warning",
     "lines": [
-      22,
       23,
       24,
       25
@@ -88,7 +87,6 @@ cmp report.json expected.json
     "problem": "`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`.",
     "severity": "Warning",
     "lines": [
-      28,
       29,
       30,
       31
@@ -100,7 +98,6 @@ cmp report.json expected.json
     "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
     "severity": "Warning",
     "lines": [
-      28,
       29,
       30,
       31
@@ -112,7 +109,6 @@ cmp report.json expected.json
     "problem": "`job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`.",
     "severity": "Warning",
     "lines": [
-      34,
       35,
       36,
       37

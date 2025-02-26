@@ -12,14 +12,17 @@ import (
 )
 
 func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
+	lr.First = node.Line + offset
+	lr.Last = node.Line + offset
 	if node.Value != "" && (node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle) {
-		lr.First = node.Line + 1 + offset
+		lr.First++
 		lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
-	} else {
-		lr.First = node.Line + offset
-		lr.Last = node.Line + offset
 	}
 	return lr
+}
+
+func nodeColumn(node *yaml.Node, offset int) int {
+	return node.Column + offset
 }
 
 func nodeValue(node *yaml.Node) string {
@@ -65,26 +68,11 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 }
 
 func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int) *YamlNode {
-	n := YamlNode{
+	return &YamlNode{
 		Lines:  nodeLines(node, offsetLine),
 		Value:  nodeValue(node),
-		Column: node.Column + offsetColumn,
+		Column: nodeColumn(node, offsetColumn),
 	}
-	return &n
-}
-
-func newYamlNodeWithKey(key, node *yaml.Node, offsetLine, offsetColumn int) *YamlNode {
-	keyLines := nodeLines(key, offsetLine)
-	valLines := nodeLines(node, offsetLine)
-	n := YamlNode{
-		Lines: LineRange{
-			First: min(keyLines.First, valLines.First),
-			Last:  max(keyLines.Last, valLines.Last),
-		},
-		Value:  nodeValue(node),
-		Column: node.Column + offsetColumn,
-	}
-	return &n
 }
 
 type YamlKeyValue struct {
@@ -163,9 +151,9 @@ func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 	return pqle.Value.Value == b.Value.Value
 }
 
-func newPromQLExpr(key, val *yaml.Node, offsetLine, offsetColumn int) *PromQLExpr {
+func newPromQLExpr(val *yaml.Node, offsetLine, offsetColumn int) *PromQLExpr {
 	expr := PromQLExpr{
-		Value:       newYamlNodeWithKey(key, val, offsetLine, offsetColumn),
+		Value:       newYamlNode(val, offsetLine, offsetColumn),
 		SyntaxError: nil,
 		Query:       nil,
 	}

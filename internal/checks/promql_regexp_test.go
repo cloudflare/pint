@@ -276,7 +276,7 @@ func TestRegexpCheck(t *testing.T) {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
-							First: 2,
+							First: 3,
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
@@ -286,7 +286,7 @@ func TestRegexpCheck(t *testing.T) {
 					},
 					{
 						Lines: parser.LineRange{
-							First: 2,
+							First: 3,
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
@@ -309,7 +309,7 @@ func TestRegexpCheck(t *testing.T) {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
-							First: 2,
+							First: 3,
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,
@@ -319,7 +319,7 @@ func TestRegexpCheck(t *testing.T) {
 					},
 					{
 						Lines: parser.LineRange{
-							First: 2,
+							First: 3,
 							Last:  3,
 						},
 						Reporter: checks.RegexpCheckName,

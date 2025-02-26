@@ -28,26 +28,22 @@ rules/0003.yaml:11 Warning: `job` label is required and should be preserved when
 rules/0003.yaml:14 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected right parenthesis ')'. (promql/syntax)
  14 |   expr: sum(foo) by ())
 
-rules/0003.yaml:22-25 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 22 |   expr: |
+rules/0003.yaml:23-25 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
  23 |     sum(
  24 |       multiline
  25 |     ) without(job, instance)
 
-rules/0003.yaml:28-31 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 28 |   expr: |
+rules/0003.yaml:29-31 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
  29 |     sum(sum) without(job)
  30 |     +
  31 |     sum(sum) without(job)
 
-rules/0003.yaml:28-31 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 28 |   expr: |
+rules/0003.yaml:29-31 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
  29 |     sum(sum) without(job)
  30 |     +
  31 |     sum(sum) without(job)
 
-rules/0003.yaml:34-37 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 34 |   expr: >-
+rules/0003.yaml:35-37 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
  35 |     sum(
  36 |       multiline2
  37 |     ) without(job, instance)

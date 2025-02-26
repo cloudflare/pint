@@ -568,14 +568,14 @@ groups:
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines:  parser.LineRange{First: 2, Last: 3},
-								Column: 9,
+								Lines:  parser.LineRange{First: 3, Last: 3},
+								Column: 5,
 								Value:  "up == 0\n",
 							},
 						},
 						For: &parser.YamlNode{
-							Lines:  parser.LineRange{First: 4, Last: 5},
-							Column: 8,
+							Lines:  parser.LineRange{First: 5, Last: 5},
+							Column: 5,
 							Value:  "11m\n",
 						},
 						Labels: &parser.YamlMap{
@@ -634,8 +634,8 @@ groups:
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines:  parser.LineRange{First: 12, Last: 15},
-								Column: 9,
+								Lines:  parser.LineRange{First: 13, Last: 15},
+								Column: 5,
 								Value:  "bar\n/\nbaz > 1",
 							},
 						},
@@ -673,9 +673,9 @@ groups:
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines:  parser.LineRange{First: 2, Last: 8},
+								Lines:  parser.LineRange{First: 3, Last: 8},
 								Column: 5,
-								Value:  "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
+								Value:  "(\n  xxx\n  -\n  yyy\n) * bar > 0\nand on(instance, device) baz\n",
 							},
 						},
 						For: &parser.YamlNode{
@@ -3007,8 +3007,8 @@ groups:
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines:  parser.LineRange{First: 6, Last: 7},
-								Column: 11,
+								Lines:  parser.LineRange{First: 7, Last: 7},
+								Column: 7,
 								Value:  "{\"up\"}\n",
 							},
 						},
@@ -3036,8 +3036,8 @@ groups:
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines:  parser.LineRange{First: 6, Last: 7},
-								Column: 11,
+								Lines:  parser.LineRange{First: 7, Last: 7},
+								Column: 7,
 								Value:  "{'up'}\n",
 							},
 						},
@@ -3065,8 +3065,8 @@ groups:
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
-								Lines:  parser.LineRange{First: 6, Last: 7},
-								Column: 11,
+								Lines:  parser.LineRange{First: 7, Last: 7},
+								Column: 7,
 								Value:  "{'up' == 1}\n",
 							},
 							SyntaxError: errors.New("unexpected character inside braces: '1'"),
@@ -3205,6 +3205,170 @@ groups:
 			strict: true,
 			schema: parser.ThanosSchema,
 			err:    "error at line 4: partial_response_strategy must be a string, got integer",
+		},
+		{
+			content: []byte(`
+- alert: Multi Line
+  expr: foo
+          AND ON (instance)
+          bar
+`),
+			strict: false,
+			schema: parser.PrometheusSchema,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 5},
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{
+							Lines:  parser.LineRange{First: 2, Last: 2},
+							Column: 10,
+							Value:  "Multi Line",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines:  parser.LineRange{First: 3, Last: 5},
+								Column: 9,
+								Value:  "foo\n  AND ON (instance)\n  bar\n",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+  - alert: FooBar
+    expr: >-
+      count(
+        foo
+        or
+        bar
+      ) > 0
+`),
+			strict: false,
+			schema: parser.PrometheusSchema,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 8},
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{
+							Lines:  parser.LineRange{First: 2, Last: 2},
+							Column: 12,
+							Value:  "FooBar",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines:  parser.LineRange{First: 4, Last: 8},
+								Column: 7,
+								Value:  "count(\n  foo\n  or\n  bar\n) > 0",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+  - alert: FooBar
+    expr: >-
+      aaaaaaaaaaaaaaaaaaaaaaaa
+      AND ON (colo_id) bbbbbbbbbbb
+      > 2
+    for: 1m
+`),
+			strict: false,
+			schema: parser.PrometheusSchema,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 7},
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{
+							Lines:  parser.LineRange{First: 2, Last: 2},
+							Column: 12,
+							Value:  "FooBar",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines:  parser.LineRange{First: 4, Last: 6},
+								Column: 7,
+								Value:  "aaaaaaaaaaaaaaaaaaaaaaaa\nAND ON (colo_id) bbbbbbbbbbb\n> 2\n",
+							},
+						},
+						For: &parser.YamlNode{
+							Lines:  parser.LineRange{First: 7, Last: 7},
+							Column: 10,
+							Value:  "1m",
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+  - alert: FooBar
+    expr: 'aaaaaaaaaaaaaaaaaaaaaaaa
+          AND ON (colo_id) bbbbbbbbbbb
+          > 2'
+    for: 1m
+`),
+			strict: false,
+			schema: parser.PrometheusSchema,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 2, Last: 6},
+					AlertingRule: &parser.AlertingRule{
+						Alert: parser.YamlNode{
+							Lines:  parser.LineRange{First: 2, Last: 2},
+							Column: 12,
+							Value:  "FooBar",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines:  parser.LineRange{First: 3, Last: 5},
+								Column: 12,
+								Value:  "aaaaaaaaaaaaaaaaaaaaaaaa\nAND ON (colo_id) bbbbbbbbbbb\n> 2\n",
+							},
+						},
+						For: &parser.YamlNode{
+							Lines:  parser.LineRange{First: 6, Last: 6},
+							Column: 10,
+							Value:  "1m",
+						},
+					},
+				},
+			},
+		},
+		{
+			content: []byte(`
+groups:
+- name: foo
+  rules: 
+  - record: colo:foo:sum
+    expr: sum without (instance) ( rate(my_metric[2m]) * on (instance)
+      group_left (hardware_generation, hms_scope, sliver) (instance:metadata{})
+      )
+`),
+			strict: false,
+			schema: parser.PrometheusSchema,
+			output: []parser.Rule{
+				{
+					Lines: parser.LineRange{First: 5, Last: 8},
+					RecordingRule: &parser.RecordingRule{
+						Record: parser.YamlNode{
+							Lines:  parser.LineRange{First: 5, Last: 5},
+							Column: 13,
+							Value:  "colo:foo:sum",
+						},
+						Expr: parser.PromQLExpr{
+							Value: &parser.YamlNode{
+								Lines:  parser.LineRange{First: 6, Last: 8},
+								Column: 11,
+								Value:  "sum without (instance) ( rate(my_metric[2m]) * on (instance)\ngroup_left (hardware_generation, hms_scope, sliver) (instance:metadata{})\n)\n",
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 
