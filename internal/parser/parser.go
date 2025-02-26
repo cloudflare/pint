@@ -259,14 +259,17 @@ func parseRule(content []byte, node *yaml.Node, offsetLine, offsetColumn int) (r
 		}
 	}
 
+	// Fix line range for multi-line strings, example:
+	//
+	// expr:
+	//   (
+	//      sum(foo) - 1
+	//   )
 	if exprPart != nil && exprPart.Value.Lines.First != exprPart.Value.Lines.Last {
 		contentLines := strings.Split(string(content), "\n")
 		for {
 			start := exprPart.Value.Lines.First - offsetLine
 			end := exprPart.Value.Lines.Last - offsetLine
-			if end > len(contentLines) {
-				end--
-			}
 			input := strings.Join(contentLines[start:end], "")
 			input = strings.ReplaceAll(input, " ", "")
 			output := strings.ReplaceAll(exprPart.Value.Value, "\n", "")

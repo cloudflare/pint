@@ -12,14 +12,10 @@ import (
 )
 
 func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
-	switch {
-	case node.Value == "":
-		lr.First = node.Line + offset
-		lr.Last = node.Line + offset
-	case node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle:
+	if node.Value != "" && (node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle) {
 		lr.First = node.Line + 1 + offset
 		lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
-	default:
+	} else {
 		lr.First = node.Line + offset
 		lr.Last = node.Line + offset
 	}
