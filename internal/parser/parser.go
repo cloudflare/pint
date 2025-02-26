@@ -78,7 +78,7 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 			}
 			rules = append(rules, r...)
 		} else {
-			rules = append(rules, parseNode(content, &doc, 0, p.schema)...)
+			rules = append(rules, parseNode(content, &doc, 0, 0, p.schema)...)
 		}
 		if index > 1 && p.isStrict {
 			rules = append(rules, Rule{
@@ -96,8 +96,8 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 	return rules, err
 }
 
-func parseNode(content []byte, node *yaml.Node, offset int, schema Schema) (rules []Rule) {
-	ret, isEmpty := parseRule(content, node, offset)
+func parseNode(content []byte, node *yaml.Node, offsetLine, offsetColumn int, schema Schema) (rules []Rule) {
+	ret, isEmpty := parseRule(content, node, offsetLine, offsetColumn)
 	if !isEmpty {
 		rules = append(rules, ret)
 		return rules
@@ -109,23 +109,33 @@ func parseNode(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
-				rules = append(rules, parseNode(content, n, offset, schema)...)
+				rules = append(rules, parseNode(content, n, offsetLine, offsetColumn, schema)...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty = parseRule(content, root, offset)
+			rule, isEmpty = parseRule(content, root, offsetLine, offsetColumn)
 			if !isEmpty {
 				rules = append(rules, rule)
 			} else {
 				for _, n := range root.Content {
-					rules = append(rules, parseNode(content, n, offset, schema)...)
+					rules = append(rules, parseNode(content, n, offsetLine, offsetColumn, schema)...)
 				}
 			}
 		case yaml.ScalarNode:
 			if root.Value != string(content) {
 				c := []byte(root.Value)
 				var n yaml.Node
+				// FIXME there must be a better way.
+				// If we have YAML inside YAML:
+				// alerts: |
+				//   groups:
+				//     rules: ...
+				// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
+				// Right now we read the line where it's in the file and count leading spaces.
+				contentLines := strings.Split(string(content), "\n")
 				if err := yaml.Unmarshal(c, &n); err == nil {
-					rules = append(rules, parseNode(c, &n, offset+root.Line, schema)...)
+					rules = append(rules,
+						parseNode(c, &n, offsetLine+root.Line, offsetColumn+countLeadingSpace(contentLines[root.Line]), schema)...,
+					)
 				}
 			}
 		}
@@ -133,7 +143,7 @@ func parseNode(content []byte, node *yaml.Node, offset int, schema Schema) (rule
 	return rules
 }
 
-func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) {
+func parseRule(content []byte, node *yaml.Node, offsetLine, offsetColumn int) (rule Rule, _ bool) {
 	if node.Kind != yaml.MappingNode {
 		return rule, true
 	}
@@ -166,10 +176,10 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 	var ruleComments []comments.Comment
 
 	for i, part := range unpackNodes(node) {
-		if lines.First == 0 || part.Line+offset < lines.First {
-			lines.First = part.Line + offset
+		if lines.First == 0 || part.Line+offsetLine < lines.First {
+			lines.First = part.Line + offsetLine
 		}
-		lines.Last = max(lines.Last, part.Line+offset)
+		lines.Last = max(lines.Last, part.Line+offsetLine)
 
 		if i == 0 && node.HeadComment != "" && part.HeadComment == "" {
 			part.HeadComment = node.HeadComment
@@ -194,54 +204,54 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 			switch key.Value {
 			case recordKey:
 				if recordPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, recordKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, recordKey)
 				}
 				recordNode = part
-				recordPart = newYamlNodeWithKey(key, part, offset)
+				recordPart = newYamlNodeWithKey(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, recordPart.Lines.Last)
 			case alertKey:
 				if alertPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, alertKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, alertKey)
 				}
 				alertNode = part
-				alertPart = newYamlNodeWithKey(key, part, offset)
+				alertPart = newYamlNodeWithKey(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, alertPart.Lines.Last)
 			case exprKey:
 				if exprPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, exprKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, exprKey)
 				}
 				exprNode = part
-				exprPart = newPromQLExpr(key, part, offset)
+				exprPart = newPromQLExpr(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, exprPart.Value.Lines.Last)
 			case forKey:
 				if forPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, forKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, forKey)
 				}
 				forNode = part
-				forPart = newYamlNodeWithKey(key, part, offset)
+				forPart = newYamlNodeWithKey(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, forPart.Lines.Last)
 			case keepFiringForKey:
 				if keepFiringForPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, keepFiringForKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, keepFiringForKey)
 				}
 				keepFiringForNode = part
-				keepFiringForPart = newYamlNodeWithKey(key, part, offset)
+				keepFiringForPart = newYamlNodeWithKey(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, keepFiringForPart.Lines.Last)
 			case labelsKey:
 				if labelsPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, labelsKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, labelsKey)
 				}
 				labelsNode = part
 				labelsNodes = mappingNodes(part)
-				labelsPart = newYamlMap(key, part, offset)
+				labelsPart = newYamlMap(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, labelsPart.Lines.Last)
 			case annotationsKey:
 				if annotationsPart != nil {
-					return duplicatedKeyError(lines, part.Line+offset, annotationsKey)
+					return duplicatedKeyError(lines, part.Line+offsetLine, annotationsKey)
 				}
 				annotationsNode = part
 				annotationsNodes = mappingNodes(part)
-				annotationsPart = newYamlMap(key, part, offset)
+				annotationsPart = newYamlMap(key, part, offsetLine, offsetColumn)
 				lines.Last = max(lines.Last, annotationsPart.Lines.Last)
 			default:
 				unknownKeys = append(unknownKeys, key)
@@ -249,14 +259,17 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		}
 	}
 
+	// Fix line range for multi-line strings, example:
+	//
+	// expr:
+	//   (
+	//      sum(foo) - 1
+	//   )
 	if exprPart != nil && exprPart.Value.Lines.First != exprPart.Value.Lines.Last {
 		contentLines := strings.Split(string(content), "\n")
 		for {
-			start := exprPart.Value.Lines.First - offset
-			end := exprPart.Value.Lines.Last - offset
-			if end > len(contentLines) {
-				end--
-			}
+			start := exprPart.Value.Lines.First - offsetLine
+			end := exprPart.Value.Lines.Last - offsetLine
 			input := strings.Join(contentLines[start:end], "")
 			input = strings.ReplaceAll(input, " ", "")
 			output := strings.ReplaceAll(exprPart.Value.Value, "\n", "")
@@ -275,7 +288,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: node.Line + offset,
+				Line: node.Line + offsetLine,
 				Err:  fmt.Errorf("got both %s and %s keys in a single rule", recordKey, alertKey),
 			},
 		}
@@ -332,7 +345,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		{key: keepFiringForKey, part: keepFiringForNode},
 	} {
 		if entry.part != nil && !isTag(entry.part.ShortTag(), strTag) {
-			return invalidValueError(lines, entry.part.Line+offset, entry.key, describeTag(strTag), describeTag(entry.part.ShortTag()))
+			return invalidValueError(lines, entry.part.Line+offsetLine, entry.key, describeTag(strTag), describeTag(entry.part.ShortTag()))
 		}
 	}
 
@@ -344,7 +357,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		{key: annotationsKey, part: annotationsNode},
 	} {
 		if entry.part != nil && !isTag(entry.part.ShortTag(), mapTag) {
-			return invalidValueError(lines, entry.part.Line+offset, entry.key, describeTag(mapTag), describeTag(entry.part.ShortTag()))
+			return invalidValueError(lines, entry.part.Line+offsetLine, entry.key, describeTag(mapTag), describeTag(entry.part.ShortTag()))
 		}
 	}
 
@@ -358,7 +371,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		names := map[string]struct{}{}
 		for _, entry := range elem.parts {
 			if !isTag(entry.val.ShortTag(), strTag) {
-				return invalidValueError(lines, entry.val.Line+offset, fmt.Sprintf("%s %s", elem.key, nodeValue(entry.key)), describeTag(strTag), describeTag(entry.val.ShortTag()))
+				return invalidValueError(lines, entry.val.Line+offsetLine, fmt.Sprintf("%s %s", elem.key, nodeValue(entry.key)), describeTag(strTag), describeTag(entry.val.ShortTag()))
 			}
 			if _, ok := names[entry.key.Value]; ok {
 				return Rule{
@@ -387,7 +400,7 @@ func parseRule(content []byte, node *yaml.Node, offset int) (rule Rule, _ bool) 
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: unknownKeys[0].Line + offset,
+				Line: unknownKeys[0].Line + offsetLine,
 				Err:  fmt.Errorf("invalid key(s) found: %s", strings.Join(keys, ", ")),
 			},
 		}
@@ -656,4 +669,14 @@ func tryDecodingYamlError(err error) ParseError {
 		}
 	}
 	return ParseError{Line: 1, Err: err}
+}
+
+func countLeadingSpace(line string) (i int) {
+	for _, r := range line {
+		if r != ' ' {
+			return i
+		}
+		i++
+	}
+	return i
 }
