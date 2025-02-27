@@ -3796,7 +3796,7 @@ func TestSeriesCheck(t *testing.T) {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
-							First: 3,
+							First: 4,
 							Last:  12,
 						},
 						Reporter: checks.SeriesCheckName,
@@ -3806,7 +3806,7 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					{
 						Lines: parser.LineRange{
-							First: 3,
+							First: 4,
 							Last:  12,
 						},
 						Reporter: checks.SeriesCheckName,
@@ -3816,7 +3816,7 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					{
 						Lines: parser.LineRange{
-							First: 3,
+							First: 4,
 							Last:  12,
 						},
 						Reporter: checks.SeriesCheckName,
@@ -3900,7 +3900,7 @@ func TestSeriesCheck(t *testing.T) {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
-							First: 6,
+							First: 7,
 							Last:  10,
 						},
 						Reporter: checks.SeriesCheckName,
@@ -3910,7 +3910,7 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					{
 						Lines: parser.LineRange{
-							First: 6,
+							First: 7,
 							Last:  10,
 						},
 						Reporter: checks.SeriesCheckName,
@@ -3920,7 +3920,7 @@ func TestSeriesCheck(t *testing.T) {
 					},
 					{
 						Lines: parser.LineRange{
-							First: 6,
+							First: 7,
 							Last:  10,
 						},
 						Reporter: checks.SeriesCheckName,

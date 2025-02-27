@@ -901,7 +901,7 @@ func TestRateCheck(t *testing.T) {
 				return []checks.Problem{
 					{
 						Lines: parser.LineRange{
-							First: 3,
+							First: 4,
 							Last:  11,
 						},
 						Reporter: "promql/rate",

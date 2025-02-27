@@ -96,7 +96,7 @@ func TestComparisonCheck(t *testing.T) {
 					{
 						Lines: parser.LineRange{
 							First: 3,
-							Last:  3,
+							Last:  5,
 						},
 						Reporter: checks.ComparisonCheckName,
 						Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
