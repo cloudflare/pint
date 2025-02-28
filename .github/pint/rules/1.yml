@@ -10,7 +10,7 @@ groups:
 
   - alert: Service Is Missing
     expr: absent({job="myjob"})
-    for: 0mabs
+    for: 0m
 
   - alert: Everything Is Down
     expr: up:sum == 0
