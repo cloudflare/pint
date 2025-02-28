@@ -73,7 +73,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -101,7 +101,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -129,7 +129,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -157,7 +157,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -185,7 +185,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -213,7 +213,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -241,7 +241,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -259,7 +259,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -294,7 +294,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -322,7 +322,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -340,7 +340,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -371,7 +371,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        3,
@@ -389,7 +389,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        3,
@@ -420,7 +420,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        3,
@@ -438,7 +438,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        3,
@@ -473,7 +473,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,
@@ -501,7 +501,7 @@ func TestRegexpCheck(t *testing.T) {
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
-						Severity: checks.Bug,
+						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
 								Line:        2,

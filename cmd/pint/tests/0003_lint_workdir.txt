@@ -20,13 +20,13 @@ Warning: label must be removed in aggregations (promql/aggregate)
 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
-Bug: redundant regexp (promql/regexp)
+Warning: redundant regexp (promql/regexp)
   ---> rules/0002.yaml:2
 1 | - record: colo_job:down:count
 2 |   expr: up{job=~"foo"} == 0
             ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"foo"`, use `job="foo"` instead.
 
-Bug: redundant regexp (promql/regexp)
+Warning: redundant regexp (promql/regexp)
   ---> rules/0002.yaml:5
 4 | - record: colo_job:down:count
 5 |   expr: up{job!~"foo"} == 0
@@ -117,8 +117,8 @@ Information: use humanize filters for the results (alerts/template)
 61 |     summary: 'error rate: {{ $value }}'
                   ^^^^^^^^^^^^^^^^^^^^^^^^ Use one of humanize template functions to make the result more readable.
 
-level=INFO msg="Problems found" Fatal=1 Bug=2 Warning=10 Information=1
-level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Fatal=1 Warning=12 Information=1
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m
   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)

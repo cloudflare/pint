@@ -172,7 +172,7 @@ rule {
     "reporter": "promql/regexp",
     "problem": "redundant regexp",
     "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
-    "severity": "Bug",
+    "severity": "Warning",
     "lines": [
       15
     ]
@@ -182,7 +182,7 @@ rule {
     "reporter": "promql/regexp",
     "problem": "redundant regexp",
     "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
-    "severity": "Bug",
+    "severity": "Warning",
     "lines": [
       18
     ]

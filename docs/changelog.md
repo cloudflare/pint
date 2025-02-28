@@ -12,6 +12,7 @@
 ### Changed
 
 - Removed aggregation checks from the [promql/fragile](checks/promql/fragile.md) check - #1289.
+- [promql/regexp](checks/promql/regexp.md) check severity was reduced from `bug` to a `warning`.
 
 ### Fixed
 

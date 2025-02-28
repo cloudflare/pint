@@ -20,7 +20,7 @@ cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 
 env BITBUCKET_AUTH_TOKEN="12345"
-! exec pint -l error --no-color ci
+exec pint -l error --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
 
@@ -29,7 +29,7 @@ Warning: Alert query doesn't have any condition, it will always fire if the metr
   ---> rules.yml:2
  2 |   expr: sum(foo{job=~"xxx"}) by(job)
 
-Bug: redundant regexp (promql/regexp)
+Warning: redundant regexp (promql/regexp)
   ---> rules.yml:2
 1 | - alert: rule1b
 2 |   expr: sum(foo{job=~"xxx"}) by(job)
@@ -47,7 +47,7 @@ Warning: Alert query doesn't have any condition, it will always fire if the metr
   ---> rules.yml:5
  5 |   expr: sum(foo{job=~"xxx"}) by(job)
 
-Bug: redundant regexp (promql/regexp)
+Warning: redundant regexp (promql/regexp)
   ---> rules.yml:5
 4 | - alert: rule2b
 5 |   expr: sum(foo{job=~"xxx"}) by(job)
@@ -61,7 +61,6 @@ Information: redundant field with default value (alerts/for)
 6 |   for: 0s
            ^^ `0s` is the default value of `for`, this line is unnecessary.
 
-level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --
 - alert: rule1a
   expr: sum(foo{job=~"xxx"}) by(job)
