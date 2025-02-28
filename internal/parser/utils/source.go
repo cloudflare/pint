@@ -79,16 +79,22 @@ func (s Source) GetSmallestPosition() (pr posrange.PositionRange) {
 	pr.End = s.Position.End
 
 	if s.Selector != nil {
-		pr.Start = max(pr.Start, s.Selector.PosRange.Start)
-		pr.End = min(pr.End, s.Selector.PosRange.End)
+		if s.Selector.PosRange.Start > pr.Start {
+			pr.Start = s.Selector.PosRange.Start
+			pr.End = s.Selector.PosRange.End
+		}
 	}
 	if s.Call != nil {
-		pr.Start = max(pr.Start, s.Call.PosRange.Start)
-		pr.End = min(pr.End, s.Call.PosRange.End)
+		if s.Call.PosRange.Start > pr.Start {
+			pr.Start = s.Call.PosRange.Start
+			pr.End = s.Call.PosRange.End
+		}
 	}
 	if s.Aggregation != nil {
-		pr.Start = max(pr.Start, s.Aggregation.PosRange.Start)
-		pr.End = min(pr.End, s.Aggregation.PosRange.End)
+		if s.Aggregation.PosRange.Start > pr.Start {
+			pr.Start = s.Aggregation.PosRange.Start
+			pr.End = s.Aggregation.PosRange.End
+		}
 	}
 	return pr
 }
