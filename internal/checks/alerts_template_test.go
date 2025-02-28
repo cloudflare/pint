@@ -1,7 +1,6 @@
 package checks_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -12,10 +11,6 @@ import (
 
 func newTemplateCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewTemplateCheck()
-}
-
-func humanizeText(call string) string {
-	return fmt.Sprintf("Using the value of `%s` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.", call)
 }
 
 func TestTemplateCheck(t *testing.T) {
