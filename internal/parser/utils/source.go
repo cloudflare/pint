@@ -106,6 +106,16 @@ func (s Source) CanHaveLabel(name string) bool {
 	return !s.FixedLabels
 }
 
+func (s Source) LabelExcludeReason(name string) ExcludedLabel {
+	if el, ok := s.ExcludeReason[name]; ok {
+		return el
+	}
+	if el, ok := s.ExcludeReason[""]; ok {
+		return el
+	}
+	return ExcludedLabel{} // nolint: exhaustruct
+}
+
 type Visitor func(s Source)
 
 func (s Source) WalkSources(fn Visitor) {
@@ -239,6 +249,16 @@ func includeLabel(s Source, names ...string) Source {
 		delete(s.ExcludeReason, name)
 	}
 	s.IncludedLabels = appendToSlice(s.IncludedLabels, names...)
+	return s
+}
+
+// Include labels that were not already excluded.
+func maybeIncludeLabel(s Source, names ...string) Source {
+	for _, name := range names {
+		if !slices.Contains(s.ExcludedLabels, name) {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, names...)
+		}
+	}
 	return s
 }
 
@@ -460,7 +480,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			} else {
 				// Check if source of labels already fixes them.
 				if !s.FixedLabels {
-					s = includeLabel(s, n.Grouping...)
+					s = maybeIncludeLabel(s, n.Grouping...)
 					s.ExcludeReason = setInMap(
 						s.ExcludeReason,
 						"",
