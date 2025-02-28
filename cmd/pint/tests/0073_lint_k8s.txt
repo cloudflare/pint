@@ -30,7 +30,7 @@ Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yml:25
 24 |           - alert: Invalid Query
 25 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no arguments for aggregate expression provided
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no arguments for aggregate expression provided
 
 Fatal: This rule is not a valid Prometheus rule: `duplicated expr key`. (yaml/parse)
   ---> rules/1.yml:28

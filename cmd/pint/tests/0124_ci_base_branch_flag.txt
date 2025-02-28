@@ -28,7 +28,7 @@ Fatal: PromQL syntax error (promql/syntax)
   ---> rules.yml:2
 1 | - record: rule1
 2 |   expr: sum(foo) bi(job)
-            ^^^^^^^^^^^^^^^^ unexpected identifier "bi"
+                     ^^ unexpected identifier "bi"
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --
