@@ -131,7 +131,7 @@ func TestDiscoveryConfig(t *testing.T) {
 					},
 				},
 			},
-			err: `failed to parse prometheus query "foo{": unexpected end of input inside braces`,
+			err: `failed to parse prometheus query "foo{": 1:5: parse error: unexpected end of input inside braces`,
 		},
 		{
 			conf: Discovery{

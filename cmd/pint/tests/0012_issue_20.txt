@@ -6,7 +6,8 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-rules/1.yaml:9-11 Warning: `runbook_url` annotation is required. (alerts/annotation)
+Warning: `runbook_url` annotation is required. (alerts/annotation)
+  ---> rules/1.yaml:9-11
   9 |         annotations:
  10 |           summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
  11 |           description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"

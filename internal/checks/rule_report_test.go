@@ -25,7 +25,7 @@ func TestReportCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/report",
-						Text:     "problem reported",
+						Summary:  "problem reported",
 						Severity: checks.Warning,
 					},
 				}
@@ -46,7 +46,7 @@ func TestReportCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/report",
-						Text:     "problem reported",
+						Summary:  "problem reported",
 						Severity: checks.Information,
 					},
 				}

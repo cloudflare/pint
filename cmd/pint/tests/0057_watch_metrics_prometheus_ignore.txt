@@ -92,7 +92,7 @@ pint_last_run_time_seconds
 # TYPE pint_problem gauge
 pint_problem{filename="rules/1.yml",kind="alerting",name="comparison",owner="",problem="`prom1` Prometheus server at http://127.0.0.1:7057 failed with: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
 pint_problem{filename="rules/1.yml",kind="recording",name="aggregate",owner="",problem="`prom1` Prometheus server at http://127.0.0.1:7057 failed with: `bad_data: bogus query`.",reporter="promql/series",severity="bug"}
-pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="Prometheus failed to parse the query with this PromQL error: no arguments for aggregate expression provided.",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems

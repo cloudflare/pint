@@ -6,7 +6,8 @@ cmp stderr stderr.txt
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 2: invalid group key alert" path=rules/strict.yml lines=1-9
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-rules/strict.yml:2 Fatal: invalid group key alert (yaml/parse)
+Fatal: invalid group key alert (yaml/parse)
+  ---> rules/strict.yml:2
  2 | - alert: Conntrack_Table_Almost_Full
 
 level=INFO msg="Problems found" Fatal=1

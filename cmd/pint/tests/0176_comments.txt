@@ -16,7 +16,8 @@ level=INFO msg="Configured new Prometheus server" name=prom uris=1 uptime=up tag
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=WARN msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" name=prom metric=up
 level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom metric=up
-rules/1.yml:15 Bug: `prom` Prometheus server at http://127.0.0.1:7176 didn't have any series for `up` metric in the last 1w. (promql/series)
+Bug: `prom` Prometheus server at http://127.0.0.1:7176 didn't have any series for `up` metric in the last 1w. (promql/series)
+  ---> rules/1.yml:15
  15 |     expr: up == 0
 
 level=INFO msg="Problems found" Bug=1

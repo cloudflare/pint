@@ -34,7 +34,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "`severity` annotation is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -55,7 +55,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "`severity` annotation is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -83,7 +83,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  7,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "`severity` annotation is required.",
 						Severity: checks.Bug,
 					},
 				}
@@ -113,7 +113,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "`severity` annotation is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -143,7 +143,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation value `bar` must match `^critical$`.",
+						Summary:  "`severity` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -164,7 +164,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation value `bar` must match `^critical$`.",
+						Summary:  "`severity` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -212,7 +212,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  5,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`for` annotation value `4m` must match `^{{ $for }}$`.",
+						Summary:  "`for` annotation value `4m` must match `^{{ $for }}$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -251,7 +251,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`annotation_.*` annotation value `bar` must match `^critical$`.",
+						Summary:  "`annotation_.*` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -272,7 +272,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`annotation_.*` annotation value `bar` must match `^critical$`.",
+						Summary:  "`annotation_.*` annotation value `bar` must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -293,7 +293,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`components` annotation value `db` must match `^api|memcached$`.",
+						Summary:  "`components` annotation value `db` must match `^api|memcached$`.",
 						Details:  "Rule comment: rule comment",
 						Severity: checks.Bug,
 					},
@@ -323,7 +323,7 @@ func TestAnnotationCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`components` annotation value `db` is not one of valid values.",
+						Summary:  "`components` annotation value `db` is not one of valid values.",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).\nRule comment: rule comment",
 						Severity: checks.Bug,
 					},

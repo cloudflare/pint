@@ -34,7 +34,7 @@ level=INFO msg="Problems found" Fatal=1 Warning=1
 ##teamcity[testSuiteStarted name='promql/syntax']
 ##teamcity[testSuiteStarted name='Fatal']
 ##teamcity[testStarted name='b.yml:2']
-##teamcity[testFailed name='b.yml:2' message='' details='Prometheus failed to parse the query with this PromQL error: unexpected identifier "bi".']
+##teamcity[testFailed name='b.yml:2' message='' details='PromQL syntax error']
 ##teamcity[testFinished name='b.yml:2']
 ##teamcity[testSuiteFinished name='Fatal']
 ##teamcity[testSuiteFinished name='promql/syntax']

@@ -40,7 +40,7 @@ func (r Report) isEqual(nr Report) bool {
 	if nr.Problem.Reporter != r.Problem.Reporter {
 		return false
 	}
-	if nr.Problem.Text != r.Problem.Text {
+	if nr.Problem.Summary != r.Problem.Summary {
 		return false
 	}
 	if nr.Problem.Severity != r.Problem.Severity {
@@ -128,7 +128,7 @@ func (s *Summary) SortReports() {
 			cmp.Compare(a.Problem.Lines.Last, b.Problem.Lines.Last),
 			cmp.Compare(a.Problem.Severity, b.Problem.Severity),
 			cmp.Compare(a.Problem.Reporter, b.Problem.Reporter),
-			cmp.Compare(a.Problem.Text, b.Problem.Text),
+			cmp.Compare(a.Problem.Summary, b.Problem.Summary),
 		)
 	})
 }
