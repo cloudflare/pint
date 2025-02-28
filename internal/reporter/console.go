@@ -71,7 +71,11 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 
 			if report.Problem.Anchor == checks.AnchorAfter {
 				if len(report.Problem.Diagnostics) > 0 {
-					body := output.InjectDiagnostics(content, report.Problem.Diagnostics, color, report.Rule.Lines.First, report.Rule.Lines.Last)
+					body := output.InjectDiagnostics(
+						content,
+						report.Problem.Diagnostics,
+						color,
+						report.Problem.Lines.First, report.Problem.Lines.Last)
 					buf.WriteString(output.MaybeColor(output.White, cr.noColor, body))
 				} else {
 					lines := strings.Split(content, "\n")

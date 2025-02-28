@@ -69,35 +69,72 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 
 	var forDur model.Duration
 	var lines parser.LineRange
+	var diag output.Diagnostic
 
 	switch {
 	case c.key == RuleForFor && rule.AlertingRule.For != nil:
 		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value)
 		lines = rule.AlertingRule.For.Lines
+		diag = output.Diagnostic{
+			Message:     "",
+			Pos:         rule.AlertingRule.For.Pos,
+			FirstColumn: 1,
+			LastColumn:  len(rule.AlertingRule.For.Value),
+		}
 	case c.key == RuleForKeepFiringFor && rule.AlertingRule.KeepFiringFor != nil:
 		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value)
 		lines = rule.AlertingRule.KeepFiringFor.Lines
+		diag = output.Diagnostic{
+			Message:     "",
+			Pos:         rule.AlertingRule.KeepFiringFor.Pos,
+			FirstColumn: 1,
+			LastColumn:  len(rule.AlertingRule.KeepFiringFor.Value),
+		}
 	default:
 		lines = rule.AlertingRule.Alert.Lines
+		diag = output.Diagnostic{
+			Message:     "",
+			Pos:         rule.AlertingRule.Alert.Pos,
+			FirstColumn: 1,
+			LastColumn:  len(rule.AlertingRule.Alert.Value),
+		}
 	}
 
 	if time.Duration(forDur) < c.minFor {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
+			Summary:  "duration required",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
+					Pos:         diag.Pos,
+					FirstColumn: diag.FirstColumn,
+					LastColumn:  diag.LastColumn,
+				},
+			},
 		})
 	}
 
 	if c.maxFor > 0 && time.Duration(forDur) > c.maxFor {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
+			Summary:  "duration too long",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
+					Pos:         diag.Pos,
+					FirstColumn: diag.FirstColumn,
+					LastColumn:  diag.LastColumn,
+				},
+			},
 		})
 	}
 

@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"slices"
 
-	promParser "github.com/prometheus/prometheus/promql/parser"
-
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -55,13 +54,15 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	}
 
 	if rule.AlertingRule != nil {
-		for _, problem := range c.checkSampling(expr.Value.Value, expr.Query.Expr) {
+		for _, problem := range c.checkSampling(expr) {
 			problems = append(problems, Problem{
-				Lines:    expr.Value.Lines,
-				Reporter: c.Reporter(),
-				Summary:  problem.summary,
-				Details:  problem.details,
-				Severity: problem.severity,
+				Anchor:      AnchorAfter,
+				Lines:       expr.Value.Lines,
+				Reporter:    c.Reporter(),
+				Summary:     problem.summary,
+				Details:     problem.details,
+				Severity:    problem.severity,
+				Diagnostics: problem.diags,
 			})
 		}
 	}
@@ -69,8 +70,8 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	return problems
 }
 
-func (c FragileCheck) checkSampling(expr string, node promParser.Node) (problems []exprProblem) {
-	for _, src := range utils.LabelsSource(expr, node) {
+func (c FragileCheck) checkSampling(expr parser.PromQLExpr) (problems []exprProblem) {
+	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
 		if src.Type != utils.AggregateSource {
 			continue
 		}
@@ -81,9 +82,17 @@ func (c FragileCheck) checkSampling(expr string, node promParser.Node) (problems
 			continue
 		}
 		problems = append(problems, exprProblem{
-			summary:  fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+			summary:  "fragile query",
 			details:  FragileCheckSamplingDetails,
 			severity: Warning,
+			diags: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(src.GetSmallestPosition().Start) + 1,
+					LastColumn:  int(src.GetSmallestPosition().End),
+				},
+			},
 		})
 	}
 	return problems

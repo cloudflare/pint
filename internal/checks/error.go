@@ -67,42 +67,52 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 	case errors.As(err, &ignoreErr):
 		slog.Debug("ignore/file report", slog.Any("err", ignoreErr))
 		return Problem{
+			Anchor: AnchorAfter,
 			Lines: parser.LineRange{
 				First: ignoreErr.Line,
 				Last:  ignoreErr.Line,
 			},
-			Reporter: ignoreFileReporter,
-			Summary:  ignoreErr.Error(),
-			Severity: Information,
+			Reporter:    ignoreFileReporter,
+			Summary:     ignoreErr.Error(),
+			Details:     "",
+			Severity:    Information,
+			Diagnostics: nil, // FIXME needs Pos & columns
 		}
 
 	case errors.As(err, &commentErr):
 		slog.Debug("invalid comment report", slog.Any("err", commentErr))
 		return Problem{
+			Anchor: AnchorAfter,
 			Lines: parser.LineRange{
 				First: commentErr.Line,
 				Last:  commentErr.Line,
 			},
-			Reporter: pintCommentReporter,
-			Summary:  "This comment is not a valid pint control comment: " + commentErr.Error(),
-			Severity: Warning,
+			Reporter:    pintCommentReporter,
+			Summary:     "This comment is not a valid pint control comment: " + commentErr.Error(),
+			Details:     "",
+			Severity:    Warning,
+			Diagnostics: nil, // FIXME needs Pos & columns
 		}
 
 	case errors.As(err, &ownerErr):
 		slog.Debug("invalid owner report", slog.Any("err", ownerErr))
 		return Problem{
+			Anchor: AnchorAfter,
 			Lines: parser.LineRange{
 				First: ownerErr.Line,
 				Last:  ownerErr.Line,
 			},
-			Reporter: discovery.RuleOwnerComment,
-			Summary:  fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", ownerErr.Name, ownerErr.Name),
-			Severity: Bug,
+			Reporter:    discovery.RuleOwnerComment,
+			Summary:     fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", ownerErr.Name, ownerErr.Name),
+			Details:     "",
+			Severity:    Bug,
+			Diagnostics: nil, // FIXME needs Pos & columns
 		}
 
 	case errors.As(err, &parseErr):
 		slog.Debug("parse error", slog.Any("err", parseErr))
 		return Problem{
+			Anchor: AnchorAfter,
 			Lines: parser.LineRange{
 				First: parseErr.Line,
 				Last:  parseErr.Line,
@@ -113,7 +123,8 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 This usually means that you have an indention error or the file doesn't have the YAML structure required by Prometheus for [recording](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/) and [alerting](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) rules.
 If this file is a template that will be rendered into valid YAML then you can instruct pint to ignore some lines using comments, see [pint docs](https://cloudflare.github.io/pint/ignoring.html).
 `,
-			Severity: Fatal,
+			Severity:    Fatal,
+			Diagnostics: nil, // FIXME needs Pos & columns
 		}
 
 	default:
@@ -123,14 +134,16 @@ If this file is a template that will be rendered into valid YAML then you can in
 			details = rule.Error.Details
 		}
 		return Problem{
+			Anchor: AnchorAfter,
 			Lines: parser.LineRange{
 				First: rule.Error.Line,
 				Last:  rule.Error.Line,
 			},
-			Reporter: yamlParseReporter,
-			Summary:  fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
-			Details:  details,
-			Severity: Fatal,
+			Reporter:    yamlParseReporter,
+			Summary:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
+			Details:     details,
+			Severity:    Fatal,
+			Diagnostics: nil, // FIXME needs Pos & columns
 		}
 	}
 }

@@ -173,9 +173,12 @@ func promText(name, uri string) string {
 	return fmt.Sprintf("`%s` Prometheus server at %s", name, uri)
 }
 
-func nodeLastColumn(node *parser.YamlNode) int {
-	if node.Value == "" {
-		return node.Column
+func WholeRuleDiag(rule parser.Rule, msg string) output.Diagnostic {
+	node := rule.LastKey()
+	return output.Diagnostic{
+		Message:     msg,
+		Pos:         node.Pos,
+		FirstColumn: 1,
+		LastColumn:  min(3, len(node.Value)),
 	}
-	return node.Column + len(node.Value) - 1
 }

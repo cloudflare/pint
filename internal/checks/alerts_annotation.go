@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -69,11 +70,15 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	if rule.AlertingRule.Annotations == nil || len(rule.AlertingRule.Annotations.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+				},
 			})
 		}
 		return problems
@@ -89,11 +94,20 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 
 	if len(annotations) == 0 && c.isRequired {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.AlertingRule.Annotations.Lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+			Summary:  "required annotation not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+					Pos:         rule.AlertingRule.Annotations.Key.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Annotations.Key.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -101,34 +115,52 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	for _, ann := range annotations {
 		if ann.Value.Value == "" && c.isRequired {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.AlertingRule.Annotations.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+						Pos:         ann.Key.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(ann.Key.Value),
+					},
+				},
 			})
 			return problems
 		}
 		if c.tokenRe != nil {
 			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(ann.Value.Value, -1) {
-				problems = append(problems, c.checkValue(rule, match, ann.Value.Lines)...)
+				problems = append(problems, c.checkValue(rule, match, ann.Value)...)
 			}
 		} else {
-			problems = append(problems, c.checkValue(rule, ann.Value.Value, ann.Value.Lines)...)
+			problems = append(problems, c.checkValue(rule, ann.Value.Value, ann.Value)...)
 		}
 	}
 
 	return problems
 }
 
-func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser.LineRange) (problems []Problem) {
+func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.YamlNode) (problems []Problem) {
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
-			Lines:    lines,
+			Anchor:   AnchorAfter,
+			Lines:    ann.Lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+			Summary:  "invalid annotation value",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+					Pos:         ann.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(ann.Value),
+				},
+			},
 		})
 	}
 	if len(c.values) > 0 {
@@ -152,11 +184,20 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, lines parser
 				details.WriteString(c.comment)
 			}
 			problems = append(problems, Problem{
-				Lines:    lines,
+				Anchor:   AnchorAfter,
+				Lines:    ann.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` annotation value `%s` is not one of valid values.", c.keyRe.original, value),
+				Summary:  "invalid annotation value",
 				Details:  details.String(),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     fmt.Sprintf("`%s` annotation value `%s` is not one of valid values.", c.keyRe.original, value),
+						Pos:         ann.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(ann.Value),
+					},
+				},
 			})
 		}
 	}

@@ -76,15 +76,17 @@ func (c Reject) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ [
 func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines parser.LineRange) (problems []Problem) {
 	if c.keyRe != nil && c.keyRe.MustExpand(rule).MatchString(label.Key.Value) {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    lines,
 			Reporter: c.Reporter(),
 			Summary:  "key not allowed",
+			Details:  "",
 			Diagnostics: []output.Diagnostic{
 				{
-					Line:        label.Key.Lines.Last,
-					FirstColumn: label.Key.Column,
-					LastColumn:  nodeLastColumn(label.Key),
 					Message:     fmt.Sprintf("key is not allowed to match `%s`.", c.keyRe.anchored),
+					Pos:         label.Key.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(label.Key.Value) - 1,
 				},
 			},
 			Severity: c.severity,
@@ -92,18 +94,20 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines parse
 	}
 	if c.valueRe != nil && c.valueRe.MustExpand(rule).MatchString(label.Value.Value) {
 		problems = append(problems, Problem{
+			Anchor: AnchorAfter,
 			Lines: parser.LineRange{
 				First: label.Key.Lines.First,
 				Last:  label.Value.Lines.Last,
 			},
 			Reporter: c.Reporter(),
 			Summary:  "value not allowed",
+			Details:  "",
 			Diagnostics: []output.Diagnostic{
 				{
-					Line:        label.Value.Lines.Last,
-					FirstColumn: label.Value.Column,
-					LastColumn:  nodeLastColumn(label.Value),
 					Message:     fmt.Sprintf("value is not allowed to match `%s`.", c.valueRe.anchored),
+					Pos:         label.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(label.Value.Value) - 1,
 				},
 			},
 			Severity: c.severity,

@@ -27,10 +27,9 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 level=INFO msg="Problems found" Bug=1
 Bug: required label is being removed via aggregation (promql/aggregate)
   ---> rules.yml:4
-3 | - record: rule2
 4 |   expr: sum(foo)
-            ^^^ Query is using aggregation that removes all labels.
-                `job` label is required and should be preserved when aggregating all rules.
+            ^^ Query is using aggregation that removes all labels.
+               `job` label is required and should be preserved when aggregating all rules.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/rules.yml --

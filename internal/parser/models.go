@@ -9,6 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/output"
 )
 
 func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
@@ -19,10 +20,6 @@ func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
 		lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
 	}
 	return lr
-}
-
-func nodeColumn(node *yaml.Node, offset int) int {
-	return node.Column + offset
 }
 
 func nodeValue(node *yaml.Node) string {
@@ -49,9 +46,9 @@ func mergeComments(node *yaml.Node) (comments []string) {
 }
 
 type YamlNode struct {
-	Value  string
-	Lines  LineRange
-	Column int
+	Value string
+	Pos   output.PositionRanges
+	Lines LineRange // FIXME remove
 }
 
 func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
@@ -67,11 +64,11 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 	return true
 }
 
-func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int) *YamlNode {
+func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlNode {
 	return &YamlNode{
-		Lines:  nodeLines(node, offsetLine),
-		Value:  nodeValue(node),
-		Column: nodeColumn(node, offsetColumn),
+		Lines: nodeLines(node, offsetLine),
+		Pos:   output.NewPositionRange(contentLines, node, minColumn).AddOffset(offsetLine, offsetColumn),
+		Value: nodeValue(node),
 	}
 }
 
@@ -117,9 +114,9 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 	return nil
 }
 
-func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int) *YamlMap {
+func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLines []string) *YamlMap {
 	ym := YamlMap{
-		Key:   newYamlNode(key, offsetLine, offsetColumn),
+		Key:   newYamlNode(key, offsetLine, offsetColumn, contentLines, 1),
 		Items: nil,
 		Lines: LineRange{
 			First: key.Line + offsetLine,
@@ -131,8 +128,8 @@ func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int) *YamlMap {
 	for _, child := range value.Content {
 		if ckey != nil {
 			kv := YamlKeyValue{
-				Key:   newYamlNode(ckey, offsetLine, offsetColumn),
-				Value: newYamlNode(child, offsetLine, offsetColumn),
+				Key:   newYamlNode(ckey, offsetLine, offsetColumn, contentLines, key.Column+2),
+				Value: newYamlNode(child, offsetLine, offsetColumn, contentLines, ckey.Column+2),
 			}
 			if kv.Value.Lines.Last > ym.Lines.Last {
 				ym.Lines.Last = kv.Value.Lines.Last
@@ -151,9 +148,9 @@ func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 	return pqle.Value.Value == b.Value.Value
 }
 
-func newPromQLExpr(val *yaml.Node, offsetLine, offsetColumn int) *PromQLExpr {
+func newPromQLExpr(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *PromQLExpr {
 	expr := PromQLExpr{
-		Value:       newYamlNode(val, offsetLine, offsetColumn),
+		Value:       newYamlNode(node, offsetLine, offsetColumn, contentLines, minColumn),
 		SyntaxError: nil,
 		Query:       nil,
 	}
@@ -331,6 +328,49 @@ func (r Rule) Expr() PromQLExpr {
 	return r.AlertingRule.Expr
 }
 
+func (r Rule) LastKey() (node *YamlNode) {
+	if r.RecordingRule != nil {
+		node = &r.RecordingRule.Record
+		if r.RecordingRule.Expr.Value.Pos.Lines().Last > node.Pos.Lines().Last {
+			node = r.RecordingRule.Expr.Value
+		}
+		if r.RecordingRule.Labels != nil {
+			for _, lab := range r.RecordingRule.Labels.Items {
+				if lab.Key.Pos.Lines().Last > node.Pos.Lines().Last {
+					node = lab.Key
+				}
+			}
+		}
+	}
+	if r.AlertingRule != nil {
+		node = &r.AlertingRule.Alert
+		if r.AlertingRule.Expr.Value.Pos.Lines().Last > node.Pos.Lines().Last {
+			node = r.AlertingRule.Expr.Value
+		}
+		if r.AlertingRule.For != nil && r.AlertingRule.For.Pos.Lines().Last > node.Pos.Lines().Last {
+			node = r.AlertingRule.For
+		}
+		if r.AlertingRule.KeepFiringFor != nil && r.AlertingRule.KeepFiringFor.Pos.Lines().Last > node.Pos.Lines().Last {
+			node = r.AlertingRule.KeepFiringFor
+		}
+		if r.AlertingRule.Labels != nil {
+			for _, lab := range r.AlertingRule.Labels.Items {
+				if lab.Key.Pos.Lines().Last > node.Pos.Lines().Last {
+					node = lab.Key
+				}
+			}
+		}
+		if r.AlertingRule.Annotations != nil {
+			for _, ann := range r.AlertingRule.Annotations.Items {
+				if ann.Key.Pos.Lines().Last > node.Pos.Lines().Last {
+					node = ann.Key
+				}
+			}
+		}
+	}
+	return node
+}
+
 type RuleType string
 
 const (
@@ -347,11 +387,4 @@ func (r Rule) Type() RuleType {
 		return RecordingRuleType
 	}
 	return InvalidRuleType
-}
-
-type Result struct {
-	Path    string
-	Error   error
-	Content []byte
-	Rules   []Rule
 }

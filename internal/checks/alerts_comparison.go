@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 
@@ -55,43 +56,70 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		return problems
 	}
 
-	expr := rule.Expr().Query
+	expr := rule.Expr()
 
-	if n := utils.HasOuterBinaryExpr(expr); n != nil && n.Op == promParser.LOR {
+	if n := utils.HasOuterBinaryExpr(expr.Query); n != nil && n.Op == promParser.LOR {
 		if (hasComparision(n.LHS) == nil || hasComparision(n.RHS) == nil) && !isAbsent(n.LHS) && !isAbsent(n.RHS) {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.AlertingRule.Expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Summary:  "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
 				Severity: rewriteSeverity(Warning, n.LHS, n.RHS),
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(n.PositionRange().Start) + 1,
+						LastColumn:  int(n.PositionRange().End),
+					},
+				},
 			})
 		}
 	}
 
-	if n := hasComparision(expr.Expr); n != nil {
+	if n := hasComparision(expr.Query.Expr); n != nil {
 		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.AlertingRule.Expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Summary:  "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
+				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
 				Severity: Bug,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(n.PositionRange().Start) + 1,
+						LastColumn:  int(n.PositionRange().End),
+					},
+				},
 			})
 		}
 		return problems
 	}
 
-	if hasAbsent(expr) {
+	if hasAbsent(expr.Query) {
 		return problems
 	}
 
 	problems = append(problems, Problem{
+		Anchor:   AnchorAfter,
 		Lines:    rule.AlertingRule.Expr.Value.Lines,
 		Reporter: c.Reporter(),
-		Summary:  "Alert query doesn't have any condition, it will always fire if the metric exists.",
+		Summary:  "always firing alert",
 		Details:  ComparisonCheckDetails,
 		Severity: Warning,
+		Diagnostics: []output.Diagnostic{
+			{
+				Message:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
+				Pos:         expr.Value.Pos,
+				FirstColumn: 1,
+				LastColumn:  len(expr.Value.Value),
+			},
+		},
 	})
 
 	return problems

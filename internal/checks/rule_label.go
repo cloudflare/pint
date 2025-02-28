@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -77,11 +78,15 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 	if rule.RecordingRule.Labels == nil || len(rule.RecordingRule.Labels.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+				},
 			})
 		}
 		return problems
@@ -91,11 +96,20 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 	if val == nil || val.Value == "" {
 		if c.isRequired {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.RecordingRule.Labels.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+						Pos:         rule.RecordingRule.Labels.Key.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(rule.RecordingRule.Labels.Key.Value),
+					},
+				},
 			})
 		}
 		return problems
@@ -103,12 +117,12 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 
 	if c.tokenRe != nil {
 		for _, match := range c.tokenRe.MustExpand(rule).FindAllString(val.Value, -1) {
-			problems = append(problems, c.checkValue(rule, match, val.Lines)...)
+			problems = append(problems, c.checkValue(rule, match, val)...)
 		}
 		return problems
 	}
 
-	problems = append(problems, c.checkValue(rule, val.Value, val.Lines)...)
+	problems = append(problems, c.checkValue(rule, val.Value, val)...)
 	return problems
 }
 
@@ -116,11 +130,15 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 	if rule.AlertingRule.Labels == nil || len(rule.AlertingRule.Labels.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+				},
 			})
 		}
 		return problems
@@ -136,11 +154,20 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 
 	if len(labels) == 0 && c.isRequired {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.AlertingRule.Labels.Lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+			Summary:  "required label not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+					Pos:         rule.AlertingRule.Labels.Key.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Labels.Key.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -148,34 +175,52 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 	for _, lab := range labels {
 		if lab.Value.Value == "" && c.isRequired {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    rule.AlertingRule.Labels.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+						Pos:         lab.Key.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(lab.Key.Value),
+					},
+				},
 			})
 			return problems
 		}
 		if c.tokenRe != nil {
 			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(lab.Value.Value, -1) {
-				problems = append(problems, c.checkValue(rule, match, lab.Value.Lines)...)
+				problems = append(problems, c.checkValue(rule, match, lab.Value)...)
 			}
 		} else {
-			problems = append(problems, c.checkValue(rule, lab.Value.Value, lab.Value.Lines)...)
+			problems = append(problems, c.checkValue(rule, lab.Value.Value, lab.Value)...)
 		}
 	}
 
 	return problems
 }
 
-func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.LineRange) (problems []Problem) {
+func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlNode) (problems []Problem) {
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
-			Lines:    lines,
+			Anchor:   AnchorAfter,
+			Lines:    lab.Lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+			Summary:  "invalid label value",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+					Pos:         lab.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(lab.Value),
+				},
+			},
 		})
 	}
 	if len(c.values) > 0 {
@@ -199,11 +244,20 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lines parser.Line
 				details.WriteString(c.comment)
 			}
 			problems = append(problems, Problem{
-				Lines:    lines,
+				Anchor:   AnchorAfter,
+				Lines:    lab.Lines,
 				Reporter: c.Reporter(),
-				Summary:  fmt.Sprintf("`%s` label value `%s` is not one of valid values.", c.keyRe.original, value),
+				Summary:  "invalid label value",
 				Details:  details.String(),
 				Severity: c.severity,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     fmt.Sprintf("`%s` label value `%s` is not one of valid values.", c.keyRe.original, value),
+						Pos:         lab.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(lab.Value),
+					},
+				},
 			})
 		}
 	}

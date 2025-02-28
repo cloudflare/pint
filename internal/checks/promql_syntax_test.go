@@ -48,9 +48,6 @@ func TestSyntaxCheck(t *testing.T) {
 						Severity: checks.Fatal,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  12,
 								Message:     "no arguments for aggregate expression provided",
 							},
 						},
@@ -77,10 +74,7 @@ func TestSyntaxCheck(t *testing.T) {
 						Severity: checks.Fatal,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 20,
-								LastColumn:  20,
-								Message:     "unclosed left parenthesis",
+								Message: "unclosed left parenthesis",
 							},
 						},
 					},

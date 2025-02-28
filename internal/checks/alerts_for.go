@@ -62,6 +62,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 	d, err := model.ParseDuration(value.Value)
 	if err != nil {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    value.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "invalid duration",
@@ -70,9 +71,9 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 			Diagnostics: []output.Diagnostic{
 				{
 					Message:     err.Error(),
-					Line:        value.Lines.First,
-					FirstColumn: value.Column,
-					LastColumn:  nodeLastColumn(value),
+					Pos:         value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(value.Value),
 				},
 			},
 		})
@@ -81,16 +82,18 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 
 	if d == 0 {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    value.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "redundant field with default value",
+			Details:  "",
 			Severity: Information,
 			Diagnostics: []output.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s` is the default value of `%s`, this line is unnecessary.", value.Value, name),
-					Line:        value.Lines.First,
-					FirstColumn: value.Column,
-					LastColumn:  nodeLastColumn(value),
+					Pos:         value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(value.Value),
 				},
 			},
 		})

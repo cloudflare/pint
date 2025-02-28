@@ -8,14 +8,12 @@ level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:5
-4 |     - record: colo:http_inprogress_requests:sum
 5 |       expr: sum by (instance) (http_inprogress_requests)
-                    ^^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-                        `job` label is required and should be preserved when aggregating all rules.
+                    ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                       `job` label is required and should be preserved when aggregating all rules.
 
 Bug: label must be removed in aggregations (promql/aggregate)
   ---> rules/0001.yml:5
-4 |     - record: colo:http_inprogress_requests:sum
 5 |       expr: sum by (instance) (http_inprogress_requests)
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 

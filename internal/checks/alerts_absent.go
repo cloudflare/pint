@@ -81,10 +81,20 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Summary:  text,
+			Summary:  "unable to run checks",
+			Details:  "",
 			Severity: severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     text,
+					Pos:         rule.AlertingRule.Expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -106,9 +116,9 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		diags := []output.Diagnostic{
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
-				Line:        rule.AlertingRule.Expr.Value.Lines.First,
-				FirstColumn: rule.AlertingRule.Expr.Value.Column + int(s.Call.PosRange.Start),
-				LastColumn:  rule.AlertingRule.Expr.Value.Column + int(s.Call.PosRange.End) - 1,
+				Pos:         rule.AlertingRule.Expr.Value.Pos,
+				FirstColumn: int(s.Call.PosRange.Start) + 1,
+				LastColumn:  int(s.Call.PosRange.End),
 			},
 		}
 		if forVal > 0 {
@@ -116,15 +126,16 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 			diags = append(diags, output.Diagnostic{
 				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
 					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
-				Line:        rule.AlertingRule.For.Lines.First,
-				FirstColumn: rule.AlertingRule.For.Column,
-				LastColumn:  nodeLastColumn(rule.AlertingRule.For),
+				Pos:         rule.AlertingRule.For.Pos,
+				FirstColumn: 1,
+				LastColumn:  len(rule.AlertingRule.For.Value),
 			})
 		} else {
 			summary = "absent() based alert without for"
 		}
 
 		problems = append(problems, Problem{
+			Anchor:      AnchorAfter,
 			Lines:       rule.AlertingRule.Expr.Value.Lines,
 			Reporter:    c.Reporter(),
 			Summary:     summary,

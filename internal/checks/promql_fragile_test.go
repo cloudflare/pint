@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -46,9 +47,14 @@ func TestFragileCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.FragileCheckName,
-						Summary:  fragileSampleFunc("topk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: fragileSampleFunc("topk"),
+							},
+						},
 					},
 				}
 			},
@@ -66,9 +72,14 @@ func TestFragileCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.FragileCheckName,
-						Summary:  fragileSampleFunc("topk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: fragileSampleFunc("topk"),
+							},
+						},
 					},
 				}
 			},
@@ -86,9 +97,14 @@ func TestFragileCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.FragileCheckName,
-						Summary:  fragileSampleFunc("topk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: fragileSampleFunc("topk"),
+							},
+						},
 					},
 					{
 						Lines: parser.LineRange{
@@ -96,9 +112,14 @@ func TestFragileCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.FragileCheckName,
-						Summary:  fragileSampleFunc("bottomk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: fragileSampleFunc("bottomk"),
+							},
+						},
 					},
 				}
 			},

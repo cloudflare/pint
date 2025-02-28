@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"slices"
 	"strings"
 	textTemplate "text/template"
 	"text/template/parse"
@@ -112,38 +111,56 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		for _, label := range rule.AlertingRule.Labels.Items {
 			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
+					Anchor: AnchorAfter,
 					Lines: parser.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Summary:  fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+					Summary:  "template syntax error",
 					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
+					Diagnostics: []output.Diagnostic{
+						{
+							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+							Pos:         label.Value.Pos,
+							FirstColumn: 1,
+							LastColumn:  len(label.Value.Value),
+						},
+					},
 				})
 			}
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
 				problems = append(problems, Problem{
+					Anchor: AnchorAfter,
 					Lines: parser.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Summary:  msg,
+					Summary:  "value used in labels",
+					Details:  "",
 					Severity: Bug,
+					Diagnostics: []output.Diagnostic{
+						{
+							Message:     msg,
+							Pos:         label.Value.Pos,
+							FirstColumn: 1,
+							LastColumn:  len(label.Value.Value),
+						},
+					},
 				})
 			}
 
-			for _, problem := range checkQueryLabels(label.Key.Value, label.Value.Value, src) {
+			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr, label, src) {
 				problems = append(problems, Problem{
-					Lines: parser.LineRange{
-						First: label.Key.Lines.First,
-						Last:  label.Value.Lines.Last,
-					},
-					Reporter: c.Reporter(),
-					Summary:  problem.summary,
-					Details:  problem.details,
-					Severity: problem.severity,
+					Anchor:      AnchorAfter,
+					Lines:       rule.Lines,
+					Reporter:    c.Reporter(),
+					Summary:     problem.summary,
+					Details:     problem.details,
+					Severity:    problem.severity,
+					Diagnostics: problem.diags,
 				})
 			}
 		}
@@ -153,39 +170,49 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		for _, annotation := range rule.AlertingRule.Annotations.Items {
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
+					Anchor: AnchorAfter,
 					Lines: parser.LineRange{
 						First: annotation.Key.Lines.First,
 						Last:  annotation.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Summary:  fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+					Summary:  "template syntax error",
 					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
+					Diagnostics: []output.Diagnostic{
+						{
+							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+							Pos:         annotation.Value.Pos,
+							FirstColumn: 1,
+							LastColumn:  len(annotation.Value.Value),
+						},
+					},
 				})
 			}
 
-			for _, problem := range checkQueryLabels(annotation.Key.Value, annotation.Value.Value, src) {
+			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr, annotation, src) {
 				problems = append(problems, Problem{
-					Lines: parser.LineRange{
-						First: annotation.Key.Lines.First,
-						Last:  annotation.Value.Lines.Last,
-					},
-					Reporter: c.Reporter(),
-					Summary:  problem.summary,
-					Details:  problem.details,
-					Severity: problem.severity,
+					Anchor:      AnchorAfter,
+					Lines:       rule.Lines,
+					Reporter:    c.Reporter(),
+					Summary:     problem.summary,
+					Details:     problem.details,
+					Severity:    problem.severity,
+					Diagnostics: problem.diags,
 				})
 			}
 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
 				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value) {
 					problems = append(problems, Problem{
+						Anchor: AnchorAfter,
 						Lines: parser.LineRange{
 							First: min(rule.AlertingRule.Expr.Value.Lines.First, annotation.Value.Lines.First),
 							Last:  max(rule.AlertingRule.Expr.Value.Lines.Last, annotation.Value.Lines.Last),
 						},
 						Reporter:    c.Reporter(),
 						Summary:     problem.summary,
+						Details:     "",
 						Severity:    problem.severity,
 						Diagnostics: problem.diags,
 					})
@@ -205,15 +232,15 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 			diags: []output.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
-					Line:        expr.Value.Lines.First,
-					FirstColumn: expr.Value.Column + int(call.PosRange.Start),
-					LastColumn:  expr.Value.Column + int(call.PosRange.End) - 1,
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(call.PosRange.Start) + 1,
+					LastColumn:  int(call.PosRange.End),
 				},
 				{
 					Message:     "Use one of humanize template functions to make the result more readable.",
-					Line:        ann.Lines.First,
-					FirstColumn: ann.Column,
-					LastColumn:  nodeLastColumn(ann),
+					Pos:         ann.Pos,
+					FirstColumn: 1,              // FIXME use $value offset
+					LastColumn:  len(ann.Value), // FIXME use $value offset
 				},
 			},
 			severity: Information,
@@ -441,8 +468,8 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func checkQueryLabels(labelName, labelValue string, src []utils.Source) (problems []exprProblem) {
-	vars, aliases, ok := findTemplateVariables(labelName, labelValue)
+func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []utils.Source) (problems []exprProblem) {
+	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
 	if !ok {
 		return nil
 	}
@@ -459,18 +486,27 @@ func checkQueryLabels(labelName, labelValue string, src []utils.Source) (problem
 					if s.IsDead {
 						continue
 					}
-					if slices.Contains(s.IncludedLabels, v[1]) {
-						continue
-					}
-					if slices.Contains(s.GuaranteedLabels, v[1]) {
-						continue
-					}
-					if s.FixedLabels {
-						problems = append(problems, textForProblem(v[1], "", s, Bug))
-						goto NEXT
-					}
-					if slices.Contains(s.ExcludedLabels, v[1]) {
-						problems = append(problems, textForProblem(v[1], v[1], s, Bug))
+					if !s.CanHaveLabel(v[1]) {
+						er := s.LabelExcludeReason(v[1])
+						problems = append(problems, exprProblem{
+							summary:  "template uses non-existent label",
+							details:  "",
+							severity: Bug,
+							diags: []output.Diagnostic{
+								{
+									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v[1]),
+									Pos:         label.Value.Pos,
+									FirstColumn: 1,
+									LastColumn:  len(label.Value.Value),
+								},
+								{
+									Message:     er.Reason,
+									Pos:         expr.Value.Pos,
+									FirstColumn: int(er.Fragment.Start) + 1,
+									LastColumn:  int(er.Fragment.End),
+								},
+							},
+						})
 						goto NEXT
 					}
 				}
@@ -481,12 +517,4 @@ func checkQueryLabels(labelName, labelValue string, src []utils.Source) (problem
 	}
 
 	return problems
-}
-
-func textForProblem(label, reasonLabel string, src utils.Source, severity Severity) exprProblem {
-	return exprProblem{
-		summary:  fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", label),
-		details:  src.ExcludeReason[reasonLabel].Reason,
-		severity: severity,
-	}
 }

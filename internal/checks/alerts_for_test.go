@@ -47,10 +47,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 8,
-								LastColumn:  10,
-								Message:     `not a valid duration string: "abc"`,
+								Message: `not a valid duration string: "abc"`,
 							},
 						},
 					},
@@ -75,10 +72,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 8,
-								LastColumn:  10,
-								Message:     `not a valid duration string: "-5m"`,
+								Message: `not a valid duration string: "-5m"`,
 							},
 						},
 					},
@@ -102,10 +96,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Severity: checks.Information,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 8,
-								LastColumn:  9,
-								Message:     "`0h` is the default value of `for`, this line is unnecessary.",
+								Message: "`0h` is the default value of `for`, this line is unnecessary.",
 							},
 						},
 					},
@@ -130,10 +121,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 20,
-								LastColumn:  22,
-								Message:     `not a valid duration string: "abc"`,
+								Message: `not a valid duration string: "abc"`,
 							},
 						},
 					},
@@ -158,10 +146,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 20,
-								LastColumn:  22,
-								Message:     `not a valid duration string: "-5m"`,
+								Message: `not a valid duration string: "-5m"`,
 							},
 						},
 					},
@@ -185,10 +170,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Severity: checks.Information,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 20,
-								LastColumn:  21,
-								Message:     "`0h` is the default value of `keep_firing_for`, this line is unnecessary.",
+								Message: "`0h` is the default value of `keep_firing_for`, this line is unnecessary.",
 							},
 						},
 					},

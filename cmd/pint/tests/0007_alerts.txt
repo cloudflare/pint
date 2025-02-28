@@ -6,61 +6,74 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=6 workers=10 online=true
-Warning: `severity` label is required. (rule/label)
+Warning: required label not set (rule/label)
   ---> rules/0001.yml:1-2
- 1 | - alert: Always
- 2 |   expr: up
+1 | - alert: Always
+2 |   expr: up
+            ^^ `severity` label is required.
 
-Bug: `url` annotation is required. (alerts/annotation)
+Bug: required annotation not set (alerts/annotation)
   ---> rules/0001.yml:1-2
- 1 | - alert: Always
- 2 |   expr: up
+1 | - alert: Always
+2 |   expr: up
+            ^^ `url` annotation is required.
 
-Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+Warning: always firing alert (alerts/comparison)
   ---> rules/0001.yml:2
- 2 |   expr: up
+2 |   expr: up
+            ^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
-Warning: `severity` label is required. (rule/label)
+Warning: required label not set (rule/label)
   ---> rules/0001.yml:9-10
-  9 | - alert: ServiceIsDown
- 10 |   expr: up == 0
+ 9 | - alert: ServiceIsDown
+10 |   expr: up == 0
+             ^^^ `severity` label is required.
 
-Bug: `url` annotation is required. (alerts/annotation)
+Bug: required annotation not set (alerts/annotation)
   ---> rules/0001.yml:9-10
-  9 | - alert: ServiceIsDown
- 10 |   expr: up == 0
+ 9 | - alert: ServiceIsDown
+10 |   expr: up == 0
+             ^^^ `url` annotation is required.
 
-Warning: `severity` label value `bad` must match `^critical|warning|info$`. (rule/label)
+Warning: invalid label value (rule/label)
   ---> rules/0001.yml:14
- 14 |     severity: bad
+14 |     severity: bad
+                   ^^^ `severity` label value `bad` must match `^critical|warning|info$`.
 
-Bug: `url` annotation value `bad` must match `^https://wiki.example.com/page/(.+).html$`. (alerts/annotation)
+Bug: invalid annotation value (alerts/annotation)
   ---> rules/0001.yml:16
- 16 |     url: bad
+16 |     url: bad
+              ^^^ `url` annotation value `bad` must match `^https://wiki.example.com/page/(.+).html$`.
 
-Fatal: Template failed to parse with this error: `undefined variable "$label"`. (alerts/template)
+Fatal: template syntax error (alerts/template)
   ---> rules/0002.yml:5
- 5 |     summary: 'Instance {{ $label.instance }} down'
+5 |     summary: 'Instance {{ $label.instance }} down'
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `undefined variable "$label"`.
 
-Fatal: Template failed to parse with this error: `undefined variable "$valuexx"`. (alerts/template)
+Fatal: template syntax error (alerts/template)
   ---> rules/0002.yml:6
- 6 |     func: '{{ $valuexx | xxx }}'
+6 |     func: '{{ $valuexx | xxx }}'
+               ^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `undefined variable "$valuexx"`.
 
-Fatal: Template failed to parse with this error: `undefined variable "$label"`. (alerts/template)
+Fatal: template syntax error (alerts/template)
   ---> rules/0002.yml:9
- 9 |     summary: 'Instance {{ $label.instance }} down'
+9 |     summary: 'Instance {{ $label.instance }} down'
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `undefined variable "$label"`.
 
-Fatal: Template failed to parse with this error: `function "xxx" not defined`. (alerts/template)
+Fatal: template syntax error (alerts/template)
   ---> rules/0002.yml:10
- 10 |     func: '{{ $value | xxx }}'
+10 |     func: '{{ $value | xxx }}'
+                ^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `function "xxx" not defined`.
 
-Bug: Using `$value` in labels will generate a new alert on every value change, move it to annotations. (alerts/template)
+Bug: value used in labels (alerts/template)
   ---> rules/0002.yml:11
- 11 |     bar: 'Some {{$value}} value'
+11 |     bar: 'Some {{$value}} value'
+               ^^^^^^^^^^^^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
 
-Bug: Using `.Value` in labels will generate a new alert on every value change, move it to annotations. (alerts/template)
+Bug: value used in labels (alerts/template)
   ---> rules/0002.yml:12
- 12 |     val: '{{ .Value|humanizeDuration }}'
+12 |     val: '{{ .Value|humanizeDuration }}'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
 
 level=INFO msg="Problems found" Fatal=4 Bug=5 Warning=4
 level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Bug or higher"

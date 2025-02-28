@@ -41,13 +41,15 @@ level=INFO msg="Configured new Prometheus server" name=prom1 uris=1 uptime=up ta
 level=INFO msg="Configured new Prometheus server" name=prom2 uris=1 uptime=up tags=[] include=["^prom2.yml$"] exclude=[]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 -- stderrV2.txt --
-Bug: `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w. (promql/series)
+Bug: query on nonexistent series (promql/series)
   ---> prom2.yml:10
- 10 |     expr: up == 0
+10 |     expr: up == 0
+               ^^ `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w.
 
-Bug: `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w. (promql/series)
+Bug: query on nonexistent series (promql/series)
   ---> prom2.yml:21
- 21 |     expr: up == 0
+21 |     expr: up == 0
+               ^^ `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v0.yml --

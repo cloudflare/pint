@@ -6,10 +6,11 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=9 workers=10 online=true
-Warning: `summary` annotation is required. (alerts/annotation)
+Warning: required annotation not set (alerts/annotation)
   ---> rules/1.yaml:149-150
- 149 |             annotations:
- 150 |               description: Thanos Ruler has not been able to reload its configuration.
+149 |             annotations:
+                  ^^^^^^^^^^^ `summary` annotation is required.
+150 |               description: Thanos Ruler has not been able to reload its configuration.
 
 level=INFO msg="Problems found" Warning=1
 -- .pint.hcl --

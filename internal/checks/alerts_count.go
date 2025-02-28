@@ -77,10 +77,20 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Summary:  text,
+			Summary:  "unable to run checks",
+			Details:  "",
 			Severity: severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     text,
+					Pos:         rule.AlertingRule.Expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -125,11 +135,20 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	}
 
 	problems = append(problems, Problem{
+		Anchor:   AnchorAfter,
 		Lines:    rule.AlertingRule.Expr.Value.Lines,
 		Reporter: c.Reporter(),
-		Summary:  fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
+		Summary:  "alert count estimate",
 		Details:  details,
 		Severity: c.severity,
+		Diagnostics: []output.Diagnostic{
+			{
+				Message:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
+				Pos:         rule.AlertingRule.Expr.Value.Pos,
+				FirstColumn: 1,
+				LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
+			},
+		},
 	})
 	return problems
 }

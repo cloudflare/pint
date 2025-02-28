@@ -5,21 +5,55 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
-  ---> rules/01.yml:5
+Bug: template uses non-existent label (alerts/template)
+  ---> rules/01.yml:4-13
+ 4 |   - alert: foo
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+               ^^ Query is using aggregation that removes all labels.
+ 6 |     for: 5m
+ 7 |     labels:
+ 8 |         priority: "2"
+ 9 |         component: bob
+10 |     annotations:
+11 |         link: https://example.com/link
+12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
 
-Bug: Template is using `cluster` label but the query results won't have this label. (alerts/template)
-  ---> rules/01.yml:12
- 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+Bug: template uses non-existent label (alerts/template)
+  ---> rules/01.yml:4-13
+ 4 |   - alert: foo
+ 5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+               ^^ Query is using aggregation that removes all labels.
+ 6 |     for: 5m
+ 7 |     labels:
+ 8 |         priority: "2"
+ 9 |         component: bob
+10 |     annotations:
+11 |         link: https://example.com/link
+12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
+13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
 
-Bug: Template is using `instance` label but the query results won't have this label. (alerts/template)
-  ---> rules/01.yml:12
- 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+Bug: template uses non-existent label (alerts/template)
+  ---> rules/01.yml:4-13
+ 4 |   - alert: foo
+ 5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+               ^^ Query is using aggregation that removes all labels.
+ 6 |     for: 5m
+ 7 |     labels:
+ 8 |         priority: "2"
+ 9 |         component: bob
+10 |     annotations:
+11 |         link: https://example.com/link
+12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
+13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
 
-Bug: Template is using `cluster` label but the query results won't have this label. (alerts/template)
-  ---> rules/01.yml:13
- 13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
+Warning: always firing alert (alerts/comparison)
+  ---> rules/01.yml:5
+5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
 level=INFO msg="Problems found" Bug=3 Warning=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

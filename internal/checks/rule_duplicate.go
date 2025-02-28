@@ -7,6 +7,7 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -94,10 +95,20 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 
 	if rule.Expr.Query.Expr.String() == entry.Rule.RecordingRule.Expr.Query.Expr.String() {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Summary:  fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
+			Summary:  "duplicated recording rule",
+			Details:  "",
 			Severity: Bug,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
+					Pos:         rule.Record.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.Record.Value),
+				},
+			},
 		})
 	}
 

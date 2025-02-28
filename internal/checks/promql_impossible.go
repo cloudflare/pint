@@ -59,14 +59,16 @@ func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (pr
 	if s.IsDead {
 		pos := s.GetSmallestPosition()
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "dead code in query",
+			Details:  "",
 			Diagnostics: []output.Diagnostic{
 				{
-					Line:        expr.Value.Lines.First,
-					FirstColumn: expr.Value.Column + int(pos.Start),
-					LastColumn:  expr.Value.Column + int(pos.End) - 1,
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(pos.Start) + 1,
+					LastColumn:  int(pos.End),
 					Message:     s.IsDeadReason,
 				},
 			},

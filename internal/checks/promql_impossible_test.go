@@ -42,10 +42,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 19,
-								LastColumn:  27,
-								Message:     "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 							},
 						},
 					},
@@ -72,10 +69,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 9,
-								LastColumn:  9,
-								Message:     "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 							},
 						},
 					},
@@ -102,10 +96,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 20,
-								LastColumn:  28,
-								Message:     "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 							},
 						},
 					},
@@ -132,10 +123,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 31,
-								LastColumn:  39,
-								Message:     "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
 							},
 						},
 					},
@@ -162,10 +150,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        3,
-								FirstColumn: 35, // FIXME 31
-								LastColumn:  37, // FIXME 38
-								Message:     "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
 							},
 						},
 					},

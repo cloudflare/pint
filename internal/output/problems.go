@@ -1,22 +1,9 @@
 package output
 
 import (
-	"bufio"
-	"cmp"
 	"fmt"
-	"slices"
 	"strings"
 )
-
-func overlaps(n, minN, maxN int) bool {
-	if n < minN {
-		return false
-	}
-	if n > maxN {
-		return false
-	}
-	return true
-}
 
 func countDigits(n int) (c int) {
 	for n > 0 {
@@ -28,31 +15,26 @@ func countDigits(n int) (c int) {
 
 type Diagnostic struct {
 	Message     string
-	Line        int // 1-indexed
+	Pos         PositionRanges
 	FirstColumn int // 1-indexed
 	LastColumn  int // 1-indexed
 }
 
 func InjectDiagnostics(content string, diags []Diagnostic, color Color, firstLine, lastLine int) string {
-	slices.SortFunc(diags, func(a, b Diagnostic) int {
-		return cmp.Or(
-			cmp.Compare(b.FirstColumn, a.FirstColumn),
-			cmp.Compare(a.LastColumn, b.LastColumn),
-			cmp.Compare(a.Message, b.Message),
-		)
-	})
+	diagPositions := make([]PositionRanges, len(diags))
+	for i, diag := range diags {
+		diagPositions[i] = readRange(diag.FirstColumn, diag.LastColumn, diag.Pos)
+	}
 
 	var buf strings.Builder
-	var lineIndex int
 	nextLine := make([]strings.Builder, len(diags))
 	needsNextLine := make([]bool, len(diags))
-	offsets := make([]int, len(diags))
 
 	disablePoints := make([]bool, len(diags))
 	for i, a := range diags {
 		for j := range i {
 			b := diags[j]
-			if a.Line == b.Line && a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn {
+			if a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn {
 				disablePoints[i] = true
 			}
 		}
@@ -60,69 +42,57 @@ func InjectDiagnostics(content string, diags []Diagnostic, color Color, firstLin
 
 	nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine))
 
-	r := strings.NewReader(content)
-	scanner := bufio.NewScanner(r)
-	for scanner.Scan() {
-		lineIndex++
-		line := scanner.Text()
-		doPrint := overlaps(lineIndex, firstLine, lastLine)
+	for lineIndex, line := range strings.Split(content, "\n") {
 
-		for i, diag := range diags {
-			if diag.Line == lineIndex {
-				offsets[i] = 1
-			}
-			if offsets[i] > 0 && (overlaps(diag.FirstColumn, offsets[i], offsets[i]+len(line)) || overlaps(diag.LastColumn, offsets[i], offsets[i]+len(line))) {
-				needsNextLine[i] = true
-			} else {
-				needsNextLine[i] = false
-			}
+		if lineIndex+1 < firstLine {
+			continue
+		}
+		if lineIndex+1 > lastLine {
+			break
 		}
 
-		if doPrint {
-			prefix := fmt.Sprintf(nrFmt+" | ", lineIndex)
-			buf.WriteString(MaybeColor(White, color == None, prefix))
-			for i, ok := range needsNextLine {
-				if ok {
-					nextLine[i].WriteString(strings.Repeat(" ", len(prefix)))
+		for i := range diags {
+			needsNextLine[i] = false
+			for _, pos := range diagPositions[i] {
+				if pos.Line == lineIndex+1 {
+					needsNextLine[i] = true
 				}
 			}
 		}
 
-		for _, c := range line {
-			if doPrint {
-				buf.WriteRune(c)
+		prefix := fmt.Sprintf(nrFmt+" | ", lineIndex+1)
+		buf.WriteString(MaybeColor(White, color == None, prefix))
+		for i, ok := range needsNextLine {
+			if ok {
+				nextLine[i].WriteString(strings.Repeat(" ", len(prefix)))
 			}
+		}
+
+		for columnIndex, r := range line {
+			buf.WriteRune(r)
 
 			for i, ok := range needsNextLine {
-				if ok {
-					if offsets[i] < diags[i].FirstColumn {
+				if !ok {
+					continue
+				}
+				for _, pos := range diagPositions[i] {
+					if pos.Line != lineIndex+1 {
+						continue
+					}
+					before := pos.FirstColumn > columnIndex+1
+					inside := pos.FirstColumn <= columnIndex+1 && pos.LastColumn >= columnIndex+1
+					switch {
+					case before:
 						nextLine[i].WriteRune(' ')
-					} else if offsets[i] >= diags[i].FirstColumn && offsets[i] <= diags[i].LastColumn {
-						if disablePoints[i] {
-							nextLine[i].WriteRune(' ')
-						} else {
-							nextLine[i].WriteRune('^')
-						}
+					case inside && disablePoints[i]:
+						nextLine[i].WriteRune(' ')
+					case inside && !disablePoints[i]:
+						nextLine[i].WriteRune('^')
 					}
 				}
 			}
-
-			for i, v := range offsets {
-				if v > 0 {
-					offsets[i]++
-				}
-			}
 		}
-
-		if doPrint {
-			buf.WriteRune('\n')
-		}
-
-		for i, v := range offsets {
-			if v > 0 {
-				offsets[i]++
-			}
-		}
+		buf.WriteRune('\n')
 
 		for i, ok := range needsNextLine {
 			if ok {

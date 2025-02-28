@@ -70,10 +70,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 27,
-								LastColumn:  37,
-								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
 						},
 					},
@@ -104,10 +101,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  19,
-								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
 						},
 					},
@@ -138,16 +132,10 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  19,
-								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
 							{
-								Line:        3,
-								FirstColumn: 8,
-								LastColumn:  9,
-								Message:     "Use a value that's at least twice Prometheus scrape interval (`1m`).",
+								Message: "Use a value that's at least twice Prometheus scrape interval (`1m`).",
 							},
 						},
 					},
@@ -178,16 +166,10 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  19,
-								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
 							{
-								Line:        3,
-								FirstColumn: 8,
-								LastColumn:  9,
-								Message:     "Use a value that's at least twice Prometheus scrape interval (`53s`).",
+								Message: "Use a value that's at least twice Prometheus scrape interval (`53s`).",
 							},
 						},
 					},
@@ -218,16 +200,10 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  19,
-								Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
 							{
-								Line:        3,
-								FirstColumn: 8,
-								LastColumn:  10,
-								Message:     "Use a value that's at least twice Prometheus scrape interval (`1m`).",
+								Message: "Use a value that's at least twice Prometheus scrape interval (`1m`).",
 							},
 						},
 					},
@@ -266,8 +242,13 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Summary:  checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  "unable to run checks",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
+							},
+						},
 					},
 				}
 			},
@@ -291,8 +272,13 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Summary:  checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
+							},
+						},
 					},
 				}
 			},
@@ -318,8 +304,13 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Summary:  checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+							},
+						},
 					},
 				}
 			},
@@ -350,8 +341,13 @@ func TestAlertsAbsentCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.AlertsAbsentCheckName,
-						Summary:  checkErrorBadData("prom", s, "bad_response: 600 status code 600"),
+						Summary:  "unable to run checks",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", s, "bad_response: 600 status code 600"),
+							},
+						},
 					},
 				}
 			},

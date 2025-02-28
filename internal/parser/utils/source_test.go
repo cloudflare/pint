@@ -39,6 +39,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -56,6 +57,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 0.2,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -73,6 +75,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `32 == 5` which is not possible, so it will never return anything",
 					ReturnedNumber: 32,
@@ -93,6 +96,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `3 <= 2` which is not possible, so it will never return anything",
 					ReturnedNumber: 3,
@@ -113,6 +117,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `3 >= 20` which is not possible, so it will never return anything",
 					ReturnedNumber: 3,
@@ -133,6 +138,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -151,6 +157,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `3 < 1` which is not possible, so it will never return anything",
 					ReturnedNumber: 3,
@@ -171,6 +178,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `5 < 1` which is not possible, so it will never return anything",
 					ReturnedNumber: 5,
@@ -191,6 +199,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -232,6 +241,7 @@ func TestLabelsSource(t *testing.T) {
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -258,6 +268,7 @@ func TestLabelsSource(t *testing.T) {
 								Operation:      "vector",
 								FixedLabels:    true,
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 2,
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 22),
 								ExcludeReason: map[string]utils.ExcludedLabel{
@@ -285,6 +296,7 @@ func TestLabelsSource(t *testing.T) {
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 10,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -300,6 +312,7 @@ func TestLabelsSource(t *testing.T) {
 								Operation:      "vector",
 								FixedLabels:    true,
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 2,
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 22),
 								ExcludeReason: map[string]utils.ExcludedLabel{
@@ -331,6 +344,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -349,6 +363,7 @@ func TestLabelsSource(t *testing.T) {
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 20,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1922,6 +1937,7 @@ sum(foo:count) by(job) > 20`,
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1959,6 +1975,7 @@ sum(foo:count) by(job) > 20`,
 					Operation:     "vector",
 					FixedLabels:   true,
 					AlwaysReturns: true,
+					KnownReturn:   true,
 					IsDead:        true,
 					IsDeadReason:  "this query always evaluates to `0 == 1` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2241,6 +2258,7 @@ sum by (region, target, colo_name) (
 )`, 0), // FIXME 0? should be 1
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `1 == 0` which is not possible, so it will never return anything",
 					ReturnedNumber: 1,
@@ -2262,6 +2280,7 @@ sum by (region, target, colo_name) (
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2289,6 +2308,7 @@ sum by (region, target, colo_name) (
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 0,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
@@ -2311,6 +2331,7 @@ sum by (region, target, colo_name) (
 					Operation:      "vector",
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 0,
 					IsDead:         true,
 					IsDeadReason:   "`vector(0) > vector(1)` always evaluates to `0 > 1` which is not possible, so it will never return anything",
@@ -2329,6 +2350,7 @@ sum by (region, target, colo_name) (
 								Operation:      "vector",
 								FixedLabels:    true,
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 1,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
@@ -2367,6 +2389,7 @@ sum by (region, target, colo_name) (
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(0))`, 0),
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 0,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
@@ -2404,6 +2427,7 @@ sum by (region, target, colo_name) (
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `1 == 2` which is not possible, so it will never return anything",
@@ -2441,6 +2465,7 @@ sum by (region, target, colo_name) (
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2476,6 +2501,7 @@ sum by (region, target, colo_name) (
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(2))`, 1),
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 2,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `2 != 2` which is not possible, so it will never return anything",
@@ -2515,6 +2541,7 @@ or
 					Call:           mustParse[*promParser.Call](t, `vector(0)`, 30),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 0,
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -2549,6 +2576,7 @@ or
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "vector",
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					FixedLabels:    true,
 					Call:           mustParse[*promParser.Call](t, "vector(1)", 72),
@@ -2626,6 +2654,7 @@ or
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "vector",
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 1,
 					FixedLabels:    true,
 					Call:           mustParse[*promParser.Call](t, "vector(1)", 36),
@@ -2714,6 +2743,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 1,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(1)", 58),
@@ -2740,6 +2770,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 2,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 114),
@@ -2757,6 +2788,7 @@ or
 					Returns:        promParser.ValueTypeVector,
 					Operation:      "vector",
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					ReturnedNumber: 3,
 					FixedLabels:    true,
 					Call:           mustParse[*promParser.Call](t, "vector(0)", 23),
@@ -2782,6 +2814,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 1,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(1)", 58),
@@ -2808,6 +2841,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 2,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(2)", 114),
@@ -2830,6 +2864,7 @@ or
 					Returns:          promParser.ValueTypeVector,
 					Operation:        "label_replace",
 					AlwaysReturns:    true,
+					KnownReturn:      true,
 					FixedLabels:      true,
 					ReturnedNumber:   1,
 					GuaranteedLabels: []string{"nexthop_tag"},
@@ -2881,6 +2916,7 @@ or
 					Returns:        promParser.ValueTypeVector,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsConditional:  true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
@@ -2904,6 +2940,7 @@ or
 					Returns:        promParser.ValueTypeScalar,
 					FixedLabels:    true,
 					AlwaysReturns:  true,
+					KnownReturn:    true,
 					IsConditional:  true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `1 > 5` which is not possible, so it will never return anything",
@@ -2932,6 +2969,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 0,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(0)", 42),
@@ -2966,6 +3004,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								ReturnedNumber: 0,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(0)", 47),
@@ -2997,6 +3036,7 @@ or
 								Returns:        promParser.ValueTypeVector,
 								Operation:      "vector",
 								AlwaysReturns:  true,
+								KnownReturn:    true,
 								IsDead:         true,
 								IsDeadReason:   "the right hand side will never be matched because it doesn't have the `job` label from `on(...)`",
 								ReturnedNumber: 0,

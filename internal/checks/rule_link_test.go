@@ -104,10 +104,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Details:  "Rule comment: some text",
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 11,
-								LastColumn:  17,
-								Message:     `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
+								Message: `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
 							},
 						},
 						Severity: checks.Bug,
@@ -158,10 +155,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 11,
-								LastColumn:  11 + len(srv.URL) + 9,
-								Message:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 							},
 						},
 					},
@@ -194,10 +188,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 12,
-								LastColumn:  12 + len(srv.URL) + 9,
-								Message:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 							},
 						},
 					},
@@ -211,10 +202,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        5,
-								FirstColumn: 12,
-								LastColumn:  12 + len(srv.URL) + 5,
-								Message:     fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
+								Message: fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
 							},
 						},
 					},

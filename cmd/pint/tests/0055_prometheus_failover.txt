@@ -8,7 +8,7 @@ http start prometheus 127.0.0.1:7055
 stderr 'level=ERROR msg="Query returned an error" err="Post \\"http://127.0.0.1:1055/api/v1/query\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055 query=count\(foo\)'
 stderr 'level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \\"http://127.0.0.1:1055/api/v1/status/config\\": dial tcp 127.0.0.1:1055: connect: connection refused" uri=http://127.0.0.1:1055 query=/api/v1/status/config'
 ! stderr 'query="count\(foo offset '
-stderr 'Bug: `prom` Prometheus server at http://127.0.0.1:7055 didn''t have any series for `foo` metric in the last 1w. \(promql/series\)'
+stderr '`prom` Prometheus server at http://127.0.0.1:7055 didn''t have any series for `foo` metric in the last 1w.'
 
 -- rules/1.yml --
 - record: aggregate

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -63,10 +64,20 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    labels.Lines,
 			Reporter: c.Reporter(),
-			Summary:  text,
+			Summary:  "unable to run checks",
+			Details:  "",
 			Severity: severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     text,
+					Pos:         labels.Key.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(labels.Key.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -75,14 +86,23 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 		for k, v := range cfg.Config.Global.ExternalLabels {
 			if label.Key.Value == k {
 				problems = append(problems, Problem{
+					Anchor: AnchorAfter,
 					Lines: parser.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Summary:  c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
+					Summary:  "conflicting labels",
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Warning,
+					Diagnostics: []output.Diagnostic{
+						{
+							Message:     c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
+							Pos:         label.Key.Pos,
+							FirstColumn: 1,
+							LastColumn:  len(label.Key.Value),
+						},
+					},
 				})
 			}
 		}

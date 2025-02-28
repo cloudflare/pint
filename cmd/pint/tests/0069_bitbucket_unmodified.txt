@@ -25,39 +25,33 @@ exec pint -l error --no-color ci
 cmp stderr ../stderr.txt
 
 -- stderr.txt --
-Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+Warning: always firing alert (alerts/comparison)
   ---> rules.yml:2
- 2 |   expr: sum(foo{job=~"xxx"}) by(job)
+2 |   expr: sum(foo{job=~"xxx"}) by(job)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:2
-1 | - alert: rule1b
 2 |   expr: sum(foo{job=~"xxx"}) by(job)
                 ^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
-3 |   for: 0s
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:3
-1 | - alert: rule1b
-2 |   expr: sum(foo{job=~"xxx"}) by(job)
 3 |   for: 0s
            ^^ `0s` is the default value of `for`, this line is unnecessary.
 
-Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+Warning: always firing alert (alerts/comparison)
   ---> rules.yml:5
- 5 |   expr: sum(foo{job=~"xxx"}) by(job)
+5 |   expr: sum(foo{job=~"xxx"}) by(job)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:5
-4 | - alert: rule2b
 5 |   expr: sum(foo{job=~"xxx"}) by(job)
                 ^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
-6 |   for: 0s
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:6
-4 | - alert: rule2b
-5 |   expr: sum(foo{job=~"xxx"}) by(job)
 6 |   for: 0s
            ^^ `0s` is the default value of `for`, this line is unnecessary.
 

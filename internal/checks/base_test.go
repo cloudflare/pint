@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/neilotoole/slogt"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
@@ -24,6 +25,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -158,8 +160,18 @@ func runTests(t *testing.T, testCases []checkTest) {
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
 				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
-				if diff := cmp.Diff(tc.problems(uri), problems); diff != "" {
+				if diff := cmp.Diff(tc.problems(uri), problems,
+					cmpopts.IgnoreFields(output.Diagnostic{}, "Pos", "FirstColumn", "LastColumn"),
+					cmpopts.IgnoreFields(checks.Problem{}, "Lines"),
+				); diff != "" {
 					t.Errorf("wrong problems (-want +got):\n%s", diff)
+				}
+
+				for _, p := range problems {
+					require.NotEmptyf(t, p.Diagnostics, "empty diagnostics in %+v\n", p)
+					for _, d := range p.Diagnostics {
+						require.NotNilf(t, d.Pos, "empty diagnostics Pos in %+v\n", d)
+					}
 				}
 			}
 			cancel()

@@ -6,29 +6,32 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=4 workers=10 online=true
-Bug: `summary` annotation is required. (alerts/annotation)
+Bug: required annotation not set (alerts/annotation)
   ---> rules/1.yml:22-23
- 22 |           - alert: Example_High_Restart_Rate
- 23 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+22 |           - alert: Example_High_Restart_Rate
+23 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+                       ^^^ `summary` annotation is required.
 
-Bug: `priority` label is required. (rule/label)
+Bug: required label not set (rule/label)
   ---> rules/1.yml:22-23
- 22 |           - alert: Example_High_Restart_Rate
- 23 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+22 |           - alert: Example_High_Restart_Rate
+23 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
+                       ^^^ `priority` label is required.
 
-Bug: `summary` annotation is required. (alerts/annotation)
+Bug: required annotation not set (alerts/annotation)
   ---> rules/1.yml:24-25
- 24 |           - alert: Invalid Query
- 25 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+24 |           - alert: Invalid Query
+25 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+                       ^^^ `summary` annotation is required.
 
-Bug: `priority` label is required. (rule/label)
+Bug: required label not set (rule/label)
   ---> rules/1.yml:24-25
- 24 |           - alert: Invalid Query
- 25 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+24 |           - alert: Invalid Query
+25 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
+                       ^^^ `priority` label is required.
 
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yml:25
-24 |           - alert: Invalid Query
 25 |             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m]) / x
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ no arguments for aggregate expression provided
 

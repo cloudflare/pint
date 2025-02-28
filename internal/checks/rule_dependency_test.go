@@ -9,6 +9,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -110,9 +111,14 @@ func TestRuleDependencyCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDependencyCheckName,
-						Summary:  textDependencyRule(1),
+						Summary:  "rule results used by another rule",
 						Details:  detailsDependencyRule("recording", "foo", "- `alert` at `excluded.yaml:2`\n"),
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: textDependencyRule(1),
+							},
+						},
 					},
 				}
 			},
@@ -137,9 +143,14 @@ func TestRuleDependencyCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDependencyCheckName,
-						Summary:  textDependencyRule(1),
+						Summary:  "rule results used by another rule",
 						Details:  detailsDependencyRule("recording", "foo", "- `alert` at `foo.yaml:2`\n"),
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: textDependencyRule(1),
+							},
+						},
 					},
 				}
 			},
@@ -196,9 +207,14 @@ func TestRuleDependencyCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDependencyCheckName,
-						Summary:  textDependencyRule(5),
+						Summary:  "rule results used by another rule",
 						Details:  detailsDependencyRule("recording", "foo", "- `alert` at `alice.yaml:4`\n- `alert` at `alice.yaml:6`\n- `alert` at `bar.yaml:2`\n- `xxx` at `bar.yaml:2`\n- `alert` at `foo.yaml:2`\n"),
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: textDependencyRule(5),
+							},
+						},
 					},
 				}
 			},
@@ -230,9 +246,14 @@ func TestRuleDependencyCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDependencyCheckName,
-						Summary:  textDependencyRule(1),
+						Summary:  "rule results used by another rule",
 						Details:  detailsDependencyRule("alerting", `ALERTS{alertname="TargetIsDown"}`, "- `alert:count` at `foo.yaml:3`\n"),
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: textDependencyRule(1),
+							},
+						},
 					},
 				}
 			},
@@ -259,9 +280,14 @@ func TestRuleDependencyCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDependencyCheckName,
-						Summary:  textDependencyRule(1),
+						Summary:  "rule results used by another rule",
 						Details:  detailsDependencyRule("alerting", `ALERTS_FOR_STATE{alertname="TargetIsDown"}`, "- `alert:count` at `foo.yaml:3`\n"),
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: textDependencyRule(1),
+							},
+						},
 					},
 				}
 			},
@@ -303,9 +329,14 @@ func TestRuleDependencyCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.RuleDependencyCheckName,
-						Summary:  textDependencyRule(1),
+						Summary:  "rule results used by another rule",
 						Details:  detailsDependencyRule("recording", "foo", "- `alert` at `foo.yaml:2`\n"),
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: textDependencyRule(1),
+							},
+						},
 					},
 				}
 			},

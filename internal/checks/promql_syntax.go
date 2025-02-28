@@ -48,30 +48,26 @@ func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 	if expr.SyntaxError != nil {
 		diag := output.Diagnostic{
 			Message:     expr.SyntaxError.Error(),
-			Line:        expr.Value.Lines.First,
-			FirstColumn: expr.Value.Column,
-			LastColumn:  nodeLastColumn(expr.Value),
+			Pos:         expr.Value.Pos,
+			FirstColumn: 1,
+			LastColumn:  len(expr.Value.Value) - 1,
 		}
 
 		var perrs promParser.ParseErrors
 		ok := errors.As(expr.SyntaxError, &perrs)
 		if ok {
 			for _, perr := range perrs { // Use only the last error.
-				start := expr.Value.Column + int(perr.PositionRange.Start)
-				end := expr.Value.Column + int(perr.PositionRange.End)
-				if end > start {
-					end--
-				}
 				diag = output.Diagnostic{
 					Message:     perr.Err.Error(),
-					Line:        expr.Value.Lines.First,
-					FirstColumn: min(start, nodeLastColumn(expr.Value)),
-					LastColumn:  min(end, nodeLastColumn(expr.Value)),
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(perr.PositionRange.Start) + 1,
+					LastColumn:  int(perr.PositionRange.End),
 				}
 			}
 		}
 
 		problems = append(problems, Problem{
+			Anchor:      AnchorAfter,
 			Lines:       expr.Value.Lines,
 			Reporter:    c.Reporter(),
 			Summary:     "PromQL syntax error",

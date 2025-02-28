@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -62,10 +63,20 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.Lines,
 			Reporter: c.Reporter(),
-			Summary:  text,
+			Summary:  "unable to run checks",
+			Details:  "",
 			Severity: severity,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message:     text,
+					Pos:         rule.AlertingRule.Expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -74,13 +85,23 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 		for _, label := range rule.AlertingRule.Labels.Items {
 			for _, name := range checkExternalLabels(label.Key.Value, label.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
+					Anchor: AnchorAfter,
 					Lines: parser.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Summary:  fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)), Severity: Bug,
-					Details: fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
+					Summary:  "invalid label",
+					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
+					Severity: Bug,
+					Diagnostics: []output.Diagnostic{
+						{
+							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+							Pos:         label.Value.Pos,
+							FirstColumn: 1,
+							LastColumn:  len(label.Value.Value),
+						},
+					},
 				})
 			}
 		}
@@ -90,14 +111,23 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 		for _, annotation := range rule.AlertingRule.Annotations.Items {
 			for _, name := range checkExternalLabels(annotation.Key.Value, annotation.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
+					Anchor: AnchorAfter,
 					Lines: parser.LineRange{
 						First: annotation.Key.Lines.First,
 						Last:  annotation.Value.Lines.Last,
 					},
 					Reporter: c.Reporter(),
-					Summary:  fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+					Summary:  "invalid label",
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
+					Diagnostics: []output.Diagnostic{
+						{
+							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+							Pos:         annotation.Value.Pos,
+							FirstColumn: 1,
+							LastColumn:  len(annotation.Value.Value),
+						},
+					},
 				})
 			}
 		}

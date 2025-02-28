@@ -94,10 +94,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 5,
-								LastColumn:  7,
-								Message:     "key is not allowed to match `^bad$`.",
+								Message: "key is not allowed to match `^bad$`.",
 							},
 						},
 					},
@@ -123,10 +120,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 10,
-								LastColumn:  12,
-								Message:     "value is not allowed to match `^bad$`.",
+								Message: "value is not allowed to match `^bad$`.",
 							},
 						},
 					},
@@ -152,10 +146,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 5,
-								LastColumn:  7,
-								Message:     "key is not allowed to match `^bad$`.",
+								Message: "key is not allowed to match `^bad$`.",
 							},
 						},
 					},
@@ -181,10 +172,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 10,
-								LastColumn:  12,
-								Message:     "value is not allowed to match `^bad$`.",
+								Message: "value is not allowed to match `^bad$`.",
 							},
 						},
 					},
@@ -229,10 +217,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Information,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 5,
-								LastColumn:  7,
-								Message:     "key is not allowed to match `^bad$`.",
+								Message: "key is not allowed to match `^bad$`.",
 							},
 						},
 					},
@@ -258,10 +243,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 10,
-								LastColumn:  12,
-								Message:     "value is not allowed to match `^bad$`.",
+								Message: "value is not allowed to match `^bad$`.",
 							},
 						},
 					},
@@ -296,10 +278,7 @@ func TestRejectCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        4,
-								FirstColumn: 12,
-								LastColumn:  14,
-								Message:     "value is not allowed to match `^{{ $alert }}$`.",
+								Message: "value is not allowed to match `^{{ $alert }}$`.",
 							},
 						},
 					},

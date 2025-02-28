@@ -110,6 +110,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			problems = append(problems, Problem{
+				Anchor: AnchorAfter,
 				Lines: parser.LineRange{
 					First: ann.Key.Lines.First,
 					Last:  ann.Value.Lines.Last,
@@ -119,10 +120,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				Details:  maybeComment(c.comment),
 				Diagnostics: []output.Diagnostic{
 					{
-						Line:        ann.Value.Lines.Last,
-						FirstColumn: ann.Value.Column,
-						LastColumn:  nodeLastColumn(ann.Value),
 						Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+						Pos:         ann.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(ann.Value.Value) - 1,
 					},
 				},
 				Severity: c.severity,
@@ -135,6 +136,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 
 		if resp.StatusCode != http.StatusOK {
 			problems = append(problems, Problem{
+				Anchor: AnchorAfter,
 				Lines: parser.LineRange{
 					First: ann.Key.Lines.First,
 					Last:  ann.Value.Lines.Last,
@@ -144,10 +146,10 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				Details:  maybeComment(c.comment),
 				Diagnostics: []output.Diagnostic{
 					{
-						Line:        ann.Value.Lines.Last,
-						FirstColumn: ann.Value.Column,
-						LastColumn:  nodeLastColumn(ann.Value),
 						Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+						Pos:         ann.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(ann.Value.Value) - 1,
 					},
 				},
 				Severity: c.severity,

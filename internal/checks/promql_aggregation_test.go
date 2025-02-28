@@ -77,16 +77,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  24,
-								Message:     "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  24,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -113,16 +107,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  24,
-								Message:     "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  24,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -149,10 +137,7 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  34,
-								Message:     "`job` label should be removed when aggregating all rules.",
+								Message: "`job` label should be removed when aggregating all rules.",
 							},
 						},
 					},
@@ -197,16 +182,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  28,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  28,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -242,10 +221,7 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  47,
-								Message:     "`instance` label should be removed when aggregating all rules.",
+								Message: "`instance` label should be removed when aggregating all rules.",
 							},
 						},
 					},
@@ -271,16 +247,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  28,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  28,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -315,16 +285,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 19,
-								LastColumn:  25,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 19,
-								LastColumn:  25,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -359,16 +323,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 13,
-								LastColumn:  19,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 13,
-								LastColumn:  19,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -403,16 +361,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 61,
-								LastColumn:  67,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 61,
-								LastColumn:  67,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -476,16 +428,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  19,
-								Message:     "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  19,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -511,16 +457,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  19,
-								Message:     "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 18,
-								LastColumn:  19,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -547,10 +487,7 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  24,
-								Message:     "`job` label should be removed when aggregating all rules.",
+								Message: "`job` label should be removed when aggregating all rules.",
 							},
 						},
 					},
@@ -586,16 +523,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  23,
-								Message:     "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  23,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -631,16 +562,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 19,
-								LastColumn:  20,
-								Message:     "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 19,
-								LastColumn:  20,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -676,16 +601,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 13,
-								LastColumn:  14,
-								Message:     "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 13,
-								LastColumn:  14,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -721,16 +640,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 56,
-								LastColumn:  57,
-								Message:     "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 56,
-								LastColumn:  57,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -775,16 +688,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 36,
-								LastColumn:  42,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 36,
-								LastColumn:  42,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -810,16 +717,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 40,
-								LastColumn:  46,
-								Message:     "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 40,
-								LastColumn:  46,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -846,16 +747,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  23,
-								Message:     "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 22,
-								LastColumn:  23,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -883,10 +778,7 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  47,
-								Message:     "`instance` label should be removed when aggregating all rules.",
+								Message: "`instance` label should be removed when aggregating all rules.",
 							},
 						},
 					},
@@ -912,16 +804,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  11,
-								Message:     "Query is using aggregation that removes all labels.",
+								Message: "Query is using aggregation that removes all labels.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  11,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -947,16 +833,10 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  11,
-								Message:     "Query is using aggregation that removes all labels.",
+								Message: "Query is using aggregation that removes all labels.",
 							},
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  11,
-								Message:     "`job` label is required and should be preserved when aggregating all rules.",
+								Message: "`job` label is required and should be preserved when aggregating all rules.",
 							},
 						},
 					},
@@ -982,10 +862,7 @@ func TestAggregationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []output.Diagnostic{
 							{
-								Line:        2,
-								FirstColumn: 9,
-								LastColumn:  26,
-								Message:     "`job` label should be removed when aggregating all rules.",
+								Message: "`job` label should be removed when aggregating all rules.",
 							},
 						},
 					},

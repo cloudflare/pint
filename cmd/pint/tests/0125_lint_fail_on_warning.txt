@@ -12,13 +12,13 @@ groups:
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+Warning: always firing alert (alerts/comparison)
   ---> rules/0001.yml:5
- 5 |       expr: up{job=~"xxx"}
+5 |       expr: up{job=~"xxx"}
+                ^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules/0001.yml:5
-4 |     - alert: foo
 5 |       expr: up{job=~"xxx"}
                 ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
 

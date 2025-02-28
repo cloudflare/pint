@@ -56,6 +56,7 @@ type Source struct {
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 	IsDead           bool // True if this source cannot be reached and is dead code.
 	AlwaysReturns    bool // True if this source always returns results.
+	KnownReturn      bool // True if we always know the return value.
 	IsConditional    bool // True if this source is guarded by 'foo > 5' or other condition.
 }
 
@@ -156,6 +157,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.NumberLiteral:
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
+		s.KnownReturn = true
 		s.ReturnedNumber = n.Val
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
@@ -256,6 +258,7 @@ func includeLabel(s Source, names ...string) Source {
 }
 
 // Include labels that were not already excluded.
+// FIXME most should use this?
 func maybeIncludeLabel(s Source, names ...string) Source {
 	for _, name := range names {
 		if !slices.Contains(s.ExcludedLabels, name) {
@@ -664,8 +667,9 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.FixedLabels = true
 		s.AlwaysReturns = true
 		for _, vs := range walkNode(expr, n.Args[0]) {
-			if !math.IsNaN(vs.ReturnedNumber) {
+			if vs.KnownReturn {
 				s.ReturnedNumber = vs.ReturnedNumber
+				s.KnownReturn = true
 			}
 		}
 		s.ExcludeReason = setInMap(
@@ -734,7 +738,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			for _, rs := range rhs {
 				rs.IsConditional = n.Op.IsComparisonOperator()
 				switch {
-				case ls.AlwaysReturns && rs.AlwaysReturns:
+				case ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn:
 					// Both sides always return something
 					ls.ReturnedNumber, ls.IsDead, ls.IsDeadReason = calculateStaticReturn(
 						expr,
@@ -793,7 +797,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 				for _, rs := range rhs {
 					rs.IsConditional = n.Op.IsComparisonOperator()
-					if s.AlwaysReturns && rs.AlwaysReturns {
+					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
 						// Both sides always return something
 						s.ReturnedNumber, s.IsDead, s.IsDeadReason = calculateStaticReturn(
 							expr,

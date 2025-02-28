@@ -133,7 +133,7 @@ rule {
   {
     "path": "rules.yml",
     "reporter": "alerts/comparison",
-    "problem": "Alert query doesn't have any condition, it will always fire if the metric exists.",
+    "problem": "always firing alert",
     "details": "Prometheus alerting rules will trigger an alert for each query that returns *any* result.\nUnless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.\nIn most cases this can be achieved by having some condition in the query expression.\nFor example `up == 0` or `rate(error_total[2m]) \u003e 0`.\nBe careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).",
     "severity": "Warning",
     "lines": [

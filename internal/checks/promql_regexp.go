@@ -206,6 +206,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 			}
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
 				Summary:  summary,
@@ -214,9 +215,9 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				Diagnostics: []output.Diagnostic{
 					{
 						Message:     text,
-						Line:        expr.Value.Lines.First,
-						FirstColumn: expr.Value.Column + int(b.pos.Start),
-						LastColumn:  expr.Value.Column + int(b.pos.End) - 1,
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(b.pos.Start) + 1,
+						LastColumn:  int(b.pos.End),
 					},
 				},
 			})

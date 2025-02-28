@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -80,8 +81,13 @@ func TestRuleForCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/for",
-						Summary:  forMin("for", "5m"),
+						Summary:  "duration required",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: forMin("for", "5m"),
+							},
+						},
 					},
 				}
 			},
@@ -101,9 +107,14 @@ func TestRuleForCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/for",
-						Summary:  forMax("for", "2m"),
+						Summary:  "duration too long",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: forMax("for", "2m"),
+							},
+						},
 					},
 				}
 			},
@@ -141,8 +152,13 @@ func TestRuleForCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "rule/for",
-						Summary:  forMin("keep_firing_for", "5m"),
+						Summary:  "duration required",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: forMin("keep_firing_for", "5m"),
+							},
+						},
 					},
 				}
 			},

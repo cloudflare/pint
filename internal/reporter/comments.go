@@ -50,8 +50,17 @@ func (cr CommentReporter) Submit(summary Summary) (err error) {
 
 func makeComments(summary Summary) (comments []PendingComment) {
 	var buf strings.Builder
+	var content string
+	var err error
 	for _, reports := range dedupReports(summary.reports) {
 		mergeDetails := identicalDetails(reports)
+
+		if reports[0].Problem.Anchor == checks.AnchorAfter {
+			content, err = readFile(reports[0].Path.Name)
+			if err != nil {
+				content = ""
+			}
+		}
 
 		buf.Reset()
 
@@ -65,6 +74,17 @@ func makeComments(summary Summary) (comments []PendingComment) {
 			buf.WriteString("------\n\n")
 			buf.WriteString(report.Problem.Summary)
 			buf.WriteString("\n\n")
+
+			if content != "" {
+				buf.WriteString("```yaml\n")
+				buf.WriteString(output.InjectDiagnostics(
+					content,
+					report.Problem.Diagnostics,
+					output.None,
+					report.Rule.Lines.First, report.Rule.Lines.Last))
+				buf.WriteString("```\n\n")
+			}
+
 			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
 				buf.WriteString("\n\n")

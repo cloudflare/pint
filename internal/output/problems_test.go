@@ -1,107 +1,148 @@
-package output_test
+package output
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/cloudflare/pint/internal/output"
 )
 
 func TestInjectDiagnostics(t *testing.T) {
 	type testCaseT struct {
 		input               string
 		output              string
-		diags               []output.Diagnostic
+		diags               []Diagnostic
 		firstLine, lastLine int
 	}
 
 	testCases := []testCaseT{
 		{
-			input:     "foo(bar) by()",
+			input:     "expr: foo(bar) by()",
 			firstLine: 1,
 			lastLine:  1,
-			diags: []output.Diagnostic{
-				{Line: 1, FirstColumn: 0, LastColumn: 13, Message: "this is bad"},
+			diags: []Diagnostic{
+				{FirstColumn: 1, LastColumn: 13, Message: "this is bad"},
 			},
-			output: `1 | foo(bar) by()
-    ^^^^^^^^^^^^^ this is bad
+			output: `1 | expr: foo(bar) by()
+          ^^^^^^^^^^^^^ this is bad
 `,
 		},
 		{
-			input:     "foo(bar) on()",
+			input:     "expr: foo(bar) on()",
 			firstLine: 1,
 			lastLine:  1,
-			diags: []output.Diagnostic{
-				{Line: 1, FirstColumn: 10, LastColumn: 11, Message: "oops"},
+			diags: []Diagnostic{
+				{FirstColumn: 10, LastColumn: 11, Message: "oops"},
 			},
-			output: `1 | foo(bar) on()
-             ^^ oops
+			output: `1 | expr: foo(bar) on()
+                   ^^ oops
 `,
 		},
 		{
 			input: `
-sum(foo{job="bar"})
-/ on(a,b)
-sum(foo)
-`,
-			firstLine: 1,
-			lastLine:  4,
-			diags: []output.Diagnostic{
-				{Line: 2, FirstColumn: 23, LastColumn: 29, Message: "abc"},
-				{Line: 2, FirstColumn: 26, LastColumn: 28, Message: "efg"},
-			},
-			output: `1 | 
-2 | sum(foo{job="bar"})
-3 | / on(a,b)
-         ^^^ efg
-      ^^^^^^^ abc
-4 | sum(foo)
-`,
-		},
-		{
-			input: `
-sum(bar{job="foo"})
-/ on(c,d)
-sum(bar)
+expr: sum(foo{job="bar"})
+      / on(a,b)
+      sum(foo)
 `,
 			firstLine: 2,
 			lastLine:  4,
-			diags: []output.Diagnostic{
-				{Line: 3, FirstColumn: 3, LastColumn: 9, Message: "abc"},
-				{Line: 4, FirstColumn: 1, LastColumn: 3, Message: "efg"},
+			diags: []Diagnostic{
+				{FirstColumn: 23, LastColumn: 29, Message: "abc"},
+				{FirstColumn: 26, LastColumn: 28, Message: "efg"},
 			},
-			output: `2 | sum(bar{job="foo"})
-3 | / on(c,d)
-      ^^^^^^^ abc
-4 | sum(bar)
-    ^^^ efg
+			output: `2 | expr: sum(foo{job="bar"})
+3 |       / on(a,b)
+            ^^^^^^^ abc
+               ^^^ efg
+4 |       sum(foo)
 `,
 		},
 		{
 			input: `
-sum(bar{job="foo"})
-/ on(c,d)
-sum(bar)
+expr: |
+  sum(bar{job="foo"})
+  / on(c,d)
+  sum(bar)
 `,
 			firstLine: 2,
-			lastLine:  4,
-			diags: []output.Diagnostic{
-				{Line: 3, FirstColumn: 3, LastColumn: 9, Message: "abc"},
-				{Line: 3, FirstColumn: 3, LastColumn: 9, Message: "efg"},
+			lastLine:  5,
+			diags: []Diagnostic{
+				{FirstColumn: 23, LastColumn: 24, Message: "123"},
+				{FirstColumn: 31, LastColumn: 33, Message: "456"},
 			},
-			output: `2 | sum(bar{job="foo"})
-3 | / on(c,d)
-      ^^^^^^^ abc
-              efg
-4 | sum(bar)
+			output: `2 | expr: |
+3 |   sum(bar{job="foo"})
+4 |   / on(c,d)
+        ^^ 123
+5 |   sum(bar)
+      ^^^ 456
+`,
+		},
+		{
+			input: `
+expr:
+  sum(bar{job="foo"})
+  / on(c,d)
+  sum(bar)
+`,
+			firstLine: 2,
+			lastLine:  5,
+			diags: []Diagnostic{
+				{FirstColumn: 23, LastColumn: 29, Message: "abc"},
+				{FirstColumn: 23, LastColumn: 29, Message: "efg"},
+			},
+			output: `2 | expr:
+3 |   sum(bar{job="foo"})
+4 |   / on(c,d)
+        ^^^^^^^ abc
+                efg
+5 |   sum(bar)
+`,
+		},
+		{
+			input: `
+### BEGIN ###
+expr: >-
+  sum(bar{job="foo"})
+  / on(c,d)
+  sum(bar)
+### END ###
+`,
+			firstLine: 3,
+			lastLine:  6,
+			diags: []Diagnostic{
+				{FirstColumn: 23, LastColumn: 29, Message: "abc"},
+				{FirstColumn: 23, LastColumn: 29, Message: "efg"},
+			},
+			output: `3 | expr: >-
+4 |   sum(bar{job="foo"})
+5 |   / on(c,d)
+        ^^^^^^^ abc
+                efg
+6 |   sum(bar)
 `,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			out := output.InjectDiagnostics(tc.input, tc.diags, output.None, tc.firstLine, tc.lastLine)
+			key, val := parseYaml(tc.input)
+			require.NotNil(t, key)
+			require.NotNil(t, val)
+			pos := NewPositionRange(strings.Split(tc.input, "\n"), val, key.Column+2)
+			require.NotEmpty(t, pos)
+
+			diags := make([]Diagnostic, 0, len(tc.diags))
+			for _, diag := range tc.diags {
+				diags = append(diags, Diagnostic{
+					Message:     diag.Message,
+					Pos:         pos,
+					FirstColumn: diag.FirstColumn,
+					LastColumn:  diag.LastColumn,
+				})
+			}
+
+			out := InjectDiagnostics(tc.input, diags, None, tc.firstLine, tc.lastLine)
 			require.Equal(t, tc.output, out)
 		})
 	}

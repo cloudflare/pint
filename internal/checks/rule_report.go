@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -42,11 +43,28 @@ func (c ReportCheck) Reporter() string {
 }
 
 func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
+	var pos output.PositionRanges
+	if rule.AlertingRule != nil {
+		pos = rule.AlertingRule.Alert.Pos
+	} else {
+		pos = rule.RecordingRule.Record.Pos
+	}
+
 	problems = append(problems, Problem{
+		Anchor:   AnchorAfter,
 		Lines:    rule.Lines,
 		Reporter: c.Reporter(),
-		Summary:  c.comment,
+		Summary:  "problem reported by config rule",
+		Details:  "",
 		Severity: c.severity,
+		Diagnostics: []output.Diagnostic{
+			{
+				Message:     c.comment,
+				Pos:         pos,
+				FirstColumn: 1,
+				LastColumn:  len(rule.Name()) - 1,
+			},
+		},
 	})
 	return problems
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -84,8 +85,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  checkErrorUnableToRun(checks.CostCheckName, "prom", uri, "connection timeout"),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.CostCheckName, "prom", uri, "connection timeout"),
+							},
+						},
 					},
 				}
 			},
@@ -114,8 +120,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
+							},
+						},
 					},
 				}
 			},
@@ -146,8 +157,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  "unable to run checks",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+							},
+						},
 					},
 				}
 			},
@@ -167,8 +183,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
+						Summary:  "query cost estimate",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
+							},
+						},
 					},
 				}
 			},
@@ -208,8 +229,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 7) + memUsageText("707B") + ".",
+						Summary:  "query cost estimate",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 7) + memUsageText("707B") + ".",
+							},
+						},
 					},
 				}
 			},
@@ -259,8 +285,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
+						Summary:  "query cost estimate",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
+							},
+						},
 					},
 				}
 			},
@@ -310,8 +341,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
+						Summary:  "query is too expensive",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
+							},
+						},
 					},
 				}
 			},
@@ -361,8 +397,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 6) + maxSeriesText(5) + ".",
+						Summary:  "query is too expensive",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 6) + maxSeriesText(5) + ".",
+							},
+						},
 					},
 				}
 			},
@@ -407,9 +448,14 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 7) + maxSeriesText(5) + ".",
+						Summary:  "query is too expensive",
 						Details:  "Rule comment: rule comment",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 7) + maxSeriesText(5) + ".",
+							},
+						},
 					},
 				}
 			},
@@ -458,8 +504,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "query/cost",
-						Summary:  costText("prom", uri, 7) + memUsageText("707B") + ".",
+						Summary:  "query cost estimate",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: costText("prom", uri, 7) + memUsageText("707B") + ".",
+							},
+						},
 					},
 				}
 			},
@@ -545,8 +596,13 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  totalSamplesText("prom", uri, 200, 100),
+						Summary:  "query is too expensive",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: totalSamplesText("prom", uri, 200, 100),
+							},
+						},
 					},
 				}
 			},
@@ -597,9 +653,14 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  peakSamplesText("prom", uri, 20, 10),
+						Summary:  "query is too expensive",
 						Details:  "Rule comment: some text",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: peakSamplesText("prom", uri, 20, 10),
+							},
+						},
 					},
 				}
 			},
@@ -650,9 +711,14 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Summary:  evalDurText("prom", uri, "5s100ms", "5s"),
+						Summary:  "query is too expensive",
 						Details:  "Rule comment: some text",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: evalDurText("prom", uri, "5s100ms", "5s"),
+							},
+						},
 					},
 				}
 			},

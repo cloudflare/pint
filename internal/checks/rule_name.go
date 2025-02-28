@@ -51,16 +51,17 @@ func (c RuleNameCheck) Reporter() string {
 func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if rule.AlertingRule != nil && !c.re.MustExpand(rule).MatchString(rule.AlertingRule.Alert.Value) {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.AlertingRule.Alert.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
 			Diagnostics: []output.Diagnostic{
 				{
-					Line:        rule.AlertingRule.Alert.Lines.Last,
-					FirstColumn: rule.AlertingRule.Alert.Column,
-					LastColumn:  nodeLastColumn(&rule.AlertingRule.Alert),
 					Message:     fmt.Sprintf("alerting rule name must match `%s`.", c.re.anchored),
+					Pos:         rule.AlertingRule.Alert.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Alert.Value) - 1,
 				},
 			},
 			Severity: c.severity,
@@ -68,16 +69,17 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 	}
 	if rule.RecordingRule != nil && !c.re.MustExpand(rule).MatchString(rule.RecordingRule.Record.Value) {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.RecordingRule.Record.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
 			Diagnostics: []output.Diagnostic{
 				{
-					Line:        rule.RecordingRule.Record.Lines.Last,
-					FirstColumn: rule.RecordingRule.Record.Column,
-					LastColumn:  nodeLastColumn(&rule.RecordingRule.Record),
 					Message:     fmt.Sprintf("recording rule name must match `%s`.", c.re.anchored),
+					Pos:         rule.RecordingRule.Record.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.RecordingRule.Record.Value) - 1,
 				},
 			},
 			Severity: c.severity,

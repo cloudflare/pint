@@ -35,7 +35,6 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=INFO msg="Problems found" Fatal=1
 Fatal: PromQL syntax error (promql/syntax)
   ---> b.yml:2
-1 | - record: rule1
 2 |   expr: sum(foo) bi()
                      ^^ unexpected identifier "bi"
 

@@ -9,6 +9,7 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -106,10 +107,20 @@ LOOP:
 			}
 			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Summary:  text,
+				Summary:  "unable to run checks",
+				Details:  "",
 				Severity: severity,
+				Diagnostics: []output.Diagnostic{
+					{
+						Message:     text,
+						Pos:         expr.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(expr.Value.Value),
+					},
+				},
 			})
 			continue LOOP
 		}
@@ -124,14 +135,23 @@ LOOP:
 			}
 		}
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Summary: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, it can be dangarous to use its value directly.",
-				selector.Name,
-				promText(c.prom.Name(), metadata.URI),
-			),
+			Summary:  "direct counter read",
 			Details:  CounterCheckDetails,
 			Severity: Warning,
+			Diagnostics: []output.Diagnostic{
+				{
+					Message: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, it can be dangarous to use its value directly.",
+						selector.Name,
+						promText(c.prom.Name(), metadata.URI),
+					),
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(selector.PosRange.Start) + 1,
+					LastColumn:  int(selector.PosRange.End),
+				},
+			},
 		})
 
 		done[selector.Name] = struct{}{}

@@ -92,6 +92,7 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 		if c.keep && !src.CanHaveLabel(c.label) {
 			el := src.LabelExcludeReason(c.label)
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required label is being removed via aggregation",
@@ -99,16 +100,16 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 				Diagnostics: []output.Diagnostic{
 					{
 						Message:     el.Reason,
-						Line:        expr.Value.Lines.First,
-						FirstColumn: expr.Value.Column + int(el.Fragment.Start),
-						LastColumn:  expr.Value.Column + int(el.Fragment.End),
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(el.Fragment.Start) + 1,
+						LastColumn:  int(el.Fragment.End),
 					},
 					{
 						Message: fmt.Sprintf("`%s` label is required and should be preserved when aggregating %s rules.",
 							c.label, nameDesc),
-						Line:        expr.Value.Lines.First,
-						FirstColumn: expr.Value.Column + int(el.Fragment.Start),
-						LastColumn:  expr.Value.Column + int(el.Fragment.End),
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(el.Fragment.Start) + 1,
+						LastColumn:  int(el.Fragment.End),
 					},
 				},
 				Severity: c.severity,
@@ -116,6 +117,7 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 		}
 		if !c.keep && src.CanHaveLabel(c.label) {
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "label must be removed in aggregations",
@@ -124,9 +126,9 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 					{
 						Message: fmt.Sprintf("`%s` label should be removed when aggregating %s rules.",
 							c.label, nameDesc),
-						Line:        expr.Value.Lines.First,
-						FirstColumn: expr.Value.Column + int(src.Position.Start),
-						LastColumn:  expr.Value.Column + int(src.Position.End) - 1,
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(src.Position.Start) + 1,
+						LastColumn:  int(src.Position.End),
 					},
 				},
 				Severity: c.severity,

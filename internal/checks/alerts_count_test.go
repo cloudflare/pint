@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -63,8 +64,13 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "alerts/count",
-						Summary:  checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
+							},
+						},
 					},
 				}
 			},
@@ -93,8 +99,13 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "alerts/count",
-						Summary:  checkErrorUnableToRun(checks.AlertsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
+						Summary:  "unable to run checks",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.AlertsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
+							},
+						},
 					},
 				}
 			},
@@ -112,9 +123,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 0, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 0, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -141,9 +157,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 7, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 7, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -229,9 +250,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 2, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 2, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -306,9 +332,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 2, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", "rule comment"),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 2, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -383,9 +414,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 2, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 2, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -525,9 +561,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 3, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `{__name__="up", job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 3, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -585,10 +626,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 3, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `{__name__=~"(up|foo)", job="foo"} == 0`, "1d", ""),
-
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 3, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -643,10 +688,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 3, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 3, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -701,9 +750,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 2, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 2, "1d"),
+							},
+						},
 					},
 				}
 			},
@@ -776,9 +830,14 @@ func TestAlertsCountCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "alerts/count",
-						Summary:  alertsText("prom", uri, 1, "1d"),
+						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Message: alertsText("prom", uri, 1, "1d"),
+							},
+						},
 					},
 				}
 			},
