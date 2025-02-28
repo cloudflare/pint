@@ -3413,6 +3413,28 @@ unless
 				},
 			},
 		},
+		{
+			expr: `sum(sum(foo) without(job)) by(job)`,
+			output: []utils.Source{
+				{
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 8),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(sum(foo) without(job)) by(job)`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{"job"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						"job": {
+							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
