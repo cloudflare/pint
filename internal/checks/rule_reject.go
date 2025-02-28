@@ -57,23 +57,23 @@ func (c Reject) Reporter() string {
 func (c Reject) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	if c.checkLabels && rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
 		for _, label := range rule.AlertingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label, "Label", label.Value.Lines)...)
+			problems = append(problems, c.reject(rule, label, label.Value.Lines)...)
 		}
 	}
 	if c.checkLabels && rule.RecordingRule != nil && rule.RecordingRule.Labels != nil {
 		for _, label := range rule.RecordingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label, "Label", label.Value.Lines)...)
+			problems = append(problems, c.reject(rule, label, label.Value.Lines)...)
 		}
 	}
 	if c.checkAnnotations && rule.AlertingRule != nil && rule.AlertingRule.Annotations != nil {
 		for _, ann := range rule.AlertingRule.Annotations.Items {
-			problems = append(problems, c.reject(rule, ann, "Annotation", ann.Value.Lines)...)
+			problems = append(problems, c.reject(rule, ann, ann.Value.Lines)...)
 		}
 	}
 	return problems
 }
 
-func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, kind string, lines parser.LineRange) (problems []Problem) {
+func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines parser.LineRange) (problems []Problem) {
 	if c.keyRe != nil && c.keyRe.MustExpand(rule).MatchString(label.Key.Value) {
 		problems = append(problems, Problem{
 			Lines:    lines,
