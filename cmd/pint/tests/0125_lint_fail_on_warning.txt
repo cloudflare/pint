@@ -16,11 +16,11 @@ Warning: Alert query doesn't have any condition, it will always fire if the metr
   ---> rules/0001.yml:5
  5 |       expr: up{job=~"xxx"}
 
-Bug: redundant regexp (promql/regexp)
+Warning: redundant regexp (promql/regexp)
   ---> rules/0001.yml:5
 4 |     - alert: foo
 5 |       expr: up{job=~"xxx"}
                 ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
 
-level=INFO msg="Problems found" Bug=1 Warning=1
-level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Warning or higher"
+level=INFO msg="Problems found" Warning=2
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Warning or higher"

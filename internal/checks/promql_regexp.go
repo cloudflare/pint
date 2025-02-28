@@ -182,7 +182,6 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		}
 		for _, b := range bad {
 			var summary, text string
-			s := Bug // FIXME Warning
 			switch {
 			case b.badAnchor:
 				summary = "redundant regexp anchors"
@@ -200,7 +199,6 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			case b.isSmelly:
 				summary = "smelly regexp selector"
 				text = fmt.Sprintf("`{%s}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels", b.lm.String())
-				s = Warning
 			default:
 				summary = "redundant regexp"
 				text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
@@ -212,7 +210,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				Reporter: c.Reporter(),
 				Summary:  summary,
 				Details:  RegexpCheckDetails,
-				Severity: s,
+				Severity: Warning,
 				Diagnostics: []output.Diagnostic{
 					{
 						Message:     text,

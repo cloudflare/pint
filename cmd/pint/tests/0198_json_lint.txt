@@ -27,7 +27,7 @@ cmp report.json expected.json
     "reporter": "promql/regexp",
     "problem": "redundant regexp",
     "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
-    "severity": "Bug",
+    "severity": "Warning",
     "lines": [
       2
     ]
@@ -37,7 +37,7 @@ cmp report.json expected.json
     "reporter": "promql/regexp",
     "problem": "redundant regexp",
     "details": "See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.",
-    "severity": "Bug",
+    "severity": "Warning",
     "lines": [
       5
     ]
