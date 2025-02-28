@@ -116,10 +116,7 @@ func (s Source) LabelExcludeReason(name string) ExcludedLabel {
 	if el, ok := s.ExcludeReason[name]; ok {
 		return el
 	}
-	if el, ok := s.ExcludeReason[""]; ok {
-		return el
-	}
-	return ExcludedLabel{} // nolint: exhaustruct
+	return s.ExcludeReason[""]
 }
 
 type Visitor func(s Source)
