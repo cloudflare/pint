@@ -1,12 +1,12 @@
 env NO_COLOR=0
-! exec pint lint rules
+! exec pint lint --min-severity=info rules
 ! stdout .
 cmp stderr stderr.txt
 
 -- stderr.txt --
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Loading configuration file"[0m [2mpath=[0m[96m.pint.hcl[0m
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Finding all rules to check"[0m [2mpaths=[0m[96m["rules"][0m
-[2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Checking Prometheus rules"[0m [2mentries=[0m[94m14[0m [2mworkers=[0m[94m10[0m [2monline=[0m[94mtrue[0m
+[2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Checking Prometheus rules"[0m [2mentries=[0m[94m15[0m [2mworkers=[0m[94m10[0m [2monline=[0m[94mtrue[0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0001.yml[0m[96m:2[0m
 [97m[97m1 | [0m- record: colo_job:fl_cf_html_bytes_in:rate10m
@@ -95,8 +95,23 @@ cmp stderr stderr.txt
 [93m                             ^^[0m [93mQuery is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.[0m
 [93m                               [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [0m
-[2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Problems found"[0m [2mFatal=[0m[94m1[0m [2mWarning=[0m[94m10[0m
-[2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97m"Execution completed with error(s)"[0m [2merr=[0m[91m"found 1 problem(s) with severity Bug or higher"[0m
+[91mBug: [0m[1minvalid duration[0m[95m (alerts/for)
+[0m[96m  ---> rules/0003.yaml[0m[96m:54[0m
+[97m[97m51 | [0m- alert: Instance Is Down
+[97m52 | [0m  expr: up == 0
+[97m53 | [0m  for: |
+[97m54 | [0m    11am
+[91m         ^^^^[0m [91munknown unit "am\n" in duration "11am\n"[0m
+[0m
+[2mInformation: [0m[1mredundant field with default value[0m[95m (alerts/for)
+[0m[96m  ---> rules/0003.yaml[0m[96m:58[0m
+[97m[97m56 | [0m- alert: Instance Is Down
+[97m57 | [0m  expr: up == vector(0)
+[97m58 | [0m  for: "0h"
+[2m            ^^[0m [2m`0h` is the default value of `for`, this line is unnecessary.[0m
+[0m
+[2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Problems found"[0m [2mFatal=[0m[94m1[0m [2mBug=[0m[94m1[0m [2mWarning=[0m[94m10[0m [2mInformation=[0m[94m1[0m
+[2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97m"Execution completed with error(s)"[0m [2merr=[0m[91m"found 2 problem(s) with severity Bug or higher"[0m
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m
   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
@@ -162,6 +177,12 @@ cmp stderr stderr.txt
 
 - alert: Instance Is Down
   expr: up == 0
+  for: |
+    11am
+
+- alert: Instance Is Down
+  expr: up == vector(0)
+  for: "0h"
 
 -- .pint.hcl --
 parser {
