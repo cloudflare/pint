@@ -37,7 +37,7 @@ cmp stderr stderr.txt
 [0m[96m  ---> rules/0003.yaml[0m[96m:14[0m
 [97m[97m13 | [0m- record: invalid
 [97m14 | [0m  expr: sum(foo) by ())
-[91m             ^^^^^^^^^^^^^^^[0m [91munexpected right parenthesis ')'[0m
+[91m                           ^[0m [91munexpected right parenthesis ')'[0m
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0003.yaml[0m[96m:23-25[0m

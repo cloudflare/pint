@@ -49,7 +49,7 @@ Fatal: PromQL syntax error (promql/syntax)
   ---> rules/0003.yaml:14
 13 | - record: invalid
 14 |   expr: sum(foo) by ())
-             ^^^^^^^^^^^^^^^ unexpected right parenthesis ')'
+                           ^ unexpected right parenthesis ')'
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:23-25

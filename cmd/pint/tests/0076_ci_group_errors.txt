@@ -174,7 +174,7 @@ Fatal: PromQL syntax error (promql/syntax)
   ---> rules.yml:5
 4 |   - alert: syntax error
 5 |     expr: sum(foo) bar
-              ^^^^^^^^^^^^ unexpected identifier "bar"
+                       ^^^ unexpected identifier "bar"
 
 Bug: `link` annotation is required. (alerts/annotation)
   ---> rules.yml:7-8

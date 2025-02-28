@@ -10,7 +10,7 @@ Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:5
 4 | - record: active
 5 |   expr: sum(errors_total) by )
-            ^^^^^^^^^^^^^^^^^^^^^^ unexpected right parenthesis ')'
+                                 ^ unexpected right parenthesis ')'
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:16
@@ -23,7 +23,7 @@ Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:22
 21 | - alert: active
 22 |   expr: sum(errors_total) by )
-             ^^^^^^^^^^^^^^^^^^^^^^ unexpected right parenthesis ')'
+                                  ^ unexpected right parenthesis ')'
 
 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
   ---> rules/1.yaml:33
