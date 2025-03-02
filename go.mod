@@ -13,7 +13,7 @@ require (
 	github.com/prometheus/client_golang v1.21.0
 	github.com/prometheus/client_model v0.6.1
 	github.com/prometheus/common v0.62.0
-	github.com/prometheus/prometheus v0.302.0
+	github.com/prometheus/prometheus v0.302.1
 	github.com/prymitive/current v0.1.1
 	github.com/rogpeppe/go-internal v1.14.0
 	github.com/stretchr/testify v1.10.0
