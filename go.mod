@@ -15,7 +15,7 @@ require (
 	github.com/prometheus/common v0.62.0
 	github.com/prometheus/prometheus v0.302.0
 	github.com/prymitive/current v0.1.1
-	github.com/rogpeppe/go-internal v1.14.0
+	github.com/rogpeppe/go-internal v1.14.1
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.5
 	github.com/zclconf/go-cty v1.16.2
