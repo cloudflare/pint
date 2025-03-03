@@ -274,7 +274,7 @@ func (gl *GitLabReporter) getUserID(ctx context.Context) (int, error) {
 
 func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int, err error) {
 	slog.Debug("Finding merge requests for current branch", slog.String("branch", gl.branch))
-	mrs, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.MergeRequest, *gitlab.Response, error) {
+	mrs, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.BasicMergeRequest, *gitlab.Response, error) {
 		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 		defer cancel()
 		return gl.client.MergeRequests.ListProjectMergeRequests(gl.project, &gitlab.ListProjectMergeRequestsOptions{
