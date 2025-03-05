@@ -3069,7 +3069,7 @@ groups:
 								Column: 7,
 								Value:  "{'up' == 1}\n",
 							},
-							SyntaxError: errors.New("unexpected character inside braces: '1'"),
+							SyntaxError: errors.New(`1:8: parse error: unexpected "=" in label matching, expected string`),
 						},
 					},
 				},

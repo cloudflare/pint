@@ -67,7 +67,7 @@ func (d checkstyleReport) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err er
 }
 
 func (r Report) MarshalXML(e *xml.Encoder, _ xml.StartElement) (err error) {
-	msg := r.Problem.Text
+	msg := r.Problem.Summary
 	if r.Problem.Details != "" {
 		msg += "\n" + r.Problem.Details
 	}

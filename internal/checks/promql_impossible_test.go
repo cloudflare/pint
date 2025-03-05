@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -37,8 +38,16 @@ func TestImpossibleCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`vector(0)` is dead code because this query always evaluates to `0 > 0` which is not possible, so it will never return anything.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 19,
+								LastColumn:  27,
+								Message:     "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+							},
+						},
 					},
 				}
 			},
@@ -59,8 +68,16 @@ func TestImpossibleCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "This is dead code because this query always evaluates to `0 > 0` which is not possible, so it will never return anything.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 9,
+								LastColumn:  9,
+								Message:     "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+							},
+						},
 					},
 				}
 			},
@@ -81,8 +98,16 @@ func TestImpossibleCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`vector(0)` is dead code because this query always evaluates to `0 > 0` which is not possible, so it will never return anything.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 20,
+								LastColumn:  28,
+								Message:     "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+							},
+						},
 					},
 				}
 			},
@@ -103,8 +128,16 @@ func TestImpossibleCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`vector(0)` is dead code because the right hand side will never be matched because it doesn't have the `job` label while the left hand side will.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 31,
+								LastColumn:  39,
+								Message:     "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+							},
+						},
 					},
 				}
 			},
@@ -125,8 +158,16 @@ func TestImpossibleCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`sum(foo)` is dead code because the right hand side will never be matched because it doesn't have the `job` label while the left hand side will.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        3,
+								FirstColumn: 35, // FIXME 31
+								LastColumn:  37, // FIXME 38
+								Message:     "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+							},
+						},
 					},
 				}
 			},

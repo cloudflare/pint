@@ -32,7 +32,7 @@ func (jr JSONReporter) Submit(summary Summary) (err error) {
 			Path:     report.Path.Name,
 			Owner:    report.Owner,
 			Reporter: report.Problem.Reporter,
-			Problem:  report.Problem.Text,
+			Problem:  report.Problem.Summary,
 			Details:  report.Problem.Details,
 			Severity: report.Problem.Severity.String(),
 			Lines:    report.Problem.Lines.Expand(),

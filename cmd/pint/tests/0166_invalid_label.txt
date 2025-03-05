@@ -6,10 +6,12 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
-rules/1.yaml:7 Fatal: This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`. (yaml/parse)
+  ---> rules/1.yaml:7
  7 |       "{{ $value }}": "down"
 
-rules/1.yaml:11 Fatal: This rule is not a valid Prometheus rule: `invalid label name: {{ $value }}`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `invalid label name: {{ $value }}`. (yaml/parse)
+  ---> rules/1.yaml:11
  11 |       "{{ $value }}": "down"
 
 level=INFO msg="Problems found" Fatal=2

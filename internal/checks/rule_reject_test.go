@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -89,8 +90,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Label key `bad` is not allowed to match `^bad$`.",
+						Summary:  "key not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 5,
+								LastColumn:  7,
+								Message:     "key is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -110,8 +119,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Label value `bad` is not allowed to match `^bad$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Warning,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 10,
+								LastColumn:  12,
+								Message:     "value is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -131,8 +148,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Label key `bad` is not allowed to match `^bad$`.",
+						Summary:  "key not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 5,
+								LastColumn:  7,
+								Message:     "key is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -152,8 +177,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Label value `bad` is not allowed to match `^bad$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 10,
+								LastColumn:  12,
+								Message:     "value is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -192,8 +225,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Annotation key `bad` is not allowed to match `^bad$`.",
+						Summary:  "key not allowed",
 						Severity: checks.Information,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 5,
+								LastColumn:  7,
+								Message:     "key is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -213,8 +254,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Annotation value `bad` is not allowed to match `^bad$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 10,
+								LastColumn:  12,
+								Message:     "value is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -243,8 +292,16 @@ func TestRejectCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: "rule/reject",
-						Text:     "Annotation value `foo` is not allowed to match `^{{ $alert }}$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []output.Diagnostic{
+							{
+								Line:        4,
+								FirstColumn: 12,
+								LastColumn:  14,
+								Message:     "value is not allowed to match `^{{ $alert }}$`.",
+							},
+						},
 					},
 				}
 			},

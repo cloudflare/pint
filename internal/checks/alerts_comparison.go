@@ -62,7 +62,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 			problems = append(problems, Problem{
 				Lines:    rule.AlertingRule.Expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+				Summary:  "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
 				Details:  ComparisonCheckDetails,
 				Severity: rewriteSeverity(Warning, n.LHS, n.RHS),
 			})
@@ -74,7 +74,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 			problems = append(problems, Problem{
 				Lines:    rule.AlertingRule.Expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Text:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
+				Summary:  "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
 				Details:  ComparisonCheckDetails,
 				Severity: Bug,
 			})
@@ -89,7 +89,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	problems = append(problems, Problem{
 		Lines:    rule.AlertingRule.Expr.Value.Lines,
 		Reporter: c.Reporter(),
-		Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
+		Summary:  "Alert query doesn't have any condition, it will always fire if the metric exists.",
 		Details:  ComparisonCheckDetails,
 		Severity: Warning,
 	})

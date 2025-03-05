@@ -5,6 +5,8 @@ import "fmt"
 type Color int
 
 const (
+	None    Color = 0
+	Bold    Color = 1
 	Dim     Color = 2
 	Black   Color = 90
 	Red     Color = 91

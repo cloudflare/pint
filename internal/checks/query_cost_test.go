@@ -84,7 +84,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", uri, "connection timeout"),
+						Summary:  checkErrorUnableToRun(checks.CostCheckName, "prom", uri, "connection timeout"),
 						Severity: checks.Bug,
 					},
 				}
@@ -114,7 +114,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  checkErrorBadData("prom", uri, "bad_data: bad input data"),
 						Severity: checks.Bug,
 					},
 				}
@@ -146,7 +146,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  checkErrorUnableToRun(checks.CostCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 						Severity: checks.Warning,
 					},
 				}
@@ -167,7 +167,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
+						Summary:  costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -208,7 +208,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
+						Summary:  costText("prom", uri, 7) + memUsageText("707B") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -259,7 +259,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
+						Summary:  costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -310,7 +310,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
+						Summary:  costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
 						Severity: checks.Bug,
 					},
 				}
@@ -361,7 +361,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 6) + maxSeriesText(5) + ".",
+						Summary:  costText("prom", uri, 6) + maxSeriesText(5) + ".",
 						Severity: checks.Bug,
 					},
 				}
@@ -407,7 +407,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + maxSeriesText(5) + ".",
+						Summary:  costText("prom", uri, 7) + maxSeriesText(5) + ".",
 						Details:  "Rule comment: rule comment",
 						Severity: checks.Information,
 					},
@@ -458,7 +458,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  3,
 						},
 						Reporter: "query/cost",
-						Text:     costText("prom", uri, 7) + memUsageText("707B") + ".",
+						Summary:  costText("prom", uri, 7) + memUsageText("707B") + ".",
 						Severity: checks.Information,
 					},
 				}
@@ -545,7 +545,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     totalSamplesText("prom", uri, 200, 100),
+						Summary:  totalSamplesText("prom", uri, 200, 100),
 						Severity: checks.Bug,
 					},
 				}
@@ -597,7 +597,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     peakSamplesText("prom", uri, 20, 10),
+						Summary:  peakSamplesText("prom", uri, 20, 10),
 						Details:  "Rule comment: some text",
 						Severity: checks.Information,
 					},
@@ -650,7 +650,7 @@ func TestCostCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: "query/cost",
-						Text:     evalDurText("prom", uri, "5s100ms", "5s"),
+						Summary:  evalDurText("prom", uri, "5s100ms", "5s"),
 						Details:  "Rule comment: some text",
 						Severity: checks.Information,
 					},

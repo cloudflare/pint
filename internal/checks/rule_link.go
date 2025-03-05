@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -114,8 +115,16 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Last:  ann.Value.Lines.Last,
 				},
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+				Summary:  "link check failed",
 				Details:  maybeComment(c.comment),
+				Diagnostics: []output.Diagnostic{
+					{
+						Line:        ann.Value.Lines.Last,
+						FirstColumn: ann.Value.Column,
+						LastColumn:  nodeLastColumn(ann.Value),
+						Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+					},
+				},
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
@@ -131,8 +140,16 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Last:  ann.Value.Lines.Last,
 				},
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+				Summary:  "link check failed",
 				Details:  maybeComment(c.comment),
+				Diagnostics: []output.Diagnostic{
+					{
+						Line:        ann.Value.Lines.Last,
+						FirstColumn: ann.Value.Column,
+						LastColumn:  nodeLastColumn(ann.Value),
+						Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+					},
+				},
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))

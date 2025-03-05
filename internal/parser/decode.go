@@ -2,7 +2,6 @@ package parser
 
 import (
 	"encoding/json"
-	"errors"
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 )
@@ -95,15 +94,8 @@ func WalkUpParent[T promParser.Node](node *PromQLNode) (nodes []*PromQLNode) {
 
 func DecodeExpr(expr string) (*PromQLNode, error) {
 	node, err := promParser.ParseExpr(expr)
-	if err == nil {
-		return tree(node, nil), nil
+	if err != nil {
+		return nil, err
 	}
-
-	var perrs promParser.ParseErrors
-	if ok := errors.As(err, &perrs); ok {
-		for _, perr := range perrs {
-			err = perr.Err
-		}
-	}
-	return nil, err
+	return tree(node, nil), nil
 }

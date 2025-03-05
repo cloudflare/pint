@@ -5,16 +5,20 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-rules/01.yml:5 Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+Warning: Alert query doesn't have any condition, it will always fire if the metric exists. (alerts/comparison)
+  ---> rules/01.yml:5
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
 
-rules/01.yml:12 Bug: Template is using `cluster` label but the query results won't have this label. (alerts/template)
+Bug: Template is using `cluster` label but the query results won't have this label. (alerts/template)
+  ---> rules/01.yml:12
  12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
 
-rules/01.yml:12 Bug: Template is using `instance` label but the query results won't have this label. (alerts/template)
+Bug: Template is using `instance` label but the query results won't have this label. (alerts/template)
+  ---> rules/01.yml:12
  12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
 
-rules/01.yml:13 Bug: Template is using `cluster` label but the query results won't have this label. (alerts/template)
+Bug: Template is using `cluster` label but the query results won't have this label. (alerts/template)
+  ---> rules/01.yml:13
  13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
 
 level=INFO msg="Problems found" Bug=3 Warning=1

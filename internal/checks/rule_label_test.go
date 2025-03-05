@@ -25,7 +25,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "`severity` label is required.",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
 					},
@@ -47,7 +47,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -75,7 +75,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  7,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -113,7 +113,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  5,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`sev.+` label is required.",
+						Summary:  "`sev.+` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -143,7 +143,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical$`.",
+						Summary:  "`severity` label value `warning` must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -164,7 +164,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical$`.",
+						Summary:  "`severity` label value `warning` must match `^critical$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -193,7 +193,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`priority` label value `2a` must match `^(1|2|3)$`.",
+						Summary:  "`priority` label value `2a` must match `^(1|2|3)$`.",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
 					},
@@ -223,7 +223,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`priority` label value `2a` must match `^(1|2|3)$`.",
+						Summary:  "`priority` label value `2a` must match `^(1|2|3)$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -244,7 +244,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  2,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -272,7 +272,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  7,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -302,7 +302,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "`severity` label is required.",
 						Severity: checks.Warning,
 					},
 				}
@@ -332,7 +332,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical|info$`.",
+						Summary:  "`severity` label value `warning` must match `^critical|info$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -353,7 +353,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical|info$`.",
+						Summary:  "`severity` label value `warning` must match `^critical|info$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -419,7 +419,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  5,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`for` label value `must wait 5m to fire` must match `^must wait {{$for}} to fire$`.",
+						Summary:  "`for` label value `must wait 5m to fire` must match `^must wait {{$for}} to fire$`.",
 						Severity: checks.Warning,
 					},
 				}
@@ -440,7 +440,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` must match `^api|memcached$`.",
+						Summary:  "`components` label value `db` must match `^api|memcached$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -469,7 +469,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` is not one of valid values.",
+						Summary:  "`components` label value `db` is not one of valid values.",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).",
 						Severity: checks.Bug,
 					},
@@ -491,7 +491,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` must match `^api|memcached$`.",
+						Summary:  "`components` label value `db` must match `^api|memcached$`.",
 						Severity: checks.Bug,
 					},
 				}
@@ -520,7 +520,7 @@ func TestLabelCheck(t *testing.T) {
 							Last:  4,
 						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` is not one of valid values.",
+						Summary:  "`components` label value `db` is not one of valid values.",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n- `memsql`\n- `haproxy`\n\nRule comment: some text",
 						Severity: checks.Warning,
 					},

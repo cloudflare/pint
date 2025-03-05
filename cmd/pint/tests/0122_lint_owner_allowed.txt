@@ -6,23 +6,28 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=6 workers=10 online=true
-rules/1.yml:4-5 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+  ---> rules/1.yml:4-5
  4 |   - alert: No Owner
  5 |     expr: up > 0
 
-rules/1.yml:7-8 Bug: This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values. (rule/owner)
+Bug: This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values. (rule/owner)
+  ---> rules/1.yml:7-8
  7 |   - alert: Invalid
  8 |     expr: up == 0
 
-rules/1.yml:13-14 Bug: This rule is set as owned by `zed` but `zed` doesn't match any of the allowed owner values. (rule/owner)
+Bug: This rule is set as owned by `zed` but `zed` doesn't match any of the allowed owner values. (rule/owner)
+  ---> rules/1.yml:13-14
  13 |   - alert: Owner Zed
  14 |     expr: up < 0
 
-rules/2.yml:4-5 Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+Bug: `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule. (rule/owner)
+  ---> rules/2.yml:4-5
  4 |   - alert: No Owner
  5 |     expr: up > 0
 
-rules/3.yml:1 Bug: This file is set as owned by `ax` but `ax` doesn't match any of the allowed owner values. (rule/owner)
+Bug: This file is set as owned by `ax` but `ax` doesn't match any of the allowed owner values. (rule/owner)
+  ---> rules/3.yml:1
  1 | # pint file/owner ax
 
 level=INFO msg="Problems found" Bug=5

@@ -49,13 +49,16 @@ level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=
 level=WARN msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" name=prom metric=up
 level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom metric=up
 level=INFO msg="Problems found" Bug=2 Warning=1
-rules.yml:8 Warning: pint disable comment `promql/series(xxx)` doesn't match any selector in this query (promql/series)
+Warning: pint disable comment `promql/series(xxx)` doesn't match any selector in this query (promql/series)
+  ---> rules.yml:8
  8 |     expr: up == 0
 
-rules.yml:8 Bug: `prom` Prometheus server at http://127.0.0.1:7160 didn't have any series for `up` metric in the last 1w. (promql/series)
+Bug: `prom` Prometheus server at http://127.0.0.1:7160 didn't have any series for `up` metric in the last 1w. (promql/series)
+  ---> rules.yml:8
  8 |     expr: up == 0
 
-rules.yml:16 Bug: `prom` Prometheus server at http://127.0.0.1:7160 didn't have any series for `up` metric in the last 1w. (promql/series)
+Bug: `prom` Prometheus server at http://127.0.0.1:7160 didn't have any series for `up` metric in the last 1w. (promql/series)
+  ---> rules.yml:16
  16 |     expr: up == 0
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
