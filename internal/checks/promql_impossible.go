@@ -3,8 +3,8 @@ package checks
 import (
 	"context"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -64,7 +64,7 @@ func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (pr
 			Reporter: c.Reporter(),
 			Summary:  "dead code in query",
 			Details:  "",
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Pos:         expr.Value.Pos,
 					FirstColumn: int(pos.Start) + 1,

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -24,7 +24,7 @@ func TestLabelCheck(t *testing.T) {
 						Summary:  "required label not set",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label is required.",
 							},
@@ -46,7 +46,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "required label not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label is required.",
 							},
@@ -75,7 +75,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "required label not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label is required.",
 							},
@@ -114,7 +114,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "required label not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`sev.+` label is required.",
 							},
@@ -145,7 +145,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label value `warning` must match `^critical$`.",
 							},
@@ -167,7 +167,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label value `warning` must match `^critical$`.",
 							},
@@ -198,7 +198,7 @@ func TestLabelCheck(t *testing.T) {
 						Summary:  "invalid label value",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`priority` label value `2a` must match `^(1|2|3)$`.",
 							},
@@ -228,7 +228,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`priority` label value `2a` must match `^(1|2|3)$`.",
 							},
@@ -250,7 +250,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "required label not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label is required.",
 							},
@@ -279,7 +279,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "required label not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label is required.",
 							},
@@ -310,7 +310,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "required label not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label is required.",
 							},
@@ -341,7 +341,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label value `warning` must match `^critical|info$`.",
 							},
@@ -363,7 +363,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` label value `warning` must match `^critical|info$`.",
 							},
@@ -430,7 +430,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`for` label value `must wait 5m to fire` must match `^must wait {{$for}} to fire$`.",
 							},
@@ -452,7 +452,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`components` label value `db` must match `^api|memcached$`.",
 							},
@@ -483,7 +483,7 @@ func TestLabelCheck(t *testing.T) {
 						Summary:  "invalid label value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`components` label value `db` is not one of valid values.",
 							},
@@ -505,7 +505,7 @@ func TestLabelCheck(t *testing.T) {
 						Reporter: checks.LabelCheckName,
 						Summary:  "invalid label value",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`components` label value `db` must match `^api|memcached$`.",
 							},
@@ -536,7 +536,7 @@ func TestLabelCheck(t *testing.T) {
 						Summary:  "invalid label value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n- `memsql`\n- `haproxy`\n\nRule comment: some text",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`components` label value `db` is not one of valid values.",
 							},

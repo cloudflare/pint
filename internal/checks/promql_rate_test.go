@@ -10,8 +10,8 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -57,7 +57,7 @@ func TestRateCheck(t *testing.T) {
 						Summary:  "duration too small",
 						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "rate", "2", "1m"),
 							},
@@ -126,7 +126,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "irate", "2", "1m"),
 							},
@@ -158,7 +158,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "deriv", "2", "1m"),
 							},
@@ -336,7 +336,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "rate", "2", "1m"),
 							},
@@ -368,7 +368,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -394,7 +394,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
 							},
@@ -421,7 +421,7 @@ func TestRateCheck(t *testing.T) {
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri,
 									fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
@@ -449,7 +449,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 							},
@@ -488,7 +488,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "rate", "2", "1m"),
 							},
@@ -498,7 +498,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -545,7 +545,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "rate", "2", "1m"),
 							},
@@ -575,7 +575,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: durationMustText("prom", uri, "rate", "2", "1m"),
 							},
@@ -585,7 +585,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "counter based function called on a non-counter",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: notCounterText("prom", uri, "rate", "foo", "gauge"),
 							},
@@ -617,7 +617,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "counter based function called on a non-counter",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: notCounterText("prom", uri, "rate", "bar_g", "gauge"),
 							},
@@ -680,7 +680,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "counter based function called on a non-counter",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: notCounterText("prom", uri, "rate", "foo", "gauge"),
 							},
@@ -716,7 +716,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "chained rate call",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: rateSumText("my:sum[5m]", "sum(foo)"),
 							},
@@ -759,7 +759,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -910,7 +910,7 @@ func TestRateCheck(t *testing.T) {
 					{
 						Reporter: "promql/rate",
 						Summary:  "chained rate call",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: rateSumText(`global:response_time_sum{namespace!~"test[.].+"}[15m]`, "sum(response_time_sum:rate2m)"),
 							},

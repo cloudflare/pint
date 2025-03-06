@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -84,7 +84,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 				},
 			})
@@ -102,7 +102,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 						Pos:         rule.RecordingRule.Labels.Key.Pos,
@@ -136,7 +136,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 				},
 			})
@@ -160,7 +160,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 			Summary:  "required label not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 					Pos:         rule.AlertingRule.Labels.Key.Pos,
@@ -181,7 +181,7 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
 						Pos:         lab.Key.Pos,
@@ -213,7 +213,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 			Summary:  "invalid label value",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
 					Pos:         lab.Pos,
@@ -250,7 +250,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 				Summary:  "invalid label value",
 				Details:  details.String(),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` label value `%s` is not one of valid values.", c.keyRe.original, value),
 						Pos:         lab.Pos,

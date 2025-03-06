@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -41,7 +41,7 @@ func TestSyntaxCheck(t *testing.T) {
 						Summary:  "PromQL syntax error",
 						Details:  checks.SyntaxCheckDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message:     "no arguments for aggregate expression provided",
 							},
@@ -63,7 +63,7 @@ func TestSyntaxCheck(t *testing.T) {
 						Summary:  "PromQL syntax error",
 						Details:  checks.SyntaxCheckDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "unclosed left parenthesis",
 							},

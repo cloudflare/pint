@@ -11,8 +11,8 @@ import (
 	"slices"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -111,14 +111,14 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		if err != nil {
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
-				Lines: parser.LineRange{
+				Lines: diags.LineRange{
 					First: ann.Key.Lines.First,
 					Last:  ann.Value.Lines.Last,
 				},
 				Reporter: c.Reporter(),
 				Summary:  "link check failed",
 				Details:  maybeComment(c.comment),
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
 						Pos:         ann.Value.Pos,
@@ -137,14 +137,14 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		if resp.StatusCode != http.StatusOK {
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
-				Lines: parser.LineRange{
+				Lines: diags.LineRange{
 					First: ann.Key.Lines.First,
 					Last:  ann.Value.Lines.Last,
 				},
 				Reporter: c.Reporter(),
 				Summary:  "link check failed",
 				Details:  maybeComment(c.comment),
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
 						Pos:         ann.Value.Pos,

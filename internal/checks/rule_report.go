@@ -3,8 +3,8 @@ package checks
 import (
 	"context"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -43,7 +43,7 @@ func (c ReportCheck) Reporter() string {
 }
 
 func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	var pos output.PositionRanges
+	var pos diags.PositionRanges
 	if rule.AlertingRule != nil {
 		pos = rule.AlertingRule.Alert.Pos
 	} else {
@@ -57,7 +57,7 @@ func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 		Summary:  "problem reported by config rule",
 		Details:  "",
 		Severity: c.severity,
-		Diagnostics: []output.Diagnostic{
+		Diagnostics: []diags.Diagnostic{
 			{
 				Message:     c.comment,
 				Pos:         pos,

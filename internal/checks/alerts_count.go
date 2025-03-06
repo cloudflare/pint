@@ -9,6 +9,7 @@ import (
 
 	"github.com/prometheus/common/model"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -83,7 +84,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         rule.AlertingRule.Expr.Value.Pos,
@@ -141,7 +142,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		Summary:  "alert count estimate",
 		Details:  details,
 		Severity: c.severity,
-		Diagnostics: []output.Diagnostic{
+		Diagnostics: []diags.Diagnostic{
 			{
 				Message:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
 				Pos:         rule.AlertingRule.Expr.Value.Pos,

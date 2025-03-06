@@ -7,6 +7,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -82,7 +83,7 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         expr.Value.Pos,
@@ -122,7 +123,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 					summary:  "duration too small",
 					details:  RateCheckDetails,
 					severity: Bug,
-					diags: []output.Diagnostic{
+					diags: []diags.Diagnostic{
 						{
 							Message: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
 								n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
@@ -152,7 +153,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 						summary:  "unable to run checks",
 						details:  "",
 						severity: severity,
-						diags: []output.Diagnostic{
+						diags: []diags.Diagnostic{
 							{
 								Message:     text,
 								Pos:         expr.Value.Pos,
@@ -169,7 +170,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 							summary:  "counter based function called on a non-counter",
 							details:  RateCheckDetails,
 							severity: Bug,
-							diags: []output.Diagnostic{
+							diags: []diags.Diagnostic{
 								{
 									Message: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
 										n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
@@ -205,7 +206,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 										summary:  "unable to run checks",
 										details:  "",
 										severity: severity,
-										diags: []output.Diagnostic{
+										diags: []diags.Diagnostic{
 											{
 												Message:     text,
 												Pos:         expr.Value.Pos,
@@ -238,7 +239,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 											"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
 										src.Operation, src.Operation),
 									severity: severity,
-									diags: []output.Diagnostic{
+									diags: []diags.Diagnostic{
 										{
 											Message: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
 												src.Operation, node.Expr, src.Operation, src.Selector),

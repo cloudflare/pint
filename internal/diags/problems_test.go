@@ -1,10 +1,12 @@
-package output
+package diags
 
 import (
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/cloudflare/pint/internal/output"
 )
 
 func TestInjectDiagnostics(t *testing.T) {
@@ -142,7 +144,7 @@ expr: >-
 				})
 			}
 
-			out := InjectDiagnostics(tc.input, diags, None, tc.firstLine, tc.lastLine)
+			out := InjectDiagnostics(tc.input, diags, output.None, tc.firstLine, tc.lastLine)
 			require.Equal(t, tc.output, out)
 		})
 	}

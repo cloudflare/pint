@@ -7,7 +7,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -39,7 +39,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.CounterCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -65,7 +65,7 @@ func TestCounterCheck(t *testing.T) {
 						Reporter: "promql/counter",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
 							},
@@ -196,7 +196,7 @@ func TestCounterCheck(t *testing.T) {
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: counterText("prom", uri, "http_requests_total"),
 							},
@@ -225,7 +225,7 @@ func TestCounterCheck(t *testing.T) {
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: counterText("prom", uri, "http_requests_total"),
 							},
@@ -256,7 +256,7 @@ func TestCounterCheck(t *testing.T) {
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: counterText("prom", uri, "http_requests_total"),
 							},
@@ -285,7 +285,7 @@ func TestCounterCheck(t *testing.T) {
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: counterText("prom", uri, "http_requests_total"),
 							},
@@ -314,7 +314,7 @@ func TestCounterCheck(t *testing.T) {
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: counterText("prom", uri, "http_requests_total"),
 							},
@@ -343,7 +343,7 @@ func TestCounterCheck(t *testing.T) {
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: counterText("prom", uri, "http_requests_total"),
 							},

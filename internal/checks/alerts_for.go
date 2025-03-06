@@ -6,8 +6,8 @@ import (
 
 	"github.com/prometheus/common/model"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -68,7 +68,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 			Summary:  "invalid duration",
 			Details:  AlertForCheckDurationHelp,
 			Severity: Bug,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     err.Error(),
 					Pos:         value.Pos,
@@ -88,7 +88,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 			Summary:  "redundant field with default value",
 			Details:  "",
 			Severity: Information,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s` is the default value of `%s`, this line is unnecessary.", value.Value, name),
 					Pos:         value.Pos,

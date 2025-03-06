@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -70,7 +70,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -96,7 +96,7 @@ func TestAggregationCheck(t *testing.T) {
 						Summary:  "required label is being removed via aggregation",
 						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -122,7 +122,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`job` label should be removed when aggregating all rules.",
 							},
@@ -163,7 +163,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -198,7 +198,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`instance` label should be removed when aggregating all rules.",
 							},
@@ -220,7 +220,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -254,7 +254,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -288,7 +288,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -322,7 +322,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -385,7 +385,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -410,7 +410,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -436,7 +436,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`job` label should be removed when aggregating all rules.",
 							},
@@ -468,7 +468,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -503,7 +503,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -538,7 +538,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -573,7 +573,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -617,7 +617,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -642,7 +642,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
 							},
@@ -668,7 +668,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 							},
@@ -695,7 +695,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`instance` label should be removed when aggregating all rules.",
 							},
@@ -717,7 +717,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation that removes all labels.",
 							},
@@ -742,7 +742,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Query is using aggregation that removes all labels.",
 							},
@@ -767,7 +767,7 @@ func TestAggregationCheck(t *testing.T) {
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`job` label should be removed when aggregating all rules.",
 							},

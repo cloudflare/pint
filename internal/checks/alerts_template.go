@@ -15,8 +15,8 @@ import (
 	promParser "github.com/prometheus/prometheus/promql/parser"
 	promTemplate "github.com/prometheus/prometheus/template"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -112,7 +112,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
@@ -120,7 +120,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Summary:  "template syntax error",
 					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 							Pos:         label.Value.Pos,
@@ -133,7 +133,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 			for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
@@ -141,7 +141,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Summary:  "value used in labels",
 					Details:  "",
 					Severity: Bug,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message:     msg,
 							Pos:         label.Value.Pos,
@@ -171,7 +171,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: annotation.Key.Lines.First,
 						Last:  annotation.Value.Lines.Last,
 					},
@@ -179,7 +179,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					Summary:  "template syntax error",
 					Details:  TemplateCheckSyntaxDetails,
 					Severity: Fatal,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
 							Pos:         annotation.Value.Pos,
@@ -206,7 +206,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value) {
 					problems = append(problems, Problem{
 						Anchor: AnchorAfter,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: min(rule.AlertingRule.Expr.Value.Lines.First, annotation.Value.Lines.First),
 							Last:  max(rule.AlertingRule.Expr.Value.Lines.Last, annotation.Value.Lines.Last),
 						},
@@ -229,7 +229,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 		problems = append(problems, exprProblem{
 			summary: "use humanize filters for the results",
 			details: "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
-			diags: []output.Diagnostic{
+			diags: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
 					Pos:         expr.Value.Pos,
@@ -492,7 +492,7 @@ func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []
 							summary:  "template uses non-existent label",
 							details:  "",
 							severity: Bug,
-							diags: []output.Diagnostic{
+							diags: []diags.Diagnostic{
 								{
 									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v[1]),
 									Pos:         label.Value.Pos,

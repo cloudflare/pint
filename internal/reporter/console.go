@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/output"
 )
 
@@ -71,7 +72,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 
 			if report.Problem.Anchor == checks.AnchorAfter {
 				if len(report.Problem.Diagnostics) > 0 {
-					body := output.InjectDiagnostics(
+					body := diags.InjectDiagnostics(
 						content,
 						report.Problem.Diagnostics,
 						color,

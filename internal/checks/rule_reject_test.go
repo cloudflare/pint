@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -87,7 +87,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "key not allowed",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "key is not allowed to match `^bad$`.",
 							},
@@ -109,7 +109,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "value is not allowed to match `^bad$`.",
 							},
@@ -131,7 +131,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "key not allowed",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "key is not allowed to match `^bad$`.",
 							},
@@ -153,7 +153,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "value is not allowed to match `^bad$`.",
 							},
@@ -194,7 +194,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "key not allowed",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "key is not allowed to match `^bad$`.",
 							},
@@ -216,7 +216,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "value is not allowed to match `^bad$`.",
 							},
@@ -247,7 +247,7 @@ func TestRejectCheck(t *testing.T) {
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "value is not allowed to match `^{{ $alert }}$`.",
 							},

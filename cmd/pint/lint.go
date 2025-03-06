@@ -10,9 +10,9 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/reporter"
 
 	"github.com/urfave/cli/v2"
@@ -202,7 +202,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 					Summary:  "missing owner",
 					Details:  "",
 					Severity: checks.Bug,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` comments are required in all files, please add a `# pint %s $owner` somewhere in this file and/or `# pint %s $owner` on top of each rule.",
 							discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment)),
 					},
@@ -227,7 +227,7 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 				Summary:  "invalid owner",
 				Details:  "",
 				Severity: checks.Bug,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", entry.Owner, entry.Owner)),
 				},
 			},

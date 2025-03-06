@@ -10,8 +10,8 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -88,7 +88,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 				summary:  "unable to run checks",
 				details:  "",
 				severity: severity,
-				diags: []output.Diagnostic{
+				diags: []diags.Diagnostic{
 					{
 						Message:     text,
 						Pos:         expr.Value.Pos,
@@ -139,7 +139,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 						summary:  "impossible binary operation",
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
-						diags: []output.Diagnostic{
+						diags: []diags.Diagnostic{
 							{
 								Message:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
 								Pos:         expr.Value.Pos,
@@ -160,7 +160,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 				summary:  "unable to run checks",
 				details:  "",
 				severity: severity,
-				diags: []output.Diagnostic{
+				diags: []diags.Diagnostic{
 					{
 						Message:     text,
 						Pos:         expr.Value.Pos,
@@ -182,7 +182,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 				summary:  "unable to run checks",
 				details:  "",
 				severity: severity,
-				diags: []output.Diagnostic{
+				diags: []diags.Diagnostic{
 					{
 						Message:     text,
 						Pos:         expr.Value.Pos,
@@ -204,7 +204,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 						summary:  "impossible binary operation",
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
-						diags: []output.Diagnostic{
+						diags: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf(
 									"Using `on(%s)` won't produce any results on %s because results from the left hand side of the query don't have this label: `%s`.",
@@ -221,7 +221,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 						summary:  "impossible binary operation",
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
-						diags: []output.Diagnostic{
+						diags: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).RHS),
@@ -237,7 +237,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 						summary:  "impossible binary operation",
 						details:  VectorMatchingCheckDetails,
 						severity: Bug,
-						diags: []output.Diagnostic{
+						diags: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr),
@@ -256,7 +256,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 					summary:  "impossible binary operation",
 					details:  VectorMatchingCheckDetails,
 					severity: Bug,
-					diags: []output.Diagnostic{
+					diags: []diags.Diagnostic{
 						{
 							Message: fmt.Sprintf("This query will never return anything on %s because results from the right and the left hand side have different labels: `%s` != `%s`. Failing query: `%s`.",
 								promText(c.prom.Name(), qr.URI), l, r, node.Expr),
@@ -271,7 +271,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 					summary:  "impossible binary operation",
 					details:  VectorMatchingCheckDetails,
 					severity: Bug,
-					diags: []output.Diagnostic{
+					diags: []diags.Diagnostic{
 						{
 							Message: fmt.Sprintf("Using `ignoring(%s)` won't produce any results on %s because results from both sides of the query have different labels: `%s` != `%s`. Failing query: `%s`.",
 								strings.Join(n.VectorMatching.MatchingLabels, ","), promText(c.prom.Name(), qr.URI), l, r, node.Expr),

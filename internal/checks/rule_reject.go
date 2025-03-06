@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -73,7 +73,7 @@ func (c Reject) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ [
 	return problems
 }
 
-func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines parser.LineRange) (problems []Problem) {
+func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines diags.LineRange) (problems []Problem) {
 	if c.keyRe != nil && c.keyRe.MustExpand(rule).MatchString(label.Key.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
@@ -81,7 +81,7 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines parse
 			Reporter: c.Reporter(),
 			Summary:  "key not allowed",
 			Details:  "",
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("key is not allowed to match `%s`.", c.keyRe.anchored),
 					Pos:         label.Key.Pos,
@@ -95,14 +95,14 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue, lines parse
 	if c.valueRe != nil && c.valueRe.MustExpand(rule).MatchString(label.Value.Value) {
 		problems = append(problems, Problem{
 			Anchor: AnchorAfter,
-			Lines: parser.LineRange{
+			Lines: diags.LineRange{
 				First: label.Key.Lines.First,
 				Last:  label.Value.Lines.Last,
 			},
 			Reporter: c.Reporter(),
 			Summary:  "value not allowed",
 			Details:  "",
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("value is not allowed to match `%s`.", c.valueRe.anchored),
 					Pos:         label.Value.Pos,

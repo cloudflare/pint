@@ -13,8 +13,8 @@ import (
 	"github.com/prometheus/prometheus/model/labels"
 	"github.com/prometheus/prometheus/promql/parser/posrange"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -212,7 +212,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				Summary:  summary,
 				Details:  RegexpCheckDetails,
 				Severity: Warning,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     text,
 						Pos:         expr.Value.Pos,

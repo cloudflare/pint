@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -69,7 +69,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         rule.AlertingRule.Expr.Value.Pos,
@@ -86,7 +86,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 			for _, name := range checkExternalLabels(label.Key.Value, label.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
@@ -94,7 +94,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 					Summary:  "invalid label",
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 							Pos:         label.Value.Pos,
@@ -112,7 +112,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 			for _, name := range checkExternalLabels(annotation.Key.Value, annotation.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: annotation.Key.Lines.First,
 						Last:  annotation.Value.Lines.Last,
 					},
@@ -120,7 +120,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 					Summary:  "invalid label",
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Bug,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
 							Pos:         annotation.Value.Pos,

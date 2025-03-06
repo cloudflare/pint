@@ -9,6 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -92,7 +93,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         expr.Value.Pos,
@@ -115,7 +116,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 				Summary:  "unable to run checks",
 				Details:  "",
 				Severity: Warning,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
 						Pos:         expr.Value.Pos,
@@ -156,7 +157,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, 
 				summary:  "query beyond configured retention",
 				details:  "",
 				severity: Warning,
-				diags: []output.Diagnostic{
+				diags: []diags.Diagnostic{
 					{
 						Message: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
 							node.Expr, model.Duration(n.Range), reason),

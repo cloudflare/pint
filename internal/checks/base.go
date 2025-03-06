@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -115,8 +115,8 @@ type Problem struct {
 	Reporter    string
 	Summary     string
 	Details     string
-	Diagnostics []output.Diagnostic
-	Lines       parser.LineRange
+	Diagnostics []diags.Diagnostic
+	Lines       diags.LineRange
 	Severity    Severity
 	Anchor      Anchor
 }
@@ -137,7 +137,7 @@ type RuleChecker interface {
 type exprProblem struct {
 	summary  string
 	details  string
-	diags    []output.Diagnostic
+	diags    []diags.Diagnostic
 	severity Severity
 }
 
@@ -173,9 +173,9 @@ func promText(name, uri string) string {
 	return fmt.Sprintf("`%s` Prometheus server at %s", name, uri)
 }
 
-func WholeRuleDiag(rule parser.Rule, msg string) output.Diagnostic {
+func WholeRuleDiag(rule parser.Rule, msg string) diags.Diagnostic {
 	node := rule.LastKey()
-	return output.Diagnostic{
+	return diags.Diagnostic{
 		Message:     msg,
 		Pos:         node.Pos,
 		FirstColumn: 1,

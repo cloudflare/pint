@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -69,7 +69,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 							},
@@ -90,7 +90,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Unnecessary regexp match on static string `job!~\"bar\"`, use `job!=\"bar\"` instead.",
 							},
@@ -111,7 +111,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Unnecessary regexp match on static string `job=~\"\"`, use `job=\"\"` instead.",
 							},
@@ -132,7 +132,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"^.+$\"` will result in `job=~\"^^.+$$\"`, remove regexp anchors `^` and/or `$`.",
 							},
@@ -153,7 +153,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Prometheus regexp matchers are automatically fully anchored so match for `job=~\"(foo|^.+)$\"` will result in `job=~\"^(foo|^.+)$$\"`, remove regexp anchors `^` and/or `$`.",
 							},
@@ -174,7 +174,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 							},
@@ -195,7 +195,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 							},
@@ -206,7 +206,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Unnecessary regexp match on static string `job=~\"bar\"`, use `job=\"bar\"` instead.",
 							},
@@ -234,7 +234,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `foo` if you want to match on all `job` values.",
 							},
@@ -255,7 +255,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `foo{instance=\"bob\"}` if you want to match on all `job` values.",
 							},
@@ -266,7 +266,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `foo{instance=\"bob\"}` if you want to match on all `cluster` values.",
 							},
@@ -290,7 +290,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `{instance=\"bob\"}` if you want to match on all `job` values.",
 							},
@@ -301,7 +301,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `{instance=\"bob\"}` if you want to match on all `cluster` values.",
 							},
@@ -325,7 +325,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `job` values.",
 							},
@@ -336,7 +336,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `{__name__=~\"foo|bar\", instance=\"bob\"}` if you want to match on all `cluster` values.",
 							},
@@ -364,7 +364,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
 							},
@@ -385,7 +385,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Use `foo{job=\"\"}` if you want to match on all time series for `foo` without the `job` label.",
 							},
@@ -434,7 +434,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "smelly regexp selector",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
 							},
@@ -473,7 +473,7 @@ func TestRegexpCheck(t *testing.T) {
 						Summary:  "smelly regexp selector",
 						Details:  checks.RegexpCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`{job=~\"service_.*_prod\"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
 							},

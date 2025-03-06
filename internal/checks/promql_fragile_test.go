@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -45,7 +45,7 @@ func TestFragileCheck(t *testing.T) {
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fragileSampleFunc("topk"),
 							},
@@ -66,7 +66,7 @@ func TestFragileCheck(t *testing.T) {
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fragileSampleFunc("topk"),
 							},
@@ -87,7 +87,7 @@ func TestFragileCheck(t *testing.T) {
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fragileSampleFunc("topk"),
 							},
@@ -98,7 +98,7 @@ func TestFragileCheck(t *testing.T) {
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fragileSampleFunc("bottomk"),
 							},

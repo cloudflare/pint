@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -68,7 +69,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		slog.Debug("ignore/file report", slog.Any("err", ignoreErr))
 		return Problem{
 			Anchor: AnchorAfter,
-			Lines: parser.LineRange{
+			Lines: diags.LineRange{
 				First: ignoreErr.Line,
 				Last:  ignoreErr.Line,
 			},
@@ -83,7 +84,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		slog.Debug("invalid comment report", slog.Any("err", commentErr))
 		return Problem{
 			Anchor: AnchorAfter,
-			Lines: parser.LineRange{
+			Lines: diags.LineRange{
 				First: commentErr.Line,
 				Last:  commentErr.Line,
 			},
@@ -98,7 +99,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		slog.Debug("invalid owner report", slog.Any("err", ownerErr))
 		return Problem{
 			Anchor: AnchorAfter,
-			Lines: parser.LineRange{
+			Lines: diags.LineRange{
 				First: ownerErr.Line,
 				Last:  ownerErr.Line,
 			},
@@ -113,7 +114,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		slog.Debug("parse error", slog.Any("err", parseErr))
 		return Problem{
 			Anchor: AnchorAfter,
-			Lines: parser.LineRange{
+			Lines: diags.LineRange{
 				First: parseErr.Line,
 				Last:  parseErr.Line,
 			},
@@ -135,7 +136,7 @@ If this file is a template that will be rendered into valid YAML then you can in
 		}
 		return Problem{
 			Anchor: AnchorAfter,
-			Lines: parser.LineRange{
+			Lines: diags.LineRange{
 				First: rule.Error.Line,
 				Last:  rule.Error.Line,
 			},

@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -76,7 +76,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
 				},
 			})
@@ -100,7 +100,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 			Summary:  "required annotation not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 					Pos:         rule.AlertingRule.Annotations.Key.Pos,
@@ -121,7 +121,7 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
 						Pos:         ann.Key.Pos,
@@ -153,7 +153,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 			Summary:  "invalid annotation value",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
 					Pos:         ann.Pos,
@@ -190,7 +190,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 				Summary:  "invalid annotation value",
 				Details:  details.String(),
 				Severity: c.severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` annotation value `%s` is not one of valid values.", c.keyRe.original, value),
 						Pos:         ann.Pos,

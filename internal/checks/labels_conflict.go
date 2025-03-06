@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -70,7 +70,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         labels.Key.Pos,
@@ -87,7 +87,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 			if label.Key.Value == k {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: label.Key.Lines.First,
 						Last:  label.Value.Lines.Last,
 					},
@@ -95,7 +95,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 					Summary:  "conflicting labels",
 					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
 					Severity: Warning,
-					Diagnostics: []output.Diagnostic{
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message:     c.formatText(k, label.Value.Value, v, rule.Type(), cfg),
 							Pos:         label.Key.Pos,

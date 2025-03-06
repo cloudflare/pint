@@ -8,8 +8,8 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -113,7 +113,7 @@ LOOP:
 				Summary:  "unable to run checks",
 				Details:  "",
 				Severity: severity,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     text,
 						Pos:         expr.Value.Pos,
@@ -141,7 +141,7 @@ LOOP:
 			Summary:  "direct counter read",
 			Details:  CounterCheckDetails,
 			Severity: Warning,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message: fmt.Sprintf("`%s` is a counter according to metrics metadata from %s, it can be dangarous to use its value directly.",
 						selector.Name,

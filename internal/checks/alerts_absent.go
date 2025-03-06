@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -87,7 +88,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         rule.AlertingRule.Expr.Value.Pos,
@@ -113,7 +114,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 
 	for _, s := range absentSources {
 		var summary string
-		diags := []output.Diagnostic{
+		dgs := []diags.Diagnostic{
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 				Pos:         rule.AlertingRule.Expr.Value.Pos,
@@ -123,7 +124,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		}
 		if forVal > 0 {
 			summary = "absent() based alert with insufficient for"
-			diags = append(diags, output.Diagnostic{
+			dgs = append(dgs, diags.Diagnostic{
 				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
 					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
 				Pos:         rule.AlertingRule.For.Pos,
@@ -141,7 +142,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 			Summary:     summary,
 			Details:     AlertsAbsentCheckDetails,
 			Severity:    Warning,
-			Diagnostics: diags,
+			Diagnostics: dgs,
 		})
 	}
 

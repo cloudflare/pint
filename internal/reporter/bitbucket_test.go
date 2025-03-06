@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -252,7 +253,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -269,7 +270,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -286,7 +287,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -303,7 +304,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -320,7 +321,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
@@ -528,7 +529,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -545,7 +546,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -562,7 +563,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -579,7 +580,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
@@ -659,7 +660,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{3, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -726,7 +727,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -743,7 +744,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -760,7 +761,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[0],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -777,7 +778,7 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
@@ -897,7 +898,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -914,7 +915,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -931,7 +932,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -949,7 +950,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
@@ -1473,7 +1474,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -1636,7 +1637,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -1653,7 +1654,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
@@ -1670,7 +1671,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -1688,7 +1689,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -1706,7 +1707,7 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},

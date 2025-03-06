@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 )
 
 const (
@@ -76,7 +77,7 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		}
 		if index > 1 && p.isStrict {
 			rules = append(rules, Rule{
-				Lines: LineRange{First: doc.Line, Last: doc.Line},
+				Lines: diags.LineRange{First: doc.Line, Last: doc.Line},
 				Error: ParseError{
 					Err: errors.New("multi-document YAML files are not allowed"),
 					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
@@ -170,7 +171,7 @@ func parseRule(content []byte, node *yaml.Node, offsetLine, offsetColumn int) (r
 	var key *yaml.Node
 	unknownKeys := []*yaml.Node{}
 
-	var lines LineRange
+	var lines diags.LineRange
 
 	var ruleComments []comments.Comment
 
@@ -223,7 +224,7 @@ func parseRule(content []byte, node *yaml.Node, offsetLine, offsetColumn int) (r
 				}
 				exprNode = part
 				exprPart = newPromQLExpr(part, offsetLine, offsetColumn, contentLines, key.Column+2)
-				exprPart.Value.Lines = LineRange(exprPart.Value.Pos.Lines())
+				exprPart.Value.Lines = exprPart.Value.Pos.Lines()
 				lines.Last = max(lines.Last, exprPart.Value.Lines.Last)
 			case forKey:
 				if forPart != nil {
@@ -516,7 +517,7 @@ func hasValue(node *YamlNode) bool {
 	return node.Value != ""
 }
 
-func ensureRequiredKeys(lines LineRange, key string, keyVal *YamlNode, expr *PromQLExpr) (Rule, bool) {
+func ensureRequiredKeys(lines diags.LineRange, key string, keyVal *YamlNode, expr *PromQLExpr) (Rule, bool) {
 	if keyVal == nil {
 		return Rule{Lines: lines}, true
 	}
@@ -568,7 +569,7 @@ func resolveMapAlias(part, parent *yaml.Node) *yaml.Node {
 	return &node
 }
 
-func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool) {
+func duplicatedKeyError(lines diags.LineRange, line int, key string) (Rule, bool) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
@@ -579,7 +580,7 @@ func duplicatedKeyError(lines LineRange, line int, key string) (Rule, bool) {
 	return rule, false
 }
 
-func invalidValueError(lines LineRange, line int, key, expectedTag, gotTag string) (Rule, bool) {
+func invalidValueError(lines diags.LineRange, line int, key, expectedTag, gotTag string) (Rule, bool) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
@@ -616,7 +617,7 @@ func mappingNodes(node *yaml.Node) []yamlMap {
 	return m
 }
 
-func rangeFromYamlMaps(m []yamlMap) (lr LineRange) {
+func rangeFromYamlMaps(m []yamlMap) (lr diags.LineRange) {
 	for _, entry := range m {
 		if lr.First == 0 {
 			lr.First = entry.key.Line

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -35,7 +35,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Reporter: checks.ImpossibleCheckName,
 						Summary:  "dead code in query",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 							},
@@ -58,7 +58,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Reporter: checks.ImpossibleCheckName,
 						Summary:  "dead code in query",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 							},
@@ -81,7 +81,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Reporter: checks.ImpossibleCheckName,
 						Summary:  "dead code in query",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 							},
@@ -104,7 +104,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Reporter: checks.ImpossibleCheckName,
 						Summary:  "dead code in query",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
 							},
@@ -127,7 +127,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Reporter: checks.ImpossibleCheckName,
 						Summary:  "dead code in query",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
 							},

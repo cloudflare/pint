@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -97,7 +97,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Details:  "Rule comment: some text",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
 							},
@@ -144,7 +144,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Summary:  "link check failed",
 						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 							},
@@ -173,7 +173,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
 							},
@@ -183,7 +183,7 @@ func TestRuleLinkCheck(t *testing.T) {
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
 							},

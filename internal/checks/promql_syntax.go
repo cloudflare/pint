@@ -6,8 +6,8 @@ import (
 
 	promParser "github.com/prometheus/prometheus/promql/parser"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -46,7 +46,7 @@ func (c SyntaxCheck) Reporter() string {
 func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
-		diag := output.Diagnostic{
+		diag := diags.Diagnostic{
 			Message:     expr.SyntaxError.Error(),
 			Pos:         expr.Value.Pos,
 			FirstColumn: 1,
@@ -57,7 +57,7 @@ func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 		ok := errors.As(expr.SyntaxError, &perrs)
 		if ok {
 			for _, perr := range perrs { // Use only the last error.
-				diag = output.Diagnostic{
+				diag = diags.Diagnostic{
 					Message:     perr.Err.Error(),
 					Pos:         expr.Value.Pos,
 					FirstColumn: int(perr.PositionRange.Start) + 1,
@@ -72,7 +72,7 @@ func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 			Reporter:    c.Reporter(),
 			Summary:     "PromQL syntax error",
 			Details:     SyntaxCheckDetails,
-			Diagnostics: []output.Diagnostic{diag},
+			Diagnostics: []diags.Diagnostic{diag},
 			Severity:    Fatal,
 		})
 	}

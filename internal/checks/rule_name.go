@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -56,7 +56,7 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 			Reporter: c.Reporter(),
 			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("alerting rule name must match `%s`.", c.re.anchored),
 					Pos:         rule.AlertingRule.Alert.Pos,
@@ -74,7 +74,7 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 			Reporter: c.Reporter(),
 			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("recording rule name must match `%s`.", c.re.anchored),
 					Pos:         rule.RecordingRule.Record.Pos,

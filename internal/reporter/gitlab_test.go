@@ -19,6 +19,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -75,7 +76,7 @@ func TestGitLabReporter(t *testing.T) {
 			Reporter: "foo",
 			Summary:  "foo error",
 			Details:  "foo details",
-			Lines:    parser.LineRange{First: 1, Last: 3},
+			Lines:    diags.LineRange{First: 1, Last: 3},
 			Severity: checks.Fatal,
 			Anchor:   checks.AnchorAfter,
 		},
@@ -265,7 +266,7 @@ func TestGitLabReporter(t *testing.T) {
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -281,7 +282,7 @@ func TestGitLabReporter(t *testing.T) {
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -297,7 +298,7 @@ func TestGitLabReporter(t *testing.T) {
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -466,7 +467,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -482,7 +483,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -498,7 +499,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -605,7 +606,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -621,7 +622,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -637,7 +638,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Reporter: "foo",
 						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -830,7 +831,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 						ModifiedLines: []int{2},
 						Rule:          mockRules[1],
 						Problem: checks.Problem{
-							Lines: parser.LineRange{
+							Lines: diags.LineRange{
 								First: tc.problemLine,
 								Last:  tc.problemLine,
 							},

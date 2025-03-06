@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -126,7 +126,7 @@ func (s Summary) hasReport(r Report) bool {
 
 func (s *Summary) SortReports() {
 	for i := range s.reports {
-		slices.SortStableFunc(s.reports[i].Problem.Diagnostics, func(a, b output.Diagnostic) int {
+		slices.SortStableFunc(s.reports[i].Problem.Diagnostics, func(a, b diags.Diagnostic) int {
 			return cmp.Or(
 				cmp.Compare(b.FirstColumn, a.FirstColumn),
 				cmp.Compare(a.LastColumn, b.LastColumn),
@@ -189,7 +189,7 @@ type Reporter interface {
 	Submit(Summary) error
 }
 
-func cmpDiags(a, b output.Diagnostic) int {
+func cmpDiags(a, b diags.Diagnostic) int {
 	return cmp.Or(
 		cmp.Compare(b.FirstColumn, a.FirstColumn),
 		cmp.Compare(a.LastColumn, b.LastColumn),
@@ -197,7 +197,7 @@ func cmpDiags(a, b output.Diagnostic) int {
 	)
 }
 
-func cmpDiagnostics(sa, sb []output.Diagnostic) int {
+func cmpDiagnostics(sa, sb []diags.Diagnostic) int {
 	if len(sa) == 0 {
 		return -1
 	}
@@ -211,7 +211,7 @@ func cmpDiagnostics(sa, sb []output.Diagnostic) int {
 	return cmpDiags(sa[0], sb[0])
 }
 
-func isSameDiagnostics(sa, sb []output.Diagnostic) bool {
+func isSameDiagnostics(sa, sb []diags.Diagnostic) bool {
 	if len(sa) != len(sb) {
 		return false
 	}

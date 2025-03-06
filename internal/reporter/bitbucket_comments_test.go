@@ -11,8 +11,8 @@ import (
 	"github.com/neilotoole/slogt"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestBitBucketMakeComments(t *testing.T) {
@@ -67,7 +67,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -84,7 +84,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 3,
 							Last:  3,
 						},
@@ -101,7 +101,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -118,7 +118,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -136,7 +136,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -153,7 +153,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -243,7 +243,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -260,7 +260,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -304,7 +304,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -321,7 +321,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -365,7 +365,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -382,7 +382,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -426,7 +426,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -443,7 +443,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Warning,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 3,
 							Last:  3,
 						},
@@ -460,7 +460,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -477,7 +477,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -495,7 +495,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					Problem: checks.Problem{
 						Anchor:   checks.AnchorBefore,
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -512,7 +512,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{1, 2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
@@ -576,7 +576,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 					ModifiedLines: []int{2, 3},
 					Problem: checks.Problem{
 						Severity: checks.Bug,
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},

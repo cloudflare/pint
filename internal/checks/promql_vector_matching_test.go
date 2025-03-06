@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -62,7 +62,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: differentLabelsText("prom", uri, "foo_with_notfound / bar", "instance, job, notfound", "instance, job"),
 							},
@@ -265,7 +265,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: usingMismatchText("prom", uri, "foo / ignoring (xxx) app_registry", "ignoring(xxx)", "instance, job", "app_name"),
 							},
@@ -327,7 +327,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: usingBothMissing("prom", uri, "foo / on (notfound) bar", "on(notfound)"),
 							},
@@ -578,7 +578,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: usingOneMissing("prom", uri, "foo", "left", "on(notfound)"),
 							},
@@ -638,7 +638,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: usingOneMissing("prom", uri, "bar", "right", "on(notfound)"),
 							},
@@ -698,7 +698,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: usingOneMissing("prom", uri, "(memory_bytes / ignoring (job) (memory_limit > 0))", "left", "on(app_name)"),
 							},
@@ -891,7 +891,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: differentLabelsText("prom", uri, "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar", "instance, job, notfound", "instance, job"),
 							},
@@ -1024,7 +1024,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: differentLabelsText("prom", uri, "(foo / ignoring (notfound) foo_with_notfound) / (memory_bytes / ignoring (job) memory_limit)", "instance, job", "dev, instance, job"),
 							},
@@ -1156,7 +1156,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 							},
@@ -1179,7 +1179,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 							},
@@ -1202,7 +1202,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
 							},
@@ -1241,7 +1241,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
 							},
@@ -1292,7 +1292,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 					{
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: differentFilters("job", "a", "b"),
 							},

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -32,7 +32,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` annotation is required.",
 							},
@@ -54,7 +54,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` annotation is required.",
 							},
@@ -83,7 +83,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` annotation is required.",
 							},
@@ -114,7 +114,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` annotation is required.",
 							},
@@ -145,7 +145,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` annotation value `bar` must match `^critical$`.",
 							},
@@ -167,7 +167,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`severity` annotation value `bar` must match `^critical$`.",
 							},
@@ -216,7 +216,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`for` annotation value `4m` must match `^{{ $for }}$`.",
 							},
@@ -256,7 +256,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`annotation_.*` annotation value `bar` must match `^critical$`.",
 							},
@@ -278,7 +278,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`annotation_.*` annotation value `bar` must match `^critical$`.",
 							},
@@ -301,7 +301,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Summary:  "invalid annotation value",
 						Details:  "Rule comment: rule comment",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`components` annotation value `db` must match `^api|memcached$`.",
 							},
@@ -332,7 +332,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Summary:  "invalid annotation value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).\nRule comment: rule comment",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`components` annotation value `db` is not one of valid values.",
 							},

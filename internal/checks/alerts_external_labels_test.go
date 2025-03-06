@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -62,7 +62,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
 							},
@@ -90,7 +90,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.AlertsExternalLabelsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
 							},
@@ -124,7 +124,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsExternalLabelsText("prom", uri, "cluster"),
 							},
@@ -135,7 +135,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsExternalLabelsText("prom", uri, "cluster"),
 							},
@@ -146,7 +146,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsExternalLabelsText("prom", uri, "cluster"),
 							},

@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestPendingCommentToBitBucketComment(t *testing.T) {
@@ -118,7 +118,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 5,
 						Last:  5,
 					},
@@ -146,7 +146,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 5,
 						Last:  5,
 					},
@@ -173,7 +173,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 5,
 						Last:  5,
 					},
@@ -200,7 +200,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 5,
 						Last:  5,
 					},
@@ -227,7 +227,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 5,
 						Last:  5,
 					},
@@ -254,7 +254,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 7,
 						Last:  7,
 					},
@@ -281,7 +281,7 @@ func TestReportToAnnotation(t *testing.T) {
 				},
 				ModifiedLines: []int{4, 5, 6},
 				Problem: checks.Problem{
-					Lines: parser.LineRange{
+					Lines: diags.LineRange{
 						First: 1,
 						Last:  1,
 					},

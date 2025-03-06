@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -33,7 +33,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `undefined variable \"$label\"`.",
 							},
@@ -54,7 +54,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `function \"xxx\" not defined`.",
 							},
@@ -82,7 +82,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `undefined variable \"$label\"`.",
 							},
@@ -103,7 +103,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `function \"xxx\" not defined`.",
 							},
@@ -130,7 +130,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -150,7 +150,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -160,7 +160,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -180,7 +180,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -200,7 +200,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -220,7 +220,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -240,7 +240,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -260,7 +260,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -280,7 +280,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
 							},
@@ -300,7 +300,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -323,7 +323,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -346,7 +346,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -369,7 +369,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -392,7 +392,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -415,7 +415,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -438,7 +438,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -467,7 +467,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `ixtance` label but the query results won't have this label.",
 							},
@@ -526,7 +526,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -539,7 +539,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -552,7 +552,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `foo` label but the query results won't have this label.",
 							},
@@ -565,7 +565,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `xxx` label but the query results won't have this label.",
 							},
@@ -593,7 +593,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -606,7 +606,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -634,7 +634,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -647,7 +647,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -675,7 +675,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -703,7 +703,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -743,7 +743,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `cluster` label but the query results won't have this label.",
 							},
@@ -756,7 +756,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `env` label but the query results won't have this label.",
 							},
@@ -796,7 +796,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `cluster` label but the query results won't have this label.",
 							},
@@ -809,7 +809,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `env` label but the query results won't have this label.",
 							},
@@ -849,7 +849,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`rate()` will produce results that are hard to read for humans.",
 							},
@@ -877,7 +877,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`rate()` will produce results that are hard to read for humans.",
 							},
@@ -905,7 +905,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`irate()` will produce results that are hard to read for humans.",
 							},
@@ -933,7 +933,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`deriv()` will produce results that are hard to read for humans.",
 							},
@@ -1069,7 +1069,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`rate()` will produce results that are hard to read for humans.",
 							},
@@ -1113,7 +1113,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `163: executing \"summary\" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.",
 							},
@@ -1142,7 +1142,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `159: executing \"summary\" at <query>: error calling query: 1:1: parse error: unknown function with name \"suz\"`.",
 							},
@@ -1168,7 +1168,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Severity: checks.Fatal,
 						Details:  checks.TemplateCheckSyntaxDetails,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `124: executing \"summary\" at <first>: wrong type for value; expected template.queryResult; got float64`.",
 							},
@@ -1178,7 +1178,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`rate()` will produce results that are hard to read for humans.",
 							},
@@ -1210,7 +1210,7 @@ func TestTemplateCheck(t *testing.T) {
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template failed to parse with this error: `121: executing \"summary\" at <query \"up xxx\">: error calling query: 1:4: parse error: unexpected identifier \"xxx\"`.",
 							},
@@ -1312,7 +1312,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -1335,7 +1335,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -1358,7 +1358,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `instance` label but the query results won't have this label.",
 							},
@@ -1371,7 +1371,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -1400,7 +1400,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job_name` label but the query results won't have this label.",
 							},
@@ -1413,7 +1413,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `app_type` label but the query results won't have this label.",
 							},
@@ -1481,7 +1481,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `prefix` label but the query results won't have this label.",
 							},
@@ -1521,7 +1521,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `job` label but the query results won't have this label.",
 							},
@@ -1551,7 +1551,7 @@ func TestTemplateCheck(t *testing.T) {
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Template is using `colo_name` label but the query results won't have this label.",
 							},

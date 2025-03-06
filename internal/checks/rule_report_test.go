@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -23,7 +23,7 @@ func TestReportCheck(t *testing.T) {
 						Reporter: "rule/report",
 						Summary:  "problem reported by config rule",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "problem reported",
 							},
@@ -45,7 +45,7 @@ func TestReportCheck(t *testing.T) {
 						Reporter: "rule/report",
 						Summary:  "problem reported by config rule",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "problem reported",
 							},

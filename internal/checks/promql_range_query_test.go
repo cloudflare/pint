@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -44,7 +44,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Reporter: "promql/range_query",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -70,7 +70,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Reporter: "promql/range_query",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"`,
 							},
@@ -80,7 +80,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: retentionToLow("prom", uri, "foo[30d]", "30d", "15d"),
 							},
@@ -134,7 +134,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
 							},
@@ -175,7 +175,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: retentionToLow("prom", uri, "foo[11d1h]", "11d1h", "11d"),
 							},
@@ -203,7 +203,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
 							},
@@ -258,7 +258,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Summary:  "query beyond configured retention",
 						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.",
 							},

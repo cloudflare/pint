@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/output"
 )
 
@@ -77,7 +78,7 @@ func makeComments(summary Summary) (comments []PendingComment) {
 
 			if content != "" {
 				buf.WriteString("```yaml\n")
-				buf.WriteString(output.InjectDiagnostics(
+				buf.WriteString(diags.InjectDiagnostics(
 					content,
 					report.Problem.Diagnostics,
 					output.None,

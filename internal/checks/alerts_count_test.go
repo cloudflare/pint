@@ -9,7 +9,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -61,7 +61,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Reporter: "alerts/count",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
 							},
@@ -92,7 +92,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Reporter: "alerts/count",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.AlertsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
 							},
@@ -113,7 +113,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 0, "1d"),
 							},
@@ -143,7 +143,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 7, "1d"),
 							},
@@ -232,7 +232,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 2, "1d"),
 							},
@@ -310,7 +310,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", "rule comment"),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 2, "1d"),
 							},
@@ -388,7 +388,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 2, "1d"),
 							},
@@ -531,7 +531,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `{__name__="up", job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 3, "1d"),
 							},
@@ -592,7 +592,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `{__name__=~"(up|foo)", job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 3, "1d"),
 							},
@@ -650,7 +650,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 3, "1d"),
 							},
@@ -708,7 +708,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 2, "1d"),
 							},
@@ -784,7 +784,7 @@ func TestAlertsCountCheck(t *testing.T) {
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertsText("prom", uri, 1, "1d"),
 							},

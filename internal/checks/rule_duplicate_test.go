@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -139,7 +139,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 						Reporter: checks.RuleDuplicateCheckName,
 						Summary:  "duplicated recording rule",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: textDuplicateRule("fake.yml", 6),
 							},
@@ -192,7 +192,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 						Reporter: checks.RuleDuplicateCheckName,
 						Summary:  "duplicated recording rule",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: textDuplicateRule("fake.yml", 6),
 							},

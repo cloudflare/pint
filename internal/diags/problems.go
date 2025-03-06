@@ -1,8 +1,10 @@
-package output
+package diags
 
 import (
 	"fmt"
 	"strings"
+
+	"github.com/cloudflare/pint/internal/output"
 )
 
 func countDigits(n int) (c int) {
@@ -20,7 +22,7 @@ type Diagnostic struct {
 	LastColumn  int // 1-indexed
 }
 
-func InjectDiagnostics(content string, diags []Diagnostic, color Color, firstLine, lastLine int) string {
+func InjectDiagnostics(content string, diags []Diagnostic, color output.Color, firstLine, lastLine int) string {
 	diagPositions := make([]PositionRanges, len(diags))
 	for i, diag := range diags {
 		diagPositions[i] = readRange(diag.FirstColumn, diag.LastColumn, diag.Pos)
@@ -61,7 +63,7 @@ func InjectDiagnostics(content string, diags []Diagnostic, color Color, firstLin
 		}
 
 		prefix := fmt.Sprintf(nrFmt+" | ", lineIndex+1)
-		buf.WriteString(MaybeColor(White, color == None, prefix))
+		buf.WriteString(output.MaybeColor(output.White, color == output.None, prefix))
 		for i, ok := range needsNextLine {
 			if ok {
 				nextLine[i].WriteString(strings.Repeat(" ", len(prefix)))
@@ -96,9 +98,9 @@ func InjectDiagnostics(content string, diags []Diagnostic, color Color, firstLin
 
 		for i, ok := range needsNextLine {
 			if ok {
-				buf.WriteString(MaybeColor(color, color == None, nextLine[i].String()))
+				buf.WriteString(output.MaybeColor(color, color == output.None, nextLine[i].String()))
 				buf.WriteRune(' ')
-				buf.WriteString(MaybeColor(color, color == None, diags[i].Message))
+				buf.WriteString(output.MaybeColor(color, color == output.None, diags[i].Message))
 				buf.WriteRune('\n')
 				nextLine[i].Reset()
 			}

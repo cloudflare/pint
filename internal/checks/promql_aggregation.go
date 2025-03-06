@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -97,7 +97,7 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 				Reporter: c.Reporter(),
 				Summary:  "required label is being removed via aggregation",
 				Details:  maybeComment(c.comment),
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     el.Reason,
 						Pos:         expr.Value.Pos,
@@ -130,7 +130,7 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 				Reporter: c.Reporter(),
 				Summary:  "label must be removed in aggregations",
 				Details:  maybeComment(c.comment),
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message: fmt.Sprintf("`%s` label should be removed when aggregating %s rules.",
 							c.label, nameDesc),

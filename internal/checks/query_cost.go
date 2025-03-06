@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -80,7 +81,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "unable to run checks",
 			Details:  "",
 			Severity: severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     text,
 					Pos:         expr.Value.Pos,
@@ -116,7 +117,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
 					Pos:         expr.Value.Pos,
@@ -136,7 +137,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
 					Pos:         expr.Value.Pos,
@@ -156,7 +157,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
 					Pos:         expr.Value.Pos,
@@ -177,7 +178,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
 					Pos:         expr.Value.Pos,
@@ -197,7 +198,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			Summary:  "query cost estimate",
 			Details:  maybeComment(c.comment),
 			Severity: Information,
-			Diagnostics: []output.Diagnostic{
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
 					Pos:         expr.Value.Pos,

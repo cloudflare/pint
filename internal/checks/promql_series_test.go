@@ -11,7 +11,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/comments"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -90,7 +90,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
 							},
@@ -118,7 +118,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127:9999", `connection refused`),
 							},
@@ -138,7 +138,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
 							},
@@ -168,7 +168,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
 							},
@@ -198,7 +198,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -229,7 +229,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -260,7 +260,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -397,7 +397,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -423,7 +423,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -465,7 +465,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "3d"),
 							},
@@ -497,7 +497,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricRRText("prom", uri, "foo:bar", "1w"),
 							},
@@ -542,7 +542,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricRRText("prom", uri, "foo:bar", "1w"),
 							},
@@ -595,7 +595,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unknown alert referenced",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: alertMissing(`ALERTS{alertname="myalert"}`, "myalert"),
 							},
@@ -618,7 +618,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricRRText("prom", uri, "foo:bar", "1w"),
 							},
@@ -662,7 +662,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -702,7 +702,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w") + " " + metricIgnored("notfound", checks.SeriesCheckName, "^not.+$"),
 							},
@@ -733,7 +733,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noLabelKeyText("prom", uri, "found", "notfound", "1w"),
 							},
@@ -792,7 +792,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -842,7 +842,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noLabelKeyText("prom", uri, "found", "job", "1w"),
 							},
@@ -903,7 +903,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesSometimesText("prom", uri, `found`, "1w", "5m"),
 							},
@@ -1033,7 +1033,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
 							},
@@ -1163,7 +1163,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
 							},
@@ -1364,7 +1364,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesDisappearedText("prom", uri, "found", "4d"),
 							},
@@ -1460,7 +1460,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesDisappearedText("prom", uri, "found", "4d") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
 							},
@@ -1749,7 +1749,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesDisappearedText("prom", uri, "found", "4d"),
 							},
@@ -1839,7 +1839,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesDisappearedText("prom", uri, "found", "4d"),
 							},
@@ -1851,7 +1851,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedRuleSetText("promql/series(bar) min-age 5d"),
 							},
@@ -1941,7 +1941,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `failed to parse pint comment as duration: not a valid duration string: "foo"`,
 							},
@@ -1953,7 +1953,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesDisappearedText("prom", uri, "found", "4d"),
 							},
@@ -2049,7 +2049,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
 							},
@@ -2122,7 +2122,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w"),
 							},
@@ -2195,7 +2195,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
 							},
@@ -2252,7 +2252,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w"),
 							},
@@ -2513,7 +2513,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
 							},
@@ -2617,7 +2617,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
 							},
@@ -2629,7 +2629,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedRuleSetText(`promql/series(foo{job="bob"}) ignore/label-value error`),
 							},
@@ -2688,7 +2688,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
 							},
@@ -2769,7 +2769,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `failed to parse pint comment as duration: unknown unit "e" in duration "1e"`,
 							},
@@ -2781,7 +2781,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
 							},
@@ -2924,7 +2924,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
 							},
@@ -3031,7 +3031,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
 							},
@@ -3157,7 +3157,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, "found", "job", `{job="notfound"}`, "1w"),
 							},
@@ -3216,7 +3216,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noSeriesText("prom", uri, "notfound", "1w"),
 							},
@@ -3264,7 +3264,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noSeriesText("prom", uri, "notfound", "1w"),
 							},
@@ -3423,7 +3423,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -3434,7 +3434,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText(`promql/series({job="foo"})`),
 							},
@@ -3470,7 +3470,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -3481,7 +3481,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText(`promql/series(notfound{job=foo})`),
 							},
@@ -3539,7 +3539,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noSeriesText("prom", uri, "notfound", "1w"),
 							},
@@ -3551,7 +3551,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText(`promql/series(notfound{job="foo"})`),
 							},
@@ -3597,7 +3597,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricRRText("prom", uri, "foo:count", "1w"),
 							},
@@ -3608,7 +3608,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricRRText("prom", uri, "foo:sum", "1w"),
 							},
@@ -3667,7 +3667,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
 							},
@@ -3726,7 +3726,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
 							},
@@ -3794,7 +3794,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noSeriesText("prom", uri, "notfound", "1w"),
 							},
@@ -3886,7 +3886,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "bob", "1w"),
 							},
@@ -3897,7 +3897,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "bar", "1w"),
 							},
@@ -3908,7 +3908,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -3993,7 +3993,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText("promql/series(metric1)"),
 							},
@@ -4005,7 +4005,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText("promql/series(metric2)"),
 							},
@@ -4017,7 +4017,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText("promql/series(metric3)"),
 							},
@@ -4044,7 +4044,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedRuleSetText("promql/series(mymetric) ignore/label-value action"),
 							},
@@ -4056,7 +4056,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
 							},
@@ -4083,7 +4083,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
 							},
@@ -4116,7 +4116,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: unusedDisableText("promql/series(foo)"),
 							},
@@ -4145,7 +4145,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -4187,7 +4187,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -4229,7 +4229,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -4281,7 +4281,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -4336,7 +4336,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "notfound", "1w"),
 							},
@@ -4375,7 +4375,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
 							},
@@ -4401,7 +4401,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
 							},
@@ -4569,7 +4569,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "foo", "1w"),
 							},
@@ -4663,7 +4663,7 @@ func TestSeriesCheck(t *testing.T) {
 					{
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: noMetricText("prom", uri, "foo", "1w"),
 							},

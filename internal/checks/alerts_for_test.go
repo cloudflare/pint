@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -40,7 +40,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `not a valid duration string: "abc"`,
 							},
@@ -61,7 +61,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `not a valid duration string: "-5m"`,
 							},
@@ -81,7 +81,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Reporter: "alerts/for",
 						Summary:  "redundant field with default value",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`0h` is the default value of `for`, this line is unnecessary.",
 							},
@@ -102,7 +102,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `not a valid duration string: "abc"`,
 							},
@@ -123,7 +123,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: `not a valid duration string: "-5m"`,
 							},
@@ -143,7 +143,7 @@ func TestAlertsForCheck(t *testing.T) {
 						Reporter: "alerts/for",
 						Summary:  "redundant field with default value",
 						Severity: checks.Information,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "`0h` is the default value of `keep_firing_for`, this line is unnecessary.",
 							},

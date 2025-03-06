@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -66,7 +66,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 						Reporter: checks.LabelsConflictCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.LabelsConflictCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 							},
@@ -87,7 +87,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: textExternalLabelsRR("prom", uri, "foo", "bob"),
 							},
@@ -114,7 +114,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: textExternalLabelsRR("prom", uri, "foo", "bob"),
 							},
@@ -141,7 +141,7 @@ func TestLabelsConflictCheck(t *testing.T) {
 						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: textExternalLabelsAR("prom", uri, "foo", "bar"),
 							},

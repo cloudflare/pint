@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
@@ -85,7 +85,7 @@ func (c FragileCheck) checkSampling(expr parser.PromQLExpr) (problems []exprProb
 			summary:  "fragile query",
 			details:  FragileCheckSamplingDetails,
 			severity: Warning,
-			diags: []output.Diagnostic{
+			diags: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
 					Pos:         expr.Value.Pos,

@@ -3,16 +3,15 @@ package parser
 import (
 	"fmt"
 	"slices"
-	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/comments"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 )
 
-func nodeLines(node *yaml.Node, offset int) (lr LineRange) {
+func nodeLines(node *yaml.Node, offset int) (lr diags.LineRange) {
 	lr.First = node.Line + offset
 	lr.Last = node.Line + offset
 	if node.Value != "" && (node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle) {
@@ -47,8 +46,8 @@ func mergeComments(node *yaml.Node) (comments []string) {
 
 type YamlNode struct {
 	Value string
-	Pos   output.PositionRanges
-	Lines LineRange // FIXME remove
+	Pos   diags.PositionRanges
+	Lines diags.LineRange // FIXME remove ?
 }
 
 func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
@@ -67,7 +66,7 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlNode {
 	return &YamlNode{
 		Lines: nodeLines(node, offsetLine),
-		Pos:   output.NewPositionRange(contentLines, node, minColumn).AddOffset(offsetLine, offsetColumn),
+		Pos:   diags.NewPositionRange(contentLines, node, minColumn).AddOffset(offsetLine, offsetColumn),
 		Value: nodeValue(node),
 	}
 }
@@ -80,7 +79,7 @@ type YamlKeyValue struct {
 type YamlMap struct {
 	Key   *YamlNode
 	Items []*YamlKeyValue
-	Lines LineRange
+	Lines diags.LineRange
 }
 
 func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
@@ -118,7 +117,7 @@ func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLine
 	ym := YamlMap{
 		Key:   newYamlNode(key, offsetLine, offsetColumn, contentLines, 1),
 		Items: nil,
-		Lines: LineRange{
+		Lines: diags.LineRange{
 			First: key.Line + offsetLine,
 			Last:  key.Line + offsetLine,
 		},
@@ -238,32 +237,12 @@ func (pe ParseError) Error() string {
 	return fmt.Sprintf("error at line %d: %s", pe.Line, pe.Err)
 }
 
-type LineRange struct {
-	First int
-	Last  int
-}
-
-func (lr LineRange) String() string {
-	if lr.First == lr.Last {
-		return strconv.Itoa(lr.First)
-	}
-	return fmt.Sprintf("%d-%d", lr.First, lr.Last)
-}
-
-func (lr LineRange) Expand() []int {
-	lines := make([]int, 0, lr.Last-lr.First+1)
-	for i := lr.First; i <= lr.Last; i++ {
-		lines = append(lines, i)
-	}
-	return lines
-}
-
 type Rule struct {
 	AlertingRule  *AlertingRule
 	RecordingRule *RecordingRule
 	Comments      []comments.Comment
 	Error         ParseError
-	Lines         LineRange
+	Lines         diags.LineRange
 }
 
 func (r Rule) IsIdentical(b Rule) bool {

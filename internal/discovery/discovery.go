@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -92,7 +93,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		return nil, err
 	}
 
-	contentLines := parser.LineRange{
+	contentLines := diags.LineRange{
 		First: min(content.TotalLines, 1),
 		Last:  content.TotalLines,
 	}

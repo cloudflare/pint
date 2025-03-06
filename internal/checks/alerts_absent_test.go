@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -63,7 +63,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Summary:  "absent() based alert without for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
@@ -90,7 +90,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Summary:  "absent() based alert without for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
@@ -117,7 +117,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
@@ -147,7 +147,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
@@ -177,7 +177,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "Using `absent()` might cause false positive alerts when Prometheus restarts.",
 							},
@@ -219,7 +219,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
 							},
@@ -245,7 +245,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
 							},
@@ -273,7 +273,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
 							},
@@ -306,7 +306,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: checkErrorBadData("prom", s, "bad_response: 600 status code 600"),
 							},

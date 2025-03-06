@@ -3,8 +3,8 @@ package checks
 import (
 	"context"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 
@@ -67,7 +67,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
 				Severity: rewriteSeverity(Warning, n.LHS, n.RHS),
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
 						Pos:         expr.Value.Pos,
@@ -88,7 +88,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
 				Severity: Bug,
-				Diagnostics: []output.Diagnostic{
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
 						Pos:         expr.Value.Pos,
@@ -112,7 +112,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		Summary:  "always firing alert",
 		Details:  ComparisonCheckDetails,
 		Severity: Warning,
-		Diagnostics: []output.Diagnostic{
+		Diagnostics: []diags.Diagnostic{
 			{
 				Message:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
 				Pos:         expr.Value.Pos,

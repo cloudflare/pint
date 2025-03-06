@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/output"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -24,7 +24,7 @@ func TestRuleName(t *testing.T) {
 						Summary:  "name not allowed",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "recording rule name must match `^total:.+$`.",
 							},
@@ -56,7 +56,7 @@ func TestRuleName(t *testing.T) {
 						Summary:  "name not allowed",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
-						Diagnostics: []output.Diagnostic{
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: "alerting rule name must match `^total:.+$`.",
 							},
