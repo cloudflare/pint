@@ -14,8 +14,8 @@ Warning: label must be removed in aggregations (promql/aggregate)
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:5
 5 |   expr: sum(errors_total) without(keep,dropped)
-                              ^^^^^^ Query is using aggregation with `without(keep, dropped)`, all labels included inside `without(...)` will be removed from the results.
-                                     `keep` label is required and should be preserved when aggregating all rules.
+                              ^^^^^^^ Query is using aggregation with `without(keep, dropped)`, all labels included inside `without(...)` will be removed from the results.
+                                      `keep` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Warning=2
 -- rules/1.yaml --

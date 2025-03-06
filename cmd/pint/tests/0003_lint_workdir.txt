@@ -10,8 +10,8 @@ level=INFO msg="Checking Prometheus rules" entries=17 workers=10 online=true
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:2
 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
-                                                ^^^^^^^ Query is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results.
-                                                        `job` label is required and should be preserved when aggregating all rules.
+                                                ^^^^^^^^ Query is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results.
+                                                         `job` label is required and should be preserved when aggregating all rules.
 
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0001.yml:6
@@ -36,8 +36,8 @@ Warning: label must be removed in aggregations (promql/aggregate)
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:11
 11 |   expr: sum(foo) without(job)
-                      ^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-                             `job` label is required and should be preserved when aggregating all rules.
+                      ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                              `job` label is required and should be preserved when aggregating all rules.
 
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/0003.yaml:14
@@ -48,8 +48,8 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 23 |     sum(
 24 |       multiline
 25 |     ) without(job, instance)
-           ^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
-                  `job` label is required and should be preserved when aggregating all rules.
+           ^^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+                   `job` label is required and should be preserved when aggregating all rules.
 
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0003.yaml:29-31
@@ -61,8 +61,8 @@ Warning: label must be removed in aggregations (promql/aggregate)
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:29-31
 29 |     sum(sum) without(job)
-                  ^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-                         `job` label is required and should be preserved when aggregating all rules.
+                  ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                          `job` label is required and should be preserved when aggregating all rules.
 30 |     +
 31 |     sum(sum) without(job)
 
@@ -71,8 +71,8 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 35 |     sum(
 36 |       multiline2
 37 |     ) without(job, instance)
-           ^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
-                  `job` label is required and should be preserved when aggregating all rules.
+           ^^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+                   `job` label is required and should be preserved when aggregating all rules.
 
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0003.yaml:40
@@ -82,8 +82,8 @@ Warning: label must be removed in aggregations (promql/aggregate)
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:40
 40 |   expr: sum(byinstance) by(instance)
-                             ^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-                               `job` label is required and should be preserved when aggregating all rules.
+                             ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                                `job` label is required and should be preserved when aggregating all rules.
 
 Information: use humanize filters for the results (alerts/template)
   ---> rules/0003.yaml:58-61

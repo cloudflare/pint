@@ -1029,6 +1029,6 @@ func findPosition(expr string, within posrange.PositionRange, fn string) posrang
 	}
 	return posrange.PositionRange{
 		Start: within.Start + posrange.Pos(idx[0]),
-		End:   within.Start + posrange.Pos(idx[1]-2),
+		End:   within.Start + posrange.Pos(idx[1]-1),
 	}
 }

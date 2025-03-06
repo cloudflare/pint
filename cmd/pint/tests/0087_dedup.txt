@@ -9,7 +9,7 @@ Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13
  4 |   - alert: foo
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-               ^^ Query is using aggregation that removes all labels.
+               ^^^ Query is using aggregation that removes all labels.
  6 |     for: 5m
  7 |     labels:
  8 |         priority: "2"
@@ -24,7 +24,7 @@ Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13
  4 |   - alert: foo
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-               ^^ Query is using aggregation that removes all labels.
+               ^^^ Query is using aggregation that removes all labels.
  6 |     for: 5m
  7 |     labels:
  8 |         priority: "2"
@@ -39,7 +39,7 @@ Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13
  4 |   - alert: foo
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-               ^^ Query is using aggregation that removes all labels.
+               ^^^ Query is using aggregation that removes all labels.
  6 |     for: 5m
  7 |     labels:
  8 |         priority: "2"

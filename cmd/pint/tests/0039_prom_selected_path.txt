@@ -21,8 +21,8 @@ level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/fo
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yml:6
 6 |   expr: sum(bar)
-            ^^ Query is using aggregation that removes all labels.
-               `job` label is required and should be preserved when aggregating all rules.
+            ^^^ Query is using aggregation that removes all labels.
+                `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Warning=1
 level=DEBUG msg="Stopping query workers" name=disabled uri=http://127.0.0.1:123

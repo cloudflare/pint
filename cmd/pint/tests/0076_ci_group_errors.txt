@@ -278,7 +278,7 @@ Bug: template uses non-existent label (alerts/template)
   ---> rules.yml:25-30
 25 |   - alert: template
 26 |     expr: sum(no_such_metric) by(foo) > 0
-                                   ^ Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results.
+                                   ^^ Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results.
 27 |     labels:
 28 |       value: '{{ $value }}'
 29 |     annotations:
@@ -385,8 +385,8 @@ Warning: redundant regexp (promql/regexp)
 Bug: required label is being removed via aggregation (promql/aggregate)
   ---> rules.yml:36
 36 |     expr: sum(no_such_metric{job=~"fake"})
-               ^^ Query is using aggregation that removes all labels.
-                  `job` label is required and should be preserved when aggregating all rules.
+               ^^^ Query is using aggregation that removes all labels.
+                   `job` label is required and should be preserved when aggregating all rules.
 
 Bug: required annotation not set (alerts/annotation)
   ---> rules.yml:38-39

@@ -13,8 +13,8 @@ Fatal: PromQL syntax error (promql/syntax)
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:16
 16 |   expr: sum(errors_total) without(job)
-                               ^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-                                      `job` label is required and should be preserved when aggregating all rules.
+                               ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                       `job` label is required and should be preserved when aggregating all rules.
 
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:22
@@ -28,8 +28,8 @@ Warning: always firing alert (alerts/comparison)
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:33
 33 |   expr: sum(errors_total) without(job)
-                               ^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-                                      `job` label is required and should be preserved when aggregating all rules.
+                               ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                       `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Fatal=2 Warning=3
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
