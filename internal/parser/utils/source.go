@@ -467,7 +467,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					ExcludedLabel{
 						Reason: fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
 							strings.Join(n.Grouping, ", ")),
-						Fragment: findPosition(expr, n.PosRange, "without"),
+						Fragment: FindPosition(expr, n.PosRange, "without"),
 					},
 				)
 			}
@@ -480,7 +480,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					"",
 					ExcludedLabel{
 						Reason:   "Query is using aggregation that removes all labels.",
-						Fragment: findPosition(expr, n.PosRange, "sum"),
+						Fragment: FindPosition(expr, n.PosRange, "sum"),
 					},
 				)
 			} else {
@@ -493,7 +493,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 						ExcludedLabel{
 							Reason: fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
 								strings.Join(n.Grouping, ", ")),
-							Fragment: findPosition(expr, n.PosRange, "by"),
+							Fragment: FindPosition(expr, n.PosRange, "by"),
 						},
 					)
 				}
@@ -549,7 +549,7 @@ Since there are no matching time series there are also no labels. If some time s
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `+"`up`"+` metric instead.`,
 					n.Func.Name, n.Func.Name),
-				Fragment: findPosition(expr, n.PosRange, n.Func.Name),
+				Fragment: FindPosition(expr, n.PosRange, n.Func.Name),
 			},
 		)
 
@@ -632,7 +632,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: findPosition(expr, n.PositionRange(), n.Func.Name),
+				Fragment: FindPosition(expr, n.PositionRange(), n.Func.Name),
 			},
 		)
 
@@ -677,7 +677,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
-				Fragment: findPosition(expr, n.PosRange, n.Func.Name),
+				Fragment: FindPosition(expr, n.PosRange, n.Func.Name),
 			},
 		)
 
@@ -777,7 +777,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 							"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
-						Fragment: findPosition(expr, n.PositionRange(), "on"),
+						Fragment: FindPosition(expr, n.PositionRange(), "on"),
 					},
 				)
 			} else {
@@ -791,7 +791,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 								"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
 								n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 							),
-							Fragment: findPosition(expr, n.PositionRange(), "ignoring"),
+							Fragment: FindPosition(expr, n.PositionRange(), "ignoring"),
 						},
 					)
 				}
@@ -1021,7 +1021,7 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 }
 
 // FIXME sum() on ().
-func findPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
+func FindPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
 	re := regexp.MustCompile("(?i)(" + fn + ")[ \n\t]*\\(")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {

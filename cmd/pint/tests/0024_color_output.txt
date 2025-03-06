@@ -16,12 +16,12 @@ cmp stderr stderr.txt
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0001.yml[0m[96m:6[0m
 [97m[97m6 | [0m  expr: sum(irate(foo[3m])) WITHOUT (colo_id)
-[93m            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m                                ^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [0m
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0003.yaml[0m[96m:11[0m
 [97m[97m11 | [0m  expr: sum(foo) without(job)
-[93m             ^^^^^^^^^^^^^^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m                      ^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0003.yaml[0m[96m:11[0m
@@ -44,7 +44,7 @@ cmp stderr stderr.txt
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0003.yaml[0m[96m:29-31[0m
 [97m[97m29 | [0m    sum(sum) without(job)
-[93m         ^^^^^^^^^^^^^^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m                  ^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [97m30 | [0m    +
 [97m31 | [0m    sum(sum) without(job)
 [0m
@@ -67,7 +67,7 @@ cmp stderr stderr.txt
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0003.yaml[0m[96m:40[0m
 [97m[97m40 | [0m  expr: sum(byinstance) by(instance)
-[93m             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m                             ^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
 [0m[96m  ---> rules/0003.yaml[0m[96m:40[0m

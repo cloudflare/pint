@@ -116,6 +116,14 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 			})
 		}
 		if !c.keep && src.CanHaveLabel(c.label) {
+			posrange := src.Position
+			if src.Aggregation != nil && len(src.Aggregation.Grouping) != 0 {
+				if src.Aggregation.Without {
+					posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "without")
+				} else {
+					posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "by")
+				}
+			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
@@ -127,8 +135,8 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 						Message: fmt.Sprintf("`%s` label should be removed when aggregating %s rules.",
 							c.label, nameDesc),
 						Pos:         expr.Value.Pos,
-						FirstColumn: int(src.Position.Start) + 1,
-						LastColumn:  int(src.Position.End),
+						FirstColumn: int(posrange.Start) + 1,
+						LastColumn:  int(posrange.End),
 					},
 				},
 				Severity: c.severity,

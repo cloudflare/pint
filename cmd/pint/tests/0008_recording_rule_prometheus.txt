@@ -15,7 +15,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Bug: label must be removed in aggregations (promql/aggregate)
   ---> rules/0001.yml:5
 5 |       expr: sum by (instance) (http_inprogress_requests)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
+                    ^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
 level=INFO msg="Problems found" Bug=1 Warning=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

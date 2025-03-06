@@ -9,7 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/1.yaml:2
 2 |   expr: sum(errors_total) by(keep,dropped)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `dropped` label should be removed when aggregating all rules.
+                              ^^ `dropped` label should be removed when aggregating all rules.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:5

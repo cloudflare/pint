@@ -16,7 +16,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0001.yml:6
 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
+                                ^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules/0002.yaml:2
@@ -31,7 +31,7 @@ Warning: redundant regexp (promql/regexp)
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0003.yaml:11
 11 |   expr: sum(foo) without(job)
-             ^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
+                      ^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:11
@@ -54,7 +54,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0003.yaml:29-31
 29 |     sum(sum) without(job)
-         ^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
+                  ^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 30 |     +
 31 |     sum(sum) without(job)
 
@@ -77,7 +77,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0003.yaml:40
 40 |   expr: sum(byinstance) by(instance)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
+                             ^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:40
