@@ -53,15 +53,6 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		return nil, nil
 	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			err = ParseError{
-				Line: 1,
-				Err:  fmt.Errorf("unable to parse YAML file: %s", r),
-			}
-		}
-	}()
-
 	dec := yaml.NewDecoder(bytes.NewReader(content))
 	var index int
 	for {
