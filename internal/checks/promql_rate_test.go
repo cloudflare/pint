@@ -53,10 +53,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Details:  checks.RateCheckDetails,
@@ -128,10 +124,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Diagnostics: []output.Diagnostic{
@@ -164,10 +156,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Diagnostics: []output.Diagnostic{
@@ -346,10 +334,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Diagnostics: []output.Diagnostic{
@@ -382,10 +366,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -412,10 +392,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -442,10 +418,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -475,10 +447,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -518,10 +486,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Diagnostics: []output.Diagnostic{
@@ -532,10 +496,6 @@ func TestRateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -583,10 +543,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Diagnostics: []output.Diagnostic{
@@ -617,10 +573,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "duration too small",
 						Diagnostics: []output.Diagnostic{
@@ -631,10 +583,6 @@ func TestRateCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "counter based function called on a non-counter",
 						Diagnostics: []output.Diagnostic{
@@ -667,10 +615,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "counter based function called on a non-counter",
 						Diagnostics: []output.Diagnostic{
@@ -734,10 +678,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "counter based function called on a non-counter",
 						Diagnostics: []output.Diagnostic{
@@ -774,10 +714,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "chained rate call",
 						Diagnostics: []output.Diagnostic{
@@ -821,10 +757,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -976,10 +908,6 @@ func TestRateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  11,
-						},
 						Reporter: "promql/rate",
 						Summary:  "chained rate call",
 						Diagnostics: []output.Diagnostic{

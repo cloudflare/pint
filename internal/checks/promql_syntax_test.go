@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -38,10 +37,6 @@ func TestSyntaxCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/syntax",
 						Summary:  "PromQL syntax error",
 						Details:  checks.SyntaxCheckDetails,
@@ -64,10 +59,6 @@ func TestSyntaxCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/syntax",
 						Summary:  "PromQL syntax error",
 						Details:  checks.SyntaxCheckDetails,

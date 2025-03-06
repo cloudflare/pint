@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -21,10 +20,6 @@ func TestReportCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: "rule/report",
 						Summary:  "problem reported by config rule",
 						Severity: checks.Warning,
@@ -47,10 +42,6 @@ func TestReportCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: "rule/report",
 						Summary:  "problem reported by config rule",
 						Severity: checks.Information,

@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -60,10 +59,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "absent() based alert without for",
 						Details:  checks.AlertsAbsentCheckDetails,
@@ -91,10 +86,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "absent() based alert without for",
 						Details:  checks.AlertsAbsentCheckDetails,
@@ -122,10 +113,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
@@ -156,10 +143,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
@@ -190,10 +173,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "absent() based alert with insufficient for",
 						Details:  checks.AlertsAbsentCheckDetails,
@@ -237,10 +216,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -267,10 +242,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -299,10 +270,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -336,10 +303,6 @@ func TestAlertsAbsentCheck(t *testing.T) {
 			problems: func(s string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AlertsAbsentCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,

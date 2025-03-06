@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -66,10 +65,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -91,10 +86,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -116,10 +107,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -141,10 +128,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
@@ -166,10 +149,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp anchors",
 						Details:  checks.RegexpCheckDetails,
@@ -191,10 +170,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -216,10 +191,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -231,10 +202,6 @@ func TestRegexpCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "redundant regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -263,10 +230,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -288,10 +251,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -303,10 +262,6 @@ func TestRegexpCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -331,10 +286,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -346,10 +297,6 @@ func TestRegexpCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -374,10 +321,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -389,10 +332,6 @@ func TestRegexpCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -421,10 +360,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -446,10 +381,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "unnecessary negative wildcard regexp",
 						Details:  checks.RegexpCheckDetails,
@@ -499,10 +430,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "smelly regexp selector",
 						Details:  checks.RegexpCheckDetails,
@@ -542,10 +469,6 @@ func TestRegexpCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.RegexpCheckName,
 						Summary:  "smelly regexp selector",
 						Details:  checks.RegexpCheckDetails,

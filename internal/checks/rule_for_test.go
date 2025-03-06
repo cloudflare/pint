@@ -7,7 +7,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -76,10 +75,6 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "rule/for",
 						Summary:  "duration required",
 						Severity: checks.Warning,
@@ -102,10 +97,6 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "rule/for",
 						Summary:  "duration too long",
 						Details:  "Rule comment: some text",
@@ -147,10 +138,6 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "rule/for",
 						Summary:  "duration required",
 						Severity: checks.Warning,

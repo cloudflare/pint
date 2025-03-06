@@ -9,7 +9,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -61,10 +60,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -268,10 +263,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -334,10 +325,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -589,10 +576,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -653,10 +636,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -717,10 +696,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -914,10 +889,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -1051,10 +1022,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{
@@ -1187,10 +1154,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -1214,10 +1177,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -1241,10 +1200,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -1284,10 +1239,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -1339,10 +1290,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
 						Summary:  "impossible binary operation",
 						Diagnostics: []output.Diagnostic{

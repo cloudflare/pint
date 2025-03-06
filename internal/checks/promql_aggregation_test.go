@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -68,10 +67,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -97,10 +92,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Details:  "Rule comment: some text",
@@ -128,10 +119,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
@@ -173,10 +160,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -212,10 +195,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
@@ -238,10 +217,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -276,10 +251,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -314,10 +285,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -352,10 +319,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -419,10 +382,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -448,10 +407,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Bug,
@@ -478,10 +433,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
@@ -514,10 +465,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -553,10 +500,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -592,10 +535,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -631,10 +570,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -679,10 +614,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -708,10 +639,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -738,10 +665,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -769,10 +692,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,
@@ -795,10 +714,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -824,10 +739,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "required label is being removed via aggregation",
 						Severity: checks.Warning,
@@ -853,10 +764,6 @@ func TestAggregationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.AggregationCheckName,
 						Summary:  "label must be removed in aggregations",
 						Severity: checks.Warning,

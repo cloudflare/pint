@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -85,10 +84,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "key not allowed",
 						Severity: checks.Bug,
@@ -111,10 +106,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Warning,
@@ -137,10 +128,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "key not allowed",
 						Severity: checks.Bug,
@@ -163,10 +150,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Bug,
@@ -208,10 +191,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "key not allowed",
 						Severity: checks.Information,
@@ -234,10 +213,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Bug,
@@ -269,10 +244,6 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
 						Summary:  "value not allowed",
 						Severity: checks.Bug,

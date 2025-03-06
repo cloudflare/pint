@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -30,10 +29,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -55,10 +50,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -87,10 +78,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -112,10 +99,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -144,10 +127,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -168,10 +147,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -182,10 +157,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -206,10 +177,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -230,10 +197,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -254,10 +217,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -278,10 +237,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -302,10 +257,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -326,10 +277,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "value used in labels",
 						Severity: checks.Bug,
@@ -350,10 +297,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -377,10 +320,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -404,10 +343,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -431,10 +366,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -458,10 +389,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -485,10 +412,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -512,10 +435,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -545,10 +464,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -608,10 +523,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -625,10 +536,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  7,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -642,10 +549,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  7,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -659,10 +562,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 8,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -691,10 +590,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -708,10 +603,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -740,10 +631,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -757,10 +644,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -789,10 +672,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -821,10 +700,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -865,10 +740,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -882,10 +753,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -926,10 +793,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -943,10 +806,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -987,10 +846,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
@@ -1019,10 +874,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
@@ -1051,10 +902,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
@@ -1083,10 +930,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
@@ -1223,10 +1066,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
@@ -1270,10 +1109,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -1303,10 +1138,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -1333,10 +1164,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Severity: checks.Fatal,
@@ -1348,10 +1175,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
@@ -1383,10 +1206,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
@@ -1432,10 +1251,6 @@ func TestTemplateCheck(t *testing.T) {
 								{
 												    {{ with printf "sum({job='%s'})" .Labels.job | query }}
 			    {{ . | first | label "instance" }}`,
-									Lines: parser.LineRange{
-						First: 5,
-						Last:  8,
-					},
 									Reporter: checks.TemplateCheckName,
 									Text:     `"summary" annotation template sends a query that is using "instance" label but that query removes it`,
 									Severity: checks.Bug,
@@ -1494,10 +1309,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1521,10 +1332,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1548,10 +1355,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1565,10 +1368,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1598,10 +1397,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1615,10 +1410,6 @@ func TestTemplateCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1687,10 +1478,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 19,
-							Last:  19,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1731,10 +1518,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
@@ -1765,10 +1548,6 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  7,
-						},
 						Reporter: checks.TemplateCheckName,
 						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,

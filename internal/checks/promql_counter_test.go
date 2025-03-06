@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -37,10 +36,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/counter",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -67,10 +62,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/counter",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -201,10 +192,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "promql/counter",
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
@@ -234,10 +221,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/counter",
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
@@ -269,10 +252,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "promql/counter",
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
@@ -302,10 +281,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/counter",
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
@@ -335,10 +310,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/counter",
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,
@@ -368,10 +339,6 @@ func TestCounterCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/counter",
 						Summary:  "direct counter read",
 						Details:  checks.CounterCheckDetails,

@@ -9,7 +9,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -95,10 +94,6 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Details:  "Rule comment: some text",
@@ -145,10 +140,6 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Details:  "Rule comment: some text",
@@ -179,10 +170,6 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Severity: checks.Warning,
@@ -193,10 +180,6 @@ func TestRuleLinkCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: "rule/link",
 						Summary:  "link check failed",
 						Severity: checks.Warning,

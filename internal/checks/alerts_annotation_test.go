@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -30,10 +29,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Warning,
@@ -56,10 +51,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Warning,
@@ -89,10 +80,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  7,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Bug,
@@ -124,10 +111,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "required annotation not set",
 						Severity: checks.Warning,
@@ -159,10 +142,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
@@ -185,10 +164,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
@@ -238,10 +213,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Bug,
@@ -282,10 +253,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
@@ -308,10 +275,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
@@ -334,10 +297,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Details:  "Rule comment: rule comment",
@@ -369,10 +328,6 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
 						Summary:  "invalid annotation value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).\nRule comment: rule comment",

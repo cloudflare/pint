@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -21,10 +20,6 @@ func TestRuleName(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  1,
-						},
 						Reporter: checks.RuleNameCheckName,
 						Summary:  "name not allowed",
 						Details:  "Rule comment: some text",
@@ -57,10 +52,6 @@ func TestRuleName(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  1,
-						},
 						Reporter: checks.RuleNameCheckName,
 						Summary:  "name not allowed",
 						Details:  "Rule comment: some text",

@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -37,10 +36,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -62,10 +57,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -87,10 +78,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
 						Summary:  "redundant field with default value",
 						Severity: checks.Information,
@@ -111,10 +98,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -136,10 +119,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
 						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
@@ -161,10 +140,6 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
 						Summary:  "redundant field with default value",
 						Severity: checks.Information,

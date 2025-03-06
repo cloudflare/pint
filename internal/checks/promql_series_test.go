@@ -12,7 +12,6 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -89,10 +88,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -121,10 +116,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -145,10 +136,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -179,10 +166,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -213,10 +196,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -248,10 +227,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -283,10 +258,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -424,10 +395,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -454,10 +421,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -500,10 +463,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -536,10 +495,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -585,10 +540,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -642,10 +593,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unknown alert referenced",
 						Diagnostics: []output.Diagnostic{
@@ -669,10 +616,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -717,10 +660,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -761,10 +700,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -796,10 +731,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -859,10 +790,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -913,10 +840,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -978,10 +901,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1112,10 +1031,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1246,10 +1161,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1451,10 +1362,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1551,10 +1458,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1844,10 +1747,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1938,10 +1837,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -1954,10 +1849,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -2048,10 +1939,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -2064,10 +1951,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2164,10 +2047,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2241,10 +2120,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2318,10 +2193,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -2379,10 +2250,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2644,10 +2511,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2752,10 +2615,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2768,10 +2627,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -2831,10 +2686,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -2916,10 +2767,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -2932,10 +2779,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3079,10 +2922,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3190,10 +3029,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3320,10 +3155,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3383,10 +3214,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3435,10 +3262,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3598,10 +3421,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3613,10 +3432,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -3653,10 +3468,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3668,10 +3479,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -3730,10 +3537,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3746,10 +3549,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -3796,10 +3595,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3811,10 +3606,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Information,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3874,10 +3665,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -3937,10 +3724,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4009,10 +3792,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4105,10 +3884,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  12,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4120,10 +3895,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  12,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4135,10 +3906,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  12,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4224,10 +3991,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  10,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4240,10 +4003,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  10,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4256,10 +4015,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  10,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4287,10 +4042,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4303,10 +4054,6 @@ func TestSeriesCheck(t *testing.T) {
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4334,10 +4081,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4371,10 +4114,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "invalid comment",
 						Diagnostics: []output.Diagnostic{
@@ -4404,10 +4143,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4450,10 +4185,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4496,10 +4227,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4552,10 +4279,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4611,10 +4334,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4654,10 +4373,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -4684,10 +4399,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "unable to run checks",
 						Diagnostics: []output.Diagnostic{
@@ -4856,10 +4567,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{
@@ -4954,10 +4661,6 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
 						Summary:  "query on nonexistent series",
 						Diagnostics: []output.Diagnostic{

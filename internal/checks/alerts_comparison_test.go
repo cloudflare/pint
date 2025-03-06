@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -58,10 +57,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
 						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
@@ -100,10 +95,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.ComparisonCheckName,
 						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
@@ -132,10 +123,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
 						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
@@ -199,10 +186,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
 						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
@@ -224,10 +207,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
 						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
@@ -249,10 +228,6 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
 						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,

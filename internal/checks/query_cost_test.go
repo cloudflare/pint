@@ -9,7 +9,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -80,10 +79,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -115,10 +110,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -152,10 +143,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -178,10 +165,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query cost estimate",
 						Severity: checks.Information,
@@ -224,10 +207,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query cost estimate",
 						Severity: checks.Information,
@@ -280,10 +259,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query cost estimate",
 						Severity: checks.Information,
@@ -336,10 +311,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query is too expensive",
 						Severity: checks.Bug,
@@ -392,10 +363,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query is too expensive",
 						Severity: checks.Bug,
@@ -443,10 +410,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query is too expensive",
 						Details:  "Rule comment: rule comment",
@@ -499,10 +462,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "query/cost",
 						Summary:  "query cost estimate",
 						Severity: checks.Information,
@@ -591,10 +550,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query is too expensive",
 						Severity: checks.Bug,
@@ -648,10 +603,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query is too expensive",
 						Details:  "Rule comment: some text",
@@ -706,10 +657,6 @@ func TestCostCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "query/cost",
 						Summary:  "query is too expensive",
 						Details:  "Rule comment: some text",

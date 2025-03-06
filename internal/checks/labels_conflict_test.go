@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -64,10 +63,6 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -88,10 +83,6 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
 						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
@@ -119,10 +110,6 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
 						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
@@ -150,10 +137,6 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
 						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),

@@ -10,7 +10,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -59,10 +58,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "alerts/count",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -94,10 +89,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "alerts/count",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -118,10 +109,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
@@ -152,10 +139,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
@@ -245,10 +228,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
@@ -327,10 +306,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", "rule comment"),
@@ -409,10 +384,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
@@ -556,10 +527,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `{__name__="up", job="foo"} == 0`, "1d", ""),
@@ -621,10 +588,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `{__name__=~"(up|foo)", job="foo"} == 0`, "1d", ""),
@@ -683,10 +646,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
@@ -745,10 +704,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
@@ -825,10 +780,6 @@ func TestAlertsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "alerts/count",
 						Summary:  "alert count estimate",
 						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),

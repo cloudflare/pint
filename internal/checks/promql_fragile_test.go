@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -42,10 +41,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
@@ -67,10 +62,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
@@ -92,10 +83,6 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
@@ -107,10 +94,6 @@ func TestFragileCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
 						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,

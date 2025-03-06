@@ -10,7 +10,6 @@ import (
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -137,10 +136,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.RuleDuplicateCheckName,
 						Summary:  "duplicated recording rule",
 						Severity: checks.Bug,
@@ -194,10 +189,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.RuleDuplicateCheckName,
 						Summary:  "duplicated recording rule",
 						Severity: checks.Bug,

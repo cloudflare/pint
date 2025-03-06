@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -60,10 +59,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  10,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -92,10 +87,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  10,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -129,10 +120,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 9,
-							Last:  9,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
@@ -144,10 +131,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 10,
-							Last:  10,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
@@ -159,10 +142,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
 						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),

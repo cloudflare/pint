@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -42,10 +41,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "unable to run checks",
 						Severity: checks.Bug,
@@ -72,10 +67,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "unable to run checks",
 						Severity: checks.Warning,
@@ -86,10 +77,6 @@ func TestRangeQueryCheck(t *testing.T) {
 						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
@@ -144,10 +131,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
@@ -189,10 +172,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
@@ -221,10 +200,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Severity: checks.Warning,
@@ -279,10 +254,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/range_query",
 						Summary:  "query beyond configured retention",
 						Details:  "Rule comment: some text",
