@@ -70,14 +70,16 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
-				First: ignoreErr.Line,
-				Last:  ignoreErr.Line,
+				First: ignoreErr.Diagnostic.Pos.Lines().First,
+				Last:  ignoreErr.Diagnostic.Pos.Lines().Last,
 			},
-			Reporter:    ignoreFileReporter,
-			Summary:     ignoreErr.Error(),
-			Details:     "",
-			Severity:    Information,
-			Diagnostics: nil, // FIXME needs Pos & columns
+			Reporter: ignoreFileReporter,
+			Summary:  ignoreErr.Error(),
+			Details:  "checks disabled",
+			Severity: Information,
+			Diagnostics: []diags.Diagnostic{
+				ignoreErr.Diagnostic,
+			},
 		}
 
 	case errors.As(err, &commentErr):
@@ -85,14 +87,16 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
-				First: commentErr.Line,
-				Last:  commentErr.Line,
+				First: commentErr.Diagnostic.Pos.Lines().First,
+				Last:  commentErr.Diagnostic.Pos.Lines().Last,
 			},
-			Reporter:    pintCommentReporter,
-			Summary:     "This comment is not a valid pint control comment: " + commentErr.Error(),
-			Details:     "",
-			Severity:    Warning,
-			Diagnostics: nil, // FIXME needs Pos & columns
+			Reporter: pintCommentReporter,
+			Summary:  "invalid comment",
+			Details:  "",
+			Severity: Warning,
+			Diagnostics: []diags.Diagnostic{
+				commentErr.Diagnostic,
+			},
 		}
 
 	case errors.As(err, &ownerErr):
@@ -100,14 +104,16 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 		return Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
-				First: ownerErr.Line,
-				Last:  ownerErr.Line,
+				First: ownerErr.Diagnostic.Pos.Lines().First,
+				Last:  ownerErr.Diagnostic.Pos.Lines().Last,
 			},
-			Reporter:    discovery.RuleOwnerComment,
-			Summary:     fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", ownerErr.Name, ownerErr.Name),
-			Details:     "",
-			Severity:    Bug,
-			Diagnostics: nil, // FIXME needs Pos & columns
+			Reporter: discovery.RuleOwnerComment,
+			Summary:  "invalid owner",
+			Details:  "",
+			Severity: Bug,
+			Diagnostics: []diags.Diagnostic{
+				ownerErr.Diagnostic,
+			},
 		}
 
 	case errors.As(err, &parseErr):

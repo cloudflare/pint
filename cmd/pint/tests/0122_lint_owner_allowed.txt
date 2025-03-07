@@ -30,9 +30,10 @@ Bug: missing owner (rule/owner)
 5 |     expr: up > 0
               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
-Bug: This file is set as owned by `ax` but `ax` doesn't match any of the allowed owner values. (rule/owner)
+Bug: invalid owner (rule/owner)
   ---> rules/3.yml:1
- 1 | # pint file/owner ax
+1 | # pint file/owner ax
+    ^^ This file is set as owned by `ax` but `ax` doesn't match any of the allowed owner values.
 
 level=INFO msg="Problems found" Bug=5
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

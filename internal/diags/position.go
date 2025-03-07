@@ -154,6 +154,14 @@ END:
 	return offsets
 }
 
+func NewPositionForLine(lines []string, line int) (out PositionRanges) {
+	return append(out, PositionRange{
+		Line:        line,
+		FirstColumn: 1,
+		LastColumn:  len(lines[line-1]),
+	})
+}
+
 func countLeadingSpace(line string) (i int) {
 	for _, r := range line {
 		if r != ' ' {

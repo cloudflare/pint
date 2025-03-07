@@ -1,12 +1,12 @@
 package comments_test
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 	"time"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 
 	"github.com/stretchr/testify/require"
 )
@@ -53,10 +53,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`unexpected comment suffix: "this file"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "this file"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  30,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  30,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -71,10 +83,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`unexpected comment suffix: "this line"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "this line"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  28,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  28,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -89,10 +113,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`unexpected comment suffix: "here"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "here"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  24,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  24,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -107,10 +143,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`unexpected comment suffix: "here"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "here"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  22,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  22,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -125,10 +173,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`unexpected comment suffix: "here"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "here"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  30,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  30,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -143,10 +203,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing file/owner value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing file/owner value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  19,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  19,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -167,10 +239,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing rule/owner value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing rule/owner value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  19,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  19,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -190,10 +274,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing file/disable value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing file/disable value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  21,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  21,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -211,10 +307,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing disable value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing disable value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  16,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  16,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -241,10 +349,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing file/snooze value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing file/snooze value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  20,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  20,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -253,10 +373,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  31,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  31,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -265,10 +397,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "abc"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "abc"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  24,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  24,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -278,8 +422,18 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  fmt.Errorf("invalid snooze timestamp: %w", errUntil("2023-1231")),
+						Diagnostic: diags.Diagnostic{
+							Message: fmt.Sprintf("This comment is not a valid pint control comment: invalid snooze timestamp: %s", errUntil("2023-1231")),
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  86,
+								},
+							},
+							FirstColumn: 1,
+							LastColumn:  86,
+						},
 					}},
 				},
 			},
@@ -301,10 +455,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing snooze value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing snooze value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  15,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  15,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -313,10 +479,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "2023-12-31"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  26,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  26,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -325,10 +503,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`invalid snooze comment, expected '$TIME $MATCH' got "abc"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: invalid snooze comment, expected '$TIME $MATCH' got "abc"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  19,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  19,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -338,8 +528,18 @@ func TestParse(t *testing.T) {
 				{
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  fmt.Errorf("invalid snooze timestamp: %w", errUntil("2023-1231")),
+						Diagnostic: diags.Diagnostic{
+							Message: fmt.Sprintf("This comment is not a valid pint control comment: invalid snooze timestamp: %s", errUntil("2023-1231")),
+							Pos: diags.PositionRanges{
+								{
+									Line:        1,
+									FirstColumn: 1,
+									LastColumn:  81,
+								},
+							},
+							FirstColumn: 1,
+							LastColumn:  81,
+						},
 					}},
 				},
 			},
@@ -373,10 +573,22 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New("missing rule/set value"),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: missing rule/set value`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 1,
+										LastColumn:  17,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  17,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -458,10 +670,23 @@ func TestParse(t *testing.T) {
 			output: []comments.Comment{
 				{
 					Type: comments.InvalidComment,
-					Value: comments.Invalid{Err: comments.CommentError{
-						Line: 1,
-						Err:  errors.New(`unexpected comment suffix: "# pint ignore/file"`),
-					}},
+					Value: comments.Invalid{
+						Err: comments.CommentError{
+							Diagnostic: diags.Diagnostic{
+								Message: `This comment is not a valid pint control comment: unexpected comment suffix: "# pint ignore/file"`,
+								Pos: diags.PositionRanges{
+									{
+										Line:        1,
+										FirstColumn: 15,
+										LastColumn:  51,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  51,
+							},
+						},
+					},
+					Offset: 14,
 				},
 			},
 		},
@@ -499,15 +724,35 @@ func TestCommentValueString(t *testing.T) {
 	testCases := []testCaseT{
 		{
 			comment: comments.Invalid{Err: comments.CommentError{
-				Line: 1,
-				Err:  errors.New("foo bar"),
+				Diagnostic: diags.Diagnostic{
+					Message: "foo bar",
+					Pos: diags.PositionRanges{
+						{
+							Line:        1,
+							FirstColumn: 1,
+							LastColumn:  100,
+						},
+					},
+					FirstColumn: 1,
+					LastColumn:  100,
+				},
 			}},
 			expected: "foo bar",
 		},
 		{
 			comment: comments.Invalid{Err: comments.CommentError{
-				Line: 1,
-				Err:  comments.OwnerError{Name: "foo bar"},
+				Diagnostic: diags.Diagnostic{
+					Message: "foo bar",
+					Pos: diags.PositionRanges{
+						{
+							Line:        1,
+							FirstColumn: 1,
+							LastColumn:  100,
+						},
+					},
+					FirstColumn: 1,
+					LastColumn:  100,
+				},
 			}},
 			expected: "foo bar",
 		},

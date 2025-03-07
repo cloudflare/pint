@@ -5,13 +5,15 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
-Warning: This comment is not a valid pint control comment: unexpected comment suffix: "this line" (pint/comment)
+Warning: invalid comment (pint/comment)
   ---> rules/1.yml:4
- 4 |   # pint ignore/line this line
+4 |   # pint ignore/line this line
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This comment is not a valid pint control comment: unexpected comment suffix: "this line"
 
 Information: This file was excluded from pint checks. (ignore/file)
   ---> rules/2.yml:4
- 4 |   # pint ignore/file
+4 |   # pint ignore/file
+        ^^^^^^^^^^^^^^^^ This file was excluded from pint checks.
 
 level=INFO msg="Problems found" Warning=1 Information=1
 -- rules/1.yml --
