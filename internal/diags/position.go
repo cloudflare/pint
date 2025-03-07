@@ -7,11 +7,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type position struct {
-	Line   int // 1-indexed
-	Column int // 1-indexed
-}
-
 type LineRange struct {
 	First int
 	Last  int
@@ -72,8 +67,31 @@ func (prs PositionRanges) AddOffset(line, column int) PositionRanges {
 	return dst
 }
 
+func appendPosition(src PositionRanges, line, column int) PositionRanges {
+	size := len(src)
+
+	if size == 0 {
+		return append(src, PositionRange{
+			Line:        line,
+			FirstColumn: column,
+			LastColumn:  column,
+		})
+	}
+
+	if src[size-1].Line == line && src[size-1].LastColumn+1 == column {
+		src[size-1].LastColumn = column
+		return src
+	}
+
+	return append(src, PositionRange{
+		Line:        line,
+		FirstColumn: column,
+		LastColumn:  column,
+	})
+}
+
 func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRanges {
-	offsets := make([]position, 0, len(val.Value))
+	offsets := make(PositionRanges, 0, len(val.Value)/4)
 
 	if len(val.Value) == 0 {
 		return PositionRanges{
@@ -93,10 +111,7 @@ func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRan
 
 		// Append new line but only if we already have any tokens.
 		if len(offsets) > 0 {
-			offsets = append(offsets, position{
-				Line:   lineIndex - 1,
-				Column: len(lines[lineIndex-2]) + 1,
-			})
+			offsets = appendPosition(offsets, lineIndex-1, len(lines[lineIndex-2])+1)
 		}
 
 		if len(lines[lineIndex-1]) == 0 {
@@ -113,11 +128,7 @@ func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRan
 
 		for gotIndex, got := range []byte(lines[lineIndex-1][columnIndex-1:]) {
 			if need == got {
-				offsets = append(offsets, position{
-					Line:   lineIndex,
-					Column: columnIndex + gotIndex,
-				})
-
+				offsets = appendPosition(offsets, lineIndex, columnIndex+gotIndex)
 				needIndex++
 				if needIndex >= len(val.Value) {
 					goto END
@@ -140,7 +151,7 @@ func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRan
 	}
 
 END:
-	return mergePositions(offsets)
+	return offsets
 }
 
 func countLeadingSpace(line string) (i int) {
@@ -153,45 +164,18 @@ func countLeadingSpace(line string) (i int) {
 	return i
 }
 
-func mergePositions(input []position) (prs PositionRanges) {
-	var last PositionRange
-	for _, p := range input {
-		if last.Line == 0 {
-			last.Line = p.Line
-			last.FirstColumn = p.Column
-			last.LastColumn = p.Column
-		}
-		if p.Line != last.Line {
-			prs = append(prs, last)
-			last.Line = p.Line
-			last.FirstColumn = p.Column
-			last.LastColumn = p.Column
-			continue
-		}
-		if last.LastColumn+1 == p.Column {
-			last.LastColumn = p.Column
-		}
-	}
-	prs = append(prs, last)
-	return prs
-}
+func readRange(firstColumn, lastColumn int, prs PositionRanges) PositionRanges {
+	out := make(PositionRanges, 0, len(prs))
 
-func readRange(firstColumn, lastColumn int, in PositionRanges) PositionRanges {
-	translated := rangesToOffsets(in)
-	if firstColumn >= len(translated) {
-		return nil
-	}
-	return mergePositions(translated[firstColumn-1 : min(lastColumn, len(translated))])
-}
-
-func rangesToOffsets(prs PositionRanges) (offsets []position) {
+	var index int
 	for _, pr := range prs {
 		for j := pr.FirstColumn; j <= pr.LastColumn; j++ {
-			offsets = append(offsets, position{
-				Line:   pr.Line,
-				Column: j,
-			})
+			index++
+			if index >= firstColumn && index <= lastColumn {
+				out = appendPosition(out, pr.Line, j)
+			}
 		}
 	}
-	return offsets
+
+	return out
 }
