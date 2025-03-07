@@ -54,6 +54,8 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		return nil, nil
 	}
 
+	contentLines := strings.Split(string(content), "\n")
+
 	dec := yaml.NewDecoder(bytes.NewReader(content))
 	var index int
 	for {
@@ -67,13 +69,13 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 		}
 		index++
 		if p.isStrict {
-			r, err := parseGroups(content, &doc, p.schema)
+			r, err := parseGroups(contentLines, &doc, p.schema)
 			if err.Err != nil {
 				return rules, err
 			}
 			rules = append(rules, r...)
 		} else {
-			rules = append(rules, parseNode(content, &doc, 0, 0, p.schema)...)
+			rules = append(rules, parseNode(content, contentLines, &doc, 0, 0, p.schema)...)
 		}
 		if index > 1 && p.isStrict {
 			rules = append(rules, Rule{
@@ -91,8 +93,8 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 	return rules, err
 }
 
-func parseNode(content []byte, node *yaml.Node, offsetLine, offsetColumn int, schema Schema) (rules []Rule) {
-	ret, isEmpty := parseRule(content, node, offsetLine, offsetColumn)
+func parseNode(content []byte, contentLines []string, node *yaml.Node, offsetLine, offsetColumn int, schema Schema) (rules []Rule) {
+	ret, isEmpty := parseRule(contentLines, node, offsetLine, offsetColumn)
 	if !isEmpty {
 		rules = append(rules, ret)
 		return rules
@@ -104,15 +106,15 @@ func parseNode(content []byte, node *yaml.Node, offsetLine, offsetColumn int, sc
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
-				rules = append(rules, parseNode(content, n, offsetLine, offsetColumn, schema)...)
+				rules = append(rules, parseNode(content, contentLines, n, offsetLine, offsetColumn, schema)...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty = parseRule(content, root, offsetLine, offsetColumn)
+			rule, isEmpty = parseRule(contentLines, root, offsetLine, offsetColumn)
 			if !isEmpty {
 				rules = append(rules, rule)
 			} else {
 				for _, n := range root.Content {
-					rules = append(rules, parseNode(content, n, offsetLine, offsetColumn, schema)...)
+					rules = append(rules, parseNode(content, contentLines, n, offsetLine, offsetColumn, schema)...)
 				}
 			}
 		case yaml.ScalarNode:
@@ -126,11 +128,11 @@ func parseNode(content []byte, node *yaml.Node, offsetLine, offsetColumn int, sc
 				//     rules: ...
 				// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
 				// Right now we read the line where it's in the file and count leading spaces.
-				contentLines := strings.Split(string(content), "\n")
 				if err := yaml.Unmarshal(c, &n); err == nil {
 					rules = append(rules,
 						parseNode(
 							c,
+							strings.Split(root.Value, "\n"),
 							&n,
 							offsetLine+root.Line,
 							offsetColumn+countLeadingSpace(contentLines[root.Line]),
@@ -143,7 +145,7 @@ func parseNode(content []byte, node *yaml.Node, offsetLine, offsetColumn int, sc
 	return rules
 }
 
-func parseRule(content []byte, node *yaml.Node, offsetLine, offsetColumn int) (rule Rule, _ bool) {
+func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn int) (rule Rule, _ bool) {
 	if node.Kind != yaml.MappingNode {
 		return rule, true
 	}
@@ -174,8 +176,6 @@ func parseRule(content []byte, node *yaml.Node, offsetLine, offsetColumn int) (r
 	var lines diags.LineRange
 
 	var ruleComments []comments.Comment
-
-	contentLines := strings.Split(string(content), "\n")
 
 	for i, part := range unpackNodes(node) {
 		if lines.First == 0 || part.Line+offsetLine < lines.First {

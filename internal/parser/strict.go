@@ -40,7 +40,7 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(content []byte, doc *yaml.Node, schema Schema) (rules []Rule, err ParseError) {
+func parseGroups(contentLines []string, doc *yaml.Node, schema Schema) (rules []Rule, err ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
@@ -71,7 +71,7 @@ func parseGroups(content []byte, doc *yaml.Node, schema Schema) (rules []Rule, e
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
-				name, r, err := parseGroup(content, group, schema)
+				name, r, err := parseGroup(contentLines, group, schema)
 				if err.Err != nil {
 					return rules, err
 				}
@@ -89,7 +89,7 @@ func parseGroups(content []byte, doc *yaml.Node, schema Schema) (rules []Rule, e
 	return rules, ParseError{}
 }
 
-func parseGroup(content []byte, group *yaml.Node, schema Schema) (name string, rules []Rule, err ParseError) {
+func parseGroup(contentLines []string, group *yaml.Node, schema Schema) (name string, rules []Rule, err ParseError) {
 	if !isTag(group.ShortTag(), mapTag) {
 		return "", nil, ParseError{
 			Line: group.Line,
@@ -143,7 +143,7 @@ func parseGroup(content []byte, group *yaml.Node, schema Schema) (name string, r
 				}
 			}
 			for _, rule := range unpackNodes(entry.val) {
-				r, err := parseRuleStrict(content, rule)
+				r, err := parseRuleStrict(contentLines, rule)
 				if err.Err != nil {
 					return "", nil, err
 				}
@@ -199,7 +199,7 @@ func parseGroup(content []byte, group *yaml.Node, schema Schema) (name string, r
 	return name, rules, ParseError{}
 }
 
-func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
+func parseRuleStrict(contentLines []string, rule *yaml.Node) (Rule, ParseError) {
 	if !isTag(rule.ShortTag(), mapTag) {
 		return Rule{}, ParseError{
 			Line: rule.Line,
@@ -227,6 +227,6 @@ func parseRuleStrict(content []byte, rule *yaml.Node) (Rule, ParseError) {
 		}
 	}
 
-	r, _ := parseRule(content, rule, 0, 0)
+	r, _ := parseRule(contentLines, rule, 0, 0)
 	return r, ParseError{}
 }
