@@ -8,27 +8,27 @@ level=INFO msg="Checking Prometheus rules" entries=6 workers=10 online=true
 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
   ---> rules.yml:4
  4 |       - record:
-
+^^^ This rule is not a valid Prometheus rule: `record value cannot be empty`.
 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
   ---> rules.yml:6
  6 |       - record:
-
+^^^ This rule is not a valid Prometheus rule: `record value cannot be empty`.
 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
   ---> rules.yml:9
  9 |         expr:
-
+^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
   ---> rules.yml:10
  10 |       - alert:
-
+^^^ This rule is not a valid Prometheus rule: `alert value cannot be empty`.
 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
   ---> rules.yml:12
  12 |       - alert:
-
+^^^ This rule is not a valid Prometheus rule: `alert value cannot be empty`.
 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
   ---> rules.yml:15
  15 |         expr:
-
+^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
 level=INFO msg="Problems found" Fatal=6
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules.yml --

@@ -9,7 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Fatal: invalid group key alert (yaml/parse)
   ---> rules/strict.yml:2
  2 | - alert: Conntrack_Table_Almost_Full
-
+^^^ invalid group key alert
 level=INFO msg="Problems found" Fatal=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --

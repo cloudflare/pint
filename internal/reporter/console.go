@@ -84,6 +84,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 					for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
 						buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
 					}
+					buf.WriteString(output.MaybeColor(color, cr.noColor, "^^^ "+report.Problem.Summary))
 				}
 			}
 
