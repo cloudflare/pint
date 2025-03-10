@@ -21,12 +21,12 @@ Warning: label must be removed in aggregations (promql/aggregate)
 Warning: redundant regexp (promql/regexp)
   ---> rules/0002.yaml:2
 2 |   expr: up{job=~"foo"} == 0
-            ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"foo"`, use `job="foo"` instead.
+               ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"foo"`, use `job="foo"` instead.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules/0002.yaml:5
 5 |   expr: up{job!~"foo"} == 0
-            ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job!~"foo"`, use `job!="foo"` instead.
+               ^^^^^^^^^^ Unnecessary regexp match on static string `job!~"foo"`, use `job!="foo"` instead.
 
 Warning: label must be removed in aggregations (promql/aggregate)
   ---> rules/0003.yaml:11

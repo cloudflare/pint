@@ -33,7 +33,7 @@ Warning: always firing alert (alerts/comparison)
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:2
 2 |   expr: sum(foo{job=~"xxx"}) by(job)
-                ^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:3
@@ -48,7 +48,7 @@ Warning: always firing alert (alerts/comparison)
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:5
 5 |   expr: sum(foo{job=~"xxx"}) by(job)
-                ^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:6
