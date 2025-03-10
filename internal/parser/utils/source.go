@@ -737,23 +737,27 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			ls.IsConditional = n.Op.IsComparisonOperator()
 			for _, rs := range rhs {
 				rs.IsConditional = n.Op.IsComparisonOperator()
+				var side Source
 				switch {
-				case ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn:
+				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
+					// Use labels from LHS
+					side = ls
+				case rs.Returns == promParser.ValueTypeVector, rs.Returns == promParser.ValueTypeMatrix:
+					// Use labels from RHS
+					side = rs
+				default:
+					side = ls
+				}
+				if ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn {
 					// Both sides always return something
-					ls.ReturnedNumber, ls.IsDead, ls.IsDeadReason = calculateStaticReturn(
+					side.ReturnedNumber, side.IsDead, side.IsDeadReason = calculateStaticReturn(
 						expr,
 						ls, rs,
 						n.Op,
 						ls.IsDead,
 					)
-					src = append(src, ls)
-				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
-					// Use labels from LHS
-					src = append(src, ls)
-				case rs.Returns == promParser.ValueTypeVector, rs.Returns == promParser.ValueTypeMatrix:
-					// Use labels from RHS
-					src = append(src, rs)
 				}
+				src = append(src, side)
 			}
 		}
 

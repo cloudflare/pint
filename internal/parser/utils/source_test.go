@@ -3639,6 +3639,36 @@ sum by (foo, bar) (
 				},
 			},
 		},
+		{
+			expr: `1 - (foo or vector(0)) < 0.999`,
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     promParser.CardManyToMany.String(),
+					IsConditional: true,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 5),
+				},
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					FixedLabels:    true,
+					IsDead:         true,
+					KnownReturn:    true,
+					ReturnedNumber: 1,
+					IsDeadReason:   "this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything",
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+					},
+					Call: mustParse[*promParser.Call](t, "vector(0)", 12),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
