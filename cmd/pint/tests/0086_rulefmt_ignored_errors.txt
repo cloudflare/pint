@@ -8,11 +8,13 @@ level=INFO msg="Checking Prometheus rules" entries=5 workers=10 online=true
 Fatal: This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`. (yaml/parse)
   ---> rules/strict.yml:4
  4 |   - expr: MissingAlertOrRecord
-^^^ This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`.
+     ^^^ This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`.
+
 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
   ---> rules/strict.yml:7
  7 |     expr: 
-^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
+     ^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
+
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/strict.yml:10
 10 |     expr: sumz(0)

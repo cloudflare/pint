@@ -274,6 +274,26 @@ Information: redundant field with default value (alerts/for)
 21 |     for: 0m
               ^^ `0m` is the default value of `for`, this line is unnecessary.
 
+Bug: required annotation not set (alerts/annotation)
+  ---> rules.yml:25-30
+25 |   - alert: template
+26 |     expr: sum(no_such_metric) by(foo) > 0
+27 |     labels:
+28 |       value: '{{ $value }}'
+29 |     annotations:
+30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+           ^^^ `link` annotation is required.
+
+Bug: required annotation not set (alerts/annotation)
+  ---> rules.yml:25-30
+25 |   - alert: template
+26 |     expr: sum(no_such_metric) by(foo) > 0
+27 |     labels:
+28 |       value: '{{ $value }}'
+29 |     annotations:
+30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+           ^^^ `summary` annotation is required.
+
 Bug: template uses non-existent label (alerts/template)
   ---> rules.yml:25-30
 25 |   - alert: template
@@ -285,6 +305,36 @@ Bug: template uses non-existent label (alerts/template)
 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
 
+Bug: required label not set (rule/label)
+  ---> rules.yml:25-30
+25 |   - alert: template
+26 |     expr: sum(no_such_metric) by(foo) > 0
+27 |     labels:
+28 |       value: '{{ $value }}'
+29 |     annotations:
+30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+           ^^^ `component` label is required.
+
+Bug: required label not set (rule/label)
+  ---> rules.yml:25-30
+25 |   - alert: template
+26 |     expr: sum(no_such_metric) by(foo) > 0
+27 |     labels:
+28 |       value: '{{ $value }}'
+29 |     annotations:
+30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+           ^^^ `notify` label is required.
+
+Bug: required label not set (rule/label)
+  ---> rules.yml:25-30
+25 |   - alert: template
+26 |     expr: sum(no_such_metric) by(foo) > 0
+27 |     labels:
+28 |       value: '{{ $value }}'
+29 |     annotations:
+30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
+           ^^^ `priority` label is required.
+
 Bug: missing owner (rule/owner)
   ---> rules.yml:25-30
 25 |   - alert: template
@@ -295,40 +345,10 @@ Bug: missing owner (rule/owner)
 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
            ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
-Bug: required label not set (rule/label)
-  ---> rules.yml:27-28
-27 |     labels:
-         ^^^^^^ `component` label is required.
-28 |       value: '{{ $value }}'
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:27-28
-27 |     labels:
-         ^^^^^^ `notify` label is required.
-28 |       value: '{{ $value }}'
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:27-28
-27 |     labels:
-         ^^^^^^ `priority` label is required.
-28 |       value: '{{ $value }}'
-
 Bug: value used in labels (alerts/template)
   ---> rules.yml:28
 28 |       value: '{{ $value }}'
                    ^^^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:29-30
-29 |     annotations:
-         ^^^^^^^^^^^ `link` annotation is required.
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:29-30
-29 |     annotations:
-         ^^^^^^^^^^^ `summary` annotation is required.
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
 
 Bug: required annotation not set (alerts/annotation)
   ---> rules.yml:32-33

@@ -79,12 +79,15 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 						report.Problem.Lines.First, report.Problem.Lines.Last)
 					buf.WriteString(output.MaybeColor(output.White, cr.noColor, body))
 				} else {
+					digits := countDigits(report.Problem.Lines.Last) + 1
 					lines := strings.Split(content, "\n")
-					nrFmt := fmt.Sprintf("%%%dd", countDigits(report.Problem.Lines.Last)+1)
+					nrFmt := fmt.Sprintf("%%%dd", digits)
 					for i := report.Problem.Lines.First; i <= report.Problem.Lines.Last; i++ {
 						buf.WriteString(output.MaybeColor(output.White, cr.noColor, fmt.Sprintf(nrFmt+" | %s\n", i, lines[i-1])))
 					}
+					buf.WriteString(strings.Repeat(" ", digits+3))
 					buf.WriteString(output.MaybeColor(color, cr.noColor, "^^^ "+report.Problem.Summary))
+					buf.WriteRune('\n')
 				}
 			}
 

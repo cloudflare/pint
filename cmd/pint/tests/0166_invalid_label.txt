@@ -9,11 +9,13 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Fatal: This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`. (yaml/parse)
   ---> rules/1.yaml:7
  7 |       "{{ $value }}": "down"
-^^^ This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`.
+     ^^^ This rule is not a valid Prometheus rule: `invalid annotation name: {{ $value }}`.
+
 Fatal: This rule is not a valid Prometheus rule: `invalid label name: {{ $value }}`. (yaml/parse)
   ---> rules/1.yaml:11
  11 |       "{{ $value }}": "down"
-^^^ This rule is not a valid Prometheus rule: `invalid label name: {{ $value }}`.
+      ^^^ This rule is not a valid Prometheus rule: `invalid label name: {{ $value }}`.
+
 level=INFO msg="Problems found" Fatal=2
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yaml --

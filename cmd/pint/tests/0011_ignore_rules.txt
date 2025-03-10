@@ -9,6 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=10 workers=10 online=true
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:5
 5 |   expr: sum(errors_total) by )
+                                 ^ unexpected right parenthesis ')'
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:16
@@ -19,6 +20,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:22
 22 |   expr: sum(errors_total) by )
+                                  ^ unexpected right parenthesis ')'
 
 Warning: always firing alert (alerts/comparison)
   ---> rules/1.yaml:33

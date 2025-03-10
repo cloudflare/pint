@@ -10,7 +10,8 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Fatal: partial_response_strategy is only valid when parser is configured to use the Thanos rule schema (yaml/parse)
   ---> rules/1.yml:3
  3 |   partial_response_strategy: warn
-^^^ partial_response_strategy is only valid when parser is configured to use the Thanos rule schema
+     ^^^ partial_response_strategy is only valid when parser is configured to use the Thanos rule schema
+
 level=INFO msg="Problems found" Fatal=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yml --

@@ -8,11 +8,13 @@ level=INFO msg="Checking Prometheus rules" entries=5 workers=10 online=true
 Fatal: This rule is not a valid Prometheus rule: `multi-document YAML files are not allowed`. (yaml/parse)
   ---> rules/strict.yml:7
  7 | ---
-^^^ This rule is not a valid Prometheus rule: `multi-document YAML files are not allowed`.
+     ^^^ This rule is not a valid Prometheus rule: `multi-document YAML files are not allowed`.
+
 Fatal: This rule is not a valid Prometheus rule: `multi-document YAML files are not allowed`. (yaml/parse)
   ---> rules/strict.yml:13
  13 | ---
-^^^ This rule is not a valid Prometheus rule: `multi-document YAML files are not allowed`.
+      ^^^ This rule is not a valid Prometheus rule: `multi-document YAML files are not allowed`.
+
 level=INFO msg="Problems found" Fatal=2
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/strict.yml --

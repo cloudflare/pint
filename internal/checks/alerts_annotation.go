@@ -95,18 +95,13 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	if len(annotations) == 0 && c.isRequired {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    rule.AlertingRule.Annotations.Lines,
+			Lines:    rule.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "required annotation not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
-				{
-					Message:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
-					Pos:         rule.AlertingRule.Annotations.Key.Pos,
-					FirstColumn: 1,
-					LastColumn:  len(rule.AlertingRule.Annotations.Key.Value),
-				},
+				WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
 			},
 		})
 		return problems
@@ -116,18 +111,13 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		if ann.Value.Value == "" && c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.AlertingRule.Annotations.Lines,
+				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
-						Pos:         ann.Key.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(ann.Key.Value),
-					},
+					WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
 				},
 			})
 			return problems

@@ -7,11 +7,16 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Warning: required annotation not set (alerts/annotation)
-  ---> rules/1.yaml:9-11
+  ---> rules/1.yaml:4-11
+ 4 |       - alert: HaproxyServerHealthcheckFailure
+ 5 |         expr: increase(haproxy_server_check_failures_total[15m]) > 100
+ 6 |         for: 5m
+ 7 |         labels:
+ 8 |           severity: 24x7
  9 |         annotations:
-             ^^^^^^^^^^^ `runbook_url` annotation is required.
 10 |           summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
 11 |           description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
+               ^^^ `runbook_url` annotation is required.
 
 level=INFO msg="Problems found" Warning=1
 -- rules/1.yaml --

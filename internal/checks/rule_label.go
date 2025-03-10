@@ -155,18 +155,13 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 	if len(labels) == 0 && c.isRequired {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    rule.AlertingRule.Labels.Lines,
+			Lines:    rule.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "required label not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
-				{
-					Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
-					Pos:         rule.AlertingRule.Labels.Key.Pos,
-					FirstColumn: 1,
-					LastColumn:  len(rule.AlertingRule.Labels.Key.Value),
-				},
+				WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 			},
 		})
 		return problems
@@ -176,18 +171,13 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 		if lab.Value.Value == "" && c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.AlertingRule.Labels.Lines,
+				Lines:    rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
-						Pos:         lab.Key.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(lab.Key.Value),
-					},
+					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 				},
 			})
 			return problems

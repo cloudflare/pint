@@ -124,6 +124,17 @@ expr: >-
 6 |   sum(bar)
 `,
 		},
+		{
+			input:     "expr: cnt(bar) by()",
+			firstLine: 1,
+			lastLine:  1,
+			diags: []Diagnostic{
+				{FirstColumn: 14, LastColumn: 14, Message: "this is bad"},
+			},
+			output: `1 | expr: cnt(bar) by()
+                      ^ this is bad
+`,
+		},
 	}
 
 	for _, tc := range testCases {

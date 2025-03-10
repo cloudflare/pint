@@ -10,7 +10,8 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Fatal: did not find expected '-' indicator (yaml/parse)
   ---> rules/1.yaml:6
  6 | 
-^^^ did not find expected '-' indicator
+     ^^^ did not find expected '-' indicator
+
 level=INFO msg="Problems found" Fatal=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/1.yaml --

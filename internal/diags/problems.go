@@ -25,7 +25,12 @@ type Diagnostic struct {
 func InjectDiagnostics(content string, diags []Diagnostic, color output.Color, firstLine, lastLine int) string {
 	diagPositions := make([]PositionRanges, len(diags))
 	for i, diag := range diags {
-		diagPositions[i] = readRange(diag.FirstColumn, diag.LastColumn, diag.Pos)
+		dl := diag.Pos.Len()
+		diagPositions[i] = readRange(
+			min(diag.FirstColumn, dl),
+			min(diag.LastColumn, dl),
+			diag.Pos,
+		)
 	}
 
 	var buf strings.Builder
