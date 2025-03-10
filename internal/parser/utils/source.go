@@ -1015,7 +1015,7 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 
 // FIXME sum() on ().
 func FindPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
-	re := regexp.MustCompile("(?i)(" + fn + ")[ \n\t]*\\(")
+	re := regexp.MustCompile("(?i)(" + regexp.QuoteMeta(fn) + ")[ \n\t]*\\(")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {
 		return within
