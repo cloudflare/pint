@@ -498,6 +498,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					)
 				}
 				s = restrictGuaranteedLabels(s, n.Grouping)
+				s = restrictIncludedLabels(s, n.Grouping)
 			}
 			s.FixedLabels = true
 		}

@@ -3601,6 +3601,44 @@ label_replace(
 				},
 			},
 		},
+		{
+			expr: `
+sum by (foo, bar) (
+    rate(errors_total[5m])
+  * on (instance) group_left (bob, alice)
+    server_errors_total
+)`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum by (foo, bar) (
+    rate(errors_total[5m])
+  * on (instance) group_left (bob, alice)
+    server_errors_total
+)`, 1),
+					Call:           mustParse[*promParser.Call](t, "rate(errors_total[5m])", 25),
+					Selector:       mustParse[*promParser.VectorSelector](t, "errors_total", 30),
+					FixedLabels:    true,
+					IncludedLabels: []string{"foo", "bar"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.",
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "server_errors_total", 94),
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
