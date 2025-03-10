@@ -205,6 +205,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 					b.lm, b.lm.Name, b.op, b.lm.Value)
 
 			}
+			pos := findMatcherPos(expr.Value.Value, b.pos, b.lm)
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
@@ -216,8 +217,8 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 					{
 						Message:     text,
 						Pos:         expr.Value.Pos,
-						FirstColumn: int(b.pos.Start) + 1,
-						LastColumn:  int(b.pos.End),
+						FirstColumn: int(pos.Start) + 1,
+						LastColumn:  int(pos.End) + 1,
 					},
 				},
 			})
@@ -269,4 +270,16 @@ func isOpSmelly(a, b syntax.Op) bool {
 		return true
 	}
 	return false
+}
+
+func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
+	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + m.Value + `"`)
+	idx := re.FindStringSubmatchIndex(utils.GetQueryFragment(expr, within))
+	if idx == nil {
+		return within
+	}
+	return posrange.PositionRange{
+		Start: within.Start + posrange.Pos(idx[0]),
+		End:   within.Start + posrange.Pos(idx[1]-1),
+	}
 }

@@ -400,7 +400,7 @@ Bug: missing owner (rule/owner)
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:36
 36 |     expr: sum(no_such_metric{job=~"fake"})
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"fake"`, use `job="fake"` instead.
+                                  ^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"fake"`, use `job="fake"` instead.
 
 Bug: required label is being removed via aggregation (promql/aggregate)
   ---> rules.yml:36
