@@ -3521,8 +3521,7 @@ label_replace(
 								FixedLabels:      true,
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
-										Reason:   "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-										Fragment: posrange.PositionRange{Start: 158, End: 160},
+										Reason: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 									},
 								},
 								Joins: []utils.Join{
@@ -3538,14 +3537,65 @@ label_replace(
 											FixedLabels:    true,
 											ExcludeReason: map[string]utils.ExcludedLabel{
 												"": {
-													Reason:   "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-													Fragment: posrange.PositionRange{Start: 229, End: 231},
+													Reason: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 												},
 											},
 										},
 									},
 								},
 							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `(day_of_week() == 6 and hour() < 1) or vector(1)`,
+			output: []utils.Source{
+				{
+					Type:          utils.FuncSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "day_of_week",
+					Call:          mustParse[*promParser.Call](t, `day_of_week()`, 1),
+					FixedLabels:   true,
+					AlwaysReturns: true,
+					IsConditional: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `day_of_week()` with no arguments will return an empty time series with no labels.",
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:          utils.FuncSource,
+								Returns:       promParser.ValueTypeVector,
+								Operation:     "hour",
+								Call:          mustParse[*promParser.Call](t, `hour()`, 24),
+								FixedLabels:   true,
+								AlwaysReturns: true,
+								IsConditional: true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason: "Calling `hour()` with no arguments will return an empty time series with no labels.",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					KnownReturn:    true,
+					ReturnedNumber: 1,
+					FixedLabels:    true,
+					Call:           mustParse[*promParser.Call](t, "vector(1)", 39),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 				},

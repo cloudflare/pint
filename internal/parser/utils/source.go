@@ -889,7 +889,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			if s.Operation == "" {
 				s.Operation = n.VectorMatching.Card.String()
 			}
-			if !s.AlwaysReturns {
+			if !s.AlwaysReturns || s.IsConditional {
 				lhsCanBeEmpty = true
 			}
 			for _, rs := range rhs {
