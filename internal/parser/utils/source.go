@@ -734,9 +734,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		lhs := walkNode(expr, n.LHS)
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range lhs {
-			ls.IsConditional = n.Op.IsComparisonOperator()
+			ls.IsConditional = isConditional(ls, n.Op)
 			for _, rs := range rhs {
-				rs.IsConditional = n.Op.IsComparisonOperator()
+				rs.IsConditional = isConditional(rs, n.Op)
 				var side Source
 				switch {
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
@@ -800,7 +800,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					)
 				}
 				for _, rs := range rhs {
-					rs.IsConditional = n.Op.IsComparisonOperator()
+					rs.IsConditional = isConditional(rs, n.Op)
 					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
 						// Both sides always return something
 						s.ReturnedNumber, s.IsDead, s.IsDeadReason = calculateStaticReturn(
@@ -824,7 +824,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: rs,
 				})
 			}
-			s.IsConditional = n.Op.IsComparisonOperator()
+			s.IsConditional = isConditional(s, n.Op)
 			src = append(src, s)
 		}
 
@@ -852,7 +852,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: ls,
 				})
 			}
-			s.IsConditional = n.Op.IsComparisonOperator()
+			s.IsConditional = isConditional(s, n.Op)
 			src = append(src, s)
 		}
 
@@ -877,7 +877,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: rs,
 				})
 			}
-			s.IsConditional = n.Op.IsComparisonOperator()
+			s.IsConditional = isConditional(s, n.Op)
 			src = append(src, s)
 		}
 
@@ -888,6 +888,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		rhs := walkNode(expr, n.RHS)
 		for _, s = range walkNode(expr, n.LHS) {
+			var rhsConditional bool
 			if n.VectorMatching.On {
 				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 			}
@@ -898,6 +899,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				lhsCanBeEmpty = true
 			}
 			for _, rs := range rhs {
+				if isConditional(rs, n.Op) {
+					rhsConditional = true
+				}
 				if ok, s := canJoin(s, rs, n.VectorMatching); !ok {
 					rs.IsDead = true
 					rs.IsDeadReason = s
@@ -917,6 +921,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					})
 				}
 			}
+			if n.Op == promParser.LAND && rhsConditional {
+				s.IsConditional = true
+			}
 			src = append(src, s)
 		}
 		if n.Op == promParser.LOR {
@@ -934,6 +941,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		}
 	}
 	return src
+}
+
+func isConditional(s Source, op promParser.ItemType) bool {
+	if s.IsConditional {
+		return true
+	}
+	return op.IsComparisonOperator()
 }
 
 func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {

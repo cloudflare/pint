@@ -1584,7 +1584,7 @@ sum(foo:count) by(job) > 20`,
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo:sum > 0) without(notify)`, 4),
 					IncludedLabels: []string{"notify", "job"},
 					ExcludeReason:  map[string]utils.ExcludedLabel{},
-					IsConditional:  false, // FIXME should be true
+					IsConditional:  true,
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
@@ -2164,12 +2164,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Returns:     promParser.ValueTypeVector,
-								Operation:   "count",
-								Selector:    mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
-								FixedLabels: true,
+								Type:          utils.AggregateSource,
+								Returns:       promParser.ValueTypeVector,
+								Operation:     "count",
+								Selector:      mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
+								Aggregation:   mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
+								FixedLabels:   true,
+								IsConditional: false, // FIXME true?
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
@@ -2526,7 +2527,6 @@ or
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 5),
 					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
-
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2602,12 +2602,13 @@ or
 )`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
-					FixedLabels: true,
+					Type:          utils.AggregateSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "sum",
+					Selector:      mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
+					Aggregation:   mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
+					FixedLabels:   true,
+					IsConditional: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
@@ -2658,6 +2659,7 @@ or
 					KnownReturn:    true,
 					ReturnedNumber: 1,
 					FixedLabels:    true,
+					IsConditional:  true,
 					Call:           mustParse[*promParser.Call](t, "vector(1)", 36),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -3370,6 +3372,7 @@ unless
    )
    and on(device, instance) absent(node_disk_info)
  )`, 2),
+					IsConditional:  true,
 					IncludedLabels: []string{"instance", "device", "group"},
 					ExcludedLabels: []string{"source_instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -3666,6 +3669,64 @@ sum by (foo, bar) (
 						},
 					},
 					Call: mustParse[*promParser.Call](t, "vector(0)", 12),
+				},
+			},
+		},
+		{
+			expr: `
+(
+  vector(1) and month() == 2
+) or vector(0)
+`,
+			output: []utils.Source{
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					FixedLabels:    true,
+					KnownReturn:    true,
+					ReturnedNumber: 1,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+					},
+					Call: mustParse[*promParser.Call](t, "vector(1)", 5),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:          utils.FuncSource,
+								Returns:       promParser.ValueTypeVector,
+								Operation:     "month",
+								AlwaysReturns: true,
+								FixedLabels:   true,
+								IsConditional: true,
+								Call:          mustParse[*promParser.Call](t, "month()", 19),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason: "Calling `month()` with no arguments will return an empty time series with no labels.",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					FixedLabels:    true,
+					KnownReturn:    true,
+					ReturnedNumber: 0,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+					},
+					Call: mustParse[*promParser.Call](t, "vector(0)", 37),
 				},
 			},
 		},
