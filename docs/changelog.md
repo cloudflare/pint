@@ -6,13 +6,20 @@
 
 - Added `names` option to the `parser` block, which controls how does Prometheus validates
   label names.
-- Added [promql/impossible](checks/promql/impossible.md) check.
+- Added [promql/impossible](checks/promql/impossible.md) check. This check duplicates some
+  of the functionality of the [promql/vector_matching](checks/promql/vector_matching.md) so
+  in the future the scope of [promql/vector_matching](checks/promql/vector_matching.md) checks
+  will be reduced to avoid duplicated reports for the same issue.
 - Added `ignoreMatchingElsewhere` option to [promql/series](checks/promql/series.md) check.
 
 ### Changed
 
 - Removed aggregation checks from the [promql/fragile](checks/promql/fragile.md) check - #1289.
 - [promql/regexp](checks/promql/regexp.md) check severity was reduced from `bug` to a `warning`.
+- This release contains some major changes to the way problems are reported by pint.
+  Each problem might now point to the specific part of the PromQL query that caused the issue
+  rather than just the line range on which the query is defined. Most, but not all, checks
+  were updated to emit more detailed problem descriptions.
 
 ### Fixed
 
