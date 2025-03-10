@@ -1155,7 +1155,7 @@ func TestLabelsSource(t *testing.T) {
 								Type:             utils.SelectorSource,
 								Returns:          promParser.ValueTypeVector,
 								Selector:         mustParse[*promParser.VectorSelector](t, `bar{cluster="bar", ignored="true"}`, 50),
-								GuaranteedLabels: []string{"cluster"},
+								GuaranteedLabels: []string{"cluster", "ignored"},
 							},
 						},
 					},
@@ -1178,7 +1178,7 @@ func TestLabelsSource(t *testing.T) {
 								Type:             utils.SelectorSource,
 								Returns:          promParser.ValueTypeVector,
 								Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="foo", ignored="true"}`, 0),
-								GuaranteedLabels: []string{"job"},
+								GuaranteedLabels: []string{"job", "ignored"},
 							},
 						},
 					},
@@ -1654,9 +1654,10 @@ sum(foo:count) by(job) > 20`,
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:     utils.SelectorSource,
-								Returns:  promParser.ValueTypeVector,
-								Selector: mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 66),
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `container_ulimits_soft{ulimit="max_open_files"}`, 66),
+								GuaranteedLabels: []string{"ulimit"},
 							},
 						},
 					},
@@ -3093,9 +3094,10 @@ unless
 								Joins: []utils.Join{
 									{
 										Src: utils.Source{
-											Type:     utils.SelectorSource,
-											Returns:  promParser.ValueTypeVector,
-											Selector: mustParse[*promParser.VectorSelector](t, `cf_node_role{kubernetes_role="master",role="kubernetes"}`, 247),
+											Type:             utils.SelectorSource,
+											Returns:          promParser.ValueTypeVector,
+											Selector:         mustParse[*promParser.VectorSelector](t, `cf_node_role{kubernetes_role="master",role="kubernetes"}`, 247),
+											GuaranteedLabels: []string{"kubernetes_role", "role"},
 										},
 									},
 								},
@@ -3145,9 +3147,10 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:     utils.SelectorSource,
-								Returns:  promParser.ValueTypeVector,
-								Selector: mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 42),
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 42),
+								GuaranteedLabels: []string{"b"},
 							},
 						},
 					},
@@ -3167,9 +3170,10 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:     utils.SelectorSource,
-								Returns:  promParser.ValueTypeVector,
-								Selector: mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+								Type:             utils.SelectorSource,
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 0),
+								GuaranteedLabels: []string{"a"},
 							},
 						},
 					},
@@ -3290,12 +3294,13 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:           utils.AggregateSource,
-								Operation:      "sum",
-								Returns:        promParser.ValueTypeVector,
-								Selector:       mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
-								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"}) without(instance)`, 42),
-								ExcludedLabels: []string{"instance"},
+								Type:             utils.AggregateSource,
+								Operation:        "sum",
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
+								Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"}) without(instance)`, 42),
+								GuaranteedLabels: []string{"b"},
+								ExcludedLabels:   []string{"instance"},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"instance": {
 										Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
@@ -3322,12 +3327,13 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:           utils.AggregateSource,
-								Operation:      "sum",
-								Returns:        promParser.ValueTypeVector,
-								Selector:       mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
-								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) without(instance)`, 0),
-								ExcludedLabels: []string{"instance"},
+								Type:             utils.AggregateSource,
+								Operation:        "sum",
+								Returns:          promParser.ValueTypeVector,
+								Selector:         mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+								Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) without(instance)`, 0),
+								GuaranteedLabels: []string{"a"},
+								ExcludedLabels:   []string{"instance"},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"instance": {
 										Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
@@ -3391,11 +3397,12 @@ unless
 						},
 						{
 							Src: utils.Source{
-								Type:      utils.FuncSource,
-								Returns:   promParser.ValueTypeVector,
-								Operation: "label_replace",
-								Selector:  mustParse[*promParser.VectorSelector](t, `salt_highstate_runner_configured_minions`, 365),
-								Call:      mustParse[*promParser.Call](t, `label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")`, 351),
+								Type:             utils.FuncSource,
+								Returns:          promParser.ValueTypeVector,
+								Operation:        "label_replace",
+								GuaranteedLabels: []string{"instance"},
+								Selector:         mustParse[*promParser.VectorSelector](t, `salt_highstate_runner_configured_minions`, 365),
+								Call:             mustParse[*promParser.Call](t, `label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")`, 351),
 							},
 						},
 					},
@@ -3470,6 +3477,75 @@ unless
 						},
 						"job": {
 							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `
+prometheus:scrape_series_added:since_gc:sum
+* on(prometheus) group_left()
+label_replace(
+  max(max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) by(instance)
+  /
+  max(max_over_time(prometheus_tsdb_head_series[2h])) by(instance),
+  "prometheus", "$1",
+  "instance", "(.+)"
+)
+`,
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      promParser.CardManyToOne.String(),
+					Selector:       mustParse[*promParser.VectorSelector](t, `prometheus:scrape_series_added:since_gc:sum`, 1),
+					IncludedLabels: []string{"prometheus"},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:      utils.FuncSource,
+								Returns:   promParser.ValueTypeVector,
+								Operation: "label_replace",
+								Selector:  mustParse[*promParser.VectorSelector](t, `go_memstats_alloc_bytes{job="prometheus"}`, 110),
+								Call: mustParse[*promParser.Call](t, `label_replace(
+  max(max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) by(instance)
+  /
+  max(max_over_time(prometheus_tsdb_head_series[2h])) by(instance),
+  "prometheus", "$1",
+  "instance", "(.+)"
+)`, 75),
+								Aggregation:      mustParse[*promParser.AggregateExpr](t, `max(max_over_time(go_memstats_alloc_bytes{job="prometheus"}[2h])) by(instance)`, 92),
+								GuaranteedLabels: []string{"prometheus"},
+								IncludedLabels:   []string{"instance"},
+								FixedLabels:      true,
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason:   "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+										Fragment: posrange.PositionRange{Start: 158, End: 160},
+									},
+								},
+								Joins: []utils.Join{
+									{
+										Src: utils.Source{
+											Type:           utils.AggregateSource,
+											Returns:        promParser.ValueTypeVector,
+											Operation:      "max",
+											Selector:       mustParse[*promParser.VectorSelector](t, `prometheus_tsdb_head_series`, 195),
+											Call:           mustParse[*promParser.Call](t, `max_over_time(prometheus_tsdb_head_series[2h])`, 181),
+											Aggregation:    mustParse[*promParser.AggregateExpr](t, `max(max_over_time(prometheus_tsdb_head_series[2h])) by(instance)`, 177),
+											IncludedLabels: []string{"instance"},
+											FixedLabels:    true,
+											ExcludeReason: map[string]utils.ExcludedLabel{
+												"": {
+													Reason:   "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+													Fragment: posrange.PositionRange{Start: 229, End: 231},
+												},
+											},
+										},
+									},
+								},
+							},
 						},
 					},
 				},

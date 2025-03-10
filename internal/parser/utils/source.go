@@ -603,8 +603,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 	case "label_replace", "label_join":
 		// One label added to the results.
 		s.Returns = promParser.ValueTypeVector
-		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
-		s = guaranteeLabel(s, s.Call.Args[1].(*promParser.StringLiteral).Val)
+		s = guaranteeLabel(s, n.Args[1].(*promParser.StringLiteral).Val)
 
 	case "pi":
 		s.Returns = promParser.ValueTypeScalar
@@ -840,9 +839,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				s.Operation = n.VectorMatching.Card.String()
 			}
 			for _, ls := range lhs {
-				if n.VectorMatching.On {
-					ls = restrictGuaranteedLabels(ls, n.VectorMatching.Include)
-				}
 				if ok, s := canJoin(s, ls, n.VectorMatching); !ok {
 					ls.IsDead = true
 					ls.IsDeadReason = s
@@ -868,9 +864,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				s.Operation = n.VectorMatching.Card.String()
 			}
 			for _, rs := range rhs {
-				if n.VectorMatching.On {
-					rs = restrictGuaranteedLabels(rs, n.VectorMatching.Include)
-				}
 				if ok, s := canJoin(s, rs, n.VectorMatching); !ok {
 					rs.IsDead = true
 					rs.IsDeadReason = s
