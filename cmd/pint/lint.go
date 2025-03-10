@@ -10,6 +10,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -195,11 +196,16 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 				Rule:          entry.Rule,
 				Owner:         "",
 				Problem: checks.Problem{
+					Anchor:   checks.AnchorAfter,
 					Lines:    entry.Rule.Lines,
 					Reporter: discovery.RuleOwnerComment,
-					Text: fmt.Sprintf("`%s` comments are required in all files, please add a `# pint %s $owner` somewhere in this file and/or `# pint %s $owner` on top of each rule.",
-						discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment),
+					Summary:  "missing owner",
+					Details:  "",
 					Severity: checks.Bug,
+					Diagnostics: []diags.Diagnostic{
+						checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` comments are required in all files, please add a `# pint %s $owner` somewhere in this file and/or `# pint %s $owner` on top of each rule.",
+							discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment)),
+					},
 				},
 			})
 			goto NEXT
@@ -215,10 +221,15 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 			Rule:          entry.Rule,
 			Owner:         "",
 			Problem: checks.Problem{
+				Anchor:   checks.AnchorAfter,
 				Lines:    entry.Rule.Lines,
 				Reporter: discovery.RuleOwnerComment,
-				Text:     fmt.Sprintf("This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", entry.Owner, entry.Owner),
+				Summary:  "invalid owner",
+				Details:  "",
 				Severity: checks.Bug,
+				Diagnostics: []diags.Diagnostic{
+					checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", entry.Owner, entry.Owner)),
+				},
 			},
 		})
 	NEXT:

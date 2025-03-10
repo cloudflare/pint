@@ -11,7 +11,9 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/prometheus/prometheus/model/labels"
+	"github.com/prometheus/prometheus/promql/parser/posrange"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
@@ -164,48 +166,60 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				case labels.MatchNotRegexp:
 					op = labels.MatchNotEqual
 				}
-				bad = append(bad, badMatcher{lm: lm, op: op, isWildcard: isWildcard})
+				bad = append(bad, badMatcher{pos: selector.PosRange, lm: lm, op: op, isWildcard: isWildcard})
 				isBad = true
 			}
 			if beginText > 1 || endText > 1 {
-				bad = append(bad, badMatcher{lm: lm, badAnchor: true})
+				bad = append(bad, badMatcher{pos: selector.PosRange, lm: lm, badAnchor: true})
 				isBad = true
 			}
 			if settings.smellyEnabled && isSmelly {
-				bad = append(bad, badMatcher{lm: lm, isSmelly: true})
+				bad = append(bad, badMatcher{pos: selector.PosRange, lm: lm, isSmelly: true})
 			}
 			if !isBad {
 				good = append(good, lm)
 			}
 		}
 		for _, b := range bad {
-			var text string
-			s := Bug
+			var summary, text string
 			switch {
 			case b.badAnchor:
+				summary = "redundant regexp anchors"
 				text = fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
 					b.lm, b.lm.Name, b.lm.Type, b.lm.Value,
 				)
 			case b.isWildcard && b.op == labels.MatchEqual:
-				text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all `%s` values.",
+				summary = "unnecessary wildcard regexp"
+				text = fmt.Sprintf("Use `%s` if you want to match on all `%s` values.",
 					makeLabel(name, good...), b.lm.Name)
 			case b.isWildcard && b.op == labels.MatchNotEqual:
-				text = fmt.Sprintf("Unnecessary wildcard regexp, simply use `%s` if you want to match on all time series for `%s` without the `%s` label.",
+				summary = "unnecessary negative wildcard regexp"
+				text = fmt.Sprintf("Use `%s` if you want to match on all time series for `%s` without the `%s` label.",
 					makeLabel(name, slices.Concat(good, []*labels.Matcher{{Type: labels.MatchEqual, Name: b.lm.Name, Value: ""}})...), name, b.lm.Name)
 			case b.isSmelly:
+				summary = "smelly regexp selector"
 				text = fmt.Sprintf("`{%s}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels", b.lm.String())
-				s = Warning
 			default:
+				summary = "redundant regexp"
 				text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
 					b.lm, b.lm.Name, b.op, b.lm.Value)
 
 			}
 			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Lines,
 				Reporter: c.Reporter(),
-				Text:     text,
+				Summary:  summary,
 				Details:  RegexpCheckDetails,
-				Severity: s,
+				Severity: Warning,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     text,
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(b.pos.Start) + 1,
+						LastColumn:  int(b.pos.End),
+					},
+				},
 			})
 		}
 	}
@@ -215,6 +229,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 type badMatcher struct {
 	lm         *labels.Matcher
+	pos        posrange.PositionRange
 	op         labels.MatchType
 	isWildcard bool
 	isSmelly   bool

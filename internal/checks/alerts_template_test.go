@@ -1,20 +1,15 @@
 package checks_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func newTemplateCheck(_ *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewTemplateCheck()
-}
-
-func humanizeText(call string) string {
-	return fmt.Sprintf("Using the value of `%s` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly.", call)
 }
 
 func TestTemplateCheck(t *testing.T) {
@@ -34,14 +29,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `undefined variable \"$label\"`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `undefined variable \"$label\"`.",
+							},
+						},
 					},
 				}
 			},
@@ -54,14 +50,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `function \"xxx\" not defined`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `function \"xxx\" not defined`.",
+							},
+						},
 					},
 				}
 			},
@@ -81,14 +78,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `undefined variable \"$label\"`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `undefined variable \"$label\"`.",
+							},
+						},
 					},
 				}
 			},
@@ -101,14 +99,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `function \"xxx\" not defined`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `function \"xxx\" not defined`.",
+							},
+						},
 					},
 				}
 			},
@@ -128,13 +127,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -147,22 +147,24 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -175,13 +177,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -194,13 +197,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -213,13 +217,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -232,13 +237,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -251,13 +257,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -270,13 +277,14 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
+						Summary:  "value used in labels",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
+							},
+						},
 					},
 				}
 			},
@@ -289,14 +297,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation that removes all labels.\nQuery fragment causing this problem: `sum(foo)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation that removes all labels.",
+							},
+						},
 					},
 				}
 			},
@@ -309,14 +320,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation that removes all labels.\nQuery fragment causing this problem: `sum(foo)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation that removes all labels.",
+							},
+						},
 					},
 				}
 			},
@@ -329,14 +343,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.\nQuery fragment causing this problem: `sum(foo) without(job)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+							},
+						},
 					},
 				}
 			},
@@ -349,14 +366,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.\nQuery fragment causing this problem: `sum(foo) without(job)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+							},
+						},
 					},
 				}
 			},
@@ -369,14 +389,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.\nQuery fragment causing this problem: `sum(foo) without(job)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+							},
+						},
 					},
 				}
 			},
@@ -389,14 +412,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation that removes all labels.\nQuery fragment causing this problem: `sum(bar)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation that removes all labels.",
+							},
+						},
 					},
 				}
 			},
@@ -409,14 +435,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.\nQuery fragment causing this problem: `sum(foo) by(notjob)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
+							},
+						},
 					},
 				}
 			},
@@ -435,14 +464,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `ixtance` label but the query results won't have this label.",
-						Details:  "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.\nQuery fragment causing this problem: `count(build_info) by (instance, version)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `ixtance` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
+							},
+						},
 					},
 				}
 			},
@@ -491,44 +523,56 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  7,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  7,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `foo` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `foo` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 8,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `xxx` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"bar\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `xxx` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -546,24 +590,30 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -581,24 +631,30 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -616,14 +672,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -641,14 +700,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -678,24 +740,30 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `cluster` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `cluster` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `env` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `env` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -725,24 +793,30 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `cluster` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `cluster` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `env` label but the query results won't have this label.",
-						Details:  "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.\nQuery fragment causing this problem: `absent(foo{job=\"xxx\"})`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `env` label but the query results won't have this label.",
+							},
+							{
+								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+							},
+						},
 					},
 				}
 			},
@@ -772,13 +846,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     humanizeText("rate(errors[2m])"),
+						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`rate()` will produce results that are hard to read for humans.",
+							},
+							{
+								Message: "Use one of humanize template functions to make the result more readable.",
+							},
+						},
 					},
 				}
 			},
@@ -796,13 +874,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     humanizeText("rate(errors[2m])"),
+						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`rate()` will produce results that are hard to read for humans.",
+							},
+							{
+								Message: "Use one of humanize template functions to make the result more readable.",
+							},
+						},
 					},
 				}
 			},
@@ -820,13 +902,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     humanizeText("irate(errors[2m])"),
+						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`irate()` will produce results that are hard to read for humans.",
+							},
+							{
+								Message: "Use one of humanize template functions to make the result more readable.",
+							},
+						},
 					},
 				}
 			},
@@ -844,13 +930,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     humanizeText("deriv(errors[2m])"),
+						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`deriv()` will produce results that are hard to read for humans.",
+							},
+							{
+								Message: "Use one of humanize template functions to make the result more readable.",
+							},
+						},
 					},
 				}
 			},
@@ -976,13 +1066,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     humanizeText("rate(errors_total[5m])"),
+						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`rate()` will produce results that are hard to read for humans.",
+							},
+							{
+								Message: "Use one of humanize template functions to make the result more readable.",
+							},
+						},
 					},
 				}
 			},
@@ -1015,14 +1109,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `163: executing \"summary\" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `163: executing \"summary\" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.",
+							},
+						},
 					},
 				}
 			},
@@ -1043,14 +1138,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `159: executing \"summary\" at <query>: error calling query: 1:1: parse error: unknown function with name \"suz\"`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `159: executing \"summary\" at <query>: error calling query: 1:1: parse error: unknown function with name \"suz\"`.",
+							},
+						},
 					},
 				}
 			},
@@ -1068,23 +1164,28 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `124: executing \"summary\" at <first>: wrong type for value; expected template.queryResult; got float64`.",
+						Summary:  "template syntax error",
 						Severity: checks.Fatal,
 						Details:  checks.TemplateCheckSyntaxDetails,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `124: executing \"summary\" at <first>: wrong type for value; expected template.queryResult; got float64`.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     humanizeText("rate(errors[2m])"),
+						Summary:  "use humanize filters for the results",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`rate()` will produce results that are hard to read for humans.",
+							},
+							{
+								Message: "Use one of humanize template functions to make the result more readable.",
+							},
+						},
 					},
 				}
 			},
@@ -1105,14 +1206,15 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  8,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template failed to parse with this error: `121: executing \"summary\" at <query \"up xxx\">: error calling query: 1:4: parse error: unexpected identifier \"xxx\"`.",
+						Summary:  "template syntax error",
 						Details:  checks.TemplateCheckSyntaxDetails,
 						Severity: checks.Fatal,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template failed to parse with this error: `121: executing \"summary\" at <query \"up xxx\">: error calling query: 1:4: parse error: unexpected identifier \"xxx\"`.",
+							},
+						},
 					},
 				}
 			},
@@ -1149,10 +1251,6 @@ func TestTemplateCheck(t *testing.T) {
 								{
 												    {{ with printf "sum({job='%s'})" .Labels.job | query }}
 			    {{ . | first | label "instance" }}`,
-									Lines: parser.LineRange{
-						First: 5,
-						Last:  8,
-					},
 									Reporter: checks.TemplateCheckName,
 									Text:     `"summary" annotation template sends a query that is using "instance" label but that query removes it`,
 									Severity: checks.Bug,
@@ -1211,14 +1309,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "Calling `vector()` will return a vector value with no labels.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "Calling `vector()` will return a vector value with no labels.",
+							},
+						},
 					},
 				}
 			},
@@ -1231,14 +1332,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "Calling `vector()` will return a vector value with no labels.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "Calling `vector()` will return a vector value with no labels.",
+							},
+						},
 					},
 				}
 			},
@@ -1251,24 +1355,30 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `instance` label but the query results won't have this label.",
-						Details:  "This returns a number value with no labels.\nQuery fragment causing this problem: `1`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `instance` label but the query results won't have this label.",
+							},
+							{
+								Message: "This query returns a number value with no labels.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "This returns a number value with no labels.\nQuery fragment causing this problem: `1`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "This query returns a number value with no labels.",
+							},
+						},
 					},
 				}
 			},
@@ -1287,24 +1397,30 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job_name` label but the query results won't have this label.",
-						Details:  "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job_name` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `app_type` label but the query results won't have this label.",
-						Details:  "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `app_type` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
+							},
+						},
 					},
 				}
 			},
@@ -1362,14 +1478,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 19,
-							Last:  19,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `prefix` label but the query results won't have this label.",
-						Details:  "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.\nQuery fragment causing this problem: `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~\".*tier1.*\"}) < on() count(colo_router_tier:disabled_pops:max{tier=\"1\",router=~\"edge.*\"}) * 0.4`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `prefix` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+							},
+						},
 					},
 				}
 			},
@@ -1399,14 +1518,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `job` label but the query results won't have this label.",
-						Details:  "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `job` label but the query results won't have this label.",
+							},
+							{
+								Message: "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
+							},
+						},
 					},
 				}
 			},
@@ -1426,14 +1548,17 @@ func TestTemplateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  7,
-						},
 						Reporter: checks.TemplateCheckName,
-						Text:     "Template is using `colo_name` label but the query results won't have this label.",
-						Details:  "Calling `vector()` will return a vector value with no labels.\nQuery fragment causing this problem: `vector(0)`.",
+						Summary:  "template uses non-existent label",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Template is using `colo_name` label but the query results won't have this label.",
+							},
+							{
+								Message: "Calling `vector()` will return a vector value with no labels.",
+							},
+						},
 					},
 				}
 			},

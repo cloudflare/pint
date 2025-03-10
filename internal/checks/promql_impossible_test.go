@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -32,13 +32,14 @@ func TestImpossibleCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`vector(0)` is dead code because this query always evaluates to `0 > 0` which is not possible, so it will never return anything.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+							},
+						},
 					},
 				}
 			},
@@ -54,13 +55,14 @@ func TestImpossibleCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "This is dead code because this query always evaluates to `0 > 0` which is not possible, so it will never return anything.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+							},
+						},
 					},
 				}
 			},
@@ -76,13 +78,14 @@ func TestImpossibleCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`vector(0)` is dead code because this query always evaluates to `0 > 0` which is not possible, so it will never return anything.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+							},
+						},
 					},
 				}
 			},
@@ -98,13 +101,14 @@ func TestImpossibleCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`vector(0)` is dead code because the right hand side will never be matched because it doesn't have the `job` label while the left hand side will.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+							},
+						},
 					},
 				}
 			},
@@ -120,13 +124,14 @@ func TestImpossibleCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.ImpossibleCheckName,
-						Text:     "`sum(foo)` is dead code because the right hand side will never be matched because it doesn't have the `job` label while the left hand side will.",
+						Summary:  "dead code in query",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+							},
+						},
 					},
 				}
 			},

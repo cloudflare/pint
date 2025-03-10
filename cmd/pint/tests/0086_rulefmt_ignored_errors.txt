@@ -5,20 +5,30 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=5 workers=10 online=true
-rules/strict.yml:4 Fatal: This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`. (yaml/parse)
+  ---> rules/strict.yml:4
  4 |   - expr: MissingAlertOrRecord
+     ^^^ This rule is not a valid Prometheus rule: `incomplete rule, no alert or record key`.
 
-rules/strict.yml:7 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+  ---> rules/strict.yml:7
  7 |     expr: 
+     ^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
 
-rules/strict.yml:10 Fatal: Prometheus failed to parse the query with this PromQL error: unknown function with name "sumz". (promql/syntax)
- 10 |     expr: sumz(0)
+Fatal: PromQL syntax error (promql/syntax)
+  ---> rules/strict.yml:10
+10 |     expr: sumz(0)
+               ^^^^ unknown function with name "sumz"
 
-rules/strict.yml:15 Fatal: Template failed to parse with this error: `function "bogus" not defined`. (alerts/template)
- 15 |       dashboard: '{{ bogus }}'
+Fatal: template syntax error (alerts/template)
+  ---> rules/strict.yml:15
+15 |       dashboard: '{{ bogus }}'
+                       ^^^^^^^^^^^ Template failed to parse with this error: `function "bogus" not defined`.
 
-rules/strict.yml:20 Fatal: Template failed to parse with this error: `function "bogus" not defined`. (alerts/template)
- 20 |       dashboard: '{{ bogus }}'
+Fatal: template syntax error (alerts/template)
+  ---> rules/strict.yml:20
+20 |       dashboard: '{{ bogus }}'
+                       ^^^^^^^^^^^ Template failed to parse with this error: `function "bogus" not defined`.
 
 level=INFO msg="Problems found" Fatal=5
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

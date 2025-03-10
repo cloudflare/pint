@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -57,14 +57,15 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
-						Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
+						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Alert query doesn't have any condition, it will always fire if the metric exists.",
+							},
+						},
 					},
 				}
 			},
@@ -94,14 +95,15 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.ComparisonCheckName,
-						Text:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
+						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Alert query doesn't have any condition, it will always fire if the metric exists.",
+							},
+						},
 					},
 				}
 			},
@@ -121,14 +123,15 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
-						Text:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
+						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
+							},
+						},
 					},
 				}
 			},
@@ -183,14 +186,15 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
-						Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+							},
+						},
 					},
 				}
 			},
@@ -203,14 +207,15 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
-						Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+							},
+						},
 					},
 				}
 			},
@@ -223,14 +228,15 @@ func TestComparisonCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.ComparisonCheckName,
-						Text:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+						Summary:  "always firing alert",
 						Details:  checks.ComparisonCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
+							},
+						},
 					},
 				}
 			},

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -59,13 +59,14 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  10,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
+							},
+						},
 					},
 				}
 			},
@@ -86,13 +87,14 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  10,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     checkErrorUnableToRun(checks.AlertsExternalLabelsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
+						Summary:  "unable to run checks",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.AlertsExternalLabelsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
+							},
+						},
 					},
 				}
 			},
@@ -118,34 +120,37 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 9,
-							Last:  9,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: alertsExternalLabelsText("prom", uri, "cluster"),
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 10,
-							Last:  10,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: alertsExternalLabelsText("prom", uri, "cluster"),
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 6,
-							Last:  6,
-						},
 						Reporter: checks.AlertsExternalLabelsCheckName,
-						Text:     alertsExternalLabelsText("prom", uri, "cluster"),
+						Summary:  "invalid label",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: alertsExternalLabelsText("prom", uri, "cluster"),
+							},
+						},
 					},
 				}
 			},

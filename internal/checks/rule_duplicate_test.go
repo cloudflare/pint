@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -136,13 +136,14 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.RuleDuplicateCheckName,
-						Text:     textDuplicateRule("fake.yml", 6),
+						Summary:  "duplicated recording rule",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: textDuplicateRule("fake.yml", 6),
+							},
+						},
 					},
 				}
 			},
@@ -188,13 +189,14 @@ func TestRuleDuplicateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.RuleDuplicateCheckName,
-						Text:     textDuplicateRule("fake.yml", 6),
+						Summary:  "duplicated recording rule",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: textDuplicateRule("fake.yml", 6),
+							},
+						},
 					},
 				}
 			},

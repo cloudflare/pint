@@ -6,9 +6,17 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=9 workers=10 online=true
-rules/1.yaml:149-150 Warning: `summary` annotation is required. (alerts/annotation)
- 149 |             annotations:
- 150 |               description: Thanos Ruler has not been able to reload its configuration.
+Warning: required annotation not set (alerts/annotation)
+  ---> rules/1.yaml:143-150
+143 |           - alert: Thanos_Rule_Config_Reload_Failed
+144 |             expr: max_over_time(thanos_rule_config_last_reload_successful{kubernetes_namespace="thanos", pod_app="ruler-core", pod_component="ruler"}[10m]) < 1
+145 |             for: 5m
+146 |             labels:
+147 |               priority: "3"
+148 |               notify: chat-obs-metrics
+149 |             annotations:
+150 |               description: Thanos Ruler has not been able to reload its configuration.
+                    ^^^ `summary` annotation is required.
 
 level=INFO msg="Problems found" Warning=1
 -- .pint.hcl --

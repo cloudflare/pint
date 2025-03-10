@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
@@ -56,16 +57,21 @@ func (c ImpossibleCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 
 func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (problems []Problem) {
 	if s.IsDead {
-		fragment := s.Fragment(expr.Value.Value)
-		if fragment == "" {
-			fragment = "This"
-		} else {
-			fragment = "`" + fragment + "`"
-		}
+		pos := s.GetSmallestPosition()
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fragment + " is dead code because " + s.IsDeadReason + ".",
+			Summary:  "dead code in query",
+			Details:  "",
+			Diagnostics: []diags.Diagnostic{
+				{
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(pos.Start) + 1,
+					LastColumn:  int(pos.End),
+					Message:     s.IsDeadReason,
+				},
+			},
 			Severity: Warning,
 		})
 	}

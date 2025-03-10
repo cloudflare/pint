@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
@@ -46,12 +47,12 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 5,
 							Last:  6,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Details:  "mock details",
 						Severity: checks.Information,
 					},
@@ -77,12 +78,12 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 5,
 							Last:  6,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Severity: checks.Bug,
 					},
 				},
@@ -107,12 +108,12 @@ func TestTeamCityReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4, 5},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 5,
 							Last:  6,
 						},
 						Reporter: "mock",
-						Text: `mock text
+						Summary: `mock text
 with [new lines] and pipe| chars that are 'quoted'
 `,
 						Severity: checks.Bug,

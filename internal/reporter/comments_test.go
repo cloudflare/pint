@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -91,9 +92,9 @@ func TestCommenter(t *testing.T) {
 		Rule:          mockRules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
-			Text:     "foo error",
+			Summary:  "foo error",
 			Details:  "foo details",
-			Lines:    parser.LineRange{First: 1, Last: 3},
+			Lines:    diags.LineRange{First: 1, Last: 3},
 			Severity: checks.Fatal,
 			Anchor:   checks.AnchorAfter,
 		},
@@ -125,9 +126,9 @@ foo details
 		Rule:          mockRules[0],
 		Problem: checks.Problem{
 			Reporter: "bar",
-			Text:     "bar warning",
+			Summary:  "bar warning",
 			Details:  "",
-			Lines:    parser.LineRange{First: 1, Last: 1},
+			Lines:    diags.LineRange{First: 1, Last: 1},
 			Severity: checks.Warning,
 			Anchor:   checks.AnchorBefore,
 		},
@@ -381,9 +382,9 @@ bar warning
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
-						Text:     "foo error 1",
+						Summary:  "foo error 1",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -397,9 +398,9 @@ bar warning
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
-						Text:     "foo error 2",
+						Summary:  "foo error 2",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -477,9 +478,9 @@ foo details
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
-						Text:     "foo error",
+						Summary:  "foo error",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -549,9 +550,9 @@ foo details
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
-						Text:     "foo error 1",
+						Summary:  "foo error 1",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 1, Last: 3},
+						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -565,9 +566,9 @@ foo details
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
-						Text:     "foo error 2",
+						Summary:  "foo error 2",
 						Details:  "foo details",
-						Lines:    parser.LineRange{First: 2, Last: 2},
+						Lines:    diags.LineRange{First: 2, Last: 2},
 						Severity: checks.Bug,
 						Anchor:   checks.AnchorAfter,
 					},
@@ -770,9 +771,9 @@ func TestCommentsCommonPaths(t *testing.T) {
 		Rule:          mockRules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
-			Text:     "foo error",
+			Summary:  "foo error",
 			Details:  "foo details",
-			Lines:    parser.LineRange{First: 1, Last: 3},
+			Lines:    diags.LineRange{First: 1, Last: 3},
 			Severity: checks.Fatal,
 			Anchor:   checks.AnchorAfter,
 		},

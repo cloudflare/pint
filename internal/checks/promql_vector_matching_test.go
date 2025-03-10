@@ -8,7 +8,7 @@ import (
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -60,12 +60,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     differentLabelsText("prom", uri, "foo_with_notfound / bar", "instance, job, notfound", "instance, job"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: differentLabelsText("prom", uri, "foo_with_notfound / bar", "instance, job, notfound", "instance, job"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -261,12 +263,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingMismatchText("prom", uri, "foo / ignoring (xxx) app_registry", "ignoring(xxx)", "instance, job", "app_name"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: usingMismatchText("prom", uri, "foo / ignoring (xxx) app_registry", "ignoring(xxx)", "instance, job", "app_name"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -321,12 +325,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingBothMissing("prom", uri, "foo / on (notfound) bar", "on(notfound)"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: usingBothMissing("prom", uri, "foo / on (notfound) bar", "on(notfound)"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -570,12 +576,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingOneMissing("prom", uri, "foo", "left", "on(notfound)"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: usingOneMissing("prom", uri, "foo", "left", "on(notfound)"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -628,12 +636,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingOneMissing("prom", uri, "bar", "right", "on(notfound)"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: usingOneMissing("prom", uri, "bar", "right", "on(notfound)"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -686,12 +696,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     usingOneMissing("prom", uri, "(memory_bytes / ignoring (job) (memory_limit > 0))", "left", "on(app_name)"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: usingOneMissing("prom", uri, "(memory_bytes / ignoring (job) (memory_limit > 0))", "left", "on(app_name)"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -877,12 +889,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     differentLabelsText("prom", uri, "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar", "instance, job, notfound", "instance, job"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: differentLabelsText("prom", uri, "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar", "instance, job, notfound", "instance, job"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -1008,12 +1022,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     differentLabelsText("prom", uri, "(foo / ignoring (notfound) foo_with_notfound) / (memory_bytes / ignoring (job) memory_limit)", "instance, job", "dev, instance, job"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: differentLabelsText("prom", uri, "(foo / ignoring (notfound) foo_with_notfound) / (memory_bytes / ignoring (job) memory_limit)", "instance, job", "dev, instance, job"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},
@@ -1138,12 +1154,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+							},
+						},
+
 						Severity: checks.Bug,
 					},
 				}
@@ -1159,12 +1177,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+							},
+						},
+
 						Severity: checks.Warning,
 					},
 				}
@@ -1180,12 +1200,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
+							},
+						},
+
 						Severity: checks.Bug,
 					},
 				}
@@ -1217,12 +1239,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
+							},
+						},
+
 						Severity: checks.Bug,
 					},
 				}
@@ -1266,12 +1290,14 @@ func TestVectorMatchingCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.VectorMatchingCheckName,
-						Text:     differentFilters("job", "a", "b"),
+						Summary:  "impossible binary operation",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: differentFilters("job", "a", "b"),
+							},
+						},
+
 						Details:  checks.VectorMatchingCheckDetails,
 						Severity: checks.Bug,
 					},

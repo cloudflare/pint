@@ -2,7 +2,6 @@ package discovery
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -11,6 +10,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -22,12 +22,11 @@ const (
 )
 
 type FileIgnoreError struct {
-	Err  error
-	Line int
+	Diagnostic diags.Diagnostic
 }
 
 func (fe FileIgnoreError) Error() string {
-	return fe.Err.Error()
+	return fe.Diagnostic.Message
 }
 
 type ChangeType uint8
@@ -92,7 +91,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		return nil, err
 	}
 
-	contentLines := parser.LineRange{
+	contentLines := diags.LineRange{
 		First: min(content.TotalLines, 1),
 		Last:  content.TotalLines,
 	}
@@ -142,16 +141,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		}
 	}
 
-	if content.Ignored {
+	if content.Ignored != nil {
 		entries = append(entries, Entry{
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
 			PathError: FileIgnoreError{
-				Line: content.IgnoreLine,
-				// nolint:revive
-				Err: errors.New("This file was excluded from pint checks."),
+				Diagnostic: *content.Ignored,
 			},
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
@@ -204,7 +201,20 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
 				},
-				PathError:     comments.OwnerError(owner),
+				PathError: comments.OwnerError{
+					Diagnostic: diags.Diagnostic{
+						Message: fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", owner.Name, owner.Name),
+						Pos: diags.PositionRanges{
+							{
+								Line:        owner.Line,
+								FirstColumn: comment.Offset + 1,
+								LastColumn:  comment.Offset + len(owner.Name),
+							},
+						},
+						FirstColumn: comment.Offset + 1,
+						LastColumn:  comment.Offset + len(owner.Name),
+					},
+				},
 				ModifiedLines: contentLines.Expand(),
 			})
 		}

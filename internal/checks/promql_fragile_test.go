@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -41,14 +41,15 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
-						Text:     fragileSampleFunc("topk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fragileSampleFunc("topk"),
+							},
+						},
 					},
 				}
 			},
@@ -61,14 +62,15 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
-						Text:     fragileSampleFunc("topk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fragileSampleFunc("topk"),
+							},
+						},
 					},
 				}
 			},
@@ -81,24 +83,26 @@ func TestFragileCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
-						Text:     fragileSampleFunc("topk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fragileSampleFunc("topk"),
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.FragileCheckName,
-						Text:     fragileSampleFunc("bottomk"),
+						Summary:  "fragile query",
 						Details:  checks.FragileCheckSamplingDetails,
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fragileSampleFunc("bottomk"),
+							},
+						},
 					},
 				}
 			},

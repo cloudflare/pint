@@ -2,8 +2,11 @@ package checks
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
+	promParser "github.com/prometheus/prometheus/promql/parser"
+
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -43,12 +46,34 @@ func (c SyntaxCheck) Reporter() string {
 func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
 	expr := rule.Expr()
 	if expr.SyntaxError != nil {
+		diag := diags.Diagnostic{
+			Message:     expr.SyntaxError.Error(),
+			Pos:         expr.Value.Pos,
+			FirstColumn: 1,
+			LastColumn:  len(expr.Value.Value) - 1,
+		}
+
+		var perrs promParser.ParseErrors
+		ok := errors.As(expr.SyntaxError, &perrs)
+		if ok {
+			for _, perr := range perrs { // Use only the last error.
+				diag = diags.Diagnostic{
+					Message:     perr.Err.Error(),
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(perr.PositionRange.Start) + 1,
+					LastColumn:  int(perr.PositionRange.End),
+				}
+			}
+		}
+
 		problems = append(problems, Problem{
-			Lines:    expr.Value.Lines,
-			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Prometheus failed to parse the query with this PromQL error: %s.", expr.SyntaxError),
-			Details:  SyntaxCheckDetails,
-			Severity: Fatal,
+			Anchor:      AnchorAfter,
+			Lines:       expr.Value.Lines,
+			Reporter:    c.Reporter(),
+			Summary:     "PromQL syntax error",
+			Details:     SyntaxCheckDetails,
+			Diagnostics: []diags.Diagnostic{diag},
+			Severity:    Fatal,
 		})
 	}
 	return problems

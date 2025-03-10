@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -252,12 +253,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
+						Summary:  "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -269,12 +270,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this should be ignored, file is not part of the diff",
+						Summary:  "this should be ignored, file is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -286,12 +287,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "bad name",
+						Summary:  "bad name",
 						Severity: checks.Fatal,
 					},
 				},
@@ -303,12 +304,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Severity: checks.Bug,
 					},
 				},
@@ -320,12 +321,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
 						Reporter: "mock",
-						Text:     "mock text 2",
+						Summary:  "mock text 2",
 						Severity: checks.Warning,
 					},
 				},
@@ -528,12 +529,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "line is not part of the diff",
+						Summary:  "line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -545,12 +546,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "bad name",
+						Summary:  "bad name",
 						Severity: checks.Fatal,
 					},
 				},
@@ -562,12 +563,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Severity: checks.Bug,
 					},
 				},
@@ -579,12 +580,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
 						Reporter: "mock",
-						Text:     "mock text 2",
+						Summary:  "mock text 2",
 						Severity: checks.Warning,
 					},
 				},
@@ -659,12 +660,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{3, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "test/mock",
-						Text:     "syntax error",
+						Summary:  "syntax error",
 						Severity: checks.Fatal,
 					},
 				},
@@ -726,12 +727,12 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this line is not part of the diff",
+						Summary:  "this line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -743,12 +744,12 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "bad name",
+						Summary:  "bad name",
 						Severity: checks.Bug,
 					},
 				},
@@ -760,12 +761,12 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[0],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Severity: checks.Bug,
 					},
 				},
@@ -777,12 +778,12 @@ func TestBitBucketReporter(t *testing.T) {
 					Rule:          mockRules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
 						Reporter: "mock",
-						Text:     "mock text 2",
+						Summary:  "mock text 2",
 						Severity: checks.Warning,
 					},
 				},
@@ -897,12 +898,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
+						Summary:  "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -914,12 +915,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "bad name",
+						Summary:  "bad name",
 						Severity: checks.Fatal,
 					},
 				},
@@ -931,12 +932,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "mock text",
+						Summary:  "mock text",
 						Details:  "mock details",
 						Severity: checks.Bug,
 					},
@@ -949,12 +950,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 4,
 							Last:  4,
 						},
 						Reporter: "mock",
-						Text:     "mock text 2",
+						Summary:  "mock text 2",
 						Severity: checks.Warning,
 					},
 				},
@@ -1473,12 +1474,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
+						Summary:  "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -1636,12 +1637,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
+						Summary:  "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -1653,12 +1654,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 1,
 							Last:  1,
 						},
 						Reporter: "mock",
-						Text:     "this should be ignored, line is not part of the diff",
+						Summary:  "this should be ignored, line is not part of the diff",
 						Severity: checks.Bug,
 					},
 				},
@@ -1670,12 +1671,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "bad name",
+						Summary:  "bad name",
 						Details:  "bad name details",
 						Severity: checks.Warning,
 					},
@@ -1688,12 +1689,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[0],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "mock text 1",
+						Summary:  "mock text 1",
 						Details:  "mock details",
 						Severity: checks.Warning,
 					},
@@ -1706,12 +1707,12 @@ func TestBitBucketReporter(t *testing.T) {
 					ModifiedLines: []int{2, 4},
 					Rule:          mockRules[1],
 					Problem: checks.Problem{
-						Lines: parser.LineRange{
+						Lines: diags.LineRange{
 							First: 2,
 							Last:  2,
 						},
 						Reporter: "mock",
-						Text:     "mock text 2",
+						Summary:  "mock text 2",
 						Details:  "mock details",
 						Severity: checks.Warning,
 					},

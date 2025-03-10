@@ -50,8 +50,6 @@ linters-settings:
       - crypto/tls\..+
       - encoding/xml\..+
       - .+/checks\.badMatcher
-      - .+/checks\.Problem
-      - .+/checks\.exprProblem
       - .+/checks\..+Settings
       - .+/config\.Match
       - .+/discovery\.Entry

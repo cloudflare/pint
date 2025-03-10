@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -63,13 +63,14 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
-						Text:     checkErrorUnableToRun(checks.LabelsConflictCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  "unable to run checks",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.LabelsConflictCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+							},
+						},
 					},
 				}
 			},
@@ -82,14 +83,15 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
-						Text:     textExternalLabelsRR("prom", uri, "foo", "bob"),
+						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: textExternalLabelsRR("prom", uri, "foo", "bob"),
+							},
+						},
 					},
 				}
 			},
@@ -108,14 +110,15 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
-						Text:     textExternalLabelsRR("prom", uri, "foo", "bob"),
+						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: textExternalLabelsRR("prom", uri, "foo", "bob"),
+							},
+						},
 					},
 				}
 			},
@@ -134,14 +137,15 @@ func TestLabelsConflictCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelsConflictCheckName,
-						Text:     textExternalLabelsAR("prom", uri, "foo", "bar"),
+						Summary:  "conflicting labels",
 						Details:  alertsExternalLabelsDetails("prom", uri),
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: textExternalLabelsAR("prom", uri, "foo", "bar"),
+							},
+						},
 					},
 				}
 			},

@@ -200,7 +200,7 @@ func TestReadContent(t *testing.T) {
 			}
 
 			require.Equal(t, string(tc.output), string(output.Body), "ReadContent() returned wrong output")
-			require.Equal(t, tc.ignored, output.Ignored, "ReadContent() returned wrong Ignored value")
+			require.Equal(t, tc.ignored, output.Ignored != nil, "ReadContent() returned wrong Ignored value")
 		})
 	}
 }

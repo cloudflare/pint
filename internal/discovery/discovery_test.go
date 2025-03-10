@@ -3,7 +3,6 @@ package discovery
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/parser"
 )
 
@@ -300,7 +300,16 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{1, 2, 3, 4, 5},
-					PathError:     FileIgnoreError{Line: 2, Err: errors.New("file was ignored")},
+					PathError: FileIgnoreError{
+						Diagnostic: diags.Diagnostic{
+							Message: "This file was excluded from pint checks.",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 1, LastColumn: 18},
+							},
+							FirstColumn: 1,
+							LastColumn:  18,
+						},
+					},
 				},
 			},
 		},
@@ -328,7 +337,16 @@ groups:
 						SymlinkTarget: "rules.yml",
 					},
 					ModifiedLines: []int{1, 2, 3, 4, 5, 6, 7, 8},
-					PathError:     FileIgnoreError{Line: 2, Err: errors.New("file was ignored")},
+					PathError: FileIgnoreError{
+						Diagnostic: diags.Diagnostic{
+							Message: "This file was excluded from pint checks.",
+							Pos: diags.PositionRanges{
+								{Line: 2, FirstColumn: 1, LastColumn: 18},
+							},
+							FirstColumn: 1,
+							LastColumn:  18,
+						},
+					},
 				},
 			},
 		},

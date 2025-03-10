@@ -12,35 +12,49 @@ level=ERROR msg="Query returned an error" err="failed to query Prometheus config
 level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
 level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
 level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
-rules/0001.yml:1-2 Bug: Duplicated rule, identical rule found at rules/0002.yml:1. (rule/duplicate)
- 1 | - record: "colo:duplicate"
- 2 |   expr: sum(foo) without(job)
+Bug: duplicated recording rule (rule/duplicate)
+  ---> rules/0001.yml:1-2
+1 | - record: "colo:duplicate"
+               ^^^^^^^^^^^^^^ Duplicated rule, identical rule found at rules/0002.yml:1.
+2 |   expr: sum(foo) without(job)
 
-rules/0001.yml:7-8 Bug: Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`. (labels/conflict)
- 7 |   labels:
- 8 |     file: a
+Bug: unable to run checks (labels/conflict)
+  ---> rules/0001.yml:7-8
+7 |   labels:
+      ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+8 |     file: a
 
-rules/0001.yml:9-12 Bug: Duplicated rule, identical rule found at rules/0002.yml:11. (rule/duplicate)
-  9 | - record: "colo:labels:equal"
- 10 |   expr: sum(foo) without(job)
- 11 |   labels:
- 12 |     same: yes
+Bug: duplicated recording rule (rule/duplicate)
+  ---> rules/0001.yml:9-12
+ 9 | - record: "colo:labels:equal"
+                ^^^^^^^^^^^^^^^^^ Duplicated rule, identical rule found at rules/0002.yml:11.
+10 |   expr: sum(foo) without(job)
+11 |   labels:
+12 |     same: yes
 
-rules/0001.yml:11-12 Bug: Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`. (labels/conflict)
- 11 |   labels:
- 12 |     same: yes
+Bug: unable to run checks (labels/conflict)
+  ---> rules/0001.yml:11-12
+11 |   labels:
+       ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+12 |     same: yes
 
-rules/0002.yml:5-6 Bug: Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`. (labels/conflict)
- 5 |   labels:
- 6 |     empty: nope
+Bug: unable to run checks (labels/conflict)
+  ---> rules/0002.yml:5-6
+5 |   labels:
+      ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+6 |     empty: nope
 
-rules/0002.yml:9-10 Bug: Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`. (labels/conflict)
-  9 |   labels:
- 10 |     file: b
+Bug: unable to run checks (labels/conflict)
+  ---> rules/0002.yml:9-10
+ 9 |   labels:
+       ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+10 |     file: b
 
-rules/0002.yml:13-14 Bug: Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`. (labels/conflict)
- 13 |   labels:
- 14 |     same: yes
+Bug: unable to run checks (labels/conflict)
+  ---> rules/0002.yml:13-14
+13 |   labels:
+       ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+14 |     same: yes
 
 level=INFO msg="Problems found" Bug=7
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

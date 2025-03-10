@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"math"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -27,13 +28,15 @@ const (
 
 type ExcludedLabel struct {
 	Reason   string
-	Fragment string
+	Fragment posrange.PositionRange
 }
 
 type Join struct {
 	Src Source
 }
 
+// FIXME remove Selector/Call/Aggregation?
+// Use a single parser.Node instead?
 type Source struct {
 	Selector         *promParser.VectorSelector // Vector selector used for this source.
 	Call             *promParser.Call           // Most outer call used inside this source.
@@ -47,27 +50,74 @@ type Source struct {
 	IncludedLabels   []string // Labels that are included by filters, they will be present if exist on source series (by).
 	ExcludedLabels   []string // Labels guaranteed to be excluded from the results (without).
 	GuaranteedLabels []string // Labels guaranteed to be present on the results (matchers).
-	ReturnedNumber   float64  // If AlwaysReturns=true this is the number that's returned
+	Position         posrange.PositionRange
+	ReturnedNumber   float64 // If AlwaysReturns=true this is the number that's returned
 	Type             SourceType
 	FixedLabels      bool // Labels are fixed and only allowed labels can be present.
 	IsDead           bool // True if this source cannot be reached and is dead code.
 	AlwaysReturns    bool // True if this source always returns results.
+	KnownReturn      bool // True if we always know the return value.
 	IsConditional    bool // True if this source is guarded by 'foo > 5' or other condition.
 }
 
 func (s Source) Fragment(expr string) string {
 	switch {
 	case s.Type == FuncSource && s.Call != nil:
-		return getQueryFragment(expr, s.Call.PosRange)
+		return GetQueryFragment(expr, s.Call.PosRange)
 	case s.Call != nil:
-		return getQueryFragment(expr, s.Call.PosRange)
+		return GetQueryFragment(expr, s.Call.PosRange)
 	case s.Type == AggregateSource && s.Aggregation != nil:
-		return getQueryFragment(expr, s.Aggregation.PosRange)
+		return GetQueryFragment(expr, s.Aggregation.PosRange)
 	case s.Selector != nil:
-		return getQueryFragment(expr, s.Selector.PosRange)
+		return GetQueryFragment(expr, s.Selector.PosRange)
 	default:
 		return ""
 	}
+}
+
+func (s Source) GetSmallestPosition() (pr posrange.PositionRange) {
+	pr.Start = s.Position.Start
+	pr.End = s.Position.End
+
+	if s.Selector != nil {
+		if s.Selector.PosRange.Start > pr.Start {
+			pr.Start = s.Selector.PosRange.Start
+			pr.End = s.Selector.PosRange.End
+		}
+	}
+	if s.Call != nil {
+		if s.Call.PosRange.Start > pr.Start {
+			pr.Start = s.Call.PosRange.Start
+			pr.End = s.Call.PosRange.End
+		}
+	}
+	if s.Aggregation != nil {
+		if s.Aggregation.PosRange.Start > pr.Start {
+			pr.Start = s.Aggregation.PosRange.Start
+			pr.End = s.Aggregation.PosRange.End
+		}
+	}
+	return pr
+}
+
+func (s Source) CanHaveLabel(name string) bool {
+	if slices.Contains(s.ExcludedLabels, name) {
+		return false
+	}
+	if slices.Contains(s.IncludedLabels, name) {
+		return true
+	}
+	if slices.Contains(s.GuaranteedLabels, name) {
+		return true
+	}
+	return !s.FixedLabels
+}
+
+func (s Source) LabelExcludeReason(name string) ExcludedLabel {
+	if el, ok := s.ExcludeReason[name]; ok {
+		return el
+	}
+	return s.ExcludeReason[""]
 }
 
 type Visitor func(s Source)
@@ -107,6 +157,7 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 	case *promParser.NumberLiteral:
 		s.Type = NumberSource
 		s.Returns = promParser.ValueTypeScalar
+		s.KnownReturn = true
 		s.ReturnedNumber = n.Val
 		s.IncludedLabels = nil
 		s.GuaranteedLabels = nil
@@ -116,10 +167,11 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 			s.ExcludeReason,
 			"",
 			ExcludedLabel{
-				Reason:   "This returns a number value with no labels.",
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Reason:   "This query returns a number value with no labels.",
+				Fragment: n.PosRange,
 			},
 		)
+		s.Position = n.PosRange
 		src = append(src, s)
 
 	case *promParser.ParenExpr:
@@ -136,10 +188,11 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 			s.ExcludeReason,
 			"",
 			ExcludedLabel{
-				Reason:   "This returns a string value with no labels.",
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Reason:   "This query returns a string value with no labels.",
+				Fragment: n.PosRange,
 			},
 		)
+		s.Position = n.PosRange
 		src = append(src, s)
 
 	case *promParser.UnaryExpr:
@@ -160,10 +213,11 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 				name,
 				ExcludedLabel{
 					Reason:   fmt.Sprintf("Query uses `{%s=\"\"}` selector which will filter out any time series with the `%s` label set.", name, name),
-					Fragment: getQueryFragment(expr, n.PosRange),
+					Fragment: n.PosRange,
 				},
 			)
 		}
+		s.Position = n.PosRange
 		src = append(src, s)
 
 	default:
@@ -200,6 +254,17 @@ func includeLabel(s Source, names ...string) Source {
 		delete(s.ExcludeReason, name)
 	}
 	s.IncludedLabels = appendToSlice(s.IncludedLabels, names...)
+	return s
+}
+
+// Include labels that were not already excluded.
+// FIXME most should use this?
+func maybeIncludeLabel(s Source, names ...string) Source {
+	for _, name := range names {
+		if !slices.Contains(s.ExcludedLabels, name) {
+			s.IncludedLabels = appendToSlice(s.IncludedLabels, names...)
+		}
+	}
 	return s
 }
 
@@ -278,7 +343,7 @@ func labelsWithEmptyValueSelector(selector *promParser.VectorSelector) (names []
 	return names
 }
 
-func getQueryFragment(expr string, pos posrange.PositionRange) string {
+func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 	return expr[pos.Start:pos.End]
 }
 
@@ -290,48 +355,56 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "sum"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.MIN:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "min"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.MAX:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "max"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.AVG:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "avg"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.GROUP:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "group"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.STDDEV:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "stddev"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.STDVAR:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "stdvar"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.COUNT:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "count"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.COUNT_VALUES:
@@ -341,12 +414,14 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			// Param is the label to store the count value in.
 			s = includeLabel(s, n.Param.(*promParser.StringLiteral).Val)
 			s = guaranteeLabel(s, n.Param.(*promParser.StringLiteral).Val)
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.QUANTILE:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "quantile"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.TOPK:
@@ -354,6 +429,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Type = AggregateSource
 			s.Aggregation = n
 			s.Operation = "topk"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 	case promParser.BOTTOMK:
@@ -361,6 +437,7 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			s.Type = AggregateSource
 			s.Aggregation = n
 			s.Operation = "bottomk"
+			s.Position = n.PosRange
 			src = append(src, s)
 		}
 		/*
@@ -390,7 +467,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					ExcludedLabel{
 						Reason: fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
 							strings.Join(n.Grouping, ", ")),
-						Fragment: getQueryFragment(expr, n.PosRange),
+						Fragment: FindPosition(expr, n.PosRange, "without"),
 					},
 				)
 			}
@@ -403,20 +480,20 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					"",
 					ExcludedLabel{
 						Reason:   "Query is using aggregation that removes all labels.",
-						Fragment: getQueryFragment(expr, n.PosRange),
+						Fragment: FindPosition(expr, n.PosRange, "sum"),
 					},
 				)
 			} else {
 				// Check if source of labels already fixes them.
 				if !s.FixedLabels {
-					s = includeLabel(s, n.Grouping...)
+					s = maybeIncludeLabel(s, n.Grouping...)
 					s.ExcludeReason = setInMap(
 						s.ExcludeReason,
 						"",
 						ExcludedLabel{
 							Reason: fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
 								strings.Join(n.Grouping, ", ")),
-							Fragment: getQueryFragment(expr, n.PosRange),
+							Fragment: FindPosition(expr, n.PosRange, "by"),
 						},
 					)
 				}
@@ -472,7 +549,7 @@ Since there are no matching time series there are also no labels. If some time s
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `+"`up`"+` metric instead.`,
 					n.Func.Name, n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: FindPosition(expr, n.PosRange, n.Func.Name),
 			},
 		)
 
@@ -496,7 +573,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				ExcludedLabel{
 					Reason: fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
 						n.Func.Name),
-					Fragment: getQueryFragment(expr, n.PosRange),
+					Fragment: n.PosRange,
 				},
 			)
 		} else {
@@ -540,7 +617,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: n.PosRange,
 			},
 		)
 
@@ -555,7 +632,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: FindPosition(expr, n.PositionRange(), n.Func.Name),
 			},
 		)
 
@@ -574,7 +651,7 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: n.PosRange,
 			},
 		)
 
@@ -589,15 +666,18 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
 		s.AlwaysReturns = true
-		if v, ok := n.Args[0].(*promParser.NumberLiteral); ok {
-			s.ReturnedNumber = v.Val
+		for _, vs := range walkNode(expr, n.Args[0]) {
+			if vs.KnownReturn {
+				s.ReturnedNumber = vs.ReturnedNumber
+				s.KnownReturn = true
+			}
 		}
 		s.ExcludeReason = setInMap(
 			s.ExcludeReason,
 			"",
 			ExcludedLabel{
 				Reason:   fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
-				Fragment: getQueryFragment(expr, n.PosRange),
+				Fragment: FindPosition(expr, n.PosRange, n.Func.Name),
 			},
 		)
 
@@ -635,6 +715,7 @@ func parseCall(expr string, n *promParser.Call) (src []Source) {
 		s.Type = FuncSource
 		s.Operation = n.Func.Name
 		s.Call = n
+		s.Position = n.PosRange
 		src = append(src, parsePromQLFunc(s, expr, n))
 	}
 
@@ -657,7 +738,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 			for _, rs := range rhs {
 				rs.IsConditional = n.Op.IsComparisonOperator()
 				switch {
-				case ls.AlwaysReturns && rs.AlwaysReturns:
+				case ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn:
 					// Both sides always return something
 					ls.ReturnedNumber, ls.IsDead, ls.IsDeadReason = calculateStaticReturn(
 						expr,
@@ -696,13 +777,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 							"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
 							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 						),
-						Fragment: getQueryFragment(
-							expr,
-							posrange.PositionRange{
-								Start: n.LHS.PositionRange().Start,
-								End:   n.RHS.PositionRange().End,
-							},
-						),
+						Fragment: FindPosition(expr, n.PositionRange(), "on"),
 					},
 				)
 			} else {
@@ -716,19 +791,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 								"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
 								n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
 							),
-							Fragment: getQueryFragment(
-								expr,
-								posrange.PositionRange{
-									Start: n.LHS.PositionRange().Start,
-									End:   n.RHS.PositionRange().End,
-								},
-							),
+							Fragment: FindPosition(expr, n.PositionRange(), "ignoring"),
 						},
 					)
 				}
 				for _, rs := range rhs {
 					rs.IsConditional = n.Op.IsComparisonOperator()
-					if s.AlwaysReturns && rs.AlwaysReturns {
+					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
 						// Both sides always return something
 						s.ReturnedNumber, s.IsDead, s.IsDeadReason = calculateStaticReturn(
 							expr,
@@ -845,7 +914,6 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Src: rs,
 					})
 				case n.Op != promParser.LOR:
-
 					s.Joins = append(s.Joins, Join{
 						Src: rs,
 					})
@@ -883,31 +951,18 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {
 		return true, ""
 	case vm.On: // ls on(...) unless rs
 		for _, name := range vm.MatchingLabels {
-			if canHaveLabels(ls, name) && !canHaveLabels(rs, name) {
+			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
 				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`", side, name)
 			}
 		}
 	default: // ls unless rs
 		for _, name := range ls.GuaranteedLabels {
-			if canHaveLabels(ls, name) && !canHaveLabels(rs, name) {
+			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
 				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will", side, name)
 			}
 		}
 	}
 	return true, ""
-}
-
-func canHaveLabels(s Source, name string) bool {
-	if slices.Contains(s.ExcludedLabels, name) {
-		return false
-	}
-	if slices.Contains(s.IncludedLabels, name) {
-		return true
-	}
-	if slices.Contains(s.GuaranteedLabels, name) {
-		return true
-	}
-	return !s.FixedLabels
 }
 
 func ftos(v float64) string {
@@ -963,4 +1018,17 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 		return math.Pow(ls.ReturnedNumber, rs.ReturnedNumber), isDead, ""
 	}
 	return ls.ReturnedNumber, isDead, ""
+}
+
+// FIXME sum() on ().
+func FindPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
+	re := regexp.MustCompile("(?i)(" + fn + ")[ \n\t]*\\(")
+	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
+	if idx == nil {
+		return within
+	}
+	return posrange.PositionRange{
+		Start: within.Start + posrange.Pos(idx[0]),
+		End:   within.Start + posrange.Pos(idx[1]-1),
+	}
 }

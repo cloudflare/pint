@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -20,14 +20,15 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "required label not set",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -42,13 +43,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "required label not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -70,13 +72,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  7,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "required label not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -108,13 +111,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  5,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`sev.+` label is required.",
+						Summary:  "required label not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`sev.+` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -138,13 +142,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label value `warning` must match `^critical$`.",
+							},
+						},
 					},
 				}
 			},
@@ -159,13 +164,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label value `warning` must match `^critical$`.",
+							},
+						},
 					},
 				}
 			},
@@ -188,14 +194,15 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`priority` label value `2a` must match `^(1|2|3)$`.",
+						Summary:  "invalid label value",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`priority` label value `2a` must match `^(1|2|3)$`.",
+							},
+						},
 					},
 				}
 			},
@@ -218,13 +225,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`priority` label value `2a` must match `^(1|2|3)$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`priority` label value `2a` must match `^(1|2|3)$`.",
+							},
+						},
 					},
 				}
 			},
@@ -239,13 +247,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "required label not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -267,13 +276,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  7,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "required label not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -297,13 +307,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label is required.",
+						Summary:  "required label not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label is required.",
+							},
+						},
 					},
 				}
 			},
@@ -327,13 +338,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical|info$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label value `warning` must match `^critical|info$`.",
+							},
+						},
 					},
 				}
 			},
@@ -348,13 +360,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`severity` label value `warning` must match `^critical|info$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` label value `warning` must match `^critical|info$`.",
+							},
+						},
 					},
 				}
 			},
@@ -414,13 +427,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`for` label value `must wait 5m to fire` must match `^must wait {{$for}} to fire$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`for` label value `must wait 5m to fire` must match `^must wait {{$for}} to fire$`.",
+							},
+						},
 					},
 				}
 			},
@@ -435,13 +449,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` must match `^api|memcached$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`components` label value `db` must match `^api|memcached$`.",
+							},
+						},
 					},
 				}
 			},
@@ -464,14 +479,15 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` is not one of valid values.",
+						Summary:  "invalid label value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`components` label value `db` is not one of valid values.",
+							},
+						},
 					},
 				}
 			},
@@ -486,13 +502,14 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` must match `^api|memcached$`.",
+						Summary:  "invalid label value",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`components` label value `db` must match `^api|memcached$`.",
+							},
+						},
 					},
 				}
 			},
@@ -515,14 +532,15 @@ func TestLabelCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.LabelCheckName,
-						Text:     "`components` label value `db` is not one of valid values.",
+						Summary:  "invalid label value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n- `memsql`\n- `haproxy`\n\nRule comment: some text",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`components` label value `db` is not one of valid values.",
+							},
+						},
 					},
 				}
 			},

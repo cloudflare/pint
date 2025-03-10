@@ -13,6 +13,7 @@ import (
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -733,7 +734,7 @@ groups:
 					},
 					ModifiedLines: []int{5, 6, 7},
 					Rule: parser.Rule{
-						Lines: parser.LineRange{First: 5, Last: 7},
+						Lines: diags.LineRange{First: 5, Last: 7},
 						Error: parser.ParseError{
 							Line: 7,
 							Err:  errors.New("duplicated expr key"),

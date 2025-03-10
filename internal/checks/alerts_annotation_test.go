@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -29,13 +29,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "required annotation not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` annotation is required.",
+							},
+						},
 					},
 				}
 			},
@@ -50,13 +51,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 1,
-							Last:  2,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "required annotation not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` annotation is required.",
+							},
+						},
 					},
 				}
 			},
@@ -78,13 +80,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  7,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "required annotation not set",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` annotation is required.",
+							},
+						},
 					},
 				}
 			},
@@ -108,13 +111,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation is required.",
+						Summary:  "required annotation not set",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` annotation is required.",
+							},
+						},
 					},
 				}
 			},
@@ -138,13 +142,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation value `bar` must match `^critical$`.",
+						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` annotation value `bar` must match `^critical$`.",
+							},
+						},
 					},
 				}
 			},
@@ -159,13 +164,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`severity` annotation value `bar` must match `^critical$`.",
+						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`severity` annotation value `bar` must match `^critical$`.",
+							},
+						},
 					},
 				}
 			},
@@ -207,13 +213,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`for` annotation value `4m` must match `^{{ $for }}$`.",
+						Summary:  "invalid annotation value",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`for` annotation value `4m` must match `^{{ $for }}$`.",
+							},
+						},
 					},
 				}
 			},
@@ -246,13 +253,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`annotation_.*` annotation value `bar` must match `^critical$`.",
+						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`annotation_.*` annotation value `bar` must match `^critical$`.",
+							},
+						},
 					},
 				}
 			},
@@ -267,13 +275,14 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`annotation_.*` annotation value `bar` must match `^critical$`.",
+						Summary:  "invalid annotation value",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`annotation_.*` annotation value `bar` must match `^critical$`.",
+							},
+						},
 					},
 				}
 			},
@@ -288,14 +297,15 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`components` annotation value `db` must match `^api|memcached$`.",
+						Summary:  "invalid annotation value",
 						Details:  "Rule comment: rule comment",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`components` annotation value `db` must match `^api|memcached$`.",
+							},
+						},
 					},
 				}
 			},
@@ -318,14 +328,15 @@ func TestAnnotationCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.AnnotationCheckName,
-						Text:     "`components` annotation value `db` is not one of valid values.",
+						Summary:  "invalid annotation value",
 						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).\nRule comment: rule comment",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`components` annotation value `db` is not one of valid values.",
+							},
+						},
 					},
 				}
 			},

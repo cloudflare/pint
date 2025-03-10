@@ -5,23 +5,35 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Finding all rules to check" paths=["rules.yml"]
 level=INFO msg="Checking Prometheus rules" entries=6 workers=10 online=true
-rules.yml:4 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
+  ---> rules.yml:4
  4 |       - record:
+     ^^^ This rule is not a valid Prometheus rule: `record value cannot be empty`.
 
-rules.yml:6 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
+  ---> rules.yml:6
  6 |       - record:
+     ^^^ This rule is not a valid Prometheus rule: `record value cannot be empty`.
 
-rules.yml:9 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+  ---> rules.yml:9
  9 |         expr:
+     ^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
 
-rules.yml:10 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
+  ---> rules.yml:10
  10 |       - alert:
+      ^^^ This rule is not a valid Prometheus rule: `alert value cannot be empty`.
 
-rules.yml:12 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
+  ---> rules.yml:12
  12 |       - alert:
+      ^^^ This rule is not a valid Prometheus rule: `alert value cannot be empty`.
 
-rules.yml:15 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
+  ---> rules.yml:15
  15 |         expr:
+      ^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
 
 level=INFO msg="Problems found" Fatal=6
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

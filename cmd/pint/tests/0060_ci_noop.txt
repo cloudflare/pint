@@ -33,8 +33,10 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check on current git branch" base=main
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=INFO msg="Problems found" Fatal=1
-b.yml:2 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected identifier "bi". (promql/syntax)
- 2 |   expr: sum(foo) bi()
+Fatal: PromQL syntax error (promql/syntax)
+  ---> b.yml:2
+2 |   expr: sum(foo) bi()
+                     ^^ unexpected identifier "bi"
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/a.yml --

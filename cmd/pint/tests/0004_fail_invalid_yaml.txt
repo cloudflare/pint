@@ -7,11 +7,15 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=WARN msg="Failed to parse file content" err="error at line 4: did not find expected key" path=rules/bad.yaml lines=1-7
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
-rules/bad.yaml:4 Fatal: did not find expected key (yaml/parse)
+Fatal: did not find expected key (yaml/parse)
+  ---> rules/bad.yaml:4
  4 | 
+     ^^^ did not find expected key
 
-rules/ok.yml:5 Fatal: Prometheus failed to parse the query with this PromQL error: unclosed left bracket. (promql/syntax)
- 5 |     expr: sum(foo[5m)
+Fatal: PromQL syntax error (promql/syntax)
+  ---> rules/ok.yml:5
+5 |     expr: sum(foo[5m)
+                        ^ unclosed left bracket
 
 level=INFO msg="Problems found" Fatal=2
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

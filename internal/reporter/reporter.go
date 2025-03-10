@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -40,7 +41,10 @@ func (r Report) isEqual(nr Report) bool {
 	if nr.Problem.Reporter != r.Problem.Reporter {
 		return false
 	}
-	if nr.Problem.Text != r.Problem.Text {
+	if nr.Problem.Summary != r.Problem.Summary {
+		return false
+	}
+	if !isSameDiagnostics(nr.Problem.Diagnostics, r.Problem.Diagnostics) {
 		return false
 	}
 	if nr.Problem.Severity != r.Problem.Severity {
@@ -92,12 +96,12 @@ func (s *Summary) GetPrometheusDetails() []PrometheusDetails {
 		for idx := range p.DisabledChecks {
 			slices.Sort(p.DisabledChecks[idx].Checks)
 		}
-		slices.SortFunc(p.DisabledChecks, func(a, b DisabledChecks) int {
+		slices.SortStableFunc(p.DisabledChecks, func(a, b DisabledChecks) int {
 			return cmp.Compare(a.API, b.API)
 		})
 		pd = append(pd, p)
 	}
-	slices.SortFunc(pd, func(a, b PrometheusDetails) int {
+	slices.SortStableFunc(pd, func(a, b PrometheusDetails) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 	return pd
@@ -121,14 +125,25 @@ func (s Summary) hasReport(r Report) bool {
 }
 
 func (s *Summary) SortReports() {
-	slices.SortFunc(s.reports, func(a, b Report) int {
+	for i := range s.reports {
+		slices.SortStableFunc(s.reports[i].Problem.Diagnostics, func(a, b diags.Diagnostic) int {
+			return cmp.Or(
+				cmp.Compare(b.FirstColumn, a.FirstColumn),
+				cmp.Compare(a.LastColumn, b.LastColumn),
+				cmp.Compare(a.Message, b.Message),
+			)
+		})
+	}
+
+	slices.SortStableFunc(s.reports, func(a, b Report) int {
 		return cmp.Or(
 			cmp.Compare(a.Path.Name, b.Path.Name),
 			cmp.Compare(a.Problem.Lines.First, b.Problem.Lines.First),
 			cmp.Compare(a.Problem.Lines.Last, b.Problem.Lines.Last),
 			cmp.Compare(a.Problem.Severity, b.Problem.Severity),
 			cmp.Compare(a.Problem.Reporter, b.Problem.Reporter),
-			cmp.Compare(a.Problem.Text, b.Problem.Text),
+			cmp.Compare(a.Problem.Summary, b.Problem.Summary),
+			cmpDiagnostics(a.Problem.Diagnostics, b.Problem.Diagnostics),
 		)
 	})
 }
@@ -172,4 +187,48 @@ func (s Summary) CountBySeverity() map[checks.Severity]int {
 
 type Reporter interface {
 	Submit(Summary) error
+}
+
+func cmpDiags(a, b diags.Diagnostic) int {
+	return cmp.Or(
+		cmp.Compare(b.FirstColumn, a.FirstColumn),
+		cmp.Compare(a.LastColumn, b.LastColumn),
+		cmp.Compare(a.Message, b.Message),
+	)
+}
+
+func cmpDiagnostics(sa, sb []diags.Diagnostic) int {
+	if len(sa) == 0 {
+		return -1
+	}
+	if len(sb) == 0 {
+		return 1
+	}
+
+	slices.SortStableFunc(sa, cmpDiags)
+	slices.SortStableFunc(sb, cmpDiags)
+
+	return cmpDiags(sa[0], sb[0])
+}
+
+func isSameDiagnostics(sa, sb []diags.Diagnostic) bool {
+	if len(sa) != len(sb) {
+		return false
+	}
+
+	var ok bool
+	for _, a := range sa {
+		ok = false
+		for _, b := range sb {
+			if a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn && a.Message == b.Message {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return false
+		}
+	}
+
+	return true
 }

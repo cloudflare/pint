@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/common/model"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -48,34 +49,53 @@ func (c AlertsForChecksFor) Check(_ context.Context, _ discovery.Path, rule pars
 	}
 
 	if rule.AlertingRule.For != nil {
-		problems = append(problems, c.checkField("for", rule.AlertingRule.For.Value, rule.AlertingRule.For.Lines)...)
+		problems = append(problems, c.checkField("for", rule.AlertingRule.For)...)
 	}
 	if rule.AlertingRule.KeepFiringFor != nil {
-		problems = append(problems, c.checkField("keep_firing_for", rule.AlertingRule.KeepFiringFor.Value, rule.AlertingRule.KeepFiringFor.Lines)...)
+		problems = append(problems, c.checkField("keep_firing_for", rule.AlertingRule.KeepFiringFor)...)
 	}
 
 	return problems
 }
 
-func (c AlertsForChecksFor) checkField(name, value string, lines parser.LineRange) (problems []Problem) {
-	d, err := model.ParseDuration(value)
+func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (problems []Problem) {
+	d, err := model.ParseDuration(value.Value)
 	if err != nil {
 		problems = append(problems, Problem{
-			Lines:    lines,
+			Anchor:   AnchorAfter,
+			Lines:    value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("invalid duration: %s", err),
+			Summary:  "invalid duration",
 			Details:  AlertForCheckDurationHelp,
 			Severity: Bug,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     err.Error(),
+					Pos:         value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(value.Value),
+				},
+			},
 		})
 		return problems
 	}
 
 	if d == 0 {
 		problems = append(problems, Problem{
-			Lines:    lines,
+			Anchor:   AnchorAfter,
+			Lines:    value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("`%s` is the default value of `%s`, consider removing this redundant line.", value, name),
+			Summary:  "redundant field with default value",
+			Details:  "",
 			Severity: Information,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s` is the default value of `%s`, this line is unnecessary.", value.Value, name),
+					Pos:         value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(value.Value),
+				},
+			},
 		})
 	}
 

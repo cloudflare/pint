@@ -10,6 +10,7 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -52,14 +53,15 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
+						Summary:  "duration too small",
 						Details:  checks.RateCheckDetails,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "rate", "2", "1m"),
+							},
+						},
 					},
 				}
 			},
@@ -122,13 +124,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "irate", "2", "1m"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "duration too small",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "irate", "2", "1m"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -154,13 +156,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "deriv", "2", "1m"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "duration too small",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "deriv", "2", "1m"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -332,13 +334,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "duration too small",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "rate", "2", "1m"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -364,12 +366,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -389,12 +392,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -414,14 +418,15 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text: checkErrorUnableToRun(checks.RateCheckName, "prom", uri,
-							fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
+						Summary:  "unable to run checks",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri,
+									fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
+							},
+						},
 					},
 				}
 			},
@@ -442,12 +447,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -480,22 +486,23 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "duration too small",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "rate", "2", "1m"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -536,13 +543,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "duration too small",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "rate", "2", "1m"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -566,23 +573,23 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     durationMustText("prom", uri, "rate", "2", "1m"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "duration too small",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: durationMustText("prom", uri, "rate", "2", "1m"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "counter based function called on a non-counter",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: notCounterText("prom", uri, "rate", "foo", "gauge"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -608,13 +615,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     notCounterText("prom", uri, "rate", "bar_g", "gauge"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "counter based function called on a non-counter",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: notCounterText("prom", uri, "rate", "bar_g", "gauge"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -671,13 +678,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     notCounterText("prom", uri, "rate", "foo", "gauge"),
-						Details:  checks.RateCheckDetails,
+						Summary:  "counter based function called on a non-counter",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: notCounterText("prom", uri, "rate", "foo", "gauge"),
+							},
+						}, Details: checks.RateCheckDetails,
 						Severity: checks.Bug,
 					},
 				}
@@ -707,13 +714,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     rateSumText("my:sum[5m]", "sum(foo)"),
-						Details:  rateSumDetails(),
+						Summary:  "chained rate call",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: rateSumText("my:sum[5m]", "sum(foo)"),
+							},
+						}, Details: rateSumDetails(),
 						Severity: checks.Bug,
 					},
 				}
@@ -750,12 +757,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "promql/rate",
-						Text:     checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -900,13 +908,13 @@ func TestRateCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  11,
-						},
 						Reporter: "promql/rate",
-						Text:     rateSumText(`global:response_time_sum{namespace!~"test[.].+"}[15m]`, "sum(response_time_sum:rate2m)"),
-						Details:  rateSumDetails(),
+						Summary:  "chained rate call",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: rateSumText(`global:response_time_sum{namespace!~"test[.].+"}[15m]`, "sum(response_time_sum:rate2m)"),
+							},
+						}, Details: rateSumDetails(),
 						Severity: checks.Warning,
 					},
 				}

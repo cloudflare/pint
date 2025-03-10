@@ -6,13 +6,17 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=3 workers=10 online=true
-rules/0001.yml:4-6 Bug: `alert_for` annotation is required. (alerts/annotation)
- 4 | - alert: Instance Is Down 2
- 5 |   expr: up == 0
- 6 |   for: 5m
+Bug: required annotation not set (alerts/annotation)
+  ---> rules/0001.yml:4-6
+4 | - alert: Instance Is Down 2
+5 |   expr: up == 0
+6 |   for: 5m
+           ^^ `alert_for` annotation is required.
 
-rules/0001.yml:12 Bug: `alert_for` annotation value `4m` must match `^{{ $for }}$`. (alerts/annotation)
- 12 |     alert_for: 4m
+Bug: invalid annotation value (alerts/annotation)
+  ---> rules/0001.yml:12
+12 |     alert_for: 4m
+                    ^^ `alert_for` annotation value `4m` must match `^{{ $for }}$`.
 
 level=INFO msg="Problems found" Bug=2
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

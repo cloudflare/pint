@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -60,14 +61,16 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		return problems
 	}
 
-	var hasAbsent bool
-	for _, s := range utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr) {
-		if s.Operation == "absent" {
-			hasAbsent = true
+	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr)
+	absentSources := make([]utils.Source, 0, len(src))
+	for _, s := range src {
+		if s.Operation != "absent" {
+			continue
 		}
+		absentSources = append(absentSources, s)
 	}
 
-	if !hasAbsent {
+	if len(absentSources) == 0 {
 		return problems
 	}
 
@@ -79,34 +82,69 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		}
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    rule.AlertingRule.Expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  "unable to run checks",
+			Details:  "",
 			Severity: severity,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     text,
+					Pos:         rule.AlertingRule.Expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
 
+	var forVal time.Duration
 	if rule.AlertingRule.For != nil {
 		forDur, err := model.ParseDuration(rule.AlertingRule.For.Value)
 		if err != nil {
 			return problems
 		}
-		if time.Duration(forDur) >= cfg.Config.Global.ScrapeInterval*2 {
+		forVal = time.Duration(forDur)
+		if forVal >= cfg.Config.Global.ScrapeInterval*2 {
 			return problems
 		}
 	}
 
-	problems = append(problems, Problem{
-		Lines:    rule.AlertingRule.Expr.Value.Lines,
-		Reporter: c.Reporter(),
-		Text: fmt.Sprintf("Alert query is using absent() which might cause false positives when %s restarts, please add `for: %s` to avoid this.",
-			promText(c.prom.Name(), cfg.URI),
-			output.HumanizeDuration((cfg.Config.Global.ScrapeInterval * 2).Round(time.Minute)),
-		),
-		Details:  AlertsAbsentCheckDetails,
-		Severity: Warning,
-	})
+	for _, s := range absentSources {
+		var summary string
+		dgs := []diags.Diagnostic{
+			{
+				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
+				Pos:         rule.AlertingRule.Expr.Value.Pos,
+				FirstColumn: int(s.Call.PosRange.Start) + 1,
+				LastColumn:  int(s.Call.PosRange.End),
+			},
+		}
+		if forVal > 0 {
+			summary = "absent() based alert with insufficient for"
+			dgs = append(dgs, diags.Diagnostic{
+				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
+					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+				Pos:         rule.AlertingRule.For.Pos,
+				FirstColumn: 1,
+				LastColumn:  len(rule.AlertingRule.For.Value),
+			})
+		} else {
+			summary = "absent() based alert without for"
+		}
+
+		problems = append(problems, Problem{
+			Anchor:      AnchorAfter,
+			Lines:       rule.AlertingRule.Expr.Value.Lines,
+			Reporter:    c.Reporter(),
+			Summary:     summary,
+			Details:     AlertsAbsentCheckDetails,
+			Severity:    Warning,
+			Diagnostics: dgs,
+		})
+	}
 
 	return problems
 }

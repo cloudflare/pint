@@ -7,58 +7,96 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=17 workers=10 online=true
-rules/0001.yml:2 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0001.yml:2
+2 |   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
+                                                ^^^^^^^^ Query is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results.
+                                                         `job` label is required and should be preserved when aggregating all rules.
 
-rules/0001.yml:6 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+Warning: label must be removed in aggregations (promql/aggregate)
+  ---> rules/0001.yml:6
+6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
+                                ^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
-rules/0002.yaml:2 Bug: Unnecessary regexp match on static string `job=~"foo"`, use `job="foo"` instead. (promql/regexp)
- 2 |   expr: up{job=~"foo"} == 0
+Warning: redundant regexp (promql/regexp)
+  ---> rules/0002.yaml:2
+2 |   expr: up{job=~"foo"} == 0
+            ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job=~"foo"`, use `job="foo"` instead.
 
-rules/0002.yaml:5 Bug: Unnecessary regexp match on static string `job!~"foo"`, use `job!="foo"` instead. (promql/regexp)
- 5 |   expr: up{job!~"foo"} == 0
+Warning: redundant regexp (promql/regexp)
+  ---> rules/0002.yaml:5
+5 |   expr: up{job!~"foo"} == 0
+            ^^^^^^^^^^^^^^ Unnecessary regexp match on static string `job!~"foo"`, use `job!="foo"` instead.
 
-rules/0003.yaml:11 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 11 |   expr: sum(foo) without(job)
+Warning: label must be removed in aggregations (promql/aggregate)
+  ---> rules/0003.yaml:11
+11 |   expr: sum(foo) without(job)
+                      ^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
-rules/0003.yaml:11 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 11 |   expr: sum(foo) without(job)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0003.yaml:11
+11 |   expr: sum(foo) without(job)
+                      ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                              `job` label is required and should be preserved when aggregating all rules.
 
-rules/0003.yaml:14 Fatal: Prometheus failed to parse the query with this PromQL error: unexpected right parenthesis ')'. (promql/syntax)
- 14 |   expr: sum(foo) by ())
+Fatal: PromQL syntax error (promql/syntax)
+  ---> rules/0003.yaml:14
+14 |   expr: sum(foo) by ())
+                           ^ unexpected right parenthesis ')'
 
-rules/0003.yaml:23-25 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 23 |     sum(
- 24 |       multiline
- 25 |     ) without(job, instance)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0003.yaml:23-25
+23 |     sum(
+24 |       multiline
+25 |     ) without(job, instance)
+           ^^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+                   `job` label is required and should be preserved when aggregating all rules.
 
-rules/0003.yaml:29-31 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, use `without(instance, ...)`. (promql/aggregate)
- 29 |     sum(sum) without(job)
- 30 |     +
- 31 |     sum(sum) without(job)
+Warning: label must be removed in aggregations (promql/aggregate)
+  ---> rules/0003.yaml:29-31
+29 |     sum(sum) without(job)
+                  ^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
+30 |     +
+31 |     sum(sum) without(job)
 
-rules/0003.yaml:29-31 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 29 |     sum(sum) without(job)
- 30 |     +
- 31 |     sum(sum) without(job)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0003.yaml:29-31
+29 |     sum(sum) without(job)
+                  ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                          `job` label is required and should be preserved when aggregating all rules.
+30 |     +
+31 |     sum(sum) without(job)
 
-rules/0003.yaml:35-37 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, remove job from `without()`. (promql/aggregate)
- 35 |     sum(
- 36 |       multiline2
- 37 |     ) without(job, instance)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0003.yaml:35-37
+35 |     sum(
+36 |       multiline2
+37 |     ) without(job, instance)
+           ^^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
+                   `job` label is required and should be preserved when aggregating all rules.
 
-rules/0003.yaml:40 Warning: `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules, remove instance from `by()`. (promql/aggregate)
- 40 |   expr: sum(byinstance) by(instance)
+Warning: label must be removed in aggregations (promql/aggregate)
+  ---> rules/0003.yaml:40
+40 |   expr: sum(byinstance) by(instance)
+                             ^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
-rules/0003.yaml:40 Warning: `job` label is required and should be preserved when aggregating `^.+$` rules, use `by(job, ...)`. (promql/aggregate)
- 40 |   expr: sum(byinstance) by(instance)
+Warning: required label is being removed via aggregation (promql/aggregate)
+  ---> rules/0003.yaml:40
+40 |   expr: sum(byinstance) by(instance)
+                             ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                                `job` label is required and should be preserved when aggregating all rules.
 
-rules/0003.yaml:61 Information: Using the value of `rate(errors[5m])` inside this annotation might be hard to read, consider using one of humanize template functions to make it more human friendly. (alerts/template)
- 61 |     summary: 'error rate: {{ $value }}'
+Information: use humanize filters for the results (alerts/template)
+  ---> rules/0003.yaml:58-61
+58 |   expr: sum(rate(errors[5m])) > 0.5
+                 ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+59 |   annotations:
+60 |     link: http://docs
+61 |     summary: 'error rate: {{ $value }}'
+                   ^^^^^^^^^^^^^^^^^^^^^^^^ Use one of humanize template functions to make the result more readable.
 
-level=INFO msg="Problems found" Fatal=1 Bug=2 Warning=10 Information=1
-level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Bug or higher"
+level=INFO msg="Problems found" Fatal=1 Warning=12 Information=1
+level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 - record: colo_job:fl_cf_html_bytes_in:rate10m
   expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)

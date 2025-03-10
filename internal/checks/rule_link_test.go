@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -94,13 +94,14 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/link",
-						Text:     `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
+						Summary:  "link check failed",
 						Details:  "Rule comment: some text",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -139,14 +140,15 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/link",
-						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+						Summary:  "link check failed",
 						Details:  "Rule comment: some text",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+							},
+						},
 					},
 				}
 			},
@@ -168,22 +170,24 @@ func TestRuleLinkCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/link",
-						Text:     fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+						Summary:  "link check failed",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
+							},
+						},
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: "rule/link",
-						Text:     fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
+						Summary:  "link check failed",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
+							},
+						},
 					},
 				}
 			},

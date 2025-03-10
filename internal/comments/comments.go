@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/cloudflare/pint/internal/diags"
 )
 
 type Type uint8
@@ -86,21 +88,19 @@ func parseType(s string) Type {
 }
 
 type CommentError struct {
-	Err  error
-	Line int
+	Diagnostic diags.Diagnostic
 }
 
 func (ce CommentError) Error() string {
-	return ce.Err.Error()
+	return ce.Diagnostic.Message
 }
 
 type OwnerError struct {
-	Name string
-	Line int
+	Diagnostic diags.Diagnostic
 }
 
 func (oe OwnerError) Error() string {
-	return oe.Name
+	return oe.Diagnostic.Message
 }
 
 type Invalid struct {
@@ -219,7 +219,8 @@ const (
 	readsValue
 )
 
-func parseComment(s string, line int) (parsed []Comment, err error) {
+func parseComment(s string, line int) (parsed []Comment) {
+	var err error
 	var buf strings.Builder
 	var c Comment
 
@@ -302,10 +303,29 @@ func parseComment(s string, line int) (parsed []Comment, err error) {
 
 	if c.Type != UnknownType {
 		c.Value, err = parseValue(c.Type, strings.TrimSpace(buf.String()), line)
+		if err != nil {
+			c.Type = InvalidComment
+			c.Value = Invalid{
+				Err: CommentError{
+					Diagnostic: diags.Diagnostic{
+						Message: "This comment is not a valid pint control comment: " + err.Error(),
+						Pos: diags.PositionRanges{
+							{
+								Line:        line,
+								FirstColumn: c.Offset + 1,
+								LastColumn:  len(s),
+							},
+						},
+						FirstColumn: 1,
+						LastColumn:  len(s),
+					},
+				},
+			}
+		}
 		parsed = append(parsed, c)
 	}
 
-	return parsed, err
+	return parsed
 }
 
 func Parse(lineno int, text string) (comments []Comment) {
@@ -313,16 +333,7 @@ func Parse(lineno int, text string) (comments []Comment) {
 	var index int
 	for sc.Scan() {
 		line := sc.Text()
-		parsed, err := parseComment(line, lineno+index)
-		if err != nil {
-			comments = append(comments, Comment{
-				Type:   InvalidComment,
-				Value:  Invalid{Err: CommentError{Line: lineno + index, Err: err}},
-				Offset: 0,
-			})
-			continue
-		}
-		comments = append(comments, parsed...)
+		comments = append(comments, parseComment(line, lineno+index)...)
 		index++
 	}
 	return comments

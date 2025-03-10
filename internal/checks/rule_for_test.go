@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -75,13 +75,14 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "rule/for",
-						Text:     forMin("for", "5m"),
+						Summary:  "duration required",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: forMin("for", "5m"),
+							},
+						},
 					},
 				}
 			},
@@ -96,14 +97,15 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "rule/for",
-						Text:     forMax("for", "2m"),
+						Summary:  "duration too long",
 						Details:  "Rule comment: some text",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: forMax("for", "2m"),
+							},
+						},
 					},
 				}
 			},
@@ -136,13 +138,14 @@ func TestRuleForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: "rule/for",
-						Text:     forMin("keep_firing_for", "5m"),
+						Summary:  "duration required",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: forMin("keep_firing_for", "5m"),
+							},
+						},
 					},
 				}
 			},

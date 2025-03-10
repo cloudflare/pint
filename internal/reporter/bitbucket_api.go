@@ -609,7 +609,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 		buf.WriteString("** check.\n\n")
 		for _, report := range reports {
 			buf.WriteString("------\n\n")
-			buf.WriteString(report.Problem.Text)
+			buf.WriteString(report.Problem.Summary)
 			buf.WriteString("\n\n")
 			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
@@ -869,7 +869,7 @@ func reportToAnnotation(report Report) BitBucketAnnotation {
 	return BitBucketAnnotation{
 		Path:     report.Path.SymlinkTarget,
 		Line:     reportLine,
-		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Text),
+		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Summary),
 		Severity: severity,
 		Type:     atype,
 		Link:     fmt.Sprintf("https://cloudflare.github.io/pint/checks/%s.html", report.Problem.Reporter),

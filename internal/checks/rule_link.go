@@ -11,6 +11,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 )
@@ -109,13 +110,22 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
 			problems = append(problems, Problem{
-				Lines: parser.LineRange{
+				Anchor: AnchorAfter,
+				Lines: diags.LineRange{
 					First: ann.Key.Lines.First,
 					Last:  ann.Value.Lines.Last,
 				},
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+				Summary:  "link check failed",
 				Details:  maybeComment(c.comment),
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+						Pos:         ann.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(ann.Value.Value) - 1,
+					},
+				},
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
@@ -126,13 +136,22 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 
 		if resp.StatusCode != http.StatusOK {
 			problems = append(problems, Problem{
-				Lines: parser.LineRange{
+				Anchor: AnchorAfter,
+				Lines: diags.LineRange{
 					First: ann.Key.Lines.First,
 					Last:  ann.Value.Lines.Last,
 				},
 				Reporter: c.Reporter(),
-				Text:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+				Summary:  "link check failed",
 				Details:  maybeComment(c.comment),
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+						Pos:         ann.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(ann.Value.Value) - 1,
+					},
+				},
 				Severity: c.severity,
 			})
 			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))

@@ -11,7 +11,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/comments"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -88,12 +88,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorBadData("prom", uri, "bad_data: bad input data"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -115,12 +116,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127:9999", `connection refused`),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127:9999", `connection refused`),
+							},
+						},
 						Severity: checks.Warning,
 					},
 				}
@@ -134,12 +136,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
+							},
+						},
 						Severity: checks.Warning,
 					},
 				}
@@ -163,12 +166,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
+							},
+						},
 						Severity: checks.Warning,
 					},
 				}
@@ -192,12 +196,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -222,12 +227,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -252,12 +258,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -388,12 +395,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -413,12 +421,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -454,12 +463,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "3d"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "3d"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -485,12 +495,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricRRText("prom", uri, "foo:bar", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckRuleDetails,
 						Severity: checks.Information,
 					},
@@ -529,12 +540,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricRRText("prom", uri, "foo:bar", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckRuleDetails,
 						Severity: checks.Information,
 					},
@@ -581,12 +593,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     alertMissing(`ALERTS{alertname="myalert"}`, "myalert"),
+						Summary:  "unknown alert referenced",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: alertMissing(`ALERTS{alertname="myalert"}`, "myalert"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -602,12 +616,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricRRText("prom", uri, "foo:bar", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricRRText("prom", uri, "foo:bar", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckRuleDetails,
 						Severity: checks.Information,
 					},
@@ -645,12 +660,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -684,12 +700,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w") + " " + metricIgnored("notfound", checks.SeriesCheckName, "^not.+$"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w") + " " + metricIgnored("notfound", checks.SeriesCheckName, "^not.+$"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -714,12 +731,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noLabelKeyText("prom", uri, "found", "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noLabelKeyText("prom", uri, "found", "notfound", "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -771,12 +790,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -820,12 +840,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noLabelKeyText("prom", uri, "found", "job", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noLabelKeyText("prom", uri, "found", "job", "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -879,12 +901,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesSometimesText("prom", uri, `found`, "1w", "5m"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesSometimesText("prom", uri, `found`, "1w", "5m"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -1007,12 +1031,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -1135,12 +1161,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesSometimesText("prom", uri, `found`, "1w", "1d5m"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -1334,12 +1362,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesDisappearedText("prom", uri, "found", "4d"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -1428,12 +1458,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesDisappearedText("prom", uri, "found", "4d") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesDisappearedText("prom", uri, "found", "4d") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -1715,12 +1747,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesDisappearedText("prom", uri, "found", "4d"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -1803,22 +1837,26 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesDisappearedText("prom", uri, "found", "4d"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedRuleSetText("promql/series(bar) min-age 5d"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedRuleSetText("promql/series(bar) min-age 5d"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedRuleSetComment,
 						Severity: checks.Warning,
 					},
@@ -1901,22 +1939,26 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     `Failed to parse pint comment as duration: not a valid duration string: "foo"`,
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `failed to parse pint comment as duration: not a valid duration string: "foo"`,
+							},
+						},
+
 						Details:  checks.SeriesCheckMinAgeDetails,
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesDisappearedText("prom", uri, "found", "4d"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesDisappearedText("prom", uri, "found", "4d"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -2005,12 +2047,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w") + " " + metricIgnored("found", checks.SeriesCheckName, "^found$"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -2076,12 +2120,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, "found", "notfound", `{notfound="notfound"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -2147,12 +2193,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -2203,12 +2250,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, "sometimes", "churn", `{churn="notfound"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -2462,12 +2511,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -2564,22 +2615,26 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, "foo", "error", `{error="notfound"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedRuleSetText(`promql/series(foo{job="bob"}) ignore/label-value error`),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedRuleSetText(`promql/series(foo{job="bob"}) ignore/label-value error`),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedRuleSetComment,
 						Severity: checks.Warning,
 					},
@@ -2631,12 +2686,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -2710,22 +2767,26 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     `Failed to parse pint comment as duration: unknown unit "e" in duration "1e"`,
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `failed to parse pint comment as duration: unknown unit "e" in duration "1e"`,
+							},
+						},
+
 						Details:  checks.SeriesCheckMinAgeDetails,
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: filterDisappeardText("prom", uri, "found", `{removed="xxx"}`, "5d16h"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -2861,12 +2922,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: filterSometimesText("prom", uri, `found`, `{sometimes="xxx"}`, "18h45m"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -2966,12 +3029,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: seriesSometimesText("prom", uri, "sometimes", "1w", "35m"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Warning,
 					},
@@ -3090,12 +3155,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, "found", "job", `{job="notfound"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, "found", "job", `{job="notfound"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3147,12 +3214,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noSeriesText("prom", uri, "notfound", "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3193,12 +3262,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noSeriesText("prom", uri, "notfound", "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3350,22 +3421,25 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText(`promql/series({job="foo"})`),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText(`promql/series({job="foo"})`),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
@@ -3394,22 +3468,25 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText(`promql/series(notfound{job=foo})`),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText(`promql/series(notfound{job=foo})`),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
@@ -3460,22 +3537,26 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noSeriesText("prom", uri, "notfound", "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText(`promql/series(notfound{job="foo"})`),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText(`promql/series(notfound{job="foo"})`),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
@@ -3514,22 +3595,24 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricRRText("prom", uri, "foo:count", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricRRText("prom", uri, "foo:count", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckRuleDetails,
 						Severity: checks.Information,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricRRText("prom", uri, "foo:sum", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricRRText("prom", uri, "foo:sum", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckRuleDetails,
 						Severity: checks.Information,
 					},
@@ -3582,12 +3665,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noSeriesText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3639,12 +3724,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noFilterMatchText("prom", uri, `{__name__=~"(foo|bar)_panics_total"}`, "job", `{job="myjob"}`, "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3705,12 +3792,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noSeriesText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noSeriesText("prom", uri, "notfound", "1w"),
+							},
+						},
+
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3795,32 +3884,35 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  12,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "bob", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "bob", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  12,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "bar", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "bar", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  12,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -3899,32 +3991,38 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  10,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText("promql/series(metric1)"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText("promql/series(metric1)"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  10,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText("promql/series(metric2)"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText("promql/series(metric2)"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 7,
-							Last:  10,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText("promql/series(metric3)"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText("promql/series(metric3)"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
@@ -3944,22 +4042,26 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value action"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedRuleSetText("promql/series(mymetric) ignore/label-value action"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedRuleSetComment,
 						Severity: checks.Warning,
 					},
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedRuleSetComment,
 						Severity: checks.Warning,
 					},
@@ -3979,12 +4081,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedRuleSetText("promql/series(mymetric) ignore/label-value type"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedRuleSetComment,
 						Severity: checks.Warning,
 					},
@@ -4010,12 +4114,14 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 5,
-							Last:  5,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     unusedDisableText("promql/series(foo)"),
+						Summary:  "invalid comment",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: unusedDisableText("promql/series(foo)"),
+							},
+						},
+
 						Details:  checks.SeriesCheckUnusedDisableComment,
 						Severity: checks.Warning,
 					},
@@ -4037,12 +4143,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  checks.SeriesCheckCommonProblemDetails,
 						Severity: checks.Bug,
 					},
@@ -4078,12 +4185,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  fmt.Sprintf("`notfound` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=notfound)\n- [prom1](%s/other/graph?g0.expr=notfound)\n- [prom2](%s/other/graph?g0.expr=notfound)\n- [prom3](%s/other/graph?g0.expr=notfound)\n- [prom4](%s/other/graph?g0.expr=notfound)\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n", uri, uri, uri, uri, uri),
 						Severity: checks.Bug,
 					},
@@ -4119,12 +4227,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  fmt.Sprintf("`notfound` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=notfound)\n- [prom1](%s/other/graph?g0.expr=notfound)\n- [prom2](%s/other/graph?g0.expr=notfound)\n- [prom3](%s/other/graph?g0.expr=notfound)\n- [prom4](%s/other/graph?g0.expr=notfound)\n- [prom5](%s/other/graph?g0.expr=notfound)\n- [prom6](%s/other/graph?g0.expr=notfound)\n- [prom7](%s/other/graph?g0.expr=notfound)\n- [prom8](%s/other/graph?g0.expr=notfound)\n- [prom9](%s/other/graph?g0.expr=notfound)\n- and 5 other server(s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n", uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
 						Severity: checks.Bug,
 					},
@@ -4170,12 +4279,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details:  fmt.Sprintf("`notfound` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=notfound)\n- [prom1](%s/other/graph?g0.expr=notfound)\n- [prom2](%s/other/graph?g0.expr=notfound)\n\npint tried to check 15 server(s) but stopped after checking 3 server(s) due to reaching time limit (50ms).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n", uri, uri, uri),
 						Severity: checks.Bug,
 					},
@@ -4224,12 +4334,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "notfound", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "notfound", "1w"),
+							},
+						},
 						Details: fmt.Sprintf("`notfound` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=notfound)\n- [prom1](%s/other/graph?g0.expr=notfound)\n- [prom2](%s/other/graph?g0.expr=notfound)\n- [prom3](%s/other/graph?g0.expr=notfound)\n- [prom4](%s/other/graph?g0.expr=notfound)\n- [prom5](%s/other/graph?g0.expr=notfound)\n- [prom6](%s/other/graph?g0.expr=notfound)\n- [prom7](%s/other/graph?g0.expr=notfound)\n- [prom8](%s/other/graph?g0.expr=notfound)\n- [prom9](%s/other/graph?g0.expr=notfound)\n- and 12 other server(s).\n\npint tried to check 30 server(s) but stopped after checking 22 server(s) due to reaching time limit (5s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n",
 							uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
 						Severity: checks.Bug,
@@ -4262,12 +4373,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -4287,12 +4399,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 2,
-							Last:  2,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
+						Summary:  "unable to run checks",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: checkErrorBadData("prom", uri, "client_error: 404 Not Found"),
+							},
+						},
 						Severity: checks.Bug,
 					},
 				}
@@ -4454,12 +4567,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "foo", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "foo", "1w"),
+							},
+						},
 						Details: fmt.Sprintf("`foo` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=foo)\n- [prom1](%s/other/graph?g0.expr=foo)\n- [prom2](%s/other/graph?g0.expr=foo)\n- [prom3](%s/other/graph?g0.expr=foo)\n- [prom4](%s/other/graph?g0.expr=foo)\n- [prom5](%s/other/graph?g0.expr=foo)\n- [prom6](%s/other/graph?g0.expr=foo)\n- [prom7](%s/other/graph?g0.expr=foo)\n- [prom8](%s/other/graph?g0.expr=foo)\n- [prom9](%s/other/graph?g0.expr=foo)\n- and 20 other server(s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n",
 							uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
 						Severity: checks.Bug,
@@ -4547,12 +4661,13 @@ func TestSeriesCheck(t *testing.T) {
 			problems: func(uri string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: checks.SeriesCheckName,
-						Text:     noMetricText("prom", uri, "foo", "1w"),
+						Summary:  "query on nonexistent series",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: noMetricText("prom", uri, "foo", "1w"),
+							},
+						},
 						Details: fmt.Sprintf("`foo` was found on other prometheus servers:\n\n- [prom0](%s/other/graph?g0.expr=foo)\n- [prom1](%s/other/graph?g0.expr=foo)\n- [prom2](%s/other/graph?g0.expr=foo)\n- [prom3](%s/other/graph?g0.expr=foo)\n- [prom4](%s/other/graph?g0.expr=foo)\n- [prom5](%s/other/graph?g0.expr=foo)\n- [prom6](%s/other/graph?g0.expr=foo)\n- [prom7](%s/other/graph?g0.expr=foo)\n- [prom8](%s/other/graph?g0.expr=foo)\n- [prom9](%s/other/graph?g0.expr=foo)\n- and 20 other server(s).\n\nYou might be trying to deploy this rule to the wrong Prometheus server instance.\n",
 							uri, uri, uri, uri, uri, uri, uri, uri, uri, uri),
 						Severity: checks.Bug,

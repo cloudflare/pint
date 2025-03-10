@@ -6,8 +6,10 @@ cmp stderr stderr.txt
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
-rules/0001.yml:4 Bug: `annotation_.*` annotation value `foo` must match `^bar$`. (alerts/annotation)
- 4 |     annotation_foo: foo
+Bug: invalid annotation value (alerts/annotation)
+  ---> rules/0001.yml:4
+4 |     annotation_foo: foo
+                        ^^^ `annotation_.*` annotation value `foo` must match `^bar$`.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

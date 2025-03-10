@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -36,14 +36,15 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
-						Text:     `invalid duration: not a valid duration string: "abc"`,
+						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `not a valid duration string: "abc"`,
+							},
+						},
 					},
 				}
 			},
@@ -56,14 +57,15 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
-						Text:     `invalid duration: not a valid duration string: "-5m"`,
+						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `not a valid duration string: "-5m"`,
+							},
+						},
 					},
 				}
 			},
@@ -76,13 +78,14 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
-						Text:     "`0h` is the default value of `for`, consider removing this redundant line.",
+						Summary:  "redundant field with default value",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`0h` is the default value of `for`, this line is unnecessary.",
+							},
+						},
 					},
 				}
 			},
@@ -95,14 +98,15 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
-						Text:     `invalid duration: not a valid duration string: "abc"`,
+						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `not a valid duration string: "abc"`,
+							},
+						},
 					},
 				}
 			},
@@ -115,14 +119,15 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
-						Text:     `invalid duration: not a valid duration string: "-5m"`,
+						Summary:  `invalid duration`,
 						Details:  checks.AlertForCheckDurationHelp,
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: `not a valid duration string: "-5m"`,
+							},
+						},
 					},
 				}
 			},
@@ -135,13 +140,14 @@ func TestAlertsForCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 3,
-							Last:  3,
-						},
 						Reporter: "alerts/for",
-						Text:     "`0h` is the default value of `keep_firing_for`, consider removing this redundant line.",
+						Summary:  "redundant field with default value",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "`0h` is the default value of `keep_firing_for`, this line is unnecessary.",
+							},
+						},
 					},
 				}
 			},

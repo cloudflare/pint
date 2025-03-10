@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/cloudflare/pint/internal/comments"
+	"github.com/cloudflare/pint/internal/diags"
 )
 
 type skipMode uint8
@@ -43,11 +44,10 @@ func emptyLine(line string, comments []comments.Comment, stripComments bool) str
 }
 
 type Content struct {
+	Ignored      *diags.Diagnostic
 	Body         []byte
 	FileComments []comments.Comment
 	TotalLines   int
-	IgnoreLine   int
-	Ignored      bool
 }
 
 func ReadContent(r io.Reader) (out Content, err error) {
@@ -88,6 +88,18 @@ func ReadContent(r io.Reader) (out Content, err error) {
 				case comments.IgnoreFileType:
 					skip = skipFile
 					found = true
+					out.Ignored = &diags.Diagnostic{
+						Message: "This file was excluded from pint checks.",
+						Pos: diags.PositionRanges{
+							{
+								Line:        lineno,
+								FirstColumn: comment.Offset + 1,
+								LastColumn:  len(line) - 1,
+							},
+						},
+						FirstColumn: comment.Offset + 1,
+						LastColumn:  len(line) - 1,
+					}
 				case comments.IgnoreLineType:
 					skip = skipCurrentLine
 					found = true
@@ -124,8 +136,6 @@ func ReadContent(r io.Reader) (out Content, err error) {
 				case skipNone:
 					// no-op
 				case skipFile:
-					out.Ignored = true
-					out.IgnoreLine = lineno
 					out.Body = append(out.Body, []byte(emptyLine(line, lineComments, inBegin))...)
 					skipNext = true
 					autoReset = false

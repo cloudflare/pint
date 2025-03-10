@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
@@ -74,10 +75,20 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	if err != nil {
 		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     text,
+			Summary:  "unable to run checks",
+			Details:  "",
 			Severity: severity,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     text,
+					Pos:         expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -100,33 +111,60 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 
 	if c.maxSeries > 0 && series > c.maxSeries {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
+			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
+					Pos:         expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
 
 	if c.maxTotalSamples > 0 && qr.Stats.Samples.TotalQueryableSamples > c.maxTotalSamples {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+					Pos:         expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
 
 	if c.maxPeakSamples > 0 && qr.Stats.Samples.PeakSamples > c.maxPeakSamples {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+					Pos:         expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
@@ -134,22 +172,40 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	evalDur := time.Duration(qr.Stats.Timings.EvalTotalTime * float64(time.Second))
 	if c.maxEvaluationDuration > 0 && evalDur > c.maxEvaluationDuration {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+					Pos:         expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(expr.Value.Value),
+				},
+			},
 		})
 		return problems
 	}
 
 	if series > 0 && c.maxSeries == 0 && c.maxTotalSamples == 0 && c.maxPeakSamples == 0 && c.maxEvaluationDuration == 0 {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
+			Summary:  "query cost estimate",
 			Details:  maybeComment(c.comment),
 			Severity: Information,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
+					Pos:         expr.Value.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(expr.Value.Value),
+				},
+			},
 		})
 	}
 

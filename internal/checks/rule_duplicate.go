@@ -6,6 +6,7 @@ import (
 
 	"github.com/prometheus/prometheus/model/labels"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -84,7 +85,7 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, path discovery.Path, rule
 	return problems
 }
 
-func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines parser.LineRange) (problems []Problem) {
+func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines diags.LineRange) (problems []Problem) {
 	ruleALabels := buildRuleLabels(rule.Labels)
 	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule.Labels)
 
@@ -94,10 +95,20 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 
 	if rule.Expr.Query.Expr.String() == entry.Rule.RecordingRule.Expr.Query.Expr.String() {
 		problems = append(problems, Problem{
+			Anchor:   AnchorAfter,
 			Lines:    lines,
 			Reporter: c.Reporter(),
-			Text:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
+			Summary:  "duplicated recording rule",
+			Details:  "",
 			Severity: Bug,
+			Diagnostics: []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Lines.First),
+					Pos:         rule.Record.Pos,
+					FirstColumn: 1,
+					LastColumn:  len(rule.Record.Value),
+				},
+			},
 		})
 	}
 

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/parser"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -84,13 +84,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Label key `bad` is not allowed to match `^bad$`.",
+						Summary:  "key not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "key is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -105,13 +106,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Label value `bad` is not allowed to match `^bad$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Warning,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "value is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -126,13 +128,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Label key `bad` is not allowed to match `^bad$`.",
+						Summary:  "key not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "key is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -147,13 +150,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Label value `bad` is not allowed to match `^bad$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "value is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -187,13 +191,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Annotation key `bad` is not allowed to match `^bad$`.",
+						Summary:  "key not allowed",
 						Severity: checks.Information,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "key is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -208,13 +213,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Annotation value `bad` is not allowed to match `^bad$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "value is not allowed to match `^bad$`.",
+							},
+						},
 					},
 				}
 			},
@@ -238,13 +244,14 @@ func TestRejectCheck(t *testing.T) {
 			problems: func(_ string) []checks.Problem {
 				return []checks.Problem{
 					{
-						Lines: parser.LineRange{
-							First: 4,
-							Last:  4,
-						},
 						Reporter: "rule/reject",
-						Text:     "Annotation value `foo` is not allowed to match `^{{ $alert }}$`.",
+						Summary:  "value not allowed",
 						Severity: checks.Bug,
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "value is not allowed to match `^{{ $alert }}$`.",
+							},
+						},
 					},
 				}
 			},
