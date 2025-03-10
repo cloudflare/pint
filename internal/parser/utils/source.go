@@ -904,7 +904,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				}
 				switch {
 				case n.Op == promParser.LUNLESS:
-					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns {
+					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns && !rs.IsConditional {
 						s.IsDead = true
 						s.IsDeadReason = "this query will never return anything because the `unless` query always returns something"
 					}
@@ -950,13 +950,15 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {
 	case vm.On: // ls on(...) unless rs
 		for _, name := range vm.MatchingLabels {
 			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
-				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`", side, name)
+				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`. %s",
+					side, name, rs.LabelExcludeReason(name).Reason)
 			}
 		}
 	default: // ls unless rs
 		for _, name := range ls.GuaranteedLabels {
 			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
-				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will", side, name)
+				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will. %s",
+					side, name, rs.LabelExcludeReason(name).Reason)
 			}
 		}
 	}
