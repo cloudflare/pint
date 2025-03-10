@@ -106,7 +106,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+								Message: "The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.",
 							},
 						},
 					},
@@ -129,7 +129,7 @@ func TestImpossibleCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+								Message: "The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.",
 							},
 						},
 					},
