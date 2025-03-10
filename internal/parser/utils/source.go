@@ -498,6 +498,7 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 					)
 				}
 				s = restrictGuaranteedLabels(s, n.Grouping)
+				s = restrictIncludedLabels(s, n.Grouping)
 			}
 			s.FixedLabels = true
 		}
@@ -733,26 +734,30 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		lhs := walkNode(expr, n.LHS)
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range lhs {
-			ls.IsConditional = n.Op.IsComparisonOperator()
+			ls.IsConditional = isConditional(ls, n.Op)
 			for _, rs := range rhs {
-				rs.IsConditional = n.Op.IsComparisonOperator()
+				rs.IsConditional = isConditional(rs, n.Op)
+				var side Source
 				switch {
-				case ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn:
+				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
+					// Use labels from LHS
+					side = ls
+				case rs.Returns == promParser.ValueTypeVector, rs.Returns == promParser.ValueTypeMatrix:
+					// Use labels from RHS
+					side = rs
+				default:
+					side = ls
+				}
+				if ls.AlwaysReturns && rs.AlwaysReturns && ls.KnownReturn && rs.KnownReturn {
 					// Both sides always return something
-					ls.ReturnedNumber, ls.IsDead, ls.IsDeadReason = calculateStaticReturn(
+					side.ReturnedNumber, side.IsDead, side.IsDeadReason = calculateStaticReturn(
 						expr,
 						ls, rs,
 						n.Op,
 						ls.IsDead,
 					)
-					src = append(src, ls)
-				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
-					// Use labels from LHS
-					src = append(src, ls)
-				case rs.Returns == promParser.ValueTypeVector, rs.Returns == promParser.ValueTypeMatrix:
-					// Use labels from RHS
-					src = append(src, rs)
 				}
+				src = append(src, side)
 			}
 		}
 
@@ -795,7 +800,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					)
 				}
 				for _, rs := range rhs {
-					rs.IsConditional = n.Op.IsComparisonOperator()
+					rs.IsConditional = isConditional(rs, n.Op)
 					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
 						// Both sides always return something
 						s.ReturnedNumber, s.IsDead, s.IsDeadReason = calculateStaticReturn(
@@ -819,7 +824,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: rs,
 				})
 			}
-			s.IsConditional = n.Op.IsComparisonOperator()
+			s.IsConditional = isConditional(s, n.Op)
 			src = append(src, s)
 		}
 
@@ -847,7 +852,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: ls,
 				})
 			}
-			s.IsConditional = n.Op.IsComparisonOperator()
+			s.IsConditional = isConditional(s, n.Op)
 			src = append(src, s)
 		}
 
@@ -872,7 +877,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: rs,
 				})
 			}
-			s.IsConditional = n.Op.IsComparisonOperator()
+			s.IsConditional = isConditional(s, n.Op)
 			src = append(src, s)
 		}
 
@@ -883,6 +888,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		var lhsCanBeEmpty bool // true if any of the LHS query can produce empty results.
 		rhs := walkNode(expr, n.RHS)
 		for _, s = range walkNode(expr, n.LHS) {
+			var rhsConditional bool
 			if n.VectorMatching.On {
 				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 			}
@@ -893,13 +899,16 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				lhsCanBeEmpty = true
 			}
 			for _, rs := range rhs {
+				if isConditional(rs, n.Op) {
+					rhsConditional = true
+				}
 				if ok, s := canJoin(s, rs, n.VectorMatching); !ok {
 					rs.IsDead = true
 					rs.IsDeadReason = s
 				}
 				switch {
 				case n.Op == promParser.LUNLESS:
-					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns {
+					if n.VectorMatching.On && len(n.VectorMatching.MatchingLabels) == 0 && rs.AlwaysReturns && !rs.IsConditional {
 						s.IsDead = true
 						s.IsDeadReason = "this query will never return anything because the `unless` query always returns something"
 					}
@@ -911,6 +920,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 						Src: rs,
 					})
 				}
+			}
+			if n.Op == promParser.LAND && rhsConditional {
+				s.IsConditional = true
 			}
 			src = append(src, s)
 		}
@@ -931,6 +943,13 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	return src
 }
 
+func isConditional(s Source, op promParser.ItemType) bool {
+	if s.IsConditional {
+		return true
+	}
+	return op.IsComparisonOperator()
+}
+
 func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {
 	var side string
 	if vm.Card == promParser.CardOneToMany {
@@ -945,13 +964,15 @@ func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string) {
 	case vm.On: // ls on(...) unless rs
 		for _, name := range vm.MatchingLabels {
 			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
-				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`", side, name)
+				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label from `on(...)`. %s",
+					side, name, rs.LabelExcludeReason(name).Reason)
 			}
 		}
 	default: // ls unless rs
 		for _, name := range ls.GuaranteedLabels {
 			if ls.CanHaveLabel(name) && !rs.CanHaveLabel(name) {
-				return false, fmt.Sprintf("the %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will", side, name)
+				return false, fmt.Sprintf("The %s hand side will never be matched because it doesn't have the `%s` label while the left hand side will. %s",
+					side, name, rs.LabelExcludeReason(name).Reason)
 			}
 		}
 	}
@@ -1015,7 +1036,7 @@ func calculateStaticReturn(expr string, ls, rs Source, op promParser.ItemType, i
 
 // FIXME sum() on ().
 func FindPosition(expr string, within posrange.PositionRange, fn string) posrange.PositionRange {
-	re := regexp.MustCompile("(?i)(" + fn + ")[ \n\t]*\\(")
+	re := regexp.MustCompile("(?i)(" + regexp.QuoteMeta(fn) + ")[ \n\t]*\\(")
 	idx := re.FindStringSubmatchIndex(GetQueryFragment(expr, within))
 	if idx == nil {
 		return within

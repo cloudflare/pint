@@ -273,7 +273,7 @@ func isOpSmelly(a, b syntax.Op) bool {
 }
 
 func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
-	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + m.Value + `"`)
+	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + regexp.QuoteMeta(m.Value) + `"`)
 	idx := re.FindStringSubmatchIndex(utils.GetQueryFragment(expr, within))
 	if idx == nil {
 		return within

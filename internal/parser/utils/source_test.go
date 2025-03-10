@@ -1584,7 +1584,7 @@ sum(foo:count) by(job) > 20`,
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo:sum > 0) without(notify)`, 4),
 					IncludedLabels: []string{"notify", "job"},
 					ExcludeReason:  map[string]utils.ExcludedLabel{},
-					IsConditional:  false, // FIXME should be true
+					IsConditional:  true,
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
@@ -2164,12 +2164,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Returns:     promParser.ValueTypeVector,
-								Operation:   "count",
-								Selector:    mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
-								FixedLabels: true,
+								Type:          utils.AggregateSource,
+								Returns:       promParser.ValueTypeVector,
+								Operation:     "count",
+								Selector:      mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
+								Aggregation:   mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
+								FixedLabels:   true,
+								IsConditional: false, // FIXME true?
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
@@ -2526,7 +2527,6 @@ or
 					Operation:   "sum",
 					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 5),
 					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
-
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2602,12 +2602,13 @@ or
 )`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
-					FixedLabels: true,
+					Type:          utils.AggregateSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "sum",
+					Selector:      mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
+					Aggregation:   mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
+					FixedLabels:   true,
+					IsConditional: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
@@ -2658,6 +2659,7 @@ or
 					KnownReturn:    true,
 					ReturnedNumber: 1,
 					FixedLabels:    true,
+					IsConditional:  true,
 					Call:           mustParse[*promParser.Call](t, "vector(1)", 36),
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -2980,7 +2982,7 @@ or
 									},
 								},
 								IsDead:       true,
-								IsDeadReason: "the right hand side will never be matched because it doesn't have the `job` label while the left hand side will",
+								IsDeadReason: "The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.",
 							},
 						},
 					},
@@ -3039,7 +3041,7 @@ or
 								AlwaysReturns:  true,
 								KnownReturn:    true,
 								IsDead:         true,
-								IsDeadReason:   "the right hand side will never be matched because it doesn't have the `job` label from `on(...)`",
+								IsDeadReason:   "The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.",
 								ReturnedNumber: 0,
 								FixedLabels:    true,
 								Call:           mustParse[*promParser.Call](t, "vector(0)", 50),
@@ -3210,7 +3212,7 @@ unless
 									},
 								},
 								IsDead:       true,
-								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+								IsDeadReason: "The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.",
 							},
 						},
 					},
@@ -3242,7 +3244,7 @@ unless
 									},
 								},
 								IsDead:       true,
-								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+								IsDeadReason: "The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.",
 							},
 						},
 					},
@@ -3274,7 +3276,7 @@ unless
 									},
 								},
 								IsDead:       true,
-								IsDeadReason: "the left hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+								IsDeadReason: "The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.",
 							},
 						},
 					},
@@ -3307,7 +3309,7 @@ unless
 									},
 								},
 								IsDead:       true,
-								IsDeadReason: "the right hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+								IsDeadReason: "The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 						},
 					},
@@ -3340,7 +3342,7 @@ unless
 									},
 								},
 								IsDead:       true,
-								IsDeadReason: "the left hand side will never be matched because it doesn't have the `instance` label from `on(...)`",
+								IsDeadReason: "The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
 							},
 						},
 					},
@@ -3370,6 +3372,7 @@ unless
    )
    and on(device, instance) absent(node_disk_info)
  )`, 2),
+					IsConditional:  true,
 					IncludedLabels: []string{"instance", "device", "group"},
 					ExcludedLabels: []string{"source_instance"},
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -3387,7 +3390,7 @@ unless
 								Selector:     mustParse[*promParser.VectorSelector](t, `node_disk_info`, 299),
 								Call:         mustParse[*promParser.Call](t, `absent(node_disk_info)`, 292),
 								IsDead:       true,
-								IsDeadReason: "the right hand side will never be matched because it doesn't have the `device` label from `on(...)`",
+								IsDeadReason: "The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
@@ -3598,6 +3601,132 @@ label_replace(
 							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
+				},
+			},
+		},
+		{
+			expr: `
+sum by (foo, bar) (
+    rate(errors_total[5m])
+  * on (instance) group_left (bob, alice)
+    server_errors_total
+)`,
+			output: []utils.Source{
+				{
+					Type:      utils.AggregateSource,
+					Returns:   promParser.ValueTypeVector,
+					Operation: "sum",
+					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum by (foo, bar) (
+    rate(errors_total[5m])
+  * on (instance) group_left (bob, alice)
+    server_errors_total
+)`, 1),
+					Call:           mustParse[*promParser.Call](t, "rate(errors_total[5m])", 25),
+					Selector:       mustParse[*promParser.VectorSelector](t, "errors_total", 30),
+					FixedLabels:    true,
+					IncludedLabels: []string{"foo", "bar"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.",
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "server_errors_total", 94),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: `1 - (foo or vector(0)) < 0.999`,
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     promParser.CardManyToMany.String(),
+					IsConditional: true,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 5),
+				},
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					FixedLabels:    true,
+					IsDead:         true,
+					KnownReturn:    true,
+					ReturnedNumber: 1,
+					IsDeadReason:   "this query always evaluates to `1 < 0.999` which is not possible, so it will never return anything",
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+					},
+					Call: mustParse[*promParser.Call](t, "vector(0)", 12),
+				},
+			},
+		},
+		{
+			expr: `
+(
+  vector(1) and month() == 2
+) or vector(0)
+`,
+			output: []utils.Source{
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					FixedLabels:    true,
+					KnownReturn:    true,
+					ReturnedNumber: 1,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+					},
+					Call: mustParse[*promParser.Call](t, "vector(1)", 5),
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:          utils.FuncSource,
+								Returns:       promParser.ValueTypeVector,
+								Operation:     "month",
+								AlwaysReturns: true,
+								FixedLabels:   true,
+								IsConditional: true,
+								Call:          mustParse[*promParser.Call](t, "month()", 19),
+								ExcludeReason: map[string]utils.ExcludedLabel{
+									"": {
+										Reason: "Calling `month()` with no arguments will return an empty time series with no labels.",
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					AlwaysReturns:  true,
+					FixedLabels:    true,
+					KnownReturn:    true,
+					ReturnedNumber: 0,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+					},
+					Call: mustParse[*promParser.Call](t, "vector(0)", 37),
 				},
 			},
 		},
