@@ -16,12 +16,12 @@ func newVectorMatchingCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewVectorMatchingCheck(prom)
 }
 
-func differentLabelsText(name, uri, q, l, r string) string {
-	return fmt.Sprintf("This query will never return anything on `%s` Prometheus server at %s because results from the right and the left hand side have different labels: `[%s]` != `[%s]`. Failing query: `%s`.", name, uri, l, r, q)
+func differentLabelsText(name, uri, l, r string) string {
+	return fmt.Sprintf("This query will never return anything on `%s` Prometheus server at %s because results from the right and the left hand side have different labels: `[%s]` != `[%s]`.", name, uri, l, r)
 }
 
-func usingMismatchText(name, uri, q, f, l, r string) string {
-	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from both sides of the query have different labels: `[%s]` != `[%s]`. Failing query: `%s`.", f, name, uri, l, r, q)
+func usingMismatchText(name, uri, f, l, r string) string {
+	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from both sides of the query have different labels: `[%s]` != `[%s]`.", f, name, uri, l, r)
 }
 
 func usingBothMissing(name, uri, q, f string) string {
@@ -64,7 +64,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "impossible binary operation",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: differentLabelsText("prom", uri, "foo_with_notfound / bar", "instance, job, notfound", "instance, job"),
+								Message: differentLabelsText("prom", uri, "instance, job, notfound", "instance, job"),
 							},
 						},
 
@@ -267,7 +267,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "impossible binary operation",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: usingMismatchText("prom", uri, "foo / ignoring (xxx) app_registry", "ignoring(xxx)", "instance, job", "app_name"),
+								Message: usingMismatchText("prom", uri, "ignoring()", "instance, job", "app_name"),
 							},
 						},
 
@@ -893,7 +893,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "impossible binary operation",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: differentLabelsText("prom", uri, "min_over_time((foo_with_notfound > 0)[30m:1m]) / bar", "instance, job, notfound", "instance, job"),
+								Message: differentLabelsText("prom", uri, "instance, job, notfound", "instance, job"),
 							},
 						},
 
@@ -1026,7 +1026,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "impossible binary operation",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: differentLabelsText("prom", uri, "(foo / ignoring (notfound) foo_with_notfound) / (memory_bytes / ignoring (job) memory_limit)", "instance, job", "dev, instance, job"),
+								Message: differentLabelsText("prom", uri, "instance, job", "dev, instance, job"),
 							},
 						},
 

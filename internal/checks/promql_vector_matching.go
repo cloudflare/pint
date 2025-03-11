@@ -198,6 +198,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 		}
 
 		if n.VectorMatching.On {
+			pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "on")
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
 					problems = append(problems, exprProblem{
@@ -210,8 +211,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 									"Using `on(%s)` won't produce any results on %s because results from the left hand side of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).LHS),
 								Pos:         expr.Value.Pos,
-								FirstColumn: int(n.PositionRange().Start) + 1, // FIXME point at on()
-								LastColumn:  int(n.PositionRange().End),
+								FirstColumn: int(pos.Start) + 1,
+								LastColumn:  int(pos.End),
 							},
 						},
 					})
@@ -226,8 +227,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).RHS),
 								Pos:         expr.Value.Pos,
-								FirstColumn: int(n.PositionRange().Start) + 1, // FIXME point at on()
-								LastColumn:  int(n.PositionRange().End),
+								FirstColumn: int(pos.Start) + 1,
+								LastColumn:  int(pos.End),
 							},
 						},
 					})
@@ -242,8 +243,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr),
 								Pos:         expr.Value.Pos,
-								FirstColumn: int(n.PositionRange().Start) + 1, // FIXME point at on()
-								LastColumn:  int(n.PositionRange().End),
+								FirstColumn: int(pos.Start) + 1,
+								LastColumn:  int(pos.End),
 							},
 						},
 					})
@@ -258,26 +259,27 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 					severity: Bug,
 					diags: []diags.Diagnostic{
 						{
-							Message: fmt.Sprintf("This query will never return anything on %s because results from the right and the left hand side have different labels: `%s` != `%s`. Failing query: `%s`.",
-								promText(c.prom.Name(), qr.URI), l, r, node.Expr),
+							Message: fmt.Sprintf("This query will never return anything on %s because results from the right and the left hand side have different labels: `%s` != `%s`.",
+								promText(c.prom.Name(), qr.URI), l, r),
 							Pos:         expr.Value.Pos,
-							FirstColumn: int(n.PositionRange().Start) + 1, // FIXME point at on()
+							FirstColumn: int(n.PositionRange().Start) + 1,
 							LastColumn:  int(n.PositionRange().End),
 						},
 					},
 				})
 			} else {
+				pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "ignoring")
 				problems = append(problems, exprProblem{
 					summary:  "impossible binary operation",
 					details:  VectorMatchingCheckDetails,
 					severity: Bug,
 					diags: []diags.Diagnostic{
 						{
-							Message: fmt.Sprintf("Using `ignoring(%s)` won't produce any results on %s because results from both sides of the query have different labels: `%s` != `%s`. Failing query: `%s`.",
-								strings.Join(n.VectorMatching.MatchingLabels, ","), promText(c.prom.Name(), qr.URI), l, r, node.Expr),
+							Message: fmt.Sprintf("Using `ignoring()` won't produce any results on %s because results from both sides of the query have different labels: `%s` != `%s`.",
+								promText(c.prom.Name(), qr.URI), l, r),
 							Pos:         expr.Value.Pos,
-							FirstColumn: int(n.PositionRange().Start) + 1, // FIXME point at on()
-							LastColumn:  int(n.PositionRange().End),
+							FirstColumn: int(pos.Start) + 1,
+							LastColumn:  int(pos.End),
 						},
 					},
 				})
