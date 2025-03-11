@@ -147,7 +147,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`severity` annotation value `bar` must match `^critical$`.",
+								Message: "`severity` annotation value must match `^critical$`.",
 							},
 						},
 					},
@@ -169,7 +169,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`severity` annotation value `bar` must match `^critical$`.",
+								Message: "`severity` annotation value must match `^critical$`.",
 							},
 						},
 					},
@@ -218,7 +218,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`for` annotation value `4m` must match `^{{ $for }}$`.",
+								Message: "`for` annotation value must match `^{{ $for }}$`.",
 							},
 						},
 					},
@@ -258,7 +258,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`annotation_.*` annotation value `bar` must match `^critical$`.",
+								Message: "`annotation_.*` annotation value must match `^critical$`.",
 							},
 						},
 					},
@@ -280,7 +280,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`annotation_.*` annotation value `bar` must match `^critical$`.",
+								Message: "`annotation_.*` annotation value must match `^critical$`.",
 							},
 						},
 					},
@@ -303,7 +303,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`components` annotation value `db` must match `^api|memcached$`.",
+								Message: "`components` annotation value must match `^api|memcached$`.",
 							},
 						},
 					},
@@ -334,7 +334,7 @@ func TestAnnotationCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`components` annotation value `db` is not one of valid values.",
+								Message: "`components` annotation value is not one of valid values.",
 							},
 						},
 					},

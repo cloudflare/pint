@@ -145,7 +145,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s` annotation value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+					Message:     fmt.Sprintf("`%s` annotation value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
 					Pos:         ann.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(ann.Value),
@@ -182,7 +182,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("`%s` annotation value `%s` is not one of valid values.", c.keyRe.original, value),
+						Message:     fmt.Sprintf("`%s` annotation value is not one of valid values.", c.keyRe.original),
 						Pos:         ann.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(ann.Value),
