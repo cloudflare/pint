@@ -76,7 +76,7 @@ func makeComments(summary Summary) (comments []PendingComment) {
 			buf.WriteString(report.Problem.Summary)
 			buf.WriteString("\n\n")
 
-			if content != "" {
+			if len(report.Problem.Diagnostics) > 0 && content != "" {
 				buf.WriteString("```yaml\n")
 				buf.WriteString(diags.InjectDiagnostics(
 					content,
