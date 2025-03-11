@@ -60,10 +60,8 @@ func InjectDiagnostics(content string, diags []Diagnostic, color output.Color, f
 
 		for i := range diags {
 			needsNextLine[i] = false
-			for _, pos := range diagPositions[i] {
-				if pos.Line == lineIndex+1 {
-					needsNextLine[i] = true
-				}
+			if lineIndex+1 == diagPositions[i].Lines().Last {
+				needsNextLine[i] = true
 			}
 		}
 

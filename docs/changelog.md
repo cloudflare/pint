@@ -146,6 +146,7 @@
 ### Fixed
 
 - Improved message formatting in the [alerts/template](checks/alerts/template.md) check.
+- Fixed problem reports for multi line queries.
 
 ## v0.67.0
 

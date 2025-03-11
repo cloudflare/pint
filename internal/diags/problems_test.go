@@ -135,6 +135,24 @@ expr: >-
                       ^ this is bad
 `,
 		},
+		{
+			input: `
+expr: |
+  foo{
+  job="bar"
+  }
+`,
+			firstLine: 3,
+			lastLine:  5,
+			diags: []Diagnostic{
+				{FirstColumn: 1, LastColumn: 16, Message: "this is bad"},
+			},
+			output: `3 |   foo{
+4 |   job="bar"
+5 |   }
+      ^ this is bad
+`,
+		},
 	}
 
 	for _, tc := range testCases {
