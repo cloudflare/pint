@@ -205,7 +205,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s` label value `%s` must match `%s`.", c.keyRe.original, value, c.valueRe.anchored),
+					Message:     fmt.Sprintf("`%s` label value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
 					Pos:         lab.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(lab.Value),
@@ -242,7 +242,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("`%s` label value `%s` is not one of valid values.", c.keyRe.original, value),
+						Message:     fmt.Sprintf("`%s` label value is not one of valid values.", c.keyRe.original),
 						Pos:         lab.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(lab.Value),

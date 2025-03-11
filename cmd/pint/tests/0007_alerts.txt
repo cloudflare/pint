@@ -38,12 +38,12 @@ Bug: required annotation not set (alerts/annotation)
 Warning: invalid label value (rule/label)
   ---> rules/0001.yml:14
 14 |     severity: bad
-                   ^^^ `severity` label value `bad` must match `^critical|warning|info$`.
+                   ^^^ `severity` label value must match `^critical|warning|info$`.
 
 Bug: invalid annotation value (alerts/annotation)
   ---> rules/0001.yml:16
 16 |     url: bad
-              ^^^ `url` annotation value `bad` must match `^https://wiki.example.com/page/(.+).html$`.
+              ^^^ `url` annotation value must match `^https://wiki.example.com/page/(.+).html$`.
 
 Fatal: template syntax error (alerts/template)
   ---> rules/0002.yml:5

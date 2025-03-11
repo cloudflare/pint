@@ -147,7 +147,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`severity` label value `warning` must match `^critical$`.",
+								Message: "`severity` label value must match `^critical$`.",
 							},
 						},
 					},
@@ -169,7 +169,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`severity` label value `warning` must match `^critical$`.",
+								Message: "`severity` label value must match `^critical$`.",
 							},
 						},
 					},
@@ -200,7 +200,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`priority` label value `2a` must match `^(1|2|3)$`.",
+								Message: "`priority` label value must match `^(1|2|3)$`.",
 							},
 						},
 					},
@@ -230,7 +230,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`priority` label value `2a` must match `^(1|2|3)$`.",
+								Message: "`priority` label value must match `^(1|2|3)$`.",
 							},
 						},
 					},
@@ -343,7 +343,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`severity` label value `warning` must match `^critical|info$`.",
+								Message: "`severity` label value must match `^critical|info$`.",
 							},
 						},
 					},
@@ -365,7 +365,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`severity` label value `warning` must match `^critical|info$`.",
+								Message: "`severity` label value must match `^critical|info$`.",
 							},
 						},
 					},
@@ -432,7 +432,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`for` label value `must wait 5m to fire` must match `^must wait {{$for}} to fire$`.",
+								Message: "`for` label value must match `^must wait {{$for}} to fire$`.",
 							},
 						},
 					},
@@ -454,7 +454,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`components` label value `db` must match `^api|memcached$`.",
+								Message: "`components` label value must match `^api|memcached$`.",
 							},
 						},
 					},
@@ -485,7 +485,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`components` label value `db` is not one of valid values.",
+								Message: "`components` label value is not one of valid values.",
 							},
 						},
 					},
@@ -507,7 +507,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`components` label value `db` must match `^api|memcached$`.",
+								Message: "`components` label value must match `^api|memcached$`.",
 							},
 						},
 					},
@@ -538,7 +538,7 @@ func TestLabelCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: "`components` label value `db` is not one of valid values.",
+								Message: "`components` label value is not one of valid values.",
 							},
 						},
 					},

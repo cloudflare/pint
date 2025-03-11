@@ -16,7 +16,7 @@ Bug: required annotation not set (alerts/annotation)
 Bug: invalid annotation value (alerts/annotation)
   ---> rules/0001.yml:12
 12 |     alert_for: 4m
-                    ^^ `alert_for` annotation value `4m` must match `^{{ $for }}$`.
+                    ^^ `alert_for` annotation value must match `^{{ $for }}$`.
 
 level=INFO msg="Problems found" Bug=2
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
