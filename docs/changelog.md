@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.1
+
+### Fixed
+
+- Don't create empty markdown blocks when reporting problems to GitHub & GitLab.
+
 ## v0.71.0
 
 ### Added
