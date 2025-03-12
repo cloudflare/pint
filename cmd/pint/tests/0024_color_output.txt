@@ -8,83 +8,83 @@ cmp stderr stderr.txt
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Finding all rules to check"[0m [2mpaths=[0m[96m["rules"][0m
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Checking Prometheus rules"[0m [2mentries=[0m[94m15[0m [2mworkers=[0m[94m10[0m [2monline=[0m[94mtrue[0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0001.yml[0m[96m:2[0m
+[0m[96m  ---> rules/0001.yml[0m[96m:2[0m[1m -> `colo_job:fl_cf_html_bytes_in:rate10m`[0m
 [97m[97m2 | [0m  expr: sum(rate(fl_cf_html_bytes_in[10m])) WITHOUT (colo_id, instance, node_type, region, node_status, job, colo_name)
-[93m                                                ^^^^^^^^[0m [93mQuery is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results.[0m
-[93m                                                        [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
+[93m  |                                             ^^^^^^^^[0m [93mQuery is using aggregation with `without(colo_id, instance, node_type, region, node_status, job, colo_name)`, all labels included inside `without(...)` will be removed from the results.[0m
+[93m  |                                                     [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [0m
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0001.yml[0m[96m:6[0m
+[0m[96m  ---> rules/0001.yml[0m[96m:6[0m[1m -> `colo_job:foo:irate3m`[0m
 [97m[97m6 | [0m  expr: sum(irate(foo[3m])) WITHOUT (colo_id)
-[93m                                ^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m  |                             ^^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [0m
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:11[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:11[0m[1m -> `colo_job:up:count`[0m
 [97m[97m11 | [0m  expr: sum(foo) without(job)
-[93m                      ^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m   |                  ^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:11[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:11[0m[1m -> `colo_job:up:count`[0m
 [97m[97m11 | [0m  expr: sum(foo) without(job)
-[93m                      ^^^^^^^[0m [93mQuery is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.[0m
-[93m                             [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
+[93m   |                  ^^^^^^^[0m [93mQuery is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.[0m
+[93m   |                         [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [0m
 [91mFatal: [0m[1mPromQL syntax error[0m[95m (promql/syntax)
-[0m[96m  ---> rules/0003.yaml[0m[96m:14[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:14[0m[1m -> `invalid`[0m
 [97m[97m14 | [0m  expr: sum(foo) by ())
-[91m                           ^[0m [91munexpected right parenthesis ')'[0m
+[91m   |                       ^[0m [91munexpected right parenthesis ')'[0m
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:23-25[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:23-25[0m[1m -> `colo:multiline`[0m
 [97m[97m23 | [0m    sum(
 [97m24 | [0m      multiline
 [97m25 | [0m    ) without(job, instance)
-[93m           ^^^^^^^[0m [93mQuery is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.[0m
-[93m                  [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
+[93m   |       ^^^^^^^[0m [93mQuery is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.[0m
+[93m   |              [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [0m
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:29-31[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:29-31[0m[1m -> `colo:multiline:sum`[0m
 [97m[97m29 | [0m    sum(sum) without(job)
-[93m                  ^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m   |              ^^^^^^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [97m30 | [0m    +
 [97m31 | [0m    sum(sum) without(job)
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:29-31[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:29-31[0m[1m -> `colo:multiline:sum`[0m
 [97m[97m29 | [0m    sum(sum) without(job)
-[93m                  ^^^^^^^[0m [93mQuery is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.[0m
-[93m                         [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
+[93m   |              ^^^^^^^[0m [93mQuery is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.[0m
+[93m   |                     [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [97m30 | [0m    +
 [97m31 | [0m    sum(sum) without(job)
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:35-37[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:35-37[0m[1m -> `colo:multiline2`[0m
 [97m[97m35 | [0m    sum(
 [97m36 | [0m      multiline2
 [97m37 | [0m    ) without(job, instance)
-[93m           ^^^^^^^[0m [93mQuery is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.[0m
-[93m                  [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
+[93m   |       ^^^^^^^[0m [93mQuery is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.[0m
+[93m   |              [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [0m
 [93mWarning: [0m[1mlabel must be removed in aggregations[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:40[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:40[0m[1m -> `colo_job:up:byinstance`[0m
 [97m[97m40 | [0m  expr: sum(byinstance) by(instance)
-[93m                             ^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
+[93m   |                         ^^[0m [93m`instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.[0m
 [0m
 [93mWarning: [0m[1mrequired label is being removed via aggregation[0m[95m (promql/aggregate)
-[0m[96m  ---> rules/0003.yaml[0m[96m:40[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:40[0m[1m -> `colo_job:up:byinstance`[0m
 [97m[97m40 | [0m  expr: sum(byinstance) by(instance)
-[93m                             ^^[0m [93mQuery is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.[0m
-[93m                               [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
+[93m   |                         ^^[0m [93mQuery is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.[0m
+[93m   |                           [0m [93m`job` label is required and should be preserved when aggregating all rules.[0m
 [0m
 [91mBug: [0m[1minvalid duration[0m[95m (alerts/for)
-[0m[96m  ---> rules/0003.yaml[0m[96m:54[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:54[0m[1m -> `Instance Is Down`[0m
 [97m[97m54 | [0m    11am
-[91m         ^^^^[0m [91munknown unit "am\n" in duration "11am\n"[0m
+[91m   |     ^^^^[0m [91munknown unit "am\n" in duration "11am\n"[0m
 [0m
 [2mInformation: [0m[1mredundant field with default value[0m[95m (alerts/for)
-[0m[96m  ---> rules/0003.yaml[0m[96m:58[0m
+[0m[96m  ---> rules/0003.yaml[0m[96m:58[0m[1m -> `Instance Is Down`[0m
 [97m[97m58 | [0m  for: "0h"
-[2m             ^^[0m [2m`0h` is the default value of `for`, this line is unnecessary.[0m
+[2m   |         ^^[0m [2m`0h` is the default value of `for`, this line is unnecessary.[0m
 [0m
 [2mlevel=[0m[97mINFO[0m [2mmsg=[0m[97m"Problems found"[0m [2mFatal=[0m[94m1[0m [2mBug=[0m[94m1[0m [2mWarning=[0m[94m10[0m [2mInformation=[0m[94m1[0m
 [2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97m"Execution completed with error(s)"[0m [2merr=[0m[91m"found 2 problem(s) with severity Bug or higher"[0m

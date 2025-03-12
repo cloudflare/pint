@@ -11,33 +11,28 @@ import (
 
 func TestInjectDiagnostics(t *testing.T) {
 	type testCaseT struct {
-		input               string
-		output              string
-		diags               []Diagnostic
-		firstLine, lastLine int
+		input  string
+		output string
+		diags  []Diagnostic
 	}
 
 	testCases := []testCaseT{
 		{
-			input:     "expr: foo(bar) by()",
-			firstLine: 1,
-			lastLine:  1,
+			input: "expr: foo(bar) by()",
 			diags: []Diagnostic{
 				{FirstColumn: 1, LastColumn: 13, Message: "this is bad"},
 			},
 			output: `1 | expr: foo(bar) by()
-          ^^^^^^^^^^^^^ this is bad
+  |       ^^^^^^^^^^^^^ this is bad
 `,
 		},
 		{
-			input:     "expr: foo(bar) on()",
-			firstLine: 1,
-			lastLine:  1,
+			input: "expr: foo(bar) on()",
 			diags: []Diagnostic{
 				{FirstColumn: 10, LastColumn: 11, Message: "oops"},
 			},
 			output: `1 | expr: foo(bar) on()
-                   ^^ oops
+  |                ^^ oops
 `,
 		},
 		{
@@ -46,16 +41,14 @@ expr: sum(foo{job="bar"})
       / on(a,b)
       sum(foo)
 `,
-			firstLine: 2,
-			lastLine:  4,
 			diags: []Diagnostic{
 				{FirstColumn: 23, LastColumn: 29, Message: "abc"},
 				{FirstColumn: 26, LastColumn: 28, Message: "efg"},
 			},
 			output: `2 | expr: sum(foo{job="bar"})
 3 |       / on(a,b)
-            ^^^^^^^ abc
-               ^^^ efg
+  |         ^^^^^^^ abc
+  |            ^^^ efg
 4 |       sum(foo)
 `,
 		},
@@ -66,18 +59,15 @@ expr: |
   / on(c,d)
   sum(bar)
 `,
-			firstLine: 2,
-			lastLine:  5,
 			diags: []Diagnostic{
 				{FirstColumn: 23, LastColumn: 24, Message: "123"},
 				{FirstColumn: 31, LastColumn: 33, Message: "456"},
 			},
-			output: `2 | expr: |
-3 |   sum(bar{job="foo"})
+			output: `3 |   sum(bar{job="foo"})
 4 |   / on(c,d)
-        ^^ 123
+  |     ^^ 123
 5 |   sum(bar)
-      ^^^ 456
+  |   ^^^ 456
 `,
 		},
 		{
@@ -87,17 +77,14 @@ expr:
   / on(c,d)
   sum(bar)
 `,
-			firstLine: 2,
-			lastLine:  5,
 			diags: []Diagnostic{
 				{FirstColumn: 23, LastColumn: 29, Message: "abc"},
 				{FirstColumn: 23, LastColumn: 29, Message: "efg"},
 			},
-			output: `2 | expr:
-3 |   sum(bar{job="foo"})
+			output: `3 |   sum(bar{job="foo"})
 4 |   / on(c,d)
-        ^^^^^^^ abc
-                efg
+  |     ^^^^^^^ abc
+  |             efg
 5 |   sum(bar)
 `,
 		},
@@ -110,29 +97,24 @@ expr: >-
   sum(bar)
 ### END ###
 `,
-			firstLine: 3,
-			lastLine:  6,
 			diags: []Diagnostic{
 				{FirstColumn: 23, LastColumn: 29, Message: "abc"},
 				{FirstColumn: 23, LastColumn: 29, Message: "efg"},
 			},
-			output: `3 | expr: >-
-4 |   sum(bar{job="foo"})
+			output: `4 |   sum(bar{job="foo"})
 5 |   / on(c,d)
-        ^^^^^^^ abc
-                efg
+  |     ^^^^^^^ abc
+  |             efg
 6 |   sum(bar)
 `,
 		},
 		{
-			input:     "expr: cnt(bar) by()",
-			firstLine: 1,
-			lastLine:  1,
+			input: "expr: cnt(bar) by()",
 			diags: []Diagnostic{
 				{FirstColumn: 14, LastColumn: 14, Message: "this is bad"},
 			},
 			output: `1 | expr: cnt(bar) by()
-                      ^ this is bad
+  |                   ^ this is bad
 `,
 		},
 		{
@@ -142,15 +124,13 @@ expr: |
   job="bar"
   }
 `,
-			firstLine: 3,
-			lastLine:  5,
 			diags: []Diagnostic{
 				{FirstColumn: 1, LastColumn: 16, Message: "this is bad"},
 			},
 			output: `3 |   foo{
 4 |   job="bar"
 5 |   }
-      ^ this is bad
+  |   ^ this is bad
 `,
 		},
 	}
@@ -173,7 +153,7 @@ expr: |
 				})
 			}
 
-			out := InjectDiagnostics(tc.input, diags, output.None, tc.firstLine, tc.lastLine)
+			out := InjectDiagnostics(tc.input, diags, output.None)
 			require.Equal(t, tc.output, out)
 		})
 	}

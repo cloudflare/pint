@@ -629,7 +629,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 					content,
 					report.Problem.Diagnostics,
 					output.None,
-					report.Rule.Lines.First, report.Rule.Lines.Last))
+				))
 				buf.WriteString("```\n\n")
 			}
 

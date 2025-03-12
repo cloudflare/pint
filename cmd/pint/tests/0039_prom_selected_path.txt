@@ -19,10 +19,10 @@ level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/fo
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=third lines=8-9 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/for","alerts/comparison","alerts/template","promql/fragile","promql/regexp","promql/impossible"] path=rules/0001.yml rule=third
 Warning: required label is being removed via aggregation (promql/aggregate)
-  ---> rules/0001.yml:6
+  ---> rules/0001.yml:6 -> `second`
 6 |   expr: sum(bar)
-            ^^^ Query is using aggregation that removes all labels.
-                `job` label is required and should be preserved when aggregating all rules.
+  |         ^^^ Query is using aggregation that removes all labels.
+  |             `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Warning=1
 level=DEBUG msg="Stopping query workers" name=disabled uri=http://127.0.0.1:123

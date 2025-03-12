@@ -8,9 +8,9 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Warning: query beyond configured retention (promql/range_query)
-  ---> rules/0001.yaml:2
+  ---> rules/0001.yaml:2 -> `Error Rate`
 2 |   expr: sum(rate(errors[1h1s])) > 0.5
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `errors[1h1s]` selector is trying to query Prometheus for 1h1s worth of metrics, but 1h is the maximum allowed range query.
+  |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `errors[1h1s]` selector is trying to query Prometheus for 1h1s worth of metrics, but 1h is the maximum allowed range query.
 
 level=INFO msg="Problems found" Warning=1
 -- rules/0001.yaml --

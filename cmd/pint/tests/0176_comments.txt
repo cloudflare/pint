@@ -17,9 +17,9 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 level=WARN msg="No results for Prometheus uptime metric, you might have set uptime config option to a missing metric, please check your config" name=prom metric=up
 level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom metric=up
 Bug: query on nonexistent series (promql/series)
-  ---> rules/1.yml:15
+  ---> rules/1.yml:15 -> `Active`
 15 |     expr: up == 0
-               ^^ `prom` Prometheus server at http://127.0.0.1:7176 didn't have any series for `up` metric in the last 1w.
+   |           ^^ `prom` Prometheus server at http://127.0.0.1:7176 didn't have any series for `up` metric in the last 1w.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

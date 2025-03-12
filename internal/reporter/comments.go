@@ -82,7 +82,7 @@ func makeComments(summary Summary) (comments []PendingComment) {
 					content,
 					report.Problem.Diagnostics,
 					output.None,
-					report.Rule.Lines.First, report.Rule.Lines.Last))
+				))
 				buf.WriteString("```\n\n")
 			}
 

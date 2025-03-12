@@ -7,33 +7,29 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=6 workers=10 online=true
 Bug: missing owner (rule/owner)
-  ---> rules/1.yml:4-5
-4 |   - alert: No Owner
+  ---> rules/1.yml:4-5 -> `No Owner`
 5 |     expr: up > 0
-              ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+  |           ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 Bug: invalid owner (rule/owner)
-  ---> rules/1.yml:7-8
-7 |   - alert: Invalid
+  ---> rules/1.yml:7-8 -> `Invalid`
 8 |     expr: up == 0
-              ^^^ This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values.
+  |           ^^^ This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values.
 
 Bug: invalid owner (rule/owner)
-  ---> rules/1.yml:13-14
-13 |   - alert: Owner Zed
+  ---> rules/1.yml:13-14 -> `Owner Zed`
 14 |     expr: up < 0
-               ^^^ This rule is set as owned by `zed` but `zed` doesn't match any of the allowed owner values.
+   |           ^^^ This rule is set as owned by `zed` but `zed` doesn't match any of the allowed owner values.
 
 Bug: missing owner (rule/owner)
-  ---> rules/2.yml:4-5
-4 |   - alert: No Owner
+  ---> rules/2.yml:4-5 -> `No Owner`
 5 |     expr: up > 0
-              ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+  |           ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 Bug: invalid owner (rule/owner)
   ---> rules/3.yml:1
 1 | # pint file/owner ax
-    ^^ This file is set as owned by `ax` but `ax` doesn't match any of the allowed owner values.
+  | ^^ This file is set as owned by `ax` but `ax` doesn't match any of the allowed owner values.
 
 level=INFO msg="Problems found" Bug=5
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

@@ -39,9 +39,9 @@ level=WARN msg="No results for Prometheus uptime metric, you might have set upti
 level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=prom metric=up
 level=INFO msg="Problems found" Bug=1
 Bug: query on nonexistent series (promql/series)
-  ---> renamed.yaml:2
+  ---> renamed.yaml:2 -> `rule1`
 2 |   expr: sum(foo)
-                ^^^ `prom` Prometheus server at http://127.0.0.1:7171 didn't have any series for `foo` metric in the last 1w.
+  |             ^^^ `prom` Prometheus server at http://127.0.0.1:7171 didn't have any series for `foo` metric in the last 1w.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yaml --

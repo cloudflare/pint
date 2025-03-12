@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.2
+
+### Fixed
+
+- Print only relevant lines when reporting problems.
+
 ## v0.71.1
 
 ### Fixed
