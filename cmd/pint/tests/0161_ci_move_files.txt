@@ -44,12 +44,12 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Bug: query on nonexistent series (promql/series)
   ---> prom2.yml:10 -> `DownAlert`
 10 |     expr: up == 0
-   |           ^^ `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w.
+               ^^ `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w.
 
 Bug: query on nonexistent series (promql/series)
   ---> prom2.yml:21 -> `up:sum`
 21 |     expr: up == 0
-   |           ^^ `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w.
+               ^^ `prom2` Prometheus server at http://127.0.0.1:7161/2 didn't have any series for `up` metric in the last 1w.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v0.yml --

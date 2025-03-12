@@ -20,7 +20,7 @@ level=ERROR msg="Query returned an error" err="failed to query Prometheus metric
 Warning: unable to run checks (promql/counter)
   ---> rules/0001.yml:6-8 -> `colo:test1`
 6 | - record: "colo:test1"
-  |            ^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7103 connection error: `connection refused`.
+               ^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7103 connection error: `connection refused`.
 
 level=INFO msg="Problems found" Warning=1
 level=DEBUG msg="Stopping query workers" name=prom uri=http://127.0.0.1:7103

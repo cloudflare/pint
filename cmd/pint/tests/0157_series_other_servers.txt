@@ -23,7 +23,7 @@ level=WARN msg="Using dummy Prometheus uptime metric results with no gaps" name=
 Bug: query on nonexistent series (promql/series)
   ---> rules/1.yml:5 -> `foo`
 5 |     expr: only_on_prom2 == 0
-  |           ^^^^^^^^^^^^^ `prom1` Prometheus server at http://127.0.0.1:7157 didn't have any series for `only_on_prom2` metric in the last 1w.
+              ^^^^^^^^^^^^^ `prom1` Prometheus server at http://127.0.0.1:7157 didn't have any series for `only_on_prom2` metric in the last 1w.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

@@ -94,8 +94,7 @@ func InjectDiagnostics(content string, diags []Diagnostic, color output.Color) s
 		buf.WriteString(output.MaybeColor(output.White, color == output.None, prefix))
 		for i, ok := range needsNextLine {
 			if ok {
-				nextLine[i].WriteString(strings.Repeat(" ", digits))
-				nextLine[i].WriteString(" | ")
+				nextLine[i].WriteString(strings.Repeat(" ", digits+3))
 			}
 		}
 

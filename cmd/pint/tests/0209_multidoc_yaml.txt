@@ -9,7 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=9 workers=10 online=true
 Warning: required annotation not set (alerts/annotation)
   ---> rules/1.yaml:143-150 -> `Thanos_Rule_Config_Reload_Failed`
 150 |               description: Thanos Ruler has not been able to reload its configuration.
-    |               ^^^ `summary` annotation is required.
+                    ^^^ `summary` annotation is required.
 
 level=INFO msg="Problems found" Warning=1
 -- .pint.hcl --

@@ -29,12 +29,12 @@ cmp stderr stderr.txt
 Bug: missing owner (rule/owner)
   ---> rules.yml:4-5 -> `No Owner`
 5 |     expr: up > 0
-  |           ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+              ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 Bug: invalid owner (rule/owner)
   ---> rules.yml:7-8 -> `Invalid`
 8 |     expr: up == 0
-  |           ^^^ This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values.
+              ^^^ This rule is set as owned by `bob` but `bob` doesn't match any of the allowed owner values.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --
