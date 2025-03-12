@@ -5,6 +5,7 @@
 ### Fixed
 
 - Don't create empty markdown blocks when reporting problems to GitHub & GitLab.
+- Added missing problem details to comments reported to BitBucket.
 
 ## v0.71.0
 
