@@ -120,7 +120,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", "http://127.127.127.127:9999", `connection refused`),
+								Message: checkErrorUnableToRun("prom", "http://127.127.127.127:9999", `connection refused`),
 							},
 						},
 						Severity: checks.Warning,
@@ -140,7 +140,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: query processing would load too many samples into memory in query execution"),
+								Message: checkErrorTooExpensiveToRun("prom", uri, "execution: query processing would load too many samples into memory in query execution"),
 							},
 						},
 						Severity: checks.Warning,
@@ -170,7 +170,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorTooExpensiveToRun(checks.SeriesCheckName, "prom", uri, "execution: expanding series: context deadline exceeded"),
+								Message: checkErrorTooExpensiveToRun("prom", uri, "execution: expanding series: context deadline exceeded"),
 							},
 						},
 						Severity: checks.Warning,
@@ -399,7 +399,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,
@@ -664,7 +664,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,
@@ -794,7 +794,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,
@@ -2197,7 +2197,7 @@ func TestSeriesCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.SeriesCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,

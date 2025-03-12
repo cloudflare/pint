@@ -153,17 +153,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr, label, src) {
-				problems = append(problems, Problem{
-					Anchor:      AnchorAfter,
-					Lines:       rule.Lines,
-					Reporter:    c.Reporter(),
-					Summary:     problem.summary,
-					Details:     problem.details,
-					Severity:    problem.severity,
-					Diagnostics: problem.diags,
-				})
-			}
+			problems = append(problems, c.checkQueryLabels(rule, label, src)...)
 		}
 	}
 
@@ -191,17 +181,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr, annotation, src) {
-				problems = append(problems, Problem{
-					Anchor:      AnchorAfter,
-					Lines:       rule.Lines,
-					Reporter:    c.Reporter(),
-					Summary:     problem.summary,
-					Details:     problem.details,
-					Severity:    problem.severity,
-					Diagnostics: problem.diags,
-				})
-			}
+			problems = append(problems, c.checkQueryLabels(rule, annotation, src)...)
 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
 				problems = append(problems, c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value)...)
@@ -462,7 +442,7 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []utils.Source) (problems []exprProblem) {
+func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyValue, src []utils.Source) (problems []Problem) {
 	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
 	if !ok {
 		return nil
@@ -482,11 +462,14 @@ func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []
 					}
 					if !s.CanHaveLabel(v[1]) {
 						er := s.LabelExcludeReason(v[1])
-						problems = append(problems, exprProblem{
-							summary:  "template uses non-existent label",
-							details:  "",
-							severity: Bug,
-							diags: []diags.Diagnostic{
+						problems = append(problems, Problem{
+							Anchor:   AnchorAfter,
+							Lines:    rule.Lines,
+							Reporter: c.Reporter(),
+							Summary:  "template uses non-existent label",
+							Details:  "",
+							Severity: Bug,
+							Diagnostics: []diags.Diagnostic{
 								{
 									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v[1]),
 									Pos:         label.Value.Pos,
@@ -495,7 +478,7 @@ func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []
 								},
 								{
 									Message:     er.Reason,
-									Pos:         expr.Value.Pos,
+									Pos:         rule.AlertingRule.Expr.Value.Pos,
 									FirstColumn: int(er.Fragment.Start) + 1,
 									LastColumn:  int(er.Fragment.End),
 								},

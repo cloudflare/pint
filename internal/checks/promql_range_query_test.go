@@ -46,7 +46,7 @@ func TestRangeQueryCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.RangeQueryCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 					},

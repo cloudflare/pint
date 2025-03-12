@@ -1158,7 +1158,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
 							},
 						},
 
@@ -1181,7 +1181,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
 							},
 						},
 
@@ -1204,7 +1204,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
+								Message: checkErrorUnableToRun("prom", uri, `server_error: internal error`),
 							},
 						},
 
@@ -1243,7 +1243,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.VectorMatchingCheckName, "prom", uri, `server_error: internal error`),
+								Message: checkErrorUnableToRun("prom", uri, `server_error: internal error`),
 							},
 						},
 

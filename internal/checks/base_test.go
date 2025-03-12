@@ -604,10 +604,10 @@ func checkErrorBadData(name, uri, err string) string {
 	return fmt.Sprintf("`%s` Prometheus server at %s failed with: `%s`.", name, uri, err)
 }
 
-func checkErrorUnableToRun(c, name, uri, err string) string {
+func checkErrorUnableToRun(name, uri, err string) string {
 	return fmt.Sprintf("Couldn't run some online checks due to `%s` Prometheus server at %s connection error: `%s`.", name, uri, err)
 }
 
-func checkErrorTooExpensiveToRun(c, name, uri, err string) string {
+func checkErrorTooExpensiveToRun(name, uri, err string) string {
 	return fmt.Sprintf("Couldn't run some online checks on `%s` Prometheus server at %s because some queries are too expensive: `%s`.", name, uri, err)
 }

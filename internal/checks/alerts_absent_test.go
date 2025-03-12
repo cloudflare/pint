@@ -247,7 +247,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
+								Message: checkErrorUnableToRun("prom", uri, fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
 							},
 						},
 					},
@@ -275,7 +275,7 @@ func TestAlertsAbsentCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.AlertsAbsentCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
 							},
 						},
 					},
