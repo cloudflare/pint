@@ -19,10 +19,20 @@ Bug: duplicated recording rule (rule/duplicate)
 2 |   expr: sum(foo) without(job)
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0001.yml:7-8
+  ---> rules/0001.yml:5-8
+5 | - record: "colo:labels:mismatch"
+               ^^^^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+6 |   expr: sum(foo) without(job)
 7 |   labels:
-      ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 8 |     file: a
+
+Bug: unable to run checks (labels/conflict)
+  ---> rules/0001.yml:9-12
+ 9 | - record: "colo:labels:equal"
+                ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+10 |   expr: sum(foo) without(job)
+11 |   labels:
+12 |     same: yes
 
 Bug: duplicated recording rule (rule/duplicate)
   ---> rules/0001.yml:9-12
@@ -33,27 +43,27 @@ Bug: duplicated recording rule (rule/duplicate)
 12 |     same: yes
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0001.yml:11-12
-11 |   labels:
-       ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
-12 |     same: yes
-
-Bug: unable to run checks (labels/conflict)
-  ---> rules/0002.yml:5-6
+  ---> rules/0002.yml:3-6
+3 | - record: "colo:labels:empty"
+               ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+4 |   expr: sum(foo) without(job)
 5 |   labels:
-      ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 6 |     empty: nope
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0002.yml:9-10
+  ---> rules/0002.yml:7-10
+ 7 | - record: "colo:labels:mismatch"
+                ^^^^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+ 8 |   expr: sum(foo) without(job)
  9 |   labels:
-       ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 10 |     file: b
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0002.yml:13-14
+  ---> rules/0002.yml:11-14
+11 | - record: "colo:labels:equal"
+                ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
+12 |   expr: sum(foo) without(job)
 13 |   labels:
-       ^^^^^^ Couldn't run `labels/conflict` checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 14 |     same: yes
 
 level=INFO msg="Problems found" Bug=7

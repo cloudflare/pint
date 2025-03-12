@@ -61,23 +61,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-		problems = append(problems, Problem{
-			Anchor:   AnchorAfter,
-			Lines:    rule.Lines,
-			Reporter: c.Reporter(),
-			Summary:  "unable to run checks",
-			Details:  "",
-			Severity: severity,
-			Diagnostics: []diags.Diagnostic{
-				{
-					Message:     text,
-					Pos:         rule.AlertingRule.Expr.Value.Pos,
-					FirstColumn: 1,
-					LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
-				},
-			},
-		})
+		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 		return problems
 	}
 

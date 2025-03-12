@@ -85,23 +85,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 			c.prom.DisableCheck(promapi.APIPathFlags, c.Reporter())
 			return problems
 		}
-		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
-		problems = append(problems, Problem{
-			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
-			Reporter: c.Reporter(),
-			Summary:  "unable to run checks",
-			Details:  "",
-			Severity: severity,
-			Diagnostics: []diags.Diagnostic{
-				{
-					Message:     text,
-					Pos:         expr.Value.Pos,
-					FirstColumn: 1,
-					LastColumn:  len(expr.Value.Value),
-				},
-			},
-		})
+		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Warning))
 		return problems
 	}
 

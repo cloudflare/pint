@@ -62,23 +62,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, _ discovery.Path, rule p
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Warning)
-		problems = append(problems, Problem{
-			Anchor:   AnchorAfter,
-			Lines:    labels.Lines,
-			Reporter: c.Reporter(),
-			Summary:  "unable to run checks",
-			Details:  "",
-			Severity: severity,
-			Diagnostics: []diags.Diagnostic{
-				{
-					Message:     text,
-					Pos:         labels.Key.Pos,
-					FirstColumn: 1,
-					LastColumn:  len(labels.Key.Value),
-				},
-			},
-		})
+		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Warning))
 		return problems
 	}
 

@@ -238,7 +238,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", selector.String()))
 		count, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
 		if err != nil {
-			problems = append(problems, c.queryProblem(err, expr))
+			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
 		}
 		if count > 0 {
@@ -288,7 +288,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		slog.Debug("Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
 		if err != nil {
-			problems = append(problems, c.queryProblem(err, expr))
+			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
 		}
 		trs.Series.FindGaps(promUptime.Series, trs.Series.From, trs.Series.Until)
@@ -365,7 +365,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			slog.Debug("Checking if base metric has historical series with required label", slog.String("check", c.Reporter()), slog.String("selector", (&l).String()), slog.String("label", name))
 			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), params)
 			if err != nil {
-				problems = append(problems, c.queryProblem(err, expr))
+				problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
 			}
 			trsLabelCount.Series.FindGaps(promUptime.Series, trsLabelCount.Series.From, trsLabelCount.Series.Until)
@@ -476,7 +476,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
 			if err != nil {
-				problems = append(problems, c.queryProblem(err, expr))
+				problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
 			}
 			trsLabel.Series.FindGaps(promUptime.Series, trsLabel.Series.From, trsLabel.Series.Until)
@@ -798,26 +798,6 @@ func (c SeriesCheck) hasSeriesWithSelector(ctx context.Context, prom *promapi.Fa
 		}
 	}
 	return false
-}
-
-func (c SeriesCheck) queryProblem(err error, expr parser.PromQLExpr) Problem {
-	text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-	return Problem{
-		Anchor:   AnchorAfter,
-		Lines:    expr.Value.Lines,
-		Reporter: c.Reporter(),
-		Summary:  "unable to run checks",
-		Details:  "",
-		Severity: severity,
-		Diagnostics: []diags.Diagnostic{
-			{
-				Message:     text,
-				Pos:         expr.Value.Pos,
-				FirstColumn: 1,
-				LastColumn:  len(expr.Value.Value),
-			},
-		},
-	}
 }
 
 func (c SeriesCheck) instantSeriesCount(ctx context.Context, query string) (int, error) {

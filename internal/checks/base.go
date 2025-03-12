@@ -141,7 +141,7 @@ type exprProblem struct {
 	severity Severity
 }
 
-func textAndSeverityFromError(err error, reporter, prom string, s Severity) (text string, severity Severity) {
+func textAndSeverityFromError(err error, _, prom string, s Severity) (text string, severity Severity) {
 	promDesc := fmt.Sprintf("%q", prom)
 	var perr *promapi.FailoverGroupError
 	perrOk := errors.As(err, &perr)
@@ -153,10 +153,10 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 
 	switch {
 	case promapi.IsQueryTooExpensive(err):
-		text = fmt.Sprintf("Couldn't run `%s` checks on %s because some queries are too expensive: `%s`.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run some online checks on %s because some queries are too expensive: `%s`.", promDesc, err)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("Couldn't run `%s` checks due to %s connection error: `%s`.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run some online checks due to %s connection error: `%s`.", promDesc, err)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug
@@ -167,6 +167,52 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 	}
 
 	return text, severity
+}
+
+func problemFromError(err error, rule parser.Rule, reporter, prom string, s Severity) Problem {
+	promDesc := fmt.Sprintf("%q", prom)
+	var perr *promapi.FailoverGroupError
+	perrOk := errors.As(err, &perr)
+	if perrOk {
+		if uri := perr.URI(); uri != "" {
+			promDesc = promText(prom, uri)
+		}
+	}
+
+	var text string
+	var severity Severity
+	switch {
+	case promapi.IsQueryTooExpensive(err):
+		text = fmt.Sprintf("Couldn't run some online checks on %s because some queries are too expensive: `%s`.", promDesc, err)
+		severity = Warning
+	case promapi.IsUnavailableError(err):
+		text = fmt.Sprintf("Couldn't run some online checks due to %s connection error: `%s`.", promDesc, err)
+		severity = Warning
+		if perrOk && perr.IsStrict() {
+			severity = Bug
+		}
+	default:
+		text = fmt.Sprintf("%s failed with: `%s`.", promDesc, err)
+		severity = s
+	}
+
+	name := rule.NameNode()
+	return Problem{
+		Anchor:   AnchorAfter,
+		Lines:    rule.Lines,
+		Reporter: reporter,
+		Summary:  "unable to run checks",
+		Details:  "",
+		Severity: severity,
+		Diagnostics: []diags.Diagnostic{
+			{
+				Message:     text,
+				Pos:         name.Pos,
+				FirstColumn: 1,
+				LastColumn:  len(name.Value),
+			},
+		},
+	}
 }
 
 func promText(name, uri string) string {
