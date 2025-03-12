@@ -2,6 +2,7 @@ package diags
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/output"
@@ -22,7 +23,22 @@ type Diagnostic struct {
 	LastColumn  int // 1-indexed
 }
 
-func InjectDiagnostics(content string, diags []Diagnostic, color output.Color, firstLine, lastLine int) string {
+func lineCoverage(diags []Diagnostic) (lines []int) {
+	for _, diag := range diags {
+		for _, pos := range diag.Pos {
+			if !slices.Contains(lines, pos.Line) {
+				lines = append(lines, pos.Line)
+			}
+		}
+	}
+	slices.Sort(lines)
+	return lines
+}
+
+func InjectDiagnostics(content string, diags []Diagnostic, color output.Color) string {
+	lines := lineCoverage(diags)
+	lastLine := slices.Max(lines)
+
 	diagPositions := make([]PositionRanges, len(diags))
 	for i, diag := range diags {
 		dl := diag.Pos.Len()
@@ -47,15 +63,17 @@ func InjectDiagnostics(content string, diags []Diagnostic, color output.Color, f
 		}
 	}
 
-	nrFmt := fmt.Sprintf("%%%dd", countDigits(lastLine))
+	digits := countDigits(lastLine)
+	nrFmt := fmt.Sprintf("%%%dd", digits)
 
+	var lastWriteLine int
 	for lineIndex, line := range strings.Split(content, "\n") {
 
-		if lineIndex+1 < firstLine {
-			continue
-		}
 		if lineIndex+1 > lastLine {
 			break
+		}
+		if !slices.Contains(lines, lineIndex+1) {
+			continue
 		}
 
 		for i := range diags {
@@ -66,10 +84,18 @@ func InjectDiagnostics(content string, diags []Diagnostic, color output.Color, f
 		}
 
 		prefix := fmt.Sprintf(nrFmt+" | ", lineIndex+1)
+
+		if lastWriteLine > 0 && lineIndex+1-lastWriteLine > 1 {
+			buf.WriteString(output.MaybeColor(output.White, color == output.None, strings.Repeat(" ", digits)))
+			buf.WriteString(" | [...]\n")
+		}
+		lastWriteLine = lineIndex + 1
+
 		buf.WriteString(output.MaybeColor(output.White, color == output.None, prefix))
 		for i, ok := range needsNextLine {
 			if ok {
-				nextLine[i].WriteString(strings.Repeat(" ", len(prefix)))
+				nextLine[i].WriteString(strings.Repeat(" ", digits))
+				nextLine[i].WriteString(" | ")
 			}
 		}
 

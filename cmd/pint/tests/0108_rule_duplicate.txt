@@ -13,58 +13,39 @@ level=ERROR msg="Query returned an error" err="failed to query Prometheus config
 level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
 level=ERROR msg="Query returned an error" err="failed to query Prometheus config: Get \"http://127.0.0.1:7108/api/v1/status/config\": dial tcp 127.0.0.1:7108: connect: connection refused" uri=http://127.0.0.1:7108 query=/api/v1/status/config
 Bug: duplicated recording rule (rule/duplicate)
-  ---> rules/0001.yml:1-2
+  ---> rules/0001.yml:1-2 -> `colo:duplicate`
 1 | - record: "colo:duplicate"
-               ^^^^^^^^^^^^^^ Duplicated rule, identical rule found at rules/0002.yml:1.
-2 |   expr: sum(foo) without(job)
+  |            ^^^^^^^^^^^^^^ Duplicated rule, identical rule found at rules/0002.yml:1.
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0001.yml:5-8
+  ---> rules/0001.yml:5-8 -> `colo:labels:mismatch`
 5 | - record: "colo:labels:mismatch"
-               ^^^^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
-6 |   expr: sum(foo) without(job)
-7 |   labels:
-8 |     file: a
+  |            ^^^^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0001.yml:9-12
- 9 | - record: "colo:labels:equal"
-                ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
-10 |   expr: sum(foo) without(job)
-11 |   labels:
-12 |     same: yes
+  ---> rules/0001.yml:9-12 -> `colo:labels:equal`
+9 | - record: "colo:labels:equal"
+  |            ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 
 Bug: duplicated recording rule (rule/duplicate)
-  ---> rules/0001.yml:9-12
- 9 | - record: "colo:labels:equal"
-                ^^^^^^^^^^^^^^^^^ Duplicated rule, identical rule found at rules/0002.yml:11.
-10 |   expr: sum(foo) without(job)
-11 |   labels:
-12 |     same: yes
+  ---> rules/0001.yml:9-12 -> `colo:labels:equal`
+9 | - record: "colo:labels:equal"
+  |            ^^^^^^^^^^^^^^^^^ Duplicated rule, identical rule found at rules/0002.yml:11.
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0002.yml:3-6
+  ---> rules/0002.yml:3-6 -> `colo:labels:empty`
 3 | - record: "colo:labels:empty"
-               ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
-4 |   expr: sum(foo) without(job)
-5 |   labels:
-6 |     empty: nope
+  |            ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0002.yml:7-10
- 7 | - record: "colo:labels:mismatch"
-                ^^^^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
- 8 |   expr: sum(foo) without(job)
- 9 |   labels:
-10 |     file: b
+  ---> rules/0002.yml:7-10 -> `colo:labels:mismatch`
+7 | - record: "colo:labels:mismatch"
+  |            ^^^^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 
 Bug: unable to run checks (labels/conflict)
-  ---> rules/0002.yml:11-14
+  ---> rules/0002.yml:11-14 -> `colo:labels:equal`
 11 | - record: "colo:labels:equal"
-                ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
-12 |   expr: sum(foo) without(job)
-13 |   labels:
-14 |     same: yes
+   |            ^^^^^^^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7108 connection error: `connection refused`.
 
 level=INFO msg="Problems found" Bug=7
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

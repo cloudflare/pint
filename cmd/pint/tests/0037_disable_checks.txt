@@ -19,10 +19,10 @@ level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/te
 level=DEBUG msg="Found alerting rule" path=rules/0001.yml alert=no-comparison lines=8-9 state=noop
 level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/template","promql/fragile","promql/regexp","promql/impossible","promql/vector_matching(prom)","rule/duplicate(prom)","labels/conflict(prom)","alerts/absent(prom)"] path=rules/0001.yml rule=no-comparison
 Warning: required label is being removed via aggregation (promql/aggregate)
-  ---> rules/0001.yml:6
+  ---> rules/0001.yml:6 -> `sum:job`
 6 |   expr: sum(foo)
-            ^^^ Query is using aggregation that removes all labels.
-                `job` label is required and should be preserved when aggregating all rules.
+  |         ^^^ Query is using aggregation that removes all labels.
+  |             `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Warning=1
 level=DEBUG msg="Stopping query workers" name=prom uri=http://127.0.0.1

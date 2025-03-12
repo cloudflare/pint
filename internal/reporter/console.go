@@ -68,6 +68,9 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			if report.Problem.Anchor == checks.AnchorBefore {
 				buf.WriteString(output.MaybeColor(output.Red, cr.noColor, " (deleted)"))
 			}
+			if report.Rule.Name() != "" {
+				buf.WriteString(output.MaybeColor(output.Bold, cr.noColor, " -> `"+report.Rule.Name()+"`"))
+			}
 			buf.WriteRune('\n')
 
 			if report.Problem.Anchor == checks.AnchorAfter {
@@ -76,7 +79,7 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 						content,
 						report.Problem.Diagnostics,
 						color,
-						report.Problem.Lines.First, report.Problem.Lines.Last)
+					)
 					buf.WriteString(output.MaybeColor(output.White, cr.noColor, body))
 				} else {
 					digits := countDigits(report.Problem.Lines.Last) + 1
