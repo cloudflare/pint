@@ -5,6 +5,7 @@
 ### Fixed
 
 - Print only relevant lines when reporting problems.
+- Make comments reported to GitHub & GitLab more compact by using collapsible blocks.
 
 ## v0.71.1
 
