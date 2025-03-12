@@ -370,7 +370,7 @@ func TestRateCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,
@@ -423,7 +423,7 @@ func TestRateCheck(t *testing.T) {
 						Severity: checks.Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri,
+								Message: checkErrorUnableToRun("prom", uri,
 									fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
 							},
 						},
@@ -451,7 +451,7 @@ func TestRateCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", "http://127.0.0.1:1111", "connection refused"),
+								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
 							},
 						},
 						Severity: checks.Bug,
@@ -500,7 +500,7 @@ func TestRateCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,
@@ -761,7 +761,7 @@ func TestRateCheck(t *testing.T) {
 						Summary:  "unable to run checks",
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.RateCheckName, "prom", uri, "server_error: internal error"),
+								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
 							},
 						},
 						Severity: checks.Bug,

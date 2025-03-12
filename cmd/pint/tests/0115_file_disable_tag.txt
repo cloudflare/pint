@@ -18,9 +18,11 @@ level=DEBUG msg="Scheduling Prometheus metrics metadata query" uri=http://127.0.
 level=DEBUG msg="Getting prometheus metrics metadata" uri=http://127.0.0.1:7103 metric=foo
 level=ERROR msg="Query returned an error" err="failed to query Prometheus metrics metadata: Get \"http://127.0.0.1:7103/api/v1/metadata?metric=foo\": dial tcp 127.0.0.1:7103: connect: connection refused" uri=http://127.0.0.1:7103 query=foo
 Warning: unable to run checks (promql/counter)
-  ---> rules/0001.yml:8
+  ---> rules/0001.yml:6-8
+6 | - record: "colo:test1"
+               ^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:7103 connection error: `connection refused`.
+7 |   # pint file/disable rule/duplicate(+foo)
 8 |   expr: sum(foo) without(job)
-            ^^^^^^^^^^^^^^^^^^^^^ Couldn't run `promql/counter` checks due to `prom` Prometheus server at http://127.0.0.1:7103 connection error: `connection refused`.
 
 level=INFO msg="Problems found" Warning=1
 level=DEBUG msg="Stopping query workers" name=prom uri=http://127.0.0.1:7103

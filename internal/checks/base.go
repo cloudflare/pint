@@ -134,14 +134,7 @@ type RuleChecker interface {
 	Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) []Problem
 }
 
-type exprProblem struct {
-	summary  string
-	details  string
-	diags    []diags.Diagnostic
-	severity Severity
-}
-
-func textAndSeverityFromError(err error, reporter, prom string, s Severity) (text string, severity Severity) {
+func problemFromError(err error, rule parser.Rule, reporter, prom string, s Severity) Problem {
 	promDesc := fmt.Sprintf("%q", prom)
 	var perr *promapi.FailoverGroupError
 	perrOk := errors.As(err, &perr)
@@ -151,12 +144,14 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 		}
 	}
 
+	var text string
+	var severity Severity
 	switch {
 	case promapi.IsQueryTooExpensive(err):
-		text = fmt.Sprintf("Couldn't run `%s` checks on %s because some queries are too expensive: `%s`.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run some online checks on %s because some queries are too expensive: `%s`.", promDesc, err)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("Couldn't run `%s` checks due to %s connection error: `%s`.", reporter, promDesc, err)
+		text = fmt.Sprintf("Couldn't run some online checks due to %s connection error: `%s`.", promDesc, err)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug
@@ -166,7 +161,23 @@ func textAndSeverityFromError(err error, reporter, prom string, s Severity) (tex
 		severity = s
 	}
 
-	return text, severity
+	name := rule.NameNode()
+	return Problem{
+		Anchor:   AnchorAfter,
+		Lines:    rule.Lines,
+		Reporter: reporter,
+		Summary:  "unable to run checks",
+		Details:  "",
+		Severity: severity,
+		Diagnostics: []diags.Diagnostic{
+			{
+				Message:     text,
+				Pos:         name.Pos,
+				FirstColumn: 1,
+				LastColumn:  len(name.Value),
+			},
+		},
+	}
 }
 
 func promText(name, uri string) string {

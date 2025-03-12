@@ -92,7 +92,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 						Severity: checks.Warning,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: checkErrorUnableToRun(checks.AlertsExternalLabelsCheckName, "prom", "http://127.0.0.1:1111", `connection refused`),
+								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", `connection refused`),
 							},
 						},
 					},

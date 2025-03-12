@@ -848,6 +848,7 @@ func TestTemplateCheck(t *testing.T) {
 					{
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
+						Details:  checks.TemplateCheckReferenceDetails,
 						Severity: checks.Information,
 						Diagnostics: []diags.Diagnostic{
 							{
@@ -876,6 +877,7 @@ func TestTemplateCheck(t *testing.T) {
 					{
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
+						Details:  checks.TemplateCheckReferenceDetails,
 						Severity: checks.Information,
 						Diagnostics: []diags.Diagnostic{
 							{
@@ -904,6 +906,7 @@ func TestTemplateCheck(t *testing.T) {
 					{
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
+						Details:  checks.TemplateCheckReferenceDetails,
 						Severity: checks.Information,
 						Diagnostics: []diags.Diagnostic{
 							{
@@ -932,6 +935,7 @@ func TestTemplateCheck(t *testing.T) {
 					{
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
+						Details:  checks.TemplateCheckReferenceDetails,
 						Severity: checks.Information,
 						Diagnostics: []diags.Diagnostic{
 							{
@@ -1068,6 +1072,7 @@ func TestTemplateCheck(t *testing.T) {
 					{
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
+						Details:  checks.TemplateCheckReferenceDetails,
 						Severity: checks.Information,
 						Diagnostics: []diags.Diagnostic{
 							{
@@ -1177,6 +1182,7 @@ func TestTemplateCheck(t *testing.T) {
 					{
 						Reporter: checks.TemplateCheckName,
 						Summary:  "use humanize filters for the results",
+						Details:  checks.TemplateCheckReferenceDetails,
 						Severity: checks.Information,
 						Diagnostics: []diags.Diagnostic{
 							{

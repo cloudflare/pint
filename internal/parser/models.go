@@ -300,6 +300,13 @@ func (r Rule) Name() string {
 	return ""
 }
 
+func (r Rule) NameNode() YamlNode {
+	if r.RecordingRule != nil {
+		return r.RecordingRule.Record
+	}
+	return r.AlertingRule.Alert
+}
+
 func (r Rule) Expr() PromQLExpr {
 	if r.RecordingRule != nil {
 		return r.RecordingRule.Expr

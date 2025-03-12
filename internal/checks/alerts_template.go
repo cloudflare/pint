@@ -22,8 +22,9 @@ import (
 )
 
 const (
-	TemplateCheckName          = "alerts/template"
-	TemplateCheckSyntaxDetails = `Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).`
+	TemplateCheckName             = "alerts/template"
+	TemplateCheckSyntaxDetails    = `Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).`
+	TemplateCheckReferenceDetails = "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions."
 )
 
 var (
@@ -152,17 +153,7 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr, label, src) {
-				problems = append(problems, Problem{
-					Anchor:      AnchorAfter,
-					Lines:       rule.Lines,
-					Reporter:    c.Reporter(),
-					Summary:     problem.summary,
-					Details:     problem.details,
-					Severity:    problem.severity,
-					Diagnostics: problem.diags,
-				})
-			}
+			problems = append(problems, c.checkQueryLabels(rule, label, src)...)
 		}
 	}
 
@@ -190,33 +181,10 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			for _, problem := range checkQueryLabels(rule.AlertingRule.Expr, annotation, src) {
-				problems = append(problems, Problem{
-					Anchor:      AnchorAfter,
-					Lines:       rule.Lines,
-					Reporter:    c.Reporter(),
-					Summary:     problem.summary,
-					Details:     problem.details,
-					Severity:    problem.severity,
-					Diagnostics: problem.diags,
-				})
-			}
+			problems = append(problems, c.checkQueryLabels(rule, annotation, src)...)
 
 			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
-				for _, problem := range c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value) {
-					problems = append(problems, Problem{
-						Anchor: AnchorAfter,
-						Lines: diags.LineRange{
-							First: min(rule.AlertingRule.Expr.Value.Lines.First, annotation.Value.Lines.First),
-							Last:  max(rule.AlertingRule.Expr.Value.Lines.Last, annotation.Value.Lines.Last),
-						},
-						Reporter:    c.Reporter(),
-						Summary:     problem.summary,
-						Details:     "",
-						Severity:    problem.severity,
-						Diagnostics: problem.diags,
-					})
-				}
+				problems = append(problems, c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value)...)
 			}
 		}
 	}
@@ -224,12 +192,18 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 	return problems
 }
 
-func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlNode) (problems []exprProblem) {
+func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlNode) (problems []Problem) {
 	for _, call := range utils.HasOuterRate(expr.Query) {
-		problems = append(problems, exprProblem{
-			summary: "use humanize filters for the results",
-			details: "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
-			diags: []diags.Diagnostic{
+		problems = append(problems, Problem{
+			Anchor: AnchorAfter,
+			Lines: diags.LineRange{
+				First: min(expr.Value.Lines.First, ann.Lines.First),
+				Last:  max(expr.Value.Lines.Last, ann.Lines.Last),
+			},
+			Reporter: c.Reporter(),
+			Summary:  "use humanize filters for the results",
+			Details:  TemplateCheckReferenceDetails,
+			Diagnostics: []diags.Diagnostic{
 				{
 					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
 					Pos:         expr.Value.Pos,
@@ -243,7 +217,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 					LastColumn:  len(ann.Value), // FIXME use $value offset
 				},
 			},
-			severity: Information,
+			Severity: Information,
 		})
 	}
 	return problems
@@ -468,7 +442,7 @@ func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap
 	return vars, aliases, true
 }
 
-func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []utils.Source) (problems []exprProblem) {
+func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyValue, src []utils.Source) (problems []Problem) {
 	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
 	if !ok {
 		return nil
@@ -488,11 +462,14 @@ func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []
 					}
 					if !s.CanHaveLabel(v[1]) {
 						er := s.LabelExcludeReason(v[1])
-						problems = append(problems, exprProblem{
-							summary:  "template uses non-existent label",
-							details:  "",
-							severity: Bug,
-							diags: []diags.Diagnostic{
+						problems = append(problems, Problem{
+							Anchor:   AnchorAfter,
+							Lines:    rule.Lines,
+							Reporter: c.Reporter(),
+							Summary:  "template uses non-existent label",
+							Details:  "",
+							Severity: Bug,
+							Diagnostics: []diags.Diagnostic{
 								{
 									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v[1]),
 									Pos:         label.Value.Pos,
@@ -501,7 +478,7 @@ func checkQueryLabels(expr parser.PromQLExpr, label *parser.YamlKeyValue, src []
 								},
 								{
 									Message:     er.Reason,
-									Pos:         expr.Value.Pos,
+									Pos:         rule.AlertingRule.Expr.Value.Pos,
 									FirstColumn: int(er.Fragment.Start) + 1,
 									LastColumn:  int(er.Fragment.End),
 								},

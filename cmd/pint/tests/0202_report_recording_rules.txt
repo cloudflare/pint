@@ -9,7 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Bug: problem reported by config rule (rule/report)
   ---> rules/1.yml:3-4
 3 | - record: bar
-              ^^ You cannot add any recording rules to this Prometheus server.
+              ^^^ You cannot add any recording rules to this Prometheus server.
 4 |   expr: sum(up)
 
 level=INFO msg="Problems found" Bug=1

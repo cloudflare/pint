@@ -58,23 +58,11 @@ func (c VectorMatchingCheck) Check(ctx context.Context, _ discovery.Path, rule p
 	if expr.SyntaxError != nil {
 		return nil
 	}
-
-	for _, problem := range c.checkNode(ctx, expr, expr.Query) {
-		problems = append(problems, Problem{
-			Anchor:      AnchorAfter,
-			Lines:       expr.Value.Lines,
-			Reporter:    c.Reporter(),
-			Summary:     problem.summary,
-			Details:     problem.details,
-			Severity:    problem.severity,
-			Diagnostics: problem.diags,
-		})
-	}
-
+	problems = append(problems, c.checkNode(ctx, rule, expr, expr.Query)...)
 	return problems
 }
 
-func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *parser.PromQLNode) (problems []exprProblem) {
+func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode) (problems []Problem) {
 	if n, ok := utils.RemoveConditions(node.Expr.String()).(*promParser.BinaryExpr); ok &&
 		n.VectorMatching != nil &&
 		n.Op != promParser.LOR &&
@@ -83,20 +71,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 		q := fmt.Sprintf("count(%s)", n.String())
 		qr, err := c.prom.Query(ctx, q)
 		if err != nil {
-			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-			problems = append(problems, exprProblem{
-				summary:  "unable to run checks",
-				details:  "",
-				severity: severity,
-				diags: []diags.Diagnostic{
-					{
-						Message:     text,
-						Pos:         expr.Value.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(expr.Value.Value),
-					},
-				},
-			})
+			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			return problems
 		}
 		if len(qr.Series) > 0 {
@@ -135,11 +110,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 		if lhsVec && rhsVec {
 			for k, lv := range lhsMatchers {
 				if rv, ok := rhsMatchers[k]; ok && rv != lv {
-					problems = append(problems, exprProblem{
-						summary:  "impossible binary operation",
-						details:  VectorMatchingCheckDetails,
-						severity: Bug,
-						diags: []diags.Diagnostic{
+					problems = append(problems, Problem{
+						Anchor:   AnchorAfter,
+						Lines:    expr.Value.Lines,
+						Reporter: c.Reporter(),
+						Summary:  "impossible binary operation",
+						Details:  VectorMatchingCheckDetails,
+						Severity: Bug,
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
 								Pos:         expr.Value.Pos,
@@ -155,20 +133,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 
 		leftLabels, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
 		if err != nil {
-			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-			problems = append(problems, exprProblem{
-				summary:  "unable to run checks",
-				details:  "",
-				severity: severity,
-				diags: []diags.Diagnostic{
-					{
-						Message:     text,
-						Pos:         expr.Value.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(expr.Value.Value),
-					},
-				},
-			})
+			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			return problems
 		}
 		if leftLabels == nil {
@@ -177,20 +142,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 
 		rightLabels, err := c.seriesLabels(ctx, n.RHS.String(), ignored...)
 		if err != nil {
-			text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-			problems = append(problems, exprProblem{
-				summary:  "unable to run checks",
-				details:  "",
-				severity: severity,
-				diags: []diags.Diagnostic{
-					{
-						Message:     text,
-						Pos:         expr.Value.Pos,
-						FirstColumn: 1,
-						LastColumn:  len(expr.Value.Value),
-					},
-				},
-			})
+			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			return problems
 		}
 		if rightLabels == nil {
@@ -201,11 +153,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 			pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "on")
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
-					problems = append(problems, exprProblem{
-						summary:  "impossible binary operation",
-						details:  VectorMatchingCheckDetails,
-						severity: Bug,
-						diags: []diags.Diagnostic{
+					problems = append(problems, Problem{
+						Anchor:   AnchorAfter,
+						Lines:    expr.Value.Lines,
+						Reporter: c.Reporter(),
+						Summary:  "impossible binary operation",
+						Details:  VectorMatchingCheckDetails,
+						Severity: Bug,
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf(
 									"Using `on(%s)` won't produce any results on %s because results from the left hand side of the query don't have this label: `%s`.",
@@ -218,11 +173,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 					})
 				}
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					problems = append(problems, exprProblem{
-						summary:  "impossible binary operation",
-						details:  VectorMatchingCheckDetails,
-						severity: Bug,
-						diags: []diags.Diagnostic{
+					problems = append(problems, Problem{
+						Anchor:   AnchorAfter,
+						Lines:    expr.Value.Lines,
+						Reporter: c.Reporter(),
+						Summary:  "impossible binary operation",
+						Details:  VectorMatchingCheckDetails,
+						Severity: Bug,
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).RHS),
@@ -234,11 +192,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
-					problems = append(problems, exprProblem{
-						summary:  "impossible binary operation",
-						details:  VectorMatchingCheckDetails,
-						severity: Bug,
-						diags: []diags.Diagnostic{
+					problems = append(problems, Problem{
+						Anchor:   AnchorAfter,
+						Lines:    expr.Value.Lines,
+						Reporter: c.Reporter(),
+						Summary:  "impossible binary operation",
+						Details:  VectorMatchingCheckDetails,
+						Severity: Bug,
+						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
 									name, promText(c.prom.Name(), qr.URI), node.Expr),
@@ -253,11 +214,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 		} else if !leftLabels.overlaps(rightLabels) {
 			l, r := leftLabels.getFirstNonOverlap(rightLabels)
 			if len(n.VectorMatching.MatchingLabels) == 0 {
-				problems = append(problems, exprProblem{
-					summary:  "impossible binary operation",
-					details:  VectorMatchingCheckDetails,
-					severity: Bug,
-					diags: []diags.Diagnostic{
+				problems = append(problems, Problem{
+					Anchor:   AnchorAfter,
+					Lines:    expr.Value.Lines,
+					Reporter: c.Reporter(),
+					Summary:  "impossible binary operation",
+					Details:  VectorMatchingCheckDetails,
+					Severity: Bug,
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message: fmt.Sprintf("This query will never return anything on %s because results from the right and the left hand side have different labels: `%s` != `%s`.",
 								promText(c.prom.Name(), qr.URI), l, r),
@@ -269,11 +233,14 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 				})
 			} else {
 				pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "ignoring")
-				problems = append(problems, exprProblem{
-					summary:  "impossible binary operation",
-					details:  VectorMatchingCheckDetails,
-					severity: Bug,
-					diags: []diags.Diagnostic{
+				problems = append(problems, Problem{
+					Anchor:   AnchorAfter,
+					Lines:    expr.Value.Lines,
+					Reporter: c.Reporter(),
+					Summary:  "impossible binary operation",
+					Details:  VectorMatchingCheckDetails,
+					Severity: Bug,
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message: fmt.Sprintf("Using `ignoring()` won't produce any results on %s because results from both sides of the query have different labels: `%s` != `%s`.",
 								promText(c.prom.Name(), qr.URI), l, r),
@@ -289,7 +256,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, expr parser.PromQLEx
 
 NEXT:
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, expr, child)...)
+		problems = append(problems, c.checkNode(ctx, rule, expr, child)...)
 	}
 
 	return problems

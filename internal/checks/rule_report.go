@@ -43,13 +43,7 @@ func (c ReportCheck) Reporter() string {
 }
 
 func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	var pos diags.PositionRanges
-	if rule.AlertingRule != nil {
-		pos = rule.AlertingRule.Alert.Pos
-	} else {
-		pos = rule.RecordingRule.Record.Pos
-	}
-
+	name := rule.NameNode()
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,
 		Lines:    rule.Lines,
@@ -60,9 +54,9 @@ func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 		Diagnostics: []diags.Diagnostic{
 			{
 				Message:     c.comment,
-				Pos:         pos,
+				Pos:         name.Pos,
 				FirstColumn: 1,
-				LastColumn:  len(rule.Name()) - 1,
+				LastColumn:  len(name.Value),
 			},
 		},
 	})

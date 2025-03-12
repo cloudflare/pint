@@ -281,6 +281,7 @@ rule {
     "path": "rules.yml",
     "reporter": "alerts/template",
     "problem": "use humanize filters for the results",
+    "details": "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
     "severity": "Information",
     "lines": [
       77,
