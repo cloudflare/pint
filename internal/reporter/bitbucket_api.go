@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/diags"
+	"github.com/cloudflare/pint/internal/output"
 )
 
 type BitBucketReport struct {
@@ -591,10 +593,19 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 
 func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
 	var buf strings.Builder
+	var content string
+	var err error
 	comments := []BitBucketPendingComment{}
 	for _, reports := range dedupReports(summary.reports) {
 		if _, ok := changes.pathModifiedLines[reports[0].Path.SymlinkTarget]; !ok {
 			continue
+		}
+
+		if reports[0].Problem.Anchor == checks.AnchorAfter {
+			content, err = readFile(reports[0].Path.Name)
+			if err != nil {
+				content = ""
+			}
 		}
 
 		mergeDetails := identicalDetails(reports)
@@ -611,6 +622,17 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			buf.WriteString("------\n\n")
 			buf.WriteString(report.Problem.Summary)
 			buf.WriteString("\n\n")
+
+			if len(report.Problem.Diagnostics) > 0 && content != "" {
+				buf.WriteString("```yaml\n")
+				buf.WriteString(diags.InjectDiagnostics(
+					content,
+					report.Problem.Diagnostics,
+					output.None,
+					report.Rule.Lines.First, report.Rule.Lines.Last))
+				buf.WriteString("```\n\n")
+			}
+
 			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
 				buf.WriteString("\n\n")
