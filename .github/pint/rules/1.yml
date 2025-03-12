@@ -10,7 +10,11 @@ groups:
 
   - alert: Service Is Missing
     expr: absent({job="myjob"})
-    for: 0m
+    for: 0s
 
   - alert: Everything Is Down
     expr: up:sum == 0
+
+  - alert: Dead Code
+    expr: |
+      sum(foo or vector(0)) by(name) > 0
