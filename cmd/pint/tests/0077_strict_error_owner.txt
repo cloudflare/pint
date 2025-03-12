@@ -8,7 +8,7 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Bug: missing owner (rule/owner)
   ---> rules/strict.yml:4-7 -> `foo bar`
 7 |       foo: bar
-  |       ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
+          ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

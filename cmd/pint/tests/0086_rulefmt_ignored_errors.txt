@@ -18,17 +18,17 @@ Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/strict.yml:10 -> `BadPromQL`
 10 |     expr: sumz(0)
-   |           ^^^^ unknown function with name "sumz"
+               ^^^^ unknown function with name "sumz"
 
 Fatal: template syntax error (alerts/template)
   ---> rules/strict.yml:15 -> `IgnoreTemplateErrors`
 15 |       dashboard: '{{ bogus }}'
-   |                   ^^^^^^^^^^^ Template failed to parse with this error: `function "bogus" not defined`.
+                       ^^^^^^^^^^^ Template failed to parse with this error: `function "bogus" not defined`.
 
 Fatal: template syntax error (alerts/template)
   ---> rules/strict.yml:20 -> `IgnoreTemplateErrors`
 20 |       dashboard: '{{ bogus }}'
-   |                   ^^^^^^^^^^^ Template failed to parse with this error: `function "bogus" not defined`.
+                       ^^^^^^^^^^^ Template failed to parse with this error: `function "bogus" not defined`.
 
 level=INFO msg="Problems found" Fatal=5
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

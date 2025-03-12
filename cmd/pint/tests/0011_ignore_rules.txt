@@ -9,29 +9,29 @@ level=INFO msg="Checking Prometheus rules" entries=10 workers=10 online=true
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:5 -> `active`
 5 |   expr: sum(errors_total) by )
-  |                              ^ unexpected right parenthesis ')'
+                                 ^ unexpected right parenthesis ')'
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:16 -> `active`
 16 |   expr: sum(errors_total) without(job)
-   |                           ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-   |                                   `job` label is required and should be preserved when aggregating all rules.
+                               ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                       `job` label is required and should be preserved when aggregating all rules.
 
 Fatal: PromQL syntax error (promql/syntax)
   ---> rules/1.yaml:22 -> `active`
 22 |   expr: sum(errors_total) by )
-   |                              ^ unexpected right parenthesis ')'
+                                  ^ unexpected right parenthesis ')'
 
 Warning: always firing alert (alerts/comparison)
   ---> rules/1.yaml:33 -> `active`
 33 |   expr: sum(errors_total) without(job)
-   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:33 -> `active`
 33 |   expr: sum(errors_total) without(job)
-   |                           ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-   |                                   `job` label is required and should be preserved when aggregating all rules.
+                               ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+                                       `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Fatal=2 Warning=3
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

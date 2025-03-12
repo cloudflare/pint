@@ -23,7 +23,7 @@ func TestInjectDiagnostics(t *testing.T) {
 				{FirstColumn: 1, LastColumn: 13, Message: "this is bad"},
 			},
 			output: `1 | expr: foo(bar) by()
-  |       ^^^^^^^^^^^^^ this is bad
+          ^^^^^^^^^^^^^ this is bad
 `,
 		},
 		{
@@ -32,7 +32,7 @@ func TestInjectDiagnostics(t *testing.T) {
 				{FirstColumn: 10, LastColumn: 11, Message: "oops"},
 			},
 			output: `1 | expr: foo(bar) on()
-  |                ^^ oops
+                   ^^ oops
 `,
 		},
 		{
@@ -47,8 +47,8 @@ expr: sum(foo{job="bar"})
 			},
 			output: `2 | expr: sum(foo{job="bar"})
 3 |       / on(a,b)
-  |         ^^^^^^^ abc
-  |            ^^^ efg
+            ^^^^^^^ abc
+               ^^^ efg
 4 |       sum(foo)
 `,
 		},
@@ -65,9 +65,9 @@ expr: |
 			},
 			output: `3 |   sum(bar{job="foo"})
 4 |   / on(c,d)
-  |     ^^ 123
+        ^^ 123
 5 |   sum(bar)
-  |   ^^^ 456
+      ^^^ 456
 `,
 		},
 		{
@@ -83,8 +83,8 @@ expr:
 			},
 			output: `3 |   sum(bar{job="foo"})
 4 |   / on(c,d)
-  |     ^^^^^^^ abc
-  |             efg
+        ^^^^^^^ abc
+                efg
 5 |   sum(bar)
 `,
 		},
@@ -103,8 +103,8 @@ expr: >-
 			},
 			output: `4 |   sum(bar{job="foo"})
 5 |   / on(c,d)
-  |     ^^^^^^^ abc
-  |             efg
+        ^^^^^^^ abc
+                efg
 6 |   sum(bar)
 `,
 		},
@@ -114,7 +114,7 @@ expr: >-
 				{FirstColumn: 14, LastColumn: 14, Message: "this is bad"},
 			},
 			output: `1 | expr: cnt(bar) by()
-  |                   ^ this is bad
+                      ^ this is bad
 `,
 		},
 		{
@@ -130,7 +130,7 @@ expr: |
 			output: `3 |   foo{
 4 |   job="bar"
 5 |   }
-  |   ^ this is bad
+      ^ this is bad
 `,
 		},
 	}

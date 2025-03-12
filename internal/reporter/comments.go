@@ -72,18 +72,22 @@ func makeComments(summary Summary) (comments []PendingComment) {
 		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString("** check.\n\n")
 		for _, report := range reports {
-			buf.WriteString("------\n\n")
-			buf.WriteString(report.Problem.Summary)
-			buf.WriteString("\n\n")
-
 			if len(report.Problem.Diagnostics) > 0 && content != "" {
+				buf.WriteString("<details>\n")
+				buf.WriteString("<summary>")
+				buf.WriteString(report.Problem.Summary)
+				buf.WriteString("</summary>\n\n")
 				buf.WriteString("```yaml\n")
 				buf.WriteString(diags.InjectDiagnostics(
 					content,
 					report.Problem.Diagnostics,
 					output.None,
 				))
-				buf.WriteString("```\n\n")
+				buf.WriteString("```\n\n</details>\n\n")
+			} else {
+				buf.WriteString("------\n\n")
+				buf.WriteString(report.Problem.Summary)
+				buf.WriteString("\n\n")
 			}
 
 			if !mergeDetails && report.Problem.Details != "" {

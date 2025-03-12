@@ -9,7 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Bug: name not allowed (rule/name)
   ---> rules/01.yml:4 -> `foo`
 4 |   - alert: foo
-  |            ^^ alerting rule name must match `^rec:.+$`.
+               ^^ alerting rule name must match `^rec:.+$`.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

@@ -15,8 +15,8 @@ level=DEBUG msg="Configured checks for rule" enabled=["promql/syntax","alerts/fo
 Bug: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0001.yaml:7 -> `colo_job:up:byinstance`
 7 |     expr: sum(byinstance) by(instance)
-  |                           ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
-  |                              `job` label is required and should be preserved when aggregating all rules.
+                              ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                                 `job` label is required and should be preserved when aggregating all rules.
 
 level=INFO msg="Problems found" Bug=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

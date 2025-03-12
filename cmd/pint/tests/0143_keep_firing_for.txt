@@ -9,17 +9,17 @@ level=INFO msg="Checking Prometheus rules" entries=4 workers=10 online=true
 Bug: duration required (rule/for)
   ---> rules/0001.yml:6 -> `3m`
 6 |   keep_firing_for: 3m
-  |                    ^^ This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
+                       ^^ This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
 
 Bug: duration too long (rule/for)
   ---> rules/0001.yml:9 -> `13m`
 9 |   keep_firing_for: 13m
-  |                    ^^^ This alert rule must have a `keep_firing_for` field with a maximum duration of 10m.
+                       ^^^ This alert rule must have a `keep_firing_for` field with a maximum duration of 10m.
 
 Bug: duration required (rule/for)
   ---> rules/0001.yml:10 -> `none`
 10 | - alert: none
-   |          ^^^^ This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
+              ^^^^ This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
 
 level=INFO msg="Problems found" Bug=3
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

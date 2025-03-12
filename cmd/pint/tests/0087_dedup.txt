@@ -8,31 +8,31 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13 -> `foo`
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-   |           ^^^ Query is using aggregation that removes all labels.
+               ^^^ Query is using aggregation that removes all labels.
    | [...]
 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
-   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
 
 Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13 -> `foo`
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-   |           ^^^ Query is using aggregation that removes all labels.
+               ^^^ Query is using aggregation that removes all labels.
    | [...]
 12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
-   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
 
 Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13 -> `foo`
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-   |           ^^^ Query is using aggregation that removes all labels.
+               ^^^ Query is using aggregation that removes all labels.
    | [...]
 13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
-   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
 
 Warning: always firing alert (alerts/comparison)
   ---> rules/01.yml:5 -> `foo`
 5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-  |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
 
 level=INFO msg="Problems found" Bug=3 Warning=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"

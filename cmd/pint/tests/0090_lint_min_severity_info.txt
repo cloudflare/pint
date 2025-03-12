@@ -8,10 +8,10 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Information: use humanize filters for the results (alerts/template)
   ---> rules/0001.yml:5-7 -> `foo`
 5 |     expr: rate(errors[2m]) > 0
-  |           ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+              ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
   | [...]
 7 |       summary: 'error rate: {{ $value }}'
-  |                 ^^^^^^^^^^^^^^^^^^^^^^^^ Use one of humanize template functions to make the result more readable.
+                    ^^^^^^^^^^^^^^^^^^^^^^^^ Use one of humanize template functions to make the result more readable.
 
 level=INFO msg="Problems found" Information=1
 -- rules/0001.yml --

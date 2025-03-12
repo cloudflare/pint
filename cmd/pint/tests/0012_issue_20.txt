@@ -9,7 +9,7 @@ level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Warning: required annotation not set (alerts/annotation)
   ---> rules/1.yaml:4-11 -> `HaproxyServerHealthcheckFailure`
 11 |           description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
-   |           ^^^ `runbook_url` annotation is required.
+               ^^^ `runbook_url` annotation is required.
 
 level=INFO msg="Problems found" Warning=1
 -- rules/1.yaml --
