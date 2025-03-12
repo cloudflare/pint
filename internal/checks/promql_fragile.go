@@ -54,46 +54,34 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	}
 
 	if rule.AlertingRule != nil {
-		for _, problem := range c.checkSampling(expr) {
+		for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
+			if src.Type != utils.AggregateSource {
+				continue
+			}
+			if src.FixedLabels && len(src.IncludedLabels) == 0 {
+				continue
+			}
+			if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
+				continue
+			}
 			problems = append(problems, Problem{
-				Anchor:      AnchorAfter,
-				Lines:       expr.Value.Lines,
-				Reporter:    c.Reporter(),
-				Summary:     problem.summary,
-				Details:     problem.details,
-				Severity:    problem.severity,
-				Diagnostics: problem.diags,
+				Anchor:   AnchorAfter,
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Summary:  "fragile query",
+				Details:  FragileCheckSamplingDetails,
+				Severity: Warning,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+						Pos:         expr.Value.Pos,
+						FirstColumn: int(src.GetSmallestPosition().Start) + 1,
+						LastColumn:  int(src.GetSmallestPosition().End),
+					},
+				},
 			})
 		}
 	}
 
-	return problems
-}
-
-func (c FragileCheck) checkSampling(expr parser.PromQLExpr) (problems []exprProblem) {
-	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
-		if src.Type != utils.AggregateSource {
-			continue
-		}
-		if src.FixedLabels && len(src.IncludedLabels) == 0 {
-			continue
-		}
-		if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
-			continue
-		}
-		problems = append(problems, exprProblem{
-			summary:  "fragile query",
-			details:  FragileCheckSamplingDetails,
-			severity: Warning,
-			diags: []diags.Diagnostic{
-				{
-					Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
-					Pos:         expr.Value.Pos,
-					FirstColumn: int(src.GetSmallestPosition().Start) + 1,
-					LastColumn:  int(src.GetSmallestPosition().End),
-				},
-			},
-		})
-	}
 	return problems
 }

@@ -62,17 +62,14 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 	}
 
 	if c.limit > 0 {
-		for _, problem := range c.checkNode(ctx, expr, expr.Query, c.limit, fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit))) {
-			problems = append(problems, Problem{
-				Anchor:      AnchorAfter,
-				Lines:       expr.Value.Lines,
-				Reporter:    c.Reporter(),
-				Summary:     problem.summary,
-				Details:     maybeComment(c.comment),
-				Severity:    c.severity,
-				Diagnostics: problem.diags,
-			})
-		}
+		problems = append(problems, c.checkNode(
+			ctx,
+			expr, expr.Query,
+			c.limit,
+			fmt.Sprintf("%s is the maximum allowed range query.", model.Duration(c.limit)),
+			c.severity,
+		)...,
+		)
 	}
 
 	if c.prom == nil || len(problems) > 0 {
@@ -119,29 +116,30 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		retention = time.Hour * 24 * 15
 	}
 
-	for _, problem := range c.checkNode(ctx, expr, expr.Query, retention, fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI), model.Duration(retention))) {
-		problems = append(problems, Problem{
-			Anchor:      AnchorAfter,
-			Lines:       expr.Value.Lines,
-			Reporter:    c.Reporter(),
-			Summary:     "query beyond configured retention",
-			Details:     "",
-			Severity:    problem.severity,
-			Diagnostics: problem.diags,
-		})
-	}
+	problems = append(problems, c.checkNode(
+		ctx,
+		expr, expr.Query,
+		retention,
+		fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI),
+			model.Duration(retention)),
+		Warning,
+	)...,
+	)
 
 	return problems
 }
 
-func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string) (problems []exprProblem) {
+func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string, s Severity) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
-			problems = append(problems, exprProblem{
-				summary:  "query beyond configured retention",
-				details:  "",
-				severity: Warning,
-				diags: []diags.Diagnostic{
+			problems = append(problems, Problem{
+				Anchor:   AnchorAfter,
+				Lines:    expr.Value.Lines,
+				Reporter: c.Reporter(),
+				Summary:  "query beyond configured retention",
+				Details:  maybeComment(c.comment),
+				Severity: s,
+				Diagnostics: []diags.Diagnostic{
 					{
 						Message: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
 							node.Expr, model.Duration(n.Range), reason),
@@ -155,7 +153,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, 
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, expr, child, retention, reason)...)
+		problems = append(problems, c.checkNode(ctx, expr, child, retention, reason, s)...)
 	}
 
 	return problems

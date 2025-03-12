@@ -79,23 +79,11 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 		return problems
 	}
 
-	done := &completedList{values: nil}
-	for _, problem := range c.checkNode(ctx, expr, expr.Query, entries, cfg, done) {
-		problems = append(problems, Problem{
-			Anchor:      AnchorAfter,
-			Lines:       expr.Value.Lines,
-			Reporter:    c.Reporter(),
-			Summary:     problem.summary,
-			Details:     problem.details,
-			Severity:    problem.severity,
-			Diagnostics: problem.diags,
-		})
-	}
-
+	problems = append(problems, c.checkNode(ctx, rule, expr, expr.Query, entries, cfg, &completedList{values: nil})...)
 	return problems
 }
 
-func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *parser.PromQLNode, entries []discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []exprProblem) {
+func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode, entries []discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
@@ -103,11 +91,14 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 				continue
 			}
 			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
-				p := exprProblem{
-					summary:  "duration too small",
-					details:  RateCheckDetails,
-					severity: Bug,
-					diags: []diags.Diagnostic{
+				problems = append(problems, Problem{
+					Anchor:   AnchorAfter,
+					Lines:    expr.Value.Lines,
+					Reporter: c.Reporter(),
+					Summary:  "duration too small",
+					Details:  RateCheckDetails,
+					Severity: Bug,
+					Diagnostics: []diags.Diagnostic{
 						{
 							Message: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
 								n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
@@ -116,8 +107,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 							LastColumn:  int(n.PosRange.End),
 						},
 					},
-				}
-				problems = append(problems, p)
+				})
 			}
 			if n.Func.Name == "deriv" {
 				continue
@@ -132,29 +122,19 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 					if errors.Is(err, promapi.ErrUnsupported) {
 						continue
 					}
-					text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-					problems = append(problems, exprProblem{
-						summary:  "unable to run checks",
-						details:  "",
-						severity: severity,
-						diags: []diags.Diagnostic{
-							{
-								Message:     text,
-								Pos:         expr.Value.Pos,
-								FirstColumn: 1,
-								LastColumn:  len(expr.Value.Value),
-							},
-						},
-					})
+					problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 					continue
 				}
 				for _, m := range metadata.Metadata {
 					if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
-						problems = append(problems, exprProblem{
-							summary:  "counter based function called on a non-counter",
-							details:  RateCheckDetails,
-							severity: Bug,
-							diags: []diags.Diagnostic{
+						problems = append(problems, Problem{
+							Anchor:   AnchorAfter,
+							Lines:    expr.Value.Lines,
+							Reporter: c.Reporter(),
+							Summary:  "counter based function called on a non-counter",
+							Details:  RateCheckDetails,
+							Severity: Bug,
+							Diagnostics: []diags.Diagnostic{
 								{
 									Message: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
 										n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
@@ -185,20 +165,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 									if errors.Is(err, promapi.ErrUnsupported) {
 										continue
 									}
-									text, severity := textAndSeverityFromError(err, c.Reporter(), c.prom.Name(), Bug)
-									problems = append(problems, exprProblem{
-										summary:  "unable to run checks",
-										details:  "",
-										severity: severity,
-										diags: []diags.Diagnostic{
-											{
-												Message:     text,
-												Pos:         expr.Value.Pos,
-												FirstColumn: 1,
-												LastColumn:  len(expr.Value.Value),
-											},
-										},
-									})
+									problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 									continue
 								}
 								canReport := true
@@ -215,15 +182,18 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 								if !canReport {
 									continue
 								}
-								problems = append(problems, exprProblem{
-									summary: "chained rate call",
-									details: fmt.Sprintf(
+								problems = append(problems, Problem{
+									Anchor:   AnchorAfter,
+									Lines:    expr.Value.Lines,
+									Reporter: c.Reporter(),
+									Summary:  "chained rate call",
+									Details: fmt.Sprintf(
 										"You can only calculate `rate()` directly from a counter metric. "+
 											"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
 											"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
 										src.Operation, src.Operation),
-									severity: severity,
-									diags: []diags.Diagnostic{
+									Severity: severity,
+									Diagnostics: []diags.Diagnostic{
 										{
 											Message: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
 												src.Operation, node.Expr, src.Operation, src.Selector),
@@ -242,7 +212,7 @@ func (c RateCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *
 	}
 
 	for _, child := range node.Children {
-		problems = append(problems, c.checkNode(ctx, expr, child, entries, cfg, done)...)
+		problems = append(problems, c.checkNode(ctx, rule, expr, child, entries, cfg, done)...)
 	}
 
 	return problems

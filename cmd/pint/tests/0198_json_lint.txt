@@ -136,6 +136,7 @@ cmp report.json expected.json
     "path": "rules/0003.yaml",
     "reporter": "alerts/template",
     "problem": "use humanize filters for the results",
+    "details": "[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.",
     "severity": "Information",
     "lines": [
       58,
