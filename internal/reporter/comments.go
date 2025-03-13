@@ -89,10 +89,11 @@ func makeComments(summary Summary) (comments []PendingComment) {
 				buf.WriteString(report.Problem.Summary)
 				buf.WriteString("\n\n")
 			}
-
 			if !mergeDetails && report.Problem.Details != "" {
+				buf.WriteString("<details>\n")
+				buf.WriteString("<summary>More information</summary>\n")
 				buf.WriteString(report.Problem.Details)
-				buf.WriteString("\n\n")
+				buf.WriteString("\n</details>\n\n")
 			}
 			if report.Path.SymlinkTarget != report.Path.Name {
 				buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
@@ -103,8 +104,10 @@ func makeComments(summary Summary) (comments []PendingComment) {
 		}
 		if mergeDetails && reports[0].Problem.Details != "" {
 			buf.WriteString("------\n\n")
+			buf.WriteString("<details>\n")
+			buf.WriteString("<summary>More information</summary>\n")
 			buf.WriteString(reports[0].Problem.Details)
-			buf.WriteString("\n\n")
+			buf.WriteString("\n</details>\n\n")
 		}
 		buf.WriteString("------\n\n")
 		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
