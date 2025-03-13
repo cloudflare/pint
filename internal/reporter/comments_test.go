@@ -375,7 +375,7 @@ bar warning
 			},
 		},
 		{
-			description: "Create() merges details",
+			description: "Create() identical details",
 			reports: []Report{
 				{
 					Path: discovery.Path{
@@ -436,20 +436,23 @@ bar warning
 
 foo error 1
 
+<details>
+<summary>More information</summary>
+foo details
+</details>
+
 :leftwards_arrow_with_hook: This problem was detected on a symlinked file ` + "`foo.txt`" + `.
 
 ------
 
 foo error 2
 
-:leftwards_arrow_with_hook: This problem was detected on a symlinked file ` + "`foo.txt`" + `.
-
-------
-
 <details>
 <summary>More information</summary>
 foo details
 </details>
+
+:leftwards_arrow_with_hook: This problem was detected on a symlinked file ` + "`foo.txt`" + `.
 
 ------
 
