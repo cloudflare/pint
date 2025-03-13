@@ -34,6 +34,7 @@ var (
 		"{{$externalURL := .ExternalURL}}",
 		"{{$value := .Value}}",
 	}
+	templateDefsLen = len(strings.Join(templateDefs, ""))
 
 	templateFuncMap = textTemplate.FuncMap{
 		"query":              dummyFuncMap,
@@ -180,44 +181,59 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					},
 				})
 			}
-
 			problems = append(problems, c.checkQueryLabels(rule, annotation, src)...)
-
-			if hasValue(annotation.Key.Value, annotation.Value.Value) && !hasHumanize(annotation.Key.Value, annotation.Value.Value) {
-				problems = append(problems, c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation.Value)...)
-			}
+			problems = append(problems, c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation)...)
 		}
 	}
 
 	return problems
 }
 
-func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlNode) (problems []Problem) {
+func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlKeyValue) (problems []Problem) {
+	if !hasValue(ann.Key.Value, ann.Value.Value) {
+		return problems
+	}
+	if hasHumanize(ann.Key.Value, ann.Value.Value) {
+		return problems
+	}
+	vars, aliases, ok := findTemplateVariables(ann.Key.Value, ann.Value.Value)
+	if !ok {
+		return problems
+	}
 	for _, call := range utils.HasOuterRate(expr.Query) {
+		dgs := []diags.Diagnostic{
+			{
+				Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
+				Pos:         expr.Value.Pos,
+				FirstColumn: int(call.PosRange.Start) + 1,
+				LastColumn:  int(call.PosRange.End),
+			},
+		}
+		labelsAliases := aliases.varAliases(".Value")
+		for _, v := range vars {
+			for _, a := range labelsAliases {
+				if v.value[0] == a {
+					dgs = append(dgs, diags.Diagnostic{
+						Message:     "Use one of humanize template functions to make the result more readable.",
+						Pos:         ann.Value.Pos,
+						FirstColumn: v.column,
+						LastColumn:  v.column + len(v.value[0]),
+					})
+				}
+			}
+		}
+
 		problems = append(problems, Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
-				First: min(expr.Value.Lines.First, ann.Lines.First),
-				Last:  max(expr.Value.Lines.Last, ann.Lines.Last),
+				First: min(expr.Value.Lines.First, ann.Value.Lines.First),
+				Last:  max(expr.Value.Lines.Last, ann.Value.Lines.Last),
 			},
-			Reporter: c.Reporter(),
-			Summary:  "use humanize filters for the results",
-			Details:  TemplateCheckReferenceDetails,
-			Diagnostics: []diags.Diagnostic{
-				{
-					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
-					Pos:         expr.Value.Pos,
-					FirstColumn: int(call.PosRange.Start) + 1,
-					LastColumn:  int(call.PosRange.End),
-				},
-				{
-					Message:     "Use one of humanize template functions to make the result more readable.",
-					Pos:         ann.Pos,
-					FirstColumn: 1,              // FIXME use $value offset
-					LastColumn:  len(ann.Value), // FIXME use $value offset
-				},
-			},
-			Severity: Information,
+			Reporter:    c.Reporter(),
+			Summary:     "use humanize filters for the results",
+			Details:     TemplateCheckReferenceDetails,
+			Diagnostics: dgs,
+			Severity:    Information,
 		})
 	}
 	return problems
@@ -293,7 +309,7 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 func containsAliasedNode(am aliasMap, node parse.Node, alias string) (string, bool) {
 	valAliases := am.varAliases(alias)
 	for _, vars := range getVariables(node) {
-		for _, v := range vars {
+		for _, v := range vars.value {
 			for _, a := range valAliases {
 				if v == a {
 					return v, true
@@ -389,10 +405,10 @@ func getAliases(node parse.Node, aliases *aliasMap) {
 					for _, k := range getVariables(arg) {
 						for _, d := range n.Pipe.Decl {
 							for _, v := range getVariables(d) {
-								if _, ok := aliases.aliases[k[0]]; !ok {
-									aliases.aliases[k[0]] = map[string]struct{}{}
+								if _, ok := aliases.aliases[k.value[0]]; !ok {
+									aliases.aliases[k.value[0]] = map[string]struct{}{}
 								}
-								aliases.aliases[k[0]][v[0]] = struct{}{}
+								aliases.aliases[k.value[0]][v.value[0]] = struct{}{}
 							}
 						}
 					}
@@ -402,7 +418,12 @@ func getAliases(node parse.Node, aliases *aliasMap) {
 	}
 }
 
-func getVariables(node parse.Node) (vars [][]string) {
+type tmplVar struct {
+	value  []string
+	column int
+}
+
+func getVariables(node parse.Node) (vars []tmplVar) {
 	switch n := node.(type) {
 	case *parse.ActionNode:
 		if len(n.Pipe.Decl) == 0 && len(n.Pipe.Cmds) > 0 {
@@ -414,15 +435,20 @@ func getVariables(node parse.Node) (vars [][]string) {
 		}
 	case *parse.FieldNode:
 		n.Ident[0] = "." + n.Ident[0]
-		vars = append(vars, n.Ident)
+		vars = append(vars, tmplVar{
+			value:  n.Ident,
+			column: int(n.Pos) + 1 - templateDefsLen,
+		})
 	case *parse.VariableNode:
-		vars = append(vars, n.Ident)
+		vars = append(vars, tmplVar{
+			value:  n.Ident,
+			column: int(n.Pos) + 1 - templateDefsLen,
+		})
 	}
-
 	return vars
 }
 
-func findTemplateVariables(name, text string) (vars [][]string, aliases aliasMap, ok bool) {
+func findTemplateVariables(name, text string) (vars []tmplVar, aliases aliasMap, ok bool) {
 	t, err := textTemplate.
 		New(name).
 		Funcs(templateFuncMap).
@@ -452,16 +478,16 @@ func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyV
 	labelsAliases := aliases.varAliases(".Labels")
 	for _, v := range vars {
 		for _, a := range labelsAliases {
-			if len(v) > 1 && v[0] == a {
-				if _, ok := done[v[1]]; ok {
+			if len(v.value) > 1 && v.value[0] == a {
+				if _, ok := done[v.value[1]]; ok {
 					continue
 				}
 				for _, s := range src {
 					if s.IsDead {
 						continue
 					}
-					if !s.CanHaveLabel(v[1]) {
-						er := s.LabelExcludeReason(v[1])
+					if !s.CanHaveLabel(v.value[1]) {
+						er := s.LabelExcludeReason(v.value[1])
 						problems = append(problems, Problem{
 							Anchor:   AnchorAfter,
 							Lines:    rule.Lines,
@@ -471,10 +497,10 @@ func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyV
 							Severity: Bug,
 							Diagnostics: []diags.Diagnostic{
 								{
-									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v[1]),
+									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v.value[1]),
 									Pos:         label.Value.Pos,
-									FirstColumn: 1,
-									LastColumn:  len(label.Value.Value),
+									FirstColumn: v.column,
+									LastColumn:  v.column + len(v.value[1]),
 								},
 								{
 									Message:     er.Reason,
@@ -488,7 +514,7 @@ func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyV
 					}
 				}
 			NEXT:
-				done[v[1]] = struct{}{}
+				done[v.value[1]] = struct{}{}
 			}
 		}
 	}

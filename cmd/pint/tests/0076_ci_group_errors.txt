@@ -261,7 +261,7 @@ Bug: template uses non-existent label (alerts/template)
                                    ^^ Query is using aggregation with `by(foo)`, only labels included inside `by(...)` will be present on the results.
    | [...]
 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+                                       ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
 
 Bug: required label not set (rule/label)
   ---> rules.yml:25-30 -> `template`

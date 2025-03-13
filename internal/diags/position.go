@@ -35,7 +35,7 @@ type PositionRange struct {
 
 type PositionRanges []PositionRange
 
-func (prs PositionRanges) Len() (l int) { // FIXME remove
+func (prs PositionRanges) Len() (l int) {
 	for _, pr := range prs {
 		l += pr.LastColumn - pr.FirstColumn + 1
 	}
