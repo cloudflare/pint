@@ -130,8 +130,8 @@ func checkExternalLabels(name, text string, externalLabels map[string]string) (l
 	externalLabelsAliases := aliases.varAliases(".ExternalLabels")
 	for _, v := range vars {
 		for _, a := range externalLabelsAliases {
-			if len(v) > 1 && v[0] == a {
-				name := v[1]
+			if len(v.value) > 1 && v.value[0] == a {
+				name := v.value[1]
 				if _, ok = done[name]; ok {
 					continue
 				}

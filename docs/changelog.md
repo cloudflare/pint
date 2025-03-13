@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.5
+
+### Fixed
+
+- [alerts/template](checks/alerts/template.md) check will now output more accurate comments.
+
 ## v0.71.4
 
 ### Fixed

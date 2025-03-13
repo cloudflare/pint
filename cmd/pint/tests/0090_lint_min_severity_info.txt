@@ -11,7 +11,7 @@ Information: use humanize filters for the results (alerts/template)
               ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
   | [...]
 7 |       summary: 'error rate: {{ $value }}'
-                    ^^^^^^^^^^^^^^^^^^^^^^^^ Use one of humanize template functions to make the result more readable.
+                                   ^^^^^^^ Use one of humanize template functions to make the result more readable.
 
 level=INFO msg="Problems found" Information=1
 -- rules/0001.yml --
