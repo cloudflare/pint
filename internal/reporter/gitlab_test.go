@@ -892,7 +892,7 @@ func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff
 				}
 
 				expected := `{
-		"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
+		"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nsyntax details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n",
 		"position":{
 			"base_sha":"base",
 			"head_sha":"head",
@@ -905,8 +905,8 @@ func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff
 	}`
 				expected = strings.ReplaceAll(expected, "\n", "")
 				expected = strings.ReplaceAll(expected, "\t", "")
-				if b != expected {
-					t.Errorf("Unexpected comment: %s", b)
+				if diff := cmp.Diff(b, expected); diff != "" {
+					t.Errorf("Unexpected comment: (-want +got):\n%s", diff)
 					t.FailNow()
 				}
 				_, _ = w.Write([]byte(`{}`))

@@ -696,7 +696,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -750,7 +750,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":1,"side":"RIGHT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}
@@ -804,7 +804,7 @@ func TestGitHubReporter(t *testing.T) {
 				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
 					body, _ := io.ReadAll(r.Body)
 					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
-					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\nsyntax details\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":3,"side":"LEFT","commit_id":"HEAD"}` {
+					if b != `{"body":":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":3,"side":"LEFT","commit_id":"HEAD"}` {
 						t.Errorf("Unexpected comment: %s", b)
 						t.FailNow()
 					}

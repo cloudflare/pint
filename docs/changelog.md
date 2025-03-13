@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.3
+
+### Fixed
+
+- Some parts of comments reported to GitHub & GitLab were not using collapsible blocks as intended.
+
 ## v0.71.2
 
 ### Fixed

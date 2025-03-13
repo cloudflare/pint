@@ -54,8 +54,6 @@ func makeComments(summary Summary) (comments []PendingComment) {
 	var content string
 	var err error
 	for _, reports := range dedupReports(summary.reports) {
-		mergeDetails := identicalDetails(reports)
-
 		if reports[0].Problem.Anchor == checks.AnchorAfter {
 			content, err = readFile(reports[0].Path.Name)
 			if err != nil {
@@ -77,22 +75,40 @@ func makeComments(summary Summary) (comments []PendingComment) {
 				buf.WriteString("<summary>")
 				buf.WriteString(report.Problem.Summary)
 				buf.WriteString("</summary>\n\n")
-				buf.WriteString("```yaml\n")
-				buf.WriteString(diags.InjectDiagnostics(
-					content,
-					report.Problem.Diagnostics,
-					output.None,
-				))
-				buf.WriteString("```\n\n</details>\n\n")
+				for _, diag := range report.Problem.Diagnostics {
+					buf.WriteString("```yaml\n")
+					buf.WriteString(diags.InjectDiagnostics(
+						content,
+						[]diags.Diagnostic{
+							{
+								Message:     "",
+								Pos:         diag.Pos,
+								FirstColumn: diag.FirstColumn,
+								LastColumn:  diag.LastColumn,
+							},
+						},
+						output.None,
+					))
+					buf.WriteString("```\n\n")
+					buf.WriteString(diag.Message)
+					buf.WriteRune('\n')
+					if report.Problem.Details != "" {
+						buf.WriteString(report.Problem.Details)
+						buf.WriteString("\n")
+					}
+					buf.WriteString("\n")
+				}
+				buf.WriteString("</details>\n\n")
 			} else {
 				buf.WriteString("------\n\n")
 				buf.WriteString(report.Problem.Summary)
 				buf.WriteString("\n\n")
-			}
-
-			if !mergeDetails && report.Problem.Details != "" {
-				buf.WriteString(report.Problem.Details)
-				buf.WriteString("\n\n")
+				if report.Problem.Details != "" {
+					buf.WriteString("<details>\n")
+					buf.WriteString("<summary>More information</summary>\n")
+					buf.WriteString(report.Problem.Details)
+					buf.WriteString("\n</details>\n\n")
+				}
 			}
 			if report.Path.SymlinkTarget != report.Path.Name {
 				buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
@@ -100,11 +116,6 @@ func makeComments(summary Summary) (comments []PendingComment) {
 				buf.WriteString(report.Path.Name)
 				buf.WriteString("`.\n\n")
 			}
-		}
-		if mergeDetails && reports[0].Problem.Details != "" {
-			buf.WriteString("------\n\n")
-			buf.WriteString(reports[0].Problem.Details)
-			buf.WriteString("\n\n")
 		}
 		buf.WriteString("------\n\n")
 		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")

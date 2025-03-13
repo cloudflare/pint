@@ -18,3 +18,9 @@ groups:
   - alert: Dead Code
     expr: |
       sum(foo or vector(0)) by(name) > 0
+
+  - alert: Service Is Missing
+    expr: absent({job="myjob"})
+    annotations:
+      summary: |
+        Service {{ $labels.job }} is not running on {{ $labels.instance }}

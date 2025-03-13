@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/neilotoole/slogt"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
@@ -108,7 +109,10 @@ func TestCommenter(t *testing.T) {
 
 foo error
 
+<details>
+<summary>More information</summary>
 foo details
+</details>
 
 ------
 
@@ -354,7 +358,7 @@ bar warning
 					if p.path == fooComment.path && p.line == fooComment.line && p.text == fooComment.text {
 						return nil
 					}
-					return fmt.Errorf("unexpected comment at %s:%d: %s", p.path, p.line, p.text)
+					return fmt.Errorf("unexpected comment at %s:%d: %s", p.path, p.line, cmp.Diff(fooComment.text, p.text))
 				},
 				delete: func(_ context.Context, _ any, e ExistingComment) error {
 					return fmt.Errorf("shouldn't try to delete %s:%d", e.path, e.line)
@@ -371,7 +375,7 @@ bar warning
 			},
 		},
 		{
-			description: "Create() merges details",
+			description: "Create() identical details",
 			reports: []Report{
 				{
 					Path: discovery.Path{
@@ -426,29 +430,36 @@ bar warning
 					if p.line != 3 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
-					if p.text != `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
+					expected := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
 
 ------
 
 foo error 1
 
-:leftwards_arrow_with_hook: This problem was detected on a symlinked file `+"`foo.txt`"+`.
+<details>
+<summary>More information</summary>
+foo details
+</details>
+
+:leftwards_arrow_with_hook: This problem was detected on a symlinked file ` + "`foo.txt`" + `.
 
 ------
 
 foo error 2
 
-:leftwards_arrow_with_hook: This problem was detected on a symlinked file `+"`foo.txt`"+`.
-
-------
-
+<details>
+<summary>More information</summary>
 foo details
+</details>
+
+:leftwards_arrow_with_hook: This problem was detected on a symlinked file ` + "`foo.txt`" + `.
 
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
-` {
-						return fmt.Errorf("wrong text: %s", p.text)
+`
+					if p.text != expected {
+						return fmt.Errorf("wrong text: %s", cmp.Diff(expected, p.text))
 					}
 					return nil
 				},
@@ -506,21 +517,25 @@ foo details
 					if p.line != 3 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
-					if p.text != `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
+					expected := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
 
 ------
 
 foo error
 
+<details>
+<summary>More information</summary>
 foo details
+</details>
 
-:leftwards_arrow_with_hook: This problem was detected on a symlinked file `+"`foo.txt`"+`.
+:leftwards_arrow_with_hook: This problem was detected on a symlinked file ` + "`foo.txt`" + `.
 
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
-` {
-						return fmt.Errorf("wrong text: %s", p.text)
+`
+					if p.text != expected {
+						return fmt.Errorf("wrong text: %s", cmp.Diff(expected, p.text))
 					}
 					return nil
 				},
@@ -594,33 +609,41 @@ foo details
 					if p.line != 2 && p.line != 3 {
 						return fmt.Errorf("wrong line: %d", p.line)
 					}
-					if p.line == 3 && p.text != `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
+					expected := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
 
 ------
 
 foo error 1
 
+<details>
+<summary>More information</summary>
 foo details
+</details>
 
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
-` {
-						return fmt.Errorf("wrong text on first report: %s", p.text)
+`
+					if p.line == 3 && p.text != expected {
+						return fmt.Errorf("wrong text on first report: %s", cmp.Diff(expected, p.text))
 					}
-					if p.line == 2 && p.text != `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
+					expected2 := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
 
 ------
 
 foo error 2
 
+<details>
+<summary>More information</summary>
 foo details
+</details>
 
 ------
 
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
-` {
-						return fmt.Errorf("wrong text on second report: %s", p.text)
+`
+					if p.line == 2 && p.text != expected2 {
+						return fmt.Errorf("wrong text on second report: %s", cmp.Diff(expected2, p.text))
 					}
 					return nil
 				},
