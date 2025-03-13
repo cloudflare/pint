@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.4
+
+### Fixed
+
+- Fix [promql/series](checks/promql/series.md) to not fail on `absent({...})` calls.
+
 ## v0.71.3
 
 ### Fixed

@@ -284,6 +284,10 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 		bareSelector := stripLabels(selector)
 
+		if bareSelector.String() == "" {
+			continue
+		}
+
 		// 2. If foo was NEVER there -> BUG
 		slog.Debug("Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
