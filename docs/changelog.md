@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fix [promql/series](checks/promql/series.md) to not fail on `absent({...})` calls.
+- Fix formatting of BitBucket comments.
 
 ## v0.71.3
 

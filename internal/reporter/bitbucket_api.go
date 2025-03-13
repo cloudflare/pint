@@ -622,17 +622,26 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			buf.WriteString("------\n\n")
 			buf.WriteString(report.Problem.Summary)
 			buf.WriteString("\n\n")
-
 			if len(report.Problem.Diagnostics) > 0 && content != "" {
-				buf.WriteString("```yaml\n")
-				buf.WriteString(diags.InjectDiagnostics(
-					content,
-					report.Problem.Diagnostics,
-					output.None,
-				))
-				buf.WriteString("```\n\n")
+				for _, diag := range report.Problem.Diagnostics {
+					buf.WriteString("```yaml\n")
+					buf.WriteString(diags.InjectDiagnostics(
+						content,
+						[]diags.Diagnostic{
+							{
+								Message:     "",
+								Pos:         diag.Pos,
+								FirstColumn: diag.FirstColumn,
+								LastColumn:  diag.LastColumn,
+							},
+						},
+						output.None,
+					))
+					buf.WriteString("```\n\n")
+					buf.WriteString(diag.Message)
+					buf.WriteString("\n\n")
+				}
 			}
-
 			if !mergeDetails && report.Problem.Details != "" {
 				buf.WriteString(report.Problem.Details)
 				buf.WriteString("\n\n")
