@@ -4712,6 +4712,29 @@ func TestSeriesCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: `absent{job="myjob"}`,
+			content:     "- alert: Service Is Missing\n  expr: absent({job=\"myjob\"})",
+			checker:     newSeriesCheck,
+			prometheus:  newSimpleProm,
+			problems:    noProblems,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count({job="myjob"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(up)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+			},
+		},
 	}
 	runTests(t, testCases)
 }
