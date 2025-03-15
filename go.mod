@@ -2,6 +2,8 @@ module github.com/cloudflare/pint
 
 go 1.23.0
 
+toolchain go1.24.1
+
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.11
@@ -19,7 +21,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/urfave/cli/v2 v2.27.6
 	github.com/zclconf/go-cty v1.16.2
-	gitlab.com/gitlab-org/api/client-go v0.124.0
+	gitlab.com/gitlab-org/api/client-go v0.125.0
 	go.uber.org/atomic v1.11.0
 	go.uber.org/automaxprocs v1.6.0
 	go.uber.org/ratelimit v0.3.1
@@ -74,7 +76,7 @@ require (
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
-	golang.org/x/time v0.9.0 // indirect
+	golang.org/x/time v0.10.0 // indirect
 	golang.org/x/tools v0.29.0 // indirect
 	google.golang.org/protobuf v1.36.4 // indirect
 )
