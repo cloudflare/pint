@@ -480,7 +480,7 @@ func TestLabelsSource(t *testing.T) {
 			output: []utils.Source{
 				{
 					Type:     utils.SelectorSource,
-					Returns:  promParser.ValueTypeVector, // FIXME Matrix ??
+					Returns:  promParser.ValueTypeMatrix,
 					Selector: mustParse[*promParser.VectorSelector](t, "foo", 0),
 				},
 			},
