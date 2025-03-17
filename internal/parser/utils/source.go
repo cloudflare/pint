@@ -210,14 +210,11 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		s.Selector = n
 		s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, n)...)
 		for _, name := range labelsWithEmptyValueSelector(n) {
-			s = excludeLabel(s, name)
-			s.ExcludeReason = setInMap(
-				s.ExcludeReason,
+			s = excludeLabel(
+				s,
+				fmt.Sprintf("Query uses `{%s=\"\"}` selector which will filter out any time series with the `%s` label set.", name, name),
+				n.PosRange,
 				name,
-				ExcludedLabel{
-					Reason:   fmt.Sprintf("Query uses `{%s=\"\"}` selector which will filter out any time series with the `%s` label set.", name, name),
-					Fragment: n.PosRange,
-				},
 			)
 		}
 		s.Position = n.PosRange
@@ -261,7 +258,6 @@ func includeLabel(s Source, names ...string) Source {
 }
 
 // Include labels that were not already excluded.
-// FIXME most should use this?
 func maybeIncludeLabel(s Source, names ...string) Source {
 	for _, name := range names {
 		if !slices.Contains(s.ExcludedLabels, name) {
@@ -302,10 +298,28 @@ func restrictGuaranteedLabels(s Source, names []string) Source {
 	return s
 }
 
-func excludeLabel(s Source, names ...string) Source {
+func excludeLabel(s Source, reason string, fragment posrange.PositionRange, names ...string) Source {
 	s.ExcludedLabels = appendToSlice(s.ExcludedLabels, names...)
+	for _, name := range names {
+		s.ExcludeReason = setInMap(s.ExcludeReason, name, ExcludedLabel{
+			Reason:   reason,
+			Fragment: fragment,
+		})
+	}
 	s.IncludedLabels = removeFromSlice(s.IncludedLabels, names...)
 	s.GuaranteedLabels = removeFromSlice(s.GuaranteedLabels, names...)
+	return s
+}
+
+func excludeAllLabels(s Source, reason string, fragment posrange.PositionRange) Source {
+	s.ExcludeReason = setInMap(
+		s.ExcludeReason,
+		"",
+		ExcludedLabel{
+			Reason:   reason,
+			Fragment: fragment,
+		},
+	)
 	return s
 }
 
@@ -462,42 +476,27 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	var s Source
 	for _, s = range walkNode(expr, n.Expr) {
 		if n.Without {
-			s = excludeLabel(s, n.Grouping...)
-			for _, name := range n.Grouping {
-				s.ExcludeReason = setInMap(
-					s.ExcludeReason,
-					name,
-					ExcludedLabel{
-						Reason: fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
-							strings.Join(n.Grouping, ", ")),
-						Fragment: FindPosition(expr, n.PosRange, "without"),
-					},
-				)
-			}
+			s = excludeLabel(
+				s,
+				fmt.Sprintf("Query is using aggregation with `without(%s)`, all labels included inside `without(...)` will be removed from the results.",
+					strings.Join(n.Grouping, ", ")),
+				FindPosition(expr, n.PosRange, "without"),
+				n.Grouping...,
+			)
 		} else {
 			if len(n.Grouping) == 0 {
 				s.IncludedLabels = nil
 				s.GuaranteedLabels = nil
-				s.ExcludeReason = setInMap(
-					s.ExcludeReason,
-					"",
-					ExcludedLabel{
-						Reason:   "Query is using aggregation that removes all labels.",
-						Fragment: FindPosition(expr, n.PosRange, "sum"),
-					},
-				)
+				s = excludeAllLabels(s, "Query is using aggregation that removes all labels.", FindPosition(expr, n.PosRange, "sum"))
 			} else {
 				// Check if source of labels already fixes them.
 				if !s.FixedLabels {
 					s = maybeIncludeLabel(s, n.Grouping...)
-					s.ExcludeReason = setInMap(
-						s.ExcludeReason,
-						"",
-						ExcludedLabel{
-							Reason: fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
-								strings.Join(n.Grouping, ", ")),
-							Fragment: FindPosition(expr, n.PosRange, "by"),
-						},
+					s = excludeAllLabels(
+						s,
+						fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
+							strings.Join(n.Grouping, ", ")),
+						FindPosition(expr, n.PosRange, "by"),
 					)
 				}
 				s = restrictGuaranteedLabels(s, n.Grouping)
@@ -543,18 +542,15 @@ func parsePromQLFunc(s Source, expr string, n *promParser.Call) Source {
 			s = includeLabel(s, name)
 			s = guaranteeLabel(s, name)
 		}
-		s.ExcludeReason = setInMap(
-			s.ExcludeReason,
-			"",
-			ExcludedLabel{
-				Reason: fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if provided query doesn't match any time series.
+		s = excludeAllLabels(
+			s,
+			fmt.Sprintf(`The [%s()](https://prometheus.io/docs/prometheus/latest/querying/functions/#%s) function is used to check if provided query doesn't match any time series.
 You will only get any results back if the metric selector you pass doesn't match anything.
 Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
 This means that the only labels you can get back from absent call are the ones you pass to it.
 If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `+"`up`"+` metric instead.`,
-					n.Func.Name, n.Func.Name),
-				Fragment: FindPosition(expr, n.PosRange, n.Func.Name),
-			},
+				n.Func.Name, n.Func.Name),
+			FindPosition(expr, n.PosRange, n.Func.Name),
 		)
 
 	case "avg_over_time", "count_over_time", "last_over_time", "max_over_time", "min_over_time", "present_over_time", "quantile_over_time", "stddev_over_time", "stdvar_over_time", "sum_over_time":
@@ -571,14 +567,11 @@ If you're hoping to get instance specific labels this way and alert when some ta
 			s.AlwaysReturns = true
 			s.IncludedLabels = nil
 			s.GuaranteedLabels = nil
-			s.ExcludeReason = setInMap(
-				s.ExcludeReason,
-				"",
-				ExcludedLabel{
-					Reason: fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
-						n.Func.Name),
-					Fragment: n.PosRange,
-				},
+			s = excludeAllLabels(
+				s,
+				fmt.Sprintf("Calling `%s()` with no arguments will return an empty time series with no labels.",
+					n.Func.Name),
+				n.PosRange,
 			)
 		} else {
 			s = guaranteeLabel(s, labelsFromSelectors(guaranteedLabelsMatches, s.Selector)...)
@@ -615,13 +608,10 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
 		s.AlwaysReturns = true
-		s.ExcludeReason = setInMap(
-			s.ExcludeReason,
-			"",
-			ExcludedLabel{
-				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: n.PosRange,
-			},
+		s = excludeAllLabels(
+			s,
+			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+			n.PosRange,
 		)
 
 	case "scalar":
@@ -630,13 +620,10 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
 		s.AlwaysReturns = true
-		s.ExcludeReason = setInMap(
-			s.ExcludeReason,
-			"",
-			ExcludedLabel{
-				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: FindPosition(expr, n.PositionRange(), n.Func.Name),
-			},
+		s = excludeAllLabels(
+			s,
+			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+			FindPosition(expr, n.PositionRange(), n.Func.Name),
 		)
 
 	case "sort", "sort_desc":
@@ -649,13 +636,10 @@ If you're hoping to get instance specific labels this way and alert when some ta
 		s.GuaranteedLabels = nil
 		s.FixedLabels = true
 		s.AlwaysReturns = true
-		s.ExcludeReason = setInMap(
-			s.ExcludeReason,
-			"",
-			ExcludedLabel{
-				Reason:   fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
-				Fragment: n.PosRange,
-			},
+		s = excludeAllLabels(
+			s,
+			fmt.Sprintf("Calling `%s()` will return a scalar value with no labels.", n.Func.Name),
+			n.PosRange,
 		)
 
 	case "timestamp":
@@ -675,13 +659,10 @@ If you're hoping to get instance specific labels this way and alert when some ta
 				s.KnownReturn = true
 			}
 		}
-		s.ExcludeReason = setInMap(
-			s.ExcludeReason,
-			"",
-			ExcludedLabel{
-				Reason:   fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
-				Fragment: FindPosition(expr, n.PosRange, n.Func.Name),
-			},
+		s = excludeAllLabels(
+			s,
+			fmt.Sprintf("Calling `%s()` will return a vector value with no labels.", n.Func.Name),
+			FindPosition(expr, n.PosRange, n.Func.Name),
 		)
 
 	default:
@@ -776,32 +757,24 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				s = includeLabel(s, n.VectorMatching.MatchingLabels...)
 				s = restrictIncludedLabels(s, n.VectorMatching.MatchingLabels)
 				s = restrictGuaranteedLabels(s, n.VectorMatching.MatchingLabels)
-				s.ExcludeReason = setInMap(
-					s.ExcludeReason,
-					"",
-					ExcludedLabel{
-						Reason: fmt.Sprintf(
-							"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
-							n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-						),
-						Fragment: FindPosition(expr, n.PositionRange(), "on"),
-					},
+				s = excludeAllLabels(
+					s,
+					fmt.Sprintf(
+						"Query is using %s vector matching with `on(%s)`, only labels included inside `on(...)` will be present on the results.",
+						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+					),
+					FindPosition(expr, n.PositionRange(), "on"),
 				)
 			} else {
-				s = excludeLabel(s, n.VectorMatching.MatchingLabels...)
-				for _, name := range n.VectorMatching.MatchingLabels {
-					s.ExcludeReason = setInMap(
-						s.ExcludeReason,
-						name,
-						ExcludedLabel{
-							Reason: fmt.Sprintf(
-								"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
-								n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
-							),
-							Fragment: FindPosition(expr, n.PositionRange(), "ignoring"),
-						},
-					)
-				}
+				s = excludeLabel(
+					s,
+					fmt.Sprintf(
+						"Query is using %s vector matching with `ignoring(%s)`, all labels included inside `ignoring(...)` will be removed on the results.",
+						n.VectorMatching.Card, strings.Join(n.VectorMatching.MatchingLabels, ", "),
+					),
+					FindPosition(expr, n.PositionRange(), "ignoring"),
+					n.VectorMatching.MatchingLabels...,
+				)
 				for _, rs := range rhs {
 					rs.IsConditional = isConditional(rs, n.Op)
 					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {

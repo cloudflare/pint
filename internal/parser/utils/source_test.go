@@ -1506,7 +1506,7 @@ func TestLabelsSource(t *testing.T) {
 					Operation:      "count",
 					Selector:       mustParse[*promParser.VectorSelector](t, `up{job="foo", cluster="dev"}`, 10),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`, 0),
-					ExcludedLabels: []string{"job", "cluster"}, // FIXME empty
+					ExcludedLabels: []string{"job", "cluster"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
