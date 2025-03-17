@@ -121,7 +121,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,
-		Lines:    rule.AlertingRule.Expr.Value.Lines,
+		Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
 		Reporter: c.Reporter(),
 		Summary:  "alert count estimate",
 		Details:  details,

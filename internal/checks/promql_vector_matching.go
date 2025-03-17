@@ -112,7 +112,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 				if rv, ok := rhsMatchers[k]; ok && rv != lv {
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
-						Lines:    expr.Value.Lines,
+						Lines:    expr.Value.Pos.Lines(),
 						Reporter: c.Reporter(),
 						Summary:  "impossible binary operation",
 						Details:  VectorMatchingCheckDetails,
@@ -155,7 +155,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
-						Lines:    expr.Value.Lines,
+						Lines:    expr.Value.Pos.Lines(),
 						Reporter: c.Reporter(),
 						Summary:  "impossible binary operation",
 						Details:  VectorMatchingCheckDetails,
@@ -175,7 +175,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
-						Lines:    expr.Value.Lines,
+						Lines:    expr.Value.Pos.Lines(),
 						Reporter: c.Reporter(),
 						Summary:  "impossible binary operation",
 						Details:  VectorMatchingCheckDetails,
@@ -194,7 +194,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
-						Lines:    expr.Value.Lines,
+						Lines:    expr.Value.Pos.Lines(),
 						Reporter: c.Reporter(),
 						Summary:  "impossible binary operation",
 						Details:  VectorMatchingCheckDetails,
@@ -216,7 +216,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 			if len(n.VectorMatching.MatchingLabels) == 0 {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Summary:  "impossible binary operation",
 					Details:  VectorMatchingCheckDetails,
@@ -235,7 +235,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 				pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "ignoring")
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Summary:  "impossible binary operation",
 					Details:  VectorMatchingCheckDetails,

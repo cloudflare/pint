@@ -75,7 +75,7 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	switch {
 	case c.key == RuleForFor && rule.AlertingRule.For != nil:
 		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value)
-		lines = rule.AlertingRule.For.Lines
+		lines = rule.AlertingRule.For.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         rule.AlertingRule.For.Pos,
@@ -84,7 +84,7 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 		}
 	case c.key == RuleForKeepFiringFor && rule.AlertingRule.KeepFiringFor != nil:
 		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value)
-		lines = rule.AlertingRule.KeepFiringFor.Lines
+		lines = rule.AlertingRule.KeepFiringFor.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         rule.AlertingRule.KeepFiringFor.Pos,
@@ -92,7 +92,7 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 			LastColumn:  len(rule.AlertingRule.KeepFiringFor.Value),
 		}
 	default:
-		lines = rule.AlertingRule.Alert.Lines
+		lines = rule.AlertingRule.Alert.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
 			Pos:         rule.AlertingRule.Alert.Pos,

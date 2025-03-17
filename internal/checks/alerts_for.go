@@ -63,7 +63,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 	if err != nil {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    value.Lines,
+			Lines:    value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "invalid duration",
 			Details:  AlertForCheckDurationHelp,
@@ -83,7 +83,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 	if d == 0 {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    value.Lines,
+			Lines:    value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "redundant field with default value",
 			Details:  "",

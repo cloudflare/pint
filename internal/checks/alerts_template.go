@@ -115,8 +115,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
 					Lines: diags.LineRange{
-						First: label.Key.Lines.First,
-						Last:  label.Value.Lines.Last,
+						First: label.Key.Pos.Lines().First,
+						Last:  label.Value.Pos.Lines().Last,
 					},
 					Reporter: c.Reporter(),
 					Summary:  "template syntax error",
@@ -136,8 +136,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
 					Lines: diags.LineRange{
-						First: label.Key.Lines.First,
-						Last:  label.Value.Lines.Last,
+						First: label.Key.Pos.Lines().First,
+						Last:  label.Value.Pos.Lines().Last,
 					},
 					Reporter: c.Reporter(),
 					Summary:  "value used in labels",
@@ -164,8 +164,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
 					Lines: diags.LineRange{
-						First: annotation.Key.Lines.First,
-						Last:  annotation.Value.Lines.Last,
+						First: annotation.Key.Pos.Lines().First,
+						Last:  annotation.Value.Pos.Lines().Last,
 					},
 					Reporter: c.Reporter(),
 					Summary:  "template syntax error",
@@ -226,8 +226,8 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 		problems = append(problems, Problem{
 			Anchor: AnchorAfter,
 			Lines: diags.LineRange{
-				First: min(expr.Value.Lines.First, ann.Value.Lines.First),
-				Last:  max(expr.Value.Lines.Last, ann.Value.Lines.Last),
+				First: min(expr.Value.Pos.Lines().First, ann.Value.Pos.Lines().First),
+				Last:  max(expr.Value.Pos.Lines().Last, ann.Value.Pos.Lines().Last),
 			},
 			Reporter:    c.Reporter(),
 			Summary:     "use humanize filters for the results",

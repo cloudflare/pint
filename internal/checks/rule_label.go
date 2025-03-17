@@ -97,7 +97,7 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.RecordingRule.Labels.Lines,
+				Lines:    rule.RecordingRule.Labels.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
@@ -198,7 +198,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    lab.Lines,
+			Lines:    lab.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "invalid label value",
 			Details:  maybeComment(c.comment),
@@ -235,7 +235,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    lab.Lines,
+				Lines:    lab.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "invalid label value",
 				Details:  details.String(),

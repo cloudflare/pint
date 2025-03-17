@@ -210,36 +210,35 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 				}
 				recordNode = part
 				recordPart = newYamlNode(part, offsetLine, offsetColumn, contentLines, key.Column+2)
-				lines.Last = max(lines.Last, recordPart.Lines.Last)
+				lines.Last = max(lines.Last, recordPart.Pos.Lines().Last)
 			case alertKey:
 				if alertPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, alertKey)
 				}
 				alertNode = part
 				alertPart = newYamlNode(part, offsetLine, offsetColumn, contentLines, key.Column+2)
-				lines.Last = max(lines.Last, alertPart.Lines.Last)
+				lines.Last = max(lines.Last, alertPart.Pos.Lines().Last)
 			case exprKey:
 				if exprPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, exprKey)
 				}
 				exprNode = part
 				exprPart = newPromQLExpr(part, offsetLine, offsetColumn, contentLines, key.Column+2)
-				exprPart.Value.Lines = exprPart.Value.Pos.Lines()
-				lines.Last = max(lines.Last, exprPart.Value.Lines.Last)
+				lines.Last = max(lines.Last, exprPart.Value.Pos.Lines().Last)
 			case forKey:
 				if forPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, forKey)
 				}
 				forNode = part
 				forPart = newYamlNode(part, offsetLine, offsetColumn, contentLines, key.Column+2)
-				lines.Last = max(lines.Last, forPart.Lines.Last)
+				lines.Last = max(lines.Last, forPart.Pos.Lines().Last)
 			case keepFiringForKey:
 				if keepFiringForPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, keepFiringForKey)
 				}
 				keepFiringForNode = part
 				keepFiringForPart = newYamlNode(part, offsetLine, offsetColumn, contentLines, key.Column+2)
-				lines.Last = max(lines.Last, keepFiringForPart.Lines.Last)
+				lines.Last = max(lines.Last, keepFiringForPart.Pos.Lines().Last)
 			case labelsKey:
 				if labelsPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, labelsKey)
@@ -247,7 +246,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 				labelsNode = part
 				labelsNodes = mappingNodes(part)
 				labelsPart = newYamlMap(key, part, offsetLine, offsetColumn, contentLines)
-				lines.Last = max(lines.Last, labelsPart.Lines.Last)
+				lines.Last = max(lines.Last, labelsPart.Lines().Last)
 			case annotationsKey:
 				if annotationsPart != nil {
 					return duplicatedKeyError(lines, part.Line+offsetLine, annotationsKey)
@@ -255,7 +254,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 				annotationsNode = part
 				annotationsNodes = mappingNodes(part)
 				annotationsPart = newYamlMap(key, part, offsetLine, offsetColumn, contentLines)
-				lines.Last = max(lines.Last, annotationsPart.Lines.Last)
+				lines.Last = max(lines.Last, annotationsPart.Lines().Last)
 			default:
 				unknownKeys = append(unknownKeys, key)
 			}
@@ -276,7 +275,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: exprPart.Value.Lines.Last,
+				Line: exprPart.Value.Pos.Lines().Last,
 				Err:  fmt.Errorf("incomplete rule, no %s or %s key", alertKey, recordKey),
 			},
 		}
@@ -286,7 +285,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: forPart.Lines.First,
+				Line: forPart.Pos.Lines().First,
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", forKey),
 			},
 		}
@@ -296,7 +295,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: keepFiringForPart.Lines.First,
+				Line: keepFiringForPart.Pos.Lines().First,
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", keepFiringForKey),
 			},
 		}
@@ -306,7 +305,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 		rule = Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: annotationsPart.Lines.First,
+				Line: annotationsPart.Lines().First,
 				Err:  fmt.Errorf("invalid field '%s' in recording rule", annotationsKey),
 			},
 		}
@@ -389,7 +388,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 		return Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: recordPart.Lines.First,
+				Line: recordPart.Pos.Lines().First,
 				Err:  fmt.Errorf("invalid recording rule name: %s", recordPart.Value),
 			},
 		}, false
@@ -401,7 +400,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 				return Rule{
 					Lines: lines,
 					Error: ParseError{
-						Line: lab.Key.Lines.First,
+						Line: lab.Key.Pos.Lines().First,
 						Err:  fmt.Errorf("invalid label name: %s", lab.Key.Value),
 					},
 				}, false
@@ -410,7 +409,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 				return Rule{
 					Lines: lines,
 					Error: ParseError{
-						Line: lab.Key.Lines.First,
+						Line: lab.Key.Pos.Lines().First,
 						Err:  fmt.Errorf("invalid label value: %s", lab.Value.Value),
 					},
 				}, false
@@ -424,7 +423,7 @@ func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn 
 				return Rule{
 					Lines: lines,
 					Error: ParseError{
-						Line: ann.Key.Lines.First,
+						Line: ann.Key.Pos.Lines().First,
 						Err:  fmt.Errorf("invalid annotation name: %s", ann.Key.Value),
 					},
 				}, false
@@ -525,7 +524,7 @@ func ensureRequiredKeys(lines diags.LineRange, key string, keyVal *YamlNode, exp
 		return Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: keyVal.Lines.Last,
+				Line: keyVal.Pos.Lines().Last,
 				Err:  fmt.Errorf("%s value cannot be empty", key),
 			},
 		}, false
@@ -534,7 +533,7 @@ func ensureRequiredKeys(lines diags.LineRange, key string, keyVal *YamlNode, exp
 		return Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: keyVal.Lines.Last,
+				Line: keyVal.Pos.Lines().Last,
 				Err:  fmt.Errorf("missing %s key", exprKey),
 			},
 		}, false
@@ -543,7 +542,7 @@ func ensureRequiredKeys(lines diags.LineRange, key string, keyVal *YamlNode, exp
 		return Rule{
 			Lines: lines,
 			Error: ParseError{
-				Line: expr.Value.Lines.Last,
+				Line: expr.Value.Pos.Lines().Last,
 				Err:  fmt.Errorf("%s value cannot be empty", exprKey),
 			},
 		}, false

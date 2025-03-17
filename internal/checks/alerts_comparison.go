@@ -62,7 +62,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		if (hasComparision(n.LHS) == nil || hasComparision(n.RHS) == nil) && !isAbsent(n.LHS) && !isAbsent(n.RHS) {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.AlertingRule.Expr.Value.Lines,
+				Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
@@ -83,7 +83,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.AlertingRule.Expr.Value.Lines,
+				Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
@@ -107,7 +107,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,
-		Lines:    rule.AlertingRule.Expr.Value.Lines,
+		Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
 		Reporter: c.Reporter(),
 		Summary:  "always firing alert",
 		Details:  ComparisonCheckDetails,

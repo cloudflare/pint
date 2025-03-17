@@ -112,8 +112,8 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
 				Lines: diags.LineRange{
-					First: ann.Key.Lines.First,
-					Last:  ann.Value.Lines.Last,
+					First: ann.Key.Pos.Lines().First,
+					Last:  ann.Value.Pos.Lines().Last,
 				},
 				Reporter: c.Reporter(),
 				Summary:  "link check failed",
@@ -138,8 +138,8 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 			problems = append(problems, Problem{
 				Anchor: AnchorAfter,
 				Lines: diags.LineRange{
-					First: ann.Key.Lines.First,
-					Last:  ann.Value.Lines.Last,
+					First: ann.Key.Pos.Lines().First,
+					Last:  ann.Value.Pos.Lines().Last,
 				},
 				Reporter: c.Reporter(),
 				Summary:  "link check failed",

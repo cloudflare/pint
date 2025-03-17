@@ -146,7 +146,7 @@ func (c RuleDependencyCheck) usesVector(entry discovery.Entry, name string) *bro
 				kind:   "recording",
 				metric: name,
 				path:   entry.Path.SymlinkTarget,
-				line:   expr.Value.Lines.First,
+				line:   expr.Value.Pos.Lines().First,
 				name:   entry.Rule.Name(),
 			}
 		}
@@ -171,7 +171,7 @@ func (c RuleDependencyCheck) usesAlert(entry discovery.Entry, name string) *brok
 					kind:   "alerting",
 					metric: vs.String(),
 					path:   entry.Path.SymlinkTarget,
-					line:   expr.Value.Lines.First,
+					line:   expr.Value.Pos.Lines().First,
 					name:   entry.Rule.Name(),
 				}
 			}

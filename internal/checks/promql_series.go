@@ -200,7 +200,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				} else {
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
-						Lines:    expr.Value.Lines,
+						Lines:    expr.Value.Pos.Lines(),
 						Reporter: c.Reporter(),
 						Summary:  "unknown alert referenced",
 						Details:  SeriesCheckCommonProblemDetails,
@@ -312,7 +312,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				slog.Debug("Metric is provided by recording rule", slog.String("selector", (&bareSelector).String()), slog.String("path", rrEntry.Path.Name))
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Details:  SeriesCheckRuleDetails,
 					Severity: Information,
@@ -343,7 +343,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			if details, shouldReport := c.checkOtherServer(ctx, selector.String(), settings); shouldReport {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Summary:  "query on nonexistent series",
 					Details:  details,
@@ -389,7 +389,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			if trsLabelCount.Series.Ranges.Len() == 1 && len(trsLabelCount.Series.Gaps) == 0 {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Details:  SeriesCheckCommonProblemDetails,
 					Severity: Bug,
@@ -443,7 +443,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			)
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Details:  SeriesCheckCommonProblemDetails,
 				Severity: severity,
@@ -499,7 +499,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				)
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Details:  SeriesCheckCommonProblemDetails,
 					Severity: severity,
@@ -569,7 +569,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 				)
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Details:  SeriesCheckCommonProblemDetails,
 					Severity: severity,
@@ -596,7 +596,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			if len(trsLabel.Series.Ranges) > 1 && len(trsLabel.Series.Gaps) > 0 {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Details:  SeriesCheckCommonProblemDetails,
 					Severity: Warning,
@@ -629,7 +629,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		if len(trs.Series.Ranges) > 0 && len(trs.Series.Gaps) > 0 {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Details:  SeriesCheckCommonProblemDetails,
 				Severity: Warning,
@@ -656,7 +656,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	for _, disable := range orphanedDisableComments(ctx, rule, selectors) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Details:  SeriesCheckUnusedDisableComment,
 			Severity: Warning,
@@ -674,7 +674,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	for _, ruleSet := range orphanedRuleSetComments(rule, selectors) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Details:  SeriesCheckUnusedRuleSetComment,
 			Severity: Warning,

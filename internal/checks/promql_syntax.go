@@ -68,7 +68,7 @@ func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule
 
 		problems = append(problems, Problem{
 			Anchor:      AnchorAfter,
-			Lines:       expr.Value.Lines,
+			Lines:       expr.Value.Pos.Lines(),
 			Reporter:    c.Reporter(),
 			Summary:     "PromQL syntax error",
 			Details:     SyntaxCheckDetails,

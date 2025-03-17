@@ -60,7 +60,7 @@ func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (pr
 		pos := s.GetSmallestPosition()
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "dead code in query",
 			Details:  "",
