@@ -1,0 +1,145 @@
+
+[TestImpossibleCheck/0_>_0 - 1]
+- description: 0 > 0
+  content: |4
+    - alert: Foo
+      expr: 0 > bool 0
+  output: |
+    3 |   expr: 0 > bool 0
+                ^ this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 18
+          firstcolumn: 1
+          lastcolumn: 1
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/foo{job=bar}_unless_sum(foo) - 1]
+- description: foo{job=bar} unless sum(foo)
+  content: |4
+    - alert: Foo
+      expr: foo{job="bar"} unless sum(foo)
+  output: |
+    3 |   expr: foo{job="bar"} unless sum(foo)
+                                          ^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 38
+          firstcolumn: 27
+          lastcolumn: 29
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/foo{job=bar}_unless_vector(0) - 1]
+- description: foo{job=bar} unless vector(0)
+  content: |4
+    - alert: Foo
+      expr: foo{job="bar"} unless vector(0)
+  output: |
+    3 |   expr: foo{job="bar"} unless vector(0)
+                                      ^^^^^^^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 23
+          lastcolumn: 31
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestImpossibleCheck/sum(foo_or_vector(0))_>_0 - 1]
+- description: sum(foo or vector(0)) > 0
+  content: |4
+    - alert: Foo
+      expr: sum(foo or vector(0)) > 0
+  output: |
+    3 |   expr: sum(foo or vector(0)) > 0
+                           ^^^^^^^^^ this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 33
+          firstcolumn: 12
+          lastcolumn: 20
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestImpossibleCheck/vector(0)_>_0 - 1]
+- description: vector(0) > 0
+  content: |4
+    - alert: Foo
+      expr: ((( group(vector(0)) ))) > 0
+  output: |
+    3 |   expr: ((( group(vector(0)) ))) > 0
+                          ^^^^^^^^^ this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: this query always evaluates to `0 > 0` which is not possible, so it will never return anything
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 36
+          firstcolumn: 11
+          lastcolumn: 19
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---

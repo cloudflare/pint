@@ -1,0 +1,379 @@
+
+[TestCostCheck/1_result - 1]
+- description: 1 result
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 1 result(s) with 4.0KiB estimated memory usage.
+  problem:
+    reporter: query/cost
+    summary: query cost estimate
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 1 result(s) with 4.0KiB estimated memory usage.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/1s_eval,_5s_limit - 1]
+[]
+
+---
+
+[TestCostCheck/6_results_with_5_series_max - 1]
+- description: 6 results with 5 series max
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 6 result(s), maximum allowed series is 5.
+  problem:
+    reporter: query/cost
+    summary: query is too expensive
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 6 result(s), maximum allowed series is 5.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestCostCheck/7_result_with_MB - 1]
+- description: 7 result with MB
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0MiB estimated memory usage.
+  problem:
+    reporter: query/cost
+    summary: query cost estimate
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0MiB estimated memory usage.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/7_results - 1]
+- description: 7 results
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.
+  problem:
+    reporter: query/cost
+    summary: query cost estimate
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/7_results#01 - 1]
+- description: 7 results
+  content: |4
+    - record: foo
+      expr: 'sum({__name__="foo"})'
+  output: |
+    3 |   expr: 'sum({__name__="foo"})'
+                 ^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.
+  problem:
+    reporter: query/cost
+    summary: query cost estimate
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 707B estimated memory usage.'
+          pos:
+            - line: 3
+              firstcolumn: 10
+              lastcolumn: 30
+          firstcolumn: 1
+          lastcolumn: 21
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/7_results_with_1_series_max_(1KB_bps) - 1]
+- description: 7 results with 1 series max (1KB bps)
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0KiB estimated memory usage, maximum allowed series is 1.
+  problem:
+    reporter: query/cost
+    summary: query is too expensive
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s) with 7.0KiB estimated memory usage, maximum allowed series is 1.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestCostCheck/7_results_with_5_series_max_/_infi - 1]
+- description: 7 results with 5 series max / infi
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com returned 7 result(s), maximum allowed series is 5.
+  problem:
+    reporter: query/cost
+    summary: query is too expensive
+    details: 'Rule comment: rule comment'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com returned 7 result(s), maximum allowed series is 5.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/bad_request - 1]
+- description: bad request
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    1 | - record: foo
+                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+  problem:
+    reporter: query/cost
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestCostCheck/connection_refused - 1]
+- description: connection refused
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+  problem:
+    reporter: query/cost
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCostCheck/empty_response - 1]
+[]
+
+---
+
+[TestCostCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestCostCheck/response_timeout - 1]
+- description: response timeout
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `connection timeout`.
+  problem:
+    reporter: query/cost
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `connection timeout`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestCostCheck/stats - 1]
+- description: stats
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com queried 200 samples in total when executing this query, which is more than the configured limit of 100.
+  problem:
+    reporter: query/cost
+    summary: query is too expensive
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com queried 200 samples in total when executing this query, which is more than the configured limit of 100.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestCostCheck/stats_-_duration - 1]
+- description: stats - duration
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com took 5s100ms when executing this query, which is more than the configured limit of 5s.
+  problem:
+    reporter: query/cost
+    summary: query is too expensive
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com took 5s100ms when executing this query, which is more than the configured limit of 5s.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestCostCheck/stats_-_peak_samples - 1]
+- description: stats - peak samples
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^^^^^^ `prom` Prometheus server at https://simple.example.com queried 20 peak samples when executing this query, which is more than the configured limit of 10.
+  problem:
+    reporter: query/cost
+    summary: query is too expensive
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com queried 20 peak samples when executing this query, which is more than the configured limit of 10.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---

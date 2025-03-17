@@ -1,39 +1,17 @@
 package checks_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func newVectorMatchingCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewVectorMatchingCheck(prom)
-}
-
-func differentLabelsText(name, uri, l, r string) string {
-	return fmt.Sprintf("This query will never return anything on `%s` Prometheus server at %s because results from the right and the left hand side have different labels: `[%s]` != `[%s]`.", name, uri, l, r)
-}
-
-func usingMismatchText(name, uri, f, l, r string) string {
-	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from both sides of the query have different labels: `[%s]` != `[%s]`.", f, name, uri, l, r)
-}
-
-func usingBothMissing(name, uri, q, f string) string {
-	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from both sides of the query don't have this label: `%s`.", f, name, uri, q)
-}
-
-func usingOneMissing(name, uri, q, side, f string) string {
-	return fmt.Sprintf("Using `%s` won't produce any results on `%s` Prometheus server at %s because results from the %s hand side of the query don't have this label: `%s`.", f, name, uri, side, q)
-}
-
-func differentFilters(k, lv, rv string) string {
-	return fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv)
 }
 
 func TestVectorMatchingCheck(t *testing.T) {
@@ -43,36 +21,19 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "ignores rules with bogus calls",
 			content:     "- record: foo\n  expr: sum(foo, 5) without(\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "one to one matching",
 			content:     "- record: foo\n  expr: foo_with_notfound / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: differentLabelsText("prom", uri, "instance, job, notfound", "instance, job"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -130,7 +91,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -186,7 +146,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: xxx / foo\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -209,7 +168,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / xxx\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -246,36 +204,19 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(missing or vector(0))\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "ignore present or vector",
 			content:     "- record: foo\n  expr: sum(foo or vector(0))\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "ignore with mismatched series",
 			content:     "- record: foo\n  expr: foo / ignoring(xxx) app_registry\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: usingMismatchText("prom", uri, "ignoring()", "instance, job", "app_name"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -322,22 +263,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / on(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: usingBothMissing("prom", uri, "foo / on (notfound) bar", "on(notfound)"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -381,7 +307,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / ignoring(notfound) foo\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -411,7 +336,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / ignoring(notfound) foo_with_notfound\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -441,7 +365,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / ignoring(notfound) foo_with_notfound\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -485,7 +408,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / ignoring(notfound) foo\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -529,7 +451,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / ignoring(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -573,22 +494,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / on(notfound) bar_with_notfound\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: usingOneMissing("prom", uri, "foo", "left", "on(notfound)"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -633,22 +539,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo_with_notfound / on(notfound) bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: usingOneMissing("prom", uri, "bar", "right", "on(notfound)"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -693,22 +584,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: usingOneMissing("prom", uri, "(memory_bytes / ignoring (job) (memory_limit > 0))", "left", "on(app_name)"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -758,14 +634,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 `,
 			checker:    newVectorMatchingCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 		},
 		{
 			description: "skips number comparison on LHS",
 			content:     "- record: foo\n  expr: 2 < foo / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -803,7 +677,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo / bar > 0\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -841,14 +714,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: 1 > bool 1\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "up == 0 AND foo > 0",
 			content:     "- alert: foo\n  expr: up == 0 AND foo > 0\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -886,22 +757,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: min_over_time((foo_with_notfound > 0)[30m:1m]) / bar\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: differentLabelsText("prom", uri, "instance, job, notfound", "instance, job"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -946,14 +802,12 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (100*(1024^2))\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "binary expression on both sides / passing",
 			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (foo / ignoring(notfound) foo_with_notfound)\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1019,22 +873,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: (foo / ignoring(notfound) foo_with_notfound) / (memory_bytes / ignoring(job) memory_limit)\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: differentLabelsText("prom", uri, "instance, job", "dev, instance, job"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1151,21 +990,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, true)
 			},
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
-							},
-						},
-
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems: true,
 		},
 		{
 			description: "connection refused / not required",
@@ -1174,21 +999,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, false)
 			},
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
-							},
-						},
-
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems: true,
 		},
 		{
 			description: "error on topk1() left side",
@@ -1197,21 +1008,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				return checks.NewVectorMatchingCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, `server_error: internal error`),
-							},
-						},
-
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1236,21 +1033,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 				return checks.NewVectorMatchingCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, `server_error: internal error`),
-							},
-						},
-
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1287,22 +1070,7 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: up{job=\"a\"} / up{job=\"b\"}\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.VectorMatchingCheckName,
-						Summary:  "impossible binary operation",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: differentFilters("job", "a", "b"),
-							},
-						},
-
-						Details:  checks.VectorMatchingCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -1318,7 +1086,6 @@ func TestVectorMatchingCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: up{job=\"a\"} / on() up{job=\"b\"}\n",
 			checker:     newVectorMatchingCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{

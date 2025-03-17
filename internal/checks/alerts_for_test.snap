@@ -1,0 +1,184 @@
+
+[TestAlertsForCheck/default_for_value - 1]
+- description: default for value
+  content: |
+    - alert: foo
+      expr: foo
+      for: 0h
+  output: |
+    3 |   for: 0h
+               ^^ `0h` is the default value of `for`, this line is unnecessary.
+  problem:
+    reporter: alerts/for
+    summary: redundant field with default value
+    details: ""
+    diagnostics:
+        - message: '`0h` is the default value of `for`, this line is unnecessary.'
+          pos:
+            - line: 3
+              firstcolumn: 8
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsForCheck/default_for_value#01 - 1]
+- description: default for value
+  content: |
+    - alert: foo
+      expr: foo
+      keep_firing_for: 0h
+  output: |
+    3 |   keep_firing_for: 0h
+                           ^^ `0h` is the default value of `keep_firing_for`, this line is unnecessary.
+  problem:
+    reporter: alerts/for
+    summary: redundant field with default value
+    details: ""
+    diagnostics:
+        - message: '`0h` is the default value of `keep_firing_for`, this line is unnecessary.'
+          pos:
+            - line: 3
+              firstcolumn: 20
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsForCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestAlertsForCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestAlertsForCheck/invalid_for_value - 1]
+- description: invalid for value
+  content: |
+    - alert: foo
+      expr: foo
+      for: abc
+  output: |
+    3 |   for: abc
+               ^^^ not a valid duration string: "abc"
+  problem:
+    reporter: alerts/for
+    summary: invalid duration
+    details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
+    diagnostics:
+        - message: 'not a valid duration string: "abc"'
+          pos:
+            - line: 3
+              firstcolumn: 8
+              lastcolumn: 10
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 3
+        last: 3
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsForCheck/invalid_keep_firing_for_value - 1]
+- description: invalid keep_firing_for value
+  content: |
+    - alert: foo
+      expr: foo
+      keep_firing_for: abc
+  output: |
+    3 |   keep_firing_for: abc
+                           ^^^ not a valid duration string: "abc"
+  problem:
+    reporter: alerts/for
+    summary: invalid duration
+    details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
+    diagnostics:
+        - message: 'not a valid duration string: "abc"'
+          pos:
+            - line: 3
+              firstcolumn: 20
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 3
+        last: 3
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsForCheck/negative_for_value - 1]
+- description: negative for value
+  content: |
+    - alert: foo
+      expr: foo
+      for: -5m
+  output: |
+    3 |   for: -5m
+               ^^^ not a valid duration string: "-5m"
+  problem:
+    reporter: alerts/for
+    summary: invalid duration
+    details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
+    diagnostics:
+        - message: 'not a valid duration string: "-5m"'
+          pos:
+            - line: 3
+              firstcolumn: 8
+              lastcolumn: 10
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 3
+        last: 3
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsForCheck/negative_keep_firing_for_value - 1]
+- description: negative keep_firing_for value
+  content: |
+    - alert: foo
+      expr: foo
+      keep_firing_for: -5m
+  output: |
+    3 |   keep_firing_for: -5m
+                           ^^^ not a valid duration string: "-5m"
+  problem:
+    reporter: alerts/for
+    summary: invalid duration
+    details: Supported time durations are documented [here](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-durations).
+    diagnostics:
+        - message: 'not a valid duration string: "-5m"'
+          pos:
+            - line: 3
+              firstcolumn: 20
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 3
+        last: 3
+    severity: 2
+    anchor: 0
+
+---

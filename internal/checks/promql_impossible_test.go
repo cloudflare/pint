@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -19,7 +18,6 @@ func TestImpossibleCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newImpossibleCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "vector(0) > 0",
@@ -29,20 +27,7 @@ func TestImpossibleCheck(t *testing.T) {
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.ImpossibleCheckName,
-						Summary:  "dead code in query",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "0 > 0",
@@ -52,20 +37,7 @@ func TestImpossibleCheck(t *testing.T) {
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.ImpossibleCheckName,
-						Summary:  "dead code in query",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "sum(foo or vector(0)) > 0",
@@ -75,20 +47,7 @@ func TestImpossibleCheck(t *testing.T) {
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.ImpossibleCheckName,
-						Summary:  "dead code in query",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "foo{job=bar} unless vector(0)",
@@ -98,20 +57,7 @@ func TestImpossibleCheck(t *testing.T) {
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.ImpossibleCheckName,
-						Summary:  "dead code in query",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "foo{job=bar} unless sum(foo)",
@@ -121,20 +67,7 @@ func TestImpossibleCheck(t *testing.T) {
 `,
 			checker:    newImpossibleCheck,
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.ImpossibleCheckName,
-						Summary:  "dead code in query",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 	}
 

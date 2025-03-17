@@ -1,0 +1,155 @@
+
+[TestLabelsConflictCheck/conflict_/_alerting_/_different - 1]
+- description: conflict / alerting / different
+  content: |
+    - alert: foo
+      expr: up == 0
+      labels:
+        foo: bar
+  output: |
+    4 |     foo: bar
+            ^^^ `prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.
+  problem:
+    reporter: labels/conflict
+    summary: conflicting labels
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelsConflictCheck/conflict_/_alerting_/_identical - 1]
+- description: conflict / alerting / identical
+  content: |
+    - alert: foo
+      expr: up == 0
+      labels:
+        foo: bar
+  output: |
+    4 |     foo: bar
+            ^^^ This label is redundant. `prom` Prometheus server at https://simple.example.com external_labels already has foo="bar" label set and it will be automatically added to all alerts, there's no need to set it manually.
+  problem:
+    reporter: labels/conflict
+    summary: conflicting labels
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: This label is redundant. `prom` Prometheus server at https://simple.example.com external_labels already has foo="bar" label set and it will be automatically added to all alerts, there's no need to set it manually.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelsConflictCheck/conflict_/_recording - 1]
+- description: conflict / recording
+  content: |
+    - record: foo
+      expr: up == 0
+      labels:
+        foo: bar
+  output: |
+    4 |     foo: bar
+            ^^^ `prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.
+  problem:
+    reporter: labels/conflict
+    summary: conflicting labels
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com external_labels already has foo="bob" label set, please choose a different name for this label to avoid any conflicts.'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelsConflictCheck/connection_refused - 1]
+- description: connection refused
+  content: |
+    - record: foo
+      expr: up == 0
+      labels:
+        foo: bar
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+  problem:
+    reporter: labels/conflict
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelsConflictCheck/flags_unsupported - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/ignores_alerting_rules - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/no_conflict_/_alerting - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/no_conflict_/_recording - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/no_labels_/_alerting - 1]
+[]
+
+---
+
+[TestLabelsConflictCheck/no_labels_/_recording - 1]
+[]
+
+---

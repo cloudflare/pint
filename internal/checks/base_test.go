@@ -9,23 +9,28 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"regexp"
+	"runtime"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
-	"github.com/google/go-cmp/cmp/cmpopts"
+	"github.com/gkampitakis/go-snaps/snaps"
 	"github.com/neilotoole/slogt"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
+	"github.com/cloudflare/pint/internal/output"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
@@ -66,12 +71,14 @@ func TestParseSeverity(t *testing.T) {
 	}
 }
 
+const simplePromPublicURI = "https://simple.example.com"
+
 func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi.FailoverGroup {
 	return promapi.NewFailoverGroup(
 		name,
 		uri,
 		[]*promapi.Prometheus{
-			promapi.NewPrometheus(name, uri, "", map[string]string{"X-Debug": "1"}, timeout, 16, 1000, nil),
+			promapi.NewPrometheus(name, uri, simplePromPublicURI, map[string]string{"X-Debug": "1"}, timeout, 16, 1000, nil),
 		},
 		required,
 		"up",
@@ -91,27 +98,45 @@ func noProm(_ string) *promapi.FailoverGroup {
 
 type newCheckFn func(*promapi.FailoverGroup) checks.RuleChecker
 
-type problemsFn func(string) []checks.Problem
-
 type newPrometheusFn func(string) *promapi.FailoverGroup
 
 type newCtxFn func(context.Context, string) context.Context
 
 type otherPromsFn func(string) []*promapi.FailoverGroup
 
+type snapshotFn func(string) string
+
 type checkTest struct {
-	description string
-	content     string
 	prometheus  newPrometheusFn
 	otherProms  otherPromsFn
 	ctx         newCtxFn
 	checker     newCheckFn
+	snapshot    snapshotFn
+	description string
+	content     string
 	entries     []discovery.Entry
-	problems    problemsFn
 	mocks       []*prometheusMock
+	problems    bool
+}
+
+type Snapshot struct {
+	Description string
+	Content     string
+	Output      string
+	Problem     checks.Problem
+}
+
+func TestMain(t *testing.M) {
+	v := t.Run()
+	snaps.Clean(t, snaps.CleanOpts{Sort: true})
+	os.Exit(v)
 }
 
 func runTests(t *testing.T, testCases []checkTest) {
+	_, file, _, ok := runtime.Caller(1)
+	require.True(t, ok, "can't get caller function")
+	file = strings.TrimSuffix(filepath.Base(file), ".go")
+
 	for _, tc := range testCases {
 		// original test
 		t.Run(tc.description, func(t *testing.T) {
@@ -160,18 +185,41 @@ func runTests(t *testing.T, testCases []checkTest) {
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
 				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
-				if diff := cmp.Diff(tc.problems(uri), problems,
-					cmpopts.IgnoreFields(diags.Diagnostic{}, "Pos", "FirstColumn", "LastColumn"),
-					cmpopts.IgnoreFields(checks.Problem{}, "Lines"),
-				); diff != "" {
-					t.Errorf("wrong problems (-want +got):\n%s", diff)
+
+				var snapshots []Snapshot
+				for _, problem := range problems {
+					snapshots = append(snapshots, Snapshot{
+						Description: tc.description,
+						Content:     tc.content,
+						Problem:     problem,
+						Output:      diags.InjectDiagnostics(tc.content, problem.Diagnostics, output.None),
+					})
 				}
+
+				d, err := yaml.Marshal(snapshots)
+				var snapshot string
+				if tc.snapshot != nil {
+					snapshot = tc.snapshot(string(d))
+				} else {
+					snapshot = string(d)
+				}
+				// Always rewrite Prometheus URI.
+				snapshot = rewriteURL(snapshot, uri)
+
+				require.NoError(t, err, "failed to YAML encode snapshots")
+				snaps.WithConfig(snaps.Dir("."), snaps.Filename(file)).MatchSnapshot(t, snapshot)
 
 				for _, p := range problems {
 					require.NotEmptyf(t, p.Diagnostics, "empty diagnostics in %+v\n", p)
 					for _, d := range p.Diagnostics {
 						require.NotNilf(t, d.Pos, "empty diagnostics Pos in %+v\n", d)
 					}
+				}
+
+				if tc.problems {
+					require.NotEmpty(t, problems, "expected SOME problems to be reported")
+				} else {
+					require.Empty(t, problems, "expected NO problems to be reported")
 				}
 			}
 			cancel()
@@ -228,10 +276,6 @@ func mustParseContent(content string) (entries []discovery.Entry) {
 		panic(err)
 	}
 	return entries
-}
-
-func noProblems(_ string) []checks.Problem {
-	return nil
 }
 
 type requestCondition interface {
@@ -600,14 +644,13 @@ func generateSampleStream(labels map[string]string, from, until time.Time, step 
 	return s
 }
 
-func checkErrorBadData(name, uri, err string) string {
-	return fmt.Sprintf("`%s` Prometheus server at %s failed with: `%s`.", name, uri, err)
-}
-
-func checkErrorUnableToRun(name, uri, err string) string {
-	return fmt.Sprintf("Couldn't run some online checks due to `%s` Prometheus server at %s connection error: `%s`.", name, uri, err)
-}
-
-func checkErrorTooExpensiveToRun(name, uri, err string) string {
-	return fmt.Sprintf("Couldn't run some online checks on `%s` Prometheus server at %s because some queries are too expensive: `%s`.", name, uri, err)
+func rewriteURL(text, url string) string {
+	var digits int
+	for i := len(url) - 1; i >= 0; i-- {
+		if url[i] == byte(':') {
+			break
+		}
+		digits++
+	}
+	return strings.ReplaceAll(text, url, url[:len(url)-digits]+strings.Repeat("X", digits))
 }

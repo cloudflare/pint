@@ -2,20 +2,14 @@ package checks_test
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"testing"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/promapi"
 )
-
-func textDuplicateRule(path string, line int) string {
-	return fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", path, line)
-}
 
 func TestRuleDuplicateCheck(t *testing.T) {
 	xxxEntries := mustParseContent("- record: foo\n  expr: up == 0\n")
@@ -31,7 +25,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 		},
 		{
 			description: "ignores entries with path errors",
@@ -40,7 +33,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			entries: []discovery.Entry{
 				{PathError: errors.New("Mock error")},
 			},
@@ -52,7 +44,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			entries:    mustParseContent("- record: foo\n  expr: up == 0\n"),
 		},
 		{
@@ -62,7 +53,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			entries: mustParseContent(`
 - alert: foo
   expr: up == 0
@@ -79,7 +69,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			entries: mustParseContent(`
 # foo
 - record: foo
@@ -95,7 +84,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			entries: mustParseContent(`
 - record: bar
   expr: up == 0
@@ -114,7 +102,6 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			entries: mustParseContent(`
 - record: foo
   expr: up == 0
@@ -133,20 +120,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.RuleDuplicateCheckName,
-						Summary:  "duplicated recording rule",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: textDuplicateRule("fake.yml", 6),
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			entries: mustParseContent(`
 - record: foo
   expr: up == 0
@@ -167,7 +141,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					"prom",
 					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, "", map[string]string{}, time.Second, 4, 100, nil),
+						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{}, time.Second, 4, 100, nil),
 					},
 					true,
 					"up",
@@ -176,8 +150,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 					nil,
 				)
 			},
-			problems: noProblems,
-			entries:  xxxEntries,
+			entries: xxxEntries,
 		},
 		{
 			description: "same expr but formatted differently",
@@ -186,20 +159,7 @@ func TestRuleDuplicateCheck(t *testing.T) {
 				return checks.NewRuleDuplicateCheck(prom)
 			},
 			prometheus: newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.RuleDuplicateCheckName,
-						Summary:  "duplicated recording rule",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: textDuplicateRule("fake.yml", 6),
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			entries: mustParseContent(`
 - record: job:up:sum
   expr: sum by(job) (up)

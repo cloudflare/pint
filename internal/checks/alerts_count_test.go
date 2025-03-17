@@ -1,35 +1,17 @@
 package checks_test
 
 import (
-	"fmt"
-	"net/url"
 	"testing"
 	"time"
 
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func newAlertsCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 0, "", checks.Information)
-}
-
-func alertsText(name, uri string, count int, since string) string {
-	return fmt.Sprintf("`%s` Prometheus server at %s would trigger %d alert(s) in the last %s.", name, uri, count, since)
-}
-
-func alertsDetails(uri, query, since, comment string) string {
-	details := fmt.Sprintf(
-		`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
-		uri, url.QueryEscape(query), since,
-	)
-	if comment != "" {
-		details = fmt.Sprintf("%s\nRule comment: %s", details, comment)
-	}
-	return details
 }
 
 func TestAlertsCountCheck(t *testing.T) {
@@ -41,34 +23,18 @@ func TestAlertsCountCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: up == 0\n",
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- alert: Foo Is Down\n  expr: sum(\n",
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "bad request",
 			content:     content,
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "unable to run checks",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -78,6 +44,7 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithBadData(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "connection refused / upstream not required / warning",
@@ -86,41 +53,13 @@ func TestAlertsCountCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false)
 			},
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "unable to run checks",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", `connection refused`),
-							},
-						},
-					},
-				}
-			},
+			problems: true,
 		},
 		{
 			description: "empty response",
 			content:     content,
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 0, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -130,27 +69,13 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithEmptyMatrix(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "multiple alerts",
 			content:     content,
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 7, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -219,27 +144,13 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "for: 10m",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 2, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -295,6 +206,7 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "minCount=2",
@@ -303,21 +215,6 @@ func TestAlertsCountCheck(t *testing.T) {
 				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 2, "rule comment", checks.Information)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", "rule comment"),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 2, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -373,6 +270,7 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "minCount=2 severity=bug",
@@ -381,21 +279,6 @@ func TestAlertsCountCheck(t *testing.T) {
 				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 2, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 2, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -451,6 +334,7 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "minCount=10",
@@ -459,7 +343,6 @@ func TestAlertsCountCheck(t *testing.T) {
 				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 10, "", checks.Information)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -524,21 +407,6 @@ func TestAlertsCountCheck(t *testing.T) {
 `,
 			checker:    newAlertsCheck,
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `{__name__="up", job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 3, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -576,6 +444,7 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "{__name__=~}",
@@ -585,21 +454,6 @@ func TestAlertsCountCheck(t *testing.T) {
 `,
 			checker:    newAlertsCheck,
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `{__name__=~"(up|foo)", job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 3, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -637,27 +491,13 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "uptime query error",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n",
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 3, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -695,27 +535,13 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithInternalError(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "keep_firing_for: 10m",
 			content:     "- alert: Foo Is Down\n  keep_firing_for: 10m\n  expr: up{job=\"foo\"} == 0\n",
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 2, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -771,27 +597,13 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 		{
 			description: "for: 10m + keep_firing_for: 10m",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  keep_firing_for: 10m\n  expr: up{job=\"foo\"} == 0\n",
 			checker:     newAlertsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "alerts/count",
-						Summary:  "alert count estimate",
-						Details:  alertsDetails(uri, `up{job="foo"} == 0`, "1d", ""),
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsText("prom", uri, 1, "1d"),
-							},
-						},
-					},
-				}
-			},
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -847,6 +659,7 @@ func TestAlertsCountCheck(t *testing.T) {
 					resp: respondWithSingleRangeVector1D(),
 				},
 			},
+			problems: true,
 		},
 	}
 

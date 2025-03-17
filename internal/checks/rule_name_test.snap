@@ -1,0 +1,66 @@
+
+[TestRuleName/alerting_rule_name_doesn't_match - 1]
+- description: alerting rule name doesn't match
+  content: |
+    - alert: foo
+      expr: sum(foo) without(
+  output: |
+    1 | - alert: foo
+                 ^^ alerting rule name must match `^total:.+$`.
+  problem:
+    reporter: rule/name
+    summary: name not allowed
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: alerting rule name must match `^total:.+$`.
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 1
+        last: 1
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleName/alerting_rule_name_match - 1]
+[]
+
+---
+
+[TestRuleName/recording_rule_name_doesn't_match - 1]
+- description: recording rule name doesn't match
+  content: |
+    - record: foo
+      expr: sum(foo) without(
+  output: |
+    1 | - record: foo
+                  ^^ recording rule name must match `^total:.+$`.
+  problem:
+    reporter: rule/name
+    summary: name not allowed
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: recording rule name must match `^total:.+$`.
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 1
+        last: 1
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleName/recording_rule_name_match - 1]
+[]
+
+---

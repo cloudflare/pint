@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -17,21 +16,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "some text", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Details:  "Rule comment: some text",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no labels in recording rule / required",
@@ -40,20 +25,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "empty label in recording rule / required",
@@ -69,20 +41,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no labels in recording rule / not required",
@@ -91,7 +50,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "missing label in recording rule / required",
@@ -108,20 +66,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`sev.+` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "missing label in recording rule / not required",
@@ -130,7 +75,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "invalid value in recording rule / required",
@@ -139,20 +83,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label value must match `^critical$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value in recording rule / not required",
@@ -161,20 +92,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label value must match `^critical$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "typo in recording rule / required",
@@ -191,21 +109,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Details:  "Rule comment: some text",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`priority` label value must match `^(1|2|3)$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "typo in recording rule / not required",
@@ -222,20 +126,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`priority` label value must match `^(1|2|3)$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no labels in alerting rule / required",
@@ -244,20 +135,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "empty label in alerting rule / required",
@@ -273,20 +151,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no labels in alerting rule / not required",
@@ -295,7 +160,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "missing label in alerting rule / required",
@@ -304,20 +168,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "required label not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "missing label in alerting rule / not required",
@@ -326,7 +177,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "invalid value in alerting rule / required",
@@ -335,20 +185,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label value must match `^critical|info$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value in alerting rule / not required",
@@ -357,20 +194,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` label value must match `^critical|info$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "valid recording rule / required",
@@ -379,7 +203,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "valid recording rule / not required",
@@ -388,7 +211,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "valid alerting rule / required",
@@ -397,7 +219,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "valid alerting rule / not required",
@@ -406,7 +227,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "templated label value / passing",
@@ -415,7 +235,6 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("must wait {{$for}} to fire"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "templated label value / not passing",
@@ -424,20 +243,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("must wait {{$for}} to fire"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`for` label value must match `^must wait {{$for}} to fire$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value in alerting rule / token / valueRe",
@@ -446,20 +252,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`components` label value must match `^api|memcached$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value in alerting rule / token / values",
@@ -476,21 +269,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`components` label value is not one of valid values.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value in recording rule / token / valueRe",
@@ -499,20 +278,7 @@ func TestLabelCheck(t *testing.T) {
 				return checks.NewLabelCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`components` label value must match `^api|memcached$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value in recording rule / token / values",
@@ -529,21 +295,7 @@ func TestLabelCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.LabelCheckName,
-						Summary:  "invalid label value",
-						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n- `memsql`\n- `haproxy`\n\nRule comment: some text",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`components` label value is not one of valid values.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 	}
 	runTests(t, testCases)

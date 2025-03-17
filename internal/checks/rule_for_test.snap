@@ -1,0 +1,122 @@
+
+[TestRuleForCheck/alerting_rule,_for:1d,_5m-0 - 1]
+[]
+
+---
+
+[TestRuleForCheck/alerting_rule,_for:1m,_0-0 - 1]
+[]
+
+---
+
+[TestRuleForCheck/alerting_rule,_for:1m,_1s-0 - 1]
+[]
+
+---
+
+[TestRuleForCheck/alerting_rule,_for:1m,_1s-2m - 1]
+[]
+
+---
+
+[TestRuleForCheck/alerting_rule,_for:4m,_5m-10m - 1]
+- description: alerting rule, for:4m, 5m-10m
+  content: |
+    - alert: foo
+      for: 4m
+      expr: sum(foo)
+  output: |
+    2 |   for: 4m
+               ^^ This alert rule must have a `for` field with a minimum duration of 5m.
+  problem:
+    reporter: rule/for
+    summary: duration required
+    details: ""
+    diagnostics:
+        - message: This alert rule must have a `for` field with a minimum duration of 5m.
+          pos:
+            - line: 2
+              firstcolumn: 8
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleForCheck/alerting_rule,_for:5m,_1s-2m - 1]
+- description: alerting rule, for:5m, 1s-2m
+  content: |
+    - alert: foo
+      for: 5m
+      expr: sum(foo)
+  output: |
+    2 |   for: 5m
+               ^^ This alert rule must have a `for` field with a maximum duration of 2m.
+  problem:
+    reporter: rule/for
+    summary: duration too long
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: This alert rule must have a `for` field with a maximum duration of 2m.
+          pos:
+            - line: 2
+              firstcolumn: 8
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleForCheck/alerting_rule,_for:14m,_5m-10m,_keep_firing_for_enforced - 1]
+[]
+
+---
+
+[TestRuleForCheck/alerting_rule,_keep_firing_for:4m,_5m-10m - 1]
+- description: alerting rule, keep_firing_for:4m, 5m-10m
+  content: |
+    - alert: foo
+      keep_firing_for: 4m
+      expr: sum(foo)
+  output: |
+    2 |   keep_firing_for: 4m
+                           ^^ This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
+  problem:
+    reporter: rule/for
+    summary: duration required
+    details: ""
+    diagnostics:
+        - message: This alert rule must have a `keep_firing_for` field with a minimum duration of 5m.
+          pos:
+            - line: 2
+              firstcolumn: 20
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRuleForCheck/alerting_rule,_no_for,_0-0 - 1]
+[]
+
+---
+
+[TestRuleForCheck/recording_rule - 1]
+[]
+
+---

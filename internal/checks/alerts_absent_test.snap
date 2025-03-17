@@ -1,0 +1,322 @@
+
+[TestAlertsAbsentCheck/404 - 1]
+[]
+
+---
+
+[TestAlertsAbsentCheck/600 - 1]
+- description: "600"
+  content: |
+    - alert: foo
+      expr: absent(foo)
+  output: |
+    1 | - alert: foo
+                 ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_response: 600 status code 600`.
+  problem:
+    reporter: alerts/absent
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_response: 600 status code 600`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/absent()_<_2x_scrape_interval - 1]
+- description: absent() < 2x scrape_interval
+  content: |
+    - alert: foo
+      expr: absent(foo)
+      for: 1m
+  output: |
+    2 |   expr: absent(foo)
+                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+    3 |   for: 1m
+               ^^ Use a value that's at least twice Prometheus scrape interval (`1m`).
+  problem:
+    reporter: alerts/absent
+    summary: absent() based alert with insufficient for
+    details: |-
+        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+    diagnostics:
+        - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 11
+        - message: Use a value that's at least twice Prometheus scrape interval (`1m`).
+          pos:
+            - line: 3
+              firstcolumn: 8
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/absent()_<_2x_scrape_interval,_53s - 1]
+- description: absent() < 2x scrape_interval, 53s
+  content: |
+    - alert: foo
+      expr: absent(foo)
+      for: 1m
+  output: |
+    2 |   expr: absent(foo)
+                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+    3 |   for: 1m
+               ^^ Use a value that's at least twice Prometheus scrape interval (`53s`).
+  problem:
+    reporter: alerts/absent
+    summary: absent() based alert with insufficient for
+    details: |-
+        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+    diagnostics:
+        - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 11
+        - message: Use a value that's at least twice Prometheus scrape interval (`53s`).
+          pos:
+            - line: 3
+              firstcolumn: 8
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/absent()_<_2x_scrape_interval,_no_config - 1]
+- description: absent() < 2x scrape_interval, no config
+  content: |
+    - alert: foo
+      expr: absent(foo)
+      for: 30s
+  output: |
+    2 |   expr: absent(foo)
+                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+    3 |   for: 30s
+               ^^^ Use a value that's at least twice Prometheus scrape interval (`1m`).
+  problem:
+    reporter: alerts/absent
+    summary: absent() based alert with insufficient for
+    details: |-
+        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+    diagnostics:
+        - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 11
+        - message: Use a value that's at least twice Prometheus scrape interval (`1m`).
+          pos:
+            - line: 3
+              firstcolumn: 8
+              lastcolumn: 10
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/absent()_==_2x_scrape_interval - 1]
+[]
+
+---
+
+[TestAlertsAbsentCheck/absent()_without_for - 1]
+- description: absent() without for
+  content: |
+    - alert: foo
+      expr: absent(foo)
+  output: |
+    2 |   expr: absent(foo)
+                ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+  problem:
+    reporter: alerts/absent
+    summary: absent() based alert without for
+    details: |-
+        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+    diagnostics:
+        - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 11
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/connection_refused - 1]
+- description: connection refused
+  content: |
+    - alert: foo
+      expr: absent(foo)
+  output: |
+    1 | - alert: foo
+                 ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+  problem:
+    reporter: alerts/absent
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/count()_or_absent()_without_for - 1]
+- description: count() or absent() without for
+  content: |
+    - alert: foo
+      expr: count(foo) > 5 or absent(foo)
+  output: |
+    2 |   expr: count(foo) > 5 or absent(foo)
+                                  ^^^^^^^^^^^ Using `absent()` might cause false positive alerts when Prometheus restarts.
+  problem:
+    reporter: alerts/absent
+    summary: absent() based alert without for
+    details: |-
+        When Prometheus restart this alert rule might be evaluated before your service is scraped, which can cause false positives from absent() call.
+        Adding `for` option that is at least 2x scrape interval will prevent this from happening.
+    diagnostics:
+        - message: Using `absent()` might cause false positive alerts when Prometheus restarts.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 37
+          firstcolumn: 19
+          lastcolumn: 29
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestAlertsAbsentCheck/ignores_rules_with_invalid_duration - 1]
+[]
+
+---
+
+[TestAlertsAbsentCheck/ignores_rules_with_no_absent() - 1]
+[]
+
+---
+
+[TestAlertsAbsentCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestAlertsAbsentCheck/invalid_YAML - 1]
+- description: invalid YAML
+  content: |
+    - alert: foo
+      expr: absent(foo)
+  output: |
+    1 | - alert: foo
+                 ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected ':'`.
+  problem:
+    reporter: alerts/absent
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsAbsentCheck/invalid_status - 1]
+- description: invalid status
+  content: |
+    - alert: foo
+      expr: absent(foo)
+  output: |
+    1 | - alert: foo
+                 ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+  problem:
+    reporter: alerts/absent
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---

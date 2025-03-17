@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -17,20 +16,7 @@ func TestReportCheck(t *testing.T) {
 				return checks.NewReportCheck("problem reported", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/report",
-						Summary:  "problem reported by config rule",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "problem reported",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "report passed problem / info",
@@ -39,20 +25,7 @@ func TestReportCheck(t *testing.T) {
 				return checks.NewReportCheck("problem reported", checks.Information)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/report",
-						Summary:  "problem reported by config rule",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "problem reported",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 	}
 	runTests(t, testCases)

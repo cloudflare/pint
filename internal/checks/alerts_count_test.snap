@@ -1,0 +1,359 @@
+
+[TestAlertsCountCheck/bad_request - 1]
+- description: bad request
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+  output: |
+    1 | - alert: Foo Is Down
+                 ^^^^^^^^^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+  problem:
+    reporter: alerts/count
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 11
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/connection_refused_/_upstream_not_required_/_warning - 1]
+- description: connection refused / upstream not required / warning
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+  output: |
+    1 | - alert: Foo Is Down
+                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+  problem:
+    reporter: alerts/count
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 11
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/empty_response - 1]
+- description: empty response
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+  output: |
+    2 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 0 alert(s) in the last 1d.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/for:_10m - 1]
+- description: 'for: 10m'
+  content: |
+    - alert: Foo Is Down
+      for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    3 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/for:_10m_+_keep_firing_for:_10m - 1]
+- description: 'for: 10m + keep_firing_for: 10m'
+  content: |
+    - alert: Foo Is Down
+      for: 10m
+      keep_firing_for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    4 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 1 alert(s) in the last 1d.'
+          pos:
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 4
+        last: 4
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestAlertsCountCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestAlertsCountCheck/keep_firing_for:_10m - 1]
+- description: 'keep_firing_for: 10m'
+  content: |
+    - alert: Foo Is Down
+      keep_firing_for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    3 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/minCount=2 - 1]
+- description: minCount=2
+  content: |
+    - alert: Foo Is Down
+      for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    3 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: |-
+        To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+        Rule comment: rule comment
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/minCount=2_severity=bug - 1]
+- description: minCount=2 severity=bug
+  content: |
+    - alert: Foo Is Down
+      for: 10m
+      expr: up{job="foo"} == 0
+  output: |
+    3 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 2 alert(s) in the last 1d.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 3
+        last: 3
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/minCount=10 - 1]
+[]
+
+---
+
+[TestAlertsCountCheck/multiple_alerts - 1]
+- description: multiple alerts
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+  output: |
+    2 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 7 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 7 alert(s) in the last 1d.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/uptime_query_error - 1]
+- description: uptime query error
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+  output: |
+    2 |   expr: up{job="foo"} == 0
+                ^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=up%7Bjob%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 26
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 2
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/{__name__=} - 1]
+- description: '{__name__=}'
+  content: |4
+    - alert: foo
+      expr: '{__name__="up", job="foo"} == 0'
+  output: |
+    3 |   expr: '{__name__="up", job="foo"} == 0'
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=%7B__name__%3D%22up%22%2C+job%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
+          pos:
+            - line: 3
+              firstcolumn: 10
+              lastcolumn: 40
+          firstcolumn: 1
+          lastcolumn: 31
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---
+
+[TestAlertsCountCheck/{__name__=~} - 1]
+- description: '{__name__=~}'
+  content: |4
+    - alert: foo
+      expr: '{__name__=~"(up|foo)", job="foo"} == 0'
+  output: |
+    3 |   expr: '{__name__=~"(up|foo)", job="foo"} == 0'
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.
+  problem:
+    reporter: alerts/count
+    summary: alert count estimate
+    details: To get a preview of the alerts that would fire please [click here](https://simple.example.com/graph?g0.expr=%7B__name__%3D~%22%28up%7Cfoo%29%22%2C+job%3D%22foo%22%7D+%3D%3D+0&g0.tab=0&g0.range_input=1d).
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com would trigger 3 alert(s) in the last 1d.'
+          pos:
+            - line: 3
+              firstcolumn: 10
+              lastcolumn: 47
+          firstcolumn: 1
+          lastcolumn: 38
+    lines:
+        first: 3
+        last: 3
+    severity: 0
+    anchor: 0
+
+---

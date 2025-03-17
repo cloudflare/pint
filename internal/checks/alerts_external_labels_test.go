@@ -1,26 +1,16 @@
 package checks_test
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
 func newAlertsExternalLabelsCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewAlertsExternalLabelsCheck(prom)
-}
-
-func alertsExternalLabelsText(name, uri, label string) string {
-	return fmt.Sprintf("Template is using `%s` external label but `%s` Prometheus server at %s doesn't have this label configured in global:external_labels.", label, name, uri)
-}
-
-func alertsExternalLabelsDetails(name, uri string) string {
-	return fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", uri, name)
 }
 
 func TestAlertsExternalLabelsCountCheck(t *testing.T) {
@@ -42,34 +32,19 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: up == 0\n",
 			checker:     newAlertsExternalLabelsCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "ignores rules with syntax errors",
 			content:     "- alert: Foo Is Down\n  expr: sum(\n",
 			checker:     newAlertsExternalLabelsCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "bad request",
 			content:     content,
 			checker:     newAlertsExternalLabelsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Summary:  "unable to run checks",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -84,27 +59,13 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false)
 			},
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Summary:  "unable to run checks",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", `connection refused`),
-							},
-						},
-					},
-				}
-			},
+			problems: true,
 		},
 		{
 			description: "all labels present",
 			content:     content,
 			checker:     newAlertsExternalLabelsCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -117,43 +78,7 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			content:     content,
 			checker:     newAlertsExternalLabelsCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Summary:  "invalid label",
-						Details:  alertsExternalLabelsDetails("prom", uri),
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsExternalLabelsText("prom", uri, "cluster"),
-							},
-						},
-					},
-					{
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Summary:  "invalid label",
-						Details:  alertsExternalLabelsDetails("prom", uri),
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsExternalLabelsText("prom", uri, "cluster"),
-							},
-						},
-					},
-					{
-						Reporter: checks.AlertsExternalLabelsCheckName,
-						Summary:  "invalid label",
-						Details:  alertsExternalLabelsDetails("prom", uri),
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: alertsExternalLabelsText("prom", uri, "cluster"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -166,7 +91,6 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 			content:     content,
 			checker:     newAlertsExternalLabelsCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},

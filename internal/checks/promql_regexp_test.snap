@@ -1,0 +1,595 @@
+
+[TestRegexpCheck/code=~5.* - 1]
+[]
+
+---
+
+[TestRegexpCheck/duplicated_unnecessary_regexp - 1]
+- description: duplicated unnecessary regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"bar"} / foo{job=~"bar"}
+  output: |
+    2 |   expr: foo{job=~"bar"} / foo{job=~"bar"}
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 41
+          firstcolumn: 5
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/duplicated_unnecessary_regexp#01 - 1]
+- description: duplicated unnecessary regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
+  output: |
+    2 |   expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 56
+          firstcolumn: 5
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: duplicated unnecessary regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
+  output: |
+    2 |   expr: foo{job=~"bar"} / foo{job=~"bar", level="total"}
+                                      ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 56
+          firstcolumn: 23
+          lastcolumn: 32
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/empty_match - 1]
+[]
+
+---
+
+[TestRegexpCheck/empty_negative_match - 1]
+[]
+
+---
+
+[TestRegexpCheck/empty_regexp - 1]
+- description: empty regexp
+  content: |
+    - record: foo
+      expr: foo{job=~""}
+  output: |
+    2 |   expr: foo{job=~""}
+                    ^^^^^^^ Unnecessary regexp match on static string `job=~""`, use `job=""` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~""`, use `job=""` instead.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 20
+          firstcolumn: 5
+          lastcolumn: 11
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/greedy_wildcard_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestRegexpCheck/needed_wildcard_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/non-smelly_selector - 1]
+[]
+
+---
+
+[TestRegexpCheck/positive_wildcard_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/regexp_with_a_modifier - 1]
+[]
+
+---
+
+[TestRegexpCheck/smelly_selector - 1]
+- description: smelly selector
+  content: |
+    - record: foo
+      expr: foo{job=~"service_.*_prod"}
+  output: |
+    2 |   expr: foo{job=~"service_.*_prod"}
+                    ^^^^^^^^^^^^^^^^^^^^^^ `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 35
+          firstcolumn: 5
+          lastcolumn: 26
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/smelly_selector_/_disabled - 1]
+[]
+
+---
+
+[TestRegexpCheck/smelly_selector_/_enabled - 1]
+- description: smelly selector / enabled
+  content: |
+    - record: foo
+      expr: foo{job=~"service_.*_prod"}
+  output: |
+    2 |   expr: foo{job=~"service_.*_prod"}
+                    ^^^^^^^^^^^^^^^^^^^^^^ `{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{job=~"service_.*_prod"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 35
+          firstcolumn: 5
+          lastcolumn: 26
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/static_match - 1]
+[]
+
+---
+
+[TestRegexpCheck/unnecessary_negative_greedy_wildcard_regexp - 1]
+- description: unnecessary negative greedy wildcard regexp
+  content: |
+    - record: foo
+      expr: foo{job!~".+"}
+  output: |
+    2 |   expr: foo{job!~".+"}
+                    ^^^^^^^^^ Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary negative wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 5
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_negative_regexp - 1]
+- description: unnecessary negative regexp
+  content: |
+    - record: foo
+      expr: foo{job!~"bar"}
+  output: |
+    2 |   expr: foo{job!~"bar"}
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job!~"bar"`, use `job!="bar"` instead.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 23
+          firstcolumn: 5
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_negative_wildcard_regexp - 1]
+- description: unnecessary negative wildcard regexp
+  content: |
+    - record: foo
+      expr: foo{job!~".*"}
+  output: |
+    2 |   expr: foo{job!~".*"}
+                    ^^^^^^^^^ Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary negative wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `foo{job=""}` if you want to match on all time series for `foo` without the `job` label.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 5
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_regexp - 1]
+- description: unnecessary regexp
+  content: |
+    - record: foo
+      expr: foo{job=~"bar"}
+  output: |
+    2 |   expr: foo{job=~"bar"}
+                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Unnecessary regexp match on static string `job=~"bar"`, use `job="bar"` instead.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 23
+          firstcolumn: 5
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_regexp_anchor - 1]
+- description: unnecessary regexp anchor
+  content: |
+    - record: foo
+      expr: foo{job=~"^.+$"}
+  output: |
+    2 |   expr: foo{job=~"^.+$"}
+                    ^^^^^^^^^^^ Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp anchors
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Prometheus regexp matchers are automatically fully anchored so match for `job=~"^.+$"` will result in `job=~"^^.+$$"`, remove regexp anchors `^` and/or `$`.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 24
+          firstcolumn: 5
+          lastcolumn: 15
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_regexp_anchor#01 - 1]
+- description: unnecessary regexp anchor
+  content: |
+    - record: foo
+      expr: foo{job=~"(foo|^.+)$"}
+  output: |
+    2 |   expr: foo{job=~"(foo|^.+)$"}
+                    ^^^^^^^^^^^^^^^^^ Prometheus regexp matchers are automatically fully anchored so match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
+  problem:
+    reporter: promql/regexp
+    summary: redundant regexp anchors
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Prometheus regexp matchers are automatically fully anchored so match for `job=~"(foo|^.+)$"` will result in `job=~"^(foo|^.+)$$"`, remove regexp anchors `^` and/or `$`.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 30
+          firstcolumn: 5
+          lastcolumn: 21
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_wildcard_regexp - 1]
+- description: unnecessary wildcard regexp
+  content: |
+    - record: foo
+      expr: foo{job=~".*"}
+  output: |
+    2 |   expr: foo{job=~".*"}
+                    ^^^^^^^^^ Use `foo` if you want to match on all `job` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `foo` if you want to match on all `job` values.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 5
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_wildcard_regexp_/_many_filters - 1]
+- description: unnecessary wildcard regexp / many filters
+  content: |
+    - record: foo
+      expr: foo{job=~".*", cluster=~".*", instance="bob"}
+  output: |
+    2 |   expr: foo{job=~".*", cluster=~".*", instance="bob"}
+                    ^^^^^^^^^ Use `foo{instance="bob"}` if you want to match on all `job` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `foo{instance="bob"}` if you want to match on all `job` values.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 53
+          firstcolumn: 5
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: unnecessary wildcard regexp / many filters
+  content: |
+    - record: foo
+      expr: foo{job=~".*", cluster=~".*", instance="bob"}
+  output: |
+    2 |   expr: foo{job=~".*", cluster=~".*", instance="bob"}
+                               ^^^^^^^^^^^^^ Use `foo{instance="bob"}` if you want to match on all `cluster` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `foo{instance="bob"}` if you want to match on all `cluster` values.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 53
+          firstcolumn: 16
+          lastcolumn: 28
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_wildcard_regexp_/_many_filters_/_no_name - 1]
+- description: unnecessary wildcard regexp / many filters / no name
+  content: |
+    - record: foo
+      expr: |
+        {job=~".*", cluster=~".*", instance="bob"}
+  output: |
+    3 |     {job=~".*", cluster=~".*", instance="bob"}
+             ^^^^^^^^^ Use `{instance="bob"}` if you want to match on all `job` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `{instance="bob"}` if you want to match on all `job` values.
+          pos:
+            - line: 3
+              firstcolumn: 5
+              lastcolumn: 46
+          firstcolumn: 2
+          lastcolumn: 10
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+- description: unnecessary wildcard regexp / many filters / no name
+  content: |
+    - record: foo
+      expr: |
+        {job=~".*", cluster=~".*", instance="bob"}
+  output: |
+    3 |     {job=~".*", cluster=~".*", instance="bob"}
+                        ^^^^^^^^^^^^^ Use `{instance="bob"}` if you want to match on all `cluster` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `{instance="bob"}` if you want to match on all `cluster` values.
+          pos:
+            - line: 3
+              firstcolumn: 5
+              lastcolumn: 46
+          firstcolumn: 13
+          lastcolumn: 25
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/unnecessary_wildcard_regexp_/_many_filters_/_regexp_name - 1]
+- description: unnecessary wildcard regexp / many filters / regexp name
+  content: |
+    - record: foo
+      expr: |
+        {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
+  output: |
+    3 |     {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
+             ^^^^^^^^^ Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `job` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `job` values.
+          pos:
+            - line: 3
+              firstcolumn: 5
+              lastcolumn: 67
+          firstcolumn: 2
+          lastcolumn: 10
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+- description: unnecessary wildcard regexp / many filters / regexp name
+  content: |
+    - record: foo
+      expr: |
+        {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
+  output: |
+    3 |     {job=~".*", __name__=~"foo|bar", cluster=~".*", instance="bob"}
+                                             ^^^^^^^^^^^^^ Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `cluster` values.
+  problem:
+    reporter: promql/regexp
+    summary: unnecessary wildcard regexp
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: Use `{__name__=~"foo|bar", instance="bob"}` if you want to match on all `cluster` values.
+          pos:
+            - line: 3
+              firstcolumn: 5
+              lastcolumn: 67
+          firstcolumn: 34
+          lastcolumn: 46
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRegexpCheck/valid_partial_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/valid_regexp - 1]
+[]
+
+---
+
+[TestRegexpCheck/valid_regexp#01 - 1]
+[]
+
+---
+
+[TestRegexpCheck/valid_regexp#02 - 1]
+[]
+
+---
