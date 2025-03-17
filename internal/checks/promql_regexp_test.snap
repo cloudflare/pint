@@ -213,6 +213,60 @@
 
 ---
 
+[TestRegexpCheck/smelly_selector_/_multiple - 1]
+- description: smelly selector / multiple
+  content: |4
+    - record: foo
+      expr: |
+        sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
+  output: |
+    4 |     sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
+                                                         ^^^^^^^^^^^^^^^^^^^ `{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 177
+          firstcolumn: 46
+          lastcolumn: 64
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+- description: smelly selector / multiple
+  content: |4
+    - record: foo
+      expr: |
+        sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
+  output: |
+    4 |     sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
+                                                                                                                                                        ^^^^^^^^^^^^^^^^^^^ `{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+  problem:
+    reporter: promql/regexp
+    summary: smelly regexp selector
+    details: See [Prometheus documentation](https://prometheus.io/docs/prometheus/latest/querying/basics/#time-series-selectors) for details on how vector selectors work.
+    diagnostics:
+        - message: '`{env=~"production.*"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 177
+          firstcolumn: 141
+          lastcolumn: 159
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
 [TestRegexpCheck/static_match - 1]
 []
 
