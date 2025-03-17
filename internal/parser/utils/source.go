@@ -149,7 +149,10 @@ func walkNode(expr string, node promParser.Node) (src []Source) {
 		src = append(src, parseCall(expr, n)...)
 
 	case *promParser.MatrixSelector:
-		src = append(src, walkNode(expr, n.VectorSelector)...)
+		for _, s := range walkNode(expr, n.VectorSelector) {
+			s.Returns = promParser.ValueTypeMatrix
+			src = append(src, s)
+		}
 
 	case *promParser.SubqueryExpr:
 		src = append(src, walkNode(expr, n.Expr)...)
