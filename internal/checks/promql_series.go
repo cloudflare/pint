@@ -471,6 +471,8 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			if c.isLabelValueIgnored(settings, rule, selector, lm.Name) {
 				continue
 			}
+
+			pos := findMatcherPos(expr.Value.Value, selector.PosRange, lm)
 			labelSelector := promParser.VectorSelector{
 				Name:          metricName,
 				LabelMatchers: []*labels.Matcher{lm},
@@ -506,8 +508,8 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 						{
 							Message:     text,
 							Pos:         expr.Value.Pos,
-							FirstColumn: int(selector.PosRange.Start) + 1,
-							LastColumn:  int(selector.PosRange.End),
+							FirstColumn: int(pos.Start) + 1,
+							LastColumn:  int(pos.End) + 1,
 						},
 					},
 				})
@@ -576,8 +578,8 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 						{
 							Message:     text,
 							Pos:         expr.Value.Pos,
-							FirstColumn: int(selector.PosRange.Start) + 1,
-							LastColumn:  int(selector.PosRange.End),
+							FirstColumn: int(pos.Start) + 1,
+							LastColumn:  int(pos.End) + 1,
 						},
 					},
 				})
@@ -606,8 +608,8 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 								bareSelector.String(), lm.String(), promText(c.prom.Name(), trs.URI),
 								output.HumanizeDuration(avgLife(trsLabel.Series.Ranges))),
 							Pos:         expr.Value.Pos,
-							FirstColumn: int(selector.PosRange.Start) + 1,
-							LastColumn:  int(selector.PosRange.End),
+							FirstColumn: int(pos.Start) + 1,
+							LastColumn:  int(pos.End) + 1,
 						},
 					},
 				})

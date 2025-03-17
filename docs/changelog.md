@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.6
+
+### Fixed
+
+- [promql/series](checks/promql/series.md) check will now output more accurate comments.
+
 ## v0.71.5
 
 ### Fixed

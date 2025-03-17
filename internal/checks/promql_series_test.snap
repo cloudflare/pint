@@ -665,7 +665,7 @@
       expr: sum(sometimes{churn="notfound"})
   output: |
     2 |   expr: sum(sometimes{churn="notfound"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `sometimes` metric with `churn` label but there are no series matching `{churn="notfound"}` in the last 1w.
+                              ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `sometimes` metric with `churn` label but there are no series matching `{churn="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -676,8 +676,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 40
-          firstcolumn: 5
-          lastcolumn: 31
+          firstcolumn: 15
+          lastcolumn: 30
     lines:
         first: 2
         last: 2
@@ -699,7 +699,7 @@
       expr: sum(foo{error="notfound"})
   output: |
     4 |   expr: sum(foo{error="notfound"})
-                    ^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `foo` metric with `error` label but there are no series matching `{error="notfound"}` in the last 1w.
+                        ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `foo` metric with `error` label but there are no series matching `{error="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -710,8 +710,8 @@
             - line: 4
               firstcolumn: 9
               lastcolumn: 34
-          firstcolumn: 5
-          lastcolumn: 25
+          firstcolumn: 9
+          lastcolumn: 24
     lines:
         first: 4
         last: 4
@@ -764,7 +764,7 @@
       expr: sum(foo{error="notfound"})
   output: |
     3 |   expr: sum(foo{error="notfound"})
-                    ^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `foo` metric with `error` label but there are no series matching `{error="notfound"}` in the last 1w.
+                        ^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `foo` metric with `error` label but there are no series matching `{error="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -775,8 +775,8 @@
             - line: 3
               firstcolumn: 9
               lastcolumn: 34
-          firstcolumn: 5
-          lastcolumn: 25
+          firstcolumn: 9
+          lastcolumn: 24
     lines:
         first: 3
         last: 3
@@ -825,7 +825,7 @@
       expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
   output: |
     2 |   expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w. Metric name `found` matches `promql/series` check ignore regexp `^found$`.
+                          ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w. Metric name `found` matches `promql/series` check ignore regexp `^found$`.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -836,8 +836,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 89
-          firstcolumn: 5
-          lastcolumn: 80
+          firstcolumn: 11
+          lastcolumn: 29
     lines:
         first: 2
         last: 2
@@ -853,7 +853,7 @@
       expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
   output: |
     2 |   expr: sum(found{notfound="notfound", instance=~".+", not!="negative", instance!~"bad"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w.
+                          ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `notfound` label but there are no series matching `{notfound="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -864,8 +864,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 89
-          firstcolumn: 5
-          lastcolumn: 80
+          firstcolumn: 11
+          lastcolumn: 29
     lines:
         first: 2
         last: 2
@@ -881,7 +881,7 @@
       expr: sum({__name__="found", removed="xxx"})
   output: |
     2 |   expr: sum({__name__="found", removed="xxx"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but doesn't currently have series matching `{removed="xxx"}`, such series was last present 5d16h ago.
+                                       ^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but doesn't currently have series matching `{removed="xxx"}`, such series was last present 5d16h ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -892,8 +892,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 46
-          firstcolumn: 5
-          lastcolumn: 37
+          firstcolumn: 24
+          lastcolumn: 36
     lines:
         first: 2
         last: 2
@@ -937,7 +937,7 @@
       expr: sum({__name__="found", removed="xxx"})
   output: |
     4 |   expr: sum({__name__="found", removed="xxx"})
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but doesn't currently have series matching `{removed="xxx"}`, such series was last present 5d16h ago.
+                                       ^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric but doesn't currently have series matching `{removed="xxx"}`, such series was last present 5d16h ago.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -948,8 +948,8 @@
             - line: 4
               firstcolumn: 9
               lastcolumn: 46
-          firstcolumn: 5
-          lastcolumn: 37
+          firstcolumn: 24
+          lastcolumn: 36
     lines:
         first: 4
         last: 4
@@ -970,7 +970,7 @@
       expr: sum(found{sometimes="xxx"})
   output: |
     2 |   expr: sum(found{sometimes="xxx"})
-                    ^^^^^^^^^^^^^^^^^^^^^^ Metric `found` with label `{sometimes="xxx"}` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 18h45m.
+                          ^^^^^^^^^^^^^^^ Metric `found` with label `{sometimes="xxx"}` is only sometimes present on `prom` Prometheus server at https://simple.example.com with average life span of 18h45m.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -981,8 +981,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 35
-          firstcolumn: 5
-          lastcolumn: 26
+          firstcolumn: 11
+          lastcolumn: 25
     lines:
         first: 2
         last: 2
@@ -1031,7 +1031,7 @@
       expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
   output: |
     2 |   expr: rate({__name__=~"(foo|bar)_panics_total", job="myjob"}[2m]) > 0
-                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `{__name__=~"(foo|bar)_panics_total"}` metric with `job` label but there are no series matching `{job="myjob"}` in the last 1w.
+                                                          ^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `{__name__=~"(foo|bar)_panics_total"}` metric with `job` label but there are no series matching `{job="myjob"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1042,8 +1042,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 71
-          firstcolumn: 6
-          lastcolumn: 54
+          firstcolumn: 43
+          lastcolumn: 53
     lines:
         first: 2
         last: 2
@@ -1823,7 +1823,7 @@
       expr: found{job="notfound"}
   output: |
     2 |   expr: found{job="notfound"}
-                ^^^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `job` label but there are no series matching `{job="notfound"}` in the last 1w.
+                      ^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com has `found` metric with `job` label but there are no series matching `{job="notfound"}` in the last 1w.
   problem:
     reporter: promql/series
     summary: query on nonexistent series
@@ -1834,8 +1834,8 @@
             - line: 2
               firstcolumn: 9
               lastcolumn: 29
-          firstcolumn: 1
-          lastcolumn: 21
+          firstcolumn: 7
+          lastcolumn: 20
     lines:
         first: 2
         last: 2
