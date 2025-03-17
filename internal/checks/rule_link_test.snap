@@ -1,0 +1,158 @@
+
+[TestRuleLinkCheck/ignores_links_without_regexp_match - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/ignores_non_link_annotations - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/ignores_unparsable_link_annotations - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/link_with_200_OK - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/link_with_400_Bad_Request - 1]
+- description: link with 400 Bad Request
+  content: |-
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        link: http://127.0.0.1:XXXXX/dashboard
+  output: |
+    4 |     link: http://127.0.0.1:XXXXX/dashboard
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.
+  problem:
+    reporter: rule/link
+    summary: link check failed
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.'
+          pos:
+            - line: 4
+              firstcolumn: 11
+              lastcolumn: 42
+          firstcolumn: 1
+          lastcolumn: 32
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleLinkCheck/link_with_headers_set - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/link_with_invalid_URL - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/link_with_no_host - 1]
+- description: link with no host
+  content: |-
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        link: http://
+  output: |
+    4 |     link: http://
+                  ^^^^^^^ GET request for http: returned an error: Get "http:": http: no Host in request URL.
+  problem:
+    reporter: rule/link
+    summary: link check failed
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: 'GET request for http: returned an error: Get "http:": http: no Host in request URL.'
+          pos:
+            - line: 4
+              firstcolumn: 11
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 7
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleLinkCheck/link_with_rewrite_rule - 1]
+[]
+
+---
+
+[TestRuleLinkCheck/multiple_links,_400 - 1]
+- description: multiple links, 400
+  content: |-
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        link1: http://127.0.0.1:XXXXX/dashboard
+        link2: http://127.0.0.1:XXXXX/graph
+  output: |
+    4 |     link1: http://127.0.0.1:XXXXX/dashboard
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.
+  problem:
+    reporter: rule/link
+    summary: link check failed
+    details: ""
+    diagnostics:
+        - message: 'GET request for http://127.0.0.1:XXXXX/dashboard returned invalid status code: `400 Bad Request`.'
+          pos:
+            - line: 4
+              firstcolumn: 12
+              lastcolumn: 43
+          firstcolumn: 1
+          lastcolumn: 32
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+- description: multiple links, 400
+  content: |-
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        link1: http://127.0.0.1:XXXXX/dashboard
+        link2: http://127.0.0.1:XXXXX/graph
+  output: |
+    5 |     link2: http://127.0.0.1:XXXXX/graph
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET request for http://127.0.0.1:XXXXX/graph returned invalid status code: `400 Bad Request`.
+  problem:
+    reporter: rule/link
+    summary: link check failed
+    details: ""
+    diagnostics:
+        - message: 'GET request for http://127.0.0.1:XXXXX/graph returned invalid status code: `400 Bad Request`.'
+          pos:
+            - line: 5
+              firstcolumn: 12
+              lastcolumn: 39
+          firstcolumn: 1
+          lastcolumn: 28
+    lines:
+        first: 5
+        last: 5
+    severity: 1
+    anchor: 0
+
+---

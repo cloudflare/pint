@@ -1,0 +1,260 @@
+
+[TestRejectCheck/allowed_annotation - 1]
+[]
+
+---
+
+[TestRejectCheck/allowed_label_/_alerting - 1]
+[]
+
+---
+
+[TestRejectCheck/allowed_label_/_alerting#01 - 1]
+[]
+
+---
+
+[TestRejectCheck/allowed_label_/_alerting#02 - 1]
+[]
+
+---
+
+[TestRejectCheck/allowed_label_/_recording - 1]
+[]
+
+---
+
+[TestRejectCheck/no_rules_/_alerting - 1]
+[]
+
+---
+
+[TestRejectCheck/no_rules_/_recording - 1]
+[]
+
+---
+
+[TestRejectCheck/reject_templated_regexp_/_not_passing - 1]
+- description: reject templated regexp / not passing
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        alert: foo
+  output: |
+    4 |     alert: foo
+                   ^^ value is not allowed to match `^{{ $alert }}$`.
+  problem:
+    reporter: rule/reject
+    summary: value not allowed
+    details: ""
+    diagnostics:
+        - message: value is not allowed to match `^{{ $alert }}$`.
+          pos:
+            - line: 4
+              firstcolumn: 12
+              lastcolumn: 14
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRejectCheck/reject_templated_regexp_/_passing - 1]
+[]
+
+---
+
+[TestRejectCheck/rejected_annotation_key - 1]
+- description: rejected annotation key
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        bad: bar
+  output: |
+    4 |     bad: bar
+            ^^ key is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: key not allowed
+    details: ""
+    diagnostics:
+        - message: key is not allowed to match `^bad$`.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 0
+    anchor: 0
+
+---
+
+[TestRejectCheck/rejected_annotation_value - 1]
+- description: rejected annotation value
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        foo: bad
+  output: |
+    4 |     foo: bad
+                 ^^ value is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: value not allowed
+    details: ""
+    diagnostics:
+        - message: value is not allowed to match `^bad$`.
+          pos:
+            - line: 4
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRejectCheck/rejected_key_/_alerting - 1]
+- description: rejected key / alerting
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        bad: bar
+  output: |
+    4 |     bad: bar
+            ^^ key is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: key not allowed
+    details: ""
+    diagnostics:
+        - message: key is not allowed to match `^bad$`.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRejectCheck/rejected_key_/_don't_check_annotations - 1]
+[]
+
+---
+
+[TestRejectCheck/rejected_key_/_don't_check_labels - 1]
+[]
+
+---
+
+[TestRejectCheck/rejected_key_/_recording - 1]
+- description: rejected key / recording
+  content: |
+    - record: foo
+      expr: sum(foo)
+      labels:
+        bad: bar
+  output: |
+    4 |     bad: bar
+            ^^ key is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: key not allowed
+    details: ""
+    diagnostics:
+        - message: key is not allowed to match `^bad$`.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRejectCheck/rejected_value_/_alerting - 1]
+- description: rejected value / alerting
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bad
+  output: |
+    4 |     foo: bad
+                 ^^ value is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: value not allowed
+    details: ""
+    diagnostics:
+        - message: value is not allowed to match `^bad$`.
+          pos:
+            - line: 4
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRejectCheck/rejected_value_/_recording - 1]
+- description: rejected value / recording
+  content: |
+    - record: foo
+      expr: sum(foo)
+      labels:
+        foo: bad
+  output: |
+    4 |     foo: bad
+                 ^^ value is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: value not allowed
+    details: ""
+    diagnostics:
+        - message: value is not allowed to match `^bad$`.
+          pos:
+            - line: 4
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---

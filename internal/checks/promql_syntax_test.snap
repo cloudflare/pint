@@ -1,0 +1,38 @@
+
+[TestSyntaxCheck/unclosed_left_parenthesis - 1]
+- description: unclosed left parenthesis
+  content: |-
+    - record: foo
+      expr: sum(foo) by(
+  output: |
+    2 |   expr: sum(foo) by(
+                           ^ unclosed left parenthesis
+  problem:
+    reporter: promql/syntax
+    summary: PromQL syntax error
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.'
+    diagnostics:
+        - message: unclosed left parenthesis
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 20
+          firstcolumn: 13
+          lastcolumn: 12
+    lines:
+        first: 2
+        last: 2
+    severity: 3
+    anchor: 0
+
+---
+
+[TestSyntaxCheck/valid_alerting_rule - 1]
+[]
+
+---
+
+[TestSyntaxCheck/valid_recording_rule - 1]
+[]
+
+---

@@ -1,0 +1,333 @@
+
+[TestCounterCheck/500_error_from_Prometheus_API - 1]
+- description: 500 error from Prometheus API
+  content: |
+    - record: foo
+      expr: http_requests_total > 1
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+  problem:
+    reporter: promql/counter
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestCounterCheck/absent(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/absent_over_time(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/changes(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/count(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/count_over_time(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/counter - 1]
+[]
+
+---
+
+[TestCounterCheck/counter_==_1_and_counter_>_2_or_counter_<_3 - 1]
+- description: counter == 1 and counter > 2 or counter < 3
+  content: |4-
+    - alert: my alert
+      expr: http_requests_total == 1 and http_requests_total > 2 or http_requests_total < 3
+  output: |
+    3 |   expr: http_requests_total == 1 and http_requests_total > 2 or http_requests_total < 3
+                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 87
+          firstcolumn: 1
+          lastcolumn: 19
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/counter_>_1 - 1]
+- description: counter > 1
+  content: |
+    - alert: my alert
+      expr: http_requests_total > 1
+  output: |
+    2 |   expr: http_requests_total > 1
+                ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 31
+          firstcolumn: 1
+          lastcolumn: 19
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/counter_>_1_/_mixed_metadata - 1]
+[]
+
+---
+
+[TestCounterCheck/counter_>_1_/_no_metadata - 1]
+[]
+
+---
+
+[TestCounterCheck/counter_>_1_unless_ok - 1]
+- description: counter > 1 unless ok
+  content: |4
+    - alert: my alert
+      expr:  http_requests_total{cluster="prod"} > 1 unless absent(http_requests_total{cluster="dev"})
+  output: |
+    3 |   expr:  http_requests_total{cluster="prod"} > 1 unless absent(http_requests_total{cluster="dev"})
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+          pos:
+            - line: 3
+              firstcolumn: 10
+              lastcolumn: 98
+          firstcolumn: 1
+          lastcolumn: 35
+    lines:
+        first: 3
+        last: 3
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/delta(counter[2m])_>_1 - 1]
+- description: delta(counter[2m]) > 1
+  content: |
+    - alert: my alert
+      expr: delta(http_requests_total[2m]) > 1
+  output: |
+    2 |   expr: delta(http_requests_total[2m]) > 1
+                      ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 42
+          firstcolumn: 7
+          lastcolumn: 25
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/group(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestCounterCheck/increase(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/invalid_status - 1]
+- description: invalid status
+  content: |
+    - record: foo
+      expr: http_requests_total > 1
+  output: |
+    1 | - record: foo
+                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+  problem:
+    reporter: promql/counter
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/ok_unless_counter - 1]
+[]
+
+---
+
+[TestCounterCheck/present_over_time(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/rate(counter)_>_1 - 1]
+[]
+
+---
+
+[TestCounterCheck/resets(counter) - 1]
+[]
+
+---
+
+[TestCounterCheck/sum(counter)_>_1 - 1]
+- description: sum(counter) > 1
+  content: |
+    - alert: my alert
+      expr: sum(http_requests_total) > 1
+  output: |
+    2 |   expr: sum(http_requests_total) > 1
+                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 36
+          firstcolumn: 5
+          lastcolumn: 23
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/sum(counter)_>_1#01 - 1]
+- description: sum(counter) > 1
+  content: |
+    - alert: my alert
+      expr: sum(http_requests_total) > 1
+  output: |
+    2 |   expr: sum(http_requests_total) > 1
+                    ^^^^^^^^^^^^^^^^^^^ `http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.
+  problem:
+    reporter: promql/counter
+    summary: direct counter read
+    details: |-
+        [Counters](https://prometheus.io/docs/concepts/metric_types/#counter) track the number of events over time and so the value of a counter can only grow and never decrease.
+        This means that the absolute value of a counter doesn't matter, it will be a random number that depends on the number of events that happened since your application was started.
+        To use the value of a counter in PromQL you most likely want to calculate the rate of events using the [rate()](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) function, or any other function that is safe to use with counters.
+        Once you calculate the rate you can use that result in other functions or aggregations that are not counter safe, like [sum()](https://prometheus.io/docs/prometheus/latest/querying/operators/#aggregation-operators).
+    diagnostics:
+        - message: '`http_requests_total` is a counter according to metrics metadata from `prom` Prometheus server at https://simple.example.com, it can be dangarous to use its value directly.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 36
+          firstcolumn: 5
+          lastcolumn: 23
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestCounterCheck/sum(rate(counter))_>_1 - 1]
+[]
+
+---
+
+[TestCounterCheck/timestamp(counter) - 1]
+[]
+
+---

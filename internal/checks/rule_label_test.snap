@@ -1,0 +1,607 @@
+
+[TestLabelCheck/doesn't_ignore_rules_with_syntax_errors - 1]
+- description: doesn't ignore rules with syntax errors
+  content: |
+    - record: foo
+      expr: sum(foo) without(
+  output: |
+    2 |   expr: sum(foo) without(
+                ^^^ `severity` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`severity` label is required.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 25
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/empty_label_in_alerting_rule_/_required - 1]
+- description: empty label in alerting rule / required
+  content: |4
+    - alert: foo
+      expr: rate(foo[1m])
+      labels:
+        foo: bar
+        severity:
+        level: warning
+  output: |
+    7 |     level: warning
+            ^^^ `severity` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: ""
+    diagnostics:
+        - message: '`severity` label is required.'
+          pos:
+            - line: 7
+              firstcolumn: 5
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 2
+        last: 7
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/empty_label_in_recording_rule_/_required - 1]
+- description: empty label in recording rule / required
+  content: |4
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        foo: bar
+        severity:
+        level: warning
+  output: |
+    4 |   labels:
+          ^^^^^^ `severity` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: ""
+    diagnostics:
+        - message: '`severity` label is required.'
+          pos:
+            - line: 4
+              firstcolumn: 3
+              lastcolumn: 8
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 7
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_alerting_rule_/_not_required - 1]
+- description: invalid value in alerting rule / not required
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      labels:
+        severity: warning
+  output: |
+    4 |     severity: warning
+                      ^^^^^^^ `severity` label value must match `^critical|info$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical|info$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 7
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_alerting_rule_/_required - 1]
+- description: invalid value in alerting rule / required
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      labels:
+        severity: warning
+  output: |
+    4 |     severity: warning
+                      ^^^^^^^ `severity` label value must match `^critical|info$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical|info$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 7
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_alerting_rule_/_token_/_valueRe - 1]
+- description: invalid value in alerting rule / token / valueRe
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      labels:
+        components: api db
+  output: |
+    4 |     components: api db
+                        ^^^^^^ `components` label value must match `^api|memcached$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`components` label value must match `^api|memcached$`.'
+          pos:
+            - line: 4
+              firstcolumn: 17
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_alerting_rule_/_token_/_values - 1]
+- description: invalid value in alerting rule / token / values
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      labels:
+        components: api db
+  output: |
+    4 |     components: api db
+                        ^^^^^^ `components` label value is not one of valid values.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: |-
+        List of allowed values:
+
+        - `api`
+        - `memcached`
+        - `storage`
+        - `prometheus`
+        - `kvm`
+        - `mysql`
+
+        And 3 other value(s).
+    diagnostics:
+        - message: '`components` label value is not one of valid values.'
+          pos:
+            - line: 4
+              firstcolumn: 17
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_recording_rule_/_not_required - 1]
+- description: invalid value in recording rule / not required
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        severity: warning
+  output: |
+    4 |     severity: warning
+                      ^^^^^^^ `severity` label value must match `^critical$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 7
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_recording_rule_/_required - 1]
+- description: invalid value in recording rule / required
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        severity: warning
+  output: |
+    4 |     severity: warning
+                      ^^^^^^^ `severity` label value must match `^critical$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 7
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_recording_rule_/_token_/_valueRe - 1]
+- description: invalid value in recording rule / token / valueRe
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        components: api db
+  output: |
+    4 |     components: api db
+                        ^^^^^^ `components` label value must match `^api|memcached$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`components` label value must match `^api|memcached$`.'
+          pos:
+            - line: 4
+              firstcolumn: 17
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_recording_rule_/_token_/_values - 1]
+- description: invalid value in recording rule / token / values
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        components: api db
+  output: |
+    4 |     components: api db
+                        ^^^^^^ `components` label value is not one of valid values.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: |-
+        List of allowed values:
+
+        - `api`
+        - `memcached`
+        - `storage`
+        - `prometheus`
+        - `kvm`
+        - `mysql`
+        - `memsql`
+        - `haproxy`
+
+        Rule comment: some text
+    diagnostics:
+        - message: '`components` label value is not one of valid values.'
+          pos:
+            - line: 4
+              firstcolumn: 17
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/missing_label_in_alerting_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/missing_label_in_alerting_rule_/_required - 1]
+- description: missing label in alerting rule / required
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      labels:
+        foo: bar
+  output: |
+    4 |     foo: bar
+            ^^^ `severity` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: ""
+    diagnostics:
+        - message: '`severity` label is required.'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/missing_label_in_recording_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/missing_label_in_recording_rule_/_required - 1]
+- description: missing label in recording rule / required
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        foo: bar
+        bob: alice
+  output: |
+    3 |   labels:
+          ^^^^^^ `sev.+` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: ""
+    diagnostics:
+        - message: '`sev.+` label is required.'
+          pos:
+            - line: 3
+              firstcolumn: 3
+              lastcolumn: 8
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 3
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/no_labels_in_alerting_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/no_labels_in_alerting_rule_/_required - 1]
+- description: no labels in alerting rule / required
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+  output: |
+    2 |   expr: rate(foo[1m])
+                ^^^ `severity` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: ""
+    diagnostics:
+        - message: '`severity` label is required.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/no_labels_in_recording_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/no_labels_in_recording_rule_/_required - 1]
+- description: no labels in recording rule / required
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+  output: |
+    2 |   expr: rate(foo[1m])
+                ^^^ `severity` label is required.
+  problem:
+    reporter: rule/label
+    summary: required label not set
+    details: ""
+    diagnostics:
+        - message: '`severity` label is required.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/templated_label_value_/_not_passing - 1]
+- description: templated label value / not passing
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      for: 4m
+      labels:
+        for: 'must wait 5m to fire'
+  output: |
+    5 |     for: 'must wait 5m to fire'
+                  ^^^^^^^^^^^^^^^^^^^^ `for` label value must match `^must wait {{$for}} to fire$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`for` label value must match `^must wait {{$for}} to fire$`.'
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 30
+          firstcolumn: 1
+          lastcolumn: 20
+    lines:
+        first: 5
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/templated_label_value_/_passing - 1]
+[]
+
+---
+
+[TestLabelCheck/typo_in_recording_rule_/_not_required - 1]
+- description: typo in recording rule / not required
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        priority: 2a
+  output: |
+    4 |     priority: 2a
+                      ^^ `priority` label value must match `^(1|2|3)$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`priority` label value must match `^(1|2|3)$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/typo_in_recording_rule_/_required - 1]
+- description: typo in recording rule / required
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+      labels:
+        priority: 2a
+  output: |
+    4 |     priority: 2a
+                      ^^ `priority` label value must match `^(1|2|3)$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`priority` label value must match `^(1|2|3)$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/valid_alerting_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/valid_alerting_rule_/_required - 1]
+[]
+
+---
+
+[TestLabelCheck/valid_recording_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/valid_recording_rule_/_required - 1]
+[]
+
+---

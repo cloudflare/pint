@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -17,21 +16,7 @@ func TestRuleName(t *testing.T) {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.RuleNameCheckName,
-						Summary:  "name not allowed",
-						Details:  "Rule comment: some text",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "recording rule name must match `^total:.+$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "recording rule name match",
@@ -40,7 +25,6 @@ func TestRuleName(t *testing.T) {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "alerting rule name doesn't match",
@@ -49,21 +33,7 @@ func TestRuleName(t *testing.T) {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.RuleNameCheckName,
-						Summary:  "name not allowed",
-						Details:  "Rule comment: some text",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "alerting rule name must match `^total:.+$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "alerting rule name match",
@@ -72,7 +42,6 @@ func TestRuleName(t *testing.T) {
 				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 	}
 	runTests(t, testCases)

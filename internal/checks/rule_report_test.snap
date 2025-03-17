@@ -1,0 +1,58 @@
+
+[TestReportCheck/report_passed_problem_/_info - 1]
+- description: report passed problem / info
+  content: |
+    - record: foo
+      expr: sum(foo)
+  output: |
+    1 | - record: foo
+                  ^^^ problem reported
+  problem:
+    reporter: rule/report
+    summary: problem reported by config rule
+    details: ""
+    diagnostics:
+        - message: problem reported
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 0
+    anchor: 0
+
+---
+
+[TestReportCheck/report_passed_problem_/_warning - 1]
+- description: report passed problem / warning
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        alert: foo
+  output: |
+    1 | - alert: foo
+                 ^^^ problem reported
+  problem:
+    reporter: rule/report
+    summary: problem reported by config rule
+    details: ""
+    diagnostics:
+        - message: problem reported
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 12
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 4
+    severity: 1
+    anchor: 0
+
+---

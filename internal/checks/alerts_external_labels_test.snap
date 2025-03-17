@@ -1,0 +1,187 @@
+
+[TestAlertsExternalLabelsCountCheck/all_labels_present - 1]
+[]
+
+---
+
+[TestAlertsExternalLabelsCountCheck/bad_request - 1]
+- description: bad request
+  content: |4
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: "{{ $labels.job }} is down"
+        cluster: "This is {{ .ExternalLabels.cluster }} cluster"
+      labels:
+        job: "{{ $labels.job }}"
+        twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+        cluster: "{{ $externalLabels.cluster }}"
+  output: |
+    2 | - alert: Foo Is Down
+                 ^^^^^^^^^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+  problem:
+    reporter: alerts/external_labels
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+          pos:
+            - line: 2
+              firstcolumn: 10
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 11
+    lines:
+        first: 2
+        last: 10
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsExternalLabelsCountCheck/config_404 - 1]
+[]
+
+---
+
+[TestAlertsExternalLabelsCountCheck/connection_refused_/_upstream_not_required_/_warning - 1]
+- description: connection refused / upstream not required / warning
+  content: |4
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: "{{ $labels.job }} is down"
+        cluster: "This is {{ .ExternalLabels.cluster }} cluster"
+      labels:
+        job: "{{ $labels.job }}"
+        twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+        cluster: "{{ $externalLabels.cluster }}"
+  output: |
+    2 | - alert: Foo Is Down
+                 ^^^^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+  problem:
+    reporter: alerts/external_labels
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+          pos:
+            - line: 2
+              firstcolumn: 10
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 11
+    lines:
+        first: 2
+        last: 10
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAlertsExternalLabelsCountCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestAlertsExternalLabelsCountCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestAlertsExternalLabelsCountCheck/no_cluster_label - 1]
+- description: no cluster label
+  content: |4
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: "{{ $labels.job }} is down"
+        cluster: "This is {{ .ExternalLabels.cluster }} cluster"
+      labels:
+        job: "{{ $labels.job }}"
+        twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+        cluster: "{{ $externalLabels.cluster }}"
+  output: |
+    9 |     twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+  problem:
+    reporter: alerts/external_labels
+    summary: invalid label
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+          pos:
+            - line: 9
+              firstcolumn: 13
+              lastcolumn: 73
+          firstcolumn: 1
+          lastcolumn: 61
+    lines:
+        first: 9
+        last: 9
+    severity: 2
+    anchor: 0
+- description: no cluster label
+  content: |4
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: "{{ $labels.job }} is down"
+        cluster: "This is {{ .ExternalLabels.cluster }} cluster"
+      labels:
+        job: "{{ $labels.job }}"
+        twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+        cluster: "{{ $externalLabels.cluster }}"
+  output: |
+    10 |     cluster: "{{ $externalLabels.cluster }}"
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+  problem:
+    reporter: alerts/external_labels
+    summary: invalid label
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+          pos:
+            - line: 10
+              firstcolumn: 15
+              lastcolumn: 43
+          firstcolumn: 1
+          lastcolumn: 29
+    lines:
+        first: 10
+        last: 10
+    severity: 2
+    anchor: 0
+- description: no cluster label
+  content: |4
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: "{{ $labels.job }} is down"
+        cluster: "This is {{ .ExternalLabels.cluster }} cluster"
+      labels:
+        job: "{{ $labels.job }}"
+        twice: "{{ $externalLabels.cluster }} / {{ $externalLabels.cluster }}"
+        cluster: "{{ $externalLabels.cluster }}"
+  output: |
+    6 |     cluster: "This is {{ .ExternalLabels.cluster }} cluster"
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+  problem:
+    reporter: alerts/external_labels
+    summary: invalid label
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+          pos:
+            - line: 6
+              firstcolumn: 15
+              lastcolumn: 59
+          firstcolumn: 1
+          lastcolumn: 45
+    lines:
+        first: 6
+        last: 6
+    severity: 2
+    anchor: 0
+
+---

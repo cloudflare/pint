@@ -1,0 +1,96 @@
+
+[TestRuleDuplicateCheck/ignores_different_Prometheus_servers - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/ignores_entries_with_path_errors - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/ignores_self - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/multiple_different_rules - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/multiple_rules_with_different_labels - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/multiple_rules_with_same_labels - 1]
+- description: multiple rules with same labels
+  content: |
+    - record: foo
+      expr: up == 0
+  output: |
+    1 | - record: foo
+                  ^^^ Duplicated rule, identical rule found at fake.yml:6.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated recording rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found at fake.yml:6.
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/same_expr_but_formatted_differently - 1]
+- description: same expr but formatted differently
+  content: |
+    - record: job:up:sum
+      expr: sum(up) by(job)
+  output: |
+    1 | - record: job:up:sum
+                  ^^^^^^^^^^ Duplicated rule, identical rule found at fake.yml:6.
+  problem:
+    reporter: rule/duplicate
+    summary: duplicated recording rule
+    details: ""
+    diagnostics:
+        - message: Duplicated rule, identical rule found at fake.yml:6.
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 10
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRuleDuplicateCheck/skip_alerting_entries - 1]
+[]
+
+---
+
+[TestRuleDuplicateCheck/skip_broken_entries - 1]
+[]
+
+---

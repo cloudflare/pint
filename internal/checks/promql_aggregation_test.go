@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -17,7 +16,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "name must match / recording",
@@ -26,7 +24,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp("bar"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "name must match  /alerting",
@@ -35,7 +32,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp("bar"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "uses label from labels map / recording",
@@ -44,7 +40,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "uses label from labels map / alerting",
@@ -53,7 +48,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "must keep job label / warning",
@@ -64,23 +58,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must keep job label / bug",
@@ -89,24 +67,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "some text", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Details:  "Rule comment: some text",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(instance, job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must strip job label",
@@ -116,20 +77,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "label must be removed in aggregations",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`job` label should be removed when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must strip job label / being stripped",
@@ -138,7 +86,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "must strip job label / empty without",
@@ -147,7 +94,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "nested rule must keep job label",
@@ -157,23 +103,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "passing most outer aggregation should stop further strip checks",
@@ -182,7 +112,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "instance", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "passing most outer aggregation should stop further checks",
@@ -192,20 +121,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "instance", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "label must be removed in aggregations",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`instance` label should be removed when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "passing most outer aggregation should continue further keep checks",
@@ -214,23 +130,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "Right hand side of AND is ignored",
@@ -239,7 +139,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "Left hand side of AND is checked",
@@ -248,23 +147,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "Right hand side of group_left() is ignored",
@@ -273,7 +156,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "Left hand side of group_left() is checked",
@@ -282,23 +164,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "Left hand side of group_right() is ignored",
@@ -307,7 +173,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "Right hand side of group_right() is checked",
@@ -316,23 +181,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "nested count",
@@ -341,7 +190,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "instance", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 
 		{
@@ -351,7 +199,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "name must match",
@@ -360,7 +207,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp("bar"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "uses label from labels map",
@@ -369,7 +215,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "must keep job label / warning",
@@ -379,23 +224,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must keep job label / bug",
@@ -404,23 +233,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must strip job label",
@@ -430,20 +243,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "label must be removed in aggregations",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`job` label should be removed when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must strip job label / being stripped",
@@ -452,7 +252,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "nested rule must keep job label",
@@ -462,23 +261,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "Right hand side of AND is ignored",
@@ -487,7 +270,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "Left hand side of AND is checked",
@@ -497,23 +279,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "Right hand side of group_left() is ignored",
@@ -522,7 +288,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "Left hand side of group_left() is checked",
@@ -532,23 +297,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "Left hand side of group_right() is ignored",
@@ -557,7 +306,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "Right hand side of group_right() is checked",
@@ -567,23 +315,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(type)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "nested count",
@@ -592,7 +324,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "instance", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "nested count AND nested count",
@@ -601,7 +332,6 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "instance", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "nested by(without())",
@@ -611,23 +341,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "nested by(without())",
@@ -636,23 +350,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "nested by(without())",
@@ -662,23 +360,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "nested by(without())",
@@ -689,20 +371,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "instance", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "label must be removed in aggregations",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`instance` label should be removed when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must keep job label / sum()",
@@ -711,23 +380,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation that removes all labels.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must keep job label / sum() by()",
@@ -736,23 +389,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "required label is being removed via aggregation",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Query is using aggregation that removes all labels.",
-							},
-							{
-								Message: "`job` label is required and should be preserved when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "must strip job label / sum() without()",
@@ -761,20 +398,7 @@ func TestAggregationCheck(t *testing.T) {
 				return checks.NewAggregationCheck(checks.MustTemplatedRegexp(".+"), "job", false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AggregationCheckName,
-						Summary:  "label must be removed in aggregations",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`job` label should be removed when aggregating all rules.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 	}
 	runTests(t, testCases)

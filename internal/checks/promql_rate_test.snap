@@ -1,0 +1,717 @@
+
+[TestRateCheck/500_error_from_Prometheus_API - 1]
+- description: 500 error from Prometheus API
+  content: |
+    - record: foo
+      expr: rate(foo[5m])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+  problem:
+    reporter: promql/rate
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/config_404 - 1]
+[]
+
+---
+
+[TestRateCheck/connection_refused - 1]
+- description: connection refused
+  content: |
+    - record: foo
+      expr: rate(foo[5m])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.
+  problem:
+    reporter: promql/rate
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:1111 connection error: `connection refused`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/deriv_<_2x_scrape_interval - 1]
+- description: deriv < 2x scrape_interval
+  content: |
+    - record: foo
+      expr: deriv(foo[1m])
+  output: |
+    2 |   expr: deriv(foo[1m])
+                ^^^^^^^^^^^^^^ Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `deriv()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/deriv_==_2x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/empty_metadata_response - 1]
+[]
+
+---
+
+[TestRateCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestRateCheck/invalid_YAML - 1]
+- description: invalid YAML
+  content: |
+    - record: foo
+      expr: rate(foo[5m])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected ':'`.
+  problem:
+    reporter: promql/rate
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `failed to decode config data in http://127.0.0.1:XXXXX response: yaml: line 2: could not find expected '':''`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/invalid_status - 1]
+- description: invalid status
+  content: |
+    - record: foo
+      expr: rate(foo[5m])
+  output: |
+    1 | - record: foo
+                  ^^^ `prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.
+  problem:
+    reporter: promql/rate
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: '`prom` Prometheus server at http://127.0.0.1:XXXXX failed with: `bad_data: bad input data`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/irate_<_2x_scrape_interval - 1]
+- description: irate < 2x scrape_interval
+  content: |
+    - record: foo
+      expr: irate(foo[1m])
+  output: |
+    2 |   expr: irate(foo[1m])
+                ^^^^^^^^^^^^^^ Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `irate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/irate_<_3x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/irate_==_3_x_default_1m - 1]
+[]
+
+---
+
+[TestRateCheck/irate_==_3x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/irate{__name__=~}_<_3x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/irate{__name__=~}_>_3x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/irate{__name__}_<_3x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/irate{__name__}_>_3x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/metadata_404 - 1]
+[]
+
+---
+
+[TestRateCheck/metadata_error - 1]
+- description: metadata error
+  content: |
+    - record: foo
+      expr: rate(foo{job="xxx"}[1m])
+  output: |
+    2 |   expr: rate(foo{job="xxx"}[1m])
+                ^^^^^^^^^^^^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 24
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+- description: metadata error
+  content: |
+    - record: foo
+      expr: rate(foo{job="xxx"}[1m])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+  problem:
+    reporter: promql/rate
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/metadata_unsupported - 1]
+- description: metadata unsupported
+  content: |
+    - record: foo
+      expr: rate(foo{job="xxx"}[1m])
+  output: |
+    2 |   expr: rate(foo{job="xxx"}[1m])
+                ^^^^^^^^^^^^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 24
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/nested_invalid_rate - 1]
+- description: nested invalid rate
+  content: |
+    - record: foo
+      expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))
+  output: |
+    2 |   expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))
+                                         ^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 47
+          firstcolumn: 26
+          lastcolumn: 38
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate(counter)__/_rate(gauge) - 1]
+- description: rate(counter)  / rate(gauge)
+  content: |
+    - record: foo
+      expr: rate(foo_c[2m]) / rate(bar_g[2m])
+  output: |
+    2 |   expr: rate(foo_c[2m]) / rate(bar_g[2m])
+                                  ^^^^^^^^^^^^^^^ `rate()` should only be used with counters but `bar_g` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/rate
+    summary: counter based function called on a non-counter
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: '`rate()` should only be used with counters but `bar_g` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 41
+          firstcolumn: 19
+          lastcolumn: 33
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate(foo)_/_rate(foo)_/_sum(rate(foo)) - 1]
+- description: rate(foo) / rate(foo) / sum(rate(foo))
+  content: |
+    - record: foo
+      expr: rate(foo[2m]) / rate(foo[2m]) / sum(rate(foo[2m]))
+  output: |
+    2 |   expr: rate(foo[2m]) / rate(foo[2m]) / sum(rate(foo[2m]))
+                ^^^^^^^^^^^^^ `rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/rate
+    summary: counter based function called on a non-counter
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 58
+          firstcolumn: 1
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate(gauge)_<_2x_scrape_interval - 1]
+- description: rate(gauge) < 2x scrape interval
+  content: |
+    - record: foo
+      expr: rate(foo{job="xxx"}[1m])
+  output: |
+    2 |   expr: rate(foo{job="xxx"}[1m])
+                ^^^^^^^^^^^^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 24
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+- description: rate(gauge) < 2x scrape interval
+  content: |
+    - record: foo
+      expr: rate(foo{job="xxx"}[1m])
+  output: |
+    2 |   expr: rate(foo{job="xxx"}[1m])
+                ^^^^^^^^^^^^^^^^^^^^^^^^ `rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.
+  problem:
+    reporter: promql/rate
+    summary: counter based function called on a non-counter
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: '`rate()` should only be used with counters but `foo` is a gauge according to metrics metadata from `prom` Prometheus server at https://simple.example.com.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 24
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate(unknown) - 1]
+[]
+
+---
+
+[TestRateCheck/rate_<_2x_scrape_interval - 1]
+- description: rate < 2x scrape_interval
+  content: |
+    - record: foo
+      expr: rate(foo[1m])
+  output: |
+    2 |   expr: rate(foo[1m])
+                ^^^^^^^^^^^^^ Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+  problem:
+    reporter: promql/rate
+    summary: duration too small
+    details: |-
+        Using [rate](https://prometheus.io/docs/prometheus/latest/querying/functions/#rate) and [irate](https://prometheus.io/docs/prometheus/latest/querying/functions/#irate) function comes with a few requirements:
+
+        - The metric you calculate (i)rate from must be a counter or native histograms.
+        - The time window of the (i)rate function must have at least 2 samples.
+
+        The type of your metric is defined by the application that exports that metric.
+        The number of samples depends on how often your application is being scraped by Prometheus.
+        Each scrape produces a sample, so if your application is scrape every minute then the minimal time window you can use is two minutes.
+    diagnostics:
+        - message: Duration for `rate()` must be at least 2 x scrape_interval, `prom` Prometheus server at https://simple.example.com is using `1m` scrape_interval.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate_<_4x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/rate_==_4x_scrape_interval - 1]
+[]
+
+---
+
+[TestRateCheck/rate_over_non_aggregate - 1]
+[]
+
+---
+
+[TestRateCheck/rate_over_sum - 1]
+- description: rate_over_sum
+  content: |
+    - alert: my alert
+      expr: rate(my:sum[5m])
+  output: |
+    2 |   expr: rate(my:sum[5m])
+                    ^^^ `rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called here on results of `sum(foo)`.
+  problem:
+    reporter: promql/rate
+    summary: chained rate call
+    details: You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
+    diagnostics:
+        - message: '`rate(sum(counter))` chain detected, `rate(my:sum[5m])` is called here on results of `sum(foo)`.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 24
+          firstcolumn: 5
+          lastcolumn: 7
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate_over_sum_error - 1]
+- description: rate_over_sum_error
+  content: |
+    - alert: my alert
+      expr: rate(my:sum[5m])
+  output: |
+    1 | - alert: my alert
+                 ^^^^^^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+  problem:
+    reporter: promql/rate
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+          pos:
+            - line: 1
+              firstcolumn: 10
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRateCheck/rate_over_sum_on_gauge - 1]
+[]
+
+---
+
+[TestRateCheck/sum(rate(sum))_/_sum(rate(sum)) - 1]
+- description: sum(rate(sum)) / sum(rate(sum))
+  content: |4
+    - alert: Plexi_Worker_High_Signing_Latency
+      expr: |
+        sum(
+          rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
+        ) by (environment, namespace)
+        /
+        sum(
+          rate(global:response_time_count{namespace!~"test[.].+"}[15m])
+        ) by (environment, namespace)
+        > 3000
+  output: |4
+     4 |     sum(
+     5 |       rate(global:response_time_sum{namespace!~"test[.].+"}[15m])
+             ^^^^^^^^^^^^^^^^^^^^^^^ `rate(sum(counter))` chain detected, `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])` is called here on results of `sum(response_time_sum:rate2m)`.
+     6 |     ) by (environment, namespace)
+     7 |     /
+     8 |     sum(
+     9 |       rate(global:response_time_count{namespace!~"test[.].+"}[15m])
+    10 |     ) by (environment, namespace)
+    11 |     > 3000
+  problem:
+    reporter: promql/rate
+    summary: chained rate call
+    details: You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`
+    diagnostics:
+        - message: '`rate(sum(counter))` chain detected, `rate(global:response_time_sum{namespace!~"test[.].+"}[15m])` is called here on results of `sum(response_time_sum:rate2m)`.'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 9
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 66
+            - line: 6
+              firstcolumn: 5
+              lastcolumn: 34
+            - line: 7
+              firstcolumn: 5
+              lastcolumn: 6
+            - line: 8
+              firstcolumn: 5
+              lastcolumn: 9
+            - line: 9
+              firstcolumn: 5
+              lastcolumn: 68
+            - line: 10
+              firstcolumn: 5
+              lastcolumn: 34
+            - line: 11
+              firstcolumn: 5
+              lastcolumn: 10
+          firstcolumn: 5
+          lastcolumn: 28
+    lines:
+        first: 4
+        last: 11
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRateCheck/sum_over_rate - 1]
+[]
+
+---
+
+[TestRateCheck/sum_over_rate_/_ignore_entry_with_PathError - 1]
+[]
+
+---
+
+[TestRateCheck/sum_over_rate_/_ignore_entry_with_rule_error - 1]
+[]
+
+---
+
+[TestRateCheck/valid_range_selector - 1]
+[]
+
+---

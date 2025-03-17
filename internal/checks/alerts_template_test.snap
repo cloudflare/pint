@@ -1,0 +1,2321 @@
+
+[TestTemplateCheck/$value_|_first - 1]
+- description: $value | first
+  content: |4
+    - alert: Foo
+      expr: rate(errors[2m])
+      annotations:
+        summary: "{{ $value | first }} errors"
+  output: |
+    5 |     summary: "{{ $value | first }} errors"
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `124: executing "summary" at <first>: wrong type for value; expected template.queryResult; got float64`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `124: executing "summary" at <first>: wrong type for value; expected template.queryResult; got float64`.'
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 41
+          firstcolumn: 1
+          lastcolumn: 27
+    lines:
+        first: 5
+        last: 5
+    severity: 3
+    anchor: 0
+- description: $value | first
+  content: |4
+    - alert: Foo
+      expr: rate(errors[2m])
+      annotations:
+        summary: "{{ $value | first }} errors"
+  output: |
+    3 |   expr: rate(errors[2m])
+                ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: "{{ $value | first }} errors"
+                         ^^^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`rate()` will produce results that are hard to read for humans.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 24
+          firstcolumn: 1
+          lastcolumn: 16
+        - message: Use one of humanize template functions to make the result more readable.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 41
+          firstcolumn: 4
+          lastcolumn: 10
+    lines:
+        first: 3
+        last: 5
+    severity: 0
+    anchor: 0
+
+---
+
+[TestTemplateCheck/abs_/_scalar - 1]
+[]
+
+---
+
+[TestTemplateCheck/absent()_*_on()_group_left()_bar - 1]
+- description: absent() * on() group_left() bar
+  content: |4
+    - alert: Foo
+      expr: absent(foo{job="xxx"}) * on() group_left() bar
+      annotations:
+        summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+  output: |
+    3 |   expr: absent(foo{job="xxx"}) * on() group_left() bar
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+                                                            ^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `cluster` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 91
+          firstcolumn: 39
+          lastcolumn: 46
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 54
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+- description: absent() * on() group_left() bar
+  content: |4
+    - alert: Foo
+      expr: absent(foo{job="xxx"}) * on() group_left() bar
+      annotations:
+        summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+  output: |
+    3 |   expr: absent(foo{job="xxx"}) * on() group_left() bar
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+                                                                                 ^^^^ Template is using `env` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `env` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 91
+          firstcolumn: 60
+          lastcolumn: 63
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 54
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/absent()_*_on()_group_left(...)_foo - 1]
+[]
+
+---
+
+[TestTemplateCheck/annotation_label_from_number - 1]
+- description: annotation label from number
+  content: |
+    - alert: DeadMansSwitch
+      expr: 1 > bool 0
+      annotations:
+        summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
+  output: |
+    2 |   expr: 1 > bool 0
+                ^ This query returns a number value with no labels.
+      | [...]
+    4 |     summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
+                                                   ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 85
+          firstcolumn: 30
+          lastcolumn: 38
+        - message: This query returns a number value with no labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 18
+          firstcolumn: 1
+          lastcolumn: 1
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+- description: annotation label from number
+  content: |
+    - alert: DeadMansSwitch
+      expr: 1 > bool 0
+      annotations:
+        summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
+  output: |
+    2 |   expr: 1 > bool 0
+                ^ This query returns a number value with no labels.
+      | [...]
+    4 |     summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'
+                                                                            ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 85
+          firstcolumn: 55
+          lastcolumn: 58
+        - message: This query returns a number value with no labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 18
+          firstcolumn: 1
+          lastcolumn: 1
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_from_vector(0) - 1]
+- description: annotation label from vector(0)
+  content: |
+    - alert: DeadMansSwitch
+      expr: vector(1)
+      annotations:
+        summary: 'Deadmans switch on {{ $labels.instance }} is firing'
+  output: |
+    2 |   expr: vector(1)
+                ^^^^^^ Calling `vector()` will return a vector value with no labels.
+      | [...]
+    4 |     summary: 'Deadmans switch on {{ $labels.instance }} is firing'
+                                                   ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 65
+          firstcolumn: 30
+          lastcolumn: 38
+        - message: Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(1+) - 1]
+- description: annotation label missing from metrics (1+)
+  content: |
+    - alert: Foo Is Down
+      expr: 1 + sum(foo) by(notjob)
+      annotations:
+        summary: '{{ .Labels.job }}'
+  output: |
+    2 |   expr: 1 + sum(foo) by(notjob)
+                             ^^ Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
+      | [...]
+    4 |     summary: '{{ .Labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 31
+          firstcolumn: 14
+          lastcolumn: 15
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(absent())_/_multiple - 1]
+- description: annotation label missing from metrics (absent()) / multiple
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(foo) or absent(bar)
+      annotations:
+        summary: '{{ .Labels.job }} / {{$labels.job}} is missing'
+  output: |
+    3 |   expr: absent(foo) or absent(bar)
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} / {{$labels.job}} is missing'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 60
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 34
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(absent(sum)) - 1]
+- description: annotation label missing from metrics (absent(sum))
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(sum(foo) by(job))
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+  output: |
+    3 |   expr: absent(sum(foo) by(job))
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+                                ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 68
+          firstcolumn: 11
+          lastcolumn: 19
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+- description: annotation label missing from metrics (absent(sum))
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(sum(foo) by(job))
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+  output: |
+    3 |   expr: absent(sum(foo) by(job))
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+                                                          ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 68
+          firstcolumn: 37
+          lastcolumn: 40
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(absent({job=~})) - 1]
+- description: annotation label missing from metrics (absent({job=~}))
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent({job=~".+"})
+      annotations:
+        summary: '{{ .Labels.job }} is missing'
+  output: |
+    3 |   expr: absent({job=~".+"})
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} is missing'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 42
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 27
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(absent,_and) - 1]
+- description: annotation label missing from metrics (absent, and)
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(foo{job="bar"}) AND on(job) foo
+      labels:
+        instance: '{{ $labels.instance }}'
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+        help: '{{ $labels.xxx }}'
+  output: |
+    3 |   expr: absent(foo{job="bar"}) AND on(job) foo
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     instance: '{{ $labels.instance }}'
+                                 ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 16
+              lastcolumn: 37
+          firstcolumn: 11
+          lastcolumn: 19
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 46
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+- description: annotation label missing from metrics (absent, and)
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(foo{job="bar"}) AND on(job) foo
+      labels:
+        instance: '{{ $labels.instance }}'
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+        help: '{{ $labels.xxx }}'
+  output: |
+    3 |   expr: absent(foo{job="bar"}) AND on(job) foo
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    7 |     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+                                ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 7
+              firstcolumn: 15
+              lastcolumn: 68
+          firstcolumn: 11
+          lastcolumn: 19
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 46
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+- description: annotation label missing from metrics (absent, and)
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(foo{job="bar"}) AND on(job) foo
+      labels:
+        instance: '{{ $labels.instance }}'
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+        help: '{{ $labels.xxx }}'
+  output: |
+    3 |   expr: absent(foo{job="bar"}) AND on(job) foo
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    7 |     summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+                                                          ^^^^ Template is using `foo` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `foo` label but the query results won't have this label.
+          pos:
+            - line: 7
+              firstcolumn: 15
+              lastcolumn: 68
+          firstcolumn: 37
+          lastcolumn: 40
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 46
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+- description: annotation label missing from metrics (absent, and)
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(foo{job="bar"}) AND on(job) foo
+      labels:
+        instance: '{{ $labels.instance }}'
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.foo }} is missing'
+        help: '{{ $labels.xxx }}'
+  output: |
+    3 |   expr: absent(foo{job="bar"}) AND on(job) foo
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    8 |     help: '{{ $labels.xxx }}'
+                             ^^^^ Template is using `xxx` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `xxx` label but the query results won't have this label.
+          pos:
+            - line: 8
+              firstcolumn: 12
+              lastcolumn: 28
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 46
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(by) - 1]
+- description: annotation label missing from metrics (by)
+  content: |
+    - alert: Foo Is Down
+      expr: sum(foo) > 0
+      annotations:
+        summary: '{{ $labels.job }}'
+  output: |
+    2 |   expr: sum(foo) > 0
+                ^^^ Query is using aggregation that removes all labels.
+      | [...]
+    4 |     summary: '{{ $labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation that removes all labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(by)#01 - 1]
+- description: annotation label missing from metrics (by)
+  content: |
+    - alert: Foo Is Down
+      expr: sum(foo) > 0
+      annotations:
+        summary: '{{ .Labels.job }}'
+  output: |
+    2 |   expr: sum(foo) > 0
+                ^^^ Query is using aggregation that removes all labels.
+      | [...]
+    4 |     summary: '{{ .Labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation that removes all labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(group_left) - 1]
+- description: annotation label missing from metrics (group_left)
+  content: |4
+    - alert: Foo Is Down
+      expr: count(build_info) by (instance, version) != ignoring(package) group_left(foo) count(package_installed) by (instance, version, package)
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.foo }} is down'
+        help: '{{ $labels.ixtance }}'
+  output: |
+    3 |   expr: count(build_info) by (instance, version) != ignoring(package) group_left(foo) count(package_installed) by (instance, version, package)
+                                  ^^^ Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+      | [...]
+    6 |     help: '{{ $labels.ixtance }}'
+                             ^^^^^^^^ Template is using `ixtance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `ixtance` label but the query results won't have this label.
+          pos:
+            - line: 6
+              firstcolumn: 12
+              lastcolumn: 32
+          firstcolumn: 11
+          lastcolumn: 18
+        - message: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 142
+          firstcolumn: 19
+          lastcolumn: 21
+    lines:
+        first: 2
+        last: 6
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(or) - 1]
+- description: annotation label missing from metrics (or)
+  content: |
+    - alert: Foo Is Down
+      expr: sum(foo) by(job) or sum(bar)
+      annotations:
+        summary: '{{ .Labels.job }}'
+  output: |
+    2 |   expr: sum(foo) by(job) or sum(bar)
+                                    ^^^ Query is using aggregation that removes all labels.
+      | [...]
+    4 |     summary: '{{ .Labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation that removes all labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 36
+          firstcolumn: 21
+          lastcolumn: 23
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(without) - 1]
+- description: annotation label missing from metrics (without)
+  content: |
+    - alert: Foo Is Down
+      expr: sum(foo) without(job) > 0
+      annotations:
+        summary: '{{ $labels.job }}'
+  output: |
+    2 |   expr: sum(foo) without(job) > 0
+                         ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+      | [...]
+    4 |     summary: '{{ $labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 33
+          firstcolumn: 10
+          lastcolumn: 16
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_missing_from_metrics_(without)#01 - 1]
+- description: annotation label missing from metrics (without)
+  content: |
+    - alert: Foo Is Down
+      expr: sum(foo) without(job) > 0
+      annotations:
+        summary: '{{ .Labels.job }}'
+  output: |
+    2 |   expr: sum(foo) without(job) > 0
+                         ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+      | [...]
+    4 |     summary: '{{ .Labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 33
+          firstcolumn: 10
+          lastcolumn: 16
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_present_on_metrics_(absent(sum)) - 1]
+- description: annotation label present on metrics (absent(sum))
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(sum(foo) by(job, instance))
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+  output: |
+    3 |   expr: absent(sum(foo) by(job, instance))
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+                                ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 68
+          firstcolumn: 11
+          lastcolumn: 19
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 42
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+- description: annotation label present on metrics (absent(sum))
+  content: |4
+    - alert: Foo Is Missing
+      expr: absent(sum(foo) by(job, instance))
+      annotations:
+        summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+  output: |
+    3 |   expr: absent(sum(foo) by(job, instance))
+                ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ $labels.instance }} on {{ .Labels.job }} is missing'
+                                                          ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 68
+          firstcolumn: 37
+          lastcolumn: 40
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 42
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/annotation_label_present_on_metrics_(absent) - 1]
+[]
+
+---
+
+[TestTemplateCheck/bar_*_ignoring(job)_foo - 1]
+- description: bar * ignoring(job) foo
+  content: |4
+    - alert: Foo
+      expr: bar * ignoring(job) foo
+      annotations:
+        summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+  output: |
+    3 |   expr: bar * ignoring(job) foo
+                      ^^^^^^^^ Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 91
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 31
+          firstcolumn: 7
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/bar_*_on()_group_right()_absent() - 1]
+- description: bar * on() group_right() absent()
+  content: |4
+    - alert: Foo
+      expr: bar * on() group_right() absent(foo{job="xxx"})
+      annotations:
+        summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+  output: |
+    3 |   expr: bar * on() group_right() absent(foo{job="xxx"})
+                                         ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+                                                            ^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `cluster` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 91
+          firstcolumn: 39
+          lastcolumn: 46
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 55
+          firstcolumn: 26
+          lastcolumn: 31
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+- description: bar * on() group_right() absent()
+  content: |4
+    - alert: Foo
+      expr: bar * on() group_right() absent(foo{job="xxx"})
+      annotations:
+        summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+  output: |
+    3 |   expr: bar * on() group_right() absent(foo{job="xxx"})
+                                         ^^^^^^ The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} in cluster {{$labels.cluster}}/{{ $labels.env }} is missing'
+                                                                                 ^^^^ Template is using `env` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `env` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 91
+          firstcolumn: 60
+          lastcolumn: 63
+        - message: |-
+            The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 55
+          firstcolumn: 26
+          lastcolumn: 31
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/bar_*_on()_group_right(...)_absent() - 1]
+[]
+
+---
+
+[TestTemplateCheck/don't_trigger_for_label_replace()_provided_labels - 1]
+[]
+
+---
+
+[TestTemplateCheck/foo_/_on(...)_bar - 1]
+- description: foo / on(...) bar
+  content: |
+    - alert: Foo
+      expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
+      annotations:
+        summary: "{{ $labels.app_type }} is using {{ $value }} fds."
+      labels:
+        job: "{{ $labels.job_name }}"
+  output: |
+    2 |   expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
+                                             ^^^ Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+      | [...]
+    6 |     job: "{{ $labels.job_name }}"
+                            ^^^^^^^^^ Template is using `job_name` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job_name` label but the query results won't have this label.
+          pos:
+            - line: 6
+              firstcolumn: 11
+              lastcolumn: 32
+          firstcolumn: 11
+          lastcolumn: 19
+        - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 108
+          firstcolumn: 30
+          lastcolumn: 32
+    lines:
+        first: 1
+        last: 6
+    severity: 2
+    anchor: 0
+- description: foo / on(...) bar
+  content: |
+    - alert: Foo
+      expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
+      annotations:
+        summary: "{{ $labels.app_type }} is using {{ $value }} fds."
+      labels:
+        job: "{{ $labels.job_name }}"
+  output: |
+    2 |   expr: container_file_descriptors / on (instance, app_name) container_ulimits_soft{ulimit="max_open_files"}
+                                             ^^^ Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+      | [...]
+    4 |     summary: "{{ $labels.app_type }} is using {{ $value }} fds."
+                                ^^^^^^^^^ Template is using `app_type` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `app_type` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 63
+          firstcolumn: 11
+          lastcolumn: 19
+        - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 108
+          firstcolumn: 30
+          lastcolumn: 32
+    lines:
+        first: 1
+        last: 6
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/foo_and_on()_absent(bar) - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanizeDuration_passed_to_value - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanizePercentage_passed_to_value - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_not_needed_on_count() - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_not_needed_on_rate()_used_in_RHS - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_not_needed_on_round(rate()) - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_not_needed_on_wjen_using_printf_%.2f - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_not_needed_on_wjen_using_printf_%f - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_passed_to_value - 1]
+[]
+
+---
+
+[TestTemplateCheck/humanize_still_needed_for_printf_on_another_value - 1]
+- description: humanize still needed for printf on another value
+  content: |4
+    - alert: Foo
+      expr: rate(errors_total[5m]) > 0
+      annotations:
+        summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
+  output: |
+    3 |   expr: rate(errors_total[5m]) > 0
+                ^^^^^^^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: Seeing {{ printf "%f" 2 }}{{ $value }} instances with errors
+                                                  ^^^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`rate()` will produce results that are hard to read for humans.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 34
+          firstcolumn: 1
+          lastcolumn: 22
+        - message: Use one of humanize template functions to make the result more readable.
+          pos:
+            - line: 5
+              firstcolumn: 14
+              lastcolumn: 73
+          firstcolumn: 30
+          lastcolumn: 36
+    lines:
+        first: 3
+        last: 5
+    severity: 0
+    anchor: 0
+
+---
+
+[TestTemplateCheck/ignore_dead_code - 1]
+[]
+
+---
+
+[TestTemplateCheck/invalid_function_in_annotations - 1]
+- description: invalid function in annotations
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: '{{ $value | xxx }}'
+  output: |
+    4 |     summary: '{{ $value | xxx }}'
+                      ^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `function "xxx" not defined`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `function "xxx" not defined`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 4
+        last: 4
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/invalid_function_in_annotations#01 - 1]
+- description: invalid function in annotations
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      labels:
+        summary: '{{ $value | xxx }}'
+  output: |
+    4 |     summary: '{{ $value | xxx }}'
+                      ^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `function "xxx" not defined`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `function "xxx" not defined`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 32
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 4
+        last: 4
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/invalid_syntax_in_annotations - 1]
+- description: invalid syntax in annotations
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      annotations:
+        summary: 'Instance {{ $label.instance }} down'
+  output: |
+    4 |     summary: 'Instance {{ $label.instance }} down'
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `undefined variable "$label"`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `undefined variable "$label"`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 49
+          firstcolumn: 1
+          lastcolumn: 35
+    lines:
+        first: 4
+        last: 4
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/invalid_syntax_in_labels - 1]
+- description: invalid syntax in labels
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"} == 0
+      labels:
+        summary: 'Instance {{ $label.instance }} down'
+  output: |
+    4 |     summary: 'Instance {{ $label.instance }} down'
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template failed to parse with this error: `undefined variable "$label"`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `undefined variable "$label"`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 49
+          firstcolumn: 1
+          lastcolumn: 35
+    lines:
+        first: 4
+        last: 4
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/label_missing_from_metrics_(without) - 1]
+- description: label missing from metrics (without)
+  content: |
+    - alert: Foo Is Down
+      expr: sum(foo) without(job) > 0
+      labels:
+        summary: '{{ $labels.job }}'
+  output: |
+    2 |   expr: sum(foo) without(job) > 0
+                         ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+      | [...]
+    4 |     summary: '{{ $labels.job }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 31
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 33
+          firstcolumn: 10
+          lastcolumn: 16
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/labels_label_from_vector(0) - 1]
+- description: labels label from vector(0)
+  content: |
+    - alert: DeadMansSwitch
+      expr: vector(1)
+      labels:
+        summary: 'Deadmans switch on {{ $labels.instance }} is firing'
+  output: |
+    2 |   expr: vector(1)
+                ^^^^^^ Calling `vector()` will return a vector value with no labels.
+      | [...]
+    4 |     summary: 'Deadmans switch on {{ $labels.instance }} is firing'
+                                                   ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `instance` label but the query results won't have this label.
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 65
+          firstcolumn: 30
+          lastcolumn: 38
+        - message: Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 1
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/metric_or_(metric_or_vector) - 1]
+- description: metric or (metric or vector)
+  content: |4
+    - alert: Foo
+      expr: |
+        max without (instance) (metric1{exported_job="abc"}) == 0 or (metric2 OR on() vector(0)) == 0
+      for: 15m
+      annotations:
+        summary: 'Foo is down in {{ $labels.colo_name }}'
+  output: |
+    4 |     max without (instance) (metric1{exported_job="abc"}) == 0 or (metric2 OR on() vector(0)) == 0
+                                                                                          ^^^^^^ Calling `vector()` will return a vector value with no labels.
+      | [...]
+    7 |     summary: 'Foo is down in {{ $labels.colo_name }}'
+                                               ^^^^^^^^^^ Template is using `colo_name` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `colo_name` label but the query results won't have this label.
+          pos:
+            - line: 7
+              firstcolumn: 15
+              lastcolumn: 52
+          firstcolumn: 26
+          lastcolumn: 35
+        - message: Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 97
+          firstcolumn: 79
+          lastcolumn: 84
+    lines:
+        first: 2
+        last: 7
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/multiple_or - 1]
+[]
+
+---
+
+[TestTemplateCheck/multiple_or_/_missing_group_left() - 1]
+- description: multiple or / missing group_left()
+  content: |4
+    - alert: Foo
+      expr: >
+        avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
+        < 0.5 > 0
+        or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
+        < 0.4 > 0
+        or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
+        < 8 > 0
+        or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+        < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
+        or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+        < 0.1 > 0
+        or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*brat.*",cidr_use_case!~".*tier1.*",plan=~".*(free|pro).*"})
+        <  0.1 > 0
+        or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*utopia.*"})
+        < 5 > 0
+      annotations:
+        dashboard: 'Prefix is {{ $labels.prefix }}'
+  output: |4
+     4 |     avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
+     5 |     < 0.5 > 0
+     6 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*multicolo.*"})
+     7 |     < 0.4 > 0
+     8 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*offpeak.*"})
+     9 |     < 8 > 0
+    10 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+    11 |     < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
+               ^^ Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+    12 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+    13 |     < 0.1 > 0
+    14 |     or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*brat.*",cidr_use_case!~".*tier1.*",plan=~".*(free|pro).*"})
+    15 |     <  0.1 > 0
+    16 |     or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*utopia.*"})
+    17 |     < 5 > 0
+       | [...]
+    19 |     dashboard: 'Prefix is {{ $labels.prefix }}'
+                                             ^^^^^^^ Template is using `prefix` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `prefix` label but the query results won't have this label.
+          pos:
+            - line: 19
+              firstcolumn: 17
+              lastcolumn: 46
+          firstcolumn: 21
+          lastcolumn: 27
+        - message: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 105
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 14
+            - line: 6
+              firstcolumn: 5
+              lastcolumn: 110
+            - line: 7
+              firstcolumn: 5
+              lastcolumn: 14
+            - line: 8
+              firstcolumn: 5
+              lastcolumn: 108
+            - line: 9
+              firstcolumn: 5
+              lastcolumn: 12
+            - line: 10
+              firstcolumn: 5
+              lastcolumn: 106
+            - line: 11
+              firstcolumn: 5
+              lastcolumn: 90
+            - line: 12
+              firstcolumn: 5
+              lastcolumn: 109
+            - line: 13
+              firstcolumn: 5
+              lastcolumn: 14
+            - line: 14
+              firstcolumn: 5
+              lastcolumn: 155
+            - line: 15
+              firstcolumn: 5
+              lastcolumn: 15
+            - line: 16
+              firstcolumn: 5
+              lastcolumn: 107
+            - line: 17
+              firstcolumn: 5
+              lastcolumn: 11
+          firstcolumn: 444
+          lastcolumn: 445
+    lines:
+        first: 2
+        last: 19
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/no_humanize_on_irate() - 1]
+- description: no humanize on irate()
+  content: |4
+    - alert: Foo
+      expr: irate(errors[2m]) > 0
+      annotations:
+        summary: "Seeing {{ .Value }} errors"
+  output: |
+    3 |   expr: irate(errors[2m]) > 0
+                ^^^^^^^^^^^^^^^^^ `irate()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: "Seeing {{ .Value }} errors"
+                                ^^^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`irate()` will produce results that are hard to read for humans.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 29
+          firstcolumn: 1
+          lastcolumn: 17
+        - message: Use one of humanize template functions to make the result more readable.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 40
+          firstcolumn: 11
+          lastcolumn: 17
+    lines:
+        first: 3
+        last: 5
+    severity: 0
+    anchor: 0
+
+---
+
+[TestTemplateCheck/no_humanize_on_irate()#01 - 1]
+- description: no humanize on irate()
+  content: |4
+    - alert: Foo
+      expr: deriv(errors[2m]) > 0
+      annotations:
+        summary: "Seeing {{ .Value }} errors"
+  output: |
+    3 |   expr: deriv(errors[2m]) > 0
+                ^^^^^^^^^^^^^^^^^ `deriv()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: "Seeing {{ .Value }} errors"
+                                ^^^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`deriv()` will produce results that are hard to read for humans.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 29
+          firstcolumn: 1
+          lastcolumn: 17
+        - message: Use one of humanize template functions to make the result more readable.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 40
+          firstcolumn: 11
+          lastcolumn: 17
+    lines:
+        first: 3
+        last: 5
+    severity: 0
+    anchor: 0
+
+---
+
+[TestTemplateCheck/no_humanize_on_rate() - 1]
+- description: no humanize on rate()
+  content: |4
+    - alert: Foo
+      expr: rate(errors[2m]) > 0
+      annotations:
+        summary: "Seeing {{ $value }} errors"
+  output: |
+    3 |   expr: rate(errors[2m]) > 0
+                ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: "Seeing {{ $value }} errors"
+                                ^^^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`rate()` will produce results that are hard to read for humans.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 28
+          firstcolumn: 1
+          lastcolumn: 16
+        - message: Use one of humanize template functions to make the result more readable.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 40
+          firstcolumn: 11
+          lastcolumn: 17
+    lines:
+        first: 3
+        last: 5
+    severity: 0
+    anchor: 0
+
+---
+
+[TestTemplateCheck/no_humanize_on_rate()_/_alias - 1]
+- description: no humanize on rate() / alias
+  content: |4
+    - alert: Foo
+      expr: rate(errors[2m]) > 0
+      annotations:
+        summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
+  output: |
+    3 |   expr: rate(errors[2m]) > 0
+                ^^^^^^^^^^^^^^^^ `rate()` will produce results that are hard to read for humans.
+      | [...]
+    5 |     summary: "{{ $foo := $value }}{{ $bar := $foo }} Seeing {{ $bar }} errors"
+                                                                       ^^^^^ Use one of humanize template functions to make the result more readable.
+  problem:
+    reporter: alerts/template
+    summary: use humanize filters for the results
+    details: '[Click here](https://prometheus.io/docs/prometheus/latest/configuration/template_reference/) for a full list of all available template functions.'
+    diagnostics:
+        - message: '`rate()` will produce results that are hard to read for humans.'
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 28
+          firstcolumn: 1
+          lastcolumn: 16
+        - message: Use one of humanize template functions to make the result more readable.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 77
+          firstcolumn: 50
+          lastcolumn: 54
+    lines:
+        first: 3
+        last: 5
+    severity: 0
+    anchor: 0
+
+---
+
+[TestTemplateCheck/rate()_but_no_$value - 1]
+[]
+
+---
+
+[TestTemplateCheck/skips_recording_rule - 1]
+[]
+
+---
+
+[TestTemplateCheck/sub_aggregation - 1]
+[]
+
+---
+
+[TestTemplateCheck/template_query_with_bogus_function - 1]
+- description: template query with bogus function
+  content: |4
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ with printf "suz({job='%s'})" .Labels.job | query }}
+          {{ . | first | label "instance" }}
+          {{ end }}
+  output: |
+    6 |       {{ with printf "suz({job='%s'})" .Labels.job | query }}
+    7 |       {{ . | first | label "instance" }}
+    8 |       {{ end }}
+              ^^^^^^^^^ Template failed to parse with this error: `159: executing "summary" at <query>: error calling query: 1:1: parse error: unknown function with name "suz"`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `159: executing "summary" at <query>: error calling query: 1:1: parse error: unknown function with name "suz"`.'
+          pos:
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 62
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 41
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 15
+          firstcolumn: 1
+          lastcolumn: 101
+    lines:
+        first: 5
+        last: 8
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_bogus_range - 1]
+- description: template query with bogus range
+  content: |4
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ range query "up xxx" }}
+          {{ .Labels.instance }} {{ .Value }}
+          {{ end }}
+  output: |
+    6 |       {{ range query "up xxx" }}
+    7 |       {{ .Labels.instance }} {{ .Value }}
+    8 |       {{ end }}
+              ^^^^^^^^^ Template failed to parse with this error: `121: executing "summary" at <query "up xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `121: executing "summary" at <query "up xxx">: error calling query: 1:4: parse error: unexpected identifier "xxx"`.'
+          pos:
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 33
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 42
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 15
+          firstcolumn: 1
+          lastcolumn: 73
+    lines:
+        first: 5
+        last: 8
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_syntax_error - 1]
+- description: template query with syntax error
+  content: |4
+    - alert: Foo
+      expr: up == 0
+      annotations:
+        summary: |
+          {{ with printf "sum({job='%s'}) by(" .Labels.job | query }}
+          {{ . | first | label "instance" }}
+          {{ end }}
+  output: |
+    6 |       {{ with printf "sum({job='%s'}) by(" .Labels.job | query }}
+    7 |       {{ . | first | label "instance" }}
+    8 |       {{ end }}
+              ^^^^^^^^^ Template failed to parse with this error: `163: executing "summary" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.
+  problem:
+    reporter: alerts/template
+    summary: template syntax error
+    details: Supported template syntax is documented [here](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/#templating).
+    diagnostics:
+        - message: 'Template failed to parse with this error: `163: executing "summary" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.'
+          pos:
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 66
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 41
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 15
+          firstcolumn: 1
+          lastcolumn: 105
+    lines:
+        first: 5
+        last: 8
+    severity: 3
+    anchor: 0
+
+---
+
+[TestTemplateCheck/template_query_with_valid_expr - 1]
+[]
+
+---
+
+[TestTemplateCheck/time_-_metric - 1]
+[]
+
+---
+
+[TestTemplateCheck/toTime - 1]
+[]
+
+---
+
+[TestTemplateCheck/valid_syntax_in_annotations - 1]
+[]
+
+---
+
+[TestTemplateCheck/valid_syntax_in_labels - 1]
+[]
+
+---
+
+[TestTemplateCheck/{{$value}}_in_label_value - 1]
+- description: '{{$value}} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: '{{$value}}'
+  output: |
+    5 |     baz: '{{$value}}'
+                  ^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 10
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{$value}}_in_multiple_labels - 1]
+- description: '{{$value}} in multiple labels'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: '{{ .Value }}'
+        baz: '{{$value}}'
+  output: |
+    4 |     foo: '{{ .Value }}'
+                  ^^^^^^^^^^^^ Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 4
+              firstcolumn: 11
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 12
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+- description: '{{$value}} in multiple labels'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: '{{ .Value }}'
+        baz: '{{$value}}'
+  output: |
+    5 |     baz: '{{$value}}'
+                  ^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 10
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{_$foo_:=_$value_}}_in_label_value - 1]
+- description: '{{ $foo := $value }} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: '{{ $foo := $value }}{{ $foo }}'
+  output: |
+    5 |     baz: '{{ $foo := $value }}{{ $foo }}'
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `$foo` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `$foo` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 40
+          firstcolumn: 1
+          lastcolumn: 30
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{_$foo_:=_.Value_}}_in_label_value - 1]
+- description: '{{ $foo := .Value }} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: '{{ $foo := .Value }}{{ $foo }}'
+  output: |
+    5 |     baz: '{{ $foo := .Value }}{{ $foo }}'
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `$foo` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `$foo` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 40
+          firstcolumn: 1
+          lastcolumn: 30
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{_.Value_}}_in_label_value - 1]
+- description: '{{ .Value }} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: 'value {{ .Value }}'
+  output: |
+    5 |     baz: 'value {{ .Value }}'
+                  ^^^^^^^^^^^^^^^^^^ Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 28
+          firstcolumn: 1
+          lastcolumn: 18
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{_.Value|humanize_}}_in_label_value - 1]
+- description: '{{ .Value|humanize }} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: '{{ .Value|humanize }}'
+  output: |
+    5 |     baz: '{{ .Value|humanize }}'
+                  ^^^^^^^^^^^^^^^^^^^^^ Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `.Value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 5
+              firstcolumn: 11
+              lastcolumn: 31
+          firstcolumn: 1
+          lastcolumn: 21
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{__$value__}}_in_label_value - 1]
+- description: '{{  $value  }} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: |
+          foo is {{  $value | humanizePercentage }}%
+  output: |
+    6 |       foo is {{  $value | humanizePercentage }}%
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 48
+          firstcolumn: 1
+          lastcolumn: 43
+    lines:
+        first: 5
+        last: 6
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/{{__$value__}}_in_label_value#01 - 1]
+- description: '{{  $value  }} in label value'
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      labels:
+        foo: bar
+        baz: |
+          foo is {{$value|humanizePercentage}}%
+  output: |
+    6 |       foo is {{$value|humanizePercentage}}%
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+  problem:
+    reporter: alerts/template
+    summary: value used in labels
+    details: ""
+    diagnostics:
+        - message: Using `$value` in labels will generate a new alert on every value change, move it to annotations.
+          pos:
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 43
+          firstcolumn: 1
+          lastcolumn: 38
+    lines:
+        first: 5
+        last: 6
+    severity: 2
+    anchor: 0
+
+---

@@ -2,7 +2,6 @@ package checks_test
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
@@ -10,7 +9,6 @@ import (
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
@@ -20,22 +18,6 @@ func newRateCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
 	return checks.NewRateCheck(prom)
 }
 
-func durationMustText(name, uri, fun, multi, using string) string {
-	return fmt.Sprintf("Duration for `%s()` must be at least %s x scrape_interval, `%s` Prometheus server at %s is using `%s` scrape_interval.", fun, multi, name, uri, using)
-}
-
-func notCounterText(name, uri, fun, metric, kind string) string {
-	return fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from `%s` Prometheus server at %s.", fun, metric, kind, name, uri)
-}
-
-func rateSumText(rateName, sumExpr string) string {
-	return fmt.Sprintf("`rate(sum(counter))` chain detected, `rate(%s)` is called here on results of `%s`.", rateName, sumExpr)
-}
-
-func rateSumDetails() string {
-	return "You can only calculate `rate()` directly from a counter metric. Calling `rate()` on `sum()` results will return bogus results because `sum()` will hide information on when each counter resets. You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`"
-}
-
 func TestRateCheck(t *testing.T) {
 	testCases := []checkTest{
 		{
@@ -43,28 +25,13 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "rate < 2x scrape_interval",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Details:  checks.RateCheckDetails,
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "rate", "2", "1m"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -83,7 +50,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[3m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -102,7 +68,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[2m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -121,20 +86,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: irate(foo[1m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "irate", "2", "1m"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -153,20 +105,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: deriv(foo[1m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "deriv", "2", "1m"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -179,7 +118,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: deriv(foo[2m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -192,7 +130,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: irate(foo[2m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -214,7 +151,6 @@ func TestRateCheck(t *testing.T) {
 `,
 			checker:    newRateCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -236,7 +172,6 @@ func TestRateCheck(t *testing.T) {
 `,
 			checker:    newRateCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -258,7 +193,6 @@ func TestRateCheck(t *testing.T) {
 `,
 			checker:    newRateCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -280,7 +214,6 @@ func TestRateCheck(t *testing.T) {
 `,
 			checker:    newRateCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -299,7 +232,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -318,7 +250,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: foo[1m]\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -331,20 +262,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(rate(foo[3m])) / sum(rate(bar[1m]))\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "rate", "2", "1m"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -363,20 +281,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
-							},
-						},
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -389,20 +294,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
-							},
-						},
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -415,21 +307,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[5m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "unable to run checks",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri,
-									fmt.Sprintf("failed to decode config data in %s response: yaml: line 2: could not find expected ':'", uri)),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -444,27 +322,13 @@ func TestRateCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second, true)
 			},
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
-							},
-						},
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems: true,
 		},
 		{
 			description: "irate == 3 x default 1m",
 			content:     "- record: foo\n  expr: irate(foo[3m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -483,30 +347,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "rate", "2", "1m"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-					{
-						Reporter: "promql/rate",
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
-							},
-						},
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -523,7 +364,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[5m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -540,20 +380,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "rate", "2", "1m"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -570,30 +397,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo{job=\"xxx\"}[1m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "duration too small",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: durationMustText("prom", uri, "rate", "2", "1m"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-					{
-						Reporter: "promql/rate",
-						Summary:  "counter based function called on a non-counter",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: notCounterText("prom", uri, "rate", "foo", "gauge"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -612,20 +416,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo_c[2m]) / rate(bar_g[2m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "counter based function called on a non-counter",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: notCounterText("prom", uri, "rate", "bar_g", "gauge"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -656,7 +447,6 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[2m])\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -675,20 +465,7 @@ func TestRateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[2m]) / rate(foo[2m]) / sum(rate(foo[2m]))\n",
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "counter based function called on a non-counter",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: notCounterText("prom", uri, "rate", "foo", "gauge"),
-							},
-						}, Details: checks.RateCheckDetails,
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -711,20 +488,7 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "chained rate call",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: rateSumText("my:sum[5m]", "sum(foo)"),
-							},
-						}, Details: rateSumDetails(),
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -754,20 +518,7 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "unable to run checks",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
-							},
-						},
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -795,7 +546,6 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -825,7 +575,6 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:rate:5m\n  expr: rate(foo[5m])\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -839,7 +588,6 @@ func TestRateCheck(t *testing.T) {
 			entries:     []discovery.Entry{{PathError: errors.New("mock error")}},
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -868,7 +616,6 @@ func TestRateCheck(t *testing.T) {
 			},
 			checker:    newRateCheck,
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -905,20 +652,7 @@ func TestRateCheck(t *testing.T) {
 - record: response_time_sum:rate2m
   expr: rate(response_time_sum[2m])
 `),
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/rate",
-						Summary:  "chained rate call",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: rateSumText(`global:response_time_sum{namespace!~"test[.].+"}[15m]`, "sum(response_time_sum:rate2m)"),
-							},
-						}, Details: rateSumDetails(),
-						Severity: checks.Warning,
-					},
-				}
-			},
+			problems: true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -938,7 +672,6 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:sum\n  expr: sum(foo)\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -968,7 +701,6 @@ func TestRateCheck(t *testing.T) {
 - record: response_time_sum:rate2m
   expr: rate(response_time_sum[2m])
 `),
-			problems: noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},
@@ -996,7 +728,6 @@ func TestRateCheck(t *testing.T) {
 			entries:     mustParseContent("- record: my:foo\n  expr: foo / foo\n"),
 			checker:     newRateCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireConfigPath},

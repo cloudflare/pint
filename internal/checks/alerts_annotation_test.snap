@@ -1,0 +1,380 @@
+
+[TestAnnotationCheck/doesn't_ignore_rules_with_syntax_errors - 1]
+- description: doesn't ignore rules with syntax errors
+  content: |
+    - alert: foo
+      expr: sum(foo) without(
+  output: |
+    2 |   expr: sum(foo) without(
+                ^^^ `severity` annotation is required.
+  problem:
+    reporter: alerts/annotation
+    summary: required annotation not set
+    details: ""
+    diagnostics:
+        - message: '`severity` annotation is required.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 25
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/empty_annotations_/_required - 1]
+- description: empty annotations / required
+  content: |4
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        foo: bar
+        severity:
+        level: warning
+  output: |
+    7 |     level: warning
+            ^^^ `severity` annotation is required.
+  problem:
+    reporter: alerts/annotation
+    summary: required annotation not set
+    details: ""
+    diagnostics:
+        - message: '`severity` annotation is required.'
+          pos:
+            - line: 7
+              firstcolumn: 5
+              lastcolumn: 9
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 2
+        last: 7
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestAnnotationCheck/invalid_value_/_token_/_valueRe - 1]
+- description: invalid value / token / valueRe
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      annotations:
+        components: api db
+  output: |
+    4 |     components: api db
+                        ^^^^^^ `components` annotation value must match `^api|memcached$`.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: 'Rule comment: rule comment'
+    diagnostics:
+        - message: '`components` annotation value must match `^api|memcached$`.'
+          pos:
+            - line: 4
+              firstcolumn: 17
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/invalid_value_/_token_/_values - 1]
+- description: invalid value / token / values
+  content: |
+    - alert: foo
+      expr: rate(foo[1m])
+      annotations:
+        components: api db
+  output: |
+    4 |     components: api db
+                        ^^^^^^ `components` annotation value is not one of valid values.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: |-
+        List of allowed values:
+
+        - `api`
+        - `memcached`
+        - `storage`
+        - `prometheus`
+        - `kvm`
+        - `mysql`
+
+        And 3 other value(s).
+        Rule comment: rule comment
+    diagnostics:
+        - message: '`components` annotation value is not one of valid values.'
+          pos:
+            - line: 4
+              firstcolumn: 17
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 6
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/missing_annotation_/_not_required - 1]
+[]
+
+---
+
+[TestAnnotationCheck/missing_annotation_/_required - 1]
+- description: missing annotation / required
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        foo: bar
+  output: |
+    4 |     foo: bar
+            ^^^ `severity` annotation is required.
+  problem:
+    reporter: alerts/annotation
+    summary: required annotation not set
+    details: ""
+    diagnostics:
+        - message: '`severity` annotation is required.'
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/no_annotations_/_not_required - 1]
+[]
+
+---
+
+[TestAnnotationCheck/no_annotations_/_required - 1]
+- description: no annotations / required
+  content: |
+    - alert: foo
+      expr: sum(foo)
+  output: |
+    2 |   expr: sum(foo)
+                ^^^ `severity` annotation is required.
+  problem:
+    reporter: alerts/annotation
+    summary: required annotation not set
+    details: ""
+    diagnostics:
+        - message: '`severity` annotation is required.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 16
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/templated_annotation_value_/_passing - 1]
+[]
+
+---
+
+[TestAnnotationCheck/templated_annotation_value_/_passing#01 - 1]
+- description: templated annotation value / passing
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      for: 5m
+      annotations:
+        for: 4m
+  output: |
+    5 |     for: 4m
+                 ^^ `for` annotation value must match `^{{ $for }}$`.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: ""
+    diagnostics:
+        - message: '`for` annotation value must match `^{{ $for }}$`.'
+          pos:
+            - line: 5
+              firstcolumn: 10
+              lastcolumn: 11
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/valid_annotation_/_not_required - 1]
+[]
+
+---
+
+[TestAnnotationCheck/valid_annotation_/_required - 1]
+[]
+
+---
+
+[TestAnnotationCheck/valid_annotation_key_regex_/_not_required - 1]
+[]
+
+---
+
+[TestAnnotationCheck/valid_annotation_key_regex_/_required - 1]
+[]
+
+---
+
+[TestAnnotationCheck/wrong_annotation_key_regex_value_/_not_required - 1]
+- description: wrong annotation key regex value / not required
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        annotation_1: bar
+  output: |
+    4 |     annotation_1: bar
+                          ^^^ `annotation_.*` annotation value must match `^critical$`.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: ""
+    diagnostics:
+        - message: '`annotation_.*` annotation value must match `^critical$`.'
+          pos:
+            - line: 4
+              firstcolumn: 19
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/wrong_annotation_key_regex_value_/_required - 1]
+- description: wrong annotation key regex value / required
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        annotation_1: bar
+  output: |
+    4 |     annotation_1: bar
+                          ^^^ `annotation_.*` annotation value must match `^critical$`.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: ""
+    diagnostics:
+        - message: '`annotation_.*` annotation value must match `^critical$`.'
+          pos:
+            - line: 4
+              firstcolumn: 19
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/wrong_annotation_value_/_not_required - 1]
+- description: wrong annotation value / not required
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        severity: bar
+  output: |
+    4 |     severity: bar
+                      ^^^ `severity` annotation value must match `^critical$`.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: ""
+    diagnostics:
+        - message: '`severity` annotation value must match `^critical$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestAnnotationCheck/wrong_annotation_value_/_required - 1]
+- description: wrong annotation value / required
+  content: |
+    - alert: foo
+      expr: sum(foo)
+      annotations:
+        severity: bar
+  output: |
+    4 |     severity: bar
+                      ^^^ `severity` annotation value must match `^critical$`.
+  problem:
+    reporter: alerts/annotation
+    summary: invalid annotation value
+    details: ""
+    diagnostics:
+        - message: '`severity` annotation value must match `^critical$`.'
+          pos:
+            - line: 4
+              firstcolumn: 15
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---

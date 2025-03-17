@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -17,7 +16,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "doesn't ignore rules with syntax errors",
@@ -26,20 +24,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "required annotation not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` annotation is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no annotations / required",
@@ -48,20 +33,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "required annotation not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` annotation is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "empty annotations / required",
@@ -77,20 +49,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "required annotation not set",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` annotation is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no annotations / not required",
@@ -99,7 +58,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "missing annotation / required",
@@ -108,20 +66,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "required annotation not set",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` annotation is required.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "missing annotation / not required",
@@ -130,7 +75,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "wrong annotation value / required",
@@ -139,20 +83,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` annotation value must match `^critical$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "wrong annotation value / not required",
@@ -161,20 +92,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`severity` annotation value must match `^critical$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "valid annotation / required",
@@ -183,7 +101,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info|debug"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "valid annotation / not required",
@@ -192,7 +109,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info|debug"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "templated annotation value / passing",
@@ -201,7 +117,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("{{ $for }}"), nil, true, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "templated annotation value / passing",
@@ -210,20 +125,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("{{ $for }}"), nil, true, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`for` annotation value must match `^{{ $for }}$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "valid annotation key regex / required",
@@ -232,7 +134,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), nil, checks.MustTemplatedRegexp("critical|info|debug"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "valid annotation key regex / not required",
@@ -241,7 +142,6 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), nil, checks.MustTemplatedRegexp("critical|info|debug"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "wrong annotation key regex value / required",
@@ -250,20 +150,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`annotation_.*` annotation value must match `^critical$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "wrong annotation key regex value / not required",
@@ -272,20 +159,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("annotation_.*"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`annotation_.*` annotation value must match `^critical$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value / token / valueRe",
@@ -294,21 +168,7 @@ func TestAnnotationCheck(t *testing.T) {
 				return checks.NewAnnotationCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, "rule comment", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Details:  "Rule comment: rule comment",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`components` annotation value must match `^api|memcached$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "invalid value / token / values",
@@ -325,21 +185,7 @@ func TestAnnotationCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.AnnotationCheckName,
-						Summary:  "invalid annotation value",
-						Details:  "List of allowed values:\n\n- `api`\n- `memcached`\n- `storage`\n- `prometheus`\n- `kvm`\n- `mysql`\n\nAnd 3 other value(s).\nRule comment: rule comment",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`components` annotation value is not one of valid values.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 	}
 	runTests(t, testCases)

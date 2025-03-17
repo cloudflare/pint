@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -18,7 +17,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, nil, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "no rules / recording",
@@ -27,7 +25,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, nil, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "allowed label / alerting",
@@ -36,7 +33,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, nil, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "allowed label / recording",
@@ -45,7 +41,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, nil, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "allowed label / alerting",
@@ -54,7 +49,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "allowed label / alerting",
@@ -63,7 +57,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "rejected key / don't check labels",
@@ -72,7 +65,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(false, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "rejected key / alerting",
@@ -81,20 +73,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "key not allowed",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "key is not allowed to match `^bad$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "rejected value / alerting",
@@ -103,20 +82,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Warning)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "value not allowed",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "value is not allowed to match `^bad$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "rejected key / recording",
@@ -125,20 +91,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "key not allowed",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "key is not allowed to match `^bad$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "rejected value / recording",
@@ -147,20 +100,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "value not allowed",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "value is not allowed to match `^bad$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 
 		{
@@ -170,7 +110,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "rejected key / don't check annotations",
@@ -179,7 +118,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(false, false, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "rejected annotation key",
@@ -188,20 +126,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Information)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "key not allowed",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "key is not allowed to match `^bad$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "rejected annotation value",
@@ -210,20 +135,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "value not allowed",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "value is not allowed to match `^bad$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "reject templated regexp / passing",
@@ -232,7 +144,6 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "reject templated regexp / not passing",
@@ -241,20 +152,7 @@ func TestRejectCheck(t *testing.T) {
 				return checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/reject",
-						Summary:  "value not allowed",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "value is not allowed to match `^{{ $alert }}$`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 	}
 	runTests(t, testCases)

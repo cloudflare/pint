@@ -1,13 +1,11 @@
 package checks_test
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -19,11 +17,6 @@ func newRangeQueryCheckWithLimit(prom *promapi.FailoverGroup) checks.RuleChecker
 	return checks.NewRangeQueryCheck(prom, time.Hour*4, "some text", checks.Bug)
 }
 
-func retentionToLow(name, uri, metric, qr, retention string) string {
-	return fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but `%s` Prometheus server at %s is configured to only keep %s of metrics history.",
-		metric, qr, name, uri, retention)
-}
-
 func TestRangeQueryCheck(t *testing.T) {
 	testCases := []checkTest{
 		{
@@ -31,27 +24,13 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 		},
 		{
 			description: "flag query error",
 			content:     "- record: foo\n  expr: rate(foo[30d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/range_query",
-						Summary:  "unable to run checks",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, "server_error: internal error"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -64,30 +43,7 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[30d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/range_query",
-						Summary:  "unable to run checks",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: `Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"`,
-							},
-						},
-					},
-					{
-						Reporter: "promql/range_query",
-						Summary:  "query beyond configured retention",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: retentionToLow("prom", uri, "foo[30d]", "30d", "15d"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -102,7 +58,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[30d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -115,7 +70,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[10d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -128,20 +82,7 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[20d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/range_query",
-						Summary:  "query beyond configured retention",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -154,7 +95,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[10d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -169,20 +109,7 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[11d1h])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/range_query",
-						Summary:  "query beyond configured retention",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: retentionToLow("prom", uri, "foo[11d1h]", "11d1h", "11d"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -197,20 +124,7 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[20d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/range_query",
-						Summary:  "query beyond configured retention",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: retentionToLow("prom", uri, "foo[20d]", "20d", "15d"),
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -227,7 +141,6 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[10d])\n",
 			checker:     newRangeQueryCheck,
 			prometheus:  newSimpleProm,
-			problems:    noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{requireFlagsPath},
@@ -244,28 +157,13 @@ func TestRangeQueryCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: rate(foo[3h])\n",
 			checker:     newRangeQueryCheckWithLimit,
 			prometheus:  noProm,
-			problems:    noProblems,
 		},
 		{
 			description: "limit / 5h",
 			content:     "- record: foo\n  expr: rate(foo[5h])\n",
 			checker:     newRangeQueryCheckWithLimit,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "promql/range_query",
-						Summary:  "query beyond configured retention",
-						Details:  "Rule comment: some text",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 	}
 	runTests(t, testCases)

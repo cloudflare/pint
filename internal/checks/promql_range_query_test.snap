@@ -1,0 +1,222 @@
+
+[TestRangeQueryCheck/flag_not_set,_10d - 1]
+[]
+
+---
+
+[TestRangeQueryCheck/flag_not_set,_20d - 1]
+- description: flag not set, 20d
+  content: |
+    - record: foo
+      expr: rate(foo[20d])
+  output: |
+    2 |   expr: rate(foo[20d])
+                ^^^^^^^^^^^^^^ `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/flag_parse_error - 1]
+- description: flag parse error
+  content: |
+    - record: foo
+      expr: rate(foo[30d])
+  output: |
+    2 |   expr: rate(foo[30d])
+                ^^^^^^^^^^^^^^ Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"
+  problem:
+    reporter: promql/range_query
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Cannot parse --storage.tsdb.retention.time="abc" flag value: not a valid duration string: "abc"'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+- description: flag parse error
+  content: |
+    - record: foo
+      expr: rate(foo[30d])
+  output: |
+    2 |   expr: rate(foo[30d])
+                ^^^^^^^^^^^^^^ `foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo[30d]` selector is trying to query Prometheus for 30d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/flag_query_error - 1]
+- description: flag query error
+  content: |
+    - record: foo
+      expr: rate(foo[30d])
+  output: |
+    1 | - record: foo
+                  ^^^ Couldn't run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.
+  problem:
+    reporter: promql/range_query
+    summary: unable to run checks
+    details: ""
+    diagnostics:
+        - message: 'Couldn''t run some online checks due to `prom` Prometheus server at http://127.0.0.1:XXXXX connection error: `server_error: internal error`.'
+          pos:
+            - line: 1
+              firstcolumn: 11
+              lastcolumn: 13
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 1
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/flag_set_to_11d,_10d - 1]
+[]
+
+---
+
+[TestRangeQueryCheck/flag_set_to_11d,_11d1h - 1]
+- description: flag set to 11d, 11d1h
+  content: |
+    - record: foo
+      expr: rate(foo[11d1h])
+  output: |
+    2 |   expr: rate(foo[11d1h])
+                ^^^^^^^^^^^^^^^^ `foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo[11d1h]` selector is trying to query Prometheus for 11d1h worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 11d of metrics history.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 24
+          firstcolumn: 1
+          lastcolumn: 16
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/flag_unsupported - 1]
+[]
+
+---
+
+[TestRangeQueryCheck/flag_with_0s,_10d - 1]
+[]
+
+---
+
+[TestRangeQueryCheck/flag_with_0s,_20d - 1]
+- description: flag with 0s, 20d
+  content: |
+    - record: foo
+      expr: rate(foo[20d])
+  output: |
+    2 |   expr: rate(foo[20d])
+                ^^^^^^^^^^^^^^ `foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: ""
+    diagnostics:
+        - message: '`foo[20d]` selector is trying to query Prometheus for 20d worth of metrics, but `prom` Prometheus server at https://simple.example.com is configured to only keep 15d of metrics history.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 14
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestRangeQueryCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestRangeQueryCheck/limit_/_3h - 1]
+[]
+
+---
+
+[TestRangeQueryCheck/limit_/_5h - 1]
+- description: limit / 5h
+  content: |
+    - record: foo
+      expr: rate(foo[5h])
+  output: |
+    2 |   expr: rate(foo[5h])
+                ^^^^^^^^^^^^^ `foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.
+  problem:
+    reporter: promql/range_query
+    summary: query beyond configured retention
+    details: 'Rule comment: some text'
+    diagnostics:
+        - message: '`foo[5h]` selector is trying to query Prometheus for 5h worth of metrics, but 4h is the maximum allowed range query.'
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---

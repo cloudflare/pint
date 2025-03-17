@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -19,436 +18,151 @@ func TestTemplateCheck(t *testing.T) {
 			content:     "- record: foo\n  expr: sum(foo)\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems:    noProblems,
 		},
 		{
 			description: "invalid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `undefined variable \"$label\"`.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "invalid function in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `function \"xxx\" not defined`.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "valid syntax in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  annotations:\n    summary: 'Instance {{ $labels.instance }} down'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems:    noProblems,
 		},
 		{
 			description: "invalid syntax in labels",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $label.instance }} down'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `undefined variable \"$label\"`.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "invalid function in annotations",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: '{{ $value | xxx }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `function \"xxx\" not defined`.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "valid syntax in labels",
 			content:     "- alert: Foo Is Down\n  expr: up{job=\"foo\"} == 0\n  labels:\n    summary: 'Instance {{ $labels.instance }} down'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems:    noProblems,
 		},
 		{
 			description: "{{$value}} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{$value}} in multiple labels",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: '{{ .Value }}'\n    baz: '{{$value}}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{  $value  }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{  $value | humanizePercentage }}%\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{  $value  }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: |\n      foo is {{$value|humanizePercentage}}%\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `$value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{ .Value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: 'value {{ .Value }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{ .Value|humanize }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ .Value|humanize }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `.Value` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{ $foo := $value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := $value }}{{ $foo }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "{{ $foo := .Value }} in label value",
 			content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    foo: bar\n    baz: '{{ $foo := .Value }}{{ $foo }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "value used in labels",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Using `$foo` in labels will generate a new alert on every value change, move it to annotations.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (by)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation that removes all labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (by)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation that removes all labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "label missing from metrics (without)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) without(job) > 0\n  labels:\n    summary: '{{ $labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (or)",
 			content:     "- alert: Foo Is Down\n  expr: sum(foo) by(job) or sum(bar)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation that removes all labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (1+)",
 			content:     "- alert: Foo Is Down\n  expr: 1 + sum(foo) by(notjob)\n  annotations:\n    summary: '{{ .Labels.job }}'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label missing from metrics (group_left)",
@@ -461,23 +175,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `ixtance` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "don't trigger for label_replace() provided labels",
@@ -493,7 +191,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "annotation label present on metrics (absent)",
@@ -505,7 +202,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "annotation label missing from metrics (absent, and)",
@@ -520,62 +216,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `foo` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `xxx` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "annotation label present on metrics (absent(sum))",
@@ -587,36 +228,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "annotation label missing from metrics (absent(sum))",
@@ -628,36 +240,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "annotation label missing from metrics (absent({job=~}))",
@@ -669,23 +252,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "annotation label missing from metrics (absent()) / multiple",
@@ -697,23 +264,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "absent() * on() group_left(...) foo",
@@ -725,7 +276,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "absent() * on() group_left() bar",
@@ -737,36 +287,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `cluster` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `env` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "bar * on() group_right(...) absent()",
@@ -778,7 +299,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "bar * on() group_right() absent()",
@@ -790,36 +310,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `cluster` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `env` label but the query results won't have this label.",
-							},
-							{
-								Message: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "foo and on() absent(bar)",
@@ -831,7 +322,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "no humanize on rate()",
@@ -843,24 +333,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "use humanize filters for the results",
-						Details:  checks.TemplateCheckReferenceDetails,
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`rate()` will produce results that are hard to read for humans.",
-							},
-							{
-								Message: "Use one of humanize template functions to make the result more readable.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no humanize on rate() / alias",
@@ -872,24 +345,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "use humanize filters for the results",
-						Details:  checks.TemplateCheckReferenceDetails,
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`rate()` will produce results that are hard to read for humans.",
-							},
-							{
-								Message: "Use one of humanize template functions to make the result more readable.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no humanize on irate()",
@@ -901,24 +357,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "use humanize filters for the results",
-						Details:  checks.TemplateCheckReferenceDetails,
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`irate()` will produce results that are hard to read for humans.",
-							},
-							{
-								Message: "Use one of humanize template functions to make the result more readable.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "no humanize on irate()",
@@ -930,24 +369,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "use humanize filters for the results",
-						Details:  checks.TemplateCheckReferenceDetails,
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`deriv()` will produce results that are hard to read for humans.",
-							},
-							{
-								Message: "Use one of humanize template functions to make the result more readable.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "rate() but no $value",
@@ -959,7 +381,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize passed to value",
@@ -971,7 +392,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanizePercentage passed to value",
@@ -983,7 +403,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanizeDuration passed to value",
@@ -995,7 +414,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize not needed on count()",
@@ -1007,7 +425,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize not needed on rate() used in RHS",
@@ -1019,7 +436,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize not needed on round(rate())",
@@ -1031,7 +447,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize not needed on wjen using printf %.2f",
@@ -1043,7 +458,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize not needed on wjen using printf %f",
@@ -1055,7 +469,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "humanize still needed for printf on another value",
@@ -1067,24 +480,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "use humanize filters for the results",
-						Details:  checks.TemplateCheckReferenceDetails,
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`rate()` will produce results that are hard to read for humans.",
-							},
-							{
-								Message: "Use one of humanize template functions to make the result more readable.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "toTime",
@@ -1096,7 +492,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "template query with syntax error",
@@ -1111,21 +506,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `163: executing \"summary\" at <query>: error calling query: 1:18: parse error: unclosed left parenthesis`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "template query with bogus function",
@@ -1140,21 +521,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `159: executing \"summary\" at <query>: error calling query: 1:1: parse error: unknown function with name \"suz\"`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "$value | first",
@@ -1166,35 +533,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Severity: checks.Fatal,
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `124: executing \"summary\" at <first>: wrong type for value; expected template.queryResult; got float64`.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "use humanize filters for the results",
-						Details:  checks.TemplateCheckReferenceDetails,
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "`rate()` will produce results that are hard to read for humans.",
-							},
-							{
-								Message: "Use one of humanize template functions to make the result more readable.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "template query with bogus range",
@@ -1209,21 +548,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template syntax error",
-						Details:  checks.TemplateCheckSyntaxDetails,
-						Severity: checks.Fatal,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template failed to parse with this error: `121: executing \"summary\" at <query \"up xxx\">: error calling query: 1:4: parse error: unexpected identifier \"xxx\"`.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "template query with valid expr",
@@ -1235,7 +560,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		/*
 					TODO
@@ -1282,7 +606,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "abs / scalar",
@@ -1305,89 +628,27 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "annotation label from vector(0)",
 			content:     "- alert: DeadMansSwitch\n  expr: vector(1)\n  annotations:\n    summary: 'Deadmans switch on {{ $labels.instance }} is firing'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "Calling `vector()` will return a vector value with no labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "labels label from vector(0)",
 			content:     "- alert: DeadMansSwitch\n  expr: vector(1)\n  labels:\n    summary: 'Deadmans switch on {{ $labels.instance }} is firing'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "Calling `vector()` will return a vector value with no labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "annotation label from number",
 			content:     "- alert: DeadMansSwitch\n  expr: 1 > bool 0\n  annotations:\n    summary: 'Deadmans switch on {{ $labels.instance }} / {{ $labels.job }} is firing'\n",
 			checker:     newTemplateCheck,
 			prometheus:  noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `instance` label but the query results won't have this label.",
-							},
-							{
-								Message: "This query returns a number value with no labels.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "This query returns a number value with no labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:    true,
 		},
 		{
 			description: "foo / on(...) bar",
@@ -1400,36 +661,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job_name` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
-							},
-						},
-					},
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `app_type` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "multiple or",
@@ -1455,7 +687,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "multiple or / missing group_left()",
@@ -1481,23 +712,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `prefix` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "time - metric",
@@ -1509,7 +724,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "bar * ignoring(job) foo",
@@ -1521,23 +735,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `job` label but the query results won't have this label.",
-							},
-							{
-								Message: "Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "metric or (metric or vector)",
@@ -1551,23 +749,7 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: checks.TemplateCheckName,
-						Summary:  "template uses non-existent label",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: "Template is using `colo_name` label but the query results won't have this label.",
-							},
-							{
-								Message: "Calling `vector()` will return a vector value with no labels.",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "ignore dead code",
@@ -1580,7 +762,6 @@ func TestTemplateCheck(t *testing.T) {
 `,
 			checker:    newTemplateCheck,
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 	}
 	runTests(t, testCases)

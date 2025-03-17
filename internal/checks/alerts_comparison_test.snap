@@ -1,0 +1,273 @@
+
+[TestComparisonCheck/(foo_>_0)_or_vector(0) - 1]
+- description: (foo > 0) or vector(0)
+  content: |
+    - alert: Foo Is Down
+      expr: (foo > 0) or vector(0)
+  output: |
+    2 |   expr: (foo > 0) or vector(0)
+                ^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 30
+          firstcolumn: 1
+          lastcolumn: 22
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestComparisonCheck/(foo_>_1)_>_bool_1 - 1]
+[]
+
+---
+
+[TestComparisonCheck/absent(foo)_or_vector(0) - 1]
+- description: absent(foo) or vector(0)
+  content: |
+    - alert: Foo Is Down
+      expr: (foo > 0) or vector(0)
+  output: |
+    2 |   expr: (foo > 0) or vector(0)
+                ^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 30
+          firstcolumn: 1
+          lastcolumn: 22
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestComparisonCheck/absent_or_absent - 1]
+[]
+
+---
+
+[TestComparisonCheck/absent_or_absent_or_absent - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_expr_with_==_condition - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_expr_with_>=_condition - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_expr_with_>_condition - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_expr_with_bool - 1]
+- description: alert expr with bool
+  content: |
+    - alert: Error rate is high
+      expr: rate(error_count[5m]) > bool 5
+  output: |
+    2 |   expr: rate(error_count[5m]) > bool 5
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 38
+          firstcolumn: 1
+          lastcolumn: 30
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---
+
+[TestComparisonCheck/alert_expr_with_bool_and_condition - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_expr_without_any_condition - 1]
+- description: alert expr without any condition
+  content: |
+    - alert: Foo Is Down
+      expr: up{job="foo"}
+  output: |
+    2 |   expr: up{job="foo"}
+                ^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: Alert query doesn't have any condition, it will always fire if the metric exists.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 21
+          firstcolumn: 1
+          lastcolumn: 13
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestComparisonCheck/alert_on_absent - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_on_absent_over_time - 1]
+[]
+
+---
+
+[TestComparisonCheck/alert_unless_condition - 1]
+[]
+
+---
+
+[TestComparisonCheck/deep_level_comparison - 1]
+[]
+
+---
+
+[TestComparisonCheck/deep_level_without_comparison - 1]
+- description: deep level without comparison
+  content: |4
+    - alert: High_UDP_Receive_Errors
+      expr: quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m])
+            AND ON (instance)
+            rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
+  output: |
+    3 |   expr: quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m])
+    4 |         AND ON (instance)
+    5 |         rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: Alert query doesn't have any condition, it will always fire if the metric exists.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 71
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 26
+            - line: 5
+              firstcolumn: 9
+              lastcolumn: 88
+          firstcolumn: 1
+          lastcolumn: 161
+    lines:
+        first: 3
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
+[TestComparisonCheck/ignores_recording_rules - 1]
+[]
+
+---
+
+[TestComparisonCheck/ignores_rules_with_syntax_errors - 1]
+[]
+
+---
+
+[TestComparisonCheck/vector(0)_or_(foo_>_0) - 1]
+- description: vector(0) or (foo > 0)
+  content: |
+    - alert: Foo Is Down
+      expr: (foo > 0) or vector(0)
+  output: |
+    2 |   expr: (foo > 0) or vector(0)
+                ^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 30
+          firstcolumn: 1
+          lastcolumn: 22
+    lines:
+        first: 2
+        last: 2
+    severity: 2
+    anchor: 0
+
+---

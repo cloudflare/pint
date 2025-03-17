@@ -1,40 +1,14 @@
 package checks_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/prometheus/common/model"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
-
-func costText(name, uri string, count int) string {
-	return fmt.Sprintf("`%s` Prometheus server at %s returned %d result(s)", name, uri, count)
-}
-
-func memUsageText(b string) string {
-	return fmt.Sprintf(" with %s estimated memory usage", b)
-}
-
-func maxSeriesText(m int) string {
-	return fmt.Sprintf(", maximum allowed series is %d", m)
-}
-
-func evalDurText(name, uri, dur, limit string) string {
-	return fmt.Sprintf("`%s` Prometheus server at %s took %s when executing this query, which is more than the configured limit of %s.", name, uri, dur, limit)
-}
-
-func totalSamplesText(name, uri string, total, limit int) string {
-	return fmt.Sprintf("`%s` Prometheus server at %s queried %d samples in total when executing this query, which is more than the configured limit of %d.", name, uri, total, limit)
-}
-
-func peakSamplesText(name, uri string, total, limit int) string {
-	return fmt.Sprintf("`%s` Prometheus server at %s queried %d peak samples when executing this query, which is more than the configured limit of %d.", name, uri, total, limit)
-}
 
 func TestCostCheck(t *testing.T) {
 	content := "- record: foo\n  expr: sum(foo)\n"
@@ -47,7 +21,6 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 		},
 		{
 			description: "empty response",
@@ -56,7 +29,6 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -76,20 +48,7 @@ func TestCostCheck(t *testing.T) {
 			prometheus: func(uri string) *promapi.FailoverGroup {
 				return simpleProm("prom", uri, time.Millisecond*50, true)
 			},
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "unable to run checks",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", uri, "connection timeout"),
-							},
-						},
-					},
-				}
-			},
+			problems: true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -107,20 +66,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "unable to run checks",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorBadData("prom", uri, "bad_data: bad input data"),
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -140,20 +86,7 @@ func TestCostCheck(t *testing.T) {
 			prometheus: func(_ string) *promapi.FailoverGroup {
 				return simpleProm("prom", "http://127.0.0.1:1111", time.Second*5, false)
 			},
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "unable to run checks",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: checkErrorUnableToRun("prom", "http://127.0.0.1:1111", "connection refused"),
-							},
-						},
-					},
-				}
-			},
+			problems: true,
 		},
 		{
 			description: "1 result",
@@ -162,20 +95,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query cost estimate",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 1) + memUsageText("4.0KiB") + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -204,20 +124,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query cost estimate",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 7) + memUsageText("707B") + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -256,20 +163,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query cost estimate",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 7) + memUsageText("7.0MiB") + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -308,20 +202,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 1, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query is too expensive",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 7) + memUsageText("7.0KiB") + maxSeriesText(1) + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -360,20 +241,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 5, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query is too expensive",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 6) + maxSeriesText(5) + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -407,21 +275,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 5, 0, 0, 0, "rule comment", checks.Information)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query is too expensive",
-						Details:  "Rule comment: rule comment",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 7) + maxSeriesText(5) + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -459,20 +313,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, 0, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query cost estimate",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: costText("prom", uri, 7) + memUsageText("707B") + ".",
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -511,7 +352,6 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 0, 0, time.Second*5, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems:   noProblems,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -547,20 +387,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 100, 10, time.Second*5, "", checks.Bug)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query is too expensive",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: totalSamplesText("prom", uri, 200, 100),
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -600,21 +427,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 300, 10, time.Second*5, "some text", checks.Information)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query is too expensive",
-						Details:  "Rule comment: some text",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: peakSamplesText("prom", uri, 20, 10),
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -654,21 +467,7 @@ func TestCostCheck(t *testing.T) {
 				return checks.NewCostCheck(prom, 0, 300, 30, time.Second*5, "some text", checks.Information)
 			},
 			prometheus: newSimpleProm,
-			problems: func(uri string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "query/cost",
-						Summary:  "query is too expensive",
-						Details:  "Rule comment: some text",
-						Severity: checks.Information,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: evalDurText("prom", uri, "5s100ms", "5s"),
-							},
-						},
-					},
-				}
-			},
+			problems:   true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{

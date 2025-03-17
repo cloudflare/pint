@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/cloudflare/pint/internal/checks"
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -55,7 +54,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "ignores unparsable link annotations",
@@ -64,7 +62,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "ignores non link annotations",
@@ -73,7 +70,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				return checks.NewRuleLinkCheck(nil, "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "ignores links without regexp match",
@@ -82,7 +78,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp("ftp://xxx.com"), "", time.Second, nil, "", checks.Bug)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "link with no host",
@@ -91,21 +86,7 @@ func TestRuleLinkCheck(t *testing.T) {
 				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, "some text", checks.Bug)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/link",
-						Summary:  "link check failed",
-						Details:  "Rule comment: some text",
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: `GET request for http: returned an error: Get "http:": http: no Host in request URL.`,
-							},
-						},
-						Severity: checks.Bug,
-					},
-				}
-			},
+			problems:   true,
 		},
 		{
 			description: "link with 200 OK",
@@ -121,7 +102,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "link with 400 Bad Request",
@@ -137,20 +117,9 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/link",
-						Summary:  "link check failed",
-						Details:  "Rule comment: some text",
-						Severity: checks.Bug,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
-							},
-						},
-					},
-				}
+			problems:   true,
+			snapshot: func(s string) string {
+				return rewriteURL(s, srv.URL)
 			},
 		},
 		{
@@ -167,29 +136,9 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems: func(_ string) []checks.Problem {
-				return []checks.Problem{
-					{
-						Reporter: "rule/link",
-						Summary:  "link check failed",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: fmt.Sprintf("GET request for %s/dashboard returned invalid status code: `400 Bad Request`.", srv.URL),
-							},
-						},
-					},
-					{
-						Reporter: "rule/link",
-						Summary:  "link check failed",
-						Severity: checks.Warning,
-						Diagnostics: []diags.Diagnostic{
-							{
-								Message: fmt.Sprintf("GET request for %s/graph returned invalid status code: `400 Bad Request`.", srv.URL),
-							},
-						},
-					},
-				}
+			problems:   true,
+			snapshot: func(s string) string {
+				return rewriteURL(s, srv.URL)
 			},
 		},
 		{
@@ -206,7 +155,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "link with rewrite rule",
@@ -222,7 +170,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 		{
 			description: "link with invalid URL",
@@ -238,7 +185,6 @@ func TestRuleLinkCheck(t *testing.T) {
 				)
 			},
 			prometheus: noProm,
-			problems:   noProblems,
 		},
 	}
 	runTests(t, testCases)
