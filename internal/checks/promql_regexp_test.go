@@ -237,6 +237,17 @@ func TestRegexpCheck(t *testing.T) {
 			checker:     newRegexpCheck,
 			prometheus:  noProm,
 		},
+		{
+			description: "smelly selector / multiple",
+			content: `
+- record: foo
+  expr: |
+    sum by (instance, type) (rate(requests_total{env=~"production.*", status="failed"}[5m])) / (1 + sum by (instance, type) (rate(request_total{env=~"production.*"}[5m]))) > 0.1
+`,
+			checker:    newRegexpCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }
