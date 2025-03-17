@@ -3,23 +3,12 @@ package parser
 import (
 	"fmt"
 	"slices"
-	"strings"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
 )
-
-func nodeLines(node *yaml.Node, offset int) (lr diags.LineRange) {
-	lr.First = node.Line + offset
-	lr.Last = node.Line + offset
-	if node.Value != "" && (node.Style == yaml.LiteralStyle || node.Style == yaml.FoldedStyle) {
-		lr.First++
-		lr.Last = lr.First + len(strings.Split(strings.TrimSuffix(node.Value, "\n"), "\n")) - 1
-	}
-	return lr
-}
 
 func nodeValue(node *yaml.Node) string {
 	if node.Alias != nil {
@@ -47,7 +36,6 @@ func mergeComments(node *yaml.Node) (comments []string) {
 type YamlNode struct {
 	Value string
 	Pos   diags.PositionRanges
-	Lines diags.LineRange // FIXME remove ?
 }
 
 func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
@@ -65,7 +53,6 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 
 func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlNode {
 	return &YamlNode{
-		Lines: nodeLines(node, offsetLine),
 		Pos:   diags.NewPositionRange(contentLines, node, minColumn).AddOffset(offsetLine, offsetColumn),
 		Value: nodeValue(node),
 	}
@@ -79,7 +66,6 @@ type YamlKeyValue struct {
 type YamlMap struct {
 	Key   *YamlNode
 	Items []*YamlKeyValue
-	Lines diags.LineRange
 }
 
 func (ym *YamlMap) IsIdentical(b *YamlMap) bool {
@@ -113,14 +99,19 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 	return nil
 }
 
+func (ym YamlMap) Lines() (lr diags.LineRange) {
+	lr = ym.Key.Pos.Lines()
+	for _, item := range ym.Items {
+		lr.First = min(lr.First, item.Key.Pos.Lines().First)
+		lr.Last = max(lr.Last, item.Value.Pos.Lines().Last)
+	}
+	return lr
+}
+
 func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLines []string) *YamlMap {
 	ym := YamlMap{
 		Key:   newYamlNode(key, offsetLine, offsetColumn, contentLines, 1),
 		Items: nil,
-		Lines: diags.LineRange{
-			First: key.Line + offsetLine,
-			Last:  key.Line + offsetLine,
-		},
 	}
 
 	var ckey *yaml.Node
@@ -129,9 +120,6 @@ func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLine
 			kv := YamlKeyValue{
 				Key:   newYamlNode(ckey, offsetLine, offsetColumn, contentLines, key.Column+2),
 				Value: newYamlNode(child, offsetLine, offsetColumn, contentLines, ckey.Column+2),
-			}
-			if kv.Value.Lines.Last > ym.Lines.Last {
-				ym.Lines.Last = kv.Value.Lines.Last
 			}
 			ym.Items = append(ym.Items, &kv)
 			ckey = nil

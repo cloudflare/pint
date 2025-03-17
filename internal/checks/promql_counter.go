@@ -120,7 +120,7 @@ LOOP:
 		}
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "direct counter read",
 			Details:  CounterCheckDetails,

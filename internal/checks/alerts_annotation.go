@@ -138,7 +138,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    ann.Lines,
+			Lines:    ann.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "invalid annotation value",
 			Details:  maybeComment(c.comment),
@@ -175,7 +175,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    ann.Lines,
+				Lines:    ann.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "invalid annotation value",
 				Details:  details.String(),

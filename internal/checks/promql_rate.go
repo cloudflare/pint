@@ -93,7 +93,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 			if m.Range < cfg.Config.Global.ScrapeInterval*time.Duration(c.minIntervals) {
 				problems = append(problems, Problem{
 					Anchor:   AnchorAfter,
-					Lines:    expr.Value.Lines,
+					Lines:    expr.Value.Pos.Lines(),
 					Reporter: c.Reporter(),
 					Summary:  "duration too small",
 					Details:  RateCheckDetails,
@@ -129,7 +129,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 					if m.Type != v1.MetricTypeCounter && m.Type != v1.MetricTypeUnknown {
 						problems = append(problems, Problem{
 							Anchor:   AnchorAfter,
-							Lines:    expr.Value.Lines,
+							Lines:    expr.Value.Pos.Lines(),
 							Reporter: c.Reporter(),
 							Summary:  "counter based function called on a non-counter",
 							Details:  RateCheckDetails,
@@ -184,7 +184,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 								}
 								problems = append(problems, Problem{
 									Anchor:   AnchorAfter,
-									Lines:    expr.Value.Lines,
+									Lines:    expr.Value.Pos.Lines(),
 									Reporter: c.Reporter(),
 									Summary:  "chained rate call",
 									Details: fmt.Sprintf(

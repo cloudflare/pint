@@ -93,7 +93,7 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 			el := src.LabelExcludeReason(c.label)
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "required label is being removed via aggregation",
 				Details:  maybeComment(c.comment),
@@ -126,7 +126,7 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "label must be removed in aggregations",
 				Details:  maybeComment(c.comment),

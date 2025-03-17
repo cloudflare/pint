@@ -52,7 +52,7 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 	if rule.AlertingRule != nil && !c.re.MustExpand(rule).MatchString(rule.AlertingRule.Alert.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    rule.AlertingRule.Alert.Lines,
+			Lines:    rule.AlertingRule.Alert.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),
@@ -70,7 +70,7 @@ func (c RuleNameCheck) Check(_ context.Context, _ discovery.Path, rule parser.Ru
 	if rule.RecordingRule != nil && !c.re.MustExpand(rule).MatchString(rule.RecordingRule.Record.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    rule.RecordingRule.Record.Lines,
+			Lines:    rule.RecordingRule.Record.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "name not allowed",
 			Details:  maybeComment(c.comment),

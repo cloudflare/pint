@@ -96,7 +96,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	if c.maxSeries > 0 && series > c.maxSeries {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
@@ -116,7 +116,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	if c.maxTotalSamples > 0 && qr.Stats.Samples.TotalQueryableSamples > c.maxTotalSamples {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
@@ -136,7 +136,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	if c.maxPeakSamples > 0 && qr.Stats.Samples.PeakSamples > c.maxPeakSamples {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
@@ -157,7 +157,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	if c.maxEvaluationDuration > 0 && evalDur > c.maxEvaluationDuration {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "query is too expensive",
 			Details:  maybeComment(c.comment),
@@ -177,7 +177,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	if series > 0 && c.maxSeries == 0 && c.maxTotalSamples == 0 && c.maxPeakSamples == 0 && c.maxEvaluationDuration == 0 {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    expr.Value.Lines,
+			Lines:    expr.Value.Pos.Lines(),
 			Reporter: c.Reporter(),
 			Summary:  "query cost estimate",
 			Details:  maybeComment(c.comment),

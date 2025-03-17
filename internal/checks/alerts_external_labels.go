@@ -71,8 +71,8 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
 					Lines: diags.LineRange{
-						First: label.Key.Lines.First,
-						Last:  label.Value.Lines.Last,
+						First: label.Key.Pos.Lines().First,
+						Last:  label.Value.Pos.Lines().Last,
 					},
 					Reporter: c.Reporter(),
 					Summary:  "invalid label",
@@ -97,8 +97,8 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
 					Lines: diags.LineRange{
-						First: annotation.Key.Lines.First,
-						Last:  annotation.Value.Lines.Last,
+						First: annotation.Key.Pos.Lines().First,
+						Last:  annotation.Value.Pos.Lines().Last,
 					},
 					Reporter: c.Reporter(),
 					Summary:  "invalid label",

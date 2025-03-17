@@ -66,7 +66,7 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 			}
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "fragile query",
 				Details:  FragileCheckSamplingDetails,

@@ -92,7 +92,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 		if err != nil {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "unable to run checks",
 				Details:  "",
@@ -134,7 +134,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, 
 		if n.Range > retention {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "query beyond configured retention",
 				Details:  maybeComment(c.comment),

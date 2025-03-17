@@ -208,7 +208,7 @@ func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			pos := findMatcherPos(expr.Value.Value, b.pos, b.lm)
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    expr.Value.Lines,
+				Lines:    expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  summary,
 				Details:  RegexpCheckDetails,

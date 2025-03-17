@@ -121,7 +121,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 
 		problems = append(problems, Problem{
 			Anchor:      AnchorAfter,
-			Lines:       rule.AlertingRule.Expr.Value.Lines,
+			Lines:       rule.AlertingRule.Expr.Value.Pos.Lines(),
 			Reporter:    c.Reporter(),
 			Summary:     summary,
 			Details:     AlertsAbsentCheckDetails,
