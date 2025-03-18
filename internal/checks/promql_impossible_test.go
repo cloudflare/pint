@@ -69,6 +69,25 @@ func TestImpossibleCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 			problems:   true,
 		},
+		{
+			description: "",
+			content: `
+  - alert: Device_IO_Errors
+    expr: >-
+      max without (source_instance) (
+        increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
+          increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
+        )
+        and on(device, instance) absent(node_disk_info)
+      ) unless on (instance,device) max(max_over_time(cloudchamber_snapshot_devices[1h])) by (instance,device)
+    labels:
+      priority: "4"
+      component: disk
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
 	}
 
 	runTests(t, testCases)

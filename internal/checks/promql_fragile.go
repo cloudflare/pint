@@ -75,8 +75,8 @@ func (c FragileCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 					{
 						Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
 						Pos:         expr.Value.Pos,
-						FirstColumn: int(src.GetSmallestPosition().Start) + 1,
-						LastColumn:  int(src.GetSmallestPosition().End),
+						FirstColumn: int(src.Position.Start) + 1,
+						LastColumn:  int(src.Position.End),
 					},
 				},
 			})

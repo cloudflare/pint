@@ -57,7 +57,6 @@ func (c ImpossibleCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 
 func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (problems []Problem) {
 	if s.IsDead {
-		pos := s.GetSmallestPosition()
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Pos.Lines(),
@@ -67,8 +66,8 @@ func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (pr
 			Diagnostics: []diags.Diagnostic{
 				{
 					Pos:         expr.Value.Pos,
-					FirstColumn: int(pos.Start) + 1,
-					LastColumn:  int(pos.End),
+					FirstColumn: int(s.IsDeadPosition.Start) + 1,
+					LastColumn:  int(s.IsDeadPosition.End),
 					Message:     s.IsDeadReason,
 				},
 			},

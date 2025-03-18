@@ -198,8 +198,8 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 											Message: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
 												src.Operation, node.Expr, src.Operation, src.Selector),
 											Pos:         expr.Value.Pos,
-											FirstColumn: int(src.GetSmallestPosition().Start) + 1,
-											LastColumn:  int(src.GetSmallestPosition().End),
+											FirstColumn: int(src.Position.Start) + 1,
+											LastColumn:  int(src.Position.End),
 										},
 									},
 								})
