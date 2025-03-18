@@ -1,4 +1,70 @@
 
+[TestImpossibleCheck/#00 - 1]
+- description: ""
+  content: |4
+      - alert: Device_IO_Errors
+        expr: >-
+          max without (source_instance) (
+            increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
+              increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
+            )
+            and on(device, instance) absent(node_disk_info)
+          ) unless on (instance,device) max(max_over_time(cloudchamber_snapshot_devices[1h])) by (instance,device)
+        labels:
+          priority: "4"
+          component: disk
+  output: |
+    4 |       max without (source_instance) (
+    5 |         increase(kernel_device_io_errors_total{device!~"loop.+"}[120m]) > 3 unless on(instance, device) (
+    6 |           increase(kernel_device_io_soft_errors_total{device!~"loop.+"}[125m])*2 > increase(kernel_device_io_errors_total[120m])
+    7 |         )
+    8 |         and on(device, instance) absent(node_disk_info)
+                                         ^^^^^^ The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+    You will only get any results back if the metric selector you pass doesn't match anything.
+    Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+    This means that the only labels you can get back from absent call are the ones you pass to it.
+    If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+    9 |       ) unless on (instance,device) max(max_over_time(cloudchamber_snapshot_devices[1h])) by (instance,device)
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: |-
+            The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
+            You will only get any results back if the metric selector you pass doesn't match anything.
+            Since there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.
+            This means that the only labels you can get back from absent call are the ones you pass to it.
+            If you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 38
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 106
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 129
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 10
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 56
+            - line: 9
+              firstcolumn: 7
+              lastcolumn: 110
+          firstcolumn: 287
+          lastcolumn: 292
+    lines:
+        first: 4
+        last: 9
+    severity: 1
+    anchor: 0
+
+---
+
 [TestImpossibleCheck/0_>_0 - 1]
 - description: 0 > 0
   content: |4
@@ -34,7 +100,7 @@
       expr: foo{job="bar"} unless sum(foo)
   output: |
     3 |   expr: foo{job="bar"} unless sum(foo)
-                                          ^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
+                                      ^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Query is using aggregation that removes all labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -45,8 +111,8 @@
             - line: 3
               firstcolumn: 9
               lastcolumn: 38
-          firstcolumn: 27
-          lastcolumn: 29
+          firstcolumn: 23
+          lastcolumn: 25
     lines:
         first: 3
         last: 3
@@ -62,7 +128,7 @@
       expr: foo{job="bar"} unless vector(0)
   output: |
     3 |   expr: foo{job="bar"} unless vector(0)
-                                      ^^^^^^^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+                                      ^^^^^^ The right hand side will never be matched because it doesn't have the `job` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -74,7 +140,7 @@
               firstcolumn: 9
               lastcolumn: 39
           firstcolumn: 23
-          lastcolumn: 31
+          lastcolumn: 28
     lines:
         first: 3
         last: 3

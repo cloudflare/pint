@@ -117,11 +117,14 @@ func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser
 		}
 		if !c.keep && src.CanHaveLabel(c.label) {
 			posrange := src.Position
-			if src.Aggregation != nil && len(src.Aggregation.Grouping) != 0 {
-				if src.Aggregation.Without {
-					posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "without")
-				} else {
-					posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "by")
+			if src.Aggregation != nil {
+				posrange = src.Aggregation.PosRange
+				if len(src.Aggregation.Grouping) != 0 {
+					if src.Aggregation.Without {
+						posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "without")
+					} else {
+						posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "by")
+					}
 				}
 			}
 			problems = append(problems, Problem{

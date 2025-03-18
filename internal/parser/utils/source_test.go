@@ -77,6 +77,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 1, End: 2},
 					IsDeadReason:   "this query always evaluates to `32 == 5` which is not possible, so it will never return anything",
 					ReturnedNumber: 32,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -98,6 +99,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 1, End: 2},
 					IsDeadReason:   "this query always evaluates to `3 <= 2` which is not possible, so it will never return anything",
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -119,6 +121,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 1, End: 2},
 					IsDeadReason:   "this query always evaluates to `3 >= 20` which is not possible, so it will never return anything",
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -159,6 +162,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 1, End: 2},
 					IsDeadReason:   "this query always evaluates to `3 < 1` which is not possible, so it will never return anything",
 					ReturnedNumber: 3,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -180,6 +184,7 @@ func TestLabelsSource(t *testing.T) {
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 0, End: 2},
 					IsDeadReason:   "this query always evaluates to `5 < 1` which is not possible, so it will never return anything",
 					ReturnedNumber: 5,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -280,12 +285,13 @@ func TestLabelsSource(t *testing.T) {
 						},
 						{
 							Src: utils.Source{
-								Type:         utils.SelectorSource,
-								Returns:      promParser.ValueTypeVector,
-								Operation:    promParser.CardManyToMany.String(),
-								Selector:     mustParse[*promParser.VectorSelector](t, "bar", 35),
-								IsDead:       true,
-								IsDeadReason: "the left hand side always returs something and so the right hand side is never used",
+								Type:           utils.SelectorSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      promParser.CardManyToMany.String(),
+								Selector:       mustParse[*promParser.VectorSelector](t, "bar", 35),
+								IsDead:         true,
+								IsDeadPosition: posrange.PositionRange{Start: 35, End: 38},
+								IsDeadReason:   "the left hand side always returs something and so the right hand side is never used",
 							},
 						},
 					},
@@ -324,12 +330,13 @@ func TestLabelsSource(t *testing.T) {
 						},
 						{
 							Src: utils.Source{
-								Type:         utils.SelectorSource,
-								Returns:      promParser.ValueTypeVector,
-								Operation:    promParser.CardManyToMany.String(),
-								Selector:     mustParse[*promParser.VectorSelector](t, "bar", 35),
-								IsDead:       true,
-								IsDeadReason: "the left hand side always returs something and so the right hand side is never used",
+								Type:           utils.SelectorSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      promParser.CardManyToMany.String(),
+								Selector:       mustParse[*promParser.VectorSelector](t, "bar", 35),
+								IsDead:         true,
+								IsDeadPosition: posrange.PositionRange{Start: 35, End: 38},
+								IsDeadReason:   "the left hand side always returs something and so the right hand side is never used",
 							},
 						},
 					},
@@ -1971,14 +1978,15 @@ sum(foo:count) by(job) > 20`,
 			expr: "vector(0.0  >= bool 0.5) == 1",
 			output: []utils.Source{
 				{
-					Type:          utils.FuncSource,
-					Returns:       promParser.ValueTypeVector,
-					Operation:     "vector",
-					FixedLabels:   true,
-					AlwaysReturns: true,
-					KnownReturn:   true,
-					IsDead:        true,
-					IsDeadReason:  "this query always evaluates to `0 == 1` which is not possible, so it will never return anything",
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "vector",
+					FixedLabels:    true,
+					AlwaysReturns:  true,
+					KnownReturn:    true,
+					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 0, End: 24},
+					IsDeadReason:   "this query always evaluates to `0 == 1` which is not possible, so it will never return anything",
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Calling `vector()` will return a vector value with no labels.",
@@ -2262,6 +2270,7 @@ sum by (region, target, colo_name) (
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsDead:         true,
+					IsDeadPosition: posrange.PositionRange{Start: 91, End: 102},
 					IsDeadReason:   "this query always evaluates to `1 == 0` which is not possible, so it will never return anything",
 					ReturnedNumber: 1,
 					ExcludeReason: map[string]utils.ExcludedLabel{
@@ -3651,6 +3660,7 @@ sum by (foo, bar) (
 					Operation:     promParser.CardManyToMany.String(),
 					IsConditional: true,
 					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 5),
+					Position:      posrange.PositionRange{Start: 5, End: 8},
 				},
 				{
 					Type:           utils.FuncSource,
@@ -3668,7 +3678,9 @@ sum by (foo, bar) (
 							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
-					Call: mustParse[*promParser.Call](t, "vector(0)", 12),
+					Call:           mustParse[*promParser.Call](t, "vector(0)", 12),
+					Position:       posrange.PositionRange{Start: 12, End: 21},
+					IsDeadPosition: posrange.PositionRange{Start: 12, End: 21},
 				},
 			},
 		},
@@ -3730,6 +3742,46 @@ sum by (foo, bar) (
 				},
 			},
 		},
+		{
+			expr: `sum(foo or vector(0)) > 0`,
+			output: []utils.Source{
+				{
+					Type:          utils.AggregateSource,
+					Returns:       promParser.ValueTypeVector,
+					Operation:     "sum",
+					FixedLabels:   true,
+					AlwaysReturns: false, // FIXME true?
+					IsConditional: true,
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
+					},
+					Aggregation: mustParse[*promParser.AggregateExpr](t, "sum(foo or vector(0))", 0),
+					Selector:    mustParse[*promParser.VectorSelector](t, "foo", 4),
+				},
+				{
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					AlwaysReturns:  true,
+					IsConditional:  true,
+					FixedLabels:    true,
+					KnownReturn:    true,
+					ReturnedNumber: 0,
+					IsDead:         true,
+					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+					IsDeadPosition: posrange.PositionRange{Start: 11, End: 20},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
+					},
+					Aggregation: mustParse[*promParser.AggregateExpr](t, "sum(foo or vector(0))", 0),
+					Call:        mustParse[*promParser.Call](t, "vector(0)", 11),
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -3745,10 +3797,19 @@ sum by (foo, bar) (
 				cmpopts.EquateNaNs(),
 				cmpopts.IgnoreUnexported(labels.Matcher{}),
 				cmpopts.IgnoreFields(utils.ExcludedLabel{}, "Fragment"),
-				cmpopts.IgnoreFields(utils.Source{}, "Position"),
+				cmpopts.IgnoreFields(utils.Source{}, "Position", "IsDeadPosition"),
 			); diff != "" {
 				t.Errorf("utils.LabelsSource() returned wrong output (-want +got):\n%s", diff)
 				return
+			}
+
+			for _, src := range output {
+				src.WalkSources(func(s utils.Source) {
+					require.Positive(t, s.Position.End, "empty position %+v", s)
+					if s.IsDead {
+						require.Positive(t, s.IsDeadPosition.End, "empty dead position %+v", s)
+					}
+				})
 			}
 		})
 	}
