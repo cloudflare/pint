@@ -763,6 +763,18 @@ func TestTemplateCheck(t *testing.T) {
 			checker:    newTemplateCheck,
 			prometheus: noProm,
 		},
+		{
+			description: "__name__ is stripped",
+			content: `
+- alert: Foo
+  expr: sum(foo) > 0
+  annotations:
+    summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }

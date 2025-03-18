@@ -65,6 +65,82 @@
 
 ---
 
+[TestTemplateCheck/__name___is_stripped - 1]
+- description: __name__ is stripped
+  content: |4
+    - alert: Foo
+      expr: sum(foo) > 0
+      annotations:
+        summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+  output: |
+    3 |   expr: sum(foo) > 0
+                ^^^ Query is using aggregation that removes all labels.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+                                ^^^^ Template is using `job` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `job` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 71
+          firstcolumn: 11
+          lastcolumn: 14
+        - message: Query is using aggregation that removes all labels.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+- description: __name__ is stripped
+  content: |4
+    - alert: Foo
+      expr: sum(foo) > 0
+      annotations:
+        summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+  output: |
+    3 |   expr: sum(foo) > 0
+                ^^^^^^^^ Aggregation removes metric name.
+      | [...]
+    5 |     summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+                                                                   ^^^^^^^^^ Template is using `__name__` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `__name__` label but the query results won't have this label.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 71
+          firstcolumn: 46
+          lastcolumn: 54
+        - message: Aggregation removes metric name.
+          pos:
+            - line: 3
+              firstcolumn: 9
+              lastcolumn: 20
+          firstcolumn: 1
+          lastcolumn: 8
+    lines:
+        first: 2
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
 [TestTemplateCheck/abs_/_scalar - 1]
 []
 
