@@ -548,15 +548,19 @@ func TestLabelsSource(t *testing.T) {
 			expr: `sum(foo{job="myjob"})`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"})`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"})`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -566,15 +570,19 @@ func TestLabelsSource(t *testing.T) {
 			expr: `sum(count(foo{job="myjob"}) by(instance))`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 10),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(count(foo{job="myjob"}) by(instance))`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 10),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(count(foo{job="myjob"}) by(instance))`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -584,15 +592,19 @@ func TestLabelsSource(t *testing.T) {
 			expr: `sum(foo{job="myjob"}) > 20`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"})`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"})`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -608,10 +620,13 @@ func TestLabelsSource(t *testing.T) {
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"}) without(job)`, 0),
-					ExcludedLabels: []string{"job"},
+					ExcludedLabels: []string{"job", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
 							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -628,9 +643,13 @@ func TestLabelsSource(t *testing.T) {
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo) by(job)`, 0),
 					IncludedLabels: []string{"job"},
 					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -648,9 +667,13 @@ func TestLabelsSource(t *testing.T) {
 					IncludedLabels:   []string{"job"},
 					GuaranteedLabels: []string{"job"},
 					FixedLabels:      true,
+					ExcludedLabels:   []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -700,10 +723,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} or bar{cluster="dev"}) without(instance)`, 0),
 					GuaranteedLabels: []string{"job"},
-					ExcludedLabels:   []string{"instance"},
+					ExcludedLabels:   []string{"instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
 							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -714,10 +740,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `bar{cluster="dev"}`, 24),
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} or bar{cluster="dev"}) without(instance)`, 0),
 					GuaranteedLabels: []string{"cluster"},
-					ExcludedLabels:   []string{"instance"},
+					ExcludedLabels:   []string{"instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
 							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -733,10 +762,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"}) without(instance)`, 0),
 					GuaranteedLabels: []string{"job"},
-					ExcludedLabels:   []string{"instance"},
+					ExcludedLabels:   []string{"instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
 							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -746,29 +778,37 @@ func TestLabelsSource(t *testing.T) {
 			expr: `min(foo{job="myjob"}) / max(foo{job="myjob"})`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "min",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `min(foo{job="myjob"})`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "min",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `min(foo{job="myjob"})`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Operation:   "max",
-								Returns:     promParser.ValueTypeVector,
-								Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `max(foo{job="myjob"})`, 24),
-								FixedLabels: true,
+								Type:           utils.AggregateSource,
+								Operation:      "max",
+								Returns:        promParser.ValueTypeVector,
+								Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `max(foo{job="myjob"})`, 24),
+								FixedLabels:    true,
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 							},
@@ -781,29 +821,37 @@ func TestLabelsSource(t *testing.T) {
 			expr: `max(foo{job="myjob"}) / min(foo{job="myjob"})`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "max",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `max(foo{job="myjob"})`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "max",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `max(foo{job="myjob"})`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Operation:   "min",
-								Returns:     promParser.ValueTypeVector,
-								Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `min(foo{job="myjob"})`, 24),
-								FixedLabels: true,
+								Type:           utils.AggregateSource,
+								Operation:      "min",
+								Returns:        promParser.ValueTypeVector,
+								Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 28),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `min(foo{job="myjob"})`, 24),
+								FixedLabels:    true,
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 							},
@@ -824,9 +872,13 @@ func TestLabelsSource(t *testing.T) {
 					GuaranteedLabels: []string{"job"},
 					IncludedLabels:   []string{"job"},
 					FixedLabels:      true,
+					ExcludedLabels:   []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -843,9 +895,13 @@ func TestLabelsSource(t *testing.T) {
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `group(foo) by(job)`, 0),
 					IncludedLabels: []string{"job"},
 					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -855,16 +911,20 @@ func TestLabelsSource(t *testing.T) {
 			expr: `stddev(rate(foo[5m]))`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "stddev",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 12),
-					Call:        mustParse[*promParser.Call](t, "rate(foo[5m])", 7),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `stddev(rate(foo[5m]))`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "stddev",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 12),
+					Call:           mustParse[*promParser.Call](t, "rate(foo[5m])", 7),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `stddev(rate(foo[5m]))`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -874,16 +934,20 @@ func TestLabelsSource(t *testing.T) {
 			expr: `stdvar(rate(foo[5m]))`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "stdvar",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 12),
-					Call:        mustParse[*promParser.Call](t, "rate(foo[5m])", 7),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `stdvar(rate(foo[5m]))`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "stdvar",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 12),
+					Call:           mustParse[*promParser.Call](t, "rate(foo[5m])", 7),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `stdvar(rate(foo[5m]))`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -917,16 +981,20 @@ func TestLabelsSource(t *testing.T) {
 			expr: `quantile(0.9, rate(foo[5m]))`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "quantile",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 19),
-					Call:        mustParse[*promParser.Call](t, "rate(foo[5m])", 14),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `quantile(0.9, rate(foo[5m]))`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "quantile",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 19),
+					Call:           mustParse[*promParser.Call](t, "rate(foo[5m])", 14),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `quantile(0.9, rate(foo[5m]))`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -944,9 +1012,13 @@ func TestLabelsSource(t *testing.T) {
 					GuaranteedLabels: []string{"version"},
 					IncludedLabels:   []string{"version"},
 					FixedLabels:      true,
+					ExcludedLabels:   []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -963,10 +1035,13 @@ func TestLabelsSource(t *testing.T) {
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `count_values("version", build_version) without(job)`, 0),
 					IncludedLabels:   []string{"version"},
 					GuaranteedLabels: []string{"version"},
-					ExcludedLabels:   []string{"job"},
+					ExcludedLabels:   []string{"job", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
 							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -983,10 +1058,13 @@ func TestLabelsSource(t *testing.T) {
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `count_values("version", build_version{job="foo"}) without(job)`, 0),
 					IncludedLabels:   []string{"version"},
 					GuaranteedLabels: []string{"version"},
-					ExcludedLabels:   []string{"job"},
+					ExcludedLabels:   []string{"job", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
 							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -1004,9 +1082,13 @@ func TestLabelsSource(t *testing.T) {
 					GuaranteedLabels: []string{"version"},
 					IncludedLabels:   []string{"job", "version"},
 					FixedLabels:      true,
+					ExcludedLabels:   []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -1067,10 +1149,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 9),
 					Call:           mustParse[*promParser.Call](t, "rate(foo[10m])", 4),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(rate(foo[10m])) without(instance)`, 0),
-					ExcludedLabels: []string{"instance"},
+					ExcludedLabels: []string{"instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"instance": {
 							Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -1196,15 +1281,19 @@ func TestLabelsSource(t *testing.T) {
 			expr: `count(foo / bar)`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "count",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 6),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `count(foo / bar)`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "count",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 6),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(foo / bar)`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1223,15 +1312,19 @@ func TestLabelsSource(t *testing.T) {
 			expr: `count(up{job="a"} / on () up{job="b"})`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "count",
-					Selector:    mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `count(up{job="a"} / on () up{job="b"})`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "count",
+					Selector:       mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(up{job="a"} / on () up{job="b"})`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1251,15 +1344,19 @@ func TestLabelsSource(t *testing.T) {
 			expr: `count(up{job="a"} / on (env) up{job="b"})`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "count",
-					Selector:    mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `count(up{job="a"} / on (env) up{job="b"})`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "count",
+					Selector:       mustParse[*promParser.VectorSelector](t, `up{job="a"}`, 6),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(up{job="a"} / on (env) up{job="b"})`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -1364,10 +1461,13 @@ func TestLabelsSource(t *testing.T) {
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 21),
 					Call:           mustParse[*promParser.Call](t, "rate(foo[5m])", 16),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `bottomk(10, sum(rate(foo[5m])) without(job))`, 0),
-					ExcludedLabels: []string{"job"},
+					ExcludedLabels: []string{"job", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"job": {
 							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -1513,7 +1613,7 @@ func TestLabelsSource(t *testing.T) {
 					Operation:      "count",
 					Selector:       mustParse[*promParser.VectorSelector](t, `up{job="foo", cluster="dev"}`, 10),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)`, 0),
-					ExcludedLabels: []string{"job", "cluster"},
+					ExcludedLabels: []string{labels.MetricName, "job", "cluster"},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
@@ -1524,6 +1624,9 @@ func TestLabelsSource(t *testing.T) {
 						},
 						"cluster": {
 							Reason: "Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -1590,8 +1693,13 @@ sum(foo:count) by(job) > 20`,
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo:sum`, 8),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo:sum > 0) without(notify)`, 4),
 					IncludedLabels: []string{"notify", "job"},
-					ExcludeReason:  map[string]utils.ExcludedLabel{},
-					IsConditional:  true,
+					ExcludedLabels: []string{labels.MetricName},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
+						},
+					},
+					IsConditional: true,
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
@@ -1609,9 +1717,13 @@ sum(foo:count) by(job) > 20`,
 								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo:count) by(job)`, 93),
 								IncludedLabels: []string{"job"},
 								FixedLabels:    true,
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								IsConditional: true,
@@ -1715,15 +1827,19 @@ sum(foo:count) by(job) > 20`,
 			expr: `absent(sum(foo) by(job, instance))`,
 			output: []utils.Source{
 				{
-					Type:        utils.FuncSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "absent",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 11),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo) by(job, instance)`, 7),
-					FixedLabels: true,
+					Type:           utils.FuncSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "absent",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 11),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo) by(job, instance)`, 7),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(sum(foo) by(job, instance))`, 0),
@@ -1770,9 +1886,13 @@ sum(foo:count) by(job) > 20`,
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo) by(notjob)`, 4),
 					IncludedLabels: []string{"notjob"},
 					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -1789,9 +1909,13 @@ sum(foo:count) by(job) > 20`,
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(node_exporter_build_info) by (instance, version)`, 0),
 					IncludedLabels: []string{"instance", "version", "foo"},
 					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -1805,9 +1929,13 @@ sum(foo:count) by(job) > 20`,
 								Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(deb_package_version) by (instance, version, package)`, 100),
 								IncludedLabels: []string{"instance", "version", "package"},
 								FixedLabels:    true,
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 							},
@@ -2068,9 +2196,13 @@ sum(foo:count) by(job) > 20`,
 					IncludedLabels:   []string{"pod"},
 					GuaranteedLabels: []string{"cluster"},
 					Call:             mustParse[*promParser.Call](t, `label_replace(sum by (pod) (pod_status) > 0, "cluster", "$1", "pod", "(.*)")`, 0),
+					ExcludedLabels:   []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(pod)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -2132,7 +2264,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Selector:    mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"}`, 41),
 					Aggregation: mustParse[*promParser.AggregateExpr](t, `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})`, 1),
 
-					ExcludedLabels: []string{"router", "colo_id", "instance"},
+					ExcludedLabels: []string{"router", "colo_id", "instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
 							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
@@ -2143,6 +2275,9 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 						"instance": {
 							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
 						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
+						},
 					},
 					IsConditional: true,
 				},
@@ -2152,7 +2287,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Operation:      "sum",
 					Selector:       mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"}`, 155),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})`, 115),
-					ExcludedLabels: []string{"router", "colo_id", "instance"},
+					ExcludedLabels: []string{"router", "colo_id", "instance", labels.MetricName},
 					FixedLabels:    true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
@@ -2167,21 +2302,28 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 						"": {
 							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
 						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
+						},
 					},
 					IsConditional: true,
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:          utils.AggregateSource,
-								Returns:       promParser.ValueTypeVector,
-								Operation:     "count",
-								Selector:      mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
-								Aggregation:   mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
-								FixedLabels:   true,
-								IsConditional: false, // FIXME true?
+								Type:           utils.AggregateSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "count",
+								Selector:       mustParse[*promParser.VectorSelector](t, `colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}`, 227),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"})`, 221),
+								FixedLabels:    true,
+								IsConditional:  false, // FIXME true?
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 							},
@@ -2195,7 +2337,7 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Selector:         mustParse[*promParser.VectorSelector](t, `router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"}`, 343),
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})`, 303),
 					GuaranteedLabels: []string{"cidr_use_case"},
-					ExcludedLabels:   []string{"router", "colo_id", "instance"},
+					ExcludedLabels:   []string{"router", "colo_id", "instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"router": {
 							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
@@ -2205,6 +2347,9 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 						},
 						"instance": {
 							Reason: "Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2221,8 +2366,13 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 					Selector:         mustParse[*promParser.VectorSelector](t, `foo`, 18),
 					Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo) without(instance)`, 14),
 					GuaranteedLabels: []string{"instance"},
-					ExcludeReason:    map[string]utils.ExcludedLabel{},
+					ExcludedLabels:   []string{labels.MetricName},
 					Call:             mustParse[*promParser.Call](t, `label_replace(sum(foo) without(instance), "instance", "none", "", "")`, 0),
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
+						},
+					},
 				},
 			},
 		},
@@ -2248,9 +2398,13 @@ sum by (region, target, colo_name) (
 )`, 0), // FIXME 0? should be 1
 					IncludedLabels: []string{"region", "target", "colo_name"},
 					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2273,9 +2427,13 @@ sum by (region, target, colo_name) (
 					IsDeadPosition: posrange.PositionRange{Start: 91, End: 102},
 					IsDeadReason:   "this query always evaluates to `1 == 0` which is not possible, so it will never return anything",
 					ReturnedNumber: 1,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2379,15 +2537,19 @@ sum by (region, target, colo_name) (
 			expr: `sum(foo or vector(0)) > 0`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 4),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(0))`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(0))`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2404,9 +2566,13 @@ sum by (region, target, colo_name) (
 					ReturnedNumber: 0,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2417,15 +2583,19 @@ sum by (region, target, colo_name) (
 			expr: `(sum(foo or vector(1)) > 0) == 2`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 5),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 5),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2442,9 +2612,13 @@ sum by (region, target, colo_name) (
 					ReturnedNumber: 1,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `1 == 2` which is not possible, so it will never return anything",
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2455,15 +2629,19 @@ sum by (region, target, colo_name) (
 			expr: `(sum(foo or vector(1)) > 0) != 2`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 5),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 5),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(1))`, 1),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2478,9 +2656,13 @@ sum by (region, target, colo_name) (
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					ReturnedNumber: 1,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2491,15 +2673,19 @@ sum by (region, target, colo_name) (
 			expr: `(sum(foo or vector(2)) > 0) != 2`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 5),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(2))`, 1),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 5),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo or vector(2))`, 1),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2516,9 +2702,13 @@ sum by (region, target, colo_name) (
 					ReturnedNumber: 2,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `2 != 2` which is not possible, so it will never return anything",
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					IsConditional: true,
@@ -2531,16 +2721,20 @@ or
 ((bob > 10) or sum(foo) or vector(1))`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 5),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 5),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"} or vector(0) )`, 1), // FIXME extra end
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -2554,10 +2748,14 @@ or
 					KnownReturn:    true,
 					ReturnedNumber: 0,
 					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -2569,15 +2767,19 @@ or
 					IsConditional: true,
 				},
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo`, 64),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo)`, 60),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 64),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo)`, 60),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -2611,16 +2813,20 @@ or
 )`,
 			output: []utils.Source{
 				{
-					Type:          utils.AggregateSource,
-					Returns:       promParser.ValueTypeVector,
-					Operation:     "sum",
-					Selector:      mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
-					Aggregation:   mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
-					FixedLabels:   true,
-					IsConditional: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `sometimes{foo!="bar"}`, 8),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(sometimes{foo!="bar"})`, 4),
+					FixedLabels:    true,
+					IsConditional:  true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -2635,16 +2841,20 @@ or
 						},
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Returns:     promParser.ValueTypeVector,
-								Operation:   "sum",
-								Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 74),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar )`, 70),
-								FixedLabels: true,
+								Type:           utils.AggregateSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "sum",
+								Selector:       mustParse[*promParser.VectorSelector](t, `bar`, 74),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(bar )`, 70),
+								FixedLabels:    true,
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason:   "Query is using aggregation that removes all labels.",
 										Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 							},
@@ -2687,16 +2897,20 @@ or
 						},
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Returns:     promParser.ValueTypeVector,
-								Operation:   "sum",
-								Selector:    mustParse[*promParser.VectorSelector](t, `bar`, 74),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar )`, 70), // FIXME extra end
-								FixedLabels: true,
+								Type:           utils.AggregateSource,
+								Returns:        promParser.ValueTypeVector,
+								Operation:      "sum",
+								Selector:       mustParse[*promParser.VectorSelector](t, `bar`, 74),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(bar )`, 70), // FIXME extra end
+								FixedLabels:    true,
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason:   "Query is using aggregation that removes all labels.",
 										Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 							},
@@ -2893,16 +3107,20 @@ or
 			expr: `(sum(foo{job="myjob"}))`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 5),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} )`, 1),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{job="myjob"}`, 5),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{job="myjob"} )`, 1),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -2935,10 +3153,14 @@ or
 					ReturnedNumber: 0,
 					Call:           mustParse[*promParser.Call](t, `vector(0)`, 11),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, "group(vector(0)  )", 5), // FIXME
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason:   "Query is using aggregation that removes all labels.",
 							Fragment: posrange.PositionRange{Start: 1, End: 1}, // FIXME bogus )
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -3082,9 +3304,13 @@ unless
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `max by (instance, cluster) (cf_node_role{kubernetes_role="master",role="kubernetes"})`, 1),
 					FixedLabels:    true,
 					IncludedLabels: []string{"instance", "cluster"},
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Unless: []utils.Join{
@@ -3097,9 +3323,13 @@ unless
 								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum by (instance, cluster) (time() - node_systemd_timer_last_trigger_seconds{name=~"etcd-defrag-.*.timer"})`, 95),
 								FixedLabels:    true,
 								IncludedLabels: []string{"instance", "cluster"},
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								Joins: []utils.Join{
@@ -3209,15 +3439,19 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Operation:   "sum",
-								Returns:     promParser.ValueTypeVector,
-								FixedLabels: true,
-								Selector:    mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 30),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 26),
+								Type:           utils.AggregateSource,
+								Operation:      "sum",
+								Returns:        promParser.ValueTypeVector,
+								FixedLabels:    true,
+								Selector:       mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 30),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 26),
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								IsDead:       true,
@@ -3241,15 +3475,19 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Operation:   "sum",
-								Returns:     promParser.ValueTypeVector,
-								FixedLabels: true,
-								Selector:    mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 42),
+								Type:           utils.AggregateSource,
+								Operation:      "sum",
+								Returns:        promParser.ValueTypeVector,
+								FixedLabels:    true,
+								Selector:       mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"})`, 42),
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								IsDead:       true,
@@ -3273,15 +3511,19 @@ unless
 					Joins: []utils.Join{
 						{
 							Src: utils.Source{
-								Type:        utils.AggregateSource,
-								Operation:   "sum",
-								Returns:     promParser.ValueTypeVector,
-								FixedLabels: true,
-								Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
-								Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"})`, 0),
+								Type:           utils.AggregateSource,
+								Operation:      "sum",
+								Returns:        promParser.ValueTypeVector,
+								FixedLabels:    true,
+								Selector:       mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+								Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"})`, 0),
+								ExcludedLabels: []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation that removes all labels.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								IsDead:       true,
@@ -3311,10 +3553,13 @@ unless
 								Selector:         mustParse[*promParser.VectorSelector](t, `bar{b="2"}`, 46),
 								Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(bar{b="2"}) without(instance)`, 42),
 								GuaranteedLabels: []string{"b"},
-								ExcludedLabels:   []string{"instance"},
+								ExcludedLabels:   []string{"instance", labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"instance": {
 										Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								IsDead:       true,
@@ -3344,10 +3589,13 @@ unless
 								Selector:         mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
 								Aggregation:      mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) without(instance)`, 0),
 								GuaranteedLabels: []string{"a"},
-								ExcludedLabels:   []string{"instance"},
+								ExcludedLabels:   []string{"instance", labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"instance": {
 										Reason: "Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								IsDead:       true,
@@ -3383,10 +3631,13 @@ unless
  )`, 2),
 					IsConditional:  true,
 					IncludedLabels: []string{"instance", "device", "group"},
-					ExcludedLabels: []string{"source_instance"},
+					ExcludedLabels: []string{"source_instance", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"source_instance": {
 							Reason: "Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3448,15 +3699,19 @@ unless
 			expr: `sum(foo{a="1"}) by(job) * on() bar{b="2"}`,
 			output: []utils.Source{
 				{
-					Type:        utils.AggregateSource,
-					Returns:     promParser.ValueTypeVector,
-					Operation:   "sum",
-					Selector:    mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
-					Aggregation: mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) by(job)`, 0),
-					FixedLabels: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					Selector:       mustParse[*promParser.VectorSelector](t, `foo{a="1"}`, 4),
+					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(foo{a="1"}) by(job)`, 0),
+					FixedLabels:    true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3482,13 +3737,16 @@ unless
 					Selector:       mustParse[*promParser.VectorSelector](t, `foo`, 8),
 					Aggregation:    mustParse[*promParser.AggregateExpr](t, `sum(sum(foo) without(job)) by(job)`, 0),
 					FixedLabels:    true,
-					ExcludedLabels: []string{"job"},
+					ExcludedLabels: []string{"job", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
 						},
 						"job": {
 							Reason: "Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 				},
@@ -3531,9 +3789,13 @@ label_replace(
 								GuaranteedLabels: []string{"prometheus"},
 								IncludedLabels:   []string{"instance"},
 								FixedLabels:      true,
+								ExcludedLabels:   []string{labels.MetricName},
 								ExcludeReason: map[string]utils.ExcludedLabel{
 									"": {
 										Reason: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+									},
+									labels.MetricName: {
+										Reason: "Aggregation removes metric name.",
 									},
 								},
 								Joins: []utils.Join{
@@ -3547,9 +3809,13 @@ label_replace(
 											Aggregation:    mustParse[*promParser.AggregateExpr](t, `max(max_over_time(prometheus_tsdb_head_series[2h])) by(instance)`, 177),
 											IncludedLabels: []string{"instance"},
 											FixedLabels:    true,
+											ExcludedLabels: []string{labels.MetricName},
 											ExcludeReason: map[string]utils.ExcludedLabel{
 												"": {
 													Reason: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+												},
+												labels.MetricName: {
+													Reason: "Aggregation removes metric name.",
 												},
 											},
 										},
@@ -3634,9 +3900,13 @@ sum by (foo, bar) (
 					Selector:       mustParse[*promParser.VectorSelector](t, "errors_total", 30),
 					FixedLabels:    true,
 					IncludedLabels: []string{"foo", "bar"},
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Joins: []utils.Join{
@@ -3746,15 +4016,19 @@ sum by (foo, bar) (
 			expr: `sum(foo or vector(0)) > 0`,
 			output: []utils.Source{
 				{
-					Type:          utils.AggregateSource,
-					Returns:       promParser.ValueTypeVector,
-					Operation:     "sum",
-					FixedLabels:   true,
-					AlwaysReturns: false, // FIXME true?
-					IsConditional: true,
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "sum",
+					FixedLabels:    true,
+					AlwaysReturns:  false, // FIXME true?
+					IsConditional:  true,
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Aggregation: mustParse[*promParser.AggregateExpr](t, "sum(foo or vector(0))", 0),
@@ -3772,9 +4046,13 @@ sum by (foo, bar) (
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `0 > 0` which is not possible, so it will never return anything",
 					IsDeadPosition: posrange.PositionRange{Start: 11, End: 20},
+					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation that removes all labels.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
 						},
 					},
 					Aggregation: mustParse[*promParser.AggregateExpr](t, "sum(foo or vector(0))", 0),

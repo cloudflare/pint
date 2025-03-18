@@ -340,7 +340,6 @@ func GetQueryFragment(expr string, pos posrange.PositionRange) string {
 	return expr[pos.Start:pos.End]
 }
 
-// FIXME Aggregations strip __name__.
 func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 	var s Source
 	switch n.Op {
@@ -348,48 +347,56 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "sum"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.MIN:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "min"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.MAX:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "max"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.AVG:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "avg"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.GROUP:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "group"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.STDDEV:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "stddev"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.STDVAR:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "stdvar"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.COUNT:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "count"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.COUNT_VALUES:
@@ -399,12 +406,14 @@ func walkAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 			// Param is the label to store the count value in.
 			s = includeLabel(s, n.Param.(*promParser.StringLiteral).Val)
 			s = guaranteeLabel(s, n.Param.(*promParser.StringLiteral).Val)
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.QUANTILE:
 		for _, s = range parseAggregation(expr, n) {
 			s.Aggregation = n
 			s.Operation = "quantile"
+			s = excludeLabel(s, "Aggregation removes metric name.", n.PosRange, labels.MetricName)
 			src = append(src, s)
 		}
 	case promParser.TOPK:
