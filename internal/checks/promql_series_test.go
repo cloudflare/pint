@@ -3236,16 +3236,24 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 15 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), fmt.Sprintf("%s/other/%d", uri, i), time.Second, false))
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
+					conds: []requestCondition{requestPathCond{path: "/other/0" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/1" + promapi.APIPathQuery}},
+					resp:  respondWithSingleInstantVector(),
+				},
+				{
+					conds: []requestCondition{requestPathCond{path: "/other/2" + promapi.APIPathQuery}},
 					resp: sleepResponse{
-						sleep: time.Millisecond * 20,
+						sleep: time.Millisecond * 100,
 						resp:  respondWithSingleInstantVector(),
 					},
 				},
