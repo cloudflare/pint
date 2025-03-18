@@ -118,7 +118,7 @@ func parseNode(content []byte, contentLines []string, node *yaml.Node, offsetLin
 				}
 			}
 		case yaml.ScalarNode:
-			if root.Value != string(content) {
+			if root.Value != string(content) && root.Line < len(contentLines) {
 				c := []byte(root.Value)
 				var n yaml.Node
 				// FIXME there must be a better way.

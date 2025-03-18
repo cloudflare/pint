@@ -36,6 +36,34 @@ func TestParse(t *testing.T) {
 			output:  nil,
 		},
 		{
+			content: []byte(""),
+			output:  nil,
+		},
+		{
+			content: []byte("\n"),
+			output:  nil,
+		},
+		{
+			content: []byte("\n\n\n"),
+			output:  nil,
+		},
+		{
+			content: []byte("---"),
+			output:  nil,
+		},
+		{
+			content: []byte("---\n"),
+			output:  nil,
+		},
+		{
+			content: []byte("\n---\n\n---\n"),
+			output:  nil,
+		},
+		{
+			content: []byte("\n---\n\n---\n---"),
+			output:  nil,
+		},
+		{
 			content: []byte(string("! !00 \xf6")),
 			output:  nil,
 			err:     "error at line 1: yaml: incomplete UTF-8 octet sequence",
