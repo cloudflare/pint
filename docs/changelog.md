@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.7
+
+### Fixed
+
+- Fixed a panic when parsing empty documents - [#1355](https://github.com/cloudflare/pint/issues/1355).
+
 ## v0.71.6
 
 ### Fixed
