@@ -93,6 +93,35 @@
 
 ---
 
+[TestImpossibleCheck/__name___is_stripped - 1]
+- description: __name__ is stripped
+  content: |4
+    - record: count:sum:foo
+      expr: |
+        {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
+  output: |
+    4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 72
+          firstcolumn: 33
+          lastcolumn: 68
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
 [TestImpossibleCheck/foo{job=bar}_unless_sum(foo) - 1]
 - description: foo{job=bar} unless sum(foo)
   content: |4

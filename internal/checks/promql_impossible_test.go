@@ -88,6 +88,17 @@ func TestImpossibleCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 			problems:   true,
 		},
+		{
+			description: "__name__ is stripped",
+			content: `
+- record: count:sum:foo
+  expr: |
+    {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
 	}
 
 	runTests(t, testCases)
