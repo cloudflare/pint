@@ -2278,9 +2278,9 @@
     details: |
         `notfound` was found on other prometheus servers:
 
-        - [prom0](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom1](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
-        - [prom2](http://127.0.0.1:XXXXX/other/graph?g0.expr=notfound)
+        - [prom0](http://127.0.0.1:XXXXX/other/0/graph?g0.expr=notfound)
+        - [prom1](http://127.0.0.1:XXXXX/other/1/graph?g0.expr=notfound)
+        - [prom2](http://127.0.0.1:XXXXX/other/2/graph?g0.expr=notfound)
 
         pint tried to check 15 server(s) but stopped after checking 3 server(s) due to reaching time limit (50ms).
 
