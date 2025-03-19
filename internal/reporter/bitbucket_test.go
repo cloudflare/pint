@@ -1935,6 +1935,53 @@ func TestBitBucketReporter(t *testing.T) {
 				return nil
 			},
 		},
+		{
+			description: "annotation on unmodified lines",
+			gitCmd:      fakeGit,
+			reports: []reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: "foo.txt",
+						Name:          "foo.txt",
+					},
+					ModifiedLines: []int{},
+					Rule:          mockRules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 1,
+							Last:  1,
+						},
+						Reporter: "mock",
+						Summary:  "line is not part of the diff",
+						Severity: checks.Bug,
+					},
+				},
+			},
+			report: reporter.BitBucketReport{
+				Reporter: "Prometheus rule linter",
+				Title:    "pint v0.0.0",
+				Details:  reporter.BitBucketDescription,
+				Link:     "https://cloudflare.github.io/pint/",
+				Result:   "FAIL",
+				Data: []reporter.BitBucketReportData{
+					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
+					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
+				},
+			},
+			annotations: reporter.BitBucketAnnotations{
+				Annotations: []reporter.BitBucketAnnotation{},
+			},
+			errorHandler: func(err error) error {
+				if err != nil {
+					return fmt.Errorf("Unpexpected error: %w", err)
+				}
+				return nil
+			},
+		},
 	}
 
 	for _, tc := range testCases {

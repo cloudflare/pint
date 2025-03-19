@@ -1218,6 +1218,55 @@ groups:
 				},
 			},
 		},
+		{
+			title: "rule comment modified",
+			setup: func(t *testing.T) {
+				commitFile(t, "rules.yml", `
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    pint disable promql/series(up)
+    expr: sum(up)
+`, "v1")
+
+				_, err := git.RunGit("checkout", "-b", "v2")
+				require.NoError(t, err, "git checkout v2")
+
+				commitFile(t, "rules.yml", `
+groups:
+- name: v2
+  rules:
+  - record: up:count
+    # pint disable promql/series(up)
+    expr: sum(up)
+`, "v2")
+			},
+			finder: discovery.NewGitBranchFinder(git.RunGit, git.NewPathFilter(includeAll, nil, nil), "main", 4, parser.PrometheusSchema, model.UTF8Validation, nil),
+			entries: []discovery.Entry{
+				{
+					State: discovery.Added,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					ModifiedLines: []int{6},
+					Rule:          mustParse(4, "  - record: up:count\n    # pint disable promql/series(up)\n    expr: sum(up)\n"),
+				},
+				{
+					State: discovery.Removed,
+					Path: discovery.Path{
+						Name:          "rules.yml",
+						SymlinkTarget: "rules.yml",
+					},
+					PathError: parser.ParseError{
+						Err:  errors.New("xxx"),
+						Line: 6,
+					},
+					ModifiedLines: []int{3, 6},
+				},
+			},
+		},
 	}
 
 	for _, tc := range testCases {

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.71.8
+
+### Fixed
+
+- Don't try to report problems to BitBucket for unmodified rules.
+
 ## v0.71.7
 
 ### Fixed
