@@ -375,7 +375,12 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 	annotations := make([]BitBucketAnnotation, 0, len(summary.reports))
 	for _, report := range summary.reports {
-		annotations = append(annotations, reportToAnnotation(report))
+		ann := reportToAnnotation(report)
+		if !slices.Contains(report.ModifiedLines, ann.Line) {
+			slog.Warn("Annotation for unmodified line, skipping", slog.String("path", ann.Path), slog.Int("line", ann.Line))
+			continue
+		}
+		annotations = append(annotations, ann)
 	}
 
 	if len(annotations) == 0 {

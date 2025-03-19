@@ -155,6 +155,5 @@ func moveReportedLine(report Report) (reported, original int) {
 	if reported < 0 {
 		reported = 0
 	}
-
 	return reported, original
 }
