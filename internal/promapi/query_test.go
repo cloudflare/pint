@@ -1,7 +1,6 @@
 package promapi_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -253,7 +252,7 @@ func TestQuery(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			qr, err := fg.Query(context.Background(), tc.query)
+			qr, err := fg.Query(t.Context(), tc.query)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {

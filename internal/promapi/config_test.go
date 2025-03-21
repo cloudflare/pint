@@ -1,7 +1,6 @@
 package promapi_test
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -127,7 +126,7 @@ func TestConfig(t *testing.T) {
 			prom.StartWorkers()
 			defer prom.Close()
 
-			cfg, err := prom.Config(context.Background(), time.Minute)
+			cfg, err := prom.Config(t.Context(), time.Minute)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {
@@ -185,7 +184,7 @@ func TestConfigHeaders(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			_, err := fg.Config(context.Background(), 0)
+			_, err := fg.Config(t.Context(), 0)
 			require.NoError(t, err)
 		})
 	}

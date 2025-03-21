@@ -1,8 +1,10 @@
 module _
 
-go 1.23.0
+go 1.24.0
 
-require github.com/dkorunic/betteralign v0.6.7
+tool github.com/dkorunic/betteralign/cmd/betteralign
+
+require github.com/dkorunic/betteralign v0.6.7 // indirect
 
 require (
 	github.com/KimMachineGun/automemlimit v0.7.1 // indirect

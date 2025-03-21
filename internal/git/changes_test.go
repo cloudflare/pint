@@ -653,8 +653,7 @@ func TestChanges(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 
 			dir := t.TempDir()
-			err := os.Chdir(dir)
-			require.NoError(t, err, "chdir")
+			t.Chdir(dir)
 
 			cmd := tc.setup(t)
 			changes, err := git.Changes(cmd, "main", git.NewPathFilter(nil, nil, nil))

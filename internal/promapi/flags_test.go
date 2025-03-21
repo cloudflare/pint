@@ -1,7 +1,6 @@
 package promapi_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -101,7 +100,7 @@ func TestFlags(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			flags, err := fg.Flags(context.Background())
+			flags, err := fg.Flags(t.Context())
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {

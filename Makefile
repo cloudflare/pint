@@ -4,11 +4,6 @@ PINT_SRC     := $(shell find $(PINT_GO_DIRS) -type f -name '*.go')
 PINT_VERSION ?= $(shell git describe --tags --always --dirty='-dev')
 PINT_COMMIT  ?= $(shell git rev-parse HEAD)
 
-GOBIN := $(shell go env GOBIN)
-ifeq ($(GOBIN),)
-GOBIN = $(shell go env GOPATH)/bin
-endif
-
 GOFLAGS := -tags stringlabels
 
 COVER_DIR     = .cover
@@ -24,28 +19,18 @@ $(PINT_BIN): $(PINT_SRC) go.mod go.sum
 		-ldflags='-X main.version=$(PINT_VERSION) -X main.commit=$(PINT_COMMIT) -s -w' \
 		./cmd/pint
 
-$(GOBIN)/golangci-lint: tools/golangci-lint/go.mod tools/golangci-lint/go.sum
-	go install -modfile=tools/golangci-lint/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint
 .PHONY: lint
-lint: $(GOBIN)/golangci-lint
-	$(GOBIN)/golangci-lint run
+lint:
+	go tool -modfile=tools/golangci-lint/go.mod golangci-lint run
 
-$(GOBIN)/gofumpt: tools/gofumpt/go.mod tools/gofumpt/go.sum
-	go install -modfile=tools/gofumpt/go.mod mvdan.cc/gofumpt
-$(GOBIN)/goimports: tools/goimports/go.mod tools/goimports/go.sum
-	go install -modfile=tools/goimports/go.mod golang.org/x/tools/cmd/goimports
-$(GOBIN)/betteralign: tools/betteralign/go.mod tools/betteralign/go.sum
-	go install -modfile=tools/betteralign/go.mod github.com/dkorunic/betteralign/cmd/betteralign
 .PHONY: format
-format: $(GOBIN)/betteralign $(GOBIN)/gofumpt $(GOBIN)/goimports
-	$(GOBIN)/betteralign -test_files -apply ./...
-	$(GOBIN)/gofumpt -extra -l -w .
-	$(GOBIN)/goimports -local github.com/cloudflare/pint -w .
+format:
+	go tool -modfile=tools/betteralign/go.mod betteralign -test_files -apply ./...
+	go tool -modfile=tools/gofumpt/go.mod gofumpt -extra -l -w .
+	go tool -modfile=tools/goimports/go.mod goimports -local github.com/cloudflare/pint -w .
 
 tidy:
 	go mod tidy
-	@for f in $(wildcard tools/*/go.mod) ; do echo ">>> $$f" && cd $(CURDIR)/`dirname "$$f"` && go mod tidy && cd $(CURDIR) ; done
-
 
 .PHONY: test
 test:
@@ -88,12 +73,10 @@ benchmark:
 		-benchmem \
 		./cmd/pint
 
-$(GOBIN)/benchstat: tools/benchstat/go.mod tools/benchstat/go.sum
-	go install -modfile=tools/benchstat/go.mod golang.org/x/perf/cmd/benchstat
 .PHONY: benchmark-diff
-benchmark-diff: $(GOBIN)/benchstat
+benchmark-diff:
 	echo "Benchmark diff:" | tee benchstat.txt
 	echo "" | tee -a benchstat.txt
 	echo '```' | tee -a benchstat.txt
-	$(GOBIN)/benchstat old.txt new.txt | tee -a benchstat.txt
+	go tool -modfile=tools/benchstat/go.mod benchstat old.txt new.txt | tee -a benchstat.txt
 	echo '```' | tee -a benchstat.txt

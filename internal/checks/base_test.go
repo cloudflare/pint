@@ -176,7 +176,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 				}
 			}
 
-			ctx, cancel := context.WithCancel(context.Background())
+			ctx, cancel := context.WithCancel(t.Context())
 			entries, err := parseContent(tc.content)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
@@ -243,7 +243,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker(newSimpleProm("prom")).Check(context.Background(), entry.Path, entry.Rule, tc.entries)
+				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry.Path, entry.Rule, tc.entries)
 			}
 		})
 	}

@@ -1,8 +1,10 @@
 module _
 
-go 1.23.0
+go 1.24.0
 
-require golang.org/x/tools v0.31.0
+tool golang.org/x/tools/cmd/goimports
+
+require golang.org/x/tools v0.31.0 // indirect
 
 require (
 	golang.org/x/mod v0.24.0 // indirect

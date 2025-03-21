@@ -1272,10 +1272,9 @@ groups:
 	for _, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			dir := t.TempDir()
-			err := os.Chdir(dir)
-			require.NoError(t, err, "chdir")
+			t.Chdir(dir)
 
-			_, err = git.RunGit("init", "--initial-branch=main", ".")
+			_, err := git.RunGit("init", "--initial-branch=main", ".")
 			require.NoError(t, err, "git init")
 
 			tc.setup(t)

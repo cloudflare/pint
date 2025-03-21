@@ -9,29 +9,15 @@ updates:
         patterns:
         - "debian"
   - package-ecosystem: "gomod"
-    directory: "/"
+    directories:
+      - "/"
+      - "/tools/benchstat"
+      - "/tools/betteralign"
+      - "/tools/gofumpt"
+      - "/tools/goimports"
+      - "/tools/golangci-lint"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "gomod"
-    directory: "/tools/benchstat"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "gomod"
-    directory: "/tools/betteralign"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "gomod"
-    directory: "/tools/gofumpt"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "gomod"
-    directory: "/tools/goimports"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "gomod"
-    directory: "/tools/golangci-lint"
-    schedule:
-      interval: "daily"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

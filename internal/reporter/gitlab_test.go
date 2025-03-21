@@ -1,7 +1,6 @@
 package reporter_test
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"io"
@@ -703,7 +702,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 				tc.maxComments,
 			)
 			if err == nil {
-				err = reporter.Submit(context.Background(), tc.summary, r)
+				err = reporter.Submit(t.Context(), tc.summary, r)
 				require.NoError(t, tc.errorHandler(err))
 			}
 			require.NoError(t, tc.errorHandler(err))
@@ -843,7 +842,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 						},
 					},
 				})
-				err = reporter.Submit(context.Background(), summary, r)
+				err = reporter.Submit(t.Context(), summary, r)
 			}
 			require.NoError(t, errorHandler(err))
 		})
