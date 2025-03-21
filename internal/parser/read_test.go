@@ -2,8 +2,8 @@ package parser_test
 
 import (
 	"bytes"
+	"io"
 	"strconv"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -163,14 +163,142 @@ func TestReadContent(t *testing.T) {
 			input:  []byte("# pint ignore/begin\n  - alert: Ignored\n    # pint rule/set foo\n    # pint rule/set bar\n    expr: up\n# pint ignore/end\n"),
 			output: []byte("# pint ignore/begin\n                  \n                       \n                       \n            \n# pint ignore/end\n"),
 		},
+		{
+			input: []byte(`
+# pint ignore/begin
+{%- set foo = 1 %}
+{% set bar = 2 -%}
+{# comment #}
+{#
+  comment 
+#}
+# pint ignore/end
+
+- record: colo_job:up:count
+  expr: sum(foo) without(job)
+
+- record: invalid
+  expr: sum(foo) by ())
+
+# pint ignore/begin
+- record: colo_job:down:count
+  expr: up == {{ foo }}
+# pint ignore/end
+
+- record: colo:multiline
+  expr: |
+    sum(
+      multiline
+    ) without(job, instance)
+
+- record: colo:multiline:sum
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+- record: colo:multiline2
+  expr: >-
+    sum(
+      multiline2
+    ) without(job, instance)
+
+- record: colo_job:up:byinstance
+  expr: sum(byinstance) by(instance)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[4m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[5m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate5min
+  expr:  sum(irate(node_cpu_seconds_total[5m])) without (cpu)
+
+- alert: Instance Is Down
+  expr: up == 0
+
+- alert: Error Rate
+  expr: sum(rate(errors[5m])) > 0.5
+
+- alert: Error Rate
+  expr: sum(rate(errors[5m])) > 0.5
+  annotations:
+    link: http://docs
+    summary: 'error rate: {{ $value }}'
+`),
+			output: []byte(`
+# pint ignore/begin
+                  
+                  
+             
+  
+          
+  
+# pint ignore/end
+
+- record: colo_job:up:count
+  expr: sum(foo) without(job)
+
+- record: invalid
+  expr: sum(foo) by ())
+
+# pint ignore/begin
+                             
+                       
+# pint ignore/end
+
+- record: colo:multiline
+  expr: |
+    sum(
+      multiline
+    ) without(job, instance)
+
+- record: colo:multiline:sum
+  expr: |
+    sum(sum) without(job)
+    +
+    sum(sum) without(job)
+
+- record: colo:multiline2
+  expr: >-
+    sum(
+      multiline2
+    ) without(job, instance)
+
+- record: colo_job:up:byinstance
+  expr: sum(byinstance) by(instance)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[4m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate4m
+  expr:  sum(rate(node_cpu_seconds_total[5m])) without (cpu)
+
+- record: instance_mode:node_cpu:rate5min
+  expr:  sum(irate(node_cpu_seconds_total[5m])) without (cpu)
+
+- alert: Instance Is Down
+  expr: up == 0
+
+- alert: Error Rate
+  expr: sum(rate(errors[5m])) > 0.5
+
+- alert: Error Rate
+  expr: sum(rate(errors[5m])) > 0.5
+  annotations:
+    link: http://docs
+    summary: 'error rate: {{ $value }}'
+`),
+		},
 	}
 
-	cmpErrorText := cmp.Comparer(func(x, y interface{}) bool {
+	cmpErrorText := cmp.Comparer(func(x, y any) bool {
 		xe := x.(error)
 		ye := y.(error)
 		return xe.Error() == ye.Error()
 	})
-	sameErrorText := cmp.FilterValues(func(x, y interface{}) bool {
+	sameErrorText := cmp.FilterValues(func(x, y any) bool {
 		_, xe := x.(error)
 		_, ye := y.(error)
 		return xe && ye
@@ -178,8 +306,8 @@ func TestReadContent(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			r := bytes.NewReader(tc.input)
-			output, err := parser.ReadContent(r)
+			r := parser.NewContentReader(bytes.NewReader(tc.input))
+			output, err := io.ReadAll(r)
 
 			hadError := err != nil
 			if hadError != tc.shouldError {
@@ -187,20 +315,13 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
-			outputLines := strings.Count(string(output.Body), "\n")
-			inputLines := strings.Count(string(tc.input), "\n")
-			if outputLines != inputLines {
-				t.Errorf("ReadContent() returned %d line(s) while input had %d", outputLines, inputLines)
-				return
-			}
-
-			if diff := cmp.Diff(tc.comments, output.FileComments, sameErrorText); diff != "" {
+			if diff := cmp.Diff(tc.comments, r.Comments(), sameErrorText); diff != "" {
 				t.Errorf("ReadContent() returned wrong comments (-want +got):\n%s", diff)
 				return
 			}
 
-			require.Equal(t, string(tc.output), string(output.Body), "ReadContent() returned wrong output")
-			require.Equal(t, tc.ignored, output.Ignored != nil, "ReadContent() returned wrong Ignored value")
+			require.Equal(t, string(tc.output), string(output), "ReadContent() returned wrong output")
+			require.Equal(t, tc.ignored, r.Ignored(), "ReadContent() returned wrong Ignored value")
 		})
 	}
 }

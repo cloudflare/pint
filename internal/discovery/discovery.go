@@ -86,20 +86,22 @@ type Entry struct {
 }
 
 func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, err error) {
-	content, err := parser.ReadContent(r)
+	cr := parser.NewContentReader(r)
+
+	content, err := io.ReadAll(cr)
 	if err != nil {
 		return nil, err
 	}
 
 	contentLines := diags.LineRange{
-		First: min(content.TotalLines, 1),
-		Last:  content.TotalLines,
+		First: min(cr.TotalLines(), 1),
+		Last:  cr.TotalLines(),
 	}
 
 	var badOwners []comments.Comment
 	var fileOwner string
 	var disabledChecks []string
-	for _, comment := range content.FileComments {
+	for _, comment := range cr.Comments() {
 		// nolint:exhaustive
 		switch comment.Type {
 		case comments.FileOwnerType:
@@ -141,14 +143,14 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		}
 	}
 
-	if content.Ignored != nil {
+	for _, d := range cr.Diagnostics() {
 		entries = append(entries, Entry{
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
 			PathError: FileIgnoreError{
-				Diagnostic: *content.Ignored,
+				Diagnostic: d,
 			},
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
@@ -156,7 +158,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		return entries, nil
 	}
 
-	rules, err := p.Parse(content.Body)
+	rules, err := p.Parse(content)
 	if err != nil {
 		slog.Warn(
 			"Failed to parse file content",
