@@ -362,3 +362,17 @@ func (r Rule) Type() RuleType {
 	}
 	return InvalidRuleType
 }
+
+type File struct {
+	Comments []comments.Comment
+	Groups   []Group
+}
+
+type Group struct {
+	Labels      map[string]string
+	Name        string
+	Interval    string
+	QueryOffset string
+	Rules       []Rule
+	Limit       int
+}

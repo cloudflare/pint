@@ -332,8 +332,7 @@ func Parse(lineno int, text string) (comments []Comment) {
 	sc := bufio.NewScanner(strings.NewReader(text))
 	var index int
 	for sc.Scan() {
-		line := sc.Text()
-		comments = append(comments, parseComment(line, lineno+index)...)
+		comments = append(comments, parseComment(sc.Text(), lineno+index)...)
 		index++
 	}
 	return comments
