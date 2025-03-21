@@ -1,7 +1,6 @@
 package promapi_test
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -132,7 +131,7 @@ func TestMetadata(t *testing.T) {
 			fg.StartWorkers(reg)
 			defer fg.Close(reg)
 
-			metadata, err := fg.Metadata(context.Background(), tc.metric)
+			metadata, err := fg.Metadata(t.Context(), tc.metric)
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err, tc)
 			} else {

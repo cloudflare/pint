@@ -322,8 +322,7 @@ func TestGlobPathFinder(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			workdir := t.TempDir()
-			err := os.Chdir(workdir)
-			require.NoError(t, err)
+			t.Chdir(workdir)
 
 			for p, content := range tc.files {
 				if strings.Contains(p, "/") {

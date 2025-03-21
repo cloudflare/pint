@@ -1,7 +1,6 @@
 package promapi_test
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -682,7 +681,7 @@ func TestRange(t *testing.T) {
 
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := fg.RangeQuery(context.Background(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step))
+					qr, err := fg.RangeQuery(t.Context(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step))
 					if tc.err != "" {
 						require.EqualError(t, err, tc.err, tc)
 					} else {

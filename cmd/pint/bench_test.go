@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -102,7 +101,6 @@ rule {
 `, srv.URL))
 	require.NoError(b, os.WriteFile(tmp+"/.pint.hcl", content, 0o644))
 
-	ctx := context.Background()
 	cfg, _, err := config.Load(tmp+"/.pint.hcl", false)
 	require.NoError(b, err)
 
@@ -110,7 +108,7 @@ rule {
 	require.NoError(b, gen.GenerateStatic())
 
 	b.ResetTimer()
-	for n := 0; n < b.N; n++ {
-		_, _ = checkRules(ctx, 10, false, gen, cfg, entries)
+	for b.Loop() {
+		_, _ = checkRules(b.Context(), 10, false, gen, cfg, entries)
 	}
 }

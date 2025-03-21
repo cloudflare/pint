@@ -755,7 +755,7 @@ foo details
 			slog.SetDefault(slogt.New(t))
 
 			summary := NewSummary(tc.reports)
-			tc.checkErr(t, Submit(context.Background(), summary, tc.commenter))
+			tc.checkErr(t, Submit(t.Context(), summary, tc.commenter))
 		})
 	}
 }
@@ -921,7 +921,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 				defer srv.Close()
 
 				summary := NewSummary(tc.reports)
-				err := Submit(context.Background(), summary, c(srv.URL))
+				err := Submit(t.Context(), summary, c(srv.URL))
 				require.NoError(t, tc.errorHandler(err))
 			})
 		}

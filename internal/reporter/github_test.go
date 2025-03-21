@@ -1,7 +1,6 @@
 package reporter_test
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -981,7 +980,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 			)
 			require.NoError(t, err)
 
-			err = reporter.Submit(context.Background(), tc.summary, r)
+			err = reporter.Submit(t.Context(), tc.summary, r)
 			if tc.error == nil {
 				require.NoError(t, err)
 			} else {

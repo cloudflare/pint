@@ -1,8 +1,10 @@
 module _
 
-go 1.23.0
+go 1.24.0
 
-require github.com/golangci/golangci-lint v1.64.8
+tool github.com/golangci/golangci-lint/cmd/golangci-lint
+
+require github.com/golangci/golangci-lint v1.64.8 // indirect
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect

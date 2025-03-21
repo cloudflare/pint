@@ -679,7 +679,7 @@ func TestMatch(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
-			ctx := context.WithValue(context.Background(), config.CommandKey, tc.cmd)
+			ctx := context.WithValue(t.Context(), config.CommandKey, tc.cmd)
 			isMatch := tc.match.IsMatch(ctx, tc.path, tc.entry)
 			require.Equal(t, tc.isMatch, isMatch)
 		})

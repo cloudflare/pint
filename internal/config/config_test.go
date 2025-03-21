@@ -2357,7 +2357,7 @@ rule {
 	}
 
 	dir := t.TempDir()
-	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
+	ctx := context.WithValue(t.Context(), config.CommandKey, config.LintCommand)
 	for i, tc := range testCases {
 		t.Run(tc.title, func(t *testing.T) {
 			path := path.Join(dir, fmt.Sprintf("%d.hcl", i))
