@@ -186,17 +186,12 @@ func (r *ContentReader) emptyCurrentLine(comments []comments.Comment) {
 		offset = c.Offset
 		break
 	}
-
-	buf := make([]byte, 0, len(r.buf))
-	for i, c := range r.buf {
-		switch {
-		case c == '\n':
-			buf = append(buf, c)
-		case i < offset || r.inBegin:
-			buf = append(buf, ' ')
-		default:
-			buf = append(buf, c)
+	for i := range r.buf {
+		if r.buf[i] == '\n' {
+			continue
+		}
+		if i < offset || r.inBegin {
+			r.buf[i] = ' '
 		}
 	}
-	r.buf = buf
 }
