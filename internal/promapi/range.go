@@ -228,11 +228,7 @@ func sliceRange(start, end time.Time, resolution, sliceSize time.Duration) (slic
 		slices = append(slices, s)
 	}
 
-	for {
-		if !rstart.Before(end) {
-			break
-		}
-
+	for rstart.Before(end) {
 		s := TimeRange{Start: rstart, End: rstart.Add(sliceSize)}
 		if s.End.After(end) {
 			s.End = end

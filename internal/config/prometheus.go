@@ -237,7 +237,7 @@ func (pg *PrometheusGenerator) ServerWithName(name string) *promapi.FailoverGrou
 func (pg *PrometheusGenerator) addServer(server *promapi.FailoverGroup) error {
 	for _, s := range pg.servers {
 		if s.Name() == server.Name() {
-			return fmt.Errorf("Duplicated name for Prometheus server definition: %s", s.Name())
+			return fmt.Errorf("Duplicated name for Prometheus server definition: %s", s.Name()) // nolint: staticcheck
 		}
 	}
 	pg.servers = append(pg.servers, server)

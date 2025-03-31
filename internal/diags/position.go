@@ -104,11 +104,7 @@ func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRan
 	lineIndex := val.Line
 	columnIndex := val.Column
 
-	for {
-		if lineIndex > len(lines) {
-			break
-		}
-
+	for lineIndex <= len(lines) {
 		// Append new line but only if we already have any tokens.
 		if len(offsets) > 0 {
 			offsets = appendPosition(offsets, lineIndex-1, len(lines[lineIndex-2])+1)

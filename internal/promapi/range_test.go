@@ -153,8 +153,8 @@ func TestRange(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
 				values = append(values, fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()))
-				_, _ = w.Write([]byte(fmt.Sprintf(
-					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))))
+
+				_, _ = fmt.Fprintf(w, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))
 			},
 		},
 		{
@@ -257,8 +257,7 @@ func TestRange(t *testing.T) {
 				for i := float64(timeParse("2022-06-14T16:34:00Z").Unix()); i <= float64(timeParse("2022-06-14T18:35:00Z").Unix()); i += 60 {
 					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 				}
-				_, _ = w.Write([]byte(fmt.Sprintf(
-					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))))
+				_, _ = fmt.Fprintf(w, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))
 			},
 		},
 		{
@@ -313,9 +312,10 @@ func TestRange(t *testing.T) {
 				for i := start; i < end; i += 300 {
 					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 				}
-				_, _ = w.Write([]byte(fmt.Sprintf(
+				_, _ = fmt.Fprintf(
+					w,
 					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]},{"metric":{"instance":"2"}, "values":[%s]},{"metric":{"instance":"3"}, "values":[%s]}]}}`,
-					strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","))))
+					strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","))
 			},
 		},
 		{
@@ -445,9 +445,11 @@ func TestRange(t *testing.T) {
 				for i := start; i < end; i += 60 {
 					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 				}
-				_, _ = w.Write([]byte(fmt.Sprintf(
+				_, _ = fmt.Fprintf(
+					w,
 					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-					strings.Join(values, ","))))
+					strings.Join(values, ","),
+				)
 			},
 		},
 		{
@@ -495,9 +497,11 @@ func TestRange(t *testing.T) {
 				for i := start; i < end; i += 300 {
 					values = append(values, fmt.Sprintf(`[%d,"1"]`, i))
 				}
-				_, _ = w.Write([]byte(fmt.Sprintf(
+				_, _ = fmt.Fprintf(
+					w,
 					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-					strings.Join(values, ","))))
+					strings.Join(values, ","),
+				)
 			},
 		},
 		{
@@ -527,9 +531,11 @@ func TestRange(t *testing.T) {
 					for i := start; i <= end; i += 300 {
 						values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 					}
-					_, _ = w.Write([]byte(fmt.Sprintf(
+					_, _ = fmt.Fprintf(
+						w,
 						`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
-						strings.Join(values, ","))))
+						strings.Join(values, ","),
+					)
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
 					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
 					w.WriteHeader(http.StatusServiceUnavailable)
@@ -638,7 +644,8 @@ func TestRange(t *testing.T) {
 				for i := start; i < end; i += 60 {
 					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 				}
-				_, _ = w.Write([]byte(fmt.Sprintf(
+				_, _ = fmt.Fprintf(
+					w,
 					`{
 						"status":"success",
 						"data":{
@@ -660,7 +667,8 @@ func TestRange(t *testing.T) {
 							}
 						}
 					}`,
-					strings.Join(values, ","))))
+					strings.Join(values, ","),
+				)
 			},
 		},
 	}

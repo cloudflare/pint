@@ -31,7 +31,7 @@ func TestHandler(t *testing.T) {
 			run: func(l *slog.Logger) {
 				l.Debug("foo", slog.Int("count", 5))
 			},
-			expected: "[2mlevel=[0m[95mDEBUG[0m [2mmsg=[0m[97mfoo[0m [2mcount=[0m[94m5[0m\n",
+			expected: "[2mlevel=[0m[95mDEBUG[0m [2mmsg=[0m[97mfoo[0m [2mcount=[0m[94m5[0m\n", // nolint: staticcheck
 		},
 		{
 			noColor: true,
@@ -60,7 +60,7 @@ func TestHandler(t *testing.T) {
 			run: func(l *slog.Logger) {
 				l.Error("bar", slog.Any("err", errors.New("error")))
 			},
-			expected: "[2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97mbar[0m [2merr=[0m[91merror[0m\n",
+			expected: "[2mlevel=[0m[91mERROR[0m [2mmsg=[0m[97mbar[0m [2merr=[0m[91merror[0m\n", // nolint: staticcheck
 		},
 		{
 			noColor: true,
