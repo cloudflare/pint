@@ -1,4 +1,4 @@
-package parser_test
+package parser
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/comments"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 func TestReadContent(t *testing.T) {
@@ -306,7 +305,7 @@ func TestReadContent(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			r := parser.NewContentReader(bytes.NewReader(tc.input))
+			r := newContentReader(bytes.NewReader(tc.input))
 			output, err := io.ReadAll(r)
 
 			hadError := err != nil

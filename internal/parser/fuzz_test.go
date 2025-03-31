@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/prometheus/common/model"
@@ -281,6 +282,6 @@ labels:
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	f.Fuzz(func(t *testing.T, s string) {
 		t.Logf("Parsing: [%s]\n", s)
-		_, _ = p.Parse([]byte(s))
+		_, _, _ = p.Parse(strings.NewReader(s))
 	})
 }

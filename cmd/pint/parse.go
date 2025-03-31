@@ -17,7 +17,7 @@ var parseCmd = &cli.Command{
 	Action: actionParse,
 }
 
-func printNode(ident int, format string, a ...interface{}) {
+func printNode(ident int, format string, a ...any) {
 	prefix := strings.Repeat(" ", ident)
 	fmt.Printf(prefix+format+"\n", a...)
 }

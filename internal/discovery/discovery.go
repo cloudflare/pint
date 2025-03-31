@@ -85,13 +85,8 @@ type Entry struct {
 	State          ChangeType
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, err error) {
-	cr := parser.NewContentReader(r)
-
-	content, err := io.ReadAll(cr)
-	if err != nil {
-		return nil, err
-	}
+func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
+	rules, cr, err := p.Parse(r)
 
 	contentLines := diags.LineRange{
 		First: min(cr.TotalLines(), 1),
@@ -158,7 +153,6 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		return entries, nil
 	}
 
-	rules, err := p.Parse(content)
 	if err != nil {
 		slog.Warn(
 			"Failed to parse file content",

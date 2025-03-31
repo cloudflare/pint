@@ -3,6 +3,7 @@ package reporter_test
 import (
 	"bytes"
 	"log/slog"
+	"strings"
 	"testing"
 
 	"github.com/neilotoole/slogt"
@@ -25,7 +26,7 @@ func TestCheckstyleReporter(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _ := p.Parse([]byte(`
+	mockRules, _, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 `))

@@ -15,18 +15,10 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-type failingReader struct {
-	err error
-}
-
-func (r failingReader) Read(_ []byte) (int, error) {
-	return 0, r.err
-}
-
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
 		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
+		r, _, err := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
 		if err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
 		}
@@ -82,30 +74,6 @@ func TestReadRules(t *testing.T) {
 				return bytes.NewBuffer([]byte("     "))
 			},
 			isStrict: true,
-		},
-		{
-			title:        "reader error",
-			reportedPath: "rules.yml",
-			sourcePath:   "rules.yml",
-			sourceFunc: func(_ *testing.T) io.Reader {
-				return failingReader{
-					err: io.ErrClosedPipe,
-				}
-			},
-			isStrict: false,
-			err:      io.ErrClosedPipe.Error(),
-		},
-		{
-			title:        "reader error",
-			reportedPath: "rules.yml",
-			sourcePath:   "rules.yml",
-			sourceFunc: func(_ *testing.T) io.Reader {
-				return failingReader{
-					err: io.ErrClosedPipe,
-				}
-			},
-			isStrict: true,
-			err:      io.ErrClosedPipe.Error(),
 		},
 		{
 			title:        "no rules, just a comment",

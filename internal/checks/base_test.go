@@ -251,7 +251,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 func parseContent(content string) (entries []discovery.Entry, err error) {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, err := p.Parse([]byte(content))
+	rules, _, err := p.Parse(strings.NewReader(content))
 	if err != nil {
 		return nil, err
 	}
