@@ -26,8 +26,7 @@ lint:
 .PHONY: format
 format:
 	go tool -modfile=tools/betteralign/go.mod betteralign -test_files -apply ./...
-	go tool -modfile=tools/gofumpt/go.mod gofumpt -extra -l -w .
-	go tool -modfile=tools/goimports/go.mod goimports -local github.com/cloudflare/pint -w .
+	go tool -modfile=tools/golangci-lint/go.mod golangci-lint fmt
 
 tidy:
 	go mod tidy

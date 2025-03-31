@@ -13,8 +13,6 @@ updates:
       - "/"
       - "/tools/benchstat"
       - "/tools/betteralign"
-      - "/tools/gofumpt"
-      - "/tools/goimports"
       - "/tools/golangci-lint"
     schedule:
       interval: "weekly"
