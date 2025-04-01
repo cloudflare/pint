@@ -262,7 +262,7 @@ func maybeExpandError(err error) error {
 	return err
 }
 
-func checkTemplateSyntax(ctx context.Context, name, text string, data interface{}) error {
+func checkTemplateSyntax(ctx context.Context, name, text string, data any) error {
 	tmpl := promTemplate.NewTemplateExpander(
 		ctx,
 		strings.Join(append(templateDefs, text), ""),

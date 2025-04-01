@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/gkampitakis/go-snaps/snaps"
@@ -161,7 +162,7 @@ func TestSetDisabledChecks(t *testing.T) {
 
 func newRule(t *testing.T, content string) parser.Rule {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, err := p.Parse([]byte(content))
+	rules, _, err := p.Parse(strings.NewReader(content))
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

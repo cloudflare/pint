@@ -41,7 +41,7 @@ func TestGitBranchFinder(t *testing.T) {
 
 	mustParse := func(offset int, s string) parser.Rule {
 		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-		r, err := p.Parse([]byte(strings.Repeat("\n", offset) + s))
+		r, _, err := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
 		if err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
 		}

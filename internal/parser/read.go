@@ -3,6 +3,7 @@ package parser
 import (
 	"bufio"
 	"io"
+	"strings"
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
@@ -19,10 +20,11 @@ const (
 	skipFile
 )
 
-func NewContentReader(r io.Reader) *ContentReader {
+func newContentReader(r io.Reader) *ContentReader {
 	return &ContentReader{
 		src:         bufio.NewReader(r),
 		buf:         nil,
+		lines:       make([]string, 0, 100),
 		comments:    nil,
 		diagnostics: nil,
 		lineno:      0,
@@ -38,6 +40,7 @@ type ContentReader struct {
 	buf         []byte
 	comments    []comments.Comment
 	diagnostics []diags.Diagnostic
+	lines       []string
 	lineno      int
 
 	skipAll   bool
@@ -83,6 +86,7 @@ func (r *ContentReader) readNextLine() (err error) {
 		return err
 	}
 
+	r.lines = append(r.lines, strings.TrimSuffix(string(r.buf), "\n"))
 	r.lineno++
 	r.parseComments()
 	return err

@@ -44,7 +44,7 @@ func TestBitBucketReporter(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _ := p.Parse([]byte(`
+	mockRules, _, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors

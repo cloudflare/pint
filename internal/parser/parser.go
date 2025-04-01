@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -49,14 +48,9 @@ type Parser struct {
 	isStrict bool
 }
 
-func (p Parser) Parse(content []byte) (rules []Rule, err error) {
-	if len(content) == 0 {
-		return nil, nil
-	}
-
-	contentLines := strings.Split(string(content), "\n")
-
-	dec := yaml.NewDecoder(bytes.NewReader(content))
+func (p Parser) Parse(src io.Reader) (rules []Rule, cr *ContentReader, _ error) {
+	cr = newContentReader(src)
+	dec := yaml.NewDecoder(cr)
 	var index int
 	for {
 		var doc yaml.Node
@@ -65,17 +59,17 @@ func (p Parser) Parse(content []byte) (rules []Rule, err error) {
 			break
 		}
 		if decodeErr != nil {
-			return nil, tryDecodingYamlError(decodeErr)
+			return nil, cr, tryDecodingYamlError(decodeErr)
 		}
 		index++
 		if p.isStrict {
-			r, err := parseGroups(contentLines, &doc, p.schema)
+			r, err := parseGroups(&doc, p.schema, cr.lines)
 			if err.Err != nil {
-				return rules, err
+				return rules, cr, err
 			}
 			rules = append(rules, r...)
 		} else {
-			rules = append(rules, parseNode(content, contentLines, &doc, 0, 0, p.schema)...)
+			rules = append(rules, p.parseNode(&doc, 0, 0, cr.lines)...)
 		}
 		if index > 1 && p.isStrict {
 			rules = append(rules, Rule{
@@ -89,12 +83,11 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 			})
 		}
 	}
-
-	return rules, err
+	return rules, cr, nil
 }
 
-func parseNode(content []byte, contentLines []string, node *yaml.Node, offsetLine, offsetColumn int, schema Schema) (rules []Rule) {
-	ret, isEmpty := parseRule(contentLines, node, offsetLine, offsetColumn)
+func (p *Parser) parseNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rules []Rule) {
+	ret, isEmpty := parseRule(node, offsetLine, offsetColumn, contentLines)
 	if !isEmpty {
 		rules = append(rules, ret)
 		return rules
@@ -106,20 +99,19 @@ func parseNode(content []byte, contentLines []string, node *yaml.Node, offsetLin
 		switch root.Kind {
 		case yaml.SequenceNode:
 			for _, n := range root.Content {
-				rules = append(rules, parseNode(content, contentLines, n, offsetLine, offsetColumn, schema)...)
+				rules = append(rules, p.parseNode(n, offsetLine, offsetColumn, contentLines)...)
 			}
 		case yaml.MappingNode:
-			rule, isEmpty = parseRule(contentLines, root, offsetLine, offsetColumn)
+			rule, isEmpty = parseRule(root, offsetLine, offsetColumn, contentLines)
 			if !isEmpty {
 				rules = append(rules, rule)
 			} else {
 				for _, n := range root.Content {
-					rules = append(rules, parseNode(content, contentLines, n, offsetLine, offsetColumn, schema)...)
+					rules = append(rules, p.parseNode(n, offsetLine, offsetColumn, contentLines)...)
 				}
 			}
 		case yaml.ScalarNode:
-			if root.Value != string(content) && root.Line < len(contentLines) {
-				c := []byte(root.Value)
+			if root.Value != strings.Join(contentLines, "\n") && root.Line < len(contentLines) {
 				var n yaml.Node
 				// FIXME there must be a better way.
 				// If we have YAML inside YAML:
@@ -128,15 +120,14 @@ func parseNode(content []byte, contentLines []string, node *yaml.Node, offsetLin
 				//     rules: ...
 				// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
 				// Right now we read the line where it's in the file and count leading spaces.
-				if err := yaml.Unmarshal(c, &n); err == nil {
+				if err := yaml.Unmarshal([]byte(root.Value), &n); err == nil {
 					rules = append(rules,
-						parseNode(
-							c,
-							strings.Split(root.Value, "\n"),
+						p.parseNode(
 							&n,
 							offsetLine+root.Line,
 							offsetColumn+countLeadingSpace(contentLines[root.Line]),
-							schema)...,
+							strings.Split(root.Value, "\n"),
+						)...,
 					)
 				}
 			}
@@ -145,7 +136,7 @@ func parseNode(content []byte, contentLines []string, node *yaml.Node, offsetLin
 	return rules
 }
 
-func parseRule(contentLines []string, node *yaml.Node, offsetLine, offsetColumn int) (rule Rule, _ bool) {
+func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rule Rule, _ bool) {
 	if node.Kind != yaml.MappingNode {
 		return rule, true
 	}

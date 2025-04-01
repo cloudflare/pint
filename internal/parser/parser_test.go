@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"bytes"
 	"errors"
 	"strconv"
 	"testing"
@@ -726,6 +727,7 @@ metadata:
   app: other
 data:
   alerts: |
+
     groups:
       - name: other alerts
         rules:
@@ -754,19 +756,19 @@ data:
 					},
 				},
 				{
-					Lines: diags.LineRange{First: 27, Last: 28},
+					Lines: diags.LineRange{First: 28, Last: 29},
 					AlertingRule: &parser.AlertingRule{
 						Alert: parser.YamlNode{
 							Value: "Example_High_Restart_Rate",
 							Pos: diags.PositionRanges{
-								{Line: 27, FirstColumn: 20, LastColumn: 44},
+								{Line: 28, FirstColumn: 20, LastColumn: 44},
 							},
 						},
 						Expr: parser.PromQLExpr{
 							Value: &parser.YamlNode{
 								Value: "1",
 								Pos: diags.PositionRanges{
-									{Line: 28, FirstColumn: 20, LastColumn: 20},
+									{Line: 29, FirstColumn: 20, LastColumn: 20},
 								},
 							},
 						},
@@ -3487,7 +3489,7 @@ groups:
 			t.Logf("\n--- Content ---%s--- END ---", tc.content)
 
 			p := parser.NewParser(tc.strict, tc.schema, tc.names)
-			output, err := p.Parse(tc.content)
+			output, _, err := p.Parse(bytes.NewReader(tc.content))
 
 			if tc.err != "" {
 				require.EqualError(t, err, tc.err)

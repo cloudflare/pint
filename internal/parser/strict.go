@@ -40,7 +40,7 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(contentLines []string, doc *yaml.Node, schema Schema) (rules []Rule, err ParseError) {
+func parseGroups(doc *yaml.Node, schema Schema, contentLines []string) (rules []Rule, err ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
@@ -71,7 +71,7 @@ func parseGroups(contentLines []string, doc *yaml.Node, schema Schema) (rules []
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
-				name, r, err := parseGroup(contentLines, group, schema)
+				name, r, err := parseGroup(group, schema, contentLines)
 				if err.Err != nil {
 					return rules, err
 				}
@@ -89,7 +89,7 @@ func parseGroups(contentLines []string, doc *yaml.Node, schema Schema) (rules []
 	return rules, ParseError{}
 }
 
-func parseGroup(contentLines []string, group *yaml.Node, schema Schema) (name string, rules []Rule, err ParseError) {
+func parseGroup(group *yaml.Node, schema Schema, contentLines []string) (name string, rules []Rule, err ParseError) {
 	if !isTag(group.ShortTag(), mapTag) {
 		return "", nil, ParseError{
 			Line: group.Line,
@@ -143,7 +143,7 @@ func parseGroup(contentLines []string, group *yaml.Node, schema Schema) (name st
 				}
 			}
 			for _, rule := range unpackNodes(entry.val) {
-				r, err := parseRuleStrict(contentLines, rule)
+				r, err := parseRuleStrict(rule, contentLines)
 				if err.Err != nil {
 					return "", nil, err
 				}
@@ -199,7 +199,7 @@ func parseGroup(contentLines []string, group *yaml.Node, schema Schema) (name st
 	return name, rules, ParseError{}
 }
 
-func parseRuleStrict(contentLines []string, rule *yaml.Node) (Rule, ParseError) {
+func parseRuleStrict(rule *yaml.Node, contentLines []string) (Rule, ParseError) {
 	if !isTag(rule.ShortTag(), mapTag) {
 		return Rule{}, ParseError{
 			Line: rule.Line,
@@ -227,6 +227,6 @@ func parseRuleStrict(contentLines []string, rule *yaml.Node) (Rule, ParseError) 
 		}
 	}
 
-	r, _ := parseRule(contentLines, rule, 0, 0)
-	return r, ParseError{}
+	pr, _ := parseRule(rule, 0, 0, contentLines)
+	return pr, ParseError{}
 }

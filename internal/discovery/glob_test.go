@@ -29,7 +29,7 @@ func TestGlobPathFinder(t *testing.T) {
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
-	testRules, err := p.Parse([]byte(testRuleBody))
+	testRules, _, err := p.Parse(strings.NewReader(testRuleBody))
 	require.NoError(t, err)
 
 	testCases := []testCaseT{
@@ -326,15 +326,15 @@ func TestGlobPathFinder(t *testing.T) {
 
 			for p, content := range tc.files {
 				if strings.Contains(p, "/") {
-					err = os.MkdirAll(path.Dir(p), 0o755)
+					err := os.MkdirAll(path.Dir(p), 0o755)
 					require.NoError(t, err)
 				}
-				err = os.WriteFile(p, []byte(content), 0o644)
+				err := os.WriteFile(p, []byte(content), 0o644)
 				require.NoError(t, err)
 			}
 			for symlink, target := range tc.symlinks {
 				if strings.Contains(symlink, "/") {
-					err = os.MkdirAll(path.Dir(symlink), 0o755)
+					err := os.MkdirAll(path.Dir(symlink), 0o755)
 					require.NoError(t, err)
 				}
 				require.NoError(t, os.Symlink(target, symlink))

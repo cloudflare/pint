@@ -1,6 +1,7 @@
 package checks_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/prometheus/common/model"
@@ -107,7 +108,7 @@ func TestTemplatedRegexpExpand(t *testing.T) {
 
 func newMustRule(content string) parser.Rule {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, err := p.Parse([]byte(content))
+	rules, _, err := p.Parse(strings.NewReader(content))
 	if err != nil {
 		panic(err)
 	}
