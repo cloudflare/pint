@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"strconv"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -289,6 +290,11 @@ func TestReadContent(t *testing.T) {
     link: http://docs
     summary: 'error rate: {{ $value }}'
 `),
+		},
+		{
+			// Test long string that doesn't fill into a single io.ReadAll read (512 bytes).
+			input:  []byte(strings.Repeat("A", 518)),
+			output: []byte(strings.Repeat("A", 518)),
 		},
 	}
 

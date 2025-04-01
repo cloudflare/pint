@@ -66,16 +66,16 @@ func (r *ContentReader) TotalLines() int {
 }
 
 func (r *ContentReader) Read(b []byte) (got int, err error) {
-	for {
+	for got < cap(b) && err == nil {
 		if len(r.buf) == 0 {
 			err = r.readNextLine()
 		}
 		n := copy(b[got:], r.buf)
 		r.buf = r.buf[n:]
 		got += n
-		if got >= cap(b) || err != nil {
-			break
-		}
+	}
+	if err != nil && len(r.buf) > 0 {
+		err = nil
 	}
 	return got, err
 }
@@ -86,9 +86,9 @@ func (r *ContentReader) readNextLine() (err error) {
 		return err
 	}
 
-	r.lines = append(r.lines, strings.TrimSuffix(string(r.buf), "\n"))
 	r.lineno++
 	r.parseComments()
+	r.lines = append(r.lines, strings.TrimSuffix(string(r.buf), "\n"))
 	return err
 }
 

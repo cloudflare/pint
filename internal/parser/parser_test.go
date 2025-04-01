@@ -3466,19 +3466,19 @@ groups:
 		},
 	}
 
-	alwaysEqual := cmp.Comparer(func(_, _ interface{}) bool { return true })
-	ignorePrometheusExpr := cmp.FilterValues(func(x, y interface{}) bool {
+	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })
+	ignorePrometheusExpr := cmp.FilterValues(func(x, y any) bool {
 		_, xe := x.(*parser.PromQLNode)
 		_, ye := y.(*parser.PromQLNode)
 		return xe || ye
 	}, alwaysEqual)
 
-	cmpErrorText := cmp.Comparer(func(x, y interface{}) bool {
+	cmpErrorText := cmp.Comparer(func(x, y any) bool {
 		xe := x.(error)
 		ye := y.(error)
 		return xe.Error() == ye.Error()
 	})
-	sameErrorText := cmp.FilterValues(func(x, y interface{}) bool {
+	sameErrorText := cmp.FilterValues(func(x, y any) bool {
 		_, xe := x.(error)
 		_, ye := y.(error)
 		return xe && ye
