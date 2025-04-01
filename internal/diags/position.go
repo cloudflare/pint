@@ -55,16 +55,12 @@ func (prs PositionRanges) Lines() (lr LineRange) {
 	return lr
 }
 
-func (prs PositionRanges) AddOffset(line, column int) PositionRanges {
-	dst := make(PositionRanges, 0, len(prs))
-	for _, pr := range prs {
-		dst = append(dst, PositionRange{
-			Line:        pr.Line + line,
-			FirstColumn: pr.FirstColumn + column,
-			LastColumn:  pr.LastColumn + column,
-		})
+func (prs PositionRanges) AddOffset(line, column int) {
+	for i := range prs {
+		prs[i].Line += line
+		prs[i].FirstColumn += column
+		prs[i].LastColumn += column
 	}
-	return dst
 }
 
 func appendPosition(src PositionRanges, line, column int) PositionRanges {
@@ -91,7 +87,7 @@ func appendPosition(src PositionRanges, line, column int) PositionRanges {
 }
 
 func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRanges {
-	offsets := make(PositionRanges, 0, len(val.Value)/4)
+	offsets := make(PositionRanges, 0, 10)
 
 	if len(val.Value) == 0 {
 		return PositionRanges{

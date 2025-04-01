@@ -52,8 +52,10 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 }
 
 func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlNode {
+	pos := diags.NewPositionRange(contentLines, node, minColumn)
+	pos.AddOffset(offsetLine, offsetColumn)
 	return &YamlNode{
-		Pos:   diags.NewPositionRange(contentLines, node, minColumn).AddOffset(offsetLine, offsetColumn),
+		Pos:   pos,
 		Value: nodeValue(node),
 	}
 }

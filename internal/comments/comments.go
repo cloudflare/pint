@@ -1,7 +1,6 @@
 package comments
 
 import (
-	"bufio"
 	"fmt"
 	"strings"
 	"time"
@@ -329,10 +328,9 @@ func parseComment(s string, line int) (parsed []Comment) {
 }
 
 func Parse(lineno int, text string) (comments []Comment) {
-	sc := bufio.NewScanner(strings.NewReader(text))
 	var index int
-	for sc.Scan() {
-		comments = append(comments, parseComment(sc.Text(), lineno+index)...)
+	for _, line := range strings.Split(text, "\n") {
+		comments = append(comments, parseComment(line, lineno+index)...)
 		index++
 	}
 	return comments
