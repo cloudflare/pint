@@ -2,8 +2,6 @@ module github.com/cloudflare/pint
 
 go 1.24.0
 
-toolchain go1.24.1
-
 require (
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.11
