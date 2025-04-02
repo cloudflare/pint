@@ -4,9 +4,8 @@ import (
 	"context"
 	"log/slog"
 	"sync"
+	"sync/atomic"
 	"time"
-
-	"go.uber.org/atomic"
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
@@ -98,14 +97,14 @@ func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.Pr
 					rulesParsedTotal.WithLabelValues(config.InvalidRuleType).Inc()
 				}
 
-				checkedEntriesCount.Inc()
+				checkedEntriesCount.Add(1)
 				checkList := cfg.GetChecksForEntry(ctx, gen, entry)
 				for _, check := range checkList {
 					checkIterationChecks.Inc()
 					if check.Meta().Online {
-						onlineChecksCount.Inc()
+						onlineChecksCount.Add(1)
 					} else {
-						offlineChecksCount.Inc()
+						offlineChecksCount.Add(1)
 					}
 					jobs <- scanJob{entry: entry, allEntries: entries, check: check}
 				}

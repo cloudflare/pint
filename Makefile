@@ -28,9 +28,6 @@ format:
 	go tool -modfile=tools/betteralign/go.mod betteralign -test_files -apply ./...
 	go tool -modfile=tools/golangci-lint/go.mod golangci-lint fmt
 
-tidy:
-	go mod tidy
-
 .PHONY: test
 test:
 	mkdir -p $(COVER_DIR)
