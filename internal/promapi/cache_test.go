@@ -322,3 +322,17 @@ func BenchmarkQueryCacheGC(b *testing.B) {
 		cache.gc()
 	}
 }
+
+func BenchmarkQueryCacheGCNoop(b *testing.B) {
+	cache := newQueryCache(time.Minute)
+	mockErr := errors.New("Fake Error")
+	var i uint64
+	for i = 1; i <= 1000; i++ {
+		cache.set(i, mockErr, time.Hour)
+	}
+
+	b.ResetTimer()
+	for b.Loop() {
+		cache.gc()
+	}
+}
