@@ -20,7 +20,7 @@ import (
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
-func BenchmarkFindEntries(b *testing.B) {
+func BenchmarkGlobFinder(b *testing.B) {
 	log.Setup(slog.LevelError, true)
 
 	finder := discovery.NewGlobFinder(
@@ -30,8 +30,55 @@ func BenchmarkFindEntries(b *testing.B) {
 		model.UTF8Validation,
 		nil,
 	)
-	for n := 0; n < b.N; n++ {
+
+	b.ResetTimer()
+	for b.Loop() {
 		_, _ = finder.Find()
+	}
+}
+
+func BenchmarkGitFinder(b *testing.B) {
+	log.Setup(slog.LevelError, true)
+
+	tmp := b.TempDir()
+	require.NoError(b, os.CopyFS(tmp, os.DirFS("bench")))
+	b.Chdir(tmp)
+
+	b.Setenv("GIT_AUTHOR_NAME", "pint")
+	b.Setenv("GIT_AUTHOR_EMAIL", "pint@example.com")
+	b.Setenv("GIT_COMMITTER_NAME", "pint")
+	b.Setenv("GIT_COMMITTER_EMAIL", "pint")
+
+	_, err := git.RunGit("init", "--initial-branch=main", ".")
+	require.NoError(b, err, "git init")
+
+	_, err = git.RunGit("add", "Makefile", "README.md")
+	require.NoError(b, err, "git add")
+	_, err = git.RunGit("commit", "-am", "commit")
+	require.NoError(b, err, "git commit")
+
+	_, err = git.RunGit("checkout", "-b", "v2")
+	require.NoError(b, err, "git checkout v2")
+
+	_, err = git.RunGit("add", ".")
+	require.NoError(b, err, "git add")
+
+	_, err = git.RunGit("commit", "-am", "commit")
+	require.NoError(b, err, "git commit")
+
+	finder := discovery.NewGitBranchFinder(
+		git.RunGit,
+		git.NewPathFilter(nil, nil, nil),
+		"main",
+		50,
+		parser.PrometheusSchema,
+		model.UTF8Validation,
+		nil,
+	)
+
+	b.ResetTimer()
+	for b.Loop() {
+		_, _ = finder.Find(nil)
 	}
 }
 
@@ -82,7 +129,7 @@ func BenchmarkCheckRules(b *testing.B) {
 	defer srv.Close()
 
 	tmp := b.TempDir()
-	content := []byte(fmt.Sprintf(`prometheus "prom" {
+	content := fmt.Appendf(nil, `prometheus "prom" {
   uri         = "%s"
   timeout     = "30s"
   uptime      = "prometheus_ready"
@@ -98,7 +145,7 @@ rule {
     minCount = 50
   }
 }
-`, srv.URL))
+`, srv.URL)
 	require.NoError(b, os.WriteFile(tmp+"/.pint.hcl", content, 0o644))
 
 	cfg, _, err := config.Load(tmp+"/.pint.hcl", false)

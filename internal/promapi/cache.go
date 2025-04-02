@@ -86,7 +86,7 @@ func (c *queryCache) gc() {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	entries := map[uint64]*cacheEntry{}
+	entries := make(map[uint64]*cacheEntry, len(c.entries)/2)
 
 	now := time.Now()
 	for key, ce := range c.entries {

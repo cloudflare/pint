@@ -267,7 +267,9 @@ pint_prometheus_cache_size{name="prom"} 110
 func BenchmarkQueryCacheOnlySet(b *testing.B) {
 	mockErr := errors.New("Fake Error")
 	cache := newQueryCache(time.Minute)
-	for n := 0; n < b.N; n++ {
+
+	b.ResetTimer()
+	for b.Loop() {
 		cache.set(1, mockErr, 0)
 	}
 }
@@ -282,6 +284,7 @@ func BenchmarkQueryCacheSetGrow(b *testing.B) {
 		cache.set(i, mockErr, 0)
 	}
 
+	b.ResetTimer()
 	for n := 1; n <= b.N; n++ {
 		cache.set(uint64(maxSize+n), mockErr, 0)
 	}
@@ -290,7 +293,8 @@ func BenchmarkQueryCacheSetGrow(b *testing.B) {
 func BenchmarkQueryCacheGetMiss(b *testing.B) {
 	cache := newQueryCache(time.Minute)
 
-	for n := 0; n < b.N; n++ {
+	b.ResetTimer()
+	for n := 0; b.Loop(); n++ {
 		cache.get(uint64(n), "/foo")
 	}
 }
@@ -301,7 +305,9 @@ func BenchmarkQueryCacheGC(b *testing.B) {
 
 	var i uint64
 	var ttl time.Duration
-	for n := 0; n < b.N; n++ {
+
+	b.ResetTimer()
+	for n := 0; b.Loop(); n++ {
 		b.StopTimer()
 		if n%2 == 0 {
 			ttl = 0

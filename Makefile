@@ -66,11 +66,12 @@ coverhtml: test
 benchmark:
 	go test \
 	    $(GOFLAGS) \
-		-count=10 \
+		-timeout=15m \
+		-count=5 \
 		-run=none \
 		-bench=. \
 		-benchmem \
-		./cmd/pint
+		./...
 
 .PHONY: benchmark-diff
 benchmark-diff:
