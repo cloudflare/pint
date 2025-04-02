@@ -49,17 +49,11 @@ linters:
     generated: lax
     presets:
       - comments
-      - common-false-positives
-      - legacy
       - std-error-handling
     rules:
       - linters:
           - exhaustruct
         path: ^.*_test\.go$
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
 issues:
   max-same-issues: 0
 formatters:
@@ -72,9 +66,3 @@ formatters:
     goimports:
       local-prefixes:
         - github.com/cloudflare/pint
-  exclusions:
-    generated: lax
-    paths:
-      - third_party$
-      - builtin$
-      - examples$
