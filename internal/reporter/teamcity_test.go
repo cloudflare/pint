@@ -26,7 +26,7 @@ func TestTeamCityReporter(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 `))
@@ -46,7 +46,7 @@ func TestTeamCityReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,
@@ -77,7 +77,7 @@ func TestTeamCityReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,
@@ -107,7 +107,7 @@ func TestTeamCityReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 5,

@@ -18,14 +18,17 @@ import (
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
 		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-		r, _, err := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
-		if err != nil {
-			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, err))
+		file, _ := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
+		if file.Error.Err != nil {
+			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
 		}
-		if len(r) != 1 {
-			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(r), s))
+		if len(file.Groups) != 1 {
+			panic(fmt.Sprintf("wrong number of groups returned: %d\n---\n%s\n---", len(file.Groups), s))
 		}
-		return r[0]
+		if len(file.Groups[0].Rules) != 1 {
+			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(file.Groups[0].Rules), s))
+		}
+		return file.Groups[0].Rules[0]
 	}
 
 	type testCaseT struct {

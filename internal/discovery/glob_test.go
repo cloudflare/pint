@@ -29,8 +29,8 @@ func TestGlobPathFinder(t *testing.T) {
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
-	testRules, _, err := p.Parse(strings.NewReader(testRuleBody))
-	require.NoError(t, err)
+	testFile, _ := p.Parse(strings.NewReader(testRuleBody))
+	require.NoError(t, testFile.Error.Err)
 
 	testCases := []testCaseT{
 		{
@@ -68,8 +68,8 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "bar.yml",
 						SymlinkTarget: "bar.yml",
 					},
-					Rule:          testRules[0],
-					ModifiedLines: testRules[0].Lines.Expand(),
+					Rule:          testFile.Groups[0].Rules[0],
+					ModifiedLines: testFile.Groups[0].Rules[0].Lines.Expand(),
 					Owner:         "bob",
 				},
 			},
@@ -84,8 +84,8 @@ func TestGlobPathFinder(t *testing.T) {
 						Name:          "foo/bar.yml",
 						SymlinkTarget: "foo/bar.yml",
 					},
-					Rule:          testRules[0],
-					ModifiedLines: testRules[0].Lines.Expand(),
+					Rule:          testFile.Groups[0].Rules[0],
+					ModifiedLines: testFile.Groups[0].Rules[0].Lines.Expand(),
 					Owner:         "alice",
 				},
 			},

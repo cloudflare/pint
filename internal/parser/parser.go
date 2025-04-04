@@ -48,10 +48,11 @@ type Parser struct {
 	isStrict bool
 }
 
-func (p Parser) Parse(src io.Reader) (rules []Rule, cr *ContentReader, _ error) {
+func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 	cr = newContentReader(src)
 	dec := yaml.NewDecoder(cr)
 	var index int
+	var g []Group
 	for {
 		var doc yaml.Node
 		decodeErr := dec.Decode(&doc)
@@ -59,31 +60,32 @@ func (p Parser) Parse(src io.Reader) (rules []Rule, cr *ContentReader, _ error) 
 			break
 		}
 		if decodeErr != nil {
-			return nil, cr, tryDecodingYamlError(decodeErr)
+			f.Error = tryDecodingYamlError(decodeErr)
+			return f, cr
 		}
 		index++
 		if p.isStrict {
-			r, err := parseGroups(&doc, p.schema, cr.lines)
-			if err.Err != nil {
-				return rules, cr, err
+			g, f.Error = parseGroups(&doc, p.schema, cr.lines)
+			if f.Error.Err != nil {
+				return f, cr
 			}
-			rules = append(rules, r...)
+			f.Groups = append(f.Groups, g...)
 		} else {
-			rules = append(rules, p.parseNode(&doc, 0, 0, cr.lines)...)
-		}
-		if index > 1 && p.isStrict {
-			rules = append(rules, Rule{
-				Lines: diags.LineRange{First: doc.Line, Last: doc.Line},
-				Error: ParseError{
-					Err: errors.New("multi-document YAML files are not allowed"),
-					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
-To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
-					Line: doc.Line,
-				},
+			f.IsRelaxed = true
+			f.Groups = append(f.Groups, Group{ // nolint: exhaustruct
+				Rules: p.parseNode(&doc, 0, 0, cr.lines),
 			})
 		}
+		if index > 1 && p.isStrict {
+			f.Error = ParseError{
+				Err: errors.New("multi-document YAML files are not allowed"),
+				Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
+				Line: doc.Line,
+			}
+		}
 	}
-	return rules, cr, nil
+	return f, cr
 }
 
 func (p *Parser) parseNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rules []Rule) {

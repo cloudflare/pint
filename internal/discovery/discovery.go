@@ -86,7 +86,7 @@ type Entry struct {
 }
 
 func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
-	rules, cr, err := p.Parse(r)
+	file, cr := p.Parse(r)
 
 	contentLines := diags.LineRange{
 		First: min(cr.TotalLines(), 1),
@@ -153,43 +153,62 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		return entries, nil
 	}
 
-	if err != nil {
+	if file.Error.Err != nil {
 		slog.Warn(
 			"Failed to parse file content",
-			slog.Any("err", err),
+			slog.Any("err", file.Error.Err),
 			slog.String("path", sourcePath),
-			slog.String("lines", contentLines.String()),
+			slog.Int("line", file.Error.Line),
 		)
 		entries = append(entries, Entry{
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
-			PathError:     err,
+			PathError:     file.Error,
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
 		})
 		return entries, nil
 	}
 
-	for _, rule := range rules {
-		ruleOwner := fileOwner
-		for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
-			ruleOwner = owner.Name
+	for _, group := range file.Groups {
+		if group.Error.Err != nil {
+			slog.Warn(
+				"Failed to parse group entry",
+				slog.Any("err", group.Error.Err),
+				slog.String("path", sourcePath),
+				slog.Int("line", group.Error.Line),
+			)
+			entries = append(entries, Entry{
+				Path: Path{
+					Name:          sourcePath,
+					SymlinkTarget: reportedPath,
+				},
+				PathError:     group.Error,
+				Owner:         fileOwner,
+				ModifiedLines: []int{group.Error.Line},
+			})
 		}
-		entries = append(entries, Entry{
-			Path: Path{
-				Name:          sourcePath,
-				SymlinkTarget: reportedPath,
-			},
-			Rule:           rule,
-			ModifiedLines:  rule.Lines.Expand(),
-			Owner:          ruleOwner,
-			DisabledChecks: disabledChecks,
-		})
+		for _, rule := range group.Rules {
+			ruleOwner := fileOwner
+			for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
+				ruleOwner = owner.Name
+			}
+			entries = append(entries, Entry{
+				Path: Path{
+					Name:          sourcePath,
+					SymlinkTarget: reportedPath,
+				},
+				Rule:           rule,
+				ModifiedLines:  rule.Lines.Expand(),
+				Owner:          ruleOwner,
+				DisabledChecks: disabledChecks,
+			})
+		}
 	}
 
-	if len(rules) == 0 && len(badOwners) > 0 {
+	if len(entries) == 0 && len(badOwners) > 0 {
 		for _, comment := range badOwners {
 			owner := comment.Value.(comments.Owner)
 			entries = append(entries, Entry{

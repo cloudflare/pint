@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -366,15 +367,18 @@ func (r Rule) Type() RuleType {
 }
 
 type File struct {
-	Comments []comments.Comment
-	Groups   []Group
+	Comments  []comments.Comment
+	Groups    []Group
+	Error     ParseError
+	IsRelaxed bool
 }
 
 type Group struct {
 	Labels      map[string]string
 	Name        string
-	Interval    string
-	QueryOffset string
+	Error       ParseError
 	Rules       []Rule
+	Interval    time.Duration
+	QueryOffset time.Duration
 	Limit       int
 }

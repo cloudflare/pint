@@ -5,9 +5,9 @@ import (
 	"errors"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/prometheus/common/model"
-	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
@@ -19,316 +19,456 @@ import (
 
 func TestParse(t *testing.T) {
 	type testCaseT struct {
-		err     string
-		content []byte
-		output  []parser.Rule
-		strict  bool
-		schema  parser.Schema
-		names   model.ValidationScheme
+		input  []byte
+		output parser.File
+		strict bool
+		schema parser.Schema
+		names  model.ValidationScheme
 	}
 
 	testCases := []testCaseT{
 		{
-			content: nil,
-			output:  nil,
+			input:  nil,
+			output: parser.File{},
 		},
 		{
-			content: []byte{},
-			output:  nil,
+			input:  []byte{},
+			output: parser.File{},
 		},
 		{
-			content: []byte(""),
-			output:  nil,
+			input:  []byte(""),
+			output: parser.File{},
 		},
 		{
-			content: []byte("\n"),
-			output:  nil,
+			input:  []byte("\n"),
+			output: parser.File{},
 		},
 		{
-			content: []byte("\n\n\n"),
-			output:  nil,
+			input:  []byte("\n\n\n"),
+			output: parser.File{},
 		},
 		{
-			content: []byte("---"),
-			output:  nil,
-		},
-		{
-			content: []byte("---\n"),
-			output:  nil,
-		},
-		{
-			content: []byte("\n---\n\n---\n"),
-			output:  nil,
-		},
-		{
-			content: []byte("\n---\n\n---\n---"),
-			output:  nil,
-		},
-		{
-			content: []byte(string("! !00 \xf6")),
-			output:  nil,
-			err:     "error at line 1: yaml: incomplete UTF-8 octet sequence",
-		},
-		{
-			content: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 6},
-					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 6},
+			input: []byte("---"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{},
 				},
 			},
 		},
 		{
-			content: []byte("- record: |\n    multiline\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 2},
+			input: []byte("---\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{},
 				},
 			},
 		},
 		{
-			content: []byte(`---
+			input: []byte("\n---\n\n---\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{},
+					{},
+				},
+			},
+		},
+		{
+			input: []byte("\n---\n\n---\n---"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{},
+					{},
+					{},
+				},
+			},
+		},
+		{
+			input: []byte(string("! !00 \xf6")),
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("yaml: incomplete UTF-8 octet sequence"),
+					Line: 1,
+				},
+			},
+		},
+		{
+			input: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 6},
+								Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 6},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte("- record: |\n    multiline\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 2},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`---
 - expr: foo
   record: foo
 ---
 - expr: bar
 `),
-			output: []parser.Rule{
-				{
-					RecordingRule: &parser.RecordingRule{
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo",
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 11},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								RecordingRule: &parser.RecordingRule{
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo",
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 11, LastColumn: 13},
+										},
+									},
 								},
-							},
-						},
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 3, FirstColumn: 11, LastColumn: 13},
+								Lines: diags.LineRange{First: 2, Last: 3},
 							},
 						},
 					},
-					Lines: diags.LineRange{First: 2, Last: 3},
-				},
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
-				},
-			},
-		},
-		{
-			content: []byte("- expr: foo\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 1},
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- alert: foo\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+			input: []byte("- expr: foo\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 1},
+								Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 1},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- alert: foo\n  record: foo\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: errors.New("got both record and alert keys in a single rule"), Line: 1},
+			input: []byte("- alert: foo\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 1},
+								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- record: foo\n  labels:\n    foo: bar\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 3},
-					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+			input: []byte("- alert: foo\n  record: foo\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Error: parser.ParseError{Err: errors.New("got both record and alert keys in a single rule"), Line: 1},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- record: - foo\n"),
-			err:     "error at line 1: yaml: block sequence entries are not allowed in this context",
+			input: []byte("- record: foo\n  labels:\n    foo: bar\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 3},
+								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte("- record: foo  expr: sum(\n"),
-			err:     "error at line 1: yaml: mapping values are not allowed in this context",
+			input: []byte("- record: - foo\n"),
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("yaml: block sequence entries are not allowed in this context"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte("- record\n\texpr: foo\n"),
-			err:     "error at line 2: found a tab character that violates indentation",
+			input: []byte("- record: foo  expr: sum(\n"),
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("yaml: mapping values are not allowed in this context"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte("- record\n\texpr: foo\n"),
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("found a tab character that violates indentation"),
+					Line: 2,
+				},
+			},
+		},
+		{
+			input: []byte(`
 - record: foo
   expr: bar
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   record: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("duplicated record key"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("duplicated record key"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   alert: bar
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("duplicated alert key"), Line: 3},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								Error: parser.ParseError{Err: errors.New("duplicated alert key"), Line: 3},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   for: 5m
   expr: bar
   for: 1m
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("duplicated for key"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("duplicated for key"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   keep_firing_for: 5m
   expr: bar
   keep_firing_for: 1m
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("duplicated keep_firing_for key"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("duplicated keep_firing_for key"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   labels: {}
   expr: bar
   labels: {}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   labels: {}
   expr: bar
   labels: {}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   annotations: {}
   expr: bar
   annotations: {}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("duplicated annotations key"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("duplicated annotations key"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- record: foo\n  expr: foo\n  extra: true\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 3},
-					Error: parser.ParseError{Err: errors.New("invalid key(s) found: extra"), Line: 3},
+			input: []byte("- record: foo\n  expr: foo\n  extra: true\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 3},
+								Error: parser.ParseError{Err: errors.New("invalid key(s) found: extra"), Line: 3},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`- record: foo
+			input: []byte(`- record: foo
   expr: foo offset 10m
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 1, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 22},
-								},
-								Value: "foo offset 10m",
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			content: []byte("- record: foo\n  expr: foo offset -10m\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 1, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo offset -10m",
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 23},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 22},
+											},
+											Value: "foo offset 10m",
+										},
+									},
 								},
 							},
 						},
@@ -337,7 +477,38 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte("- record: foo\n  expr: foo offset -10m\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo offset -10m",
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 23},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
 # pint disable head comment
 - record: foo # pint disable record comment
   expr: foo offset 10m # pint disable expr comment
@@ -349,73 +520,80 @@ func TestParse(t *testing.T) {
     bob: alice
   # pint disable foot comment
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 3, Last: 10},
-					Comments: []comments.Comment{
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "head comment"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "record comment"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "expr comment"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "pre-labels comment"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "foot comment"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "pre-foo comment"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "post-foo comment"},
-						},
-					},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 3, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo offset 10m",
-								Pos: diags.PositionRanges{
-									{Line: 4, FirstColumn: 9, LastColumn: 22},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 3, Last: 10},
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "head comment"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "record comment"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "expr comment"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "pre-labels comment"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "foot comment"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "pre-foo comment"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "post-foo comment"},
+									},
 								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 11, LastColumn: 13},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "bar",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo offset 10m",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 9, LastColumn: 22},
+											},
+										},
 									},
-								},
-								{
-									Key: &parser.YamlNode{
-										Value: "bob",
-									},
-									Value: &parser.YamlNode{
-										Value: "alice",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "foo",
+												},
+												Value: &parser.YamlNode{
+													Value: "bar",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "bob",
+												},
+												Value: &parser.YamlNode{
+													Value: "alice",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -425,22 +603,29 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			content: []byte("- record: foo\n  expr: foo[5m] offset 10m\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 1, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo[5m] offset 10m",
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 26},
+			input: []byte("- record: foo\n  expr: foo[5m] offset 10m\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo[5m] offset 10m",
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 26},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -449,50 +634,57 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: name
   expr: sum(foo)
   labels:
     foo: bar
     bob: alice
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 6},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name",
-							Pos: diags.PositionRanges{
-								{Line: 2, FirstColumn: 11, LastColumn: 14},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "sum(foo)",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 9, LastColumn: 16},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "foo",
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 6},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 11, LastColumn: 14},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "bar",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "sum(foo)",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 16},
+											},
+										},
 									},
-								},
-								{
-									Key: &parser.YamlNode{
-										Value: "bob",
-									},
-									Value: &parser.YamlNode{
-										Value: "alice",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "foo",
+												},
+												Value: &parser.YamlNode{
+													Value: "bar",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "bob",
+												},
+												Value: &parser.YamlNode{
+													Value: "alice",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -502,7 +694,7 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: custom_rules
   rules:
@@ -512,43 +704,50 @@ groups:
         foo: bar
         bob: alice
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 9},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 15, LastColumn: 18},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "sum(foo)",
-								Pos: diags.PositionRanges{
-									{Line: 6, FirstColumn: 13, LastColumn: 20},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "foo",
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 9},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 15, LastColumn: 18},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "bar",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "sum(foo)",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 13, LastColumn: 20},
+											},
+										},
 									},
-								},
-								{
-									Key: &parser.YamlNode{
-										Value: "bob",
-									},
-									Value: &parser.YamlNode{
-										Value: "alice",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "foo",
+												},
+												Value: &parser.YamlNode{
+													Value: "bar",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "bob",
+												},
+												Value: &parser.YamlNode{
+													Value: "alice",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -558,7 +757,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`- alert: Down
+			input: []byte(`- alert: Down
   expr: |
     up == 0
   for: |+
@@ -575,84 +774,91 @@ groups:
     baz > 1
   labels: {}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 9},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Down",
-							Pos: diags.PositionRanges{
-								{Line: 1, FirstColumn: 10, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "up == 0\n",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 5, LastColumn: 11},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 9},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Down",
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 10, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0\n",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 5, LastColumn: 11},
+											},
+										},
+									},
+									For: &parser.YamlNode{
+										Value: "11m\n",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 5, LastColumn: 7},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "severity",
+												},
+												Value: &parser.YamlNode{
+													Value: "critical",
+												},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "uri",
+												},
+												Value: &parser.YamlNode{
+													Value: "https://docs.example.com/down.html",
+												},
+											},
+										},
+									},
 								},
 							},
-						},
-						For: &parser.YamlNode{
-							Value: "11m\n",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 5, LastColumn: 7},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "severity",
+							{
+								Lines: diags.LineRange{First: 11, Last: 16},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 11, FirstColumn: 11, LastColumn: 13},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "critical",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar\n/\nbaz > 1",
+											Pos: diags.PositionRanges{
+												{Line: 13, FirstColumn: 5, LastColumn: 8},
+												{Line: 14, FirstColumn: 5, LastColumn: 6},
+												{Line: 15, FirstColumn: 5, LastColumn: 11},
+											},
+										},
 									},
-								},
-							},
-						},
-						Annotations: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "annotations",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "uri",
-									},
-									Value: &parser.YamlNode{
-										Value: "https://docs.example.com/down.html",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
 									},
 								},
-							},
-						},
-					},
-				},
-				{
-					Lines: diags.LineRange{First: 11, Last: 16},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 11, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "bar\n/\nbaz > 1",
-								Pos: diags.PositionRanges{
-									{Line: 13, FirstColumn: 5, LastColumn: 8},
-									{Line: 14, FirstColumn: 5, LastColumn: 6},
-									{Line: 15, FirstColumn: 5, LastColumn: 11},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
 							},
 						},
 					},
@@ -660,7 +866,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`- alert: Foo
+			input: []byte(`- alert: Foo
   expr:
     (
       xxx
@@ -670,33 +876,40 @@ groups:
     and on(instance, device) baz
   for: 30m
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 9},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Foo",
-							Pos: diags.PositionRanges{
-								{Line: 1, FirstColumn: 10, LastColumn: 12},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 5, LastColumn: 6},
-									{Line: 4, FirstColumn: 7, LastColumn: 10},
-									{Line: 5, FirstColumn: 7, LastColumn: 8},
-									{Line: 6, FirstColumn: 7, LastColumn: 10},
-									{Line: 7, FirstColumn: 5, LastColumn: 16},
-									{Line: 8, FirstColumn: 5, LastColumn: 32},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 9},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Foo",
+										Pos: diags.PositionRanges{
+											{Line: 1, FirstColumn: 10, LastColumn: 12},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "( xxx - yyy ) * bar > 0 and on(instance, device) baz",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 5, LastColumn: 6},
+												{Line: 4, FirstColumn: 7, LastColumn: 10},
+												{Line: 5, FirstColumn: 7, LastColumn: 8},
+												{Line: 6, FirstColumn: 7, LastColumn: 10},
+												{Line: 7, FirstColumn: 5, LastColumn: 16},
+												{Line: 8, FirstColumn: 5, LastColumn: 32},
+											},
+										},
+									},
+									For: &parser.YamlNode{
+										Value: "30m",
+										Pos: diags.PositionRanges{
+											{Line: 9, FirstColumn: 8, LastColumn: 10},
+										},
+									},
 								},
-							},
-						},
-						For: &parser.YamlNode{
-							Value: "30m",
-							Pos: diags.PositionRanges{
-								{Line: 9, FirstColumn: 8, LastColumn: 10},
 							},
 						},
 					},
@@ -704,7 +917,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`---
+			input: []byte(`---
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -735,40 +948,51 @@ data:
             expr: "1"
 
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 13, Last: 14},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Example_High_Restart_Rate",
-							Pos: diags.PositionRanges{
-								{Line: 13, FirstColumn: 20, LastColumn: 44},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
-								Pos: diags.PositionRanges{
-									{Line: 14, FirstColumn: 19, LastColumn: 109},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 13, Last: 14},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Example_High_Restart_Rate",
+										Pos: diags.PositionRanges{
+											{Line: 13, FirstColumn: 20, LastColumn: 44},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+											Pos: diags.PositionRanges{
+												{Line: 14, FirstColumn: 19, LastColumn: 109},
+											},
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					Lines: diags.LineRange{First: 28, Last: 29},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Example_High_Restart_Rate",
-							Pos: diags.PositionRanges{
-								{Line: 28, FirstColumn: 20, LastColumn: 44},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "1",
-								Pos: diags.PositionRanges{
-									{Line: 29, FirstColumn: 20, LastColumn: 20},
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 28, Last: 29},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Example_High_Restart_Rate",
+										Pos: diags.PositionRanges{
+											{Line: 28, FirstColumn: 20, LastColumn: 44},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "1",
+											Pos: diags.PositionRanges{
+												{Line: 29, FirstColumn: 20, LastColumn: 20},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -777,7 +1001,7 @@ data:
 			},
 		},
 		{
-			content: []byte(`---
+			input: []byte(`---
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -801,84 +1025,91 @@ data:
           - alert: Example_High_Restart_Rate
             expr: sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 13, Last: 20},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Example_Is_Down",
-							Pos: diags.PositionRanges{
-								{Line: 13, FirstColumn: 20, LastColumn: 34},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
-								Pos: diags.PositionRanges{
-									{Line: 14, FirstColumn: 19, LastColumn: 88},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 13, Last: 20},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Example_Is_Down",
+										Pos: diags.PositionRanges{
+											{Line: 13, FirstColumn: 20, LastColumn: 34},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `kube_deployment_status_replicas_available{namespace="example-app"} < 1`,
+											Pos: diags.PositionRanges{
+												{Line: 14, FirstColumn: 19, LastColumn: 88},
+											},
+										},
+									},
+									For: &parser.YamlNode{
+										Value: "5m",
+										Pos: diags.PositionRanges{
+											{Line: 15, FirstColumn: 18, LastColumn: 19},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "priority",
+												},
+												Value: &parser.YamlNode{
+													Value: "2",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "environment",
+												},
+												Value: &parser.YamlNode{
+													Value: "production",
+												},
+											},
+										},
+									},
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+												},
+												Value: &parser.YamlNode{
+													Value: "No replicas for Example have been running for 5 minutes",
+												},
+											},
+										},
+									},
 								},
 							},
-						},
-						For: &parser.YamlNode{
-							Value: "5m",
-							Pos: diags.PositionRanges{
-								{Line: 15, FirstColumn: 18, LastColumn: 19},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "priority",
+							{
+								Lines: diags.LineRange{First: 22, Last: 23},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Example_High_Restart_Rate",
+										Pos: diags.PositionRanges{
+											{Line: 22, FirstColumn: 20, LastColumn: 44},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "2",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
+											Pos: diags.PositionRanges{
+												{Line: 23, FirstColumn: 19, LastColumn: 109},
+											},
+										},
 									},
-								},
-								{
-									Key: &parser.YamlNode{
-										Value: "environment",
-									},
-									Value: &parser.YamlNode{
-										Value: "production",
-									},
-								},
-							},
-						},
-						Annotations: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "annotations",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "summary",
-									},
-									Value: &parser.YamlNode{
-										Value: "No replicas for Example have been running for 5 minutes",
-									},
-								},
-							},
-						},
-					},
-				},
-				{
-					Lines: diags.LineRange{First: 22, Last: 23},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Example_High_Restart_Rate",
-							Pos: diags.PositionRanges{
-								{Line: 22, FirstColumn: 20, LastColumn: 44},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: `sum(rate(kube_pod_container_status_restarts_total{namespace="example-app"}[5m])) > ( 3/60 )`,
-								Pos: diags.PositionRanges{
-									{Line: 23, FirstColumn: 19, LastColumn: 109},
 								},
 							},
 						},
@@ -887,7 +1118,7 @@ data:
 			},
 		},
 		{
-			content: []byte(`groups:
+			input: []byte(`groups:
 - name: "haproxy.api_server.rules"
   rules:
   - alert: HaproxyServerHealthcheckFailure
@@ -899,64 +1130,71 @@ data:
       summary: "HAProxy server healthcheck failure (instance {{ $labels.instance }})"
       description: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}"
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 4, Last: 11},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "HaproxyServerHealthcheckFailure",
-							Pos: diags.PositionRanges{
-								{Line: 4, FirstColumn: 12, LastColumn: 42},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "increase(haproxy_server_check_failures_total[15m]) > 100",
-								Pos: diags.PositionRanges{
-									{Line: 5, FirstColumn: 11, LastColumn: 66},
-								},
-							},
-						},
-						For: &parser.YamlNode{
-							Value: "5m",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 10, LastColumn: 11},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "severity",
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 4, Last: 11},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "HaproxyServerHealthcheckFailure",
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 12, LastColumn: 42},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "24x7",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "increase(haproxy_server_check_failures_total[15m]) > 100",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 11, LastColumn: 66},
+											},
+										},
 									},
-								},
-							},
-						},
-						Annotations: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "annotations",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "summary",
+									For: &parser.YamlNode{
+										Value: "5m",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 11},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "severity",
+												},
+												Value: &parser.YamlNode{
+													Value: "24x7",
+												},
+											},
+										},
 									},
-								},
-								{
-									Key: &parser.YamlNode{
-										Value: "description",
-									},
-									Value: &parser.YamlNode{
-										Value: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}",
+									Annotations: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "annotations",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+												},
+												Value: &parser.YamlNode{
+													Value: "HAProxy server healthcheck failure (instance {{ $labels.instance }})",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "description",
+												},
+												Value: &parser.YamlNode{
+													Value: "Some server healthcheck are failing on {{ $labels.server }}\n  VALUE = {{ $value }}\n  LABELS: {{ $labels }}",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -966,7 +1204,7 @@ data:
 			},
 		},
 		{
-			content: []byte(`groups:
+			input: []byte(`groups:
 - name: certmanager
   rules:
   # pint disable before recordAnchor
@@ -978,117 +1216,124 @@ data:
     expr: expr2
   - <<: *recordAnchor
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 7},
-					Comments: []comments.Comment{
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "before recordAnchor"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "recordAnchor"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "name1"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "after expr1"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "expr1"},
-						},
-					},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name1",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 13, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "expr1",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 11, LastColumn: 15},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "before recordAnchor"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "recordAnchor"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "name1"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "after expr1"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "expr1"},
+									},
+								},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name1",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 17},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr1",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 15},
+											},
+										},
+									},
 								},
 							},
-						},
-					},
-				},
-				{
-					Comments: []comments.Comment{
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "before recordAnchor"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "recordAnchor"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "name1"},
-						},
-					},
-					Lines: diags.LineRange{First: 6, Last: 10},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name1",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 13, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "expr2",
-								Pos: diags.PositionRanges{
-									{Line: 10, FirstColumn: 11, LastColumn: 15},
+							{
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "before recordAnchor"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "recordAnchor"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "name1"},
+									},
+								},
+								Lines: diags.LineRange{First: 6, Last: 10},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name1",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 17},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr2",
+											Pos: diags.PositionRanges{
+												{Line: 10, FirstColumn: 11, LastColumn: 15},
+											},
+										},
+									},
 								},
 							},
-						},
-					},
-				},
-				{
-					Comments: []comments.Comment{
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "before recordAnchor"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "recordAnchor"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "name1"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "after expr1"},
-						},
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "expr1"},
-						},
-					},
-					Lines: diags.LineRange{First: 6, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name1",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 13, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "expr1",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 11, LastColumn: 15},
+							{
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "before recordAnchor"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "recordAnchor"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "name1"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "after expr1"},
+									},
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "expr1"},
+									},
+								},
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name1",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 17},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr1",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 15},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -1097,7 +1342,7 @@ data:
 			},
 		},
 		{
-			content: []byte(`groups:
+			input: []byte(`groups:
 - name: certmanager
   rules:
   - record: name1
@@ -1110,93 +1355,116 @@ data:
     labels: *labelsAnchor
     # pint disable foot comment
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 4, Last: 8},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name1",
-							Pos: diags.PositionRanges{
-								{Line: 4, FirstColumn: 13, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "expr1",
-								Pos: diags.PositionRanges{
-									{Line: 5, FirstColumn: 11, LastColumn: 15},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 4, Last: 8},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name1",
+										Pos: diags.PositionRanges{
+											{Line: 4, FirstColumn: 13, LastColumn: 17},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr1",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 11, LastColumn: 15},
+											},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "label1",
+												},
+												Value: &parser.YamlNode{
+													Value: "val1",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "label2",
+												},
+												Value: &parser.YamlNode{
+													Value: "val2",
+												},
+											},
+										},
+									},
 								},
 							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "label1",
-									},
-									Value: &parser.YamlNode{
-										Value: "val1",
+							{
+								Comments: []comments.Comment{
+									{
+										Type:  comments.DisableType,
+										Value: comments.Disable{Match: "foot comment"},
 									},
 								},
-								{
-									Key: &parser.YamlNode{
-										Value: "label2",
+								Lines: diags.LineRange{First: 9, Last: 11},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "name2",
+										Pos: diags.PositionRanges{
+											{Line: 9, FirstColumn: 13, LastColumn: 17},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "val2",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "expr2",
+											Pos: diags.PositionRanges{
+												{Line: 10, FirstColumn: 11, LastColumn: 15},
+											},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "label1",
+												},
+												Value: &parser.YamlNode{
+													Value: "val1",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "label2",
+												},
+												Value: &parser.YamlNode{
+													Value: "val2",
+												},
+											},
+										},
 									},
 								},
 							},
 						},
 					},
 				},
-				{
-					Comments: []comments.Comment{
-						{
-							Type:  comments.DisableType,
-							Value: comments.Disable{Match: "foot comment"},
-						},
-					},
-					Lines: diags.LineRange{First: 9, Last: 11},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "name2",
-							Pos: diags.PositionRanges{
-								{Line: 9, FirstColumn: 13, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "expr2",
-								Pos: diags.PositionRanges{
-									{Line: 10, FirstColumn: 11, LastColumn: 15},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "label1",
-									},
-									Value: &parser.YamlNode{
-										Value: "val1",
-									},
-								},
-								{
-									Key: &parser.YamlNode{
-										Value: "label2",
-									},
-									Value: &parser.YamlNode{
-										Value: "val2",
-									},
-								},
+			},
+		},
+		{
+			input: []byte("- alert:\n  expr: vector(1)\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Error: parser.ParseError{Err: errors.New("alert value cannot be empty"), Line: 1},
 							},
 						},
 					},
@@ -1204,61 +1472,87 @@ data:
 			},
 		},
 		{
-			content: []byte("- alert:\n  expr: vector(1)\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: errors.New("alert value cannot be empty"), Line: 1},
+			input: []byte("- alert: foo\n  expr:\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- alert: foo\n  expr:\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
+			input: []byte("- alert: foo\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 1},
+								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- alert: foo\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+			input: []byte("- record:\n  expr:\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Error: parser.ParseError{Err: errors.New("record value cannot be empty"), Line: 1},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- record:\n  expr:\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: errors.New("record value cannot be empty"), Line: 1},
+			input: []byte("- record: foo\n  expr:\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 2},
+								Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- record: foo\n  expr:\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 2},
-					Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
+			input: []byte("- record: foo\n"),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 1, Last: 1},
+								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte("- record: foo\n"),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 1, Last: 1},
-					Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
-				},
-			},
-		},
-		{
-			content: []byte(string(`
+			input: []byte(string(`
 # pint file/owner bob
 # pint ignore/begin
 # pint ignore/end
@@ -1274,40 +1568,47 @@ data:
 
 # pint ignore/next-line
 `)),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 7, Last: 8},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 7, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "up",
-								Pos: diags.PositionRanges{
-									{Line: 8, FirstColumn: 9, LastColumn: 10},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 7, Last: 8},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up",
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 9, LastColumn: 10},
+											},
+										},
+									},
 								},
 							},
-						},
-					},
-				},
-				{
-					Lines: diags.LineRange{First: 12, Last: 13},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 12, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "up",
-								Pos: diags.PositionRanges{
-									{Line: 13, FirstColumn: 9, LastColumn: 10},
+							{
+								Lines: diags.LineRange{First: 12, Last: 13},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 12, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up",
+											Pos: diags.PositionRanges{
+												{Line: 13, FirstColumn: 9, LastColumn: 10},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -1316,7 +1617,7 @@ data:
 			},
 		},
 		{
-			content: []byte(string(`
+			input: []byte(string(`
 - alert: Template
   expr: &expr up == 0
   labels:
@@ -1327,77 +1628,84 @@ data:
     notify: *maybe_escalate_notify
     summary: foo
 `)),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Template",
-							Pos: diags.PositionRanges{
-								{Line: 2, FirstColumn: 10, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "up == 0",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 15, LastColumn: 21},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "notify",
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Template",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 10, LastColumn: 17},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "chat-alerts",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 15, LastColumn: 21},
+											},
+										},
 									},
-								},
-							},
-						},
-					},
-				},
-				{
-					Lines: diags.LineRange{First: 6, Last: 10},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Service Down",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 10, LastColumn: 21},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "up == 0",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 10, LastColumn: 13}, // points at anchor
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "notify",
-									},
-									Value: &parser.YamlNode{
-										Value: "chat-alerts",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "notify",
+												},
+												Value: &parser.YamlNode{
+													Value: "chat-alerts",
+												},
+											},
+										},
 									},
 								},
-								{
-									Key: &parser.YamlNode{
-										Value: "summary",
+							},
+							{
+								Lines: diags.LineRange{First: 6, Last: 10},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Service Down",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 21},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "foo",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "up == 0",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 10, LastColumn: 13}, // points at anchor
+											},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "notify",
+												},
+												Value: &parser.YamlNode{
+													Value: "chat-alerts",
+												},
+											},
+											{
+												Key: &parser.YamlNode{
+													Value: "summary",
+												},
+												Value: &parser.YamlNode{
+													Value: "foo",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -1407,54 +1715,68 @@ data:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: invalid metric name
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("invalid recording rule name: invalid metric name"), Line: 2},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								Error: parser.ParseError{Err: errors.New("invalid recording rule name: invalid metric name"), Line: 2},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: utf-8 enabled name
   expr: bar
   labels:
     "a b c": bar
 `),
 			names: model.UTF8Validation,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "utf-8 enabled name",
-							Pos: diags.PositionRanges{
-								{Line: 2, FirstColumn: 11, LastColumn: 28},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "bar",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 9, LastColumn: 11},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "a b c",
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "utf-8 enabled name",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 11, LastColumn: 28},
+										},
 									},
-									Value: &parser.YamlNode{
-										Value: "bar",
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "a b c",
+												},
+												Value: &parser.YamlNode{
+													Value: "bar",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -1464,217 +1786,327 @@ data:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels:
     "foo bar": yes
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   labels:
     "foo bar": yes
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   labels:
     "{{ $value }}": yes
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("invalid label name: {{ $value }}"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("invalid label name: {{ $value }}"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   annotations:
     "foo bar": yes
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("invalid annotation name: foo bar"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("invalid annotation name: foo bar"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   labels:
     foo: ` + string("\xed\xbf\xbf")),
 			// Label values are invalid only if they aren't valid UTF-8 strings
 			// which also makes them unparsable by YAML.
-			err: "error at line 1: yaml: invalid Unicode character",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("yaml: invalid Unicode character"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   annotations:
     "{{ $value }}": yes
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("invalid annotation name: {{ $value }}"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("invalid annotation name: {{ $value }}"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   keep_firing_for: 5m
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("invalid field 'keep_firing_for' in recording rule"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("invalid field 'keep_firing_for' in recording rule"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   for: 5m
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("invalid field 'for' in recording rule"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("invalid field 'for' in recording rule"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   annotations:
     foo: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("invalid field 'annotations' in recording rule"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("invalid field 'annotations' in recording rule"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		// Tag tests
 		{
-			content: []byte(`
+			input: []byte(`
 - record: 5
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("record value must be a string, got integer instead"), Line: 2},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								Error: parser.ParseError{Err: errors.New("record value must be a string, got integer instead"), Line: 2},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: 5
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("alert value must be a string, got integer instead"), Line: 2},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								Error: parser.ParseError{Err: errors.New("alert value must be a string, got integer instead"), Line: 2},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: 5
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("expr value must be a string, got integer instead"), Line: 3},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								Error: parser.ParseError{Err: errors.New("expr value must be a string, got integer instead"), Line: 3},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   for: 5
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("for value must be a string, got integer instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("for value must be a string, got integer instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   keep_firing_for: 5
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("keep_firing_for value must be a string, got integer instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("keep_firing_for value must be a string, got integer instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: []
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got list instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got list instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   labels: {}
   annotations: []
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					Error: parser.ParseError{Err: errors.New("annotations value must be a mapping, got list instead"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								Error: parser.ParseError{Err: errors.New("annotations value must be a mapping, got list instead"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   labels:
@@ -1682,15 +2114,22 @@ data:
   annotations:
     bar: "5"
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 7},
-					Error: parser.ParseError{Err: errors.New("labels foo value must be a string, got integer instead"), Line: 5},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 7},
+								Error: parser.ParseError{Err: errors.New("labels foo value must be a string, got integer instead"), Line: 5},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   labels: {}
@@ -1698,66 +2137,94 @@ data:
     foo: "3"
     bar: 5
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 7},
-					Error: parser.ParseError{Err: errors.New("annotations bar value must be a string, got integer instead"), Line: 7},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 7},
+								Error: parser.ParseError{Err: errors.New("annotations bar value must be a string, got integer instead"), Line: 7},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: 4
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got integer instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got integer instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: true
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got bool instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got bool instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: null
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 2, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "bar",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 9, LastColumn: 11},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+									},
 								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
 							},
 						},
 					},
@@ -1765,151 +2232,216 @@ data:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: true
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					Error: parser.ParseError{Err: errors.New("record value must be a string, got bool instead"), Line: 2},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								Error: parser.ParseError{Err: errors.New("record value must be a string, got bool instead"), Line: 2},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record:
     query: foo
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("record value must be a string, got mapping instead"), Line: 3},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("record value must be a string, got mapping instead"), Line: 3},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: some
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got string instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got string instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{
-						Err:  errors.New("labels value must be a mapping, got binary data instead"),
-						Line: 4,
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{
+									Err:  errors.New("labels value must be a mapping, got binary data instead"),
+									Line: 4,
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: foo
   expr: bar
   for: 1.23
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{
-						Err:  errors.New("for value must be a string, got float instead"),
-						Line: 4,
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{
+									Err:  errors.New("for value must be a string, got float instead"),
+									Line: 4,
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: !!garbage "SGVsbG8sIFdvcmxkIQ=="
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got garbage instead"), Line: 4},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got garbage instead"), Line: 4},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: foo
   expr: bar
   labels: !! "SGVsbG8sIFdvcmxkIQ=="
 `),
-			err: "error at line 4: did not find expected tag URI",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("did not find expected tag URI"),
+					Line: 4,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: &foo foo
   expr: bar
   labels: *foo
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 4},
-					Error: parser.ParseError{
-						Err:  errors.New("labels value must be a mapping, got string instead"),
-						Line: 4,
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 4},
+								Error: parser.ParseError{
+									Err:  errors.New("labels value must be a mapping, got string instead"),
+									Line: 4,
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		// Multi-document tests
 		{
-			content: []byte(`---
+			input: []byte(`---
 - expr: foo
   record: foo
 ---
 - expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 3, FirstColumn: 11, LastColumn: 13},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo",
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
+								},
 							},
 						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo",
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 11},
+					},
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("incomplete rule, no alert or record key"),
+									Line: 5,
 								},
 							},
 						},
 					},
 				},
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{
-						Err:  errors.New("incomplete rule, no alert or record key"),
-						Line: 5,
-					},
-				},
 			},
 		},
 		{
-			content: []byte(`---
+			input: []byte(`---
 - expr: foo
   record: foo
 ---
@@ -1917,74 +2449,100 @@ data:
   record: bar
   expr: bar
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 3, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo",
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 11},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "", // FIXME foo
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo",
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 7},
+					{
+						Name: "", // FIXME bar
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 7},
+							},
+						},
+					},
 				},
 			},
 		},
 		{
-			content: []byte(`---
+			input: []byte(`---
 - expr: foo
   record: foo
 ---
 - expr: bar
   alert: foo
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 3},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 3, FirstColumn: 11, LastColumn: 13},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo",
-								Pos: diags.PositionRanges{
-									{Line: 2, FirstColumn: 9, LastColumn: 11},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "", // FIXME foo
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 3},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 3, FirstColumn: 11, LastColumn: 13},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo",
+											Pos: diags.PositionRanges{
+												{Line: 2, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					Lines: diags.LineRange{First: 5, Last: 6},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 10, LastColumn: 12},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "bar",
-								Pos: diags.PositionRanges{
-									{Line: 5, FirstColumn: 9, LastColumn: 11},
+					{
+						Name: "", // FIXME bar
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 6},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 12},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos: diags.PositionRanges{
+												{Line: 5, FirstColumn: 9, LastColumn: 11},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -1993,7 +2551,7 @@ data:
 			},
 		},
 		{
-			content: []byte(`---
+			input: []byte(`---
 groups:
 - name: v1
   rules:
@@ -2003,40 +2561,16 @@ groups:
       foo:
         bar: foo
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 9},
-					Error: parser.ParseError{
-						Err:  errors.New("labels foo value must be a string, got mapping instead"),
-						Line: 9,
-					},
-				},
-			},
-		},
-		{
-			content: []byte(`
-groups:
-- name: v1
-  rules:
-  - record: up:count
-    expr: count(up)
-`),
-			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 6},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "up:count",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 13, LastColumn: 20},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "count(up)",
-								Pos: diags.PositionRanges{
-									{Line: 6, FirstColumn: 11, LastColumn: 19},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 9},
+								Error: parser.ParseError{
+									Err:  errors.New("labels foo value must be a string, got mapping instead"),
+									Line: 9,
 								},
 							},
 						},
@@ -2045,93 +2579,212 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
+groups:
+- name: v1
+  rules:
+  - record: up:count
+    expr: count(up)
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v1",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 6},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 20},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 11, LastColumn: 19},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
 groups:
 - name: v1
   rules:
   - record: up:count
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{
-						Err:  errors.New("missing expr key"),
-						Line: 5,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v1",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("missing expr key"),
+									Line: 5,
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - record: up:count
   expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 2: top level field must be a groups key, got list",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("top level field must be a groups key, got list"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 rules:
   - record: up:count
     expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 2: unexpected key rules",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("unexpected key rules"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - record: up:count
     expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 3: invalid group key record",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("invalid group key record"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - rules:
   - record: up:count
     expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 3: incomplete group definition, name is required and must be set",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("incomplete group definition, name is required and must be set"),
+							Line: 3,
+						},
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 4, Last: 5},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
 `),
 			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups: {}
 `),
 			strict: true,
-			err:    "error at line 2: groups value must be a list, got mapping",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("groups value must be a list, got mapping"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: []
 `),
 			strict: true,
-			err:    "error at line 3: group name must be a string, got list",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("group name must be a string, got list"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   name: bar
   name: bob
 `),
 			strict: true,
-			err:    "error at line 4: duplicated key name",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "bar", // FIXME "bob" ?
+						Error: parser.ParseError{
+							Err:  errors.New("duplicated key name"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v1
   rules:
@@ -2140,10 +2793,20 @@ groups:
         expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 4: rules must be a list, got mapping",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v1",
+						Error: parser.ParseError{
+							Err:  errors.New("rules must be a list, got mapping"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v1
   rules:
@@ -2152,10 +2815,24 @@ groups:
         expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 5: invalid rule key rules",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v1",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key rules"),
+									Line: 5,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v1
   rules:
@@ -2164,10 +2841,15 @@ groups:
 		expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 6: found a tab character that violates indentation",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("found a tab character that violates indentation"),
+					Line: 6,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 ---
 groups:
 - name: v1
@@ -2183,31 +2865,52 @@ groups:
         expr: count(up)
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "up:count",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 15, LastColumn: 22},
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v1",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 15, LastColumn: 22},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 13, LastColumn: 21},
+											},
+										},
+									},
+								},
 							},
 						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "count(up)",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 13, LastColumn: 21},
+					},
+					{
+						Name: "v1",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key rules"),
+									Line: 12,
 								},
 							},
 						},
 					},
 				},
+				Error: parser.ParseError{
+					Line: 8,
+					Err:  errors.New("multi-document YAML files are not allowed"),
+				},
 			},
-			err: "error at line 12: invalid rule key rules",
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 ---
 groups: []
 ---
@@ -2217,79 +2920,129 @@ groups:
     - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 8, Last: 8},
-					Error: parser.ParseError{
-						Line: 8,
-						Err:  errors.New("labels value must be a mapping, got binary data instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 8, Last: 8},
+								Error: parser.ParseError{
+									Line: 8,
+									Err:  errors.New("labels value must be a mapping, got binary data instead"),
+								},
+							},
+						},
 					},
 				},
-				{
-					Lines: diags.LineRange{First: 4, Last: 4},
-					Error: parser.ParseError{
-						Line: 4,
-						Err:  errors.New("multi-document YAML files are not allowed"),
-					},
+				Error: parser.ParseError{
+					Line: 4,
+					Err:  errors.New("multi-document YAML files are not allowed"),
 				},
 			},
 		},
 		{
-			content: []byte("[]"),
-			strict:  true,
-			err:     "error at line 1: top level field must be a groups key, got list",
+			input:  []byte("[]"),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("top level field must be a groups key, got list"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte("\n\n[]"),
-			strict:  true,
-			err:     "error at line 3: top level field must be a groups key, got list",
+			input:  []byte("\n\n[]"),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("top level field must be a groups key, got list"),
+					Line: 3,
+				},
+			},
 		},
 		{
-			content: []byte("groups: {}"),
-			strict:  true,
-			err:     "error at line 1: groups value must be a list, got mapping",
+			input:  []byte("groups: {}"),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("groups value must be a list, got mapping"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte("groups: []"),
-			strict:  true,
+			input:  []byte("groups: []"),
+			strict: true,
 		},
 		{
-			content: []byte("xgroups: {}"),
-			strict:  true,
-			err:     "error at line 1: unexpected key xgroups",
+			input:  []byte("xgroups: {}"),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("unexpected key xgroups"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte("\nbob\n"),
-			strict:  true,
-			err:     "error at line 2: top level field must be a groups key, got string",
+			input:  []byte("\nbob\n"),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("top level field must be a groups key, got string"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`groups: []
+			input: []byte(`groups: []
 
 rules: []
 `),
 			strict: true,
-			err:    "error at line 3: unexpected key rules",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("unexpected key rules"),
+					Line: 3,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules: []
 `),
 			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: 
   rules: []
 `),
 			strict: true,
-			err:    "error at line 3: group name must be a string, got null",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("group name must be a string, got null"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2299,35 +3052,42 @@ groups:
       job: foo
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 8},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 13, LastColumn: 15},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "sum(up)",
-								Pos: diags.PositionRanges{
-									{Line: 6, FirstColumn: 11, LastColumn: 17},
-								},
-							},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "job",
-									},
-									Value: &parser.YamlNode{
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 8},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
 										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "sum(up)",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 11, LastColumn: 17},
+											},
+										},
+									},
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "job",
+												},
+												Value: &parser.YamlNode{
+													Value: "foo",
+												},
+											},
+										},
 									},
 								},
 							},
@@ -2337,7 +3097,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2348,10 +3108,24 @@ groups:
       job: foo
 `),
 			strict: true,
-			err:    "error at line 7: invalid rule key xxx",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key xxx"),
+									Line: 7,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2362,10 +3136,20 @@ groups:
       job: foo
 `),
 			strict: true,
-			err:    "error at line 4: rules must be a list, got mapping",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Error: parser.ParseError{
+							Err:  errors.New("rules must be a list, got mapping"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2376,18 +3160,25 @@ groups:
         foo: bar
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 9},
-					Error: parser.ParseError{
-						Line: 9,
-						Err:  errors.New("labels job value must be a string, got mapping instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 9},
+								Error: parser.ParseError{
+									Line: 9,
+									Err:  errors.New("labels job value must be a string, got mapping instead"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2396,18 +3187,25 @@ groups:
       sum: sum(up)
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("expr value must be a string, got mapping instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								Error: parser.ParseError{
+									Line: 7,
+									Err:  errors.New("expr value must be a string, got mapping instead"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules: []
@@ -2415,10 +3213,15 @@ groups:
   rules: []
 `),
 			strict: true,
-			err:    "error at line 5: duplicated group name",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("duplicated group name"),
+					Line: 5,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2429,18 +3232,25 @@ groups:
       foo: bar
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 8, Last: 9},
-					Error: parser.ParseError{
-						Line: 9,
-						Err:  errors.New("duplicated labels key foo"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 8, Last: 9},
+								Error: parser.ParseError{
+									Line: 9,
+									Err:  errors.New("duplicated labels key foo"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   rules:
@@ -2448,18 +3258,25 @@ groups:
     expr: count(up)
     expr: sum(up)`),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("duplicated expr key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v2",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								Error: parser.ParseError{
+									Line: 7,
+									Err:  errors.New("duplicated expr key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   rules:
@@ -2468,10 +3285,15 @@ groups:
 bogus: 1
 `),
 			strict: true,
-			err:    "error at line 7: unexpected key bogus",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("unexpected key bogus"),
+					Line: 7,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   rules:
@@ -2480,10 +3302,24 @@ groups:
     bogus: 1
 `),
 			strict: true,
-			err:    "error at line 7: invalid rule key bogus",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v2",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key bogus"),
+									Line: 7,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   rules:
@@ -2496,10 +3332,24 @@ groups:
     bogus: 1
 `),
 			strict: true,
-			err:    "error at line 11: invalid rule key bogus",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v2",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key bogus"),
+									Line: 11,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 
 - name: CloudflareKafkaZookeeperExporter
@@ -2507,93 +3357,159 @@ groups:
   rules:
 `),
 			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "CloudflareKafkaZookeeperExporter",
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     expr: 1
 `),
 			strict: true,
-			err:    "error at line 4: rules must be a list, got mapping",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Error: parser.ParseError{
+							Err:  errors.New("rules must be a list, got mapping"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - expr: 1
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{
-						Line: 5,
-						Err:  errors.New("incomplete rule, no alert or record key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{
+									Line: 5,
+									Err:  errors.New("incomplete rule, no alert or record key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - expr: null
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{
-						Line: 5,
-						Err:  errors.New("incomplete rule, no alert or record key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{
+									Line: 5,
+									Err:  errors.New("incomplete rule, no alert or record key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - 1: null
 `),
 			strict: true,
-			err:    "error at line 5: invalid rule key 1",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key 1"),
+									Line: 5,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - true: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `),
 			strict: true,
-			err:    "error at line 5: invalid rule key true",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("invalid rule key true"),
+									Line: 5,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - expr: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{
-						Line: 5,
-						Err:  errors.New("incomplete rule, no alert or record key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{
+									Line: 5,
+									Err:  errors.New("incomplete rule, no alert or record key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2601,36 +3517,50 @@ groups:
       record: foo
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 6},
-					Error: parser.ParseError{
-						Line: 5,
-						Err:  errors.New("expr value must be a string, got binary data instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 6},
+								Error: parser.ParseError{
+									Line: 5,
+									Err:  errors.New("expr value must be a string, got binary data instead"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - labels: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 5},
-					Error: parser.ParseError{
-						Line: 5,
-						Err:  errors.New("labels value must be a mapping, got binary data instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 5},
+								Error: parser.ParseError{
+									Line: 5,
+									Err:  errors.New("labels value must be a mapping, got binary data instead"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 ---
 groups:
 - name: foo
@@ -2645,56 +3575,65 @@ groups:
       expr: bar
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 6, FirstColumn: 15, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "bar",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 13, LastColumn: 15},
+			output: parser.File{
+				Error: parser.ParseError{
+					Line: 8,
+					Err:  errors.New("multi-document YAML files are not allowed"),
+				},
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 15, LastColumn: 17},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 13, LastColumn: 15},
+											},
+										},
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					Lines: diags.LineRange{First: 12, Last: 13},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 12, FirstColumn: 15, LastColumn: 17},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "bar",
-								Pos: diags.PositionRanges{
-									{Line: 13, FirstColumn: 13, LastColumn: 15},
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 12, Last: 13},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 12, FirstColumn: 15, LastColumn: 17},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "bar",
+											Pos: diags.PositionRanges{
+												{Line: 13, FirstColumn: 13, LastColumn: 15},
+											},
+										},
+									},
 								},
 							},
 						},
-					},
-				},
-				{
-					Lines: diags.LineRange{First: 8, Last: 8},
-					Error: parser.ParseError{
-						Line: 8,
-						Err:  errors.New("multi-document YAML files are not allowed"),
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2703,18 +3642,25 @@ groups:
       expr: foo
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("duplicated expr key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								Error: parser.ParseError{
+									Line: 7,
+									Err:  errors.New("duplicated expr key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2723,18 +3669,25 @@ groups:
       keep_firing_for: 2m
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("duplicated keep_firing_for key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								Error: parser.ParseError{
+									Line: 7,
+									Err:  errors.New("duplicated keep_firing_for key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2743,144 +3696,275 @@ groups:
       record: 2m
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("duplicated record key"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								Error: parser.ParseError{
+									Line: 7,
+									Err:  errors.New("duplicated record key"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
     - []
 `),
 			strict: true,
-			err:    "error at line 5: rule definion must be a mapping, got list",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Rules: []parser.Rule{
+							{
+								Error: parser.ParseError{
+									Err:  errors.New("rule definion must be a mapping, got list"),
+									Line: 5,
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 1: 0
 `),
 			strict: true,
-			err:    "error at line 2: groups key must be a string, got a integer",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("groups key must be a string, got a integer"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 true: 0
 `),
 			strict: true,
-			err:    "error at line 2: groups key must be a string, got a bool",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("groups key must be a string, got a bool"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups: !!binary "SGVsbG8sIFdvcmxkIQ=="
 `),
 			strict: true,
-			err:    "error at line 2: groups value must be a list, got binary data",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("groups value must be a list, got binary data"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - true: null"
 `),
 			strict: true,
-			err:    "error at line 3: invalid group key true",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("invalid group key true"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 !!!binary "groups": true"
 `),
 			strict: true,
-			err:    "error at line 2: groups key must be a string, got a binary",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("groups key must be a string, got a binary"),
+					Line: 2,
+				},
+			},
 		},
 		{
-			content: []byte("[]"),
-			strict:  true,
-			err:     "error at line 1: top level field must be a groups key, got list",
+			input:  []byte("[]"),
+			strict: true,
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("top level field must be a groups key, got list"),
+					Line: 1,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - true
 `),
 			strict: true,
-			err:    "error at line 3: group must be a mapping, got bool",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("group must be a mapping, got bool"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name:
     rules: []
 `),
 			strict: true,
-			err:    "error at line 3: group name must be a string, got null",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("group name must be a string, got null"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: ""
     rules: []
 `),
 			strict: true,
-			err:    "error at line 3: group name cannot be empty",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("group name cannot be empty"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: 1
     rules: []
 `),
 			strict: true,
-			err:    "error at line 3: group name must be a string, got integer",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Error: parser.ParseError{
+							Err:  errors.New("group name must be a string, got integer"),
+							Line: 3,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: foo
     interval: 1
     rules: []
 `),
 			strict: true,
-			err:    "error at line 4: group interval must be a string, got integer",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Error: parser.ParseError{
+							Err:  errors.New("group interval must be a string, got integer"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: foo
     interval: xxx
     rules: []
 `),
 			strict: true,
-			err:    `error at line 4: invalid interval value: not a valid duration string: "xxx"`,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Error: parser.ParseError{
+							Err:  errors.New("invalid interval value: not a valid duration string: \"xxx\""),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: foo
     query_offset: 1
     rules: []
 `),
 			strict: true,
-			err:    "error at line 4: group query_offset must be a string, got integer",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Error: parser.ParseError{
+							Err:  errors.New("group query_offset must be a string, got integer"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: foo
     query_offset: xxx
     rules: []
 `),
 			strict: true,
-			err:    `error at line 4: invalid query_offset value: not a valid duration string: "xxx"`,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "foo",
+						Error: parser.ParseError{
+							Err:  errors.New("invalid query_offset value: not a valid duration string: \"xxx\""),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
   - name: foo
     query_offset: 1m
@@ -2888,10 +3972,21 @@ groups:
     rules: []
 `),
 			strict: true,
-			err:    "error at line 5: group limit must be a integer, got string",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name:        "foo",
+						QueryOffset: time.Minute,
+						Error: parser.ParseError{
+							Err:  errors.New("group limit must be a integer, got string"),
+							Line: 5,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   rules:
@@ -2904,10 +3999,15 @@ groups:
     bogus: 1
 `),
 			strict: true,
-			err:    "error at line 7: did not find expected alphabetic or numeric character",
+			output: parser.File{
+				Error: parser.ParseError{
+					Err:  errors.New("did not find expected alphabetic or numeric character"),
+					Line: 7,
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   rules:
@@ -2919,18 +4019,25 @@ groups:
     annotations: {}
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 10},
-					Error: parser.ParseError{
-						Line: 6,
-						Err:  errors.New("for value must be a string, got integer instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "v2",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 10},
+								Error: parser.ParseError{
+									Line: 6,
+									Err:  errors.New("for value must be a string, got integer instead"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: v2
   limit: &for 1
@@ -2942,18 +4049,26 @@ groups:
     annotations: {}
 `),
 			strict: true,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 10},
-					Error: parser.ParseError{
-						Line: 7,
-						Err:  errors.New("keep_firing_for value must be a string, got integer instead"),
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name:  "v2",
+						Limit: 1,
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 10},
+								Error: parser.ParseError{
+									Line: 7,
+									Err:  errors.New("keep_firing_for value must be a string, got integer instead"),
+								},
+							},
+						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: "{{ source }}"
   rules:
@@ -2962,9 +4077,16 @@ groups:
 # pint ignore/end
 `),
 			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "{{ source }}",
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -2972,21 +4094,28 @@ groups:
     expr: |
       {"up"}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 13, LastColumn: 15},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "{\"up\"}\n",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 7, LastColumn: 12},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "{\"up\"}\n",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 7, LastColumn: 12},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -2995,7 +4124,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -3003,21 +4132,28 @@ groups:
     expr: |
       {'up'}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 13, LastColumn: 15},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "{'up'}\n",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 7, LastColumn: 12},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "{'up'}\n",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 7, LastColumn: 12},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -3026,7 +4162,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules:
@@ -3034,31 +4170,39 @@ groups:
     expr: |
       {'up' == 1}
 `),
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "foo",
-							Pos: diags.PositionRanges{
-								{Line: 5, FirstColumn: 13, LastColumn: 15},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "{'up' == 1}\n",
-								Pos: diags.PositionRanges{
-									{Line: 7, FirstColumn: 7, LastColumn: 17},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "", // FIXME foo
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "foo",
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 15},
+										},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "{'up' == 1}\n",
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 7, LastColumn: 17},
+											},
+										},
+										SyntaxError: errors.New(`1:8: parse error: unexpected "=" in label matching, expected string`),
+									},
 								},
 							},
-							SyntaxError: errors.New(`1:8: parse error: unexpected "=" in label matching, expected string`),
 						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: mygroup
   partial_response_strategy: bob
@@ -3067,10 +4211,20 @@ groups:
     expr: count(up)
 `),
 			strict: true,
-			err:    "error at line 4: partial_response_strategy is only valid when parser is configured to use the Thanos rule schema",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "mygroup",
+						Error: parser.ParseError{
+							Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: mygroup
   partial_response_strategy: warn
@@ -3080,18 +4234,25 @@ groups:
 `),
 			strict: true,
 			schema: parser.ThanosSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "up:count",
-							Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "count(up)",
-								Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "mygroup",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+										},
+									},
+								},
 							},
 						},
 					},
@@ -3099,7 +4260,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: mygroup
   partial_response_strategy: abort
@@ -3109,18 +4270,25 @@ groups:
 `),
 			strict: true,
 			schema: parser.ThanosSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "up:count",
-							Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "count(up)",
-								Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "mygroup",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+										},
+									},
+								},
 							},
 						},
 					},
@@ -3128,7 +4296,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: mygroup
   partial_response_strategy: abort
@@ -3138,18 +4306,26 @@ groups:
 `),
 			strict: false,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 7},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "up:count",
-							Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "count(up)",
-								Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "", // FIXME mygroup
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 7},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+										},
+									},
+								},
 							},
 						},
 					},
@@ -3157,7 +4333,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: mygroup
   partial_response_strategy: bob
@@ -3167,10 +4343,20 @@ groups:
 `),
 			strict: true,
 			schema: parser.ThanosSchema,
-			err:    "error at line 4: invalid partial_response_strategy value: bob",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "mygroup",
+						Error: parser.ParseError{
+							Err:  errors.New("invalid partial_response_strategy value: bob"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: mygroup
   partial_response_strategy: 1
@@ -3180,10 +4366,20 @@ groups:
 `),
 			strict: true,
 			schema: parser.ThanosSchema,
-			err:    "error at line 4: partial_response_strategy must be a string, got integer",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "mygroup",
+						Error: parser.ParseError{
+							Err:  errors.New("partial_response_strategy must be a string, got integer"),
+							Line: 4,
+						},
+					},
+				},
+			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 - alert: Multi Line
   expr: foo
           AND ON (instance)
@@ -3191,21 +4387,28 @@ groups:
 `),
 			strict: false,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 5},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Multi Line",
-							Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 10, LastColumn: 19}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "foo AND ON (instance) bar",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 9, LastColumn: 12},
-									{Line: 4, FirstColumn: 11, LastColumn: 28},
-									{Line: 5, FirstColumn: 11, LastColumn: 13},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 5},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Multi Line",
+										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 10, LastColumn: 19}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "foo AND ON (instance) bar",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 9, LastColumn: 12},
+												{Line: 4, FirstColumn: 11, LastColumn: 28},
+												{Line: 5, FirstColumn: 11, LastColumn: 13},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -3214,7 +4417,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
   - alert: FooBar
     expr: >-
       count(
@@ -3225,23 +4428,30 @@ groups:
 `),
 			strict: false,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 8},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "FooBar",
-							Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "count(\n  foo\n  or\n  bar\n) > 0",
-								Pos: diags.PositionRanges{
-									{Line: 4, FirstColumn: 7, LastColumn: 13},
-									{Line: 5, FirstColumn: 7, LastColumn: 12},
-									{Line: 6, FirstColumn: 7, LastColumn: 11},
-									{Line: 7, FirstColumn: 7, LastColumn: 12},
-									{Line: 8, FirstColumn: 7, LastColumn: 11},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 8},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "FooBar",
+										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(\n  foo\n  or\n  bar\n) > 0",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 7, LastColumn: 13},
+												{Line: 5, FirstColumn: 7, LastColumn: 12},
+												{Line: 6, FirstColumn: 7, LastColumn: 11},
+												{Line: 7, FirstColumn: 7, LastColumn: 12},
+												{Line: 8, FirstColumn: 7, LastColumn: 11},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -3250,7 +4460,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
   - alert: FooBar
     expr: >-
       aaaaaaaaaaaaaaaaaaaaaaaa
@@ -3260,34 +4470,41 @@ groups:
 `),
 			strict: false,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 7},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "FooBar",
-							Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "aaaaaaaaaaaaaaaaaaaaaaaa AND ON (colo_id) bbbbbbbbbbb > 2",
-								Pos: diags.PositionRanges{
-									{Line: 4, FirstColumn: 7, LastColumn: 31},
-									{Line: 5, FirstColumn: 7, LastColumn: 35},
-									{Line: 6, FirstColumn: 7, LastColumn: 9},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 7},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "FooBar",
+										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "aaaaaaaaaaaaaaaaaaaaaaaa AND ON (colo_id) bbbbbbbbbbb > 2",
+											Pos: diags.PositionRanges{
+												{Line: 4, FirstColumn: 7, LastColumn: 31},
+												{Line: 5, FirstColumn: 7, LastColumn: 35},
+												{Line: 6, FirstColumn: 7, LastColumn: 9},
+											},
+										},
+									},
+									For: &parser.YamlNode{
+										Value: "1m",
+										Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 10, LastColumn: 11}},
+									},
 								},
 							},
-						},
-						For: &parser.YamlNode{
-							Value: "1m",
-							Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 10, LastColumn: 11}},
 						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
   - alert: FooBar
     expr: 'aaaaaaaaaaaaaaaaaaaaaaaa
           AND ON (colo_id) bbbbbbbbbbb
@@ -3296,34 +4513,41 @@ groups:
 `),
 			strict: false,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 2, Last: 6},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "FooBar",
-							Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "aaaaaaaaaaaaaaaaaaaaaaaa AND ON (colo_id) bbbbbbbbbbb > 2",
-								Pos: diags.PositionRanges{
-									{Line: 3, FirstColumn: 12, LastColumn: 36},
-									{Line: 4, FirstColumn: 11, LastColumn: 39},
-									{Line: 5, FirstColumn: 11, LastColumn: 13},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 2, Last: 6},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "FooBar",
+										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "aaaaaaaaaaaaaaaaaaaaaaaa AND ON (colo_id) bbbbbbbbbbb > 2",
+											Pos: diags.PositionRanges{
+												{Line: 3, FirstColumn: 12, LastColumn: 36},
+												{Line: 4, FirstColumn: 11, LastColumn: 39},
+												{Line: 5, FirstColumn: 11, LastColumn: 13},
+											},
+										},
+									},
+									For: &parser.YamlNode{
+										Value: "1m",
+										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 10, LastColumn: 11}},
+									},
 								},
 							},
-						},
-						For: &parser.YamlNode{
-							Value: "1m",
-							Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 10, LastColumn: 11}},
 						},
 					},
 				},
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: foo
   rules: 
@@ -3334,21 +4558,29 @@ groups:
 `),
 			strict: false,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 5, Last: 8},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "colo:foo:sum",
-							Pos:   diags.PositionRanges{{Line: 5, FirstColumn: 13, LastColumn: 24}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: "sum without (instance) ( rate(my_metric[2m]) * on (instance) group_left (hardware_generation, hms_scope, sliver) (instance:metadata{}) )",
-								Pos: diags.PositionRanges{
-									{Line: 6, FirstColumn: 11, LastColumn: 71},
-									{Line: 7, FirstColumn: 7, LastColumn: 80},
-									{Line: 8, FirstColumn: 7, LastColumn: 7},
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "", // FIXME "foo"
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 5, Last: 8},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "colo:foo:sum",
+										Pos:   diags.PositionRanges{{Line: 5, FirstColumn: 13, LastColumn: 24}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "sum without (instance) ( rate(my_metric[2m]) * on (instance) group_left (hardware_generation, hms_scope, sliver) (instance:metadata{}) )",
+											Pos: diags.PositionRanges{
+												{Line: 6, FirstColumn: 11, LastColumn: 71},
+												{Line: 7, FirstColumn: 7, LastColumn: 80},
+												{Line: 8, FirstColumn: 7, LastColumn: 7},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -3357,7 +4589,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: "{{ source }}"
   rules:
@@ -3375,38 +4607,45 @@ groups:
 `),
 			strict: true,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 7, Last: 15},
-					RecordingRule: &parser.RecordingRule{
-						Record: parser.YamlNode{
-							Value: "some_long_name",
-							Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 13, LastColumn: 26}},
-						},
-						Labels: &parser.YamlMap{
-							Key: &parser.YamlNode{
-								Value: "labels",
-							},
-							Items: []*parser.YamlKeyValue{
-								{
-									Key: &parser.YamlNode{
-										Value: "metricssource",
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "{{ source }}",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 7, Last: 15},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "some_long_name",
+										Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 13, LastColumn: 26}},
 									},
-									Value: &parser.YamlNode{
-										Value: "receiver",
+									Labels: &parser.YamlMap{
+										Key: &parser.YamlNode{
+											Value: "labels",
+										},
+										Items: []*parser.YamlKeyValue{
+											{
+												Key: &parser.YamlNode{
+													Value: "metricssource",
+												},
+												Value: &parser.YamlNode{
+													Value: "receiver",
+												},
+											},
+										},
 									},
-								},
-							},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: `clamp_max( sum(rate(my_metric_long_name_total{output="control:output:kafka:/:requests:http-b:http_requests_control_sample"}[5m])) / sum(rate(my_metric_long_name_total{output="control:output:kafka:/:requests:http-b:http_requests_control_sample"}[5m] offset 30m)), 2 )`,
-								Pos: diags.PositionRanges{
-									{Line: 11, FirstColumn: 7, LastColumn: 17},
-									{Line: 12, FirstColumn: 9, LastColumn: 129},
-									{Line: 13, FirstColumn: 9, LastColumn: 139},
-									{Line: 14, FirstColumn: 9, LastColumn: 10},
-									{Line: 15, FirstColumn: 7, LastColumn: 7},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `clamp_max( sum(rate(my_metric_long_name_total{output="control:output:kafka:/:requests:http-b:http_requests_control_sample"}[5m])) / sum(rate(my_metric_long_name_total{output="control:output:kafka:/:requests:http-b:http_requests_control_sample"}[5m] offset 30m)), 2 )`,
+											Pos: diags.PositionRanges{
+												{Line: 11, FirstColumn: 7, LastColumn: 17},
+												{Line: 12, FirstColumn: 9, LastColumn: 129},
+												{Line: 13, FirstColumn: 9, LastColumn: 139},
+												{Line: 14, FirstColumn: 9, LastColumn: 10},
+												{Line: 15, FirstColumn: 7, LastColumn: 7},
+											},
+										},
+									},
 								},
 							},
 						},
@@ -3415,7 +4654,7 @@ groups:
 			},
 		},
 		{
-			content: []byte(`
+			input: []byte(`
 groups:
 - name: "{{ source }}"
   rules: 
@@ -3431,35 +4670,76 @@ groups:
 `),
 			strict: true,
 			schema: parser.PrometheusSchema,
-			output: []parser.Rule{
-				{
-					Lines: diags.LineRange{First: 6, Last: 13},
-					AlertingRule: &parser.AlertingRule{
-						Alert: parser.YamlNode{
-							Value: "Director_Is_Not_Advertising_Any_Routes",
-							Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 12, LastColumn: 49}},
-						},
-						Expr: parser.PromQLExpr{
-							Value: &parser.YamlNode{
-								Value: `sum without (name) (
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "{{ source }}",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 6, Last: 13},
+								AlertingRule: &parser.AlertingRule{
+									Alert: parser.YamlNode{
+										Value: "Director_Is_Not_Advertising_Any_Routes",
+										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 12, LastColumn: 49}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: `sum without (name) (
     bird_protocol_prefix_export_count{ip_version="4",name=~".*external.*",proto!="Kernel"}
   * on (instance) group_left (profile,cluster)
     cf_node_role{kubernetes_role="director",role="kubernetes"}
 ) <= 0
 `,
-								Pos: diags.PositionRanges{
-									{Line: 8, FirstColumn: 9, LastColumn: 29},
-									{Line: 9, FirstColumn: 9, LastColumn: 99},
-									{Line: 10, FirstColumn: 9, LastColumn: 55},
-									{Line: 11, FirstColumn: 9, LastColumn: 71},
-									{Line: 12, FirstColumn: 9, LastColumn: 14},
+											Pos: diags.PositionRanges{
+												{Line: 8, FirstColumn: 9, LastColumn: 29},
+												{Line: 9, FirstColumn: 9, LastColumn: 99},
+												{Line: 10, FirstColumn: 9, LastColumn: 55},
+												{Line: 11, FirstColumn: 9, LastColumn: 71},
+												{Line: 12, FirstColumn: 9, LastColumn: 14},
+											},
+										},
+									},
+									For: &parser.YamlNode{
+										Value: "1m",
+										Pos:   diags.PositionRanges{{Line: 13, FirstColumn: 10, LastColumn: 11}},
+									},
 								},
 							},
 						},
-						For: &parser.YamlNode{
-							Value: "1m",
-							Pos:   diags.PositionRanges{{Line: 13, FirstColumn: 10, LastColumn: 11}},
-						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  interval: 3m
+  rules: []
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name:     "xxx",
+						Interval: time.Minute * 3,
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  interval: 3m
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name:     "", // FIXME xxx
+						Interval: 0,  // FIXME time.Minute*3
 					},
 				},
 			},
@@ -3486,18 +4766,12 @@ groups:
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
-			t.Logf("\n--- Content ---%s--- END ---", tc.content)
+			t.Logf("\n--- Content ---%s--- END ---", tc.input)
 
 			p := parser.NewParser(tc.strict, tc.schema, tc.names)
-			output, _, err := p.Parse(bytes.NewReader(tc.content))
+			file, _ := p.Parse(bytes.NewReader(tc.input))
 
-			if tc.err != "" {
-				require.EqualError(t, err, tc.err)
-			} else {
-				require.NoError(t, err)
-			}
-
-			if diff := cmp.Diff(tc.output, output,
+			if diff := cmp.Diff(tc.output, file,
 				ignorePrometheusExpr,
 				sameErrorText,
 				cmpopts.IgnoreFields(parser.YamlNode{}, "Pos"), // FIXME remove?

@@ -249,22 +249,24 @@ func runTests(t *testing.T, testCases []checkTest) {
 	}
 }
 
-func parseContent(content string) (entries []discovery.Entry, err error) {
+func parseContent(content string) (entries []discovery.Entry, _ error) {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, _, err := p.Parse(strings.NewReader(content))
-	if err != nil {
-		return nil, err
+	file, _ := p.Parse(strings.NewReader(content))
+	if file.Error.Err != nil {
+		return nil, file.Error
 	}
 
-	for _, rule := range rules {
-		entries = append(entries, discovery.Entry{
-			Path: discovery.Path{
-				Name:          "fake.yml",
-				SymlinkTarget: "fake.yml",
-			},
-			ModifiedLines: rule.Lines.Expand(),
-			Rule:          rule,
-		})
+	for _, group := range file.Groups {
+		for _, rule := range group.Rules {
+			entries = append(entries, discovery.Entry{
+				Path: discovery.Path{
+					Name:          "fake.yml",
+					SymlinkTarget: "fake.yml",
+				},
+				ModifiedLines: rule.Lines.Expand(),
+				Rule:          rule,
+			})
+		}
 	}
 
 	return entries, nil

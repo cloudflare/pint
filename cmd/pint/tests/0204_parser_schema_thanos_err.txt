@@ -5,7 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="error at line 3: invalid partial_response_strategy value: bob" path=rules/1.yml lines=1-9
+level=WARN msg="Failed to parse group entry" err="invalid partial_response_strategy value: bob" path=rules/1.yml line=3
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Fatal: invalid partial_response_strategy value: bob (yaml/parse)
   ---> rules/1.yml:3

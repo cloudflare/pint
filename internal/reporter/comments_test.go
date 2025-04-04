@@ -77,7 +77,7 @@ func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool
 
 func TestCommenter(t *testing.T) {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -90,7 +90,7 @@ func TestCommenter(t *testing.T) {
 			Name:          "foo.txt",
 		},
 		ModifiedLines: []int{2},
-		Rule:          mockRules[0],
+		Rule:          mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
@@ -127,7 +127,7 @@ foo details
 			Name:          "bar.txt",
 		},
 		ModifiedLines: []int{1},
-		Rule:          mockRules[0],
+		Rule:          mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "bar",
 			Summary:  "bar warning",
@@ -383,7 +383,7 @@ bar warning
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
@@ -399,7 +399,7 @@ bar warning
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
@@ -486,7 +486,7 @@ foo details
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -562,7 +562,7 @@ foo details
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 1",
@@ -578,7 +578,7 @@ foo details
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 3, 4, 5},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error 2",
@@ -778,7 +778,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -791,7 +791,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			Name:          "foo.txt",
 		},
 		ModifiedLines: []int{2},
-		Rule:          mockRules[0],
+		Rule:          mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
