@@ -81,7 +81,9 @@ type Entry struct {
 	Owner          string
 	ModifiedLines  []int
 	DisabledChecks []string
+	File           parser.File `json:"-"`
 	Rule           parser.Rule
+	Group          parser.Group `json:"-"`
 	State          ChangeType
 }
 
@@ -200,6 +202,8 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
 				},
+				File:           file,
+				Group:          group,
 				Rule:           rule,
 				ModifiedLines:  rule.Lines.Expand(),
 				Owner:          ruleOwner,
