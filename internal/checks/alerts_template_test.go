@@ -775,6 +775,21 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		/*
+					FIXME need support for parsing strict groups in runTests
+					{
+						description: "everything is stripped / group label",
+						content: `
+			- alert: Foo
+			  expr: sum(foo) > 0
+			  annotations:
+			    summary: '{{ .Labels.job }} is above zero on {{ $labels.__name__ }}'
+			`,
+						checker:    newTemplateCheck,
+						prometheus: noProm,
+						problems:   true,
+					},
+		*/
 	}
 	runTests(t, testCases)
 }

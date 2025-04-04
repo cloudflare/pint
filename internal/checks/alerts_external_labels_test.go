@@ -98,6 +98,22 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 				},
 			},
 		},
+		/*
+			FIXME need support for parsing strict groups in runTests
+			{
+				description: "no cluster label / group labels",
+				content:     content,
+				checker:     newAlertsExternalLabelsCheck,
+				prometheus:  newSimpleProm,
+				problems:    true,
+				mocks: []*prometheusMock{
+					{
+						conds: []requestCondition{requireConfigPath},
+						resp:  configResponse{yaml: "global:\n  external_labels:\n    bob: foo\n"},
+					},
+				},
+			},
+		*/
 	}
 
 	runTests(t, testCases)

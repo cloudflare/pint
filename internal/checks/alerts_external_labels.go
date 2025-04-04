@@ -64,29 +64,27 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry discovery.En
 		return problems
 	}
 
-	if entry.Rule.AlertingRule.Labels != nil {
-		for _, label := range entry.Rule.AlertingRule.Labels.Items {
-			for _, name := range checkExternalLabels(label.Key.Value, label.Value.Value, cfg.Config.Global.ExternalLabels) {
-				problems = append(problems, Problem{
-					Anchor: AnchorAfter,
-					Lines: diags.LineRange{
-						First: label.Key.Pos.Lines().First,
-						Last:  label.Value.Pos.Lines().Last,
+	for _, label := range entry.Labels().Items {
+		for _, name := range checkExternalLabels(label.Key.Value, label.Value.Value, cfg.Config.Global.ExternalLabels) {
+			problems = append(problems, Problem{
+				Anchor: AnchorAfter,
+				Lines: diags.LineRange{
+					First: label.Key.Pos.Lines().First,
+					Last:  label.Value.Pos.Lines().Last,
+				},
+				Reporter: c.Reporter(),
+				Summary:  "invalid label",
+				Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
+				Severity: Bug,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
+						Pos:         label.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(label.Value.Value),
 					},
-					Reporter: c.Reporter(),
-					Summary:  "invalid label",
-					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
-					Severity: Bug,
-					Diagnostics: []diags.Diagnostic{
-						{
-							Message:     fmt.Sprintf("Template is using `%s` external label but %s doesn't have this label configured in global:external_labels.", name, promText(c.prom.Name(), cfg.URI)),
-							Pos:         label.Value.Pos,
-							FirstColumn: 1,
-							LastColumn:  len(label.Value.Value),
-						},
-					},
-				})
-			}
+				},
+			})
 		}
 	}
 

@@ -55,13 +55,8 @@ func (c Reject) Reporter() string {
 }
 
 func (c Reject) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
-	if c.checkLabels && entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Labels != nil {
-		for _, label := range entry.Rule.AlertingRule.Labels.Items {
-			problems = append(problems, c.reject(entry.Rule, label)...)
-		}
-	}
-	if c.checkLabels && entry.Rule.RecordingRule != nil && entry.Rule.RecordingRule.Labels != nil {
-		for _, label := range entry.Rule.RecordingRule.Labels.Items {
+	if c.checkLabels {
+		for _, label := range entry.Labels().Items {
 			problems = append(problems, c.reject(entry.Rule, label)...)
 		}
 	}

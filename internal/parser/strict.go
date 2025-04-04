@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/cloudflare/pint/internal/diags"
 	"github.com/prometheus/common/model"
 	"gopkg.in/yaml.v3"
+
+	"github.com/cloudflare/pint/internal/diags"
 )
 
 // https://github.com/go-yaml/yaml/blob/v3.0.1/resolve.go#L70-L81
@@ -170,7 +171,13 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 				}
 				return group
 			}
-			if ok, err, _ := validateStringMap("labels", mappingNodes(entry.val), offsetLine, diags.LineRange{}); !ok {
+			nodes := mappingNodes(entry.val)
+			if ok, err, _ := validateStringMap(
+				"labels",
+				nodes,
+				offsetLine,
+				diags.LineRange{First: entry.key.Line, Last: rangeFromYamlMaps(nodes).Last},
+			); !ok {
 				group.Error = err
 				return group
 			}

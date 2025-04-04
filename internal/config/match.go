@@ -144,7 +144,7 @@ func (m Match) IsMatch(ctx context.Context, path string, e discovery.Entry) bool
 	}
 
 	if m.Label != nil {
-		if !m.Label.isMatching(e.Rule) {
+		if !m.Label.isMatching(e) {
 			return false
 		}
 	}
@@ -199,26 +199,13 @@ func (ml MatchLabel) validate() error {
 	return nil
 }
 
-func (ml MatchLabel) isMatching(rule parser.Rule) bool {
+func (ml MatchLabel) isMatching(entry discovery.Entry) bool {
 	keyRe := strictRegex(ml.Key)
 	valRe := strictRegex(ml.Value)
 
-	if rule.AlertingRule != nil {
-		if rule.AlertingRule.Labels != nil {
-			for _, labl := range rule.AlertingRule.Labels.Items {
-				if keyRe.MatchString(labl.Key.Value) && valRe.MatchString(labl.Value.Value) {
-					return true
-				}
-			}
-		}
-	}
-	if rule.RecordingRule != nil {
-		if rule.RecordingRule.Labels != nil {
-			for _, labl := range rule.RecordingRule.Labels.Items {
-				if keyRe.MatchString(labl.Key.Value) && valRe.MatchString(labl.Value.Value) {
-					return true
-				}
-			}
+	for _, label := range entry.Labels().Items {
+		if keyRe.MatchString(label.Key.Value) && valRe.MatchString(label.Value.Value) {
+			return true
 		}
 	}
 

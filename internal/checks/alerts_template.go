@@ -109,53 +109,51 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
-	if entry.Rule.AlertingRule.Labels != nil {
-		for _, label := range entry.Rule.AlertingRule.Labels.Items {
-			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
-				problems = append(problems, Problem{
-					Anchor: AnchorAfter,
-					Lines: diags.LineRange{
-						First: label.Key.Pos.Lines().First,
-						Last:  label.Value.Pos.Lines().Last,
+	for _, label := range entry.Labels().Items {
+		if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
+			problems = append(problems, Problem{
+				Anchor: AnchorAfter,
+				Lines: diags.LineRange{
+					First: label.Key.Pos.Lines().First,
+					Last:  label.Value.Pos.Lines().Last,
+				},
+				Reporter: c.Reporter(),
+				Summary:  "template syntax error",
+				Details:  TemplateCheckSyntaxDetails,
+				Severity: Fatal,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+						Pos:         label.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(label.Value.Value),
 					},
-					Reporter: c.Reporter(),
-					Summary:  "template syntax error",
-					Details:  TemplateCheckSyntaxDetails,
-					Severity: Fatal,
-					Diagnostics: []diags.Diagnostic{
-						{
-							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
-							Pos:         label.Value.Pos,
-							FirstColumn: 1,
-							LastColumn:  len(label.Value.Value),
-						},
-					},
-				})
-			}
-			for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
-				problems = append(problems, Problem{
-					Anchor: AnchorAfter,
-					Lines: diags.LineRange{
-						First: label.Key.Pos.Lines().First,
-						Last:  label.Value.Pos.Lines().Last,
-					},
-					Reporter: c.Reporter(),
-					Summary:  "value used in labels",
-					Details:  "",
-					Severity: Bug,
-					Diagnostics: []diags.Diagnostic{
-						{
-							Message:     msg,
-							Pos:         label.Value.Pos,
-							FirstColumn: 1,
-							LastColumn:  len(label.Value.Value),
-						},
-					},
-				})
-			}
-
-			problems = append(problems, c.checkQueryLabels(entry.Rule, label, src)...)
+				},
+			})
 		}
+		for _, msg := range checkForValueInLabels(label.Key.Value, label.Value.Value) {
+			problems = append(problems, Problem{
+				Anchor: AnchorAfter,
+				Lines: diags.LineRange{
+					First: label.Key.Pos.Lines().First,
+					Last:  label.Value.Pos.Lines().Last,
+				},
+				Reporter: c.Reporter(),
+				Summary:  "value used in labels",
+				Details:  "",
+				Severity: Bug,
+				Diagnostics: []diags.Diagnostic{
+					{
+						Message:     msg,
+						Pos:         label.Value.Pos,
+						FirstColumn: 1,
+						LastColumn:  len(label.Value.Value),
+					},
+				},
+			})
+		}
+
+		problems = append(problems, c.checkQueryLabels(entry.Rule, label, src)...)
 	}
 
 	if entry.Rule.AlertingRule.Annotations != nil {

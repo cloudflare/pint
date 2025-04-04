@@ -68,7 +68,7 @@ func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discover
 	}
 
 	if entry.Rule.AlertingRule != nil {
-		problems = append(problems, c.checkAlertingRule(entry.Rule)...)
+		problems = append(problems, c.checkAlertingRule(entry)...)
 	}
 
 	return problems
@@ -126,28 +126,30 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 	return problems
 }
 
-func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
-	if rule.AlertingRule.Labels == nil || len(rule.AlertingRule.Labels.Items) == 0 {
+func (c LabelCheck) checkAlertingRule(entry discovery.Entry) (problems []Problem) {
+	entryLabels := entry.Labels()
+
+	if len(entryLabels.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.Lines,
+				Lines:    entry.Rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 				},
 			})
 		}
 		return problems
 	}
 
-	labels := make([]*parser.YamlKeyValue, 0, len(rule.AlertingRule.Labels.Items))
+	labels := make([]*parser.YamlKeyValue, 0, len(entryLabels.Items))
 
-	for _, lab := range rule.AlertingRule.Labels.Items {
-		if c.keyRe.MustExpand(rule).MatchString(lab.Key.Value) {
+	for _, lab := range entry.Labels().Items {
+		if c.keyRe.MustExpand(entry.Rule).MatchString(lab.Key.Value) {
 			labels = append(labels, lab)
 		}
 	}
@@ -155,13 +157,13 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 	if len(labels) == 0 && c.isRequired {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    rule.Lines,
+			Lines:    entry.Rule.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "required label not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
-				WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+				WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 			},
 		})
 		return problems
@@ -171,23 +173,23 @@ func (c LabelCheck) checkAlertingRule(rule parser.Rule) (problems []Problem) {
 		if lab.Value.Value == "" && c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.Lines,
+				Lines:    entry.Rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 				},
 			})
 			return problems
 		}
 		if c.tokenRe != nil {
-			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(lab.Value.Value, -1) {
-				problems = append(problems, c.checkValue(rule, match, lab.Value)...)
+			for _, match := range c.tokenRe.MustExpand(entry.Rule).FindAllString(lab.Value.Value, -1) {
+				problems = append(problems, c.checkValue(entry.Rule, match, lab.Value)...)
 			}
 		} else {
-			problems = append(problems, c.checkValue(rule, lab.Value.Value, lab.Value)...)
+			problems = append(problems, c.checkValue(entry.Rule, lab.Value.Value, lab.Value)...)
 		}
 	}
 

@@ -87,6 +87,21 @@ type Entry struct {
 	State          ChangeType
 }
 
+func (e Entry) Labels() (ym parser.YamlMap) {
+	switch {
+	case e.Rule.AlertingRule != nil && e.Rule.AlertingRule.Labels != nil:
+		ym.Key = e.Rule.AlertingRule.Labels.Key
+		ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.AlertingRule.Labels).Items
+	case e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Labels != nil:
+		ym.Key = e.Rule.RecordingRule.Labels.Key
+		ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.RecordingRule.Labels).Items
+	case e.Group.Labels != nil:
+		ym.Key = e.Group.Labels.Key
+		ym.Items = e.Group.Labels.Items
+	}
+	return ym
+}
+
 func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
 	file, cr := p.Parse(r)
 
