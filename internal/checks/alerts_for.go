@@ -43,16 +43,16 @@ func (c AlertsForChecksFor) Reporter() string {
 	return AlertForCheckName
 }
 
-func (c AlertsForChecksFor) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c AlertsForChecksFor) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
 
-	if rule.AlertingRule.For != nil {
-		problems = append(problems, c.checkField("for", rule.AlertingRule.For)...)
+	if entry.Rule.AlertingRule.For != nil {
+		problems = append(problems, c.checkField("for", entry.Rule.AlertingRule.For)...)
 	}
-	if rule.AlertingRule.KeepFiringFor != nil {
-		problems = append(problems, c.checkField("keep_firing_for", rule.AlertingRule.KeepFiringFor)...)
+	if entry.Rule.AlertingRule.KeepFiringFor != nil {
+		problems = append(problems, c.checkField("keep_firing_for", entry.Rule.AlertingRule.KeepFiringFor)...)
 	}
 
 	return problems

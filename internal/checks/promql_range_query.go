@@ -55,8 +55,8 @@ func (c RangeQueryCheck) Reporter() string {
 	return RangeQueryCheckName
 }
 
-func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return problems
 	}
@@ -82,7 +82,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, _ discovery.Path, rule parse
 			c.prom.DisableCheck(promapi.APIPathFlags, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Warning))
+		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning))
 		return problems
 	}
 

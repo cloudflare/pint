@@ -54,20 +54,15 @@ func (c Reject) Reporter() string {
 	return RejectCheckName
 }
 
-func (c Reject) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if c.checkLabels && rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
-		for _, label := range rule.AlertingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label)...)
+func (c Reject) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if c.checkLabels {
+		for _, label := range entry.Labels().Items {
+			problems = append(problems, c.reject(entry.Rule, label)...)
 		}
 	}
-	if c.checkLabels && rule.RecordingRule != nil && rule.RecordingRule.Labels != nil {
-		for _, label := range rule.RecordingRule.Labels.Items {
-			problems = append(problems, c.reject(rule, label)...)
-		}
-	}
-	if c.checkAnnotations && rule.AlertingRule != nil && rule.AlertingRule.Annotations != nil {
-		for _, ann := range rule.AlertingRule.Annotations.Items {
-			problems = append(problems, c.reject(rule, ann)...)
+	if c.checkAnnotations && entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Annotations != nil {
+		for _, ann := range entry.Rule.AlertingRule.Annotations.Items {
+			problems = append(problems, c.reject(entry.Rule, ann)...)
 		}
 	}
 	return problems

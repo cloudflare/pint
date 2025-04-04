@@ -184,7 +184,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 					ctx = tc.ctx(ctx, uri)
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
-				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
+				problems := tc.checker(prom).Check(ctx, entry, tc.entries)
 
 				var snapshots []Snapshot
 				for _, problem := range problems {
@@ -243,28 +243,30 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry.Path, entry.Rule, tc.entries)
+				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry, tc.entries)
 			}
 		})
 	}
 }
 
-func parseContent(content string) (entries []discovery.Entry, err error) {
+func parseContent(content string) (entries []discovery.Entry, _ error) {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, _, err := p.Parse(strings.NewReader(content))
-	if err != nil {
-		return nil, err
+	file, _ := p.Parse(strings.NewReader(content))
+	if file.Error.Err != nil {
+		return nil, file.Error
 	}
 
-	for _, rule := range rules {
-		entries = append(entries, discovery.Entry{
-			Path: discovery.Path{
-				Name:          "fake.yml",
-				SymlinkTarget: "fake.yml",
-			},
-			ModifiedLines: rule.Lines.Expand(),
-			Rule:          rule,
-		})
+	for _, group := range file.Groups {
+		for _, rule := range group.Rules {
+			entries = append(entries, discovery.Entry{
+				Path: discovery.Path{
+					Name:          "fake.yml",
+					SymlinkTarget: "fake.yml",
+				},
+				ModifiedLines: rule.Lines.Expand(),
+				Rule:          rule,
+			})
+		}
 	}
 
 	return entries, nil

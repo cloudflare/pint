@@ -297,6 +297,17 @@ func TestLabelCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		/*
+			FIXME need support for parsing strict groups in runTests
+			{
+				description: "no labels in recording rule / required / group label",
+				content:     "- record: foo\n  expr: rate(foo[1m])\n",
+				checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+					return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				},
+				prometheus: noProm,
+			},
+		*/
 	}
 	runTests(t, testCases)
 }

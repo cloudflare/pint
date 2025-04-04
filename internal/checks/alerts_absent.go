@@ -9,7 +9,6 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 	"github.com/cloudflare/pint/internal/promapi"
 
@@ -52,16 +51,16 @@ func (c AlertsAbsentCheck) Reporter() string {
 	return AlertsAbsentCheckName
 }
 
-func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
 
-	if rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
 		return problems
 	}
 
-	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr)
+	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
 	absentSources := make([]utils.Source, 0, len(src))
 	for _, s := range src {
 		if s.Operation != "absent" {
@@ -80,13 +79,13 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Warning))
+		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning))
 		return problems
 	}
 
 	var forVal time.Duration
-	if rule.AlertingRule.For != nil {
-		forDur, err := model.ParseDuration(rule.AlertingRule.For.Value)
+	if entry.Rule.AlertingRule.For != nil {
+		forDur, err := model.ParseDuration(entry.Rule.AlertingRule.For.Value)
 		if err != nil {
 			return problems
 		}
@@ -101,7 +100,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 		dgs := []diags.Diagnostic{
 			{
 				Message:     "Using `absent()` might cause false positive alerts when Prometheus restarts.",
-				Pos:         rule.AlertingRule.Expr.Value.Pos,
+				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
 				FirstColumn: int(s.Call.PosRange.Start) + 1,
 				LastColumn:  int(s.Call.PosRange.End),
 			},
@@ -111,9 +110,9 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 			dgs = append(dgs, diags.Diagnostic{
 				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
 					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
-				Pos:         rule.AlertingRule.For.Pos,
+				Pos:         entry.Rule.AlertingRule.For.Pos,
 				FirstColumn: 1,
-				LastColumn:  len(rule.AlertingRule.For.Value),
+				LastColumn:  len(entry.Rule.AlertingRule.For.Value),
 			})
 		} else {
 			summary = "absent() based alert without for"
@@ -121,7 +120,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, _ discovery.Path, rule par
 
 		problems = append(problems, Problem{
 			Anchor:      AnchorAfter,
-			Lines:       rule.AlertingRule.Expr.Value.Pos.Lines(),
+			Lines:       entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
 			Reporter:    c.Reporter(),
 			Summary:     summary,
 			Details:     AlertsAbsentCheckDetails,

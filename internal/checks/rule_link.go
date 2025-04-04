@@ -13,7 +13,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -63,8 +62,8 @@ func (c RuleLinkCheck) Reporter() string {
 	return RuleLinkCheckName
 }
 
-func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil || rule.AlertingRule.Annotations == nil {
+func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil || entry.Rule.AlertingRule.Annotations == nil {
 		return nil
 	}
 
@@ -72,7 +71,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 	var err error
 	var uri string
 	var re *regexp.Regexp
-	for _, ann := range rule.AlertingRule.Annotations.Items {
+	for _, ann := range entry.Rule.AlertingRule.Annotations.Items {
 		u, err = url.Parse(ann.Value.Value)
 		if err != nil {
 			continue
@@ -82,7 +81,7 @@ func (c RuleLinkCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 			continue
 		}
 
-		re = c.re.MustExpand(rule)
+		re = c.re.MustExpand(entry.Rule)
 		if !re.MatchString(u.String()) {
 			continue
 		}

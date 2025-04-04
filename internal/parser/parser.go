@@ -48,10 +48,11 @@ type Parser struct {
 	isStrict bool
 }
 
-func (p Parser) Parse(src io.Reader) (rules []Rule, cr *ContentReader, _ error) {
+func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 	cr = newContentReader(src)
 	dec := yaml.NewDecoder(cr)
 	var index int
+	var g []Group
 	for {
 		var doc yaml.Node
 		decodeErr := dec.Decode(&doc)
@@ -59,31 +60,32 @@ func (p Parser) Parse(src io.Reader) (rules []Rule, cr *ContentReader, _ error) 
 			break
 		}
 		if decodeErr != nil {
-			return nil, cr, tryDecodingYamlError(decodeErr)
+			f.Error = tryDecodingYamlError(decodeErr)
+			return f, cr
 		}
 		index++
 		if p.isStrict {
-			r, err := parseGroups(&doc, p.schema, cr.lines)
-			if err.Err != nil {
-				return rules, cr, err
+			g, f.Error = parseGroups(&doc, p.schema, 0, 0, cr.lines)
+			if f.Error.Err != nil {
+				return f, cr
 			}
-			rules = append(rules, r...)
+			f.Groups = append(f.Groups, g...)
 		} else {
-			rules = append(rules, p.parseNode(&doc, 0, 0, cr.lines)...)
-		}
-		if index > 1 && p.isStrict {
-			rules = append(rules, Rule{
-				Lines: diags.LineRange{First: doc.Line, Last: doc.Line},
-				Error: ParseError{
-					Err: errors.New("multi-document YAML files are not allowed"),
-					Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
-To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
-					Line: doc.Line,
-				},
+			f.IsRelaxed = true
+			f.Groups = append(f.Groups, Group{ // nolint: exhaustruct
+				Rules: p.parseNode(&doc, 0, 0, cr.lines),
 			})
 		}
+		if index > 1 && p.isStrict {
+			f.Error = ParseError{
+				Err: errors.New("multi-document YAML files are not allowed"),
+				Details: `This is a multi-document YAML file. Prometheus will only parse the first document and silently ignore the rest.
+To allow for multi-document YAML files set parser->relaxed option in pint config file.`,
+				Line: doc.Line,
+			}
+		}
 	}
-	return rules, cr, nil
+	return f, cr
 }
 
 func (p *Parser) parseNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rules []Rule) {
@@ -329,29 +331,18 @@ func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []str
 		}
 	}
 
-	for _, elem := range []struct {
-		key   string
-		parts []yamlMap
-	}{
-		{key: labelsKey, parts: labelsNodes},
-		{key: annotationsKey, parts: annotationsNodes},
-	} {
-		names := map[string]struct{}{}
-		for _, entry := range elem.parts {
-			if !isTag(entry.val.ShortTag(), strTag) {
-				return invalidValueError(lines, entry.val.Line+offsetLine, fmt.Sprintf("%s %s", elem.key, nodeValue(entry.key)), describeTag(strTag), describeTag(entry.val.ShortTag()))
-			}
-			if _, ok := names[entry.key.Value]; ok {
-				return Rule{
-					Lines: rangeFromYamlMaps(elem.parts),
-					Error: ParseError{
-						Line: entry.key.Line,
-						Err:  fmt.Errorf("duplicated %s key %s", elem.key, entry.key.Value),
-					},
-				}, false
-			}
-			names[entry.key.Value] = struct{}{}
-		}
+	if ok, perr, plines := validateStringMap(labelsKey, labelsNodes, offsetLine, lines); !ok {
+		return Rule{
+			Lines: plines,
+			Error: perr,
+		}, false
+	}
+
+	if ok, perr, plines := validateStringMap(annotationsKey, annotationsNodes, offsetLine, lines); !ok {
+		return Rule{
+			Lines: plines,
+			Error: perr,
+		}, false
 	}
 
 	if r, ok := ensureRequiredKeys(lines, recordKey, recordPart, exprPart); !ok {
@@ -647,4 +638,24 @@ func countLeadingSpace(line string) (i int) {
 		i++
 	}
 	return i
+}
+
+func validateStringMap(field string, nodes []yamlMap, offsetLine int, lines diags.LineRange) (bool, ParseError, diags.LineRange) {
+	names := map[string]struct{}{}
+	for _, entry := range nodes {
+		if !isTag(entry.val.ShortTag(), strTag) {
+			return false, ParseError{
+				Line: entry.val.Line + offsetLine,
+				Err:  fmt.Errorf("%s %s value must be a %s, got %s instead", field, entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+			}, lines
+		}
+		if _, ok := names[entry.key.Value]; ok {
+			return false, ParseError{
+				Line: entry.key.Line,
+				Err:  fmt.Errorf("duplicated %s key %s", field, entry.key.Value),
+			}, rangeFromYamlMaps(nodes)
+		}
+		names[entry.key.Value] = struct{}{}
+	}
+	return true, ParseError{}, lines
 }

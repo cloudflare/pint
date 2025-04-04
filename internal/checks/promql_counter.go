@@ -51,8 +51,8 @@ func (c CounterCheck) Reporter() string {
 	return CounterCheckName
 }
 
-func (c CounterCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c CounterCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
 		return problems
@@ -105,7 +105,7 @@ LOOP:
 				c.prom.DisableCheck(promapi.APIPathMetadata, c.Reporter())
 				return problems
 			}
-			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Warning))
+			problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning))
 			continue LOOP
 		}
 		if len(metadata.Metadata) == 0 {

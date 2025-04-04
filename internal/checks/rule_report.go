@@ -5,7 +5,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -42,11 +41,11 @@ func (c ReportCheck) Reporter() string {
 	return ReportCheckName
 }
 
-func (c ReportCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	name := rule.NameNode()
+func (c ReportCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	name := entry.Rule.NameNode()
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,
-		Lines:    rule.Lines,
+		Lines:    entry.Rule.Lines,
 		Reporter: c.Reporter(),
 		Summary:  "problem reported by config rule",
 		Details:  "",

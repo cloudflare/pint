@@ -154,6 +154,18 @@ func TestRejectCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		/*
+				FIXME need support for parsing strict groups in runTests
+			{
+				description: "rejected key / alerting / group label",
+				content:     "- alert: foo\n  expr: sum(foo)\n  labels:\n    bad: bar\n",
+				checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+					return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
+				},
+				prometheus: noProm,
+				problems:   true,
+			},
+		*/
 	}
 	runTests(t, testCases)
 }

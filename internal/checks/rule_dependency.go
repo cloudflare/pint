@@ -10,7 +10,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 
 	"github.com/prometheus/prometheus/model/labels"
@@ -44,16 +43,16 @@ func (c RuleDependencyCheck) Reporter() string {
 	return RuleDependencyCheckName
 }
 
-func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
-	if path.Name != path.SymlinkTarget {
+func (c RuleDependencyCheck) Check(_ context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+	if entry.Path.Name != entry.Path.SymlinkTarget {
 		// Don't reported symlinks that are being removed.
 		return problems
 	}
 
 	filtered := nonRemovedEntries(entries)
 
-	for _, entry := range filtered {
-		if entry.Rule.Type() == rule.Type() && entry.Rule.Name() == rule.Name() {
+	for _, flt := range filtered {
+		if flt.Rule.Type() == entry.Rule.Type() && flt.Rule.Name() == entry.Rule.Name() {
 			// There's another rule with same type & name, do nothing.
 			return problems
 		}
@@ -61,12 +60,12 @@ func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule 
 
 	var broken []*brokenDependency
 	var dep *brokenDependency
-	for _, entry := range filtered {
-		if rule.RecordingRule != nil {
-			dep = c.usesVector(entry, rule.RecordingRule.Record.Value)
+	for _, flt := range filtered {
+		if entry.Rule.RecordingRule != nil {
+			dep = c.usesVector(flt, entry.Rule.RecordingRule.Record.Value)
 		}
-		if rule.AlertingRule != nil {
-			dep = c.usesAlert(entry, rule.AlertingRule.Alert.Value)
+		if entry.Rule.AlertingRule != nil {
+			dep = c.usesAlert(flt, entry.Rule.AlertingRule.Alert.Value)
 		}
 		if dep != nil {
 			var found bool
@@ -113,10 +112,10 @@ func (c RuleDependencyCheck) Check(_ context.Context, path discovery.Path, rule 
 		details.WriteString("`\n")
 	}
 
-	name := rule.NameNode()
+	name := entry.Rule.NameNode()
 	problems = append(problems, Problem{
 		Anchor:   AnchorBefore,
-		Lines:    rule.Lines,
+		Lines:    entry.Rule.Lines,
 		Reporter: c.Reporter(),
 		Summary:  "rule results used by another rule",
 		Details:  details.String(),

@@ -44,7 +44,7 @@ func TestBitBucketReporter(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -122,7 +122,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem:       checks.Problem{},
 				},
 			},
@@ -148,7 +148,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem:       checks.Problem{},
 				},
 			},
@@ -175,7 +175,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem:       checks.Problem{},
 				},
 			},
@@ -251,7 +251,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -268,7 +268,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "bar.txt",
 					},
 					ModifiedLines: []int{},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -285,7 +285,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -302,7 +302,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -319,7 +319,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -527,7 +527,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -544,7 +544,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -561,7 +561,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -578,7 +578,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -658,7 +658,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{3, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -724,7 +724,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
@@ -741,7 +741,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
@@ -758,7 +758,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
@@ -775,7 +775,7 @@ func TestBitBucketReporter(t *testing.T) {
 						SymlinkTarget: "foo.txt",
 						Name:          "foo.txt",
 					},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					ModifiedLines: []int{2, 4},
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
@@ -896,7 +896,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -913,7 +913,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -930,7 +930,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -948,7 +948,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "symlink.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 4,
@@ -1472,7 +1472,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1635,7 +1635,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1652,7 +1652,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -1669,7 +1669,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1687,7 +1687,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1705,7 +1705,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "symlink.txt",
 					},
 					ModifiedLines: []int{2, 4},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -1945,7 +1945,7 @@ func TestBitBucketReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,

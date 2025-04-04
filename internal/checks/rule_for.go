@@ -10,7 +10,6 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -63,8 +62,8 @@ func (c RuleForCheck) Reporter() string {
 	return RuleForCheckName
 }
 
-func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return nil
 	}
 
@@ -73,31 +72,31 @@ func (c RuleForCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rul
 	var diag diags.Diagnostic
 
 	switch {
-	case c.key == RuleForFor && rule.AlertingRule.For != nil:
-		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value)
-		lines = rule.AlertingRule.For.Pos.Lines()
+	case c.key == RuleForFor && entry.Rule.AlertingRule.For != nil:
+		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.For.Value)
+		lines = entry.Rule.AlertingRule.For.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
-			Pos:         rule.AlertingRule.For.Pos,
+			Pos:         entry.Rule.AlertingRule.For.Pos,
 			FirstColumn: 1,
-			LastColumn:  len(rule.AlertingRule.For.Value),
+			LastColumn:  len(entry.Rule.AlertingRule.For.Value),
 		}
-	case c.key == RuleForKeepFiringFor && rule.AlertingRule.KeepFiringFor != nil:
-		forDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value)
-		lines = rule.AlertingRule.KeepFiringFor.Pos.Lines()
+	case c.key == RuleForKeepFiringFor && entry.Rule.AlertingRule.KeepFiringFor != nil:
+		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.KeepFiringFor.Value)
+		lines = entry.Rule.AlertingRule.KeepFiringFor.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
-			Pos:         rule.AlertingRule.KeepFiringFor.Pos,
+			Pos:         entry.Rule.AlertingRule.KeepFiringFor.Pos,
 			FirstColumn: 1,
-			LastColumn:  len(rule.AlertingRule.KeepFiringFor.Value),
+			LastColumn:  len(entry.Rule.AlertingRule.KeepFiringFor.Value),
 		}
 	default:
-		lines = rule.AlertingRule.Alert.Pos.Lines()
+		lines = entry.Rule.AlertingRule.Alert.Pos.Lines()
 		diag = diags.Diagnostic{
 			Message:     "",
-			Pos:         rule.AlertingRule.Alert.Pos,
+			Pos:         entry.Rule.AlertingRule.Alert.Pos,
 			FirstColumn: 1,
-			LastColumn:  len(rule.AlertingRule.Alert.Value),
+			LastColumn:  len(entry.Rule.AlertingRule.Alert.Value),
 		}
 	}
 

@@ -53,7 +53,7 @@ func (c ErrorCheck) Reporter() string {
 	return c.problem.Reporter
 }
 
-func (c ErrorCheck) Check(_ context.Context, _ discovery.Path, _ parser.Rule, _ []discovery.Entry) (problems []Problem) {
+func (c ErrorCheck) Check(_ context.Context, _ discovery.Entry, _ []discovery.Entry) (problems []Problem) {
 	problems = append(problems, c.problem)
 	return problems
 }

@@ -62,32 +62,32 @@ func (c AnnotationCheck) Reporter() string {
 	return AnnotationCheckName
 }
 
-func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return nil
 	}
 
-	if rule.AlertingRule.Annotations == nil || len(rule.AlertingRule.Annotations.Items) == 0 {
+	if entry.Rule.AlertingRule.Annotations == nil || len(entry.Rule.AlertingRule.Annotations.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.Lines,
+				Lines:    entry.Rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
 				},
 			})
 		}
 		return problems
 	}
 
-	annotations := make([]*parser.YamlKeyValue, 0, len(rule.AlertingRule.Annotations.Items))
+	annotations := make([]*parser.YamlKeyValue, 0, len(entry.Rule.AlertingRule.Annotations.Items))
 
-	for _, annotation := range rule.AlertingRule.Annotations.Items {
-		if c.keyRe.MustExpand(rule).MatchString(annotation.Key.Value) {
+	for _, annotation := range entry.Rule.AlertingRule.Annotations.Items {
+		if c.keyRe.MustExpand(entry.Rule).MatchString(annotation.Key.Value) {
 			annotations = append(annotations, annotation)
 		}
 	}
@@ -95,13 +95,13 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 	if len(annotations) == 0 && c.isRequired {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
-			Lines:    rule.Lines,
+			Lines:    entry.Rule.Lines,
 			Reporter: c.Reporter(),
 			Summary:  "required annotation not set",
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
-				WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+				WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
 			},
 		})
 		return problems
@@ -111,23 +111,23 @@ func (c AnnotationCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		if ann.Value.Value == "" && c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.Lines,
+				Lines:    entry.Rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required annotation not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
 				},
 			})
 			return problems
 		}
 		if c.tokenRe != nil {
-			for _, match := range c.tokenRe.MustExpand(rule).FindAllString(ann.Value.Value, -1) {
-				problems = append(problems, c.checkValue(rule, match, ann.Value)...)
+			for _, match := range c.tokenRe.MustExpand(entry.Rule).FindAllString(ann.Value.Value, -1) {
+				problems = append(problems, c.checkValue(entry.Rule, match, ann.Value)...)
 			}
 		} else {
-			problems = append(problems, c.checkValue(rule, ann.Value.Value, ann.Value)...)
+			problems = append(problems, c.checkValue(entry.Rule, ann.Value.Value, ann.Value)...)
 		}
 	}
 

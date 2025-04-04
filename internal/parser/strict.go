@@ -3,10 +3,14 @@ package parser
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/prometheus/common/model"
 	"gopkg.in/yaml.v3"
+
+	"github.com/cloudflare/pint/internal/diags"
 )
 
 // https://github.com/go-yaml/yaml/blob/v3.0.1/resolve.go#L70-L81
@@ -40,7 +44,7 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(doc *yaml.Node, schema Schema, contentLines []string) (rules []Rule, err ParseError) {
+func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (groups []Group, _ ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
@@ -71,139 +75,187 @@ func parseGroups(doc *yaml.Node, schema Schema, contentLines []string) (rules []
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
-				name, r, err := parseGroup(group, schema, contentLines)
-				if err.Err != nil {
-					return rules, err
-				}
-				if _, ok := names[name]; ok {
+				g := parseGroup(group, schema, offsetLine, offsetColumn, contentLines)
+				if _, ok := names[g.Name]; ok {
 					return nil, ParseError{
 						Line: group.Line,
 						Err:  errors.New("duplicated group name"),
 					}
 				}
-				names[name] = struct{}{}
-				rules = append(rules, r...)
+				names[g.Name] = struct{}{}
+				groups = append(groups, g)
 			}
 		}
 	}
-	return rules, ParseError{}
+	return groups, ParseError{}
 }
 
-func parseGroup(group *yaml.Node, schema Schema, contentLines []string) (name string, rules []Rule, err ParseError) {
-	if !isTag(group.ShortTag(), mapTag) {
-		return "", nil, ParseError{
-			Line: group.Line,
-			Err:  fmt.Errorf("group must be a %s, got %s", describeTag(mapTag), describeTag(group.ShortTag())),
+func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (group Group) {
+	if !isTag(node.ShortTag(), mapTag) {
+		group.Error = ParseError{
+			Line: node.Line,
+			Err:  fmt.Errorf("group must be a %s, got %s", describeTag(mapTag), describeTag(node.ShortTag())),
 		}
+		return group
 	}
 
-	setKeys := make(map[string]struct{}, len(group.Content))
+	var err error
+	setKeys := make(map[string]struct{}, len(node.Content))
 
-	for _, entry := range mappingNodes(group) {
+	for _, entry := range mappingNodes(node) {
 		switch entry.key.Value {
 		case "name":
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("group name must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
 				}
+				return group
 			}
 			if entry.val.Value == "" {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  errors.New("group name cannot be empty"),
 				}
+				return group
 			}
-			name = entry.val.Value
-		case "interval", "query_offset":
+			group.Name = entry.val.Value
+		case "interval":
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
 				}
+				return group
 			}
-			if _, err := model.ParseDuration(entry.val.Value); err != nil {
-				return "", nil, ParseError{
+			var interval model.Duration
+			if interval, err = model.ParseDuration(entry.val.Value); err != nil {
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("invalid %s value: %w", entry.key.Value, err),
 				}
+				return group
 			}
+			group.Interval = time.Duration(interval)
+		case "query_offset":
+			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
+				group.Error = ParseError{
+					Line: entry.key.Line,
+					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+				}
+				return group
+			}
+			var queryOffset model.Duration
+			if queryOffset, err = model.ParseDuration(entry.val.Value); err != nil {
+				group.Error = ParseError{
+					Line: entry.key.Line,
+					Err:  fmt.Errorf("invalid %s value: %w", entry.key.Value, err),
+				}
+				return group
+			}
+			group.QueryOffset = time.Duration(queryOffset)
 		case "limit":
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != intTag {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("group limit must be a %s, got %s", describeTag(intTag), describeTag(entry.val.ShortTag())),
 				}
+				return group
 			}
+			group.Limit, _ = strconv.Atoi(nodeValue(entry.val))
+		case "labels":
+			if entry.val.ShortTag() != mapTag {
+				group.Error = ParseError{
+					Line: entry.key.Line,
+					Err:  fmt.Errorf("group labels must be a %s, got %s", describeTag(mapTag), describeTag(entry.val.ShortTag())),
+				}
+				return group
+			}
+			nodes := mappingNodes(entry.val)
+			if ok, err, _ := validateStringMap(
+				"labels",
+				nodes,
+				offsetLine,
+				diags.LineRange{First: entry.key.Line, Last: rangeFromYamlMaps(nodes).Last},
+			); !ok {
+				group.Error = err
+				return group
+			}
+			group.Labels = newYamlMap(entry.key, entry.val, offsetLine, offsetColumn, contentLines)
 		case "rules":
 			if !isTag(entry.val.ShortTag(), seqTag) {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("rules must be a %s, got %s", describeTag(seqTag), describeTag(entry.val.ShortTag())),
 				}
+				return group
 			}
 			for _, rule := range unpackNodes(entry.val) {
-				r, err := parseRuleStrict(rule, contentLines)
-				if err.Err != nil {
-					return "", nil, err
-				}
-				rules = append(rules, r)
+				group.Rules = append(group.Rules, parseRuleStrict(rule, contentLines))
 			}
 		case "partial_response_strategy":
 			if schema != ThanosSchema {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
 				}
+				return group
 			}
 			if !isTag(entry.val.ShortTag(), strTag) {
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("partial_response_strategy must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
 				}
+				return group
 			}
 			switch val := nodeValue(entry.val); val {
 			case "warn":
 			case "abort":
 			default:
-				return "", nil, ParseError{
+				group.Error = ParseError{
 					Line: entry.key.Line,
 					Err:  fmt.Errorf("invalid partial_response_strategy value: %s", val),
 				}
+				return group
 			}
 		default:
-			return "", nil, ParseError{
+			group.Error = ParseError{
 				Line: entry.key.Line,
 				Err:  fmt.Errorf("invalid group key %s", entry.key.Value),
 			}
+			return group
 		}
 
 		if _, ok := setKeys[entry.key.Value]; ok {
-			return "", nil, ParseError{
+			group.Error = ParseError{
 				Line: entry.key.Line,
 				Err:  fmt.Errorf("duplicated key %s", entry.key.Value),
 			}
+			return group
 		}
 		setKeys[entry.key.Value] = struct{}{}
 	}
 
 	if _, ok := setKeys["rules"]; ok {
 		if _, ok := setKeys["name"]; !ok {
-			return "", nil, ParseError{
-				Line: group.Line,
+			group.Error = ParseError{
+				Line: node.Line,
 				Err:  errors.New("incomplete group definition, name is required and must be set"),
 			}
+			return group
 		}
 	}
 
-	return name, rules, ParseError{}
+	return group
 }
 
-func parseRuleStrict(rule *yaml.Node, contentLines []string) (Rule, ParseError) {
+func parseRuleStrict(rule *yaml.Node, contentLines []string) Rule {
 	if !isTag(rule.ShortTag(), mapTag) {
-		return Rule{}, ParseError{
-			Line: rule.Line,
-			Err:  fmt.Errorf("rule definion must be a %s, got %s", describeTag(mapTag), describeTag(rule.ShortTag())),
+		return Rule{
+			Error: ParseError{
+				Line: rule.Line,
+				Err:  fmt.Errorf("rule definion must be a %s, got %s", describeTag(mapTag), describeTag(rule.ShortTag())),
+			},
 		}
 	}
 
@@ -220,13 +272,15 @@ func parseRuleStrict(rule *yaml.Node, contentLines []string) (Rule, ParseError) 
 		case labelsKey:
 		case annotationsKey:
 		default:
-			return Rule{}, ParseError{
-				Line: node.Line,
-				Err:  fmt.Errorf("invalid rule key %s", node.Value),
+			return Rule{
+				Error: ParseError{
+					Line: node.Line,
+					Err:  fmt.Errorf("invalid rule key %s", node.Value),
+				},
 			}
 		}
 	}
 
 	pr, _ := parseRule(rule, 0, 0, contentLines)
-	return pr, ParseError{}
+	return pr
 }

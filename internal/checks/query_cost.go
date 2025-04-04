@@ -8,7 +8,6 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -63,8 +62,8 @@ func (c CostCheck) Reporter() string {
 	return CostCheckName
 }
 
-func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
 		return problems
@@ -73,7 +72,7 @@ func (c CostCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 	query := fmt.Sprintf("count(%s)", expr.Value.Value)
 	qr, err := c.prom.Query(ctx, query)
 	if err != nil {
-		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 		return problems
 	}
 
