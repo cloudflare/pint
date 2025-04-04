@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.72.0
+
+### Added
+
+- Labels set on [the group level](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/#rule_group) are now supported by pint.
+
 ## v0.71.8
 
 ### Fixed
