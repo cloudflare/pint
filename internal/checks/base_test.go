@@ -184,7 +184,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 					ctx = tc.ctx(ctx, uri)
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
-				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
+				problems := tc.checker(prom).Check(ctx, entry, tc.entries)
 
 				var snapshots []Snapshot
 				for _, problem := range problems {
@@ -243,7 +243,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry.Path, entry.Rule, tc.entries)
+				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry, tc.entries)
 			}
 		})
 	}

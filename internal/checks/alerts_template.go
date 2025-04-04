@@ -97,20 +97,20 @@ func (c TemplateCheck) Reporter() string {
 	return TemplateCheckName
 }
 
-func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return nil
 	}
 
-	if rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
 		return nil
 	}
 
-	src := utils.LabelsSource(rule.AlertingRule.Expr.Value.Value, rule.AlertingRule.Expr.Query.Expr)
+	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
 	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
 
-	if rule.AlertingRule.Labels != nil {
-		for _, label := range rule.AlertingRule.Labels.Items {
+	if entry.Rule.AlertingRule.Labels != nil {
+		for _, label := range entry.Rule.AlertingRule.Labels.Items {
 			if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
@@ -154,12 +154,12 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 				})
 			}
 
-			problems = append(problems, c.checkQueryLabels(rule, label, src)...)
+			problems = append(problems, c.checkQueryLabels(entry.Rule, label, src)...)
 		}
 	}
 
-	if rule.AlertingRule.Annotations != nil {
-		for _, annotation := range rule.AlertingRule.Annotations.Items {
+	if entry.Rule.AlertingRule.Annotations != nil {
+		for _, annotation := range entry.Rule.AlertingRule.Annotations.Items {
 			if err := checkTemplateSyntax(ctx, annotation.Key.Value, annotation.Value.Value, data); err != nil {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
@@ -181,8 +181,8 @@ func (c TemplateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.
 					},
 				})
 			}
-			problems = append(problems, c.checkQueryLabels(rule, annotation, src)...)
-			problems = append(problems, c.checkHumanizeIsNeeded(rule.AlertingRule.Expr, annotation)...)
+			problems = append(problems, c.checkQueryLabels(entry.Rule, annotation, src)...)
+			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation)...)
 		}
 	}
 

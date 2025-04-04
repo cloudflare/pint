@@ -12,7 +12,6 @@ import (
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/output"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -63,20 +62,20 @@ func (c AlertsCheck) Reporter() string {
 	return AlertsCheckName
 }
 
-func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
 
-	if rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
 		return problems
 	}
 
 	params := promapi.NewRelativeRange(c.lookBack, c.step)
 
-	qr, err := c.prom.RangeQuery(ctx, rule.AlertingRule.Expr.Value.Value, params)
+	qr, err := c.prom.RangeQuery(ctx, entry.Rule.AlertingRule.Expr.Value.Value, params)
 	if err != nil {
-		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 		return problems
 	}
 
@@ -91,12 +90,12 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 	}
 
 	var forDur model.Duration
-	if rule.AlertingRule.For != nil {
-		forDur, _ = model.ParseDuration(rule.AlertingRule.For.Value)
+	if entry.Rule.AlertingRule.For != nil {
+		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.For.Value)
 	}
 	var keepFiringForDur model.Duration
-	if rule.AlertingRule.KeepFiringFor != nil {
-		keepFiringForDur, _ = model.ParseDuration(rule.AlertingRule.KeepFiringFor.Value)
+	if entry.Rule.AlertingRule.KeepFiringFor != nil {
+		keepFiringForDur, _ = model.ParseDuration(entry.Rule.AlertingRule.KeepFiringFor.Value)
 	}
 
 	var alerts int
@@ -113,7 +112,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
 	details := fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
-		qr.URI, url.QueryEscape(rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
+		qr.URI, url.QueryEscape(entry.Rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
 	)
 	if c.comment != "" {
 		details = fmt.Sprintf("%s\n%s", details, maybeComment(c.comment))
@@ -121,7 +120,7 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,
-		Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
+		Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
 		Reporter: c.Reporter(),
 		Summary:  "alert count estimate",
 		Details:  details,
@@ -129,9 +128,9 @@ func (c AlertsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		Diagnostics: []diags.Diagnostic{
 			{
 				Message:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
-				Pos:         rule.AlertingRule.Expr.Value.Pos,
+				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
 				FirstColumn: 1,
-				LastColumn:  len(rule.AlertingRule.Expr.Value.Value),
+				LastColumn:  len(entry.Rule.AlertingRule.Expr.Value.Value),
 			},
 		},
 	})

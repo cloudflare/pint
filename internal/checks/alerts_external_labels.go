@@ -7,7 +7,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/promapi"
 )
 
@@ -46,12 +45,12 @@ func (c AlertsExternalLabelsCheck) Reporter() string {
 	return AlertsExternalLabelsCheckName
 }
 
-func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
 
-	if rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
 		return problems
 	}
 
@@ -61,12 +60,12 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 		return problems
 	}
 
-	if rule.AlertingRule.Labels != nil {
-		for _, label := range rule.AlertingRule.Labels.Items {
+	if entry.Rule.AlertingRule.Labels != nil {
+		for _, label := range entry.Rule.AlertingRule.Labels.Items {
 			for _, name := range checkExternalLabels(label.Key.Value, label.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,
@@ -91,8 +90,8 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, _ discovery.Path, 
 		}
 	}
 
-	if rule.AlertingRule.Annotations != nil {
-		for _, annotation := range rule.AlertingRule.Annotations.Items {
+	if entry.Rule.AlertingRule.Annotations != nil {
+		for _, annotation := range entry.Rule.AlertingRule.Annotations.Items {
 			for _, name := range checkExternalLabels(annotation.Key.Value, annotation.Value.Value, cfg.Config.Global.ExternalLabels) {
 				problems = append(problems, Problem{
 					Anchor: AnchorAfter,

@@ -6,7 +6,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
@@ -53,29 +52,29 @@ func (c AggregationCheck) Reporter() string {
 	return AggregationCheckName
 }
 
-func (c AggregationCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
 	}
 
 	if c.nameRegex != nil {
-		if rule.RecordingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.RecordingRule.Record.Value) {
+		if entry.Rule.RecordingRule != nil && !c.nameRegex.MustExpand(entry.Rule).MatchString(entry.Rule.RecordingRule.Record.Value) {
 			return nil
 		}
-		if rule.AlertingRule != nil && !c.nameRegex.MustExpand(rule).MatchString(rule.AlertingRule.Alert.Value) {
-			return nil
-		}
-	}
-
-	if rule.RecordingRule != nil && rule.RecordingRule.Labels != nil {
-		if val := rule.RecordingRule.Labels.GetValue(c.label); val != nil {
+		if entry.Rule.AlertingRule != nil && !c.nameRegex.MustExpand(entry.Rule).MatchString(entry.Rule.AlertingRule.Alert.Value) {
 			return nil
 		}
 	}
 
-	if rule.AlertingRule != nil && rule.AlertingRule.Labels != nil {
-		if val := rule.AlertingRule.Labels.GetValue(c.label); val != nil {
+	if entry.Rule.RecordingRule != nil && entry.Rule.RecordingRule.Labels != nil {
+		if val := entry.Rule.RecordingRule.Labels.GetValue(c.label); val != nil {
+			return nil
+		}
+	}
+
+	if entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Labels != nil {
+		if val := entry.Rule.AlertingRule.Labels.GetValue(c.label); val != nil {
 			return nil
 		}
 	}

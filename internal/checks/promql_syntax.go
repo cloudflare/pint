@@ -8,7 +8,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 )
 
 const (
@@ -43,8 +42,8 @@ func (c SyntaxCheck) Reporter() string {
 	return SyntaxCheckName
 }
 
-func (c SyntaxCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c SyntaxCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		diag := diags.Diagnostic{
 			Message:     expr.SyntaxError.Error(),

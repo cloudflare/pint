@@ -40,8 +40,8 @@ func (c ImpossibleCheck) Reporter() string {
 	return ImpossibleCheckName
 }
 
-func (c ImpossibleCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c ImpossibleCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return problems
 	}

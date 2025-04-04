@@ -62,13 +62,13 @@ func (c LabelCheck) Reporter() string {
 	return LabelCheckName
 }
 
-func (c LabelCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.RecordingRule != nil {
-		problems = append(problems, c.checkRecordingRule(rule)...)
+func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.RecordingRule != nil {
+		problems = append(problems, c.checkRecordingRule(entry.Rule)...)
 	}
 
-	if rule.AlertingRule != nil {
-		problems = append(problems, c.checkAlertingRule(rule)...)
+	if entry.Rule.AlertingRule != nil {
+		problems = append(problems, c.checkAlertingRule(entry.Rule)...)
 	}
 
 	return problems
