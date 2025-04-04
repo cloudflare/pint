@@ -65,7 +65,7 @@ func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 		}
 		index++
 		if p.isStrict {
-			g, f.Error = parseGroups(&doc, p.schema, cr.lines)
+			g, f.Error = parseGroups(&doc, p.schema, 0, 0, cr.lines)
 			if f.Error.Err != nil {
 				return f, cr
 			}
@@ -331,29 +331,18 @@ func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []str
 		}
 	}
 
-	for _, elem := range []struct {
-		key   string
-		parts []yamlMap
-	}{
-		{key: labelsKey, parts: labelsNodes},
-		{key: annotationsKey, parts: annotationsNodes},
-	} {
-		names := map[string]struct{}{}
-		for _, entry := range elem.parts {
-			if !isTag(entry.val.ShortTag(), strTag) {
-				return invalidValueError(lines, entry.val.Line+offsetLine, fmt.Sprintf("%s %s", elem.key, nodeValue(entry.key)), describeTag(strTag), describeTag(entry.val.ShortTag()))
-			}
-			if _, ok := names[entry.key.Value]; ok {
-				return Rule{
-					Lines: rangeFromYamlMaps(elem.parts),
-					Error: ParseError{
-						Line: entry.key.Line,
-						Err:  fmt.Errorf("duplicated %s key %s", elem.key, entry.key.Value),
-					},
-				}, false
-			}
-			names[entry.key.Value] = struct{}{}
-		}
+	if ok, perr, plines := validateStringMap(labelsKey, labelsNodes, offsetLine, lines); !ok {
+		return Rule{
+			Lines: plines,
+			Error: perr,
+		}, false
+	}
+
+	if ok, perr, plines := validateStringMap(annotationsKey, annotationsNodes, offsetLine, lines); !ok {
+		return Rule{
+			Lines: plines,
+			Error: perr,
+		}, false
 	}
 
 	if r, ok := ensureRequiredKeys(lines, recordKey, recordPart, exprPart); !ok {
@@ -649,4 +638,24 @@ func countLeadingSpace(line string) (i int) {
 		i++
 	}
 	return i
+}
+
+func validateStringMap(field string, nodes []yamlMap, offsetLine int, lines diags.LineRange) (bool, ParseError, diags.LineRange) {
+	names := map[string]struct{}{}
+	for _, entry := range nodes {
+		if !isTag(entry.val.ShortTag(), strTag) {
+			return false, ParseError{
+				Line: entry.val.Line + offsetLine,
+				Err:  fmt.Errorf("%s %s value must be a %s, got %s instead", field, entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+			}, lines
+		}
+		if _, ok := names[entry.key.Value]; ok {
+			return false, ParseError{
+				Line: entry.key.Line,
+				Err:  fmt.Errorf("duplicated %s key %s", field, entry.key.Value),
+			}, rangeFromYamlMaps(nodes)
+		}
+		names[entry.key.Value] = struct{}{}
+	}
+	return true, ParseError{}, lines
 }

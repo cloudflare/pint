@@ -4744,6 +4744,105 @@ groups:
 				},
 			},
 		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  interval: 3m
+  labels:
+    foo: bar
+  rules: []
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name:     "xxx",
+						Interval: time.Minute * 3,
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Value: "foo",
+									},
+									Value: &parser.YamlNode{
+										Value: "bar",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  labels:
+    - foo: bar
+  rules: []
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "xxx",
+						Error: parser.ParseError{
+							Err:  errors.New("group labels must be a mapping, got list"),
+							Line: 4,
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  labels:
+    foo: 1
+  rules: []
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "xxx",
+						Error: parser.ParseError{
+							Err:  errors.New("labels foo value must be a string, got integer instead"),
+							Line: 5,
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  labels:
+    foo: bar
+    bob: foo
+    foo: bob
+  rules: []
+`),
+			strict: true,
+			output: parser.File{
+				Groups: []parser.Group{
+					{
+						Name: "xxx",
+						Error: parser.ParseError{
+							Err:  errors.New("duplicated labels key foo"),
+							Line: 7,
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })

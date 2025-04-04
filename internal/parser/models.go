@@ -374,7 +374,7 @@ type File struct {
 }
 
 type Group struct {
-	Labels      map[string]string
+	Labels      *YamlMap
 	Name        string
 	Error       ParseError
 	Rules       []Rule

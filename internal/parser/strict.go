@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/prometheus/common/model"
 	"gopkg.in/yaml.v3"
 )
@@ -42,7 +43,7 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(doc *yaml.Node, schema Schema, contentLines []string) (groups []Group, _ ParseError) {
+func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (groups []Group, _ ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
@@ -73,7 +74,7 @@ func parseGroups(doc *yaml.Node, schema Schema, contentLines []string) (groups [
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
-				g := parseGroup(group, schema, contentLines)
+				g := parseGroup(group, schema, offsetLine, offsetColumn, contentLines)
 				if _, ok := names[g.Name]; ok {
 					return nil, ParseError{
 						Line: group.Line,
@@ -88,7 +89,7 @@ func parseGroups(doc *yaml.Node, schema Schema, contentLines []string) (groups [
 	return groups, ParseError{}
 }
 
-func parseGroup(node *yaml.Node, schema Schema, contentLines []string) (group Group) {
+func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (group Group) {
 	if !isTag(node.ShortTag(), mapTag) {
 		group.Error = ParseError{
 			Line: node.Line,
@@ -161,6 +162,19 @@ func parseGroup(node *yaml.Node, schema Schema, contentLines []string) (group Gr
 				return group
 			}
 			group.Limit, _ = strconv.Atoi(nodeValue(entry.val))
+		case "labels":
+			if entry.val.ShortTag() != mapTag {
+				group.Error = ParseError{
+					Line: entry.key.Line,
+					Err:  fmt.Errorf("group labels must be a %s, got %s", describeTag(mapTag), describeTag(entry.val.ShortTag())),
+				}
+				return group
+			}
+			if ok, err, _ := validateStringMap("labels", mappingNodes(entry.val), offsetLine, diags.LineRange{}); !ok {
+				group.Error = err
+				return group
+			}
+			group.Labels = newYamlMap(entry.key, entry.val, offsetLine, offsetColumn, contentLines)
 		case "rules":
 			if !isTag(entry.val.ShortTag(), seqTag) {
 				group.Error = ParseError{
