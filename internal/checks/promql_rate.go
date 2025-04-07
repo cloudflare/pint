@@ -62,8 +62,8 @@ func (c RateCheck) Reporter() string {
 	return RateCheckName
 }
 
-func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c RateCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
 		return problems
@@ -75,11 +75,11 @@ func (c RateCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 		return problems
 	}
 
-	problems = append(problems, c.checkNode(ctx, rule, expr, expr.Query, entries, cfg, &completedList{values: nil})...)
+	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query, entries, cfg, &completedList{values: nil})...)
 	return problems
 }
 

@@ -159,6 +159,39 @@
 
 ---
 
+[TestRejectCheck/rejected_key_/_alerting_/_group_label - 1]
+- description: rejected key / alerting / group label
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        bad: bogus
+      rules:
+      - alert: foo
+        expr: rate(foo[1m])
+  output: |
+    5 |     bad: bogus
+            ^^ key is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: key not allowed
+    details: ""
+    diagnostics:
+        - message: key is not allowed to match `^bad$`.
+          pos:
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
 [TestRejectCheck/rejected_key_/_don't_check_annotations - 1]
 []
 
@@ -196,6 +229,49 @@
         last: 4
     severity: 2
     anchor: 0
+
+---
+
+[TestRejectCheck/rejected_key_/_recording_/_group_label - 1]
+- description: rejected key / recording / group label
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        bad: bogus
+      rules:
+      - record: foo
+        expr: rate(foo[1m])
+  output: |
+    5 |     bad: bogus
+            ^^ key is not allowed to match `^bad$`.
+  problem:
+    reporter: rule/reject
+    summary: key not allowed
+    details: ""
+    diagnostics:
+        - message: key is not allowed to match `^bad$`.
+          pos:
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 7
+          firstcolumn: 1
+          lastcolumn: 2
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestRejectCheck/rejected_key_overridden_by_good_/_alerting - 1]
+[]
+
+---
+
+[TestRejectCheck/rejected_key_overridden_by_good_/_alerting#01 - 1]
+[]
 
 ---
 

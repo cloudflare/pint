@@ -15,7 +15,6 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
 )
 
@@ -65,8 +64,8 @@ func (c RegexpCheck) Reporter() string {
 	return RegexpCheckName
 }
 
-func (c RegexpCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	expr := rule.Expr()
+func (c RegexpCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
 	}

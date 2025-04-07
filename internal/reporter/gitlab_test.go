@@ -57,7 +57,7 @@ func TestGitLabReporter(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -70,7 +70,7 @@ func TestGitLabReporter(t *testing.T) {
 			Name:          "foo.txt",
 		},
 		ModifiedLines: []int{2},
-		Rule:          mockRules[0],
+		Rule:          mockFile.Groups[0].Rules[0],
 		Problem: checks.Problem{
 			Reporter: "foo",
 			Summary:  "foo error",
@@ -260,7 +260,7 @@ func TestGitLabReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{1},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -276,7 +276,7 @@ func TestGitLabReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -292,7 +292,7 @@ func TestGitLabReporter(t *testing.T) {
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{3},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -461,7 +461,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{1},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -477,7 +477,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -493,7 +493,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{3},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -600,7 +600,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{1},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -616,7 +616,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{2},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -632,7 +632,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 						Name:          "foo.txt",
 					},
 					ModifiedLines: []int{3},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Reporter: "foo",
 						Summary:  "foo error",
@@ -720,7 +720,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -828,7 +828,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 							SymlinkTarget: "foo.txt",
 						},
 						ModifiedLines: []int{2},
-						Rule:          mockRules[1],
+						Rule:          mockFile.Groups[0].Rules[1],
 						Problem: checks.Problem{
 							Lines: diags.LineRange{
 								First: tc.problemLine,

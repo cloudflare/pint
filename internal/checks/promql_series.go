@@ -130,7 +130,7 @@ func (c SeriesCheck) Reporter() string {
 	return SeriesCheckName
 }
 
-func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Rule, entries []discovery.Entry) (problems []Problem) {
+func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
 	var settings *PromqlSeriesSettings
 	if s := ctx.Value(SettingsKey(c.Reporter())); s != nil {
 		settings = s.(*PromqlSeriesSettings)
@@ -140,7 +140,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		_ = settings.Validate()
 	}
 
-	expr := rule.Expr()
+	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
 		return problems
@@ -158,7 +158,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 		done[selector.String()] = true
 
-		if isDisabled(rule, selector) {
+		if isDisabled(entry.Rule, selector) {
 			done[selector.String()] = true
 			continue
 		}
@@ -238,7 +238,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		slog.Debug("Checking if selector returns anything", slog.String("check", c.Reporter()), slog.String("selector", selector.String()))
 		count, err := c.instantSeriesCount(ctx, fmt.Sprintf("count(%s)", selector.String()))
 		if err != nil {
-			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+			problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
 		}
 		if count > 0 {
@@ -292,7 +292,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		slog.Debug("Checking if base metric has historical series", slog.String("check", c.Reporter()), slog.String("selector", (&bareSelector).String()))
 		trs, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", bareSelector.String()), params)
 		if err != nil {
-			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+			problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 			continue
 		}
 		trs.Series.FindGaps(promUptime.Series, trs.Series.From, trs.Series.Until)
@@ -369,7 +369,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			slog.Debug("Checking if base metric has historical series with required label", slog.String("check", c.Reporter()), slog.String("selector", (&l).String()), slog.String("label", name))
 			trsLabelCount, err := c.prom.RangeQuery(ctx, fmt.Sprintf("absent(%s)", l.String()), params)
 			if err != nil {
-				problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+				problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
 			}
 			trsLabelCount.Series.FindGaps(promUptime.Series, trsLabelCount.Series.From, trsLabelCount.Series.Until)
@@ -417,7 +417,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			!oldest(trs.Series.Ranges).After(trs.Series.From.Add(settings.lookbackStepDuration)) &&
 			newest(trs.Series.Ranges).Before(trs.Series.Until.Add(settings.lookbackStepDuration*-1)) {
 
-			minAge, p := c.getMinAge(rule, selector)
+			minAge, p := c.getMinAge(entry.Rule, selector)
 			if len(p) > 0 {
 				problems = append(problems, p...)
 			}
@@ -468,7 +468,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			if lm.Type != labels.MatchEqual && lm.Type != labels.MatchRegexp {
 				continue
 			}
-			if c.isLabelValueIgnored(settings, rule, selector, lm.Name) {
+			if c.isLabelValueIgnored(settings, entry.Rule, selector, lm.Name) {
 				continue
 			}
 
@@ -482,7 +482,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 
 			trsLabel, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", labelSelector.String()), params)
 			if err != nil {
-				problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+				problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
 				continue
 			}
 			trsLabel.Series.FindGaps(promUptime.Series, trsLabel.Series.From, trsLabel.Series.Until)
@@ -543,7 +543,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 					continue
 				}
 
-				minAge, p := c.getMinAge(rule, selector)
+				minAge, p := c.getMinAge(entry.Rule, selector)
 				if len(p) > 0 {
 					problems = append(problems, p...)
 				}
@@ -653,7 +653,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 		}
 	}
 
-	for _, disable := range orphanedDisableComments(ctx, rule, selectors) {
+	for _, disable := range orphanedDisableComments(ctx, entry.Rule, selectors) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Pos.Lines(),
@@ -671,7 +671,7 @@ func (c SeriesCheck) Check(ctx context.Context, _ discovery.Path, rule parser.Ru
 			},
 		})
 	}
-	for _, ruleSet := range orphanedRuleSetComments(rule, selectors) {
+	for _, ruleSet := range orphanedRuleSetComments(entry.Rule, selectors) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Pos.Lines(),

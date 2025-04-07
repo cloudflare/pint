@@ -98,6 +98,49 @@ func TestAlertsExternalLabelsCountCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description:   "no cluster label / strict / group labels set",
+			contentStrict: true,
+			content: `
+groups:
+- name: mygroup
+  labels:
+    cluster: "{{ $externalLabels.cluster }}"
+  rules:
+  - alert: Foo Is Down
+    expr: up{job="foo"} == 0
+`,
+			checker:    newAlertsExternalLabelsCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  external_labels:\n    bob: foo\n"},
+				},
+			},
+		},
+		{
+			description: "no cluster label / relaxed / group labels set",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    cluster: "{{ $externalLabels.cluster }}"
+  rules:
+  - alert: Foo Is Down
+    expr: up{job="foo"} == 0
+`,
+			checker:    newAlertsExternalLabelsCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{requireConfigPath},
+					resp:  configResponse{yaml: "global:\n  external_labels:\n    bob: foo\n"},
+				},
+			},
+		},
 	}
 
 	runTests(t, testCases)

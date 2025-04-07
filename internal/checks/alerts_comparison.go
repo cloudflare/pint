@@ -47,22 +47,22 @@ func (c ComparisonCheck) Reporter() string {
 	return ComparisonCheckName
 }
 
-func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.Rule, _ []discovery.Entry) (problems []Problem) {
-	if rule.AlertingRule == nil {
+func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
 
-	if rule.AlertingRule.Expr.SyntaxError != nil {
+	if entry.Rule.AlertingRule.Expr.SyntaxError != nil {
 		return problems
 	}
 
-	expr := rule.Expr()
+	expr := entry.Rule.Expr()
 
 	if n := utils.HasOuterBinaryExpr(expr.Query); n != nil && n.Op == promParser.LOR {
 		if (hasComparision(n.LHS) == nil || hasComparision(n.RHS) == nil) && !isAbsent(n.LHS) && !isAbsent(n.RHS) {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
+				Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
@@ -83,7 +83,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
+				Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
@@ -107,7 +107,7 @@ func (c ComparisonCheck) Check(_ context.Context, _ discovery.Path, rule parser.
 
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,
-		Lines:    rule.AlertingRule.Expr.Value.Pos.Lines(),
+		Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
 		Reporter: c.Reporter(),
 		Summary:  "always firing alert",
 		Details:  ComparisonCheckDetails,

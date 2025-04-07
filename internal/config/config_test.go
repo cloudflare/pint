@@ -162,12 +162,17 @@ func TestSetDisabledChecks(t *testing.T) {
 
 func newRule(t *testing.T, content string) parser.Rule {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, _, err := p.Parse(strings.NewReader(content))
-	if err != nil {
-		t.Error(err)
+	file, _ := p.Parse(strings.NewReader(content))
+	if file.Error.Err != nil {
+		t.Error(file.Error)
 		t.FailNow()
 	}
-	return rules[0]
+	for _, group := range file.Groups {
+		for _, rule := range group.Rules {
+			return rule
+		}
+	}
+	return parser.Rule{}
 }
 
 func TestGetChecksForRule(t *testing.T) {

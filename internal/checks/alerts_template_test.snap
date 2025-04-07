@@ -1273,6 +1273,116 @@
 
 ---
 
+[TestTemplateCheck/everything_is_stripped_/_relaxed_/_group_label_missing - 1]
+- description: everything is stripped / relaxed / group label missing
+  content: |
+    groups:
+    - name: mygroup
+      labels:
+        bob: abc
+      rules:
+      - alert: Foo
+        expr: sum(foo) > 0
+        annotations:
+          summary: '{{ .Labels.team }}'
+  output: |
+    7 |     expr: sum(foo) > 0
+                  ^^^ Query is using aggregation that removes all labels.
+      | [...]
+    9 |       summary: '{{ .Labels.team }}'
+                                  ^^^^^ Template is using `team` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `team` label but the query results won't have this label.
+          pos:
+            - line: 9
+              firstcolumn: 17
+              lastcolumn: 34
+          firstcolumn: 11
+          lastcolumn: 15
+        - message: Query is using aggregation that removes all labels.
+          pos:
+            - line: 7
+              firstcolumn: 11
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 6
+        last: 9
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/everything_is_stripped_/_relaxed_/_group_label_override - 1]
+[]
+
+---
+
+[TestTemplateCheck/everything_is_stripped_/_relaxed_/_group_label_set - 1]
+[]
+
+---
+
+[TestTemplateCheck/everything_is_stripped_/_strict_/_group_label_missing - 1]
+- description: everything is stripped / strict / group label missing
+  content: |
+    groups:
+    - name: mygroup
+      labels:
+        bob: abc
+      rules:
+      - alert: Foo
+        expr: sum(foo) > 0
+        annotations:
+          summary: '{{ .Labels.team }}'
+  output: |
+    7 |     expr: sum(foo) > 0
+                  ^^^ Query is using aggregation that removes all labels.
+      | [...]
+    9 |       summary: '{{ .Labels.team }}'
+                                  ^^^^^ Template is using `team` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `team` label but the query results won't have this label.
+          pos:
+            - line: 9
+              firstcolumn: 17
+              lastcolumn: 34
+          firstcolumn: 11
+          lastcolumn: 15
+        - message: Query is using aggregation that removes all labels.
+          pos:
+            - line: 7
+              firstcolumn: 11
+              lastcolumn: 22
+          firstcolumn: 1
+          lastcolumn: 3
+    lines:
+        first: 6
+        last: 9
+    severity: 2
+    anchor: 0
+
+---
+
+[TestTemplateCheck/everything_is_stripped_/_strict_/_group_label_override - 1]
+[]
+
+---
+
+[TestTemplateCheck/everything_is_stripped_/_strict_/_group_label_set - 1]
+[]
+
+---
+
 [TestTemplateCheck/foo_/_on(...)_bar - 1]
 - description: foo / on(...) bar
   content: |

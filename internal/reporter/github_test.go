@@ -41,7 +41,7 @@ func TestGitHubReporter(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockRules, _, _ := p.Parse(strings.NewReader(`
+	mockFile, _ := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -80,7 +80,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -122,7 +122,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -162,7 +162,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -202,7 +202,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -243,7 +243,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -288,7 +288,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -329,7 +329,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -381,7 +381,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -400,7 +400,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -419,7 +419,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -438,7 +438,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -488,7 +488,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -507,7 +507,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -526,7 +526,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -545,7 +545,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -599,7 +599,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -618,7 +618,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -637,7 +637,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -656,7 +656,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -710,7 +710,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{1},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,
@@ -764,7 +764,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{2},
-					Rule:          mockRules[1],
+					Rule:          mockFile.Groups[0].Rules[1],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 2,
@@ -818,7 +818,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{3},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 3,
@@ -860,7 +860,7 @@ func TestGitHubReporter(t *testing.T) {
 					},
 
 					ModifiedLines: []int{1},
-					Rule:          mockRules[0],
+					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
 						Lines: diags.LineRange{
 							First: 1,

@@ -154,6 +154,76 @@ func TestRejectCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "rejected key / alerting / group label",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    bad: bogus
+  rules:
+  - alert: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "rejected key / recording / group label",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    bad: bogus
+  rules:
+  - record: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "rejected key overridden by good / alerting",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    key: bad
+  rules:
+  - alert: foo
+    expr: rate(foo[1m])
+    labels:
+      key: good
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
+			},
+			prometheus: noProm,
+		},
+		{
+			description: "rejected key overridden by good / alerting",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    key: bad
+  rules:
+  - record: foo
+    expr: rate(foo[1m])
+    labels:
+      key: good
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRejectCheck(true, true, badRe, badRe, checks.Bug)
+			},
+			prometheus: noProm,
+		},
 	}
 	runTests(t, testCases)
 }

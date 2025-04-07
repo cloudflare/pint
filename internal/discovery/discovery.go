@@ -77,6 +77,8 @@ func (p Path) String() string {
 
 type Entry struct {
 	PathError      error
+	File           *parser.File  `json:"-"`
+	Group          *parser.Group `json:"-"`
 	Path           Path
 	Owner          string
 	ModifiedLines  []int
@@ -85,8 +87,31 @@ type Entry struct {
 	State          ChangeType
 }
 
+func (e Entry) Labels() (ym parser.YamlMap) {
+	switch {
+	case e.Rule.AlertingRule != nil && e.Rule.AlertingRule.Labels != nil:
+		ym.Key = e.Rule.AlertingRule.Labels.Key
+		if e.Group != nil && e.Group.Labels != nil {
+			ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.AlertingRule.Labels).Items
+		} else {
+			ym.Items = e.Rule.AlertingRule.Labels.Items
+		}
+	case e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Labels != nil:
+		ym.Key = e.Rule.RecordingRule.Labels.Key
+		if e.Group != nil && e.Group.Labels != nil {
+			ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.RecordingRule.Labels).Items
+		} else {
+			ym.Items = e.Rule.RecordingRule.Labels.Items
+		}
+	case e.Group != nil && e.Group.Labels != nil:
+		ym.Key = e.Group.Labels.Key
+		ym.Items = e.Group.Labels.Items
+	}
+	return ym
+}
+
 func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
-	rules, cr, err := p.Parse(r)
+	file, cr := p.Parse(r)
 
 	contentLines := diags.LineRange{
 		First: min(cr.TotalLines(), 1),
@@ -153,43 +178,64 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		return entries, nil
 	}
 
-	if err != nil {
+	if file.Error.Err != nil {
 		slog.Warn(
 			"Failed to parse file content",
-			slog.Any("err", err),
+			slog.Any("err", file.Error.Err),
 			slog.String("path", sourcePath),
-			slog.String("lines", contentLines.String()),
+			slog.Int("line", file.Error.Line),
 		)
 		entries = append(entries, Entry{
 			Path: Path{
 				Name:          sourcePath,
 				SymlinkTarget: reportedPath,
 			},
-			PathError:     err,
+			PathError:     file.Error,
 			Owner:         fileOwner,
 			ModifiedLines: contentLines.Expand(),
 		})
 		return entries, nil
 	}
 
-	for _, rule := range rules {
-		ruleOwner := fileOwner
-		for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
-			ruleOwner = owner.Name
+	for _, group := range file.Groups {
+		if group.Error.Err != nil {
+			slog.Warn(
+				"Failed to parse group entry",
+				slog.Any("err", group.Error.Err),
+				slog.String("path", sourcePath),
+				slog.Int("line", group.Error.Line),
+			)
+			entries = append(entries, Entry{
+				Path: Path{
+					Name:          sourcePath,
+					SymlinkTarget: reportedPath,
+				},
+				PathError:     group.Error,
+				Owner:         fileOwner,
+				ModifiedLines: []int{group.Error.Line},
+			})
 		}
-		entries = append(entries, Entry{
-			Path: Path{
-				Name:          sourcePath,
-				SymlinkTarget: reportedPath,
-			},
-			Rule:           rule,
-			ModifiedLines:  rule.Lines.Expand(),
-			Owner:          ruleOwner,
-			DisabledChecks: disabledChecks,
-		})
+		for _, rule := range group.Rules {
+			ruleOwner := fileOwner
+			for _, owner := range comments.Only[comments.Owner](rule.Comments, comments.RuleOwnerType) {
+				ruleOwner = owner.Name
+			}
+			entries = append(entries, Entry{
+				Path: Path{
+					Name:          sourcePath,
+					SymlinkTarget: reportedPath,
+				},
+				File:           &file,
+				Group:          &group,
+				Rule:           rule,
+				ModifiedLines:  rule.Lines.Expand(),
+				Owner:          ruleOwner,
+				DisabledChecks: disabledChecks,
+			})
+		}
 	}
 
-	if len(rules) == 0 && len(badOwners) > 0 {
+	if len(entries) == 0 && len(badOwners) > 0 {
 		for _, comment := range badOwners {
 			owner := comment.Value.(comments.Owner)
 			entries = append(entries, Entry{

@@ -165,7 +165,7 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 			}
 
 			start := time.Now()
-			problems := job.check.Check(ctx, job.entry.Path, job.entry.Rule, job.allEntries)
+			problems := job.check.Check(ctx, job.entry, job.allEntries)
 			checkDuration.WithLabelValues(job.check.Reporter()).Observe(time.Since(start).Seconds())
 			for _, problem := range problems {
 				results <- reporter.Report{

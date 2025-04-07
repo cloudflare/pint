@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"slices"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -99,6 +100,16 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 		}
 	}
 	return nil
+}
+
+func (ym *YamlMap) setValue(item *YamlKeyValue) {
+	for i := range ym.Items {
+		if ym.Items[i].Key.Value == item.Key.Value {
+			ym.Items[i].Value = item.Value
+			return
+		}
+	}
+	ym.Items = append(ym.Items, item)
 }
 
 func (ym YamlMap) Lines() (lr diags.LineRange) {
@@ -225,6 +236,23 @@ type ParseError struct {
 
 func (pe ParseError) Error() string {
 	return fmt.Sprintf("error at line %d: %s", pe.Line, pe.Err)
+}
+
+type File struct {
+	Comments  []comments.Comment
+	Groups    []Group
+	Error     ParseError
+	IsRelaxed bool
+}
+
+type Group struct {
+	Labels      *YamlMap
+	Name        string
+	Error       ParseError
+	Rules       []Rule
+	Interval    time.Duration
+	QueryOffset time.Duration
+	Limit       int
 }
 
 type Rule struct {
@@ -365,16 +393,22 @@ func (r Rule) Type() RuleType {
 	return InvalidRuleType
 }
 
-type File struct {
-	Comments []comments.Comment
-	Groups   []Group
-}
+func MergeMaps(a, b *YamlMap) *YamlMap {
+	if a == nil {
+		return b
+	}
+	if b == nil {
+		return a
+	}
 
-type Group struct {
-	Labels      map[string]string
-	Name        string
-	Interval    string
-	QueryOffset string
-	Rules       []Rule
-	Limit       int
+	dst := &YamlMap{
+		Key:   a.Key,
+		Items: slices.Clone(a.Items),
+	}
+
+	for _, item := range b.Items {
+		dst.setValue(item)
+	}
+
+	return dst
 }

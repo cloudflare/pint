@@ -297,6 +297,142 @@ func TestLabelCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description:   "no labels in recording rule / strict / required / group label",
+			contentStrict: true,
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: critical
+  rules:
+  - record: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+		},
+		{
+			description: "no labels in recording rule / relaxed / required / group label",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: critical
+  rules:
+  - record: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+		},
+		{
+			description:   "no labels in alerting rule / strict / required / group label",
+			contentStrict: true,
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: critical
+  rules:
+  - alert: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+		},
+		{
+			description: "no labels in alerting rule / relaxed / required / group label",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: critical
+  rules:
+  - alert: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+		},
+		{
+			description:   "invalid value in alerting rule / strict / required",
+			contentStrict: true,
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: bogus
+  rules:
+  - alert: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "invalid value in alerting rule / relaxed / required",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: bogus
+  rules:
+  - alert: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description:   "invalid value in recording rule / strict / required",
+			contentStrict: true,
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: bogus
+  rules:
+  - record: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "invalid value in recording rule / relaxed / required",
+			content: `
+groups:
+- name: mygroup
+  labels:
+    severity: bogus
+  rules:
+  - record: foo
+    expr: rate(foo[1m])
+`,
+			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+			},
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }

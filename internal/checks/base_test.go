@@ -107,16 +107,17 @@ type otherPromsFn func(string) []*promapi.FailoverGroup
 type snapshotFn func(string) string
 
 type checkTest struct {
-	prometheus  newPrometheusFn
-	otherProms  otherPromsFn
-	ctx         newCtxFn
-	checker     newCheckFn
-	snapshot    snapshotFn
-	description string
-	content     string
-	entries     []discovery.Entry
-	mocks       []*prometheusMock
-	problems    bool
+	prometheus    newPrometheusFn
+	otherProms    otherPromsFn
+	ctx           newCtxFn
+	checker       newCheckFn
+	snapshot      snapshotFn
+	description   string
+	content       string
+	entries       []discovery.Entry
+	mocks         []*prometheusMock
+	problems      bool
+	contentStrict bool
 }
 
 type Snapshot struct {
@@ -177,14 +178,14 @@ func runTests(t *testing.T, testCases []checkTest) {
 			}
 
 			ctx, cancel := context.WithCancel(t.Context())
-			entries, err := parseContent(tc.content)
+			entries, err := parseContent(tc.content, tc.contentStrict)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
 				if tc.ctx != nil {
 					ctx = tc.ctx(ctx, uri)
 				}
 				ctx = context.WithValue(ctx, promapi.AllPrometheusServers, proms)
-				problems := tc.checker(prom).Check(ctx, entry.Path, entry.Rule, tc.entries)
+				problems := tc.checker(prom).Check(ctx, entry, tc.entries)
 
 				var snapshots []Snapshot
 				for _, problem := range problems {
@@ -239,39 +240,43 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 - record: foo
   expr: 'foo{}{}'
-`)
+`, false)
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
-				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry.Path, entry.Rule, tc.entries)
+				_ = tc.checker(newSimpleProm("prom")).Check(t.Context(), entry, tc.entries)
 			}
 		})
 	}
 }
 
-func parseContent(content string) (entries []discovery.Entry, err error) {
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, _, err := p.Parse(strings.NewReader(content))
-	if err != nil {
-		return nil, err
+func parseContent(content string, isStrict bool) (entries []discovery.Entry, _ error) {
+	p := parser.NewParser(isStrict, parser.PrometheusSchema, model.UTF8Validation)
+	file, _ := p.Parse(strings.NewReader(content))
+	if file.Error.Err != nil {
+		return nil, file.Error
 	}
 
-	for _, rule := range rules {
-		entries = append(entries, discovery.Entry{
-			Path: discovery.Path{
-				Name:          "fake.yml",
-				SymlinkTarget: "fake.yml",
-			},
-			ModifiedLines: rule.Lines.Expand(),
-			Rule:          rule,
-		})
+	for _, group := range file.Groups {
+		for _, rule := range group.Rules {
+			entries = append(entries, discovery.Entry{
+				Path: discovery.Path{
+					Name:          "fake.yml",
+					SymlinkTarget: "fake.yml",
+				},
+				ModifiedLines: rule.Lines.Expand(),
+				Rule:          rule,
+				Group:         &group,
+				File:          &file,
+			})
+		}
 	}
 
 	return entries, nil
 }
 
 func mustParseContent(content string) (entries []discovery.Entry) {
-	entries, err := parseContent(content)
+	entries, err := parseContent(content, false)
 	if err != nil {
 		panic(err)
 	}

@@ -13,12 +13,14 @@ import (
 
 func newMustRule(content string) parser.Rule {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	rules, _, err := p.Parse(strings.NewReader(content))
-	if err != nil {
-		panic(err)
+	file, _ := p.Parse(strings.NewReader(content))
+	if file.Error.Err != nil {
+		panic(file.Error.Err)
 	}
-	for _, rule := range rules {
-		return rule
+	for _, group := range file.Groups {
+		for _, rule := range group.Rules {
+			return rule
+		}
 	}
 	return parser.Rule{}
 }
@@ -177,6 +179,82 @@ func TestRuleIsIdentical(t *testing.T) {
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			equal := tc.a.IsIdentical(tc.b)
 			require.Equal(t, tc.equal, equal)
+		})
+	}
+}
+
+func TestMergeMaps(t *testing.T) {
+	type testCaseT struct {
+		a      *parser.YamlMap
+		b      *parser.YamlMap
+		output *parser.YamlMap
+	}
+
+	testCases := []testCaseT{
+		{
+			a:      nil,
+			b:      nil,
+			output: nil,
+		},
+		{
+			a:      &parser.YamlMap{},
+			b:      nil,
+			output: &parser.YamlMap{},
+		},
+		{
+			a:      nil,
+			b:      &parser.YamlMap{},
+			output: &parser.YamlMap{},
+		},
+		{
+			a:      &parser.YamlMap{},
+			b:      &parser.YamlMap{},
+			output: &parser.YamlMap{},
+		},
+		{
+			a: &parser.YamlMap{
+				Key: &parser.YamlNode{Value: "a"},
+				Items: []*parser.YamlKeyValue{
+					{
+						Key: &parser.YamlNode{Value: "1"},
+					},
+					{
+						Key: &parser.YamlNode{Value: "2"},
+					},
+				},
+			},
+			b: &parser.YamlMap{
+				Key: &parser.YamlNode{Value: "b"},
+				Items: []*parser.YamlKeyValue{
+					{
+						Key: &parser.YamlNode{Value: "2"},
+					},
+					{
+						Key: &parser.YamlNode{Value: "3"},
+					},
+				},
+			},
+			output: &parser.YamlMap{
+				Key: &parser.YamlNode{Value: "a"},
+				Items: []*parser.YamlKeyValue{
+					{
+						Key: &parser.YamlNode{Value: "1"},
+					},
+					{
+						Key: &parser.YamlNode{Value: "2"},
+					},
+					{
+						Key: &parser.YamlNode{Value: "3"},
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
+			output := parser.MergeMaps(tc.a, tc.b)
+			require.Equal(t, tc.output, output)
 		})
 	}
 }

@@ -775,6 +775,105 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description:   "everything is stripped / strict / group label override",
+			contentStrict: true,
+			content: `groups:
+- name: mygroup
+  labels:
+    job: abc
+  rules:
+  - alert: Foo
+    expr: sum(foo) > 0
+    annotations:
+      summary: '{{ .Labels.job }} is above zero'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   false,
+		},
+		{
+			description: "everything is stripped / relaxed / group label override",
+			content: `groups:
+- name: mygroup
+  labels:
+    job: abc
+  rules:
+  - alert: Foo
+    expr: sum(foo) > 0
+    annotations:
+      summary: '{{ .Labels.job }} is above zero'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   false,
+		},
+		{
+			description:   "everything is stripped / strict / group label set",
+			contentStrict: true,
+			content: `groups:
+- name: mygroup
+  labels:
+    team: abc
+  rules:
+  - alert: Foo
+    expr: sum(foo) > 0
+    annotations:
+      summary: '{{ .Labels.team }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   false,
+		},
+		{
+			description: "everything is stripped / relaxed / group label set",
+			content: `groups:
+- name: mygroup
+  labels:
+    team: abc
+  rules:
+  - alert: Foo
+    expr: sum(foo) > 0
+    annotations:
+      summary: '{{ .Labels.team }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   false,
+		},
+		{
+			description:   "everything is stripped / strict / group label missing",
+			contentStrict: true,
+			content: `groups:
+- name: mygroup
+  labels:
+    bob: abc
+  rules:
+  - alert: Foo
+    expr: sum(foo) > 0
+    annotations:
+      summary: '{{ .Labels.team }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
+		{
+			description: "everything is stripped / relaxed / group label missing",
+			content: `groups:
+- name: mygroup
+  labels:
+    bob: abc
+  rules:
+  - alert: Foo
+    expr: sum(foo) > 0
+    annotations:
+      summary: '{{ .Labels.team }}'
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }

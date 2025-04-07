@@ -5,7 +5,7 @@ cmp stderr stderr.txt
 -- stderr.txt --
 level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
-level=WARN msg="Failed to parse file content" err="error at line 2: top level field must be a groups key, got list" path=rules/strict.yml lines=1-4
+level=WARN msg="Failed to parse file content" err="top level field must be a groups key, got list" path=rules/strict.yml line=2
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Fatal: top level field must be a groups key, got list (yaml/parse)
   ---> rules/strict.yml:2
