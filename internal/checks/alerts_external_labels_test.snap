@@ -185,3 +185,69 @@
     anchor: 0
 
 ---
+
+[TestAlertsExternalLabelsCountCheck/no_cluster_label_/_relaxed_/_group_labels_set - 1]
+- description: no cluster label / relaxed / group labels set
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        cluster: "{{ $externalLabels.cluster }}"
+      rules:
+      - alert: Foo Is Down
+        expr: up{job="foo"} == 0
+  output: |
+    5 |     cluster: "{{ $externalLabels.cluster }}"
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+  problem:
+    reporter: alerts/external_labels
+    summary: invalid label
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 43
+          firstcolumn: 1
+          lastcolumn: 29
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---
+
+[TestAlertsExternalLabelsCountCheck/no_cluster_label_/_strict_/_group_labels_set - 1]
+- description: no cluster label / strict / group labels set
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        cluster: "{{ $externalLabels.cluster }}"
+      rules:
+      - alert: Foo Is Down
+        expr: up{job="foo"} == 0
+  output: |
+    5 |     cluster: "{{ $externalLabels.cluster }}"
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+  problem:
+    reporter: alerts/external_labels
+    summary: invalid label
+    details: '[Click here](https://simple.example.com/config) to see `prom` Prometheus runtime configuration.'
+    diagnostics:
+        - message: Template is using `cluster` external label but `prom` Prometheus server at https://simple.example.com doesn't have this label configured in global:external_labels.
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 43
+          firstcolumn: 1
+          lastcolumn: 29
+    lines:
+        first: 5
+        last: 5
+    severity: 2
+    anchor: 0
+
+---

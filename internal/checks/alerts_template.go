@@ -153,7 +153,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 			})
 		}
 
-		problems = append(problems, c.checkQueryLabels(entry.Rule, label, src)...)
+		problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, label, src)...)
 	}
 
 	if entry.Rule.AlertingRule.Annotations != nil {
@@ -179,7 +179,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 					},
 				})
 			}
-			problems = append(problems, c.checkQueryLabels(entry.Rule, annotation, src)...)
+			problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, annotation, src)...)
 			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation)...)
 		}
 	}
@@ -466,7 +466,7 @@ func findTemplateVariables(name, text string) (vars []tmplVar, aliases aliasMap,
 	return vars, aliases, true
 }
 
-func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyValue, src []utils.Source) (problems []Problem) {
+func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []utils.Source) (problems []Problem) {
 	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
 	if !ok {
 		return nil
@@ -479,6 +479,9 @@ func (c TemplateCheck) checkQueryLabels(rule parser.Rule, label *parser.YamlKeyV
 			if len(v.value) > 1 && v.value[0] == a {
 				if _, ok := done[v.value[1]]; ok {
 					continue
+				}
+				if group != nil && group.Labels != nil && group.Labels.GetValue(v.value[1]) != nil {
+					goto NEXT
 				}
 				for _, s := range src {
 					if s.IsDead {

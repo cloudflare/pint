@@ -17,9 +17,9 @@ import (
 
 func TestMatch(t *testing.T) {
 	type testCaseT struct {
-		match   config.Match
 		cmd     config.ContextCommandVal
 		path    string
+		match   config.Match
 		entry   discovery.Entry
 		isMatch bool
 	}

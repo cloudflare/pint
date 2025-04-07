@@ -64,7 +64,7 @@ func (c LabelCheck) Reporter() string {
 
 func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
 	if entry.Rule.RecordingRule != nil {
-		problems = append(problems, c.checkRecordingRule(entry.Rule)...)
+		problems = append(problems, c.checkRecordingRule(entry)...)
 	}
 
 	if entry.Rule.AlertingRule != nil {
@@ -74,30 +74,32 @@ func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discover
 	return problems
 }
 
-func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
-	if rule.RecordingRule.Labels == nil || len(rule.RecordingRule.Labels.Items) == 0 {
+func (c LabelCheck) checkRecordingRule(entry discovery.Entry) (problems []Problem) {
+	entryLabels := entry.Labels()
+
+	if len(entryLabels.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.Lines,
+				Lines:    entry.Rule.Lines,
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
 				},
 			})
 		}
 		return problems
 	}
 
-	val := rule.RecordingRule.Labels.GetValue(c.keyRe.original)
+	val := entryLabels.GetValue(c.keyRe.original)
 	if val == nil || val.Value == "" {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
-				Lines:    rule.RecordingRule.Labels.Lines(),
+				Lines:    entry.Rule.RecordingRule.Labels.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "required label not set",
 				Details:  maybeComment(c.comment),
@@ -105,9 +107,9 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 				Diagnostics: []diags.Diagnostic{
 					{
 						Message:     fmt.Sprintf("`%s` label is required.", c.keyRe.original),
-						Pos:         rule.RecordingRule.Labels.Key.Pos,
+						Pos:         entry.Rule.RecordingRule.Labels.Key.Pos,
 						FirstColumn: 1,
-						LastColumn:  len(rule.RecordingRule.Labels.Key.Value),
+						LastColumn:  len(entry.Rule.RecordingRule.Labels.Key.Value),
 					},
 				},
 			})
@@ -116,13 +118,13 @@ func (c LabelCheck) checkRecordingRule(rule parser.Rule) (problems []Problem) {
 	}
 
 	if c.tokenRe != nil {
-		for _, match := range c.tokenRe.MustExpand(rule).FindAllString(val.Value, -1) {
-			problems = append(problems, c.checkValue(rule, match, val)...)
+		for _, match := range c.tokenRe.MustExpand(entry.Rule).FindAllString(val.Value, -1) {
+			problems = append(problems, c.checkValue(entry.Rule, match, val)...)
 		}
 		return problems
 	}
 
-	problems = append(problems, c.checkValue(rule, val.Value, val)...)
+	problems = append(problems, c.checkValue(entry.Rule, val.Value, val)...)
 	return problems
 }
 
@@ -148,7 +150,7 @@ func (c LabelCheck) checkAlertingRule(entry discovery.Entry) (problems []Problem
 
 	labels := make([]*parser.YamlKeyValue, 0, len(entryLabels.Items))
 
-	for _, lab := range entry.Labels().Items {
+	for _, lab := range entryLabels.Items {
 		if c.keyRe.MustExpand(entry.Rule).MatchString(lab.Key.Value) {
 			labels = append(labels, lab)
 		}

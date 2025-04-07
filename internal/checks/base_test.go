@@ -107,16 +107,17 @@ type otherPromsFn func(string) []*promapi.FailoverGroup
 type snapshotFn func(string) string
 
 type checkTest struct {
-	prometheus  newPrometheusFn
-	otherProms  otherPromsFn
-	ctx         newCtxFn
-	checker     newCheckFn
-	snapshot    snapshotFn
-	description string
-	content     string
-	entries     []discovery.Entry
-	mocks       []*prometheusMock
-	problems    bool
+	prometheus    newPrometheusFn
+	otherProms    otherPromsFn
+	ctx           newCtxFn
+	checker       newCheckFn
+	snapshot      snapshotFn
+	description   string
+	content       string
+	entries       []discovery.Entry
+	mocks         []*prometheusMock
+	problems      bool
+	contentStrict bool
 }
 
 type Snapshot struct {
@@ -177,7 +178,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 			}
 
 			ctx, cancel := context.WithCancel(t.Context())
-			entries, err := parseContent(tc.content)
+			entries, err := parseContent(tc.content, tc.contentStrict)
 			require.NoError(t, err, "cannot parse rule content")
 			for _, entry := range entries {
 				if tc.ctx != nil {
@@ -239,7 +240,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 - record: foo
   expr: 'foo{}{}'
-`)
+`, false)
 		require.NoError(t, err, "cannot parse rule content")
 		t.Run(tc.description+" (bogus rules)", func(_ *testing.T) {
 			for _, entry := range entries {
@@ -249,8 +250,8 @@ func runTests(t *testing.T, testCases []checkTest) {
 	}
 }
 
-func parseContent(content string) (entries []discovery.Entry, _ error) {
-	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
+func parseContent(content string, isStrict bool) (entries []discovery.Entry, _ error) {
+	p := parser.NewParser(isStrict, parser.PrometheusSchema, model.UTF8Validation)
 	file, _ := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
 		return nil, file.Error
@@ -265,6 +266,8 @@ func parseContent(content string) (entries []discovery.Entry, _ error) {
 				},
 				ModifiedLines: rule.Lines.Expand(),
 				Rule:          rule,
+				Group:         &group,
+				File:          &file,
 			})
 		}
 	}
@@ -273,7 +276,7 @@ func parseContent(content string) (entries []discovery.Entry, _ error) {
 }
 
 func mustParseContent(content string) (entries []discovery.Entry) {
-	entries, err := parseContent(content)
+	entries, err := parseContent(content, false)
 	if err != nil {
 		panic(err)
 	}

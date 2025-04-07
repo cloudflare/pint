@@ -77,13 +77,13 @@ func (p Path) String() string {
 
 type Entry struct {
 	PathError      error
+	File           *parser.File  `json:"-"`
+	Group          *parser.Group `json:"-"`
 	Path           Path
 	Owner          string
 	ModifiedLines  []int
 	DisabledChecks []string
-	File           *parser.File `json:"-"`
 	Rule           parser.Rule
-	Group          *parser.Group `json:"-"`
 	State          ChangeType
 }
 

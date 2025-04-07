@@ -121,6 +121,39 @@
 
 ---
 
+[TestLabelCheck/invalid_value_in_alerting_rule_/_relaxed_/_required - 1]
+- description: invalid value in alerting rule / relaxed / required
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        severity: bogus
+      rules:
+      - alert: foo
+        expr: rate(foo[1m])
+  output: |
+    5 |     severity: bogus
+                      ^^^^^ `severity` label value must match `^critical|info$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical|info$`.'
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 5
+    lines:
+        first: 5
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
 [TestLabelCheck/invalid_value_in_alerting_rule_/_required - 1]
 - description: invalid value in alerting rule / required
   content: |
@@ -146,6 +179,39 @@
     lines:
         first: 4
         last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_alerting_rule_/_strict_/_required - 1]
+- description: invalid value in alerting rule / strict / required
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        severity: bogus
+      rules:
+      - alert: foo
+        expr: rate(foo[1m])
+  output: |
+    5 |     severity: bogus
+                      ^^^^^ `severity` label value must match `^critical|info$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical|info$`.'
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 5
+    lines:
+        first: 5
+        last: 5
     severity: 1
     anchor: 0
 
@@ -251,6 +317,39 @@
 
 ---
 
+[TestLabelCheck/invalid_value_in_recording_rule_/_relaxed_/_required - 1]
+- description: invalid value in recording rule / relaxed / required
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        severity: bogus
+      rules:
+      - record: foo
+        expr: rate(foo[1m])
+  output: |
+    5 |     severity: bogus
+                      ^^^^^ `severity` label value must match `^critical|info$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical|info$`.'
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 5
+    lines:
+        first: 5
+        last: 5
+    severity: 1
+    anchor: 0
+
+---
+
 [TestLabelCheck/invalid_value_in_recording_rule_/_required - 1]
 - description: invalid value in recording rule / required
   content: |
@@ -276,6 +375,39 @@
     lines:
         first: 4
         last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestLabelCheck/invalid_value_in_recording_rule_/_strict_/_required - 1]
+- description: invalid value in recording rule / strict / required
+  content: |4
+    groups:
+    - name: mygroup
+      labels:
+        severity: bogus
+      rules:
+      - record: foo
+        expr: rate(foo[1m])
+  output: |
+    5 |     severity: bogus
+                      ^^^^^ `severity` label value must match `^critical|info$`.
+  problem:
+    reporter: rule/label
+    summary: invalid label value
+    details: ""
+    diagnostics:
+        - message: '`severity` label value must match `^critical|info$`.'
+          pos:
+            - line: 5
+              firstcolumn: 15
+              lastcolumn: 19
+          firstcolumn: 1
+          lastcolumn: 5
+    lines:
+        first: 5
+        last: 5
     severity: 1
     anchor: 0
 
@@ -429,6 +561,11 @@
 
 ---
 
+[TestLabelCheck/no_labels_in_alerting_rule_/_relaxed_/_required_/_group_label - 1]
+[]
+
+---
+
 [TestLabelCheck/no_labels_in_alerting_rule_/_required - 1]
 - description: no labels in alerting rule / required
   content: |
@@ -457,7 +594,17 @@
 
 ---
 
+[TestLabelCheck/no_labels_in_alerting_rule_/_strict_/_required_/_group_label - 1]
+[]
+
+---
+
 [TestLabelCheck/no_labels_in_recording_rule_/_not_required - 1]
+[]
+
+---
+
+[TestLabelCheck/no_labels_in_recording_rule_/_relaxed_/_required_/_group_label - 1]
 []
 
 ---
@@ -487,6 +634,11 @@
         last: 2
     severity: 1
     anchor: 0
+
+---
+
+[TestLabelCheck/no_labels_in_recording_rule_/_strict_/_required_/_group_label - 1]
+[]
 
 ---
 
