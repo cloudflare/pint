@@ -81,9 +81,9 @@ type Entry struct {
 	Owner          string
 	ModifiedLines  []int
 	DisabledChecks []string
-	File           parser.File `json:"-"`
+	File           *parser.File `json:"-"`
 	Rule           parser.Rule
-	Group          parser.Group `json:"-"`
+	Group          *parser.Group `json:"-"`
 	State          ChangeType
 }
 
@@ -91,11 +91,19 @@ func (e Entry) Labels() (ym parser.YamlMap) {
 	switch {
 	case e.Rule.AlertingRule != nil && e.Rule.AlertingRule.Labels != nil:
 		ym.Key = e.Rule.AlertingRule.Labels.Key
-		ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.AlertingRule.Labels).Items
+		if e.Group != nil && e.Group.Labels != nil {
+			ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.AlertingRule.Labels).Items
+		} else {
+			ym.Items = e.Rule.AlertingRule.Labels.Items
+		}
 	case e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Labels != nil:
 		ym.Key = e.Rule.RecordingRule.Labels.Key
-		ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.RecordingRule.Labels).Items
-	case e.Group.Labels != nil:
+		if e.Group != nil && e.Group.Labels != nil {
+			ym.Items = parser.MergeMaps(e.Group.Labels, e.Rule.RecordingRule.Labels).Items
+		} else {
+			ym.Items = e.Rule.RecordingRule.Labels.Items
+		}
+	case e.Group != nil && e.Group.Labels != nil:
 		ym.Key = e.Group.Labels.Key
 		ym.Items = e.Group.Labels.Items
 	}
@@ -217,8 +225,8 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 					Name:          sourcePath,
 					SymlinkTarget: reportedPath,
 				},
-				File:           file,
-				Group:          group,
+				File:           &file,
+				Group:          &group,
 				Rule:           rule,
 				ModifiedLines:  rule.Lines.Expand(),
 				Owner:          ruleOwner,
