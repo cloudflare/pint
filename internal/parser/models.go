@@ -102,7 +102,7 @@ func (ym YamlMap) GetValue(key string) *YamlNode {
 	return nil
 }
 
-func (ym *YamlMap) SetValue(item *YamlKeyValue) {
+func (ym *YamlMap) setValue(item *YamlKeyValue) {
 	for i := range ym.Items {
 		if ym.Items[i].Key.Value == item.Key.Value {
 			ym.Items[i].Value = item.Value
@@ -407,7 +407,7 @@ func MergeMaps(a, b *YamlMap) *YamlMap {
 	}
 
 	for _, item := range b.Items {
-		dst.SetValue(item)
+		dst.setValue(item)
 	}
 
 	return dst

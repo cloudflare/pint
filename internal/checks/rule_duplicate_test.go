@@ -14,7 +14,7 @@ import (
 func TestRuleDuplicateCheck(t *testing.T) {
 	xxxEntries := mustParseContent("- record: foo\n  expr: up == 0\n")
 	for i := range xxxEntries {
-		xxxEntries[i].Path.SymlinkTarget = "xxx.yml"
+		xxxEntries[i].Path.Name = "xxx.yml"
 	}
 
 	testCases := []checkTest{
@@ -168,6 +168,28 @@ func TestRuleDuplicateCheck(t *testing.T) {
 - record: job:up:sum
   expr: sum by(job) (up)
 `),
+		},
+		{
+			description: "ignores rules for different Prometheus servers",
+			content:     "- record: foo\n  expr: up == 0\n",
+			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
+				return checks.NewRuleDuplicateCheck(prom)
+			},
+			prometheus: func(uri string) *promapi.FailoverGroup {
+				return promapi.NewFailoverGroup(
+					"prom",
+					uri,
+					[]*promapi.Prometheus{
+						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{}, time.Second, 4, 100, nil),
+					},
+					true,
+					"up",
+					[]*regexp.Regexp{regexp.MustCompile("fake.yml")},
+					nil,
+					nil,
+				)
+			},
+			entries: xxxEntries,
 		},
 	}
 
