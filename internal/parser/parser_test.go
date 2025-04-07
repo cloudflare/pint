@@ -28,67 +28,63 @@ func TestParse(t *testing.T) {
 
 	testCases := []testCaseT{
 		{
-			input:  nil,
-			output: parser.File{},
+			input: nil,
+			output: parser.File{
+				IsRelaxed: true,
+			},
 		},
 		{
-			input:  []byte{},
-			output: parser.File{},
+			input: []byte{},
+			output: parser.File{
+				IsRelaxed: true,
+			},
 		},
 		{
-			input:  []byte(""),
-			output: parser.File{},
+			input: []byte(""),
+			output: parser.File{
+				IsRelaxed: true,
+			},
 		},
 		{
-			input:  []byte("\n"),
-			output: parser.File{},
+			input: []byte("\n"),
+			output: parser.File{
+				IsRelaxed: true,
+			},
 		},
 		{
-			input:  []byte("\n\n\n"),
-			output: parser.File{},
+			input: []byte("\n\n\n"),
+			output: parser.File{
+				IsRelaxed: true,
+			},
 		},
 		{
 			input: []byte("---"),
 			output: parser.File{
 				IsRelaxed: true,
-				Groups: []parser.Group{
-					{},
-				},
 			},
 		},
 		{
 			input: []byte("---\n"),
 			output: parser.File{
 				IsRelaxed: true,
-				Groups: []parser.Group{
-					{},
-				},
 			},
 		},
 		{
 			input: []byte("\n---\n\n---\n"),
 			output: parser.File{
 				IsRelaxed: true,
-				Groups: []parser.Group{
-					{},
-					{},
-				},
 			},
 		},
 		{
 			input: []byte("\n---\n\n---\n---"),
 			output: parser.File{
 				IsRelaxed: true,
-				Groups: []parser.Group{
-					{},
-					{},
-					{},
-				},
 			},
 		},
 		{
 			input: []byte(string("! !00 \xf6")),
 			output: parser.File{
+				IsRelaxed: true,
 				Error: parser.ParseError{
 					Err:  errors.New("yaml: incomplete UTF-8 octet sequence"),
 					Line: 1,
@@ -238,6 +234,7 @@ func TestParse(t *testing.T) {
 		{
 			input: []byte("- record: - foo\n"),
 			output: parser.File{
+				IsRelaxed: true,
 				Error: parser.ParseError{
 					Err:  errors.New("yaml: block sequence entries are not allowed in this context"),
 					Line: 1,
@@ -247,6 +244,7 @@ func TestParse(t *testing.T) {
 		{
 			input: []byte("- record: foo  expr: sum(\n"),
 			output: parser.File{
+				IsRelaxed: true,
 				Error: parser.ParseError{
 					Err:  errors.New("yaml: mapping values are not allowed in this context"),
 					Line: 1,
@@ -256,6 +254,7 @@ func TestParse(t *testing.T) {
 		{
 			input: []byte("- record\n\texpr: foo\n"),
 			output: parser.File{
+				IsRelaxed: true,
 				Error: parser.ParseError{
 					Err:  errors.New("found a tab character that violates indentation"),
 					Line: 2,
@@ -708,6 +707,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "custom_rules",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 9},
@@ -952,6 +952,7 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "example-app-alerts",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 13, Last: 14},
@@ -975,6 +976,7 @@ data:
 						},
 					},
 					{
+						Name: "other alerts",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 28, Last: 29},
@@ -1029,6 +1031,7 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "example-app-alerts",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 13, Last: 20},
@@ -1134,6 +1137,7 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "haproxy.api_server.rules",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 4, Last: 11},
@@ -1220,6 +1224,7 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "certmanager",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -1359,6 +1364,7 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "certmanager",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 4, Last: 8},
@@ -1878,6 +1884,7 @@ data:
 			// Label values are invalid only if they aren't valid UTF-8 strings
 			// which also makes them unparsable by YAML.
 			output: parser.File{
+				IsRelaxed: true,
 				Error: parser.ParseError{
 					Err:  errors.New("yaml: invalid Unicode character"),
 					Line: 1,
@@ -2363,6 +2370,7 @@ data:
   labels: !! "SGVsbG8sIFdvcmxkIQ=="
 `),
 			output: parser.File{
+				IsRelaxed: true,
 				Error: parser.ParseError{
 					Err:  errors.New("did not find expected tag URI"),
 					Line: 4,
@@ -2453,7 +2461,6 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "", // FIXME foo
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
@@ -2477,7 +2484,6 @@ data:
 						},
 					},
 					{
-						Name: "", // FIXME bar
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -2500,7 +2506,6 @@ data:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "", // FIXME foo
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
@@ -2524,7 +2529,6 @@ data:
 						},
 					},
 					{
-						Name: "", // FIXME bar
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 6},
@@ -2565,6 +2569,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "v1",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 9},
@@ -2774,7 +2779,7 @@ groups:
 			output: parser.File{
 				Groups: []parser.Group{
 					{
-						Name: "bar", // FIXME "bob" ?
+						Name: "bar",
 						Error: parser.ParseError{
 							Err:  errors.New("duplicated key name"),
 							Line: 4,
@@ -4098,6 +4103,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "foo",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -4136,6 +4142,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
+						Name: "foo",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -4174,7 +4181,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "", // FIXME foo
+						Name: "foo",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
@@ -4310,7 +4317,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "", // FIXME mygroup
+						Name: "mygroup",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 6, Last: 7},
@@ -4562,7 +4569,7 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name: "", // FIXME "foo"
+						Name: "foo",
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 8},
@@ -4738,8 +4745,34 @@ groups:
 				IsRelaxed: true,
 				Groups: []parser.Group{
 					{
-						Name:     "", // FIXME xxx
-						Interval: 0,  // FIXME time.Minute*3
+						Name:     "xxx",
+						Interval: time.Minute * 3,
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  interval: 3m
+  rules: []
+---
+groups:
+- name: yyy
+  interval: 2m
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name:     "xxx",
+						Interval: time.Minute * 3,
+					},
+					{
+						Name:     "yyy",
+						Interval: time.Minute * 2,
 					},
 				},
 			},
@@ -4838,6 +4871,148 @@ groups:
 						Error: parser.ParseError{
 							Err:  errors.New("duplicated labels key foo"),
 							Line: 7,
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  interval: 3m
+  query_offset: 1s
+  limit: 5
+  labels:
+    foo: bar
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name:        "xxx",
+						Interval:    time.Minute * 3,
+						QueryOffset: time.Second,
+						Limit:       5,
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Value: "foo",
+									},
+									Value: &parser.YamlNode{
+										Value: "bar",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  labels:
+    - foo: bar
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "xxx",
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Value: "labels",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  labels:
+    foo: 1
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "xxx",
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Value: "foo",
+									},
+									Value: &parser.YamlNode{
+										Value: "1",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+groups:
+- name: xxx
+  labels:
+    foo: bar
+    bob: foo
+    foo: bob
+  rules: []
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "xxx",
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Value: "foo",
+									},
+									Value: &parser.YamlNode{
+										Value: "bar",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Value: "bob",
+									},
+									Value: &parser.YamlNode{
+										Value: "foo",
+									},
+								},
+								{
+									Key: &parser.YamlNode{
+										Value: "foo",
+									},
+									Value: &parser.YamlNode{
+										Value: "bob",
+									},
+								},
+							},
 						},
 					},
 				},

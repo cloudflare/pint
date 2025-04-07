@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"gopkg.in/yaml.v3"
 
@@ -51,6 +52,9 @@ type Parser struct {
 func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 	cr = newContentReader(src)
 	dec := yaml.NewDecoder(cr)
+
+	f.IsRelaxed = !p.isStrict
+
 	var index int
 	var g []Group
 	for {
@@ -59,11 +63,13 @@ func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 		if errors.Is(decodeErr, io.EOF) {
 			break
 		}
+
 		if decodeErr != nil {
 			f.Error = tryDecodingYamlError(decodeErr)
 			return f, cr
 		}
 		index++
+
 		if p.isStrict {
 			g, f.Error = parseGroups(&doc, p.schema, 0, 0, cr.lines)
 			if f.Error.Err != nil {
@@ -71,11 +77,9 @@ func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 			}
 			f.Groups = append(f.Groups, g...)
 		} else {
-			f.IsRelaxed = true
-			f.Groups = append(f.Groups, Group{ // nolint: exhaustruct
-				Rules: p.parseNode(&doc, 0, 0, cr.lines),
-			})
+			f.Groups = append(f.Groups, p.parseNode(&doc, nil, nil, 0, 0, cr.lines)...)
 		}
+
 		if index > 1 && p.isStrict {
 			f.Error = ParseError{
 				Err: errors.New("multi-document YAML files are not allowed"),
@@ -88,61 +92,98 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 	return f, cr
 }
 
-func (p *Parser) parseNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rules []Rule) {
-	ret, isEmpty := parseRule(node, offsetLine, offsetColumn, contentLines)
-	if !isEmpty {
-		rules = append(rules, ret)
-		return rules
-	}
-
-	var rule Rule
-	for _, root := range node.Content {
-		// nolint: exhaustive
-		switch root.Kind {
-		case yaml.SequenceNode:
-			for _, n := range root.Content {
-				rules = append(rules, p.parseNode(n, offsetLine, offsetColumn, contentLines)...)
-			}
-		case yaml.MappingNode:
-			rule, isEmpty = parseRule(root, offsetLine, offsetColumn, contentLines)
-			if !isEmpty {
-				rules = append(rules, rule)
-			} else {
-				for _, n := range root.Content {
-					rules = append(rules, p.parseNode(n, offsetLine, offsetColumn, contentLines)...)
+func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, offsetColumn int, contentLines []string) (groups []Group) {
+	switch node.Kind { // nolint: exhaustive
+	case yaml.SequenceNode:
+		if parent != nil && nodeValue(parent) == "groups" {
+			for _, n := range unpackNodes(node) {
+				if g, rulesMap, ok := tryParseGroup(n, offsetLine, offsetColumn, contentLines); ok {
+					groups = append(groups, p.parseNode(rulesMap.val, rulesMap.key, &g, offsetLine, offsetColumn, contentLines)...)
 				}
 			}
-		case yaml.ScalarNode:
-			if root.Value != strings.Join(contentLines, "\n") && root.Line < len(contentLines) {
-				var n yaml.Node
-				// FIXME there must be a better way.
-				// If we have YAML inside YAML:
-				// alerts: |
-				//   groups:
-				//     rules: ...
-				// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
-				// Right now we read the line where it's in the file and count leading spaces.
-				if err := yaml.Unmarshal([]byte(root.Value), &n); err == nil {
-					rules = append(rules,
-						p.parseNode(
-							&n,
-							offsetLine+root.Line,
-							offsetColumn+countLeadingSpace(contentLines[root.Line]),
-							strings.Split(root.Value, "\n"),
-						)...,
-					)
-				}
+			return groups
+		}
+		// Try parsing rules.
+		if group == nil {
+			group = &Group{} // nolint: exhaustruct
+		}
+		for _, n := range unpackNodes(node) {
+			if ret, isEmpty := parseRule(n, offsetLine, offsetColumn, contentLines); !isEmpty {
+				group.Rules = append(group.Rules, ret)
+			}
+		}
+		// Handle empty rules within a group.
+		if len(group.Rules) > 0 || (parent != nil && nodeValue(parent) == "rules" && len(groups) == 0 && group != nil) {
+			groups = append(groups, *group)
+		}
+		return groups
+	case yaml.MappingNode:
+		for _, field := range mappingNodes(node) {
+			groups = append(groups, p.parseNode(field.val, field.key, group, offsetLine, offsetColumn, contentLines)...)
+		}
+		return groups
+	case yaml.ScalarNode:
+		if strings.Count(node.Value, "\n") > 1 && node.Value != strings.Join(contentLines, "\n") && node.Line < len(contentLines) {
+			var n yaml.Node
+			// FIXME there must be a better way.
+			// If we have YAML inside YAML:
+			// alerts: |
+			//   groups:
+			//     rules: ...
+			// Then we need to get the offset of `groups` inside the FILE, not inside the YAML node value.
+			// Right now we read the line where it's in the file and count leading spaces.
+			if err := yaml.Unmarshal([]byte(node.Value), &n); err == nil {
+				groups = append(groups,
+					p.parseNode(
+						&n,
+						node,
+						group,
+						offsetLine+node.Line,
+						offsetColumn+countLeadingSpace(contentLines[node.Line]),
+						strings.Split(node.Value, "\n"),
+					)...,
+				)
+				return groups
 			}
 		}
 	}
-	return rules
+
+	for _, child := range unpackNodes(node) {
+		groups = append(groups, p.parseNode(child, node, group, offsetLine, offsetColumn, contentLines)...)
+	}
+
+	return groups
+}
+
+func tryParseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (g Group, rules yamlMap, _ bool) {
+	for _, e := range mappingNodes(node) {
+		switch val := nodeValue(e.key); val {
+		case "name":
+			g.Name = nodeValue(e.val)
+		case "interval":
+			if interval, err := model.ParseDuration(nodeValue(e.val)); err == nil {
+				g.Interval = time.Duration(interval)
+			}
+		case "limit":
+			if limit, err := strconv.Atoi(nodeValue(e.val)); err == nil {
+				g.Limit = limit
+			}
+		case "query_offset":
+			if queryOffset, err := model.ParseDuration(nodeValue(e.val)); err == nil {
+				g.QueryOffset = time.Duration(queryOffset)
+			}
+		case "labels":
+			g.Labels = newYamlMap(e.key, e.val, offsetLine, offsetColumn, contentLines)
+		case "rules":
+			if e.val.Kind == yaml.SequenceNode {
+				rules = e
+			}
+		}
+	}
+	return g, rules, g.Name != "" && rules.key != nil
 }
 
 func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rule Rule, _ bool) {
-	if node.Kind != yaml.MappingNode {
-		return rule, true
-	}
-
 	var recordPart *YamlNode
 	var exprPart *PromQLExpr
 	var labelsPart *YamlMap
