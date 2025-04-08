@@ -1,0 +1,135 @@
+
+[TestGetChecksForRule/prometheus_check_with_prometheus_servers_and_disable_comment - 1]
+title: prometheus check with prometheus servers and disable comment
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        },
+        {
+          "name": "prom2",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "cost": {}
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            match: promql/series(prom1)
+          type: 10
+          offset: 0
+        - value:
+            match: query/cost(prom2)
+          type: 10
+          offset: 0
+        - value:
+            match: promql/rate(prom2)
+          type: 10
+          offset: 0
+        - value:
+            match: promql/vector_matching(prom1)
+          type: 10
+          offset: 0
+        - value:
+            match: rule/duplicate(prom1)
+          type: 10
+          offset: 0
+        - value:
+            match: labels/conflict(prom2)
+          type: 10
+          offset: 0
+        - value:
+            match: alerts/external_labels(prom2)
+          type: 10
+          offset: 0
+        - value:
+            match: promql/counter(prom1)
+          type: 10
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+    - promql/rate(prom1)
+    - promql/range_query(prom1)
+    - labels/conflict(prom1)
+    - alerts/external_labels(prom1)
+    - alerts/absent(prom1)
+    - promql/series(prom2)
+    - promql/vector_matching(prom2)
+    - promql/range_query(prom2)
+    - rule/duplicate(prom2)
+    - promql/counter(prom2)
+    - alerts/absent(prom2)
+    - query/cost(prom1)
+
+---

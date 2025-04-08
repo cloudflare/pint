@@ -1,0 +1,71 @@
+
+[TestGetChecksForRule/check_enabled_globally_but_disabled_via_rule{} - 1]
+title: check enabled globally but disabled via rule{}
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "rules": [
+        {
+          "match": [
+            {
+              "kind": "recording"
+            }
+          ],
+          "disable": [
+            "rule/duplicate"
+          ]
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+
+---

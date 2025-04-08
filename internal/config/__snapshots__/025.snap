@@ -1,0 +1,98 @@
+
+[TestGetChecksForRule/checks_disabled_via_config - 1]
+title: checks disabled via config
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ],
+        "disabled": [
+          "promql/counter",
+          "promql/rate",
+          "promql/vector_matching",
+          "promql/range_query",
+          "rule/duplicate",
+          "labels/conflict",
+          "alerts/absent"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "alerts": {
+            "range": "1h",
+            "step": "1m",
+            "resolve": "5m"
+          }
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            match: promql/series
+          type: 10
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+    - alerts/external_labels(prom1)
+    - alerts/count(prom1)
+
+---

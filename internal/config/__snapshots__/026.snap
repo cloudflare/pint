@@ -1,0 +1,63 @@
+
+[TestGetChecksForRule/single_check_enabled_via_config - 1]
+title: single check enabled via config
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {},
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "alerts": {
+            "range": "1h",
+            "step": "1m",
+            "resolve": "5m"
+          }
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+    - promql/rate(prom1)
+    - promql/series(prom1)
+    - promql/vector_matching(prom1)
+    - promql/range_query(prom1)
+    - rule/duplicate(prom1)
+    - labels/conflict(prom1)
+    - alerts/external_labels(prom1)
+    - promql/counter(prom1)
+    - alerts/absent(prom1)
+    - alerts/count(prom1)
+
+---

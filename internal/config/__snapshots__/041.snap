@@ -1,0 +1,92 @@
+
+[TestGetChecksForRule/two_prometheus_servers_/_disable_checks_via_file/disable_comment - 1]
+title: two prometheus servers / disable checks via file/disable comment
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ],
+        "disabled": [
+          "alerts/template",
+          "alerts/external_labels",
+          "alerts/absent"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost/1",
+          "timeout": "1s",
+          "uptime": "up",
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        },
+        {
+          "name": "prom2",
+          "uri": "http://localhost/2",
+          "timeout": "1s",
+          "uptime": "up",
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            match: promql/series
+          type: 10
+          offset: 0
+        - value:
+            match: promql/range_query
+          type: 10
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+
+---

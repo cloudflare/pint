@@ -1,0 +1,159 @@
+
+[TestGetChecksForRule/multiple_cost_checks - 1]
+title: multiple cost checks
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        },
+        {
+          "name": "prom2",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "cost": {
+            "comment": "this is rule comment",
+            "severity": "info"
+          }
+        },
+        {
+          "cost": {
+            "severity": "warning",
+            "maxSeries": 10000
+          }
+        },
+        {
+          "cost": {
+            "severity": "bug",
+            "maxSeries": 20000
+          }
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            match: promql/counter
+          type: 10
+          offset: 0
+        - value:
+            match: promql/series
+          type: 10
+          offset: 0
+        - value:
+            match: promql/rate
+          type: 10
+          offset: 0
+        - value:
+            match: promql/vector_matching(prom1)
+          type: 10
+          offset: 0
+        - value:
+            match: promql/vector_matching(prom2)
+          type: 10
+          offset: 0
+        - value:
+            match: promql/range_query
+          type: 10
+          offset: 0
+        - value:
+            match: rule/duplicate
+          type: 10
+          offset: 0
+        - value:
+            match: labels/conflict
+          type: 10
+          offset: 0
+        - value:
+            match: alerts/external_labels
+          type: 10
+          offset: 0
+        - value:
+            match: promql/impossible
+          type: 10
+          offset: 0
+        - value:
+            match: promql/fragile
+          type: 10
+          offset: 0
+        - value:
+            match: promql/regexp
+          type: 10
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - alerts/absent(prom1)
+    - alerts/absent(prom2)
+    - query/cost(prom1)
+    - query/cost(prom2)
+    - query/cost(prom1:10000)
+    - query/cost(prom2:10000)
+    - query/cost(prom1:20000)
+    - query/cost(prom2:20000)
+
+---

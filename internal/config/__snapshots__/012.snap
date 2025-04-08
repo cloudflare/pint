@@ -1,0 +1,91 @@
+
+[TestGetChecksForRule/multiple_checks_and_disable_comment - 1]
+title: multiple checks and disable comment
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "rules": [
+        {
+          "aggregate": [
+            {
+              "name": ".+",
+              "severity": "bug",
+              "keep": [
+                "job"
+              ]
+            },
+            {
+              "name": ".+",
+              "comment": "this is rule comment",
+              "severity": "bug",
+              "strip": [
+                "instance",
+                "rack"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            match: promql/aggregate(instance:false)
+          type: 10
+          offset: 0
+        - value:
+            match: promql/impossible
+          type: 10
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/aggregate(job:true)
+    - promql/aggregate(rack:false)
+
+---
