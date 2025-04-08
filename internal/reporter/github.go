@@ -55,7 +55,13 @@ func (pr ghPR) getFile(path string) *github.CommitFile {
 
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
-func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, headCommit string) (_ GithubReporter, err error) {
+func NewGithubReporter(
+	version, baseURL, uploadURL string,
+	timeout time.Duration,
+	token, owner, repo string,
+	prNum, maxComments int,
+	headCommit string,
+) (_ GithubReporter, err error) {
 	slog.Info(
 		"Will report problems to GitHub",
 		slog.String("baseURL", baseURL),
@@ -140,7 +146,13 @@ func (gr GithubReporter) List(ctx context.Context, _ any) ([]ExistingComment, er
 	defer cancel()
 
 	slog.Debug("Getting the list of pull request comments", slog.Int("pr", gr.prNum))
-	existing, _, err := gr.client.PullRequests.ListComments(reqCtx, gr.owner, gr.repo, gr.prNum, nil)
+	existing, _, err := gr.client.PullRequests.ListComments(
+		reqCtx,
+		gr.owner,
+		gr.repo,
+		gr.prNum,
+		nil,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list pull request reviews: %w", err)
 	}
@@ -229,7 +241,9 @@ func (gr GithubReporter) IsEqual(dst any, existing ExistingComment, pending Pend
 	return strings.Trim(existing.text, "\n") == strings.Trim(pending.text, "\n")
 }
 
-func (gr GithubReporter) findExistingReview(ctx context.Context) (*github.PullRequestReview, error) {
+func (gr GithubReporter) findExistingReview(
+	ctx context.Context,
+) (*github.PullRequestReview, error) {
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
 
@@ -247,8 +261,15 @@ func (gr GithubReporter) findExistingReview(ctx context.Context) (*github.PullRe
 	return nil, nil
 }
 
-func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRequestReview, summary Summary) error {
-	slog.Info("Updating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)))
+func (gr GithubReporter) updateReview(
+	ctx context.Context,
+	review *github.PullRequestReview,
+	summary Summary,
+) error {
+	slog.Info(
+		"Updating pull request review",
+		slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)),
+	)
 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
@@ -265,7 +286,11 @@ func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRe
 }
 
 func (gr GithubReporter) createReview(ctx context.Context, summary Summary) error {
-	slog.Info("Creating pull request review", slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)), slog.String("commit", gr.headCommit))
+	slog.Info(
+		"Creating pull request review",
+		slog.String("repo", fmt.Sprintf("%s/%s", gr.owner, gr.repo)),
+		slog.String("commit", gr.headCommit),
+	)
 
 	reqCtx, cancel := gr.reqContext(ctx)
 	defer cancel()
@@ -402,7 +427,10 @@ func (gr GithubReporter) generalComment(ctx context.Context, body string) error 
 }
 
 func (gr GithubReporter) reqContext(ctx context.Context) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true), gr.timeout)
+	return context.WithTimeout(
+		context.WithValue(ctx, github.SleepUntilPrimaryRateLimitResetWhenRateLimited, true),
+		gr.timeout,
+	)
 }
 
 func (gr GithubReporter) fixCommentLine(dst any, p PendingComment) (string, int) {

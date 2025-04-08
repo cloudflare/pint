@@ -47,8 +47,13 @@ func (c RuleNameCheck) Reporter() string {
 	return RuleNameCheckName
 }
 
-func (c RuleNameCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
-	if entry.Rule.AlertingRule != nil && !c.re.MustExpand(entry.Rule).MatchString(entry.Rule.AlertingRule.Alert.Value) {
+func (c RuleNameCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
+	if entry.Rule.AlertingRule != nil &&
+		!c.re.MustExpand(entry.Rule).MatchString(entry.Rule.AlertingRule.Alert.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    entry.Rule.AlertingRule.Alert.Pos.Lines(),
@@ -66,7 +71,8 @@ func (c RuleNameCheck) Check(_ context.Context, entry discovery.Entry, _ []disco
 			Severity: c.severity,
 		})
 	}
-	if entry.Rule.RecordingRule != nil && !c.re.MustExpand(entry.Rule).MatchString(entry.Rule.RecordingRule.Record.Value) {
+	if entry.Rule.RecordingRule != nil &&
+		!c.re.MustExpand(entry.Rule).MatchString(entry.Rule.RecordingRule.Record.Value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    entry.Rule.RecordingRule.Record.Pos.Lines(),

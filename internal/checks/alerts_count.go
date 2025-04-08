@@ -19,7 +19,13 @@ const (
 	AlertsCheckName = "alerts/count"
 )
 
-func NewAlertsCheck(prom *promapi.FailoverGroup, lookBack, step, resolve time.Duration, minCount int, comment string, severity Severity) AlertsCheck {
+func NewAlertsCheck(
+	prom *promapi.FailoverGroup,
+	lookBack, step, resolve time.Duration,
+	minCount int,
+	comment string,
+	severity Severity,
+) AlertsCheck {
 	return AlertsCheck{
 		prom:     prom,
 		lookBack: lookBack,
@@ -62,7 +68,11 @@ func (c AlertsCheck) Reporter() string {
 	return AlertsCheckName
 }
 
-func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AlertsCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
@@ -75,14 +85,25 @@ func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 
 	qr, err := c.prom.RangeQuery(ctx, entry.Rule.AlertingRule.Expr.Value.Value, params)
 	if err != nil {
-		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(
+			problems,
+			problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug),
+		)
 		return problems
 	}
 
 	if len(qr.Series.Ranges) > 0 {
-		promUptime, err := c.prom.RangeQuery(ctx, fmt.Sprintf("count(%s)", c.prom.UptimeMetric()), params)
+		promUptime, err := c.prom.RangeQuery(
+			ctx,
+			fmt.Sprintf("count(%s)", c.prom.UptimeMetric()),
+			params,
+		)
 		if err != nil {
-			slog.Warn("Cannot detect Prometheus uptime gaps", slog.Any("err", err), slog.String("name", c.prom.Name()))
+			slog.Warn(
+				"Cannot detect Prometheus uptime gaps",
+				slog.Any("err", err),
+				slog.String("name", c.prom.Name()),
+			)
 		} else {
 			// FIXME: gaps are not used
 			qr.Series.FindGaps(promUptime.Series, qr.Series.From, qr.Series.Until)
@@ -111,8 +132,11 @@ func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 	}
 
 	delta := qr.Series.Until.Sub(qr.Series.From).Round(time.Minute)
-	details := fmt.Sprintf(`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
-		qr.URI, url.QueryEscape(entry.Rule.AlertingRule.Expr.Value.Value), output.HumanizeDuration(delta),
+	details := fmt.Sprintf(
+		`To get a preview of the alerts that would fire please [click here](%s/graph?g0.expr=%s&g0.tab=0&g0.range_input=%s).`,
+		qr.URI,
+		url.QueryEscape(entry.Rule.AlertingRule.Expr.Value.Value),
+		output.HumanizeDuration(delta),
 	)
 	if c.comment != "" {
 		details = fmt.Sprintf("%s\n%s", details, maybeComment(c.comment))
@@ -127,7 +151,12 @@ func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 		Severity: c.severity,
 		Diagnostics: []diags.Diagnostic{
 			{
-				Message:     fmt.Sprintf("%s would trigger %d alert(s) in the last %s.", promText(c.prom.Name(), qr.URI), alerts, output.HumanizeDuration(delta)),
+				Message: fmt.Sprintf(
+					"%s would trigger %d alert(s) in the last %s.",
+					promText(c.prom.Name(), qr.URI),
+					alerts,
+					output.HumanizeDuration(delta),
+				),
 				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(entry.Rule.AlertingRule.Expr.Value.Value),

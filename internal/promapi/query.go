@@ -83,7 +83,11 @@ func (q instantQuery) CacheTTL() time.Duration {
 }
 
 func (prom *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, error) {
-	slog.Debug("Scheduling prometheus query", slog.String("uri", prom.safeURI), slog.String("query", expr))
+	slog.Debug(
+		"Scheduling prometheus query",
+		slog.String("uri", prom.safeURI),
+		slog.String("query", expr),
+	)
 
 	key := APIPathQuery + expr
 	prom.locker.lock(key)
@@ -105,7 +109,12 @@ func (prom *Prometheus) Query(ctx context.Context, expr string) (*QueryResult, e
 		Series: result.value.([]Sample),
 		Stats:  result.stats,
 	}
-	slog.Debug("Parsed response", slog.String("uri", prom.safeURI), slog.String("query", expr), slog.Int("series", len(qr.Series)))
+	slog.Debug(
+		"Parsed response",
+		slog.String("uri", prom.safeURI),
+		slog.String("query", expr),
+		slog.Int("series", len(qr.Series)),
+	)
 
 	return &qr, nil
 }
@@ -181,15 +190,27 @@ func streamSamples(r io.Reader) (samples []Sample, stats QueryStats, err error) 
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, stats, APIError{
+			Status:    status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Sprintf("JSON parse error: %s", err),
+		}
 	}
 
 	if status != "success" {
-		return nil, stats, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+		return nil, stats, APIError{
+			Status:    status,
+			ErrorType: decodeErrorType(errType),
+			Err:       errText,
+		}
 	}
 
 	if resultType != "vector" {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected vector, got " + resultType}
+		return nil, stats, APIError{
+			Status:    status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       "invalid result type, expected vector, got " + resultType,
+		}
 	}
 
 	return samples, stats, nil

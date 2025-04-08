@@ -30,7 +30,9 @@ func TestSliceRange(t *testing.T) {
 	printRange := func(tr []TimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s - %s\n", r.Start.Format(time.RFC3339), r.End.Format(time.RFC3339)))
+			buf.WriteString(
+				fmt.Sprintf("%s - %s\n", r.Start.Format(time.RFC3339), r.End.Format(time.RFC3339)),
+			)
 		}
 		return buf.String()
 	}

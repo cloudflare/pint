@@ -96,7 +96,12 @@ func TestPendingCommentToBitBucketComment(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 			out := tc.input.toBitBucketComment(tc.changes)
-			require.Equal(t, tc.output, out, "pendingComment.toBitBucketComment() returned wrong BitBucketPendingComment")
+			require.Equal(
+				t,
+				tc.output,
+				out,
+				"pendingComment.toBitBucketComment() returned wrong BitBucketPendingComment",
+			)
 		})
 	}
 }
@@ -305,7 +310,12 @@ func TestReportToAnnotation(t *testing.T) {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
 			out := reportToAnnotation(tc.input)
-			require.Equal(t, tc.output, out, "reportToAnnotation() returned wrong BitBucketAnnotation")
+			require.Equal(
+				t,
+				tc.output,
+				out,
+				"reportToAnnotation() returned wrong BitBucketAnnotation",
+			)
 		})
 	}
 }

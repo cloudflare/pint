@@ -54,7 +54,13 @@ func TestGitBlame(t *testing.T) {
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 1, "foo.txt", "")
+				content := blameLine(
+					"b33a88cea35abc47f9973983626e1c6f3f3abc44",
+					1,
+					1,
+					"foo.txt",
+					"",
+				)
 				return []byte(content), nil
 			},
 			path: "foo.txt",
@@ -69,7 +75,13 @@ func TestGitBlame(t *testing.T) {
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 5, "foo.txt", "")
+				content := blameLine(
+					"b33a88cea35abc47f9973983626e1c6f3f3abc44",
+					1,
+					5,
+					"foo.txt",
+					"",
+				)
 				return []byte(content), nil
 			},
 			path: "foo.txt",
@@ -84,10 +96,34 @@ func TestGitBlame(t *testing.T) {
 		},
 		{
 			mock: func(_ ...string) ([]byte, error) {
-				content := blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 1, 1, "foo.txt", "") +
-					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 2, 2, "foo.txt", "") +
-					blameLine("82987dec74ba8e434ba393d83491ace784473291", 3, 3, "foo.txt", "") +
-					blameLine("b33a88cea35abc47f9973983626e1c6f3f3abc44", 4, 4, "bar.txt", "")
+				content := blameLine(
+					"b33a88cea35abc47f9973983626e1c6f3f3abc44",
+					1,
+					1,
+					"foo.txt",
+					"",
+				) +
+					blameLine(
+						"b33a88cea35abc47f9973983626e1c6f3f3abc44",
+						2,
+						2,
+						"foo.txt",
+						"",
+					) +
+					blameLine(
+						"82987dec74ba8e434ba393d83491ace784473291",
+						3,
+						3,
+						"foo.txt",
+						"",
+					) +
+					blameLine(
+						"b33a88cea35abc47f9973983626e1c6f3f3abc44",
+						4,
+						4,
+						"bar.txt",
+						"",
+					)
 				return []byte(content), nil
 			},
 			path: "foo.txt",

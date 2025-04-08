@@ -53,7 +53,11 @@ func (c ErrorCheck) Reporter() string {
 	return c.problem.Reporter
 }
 
-func (c ErrorCheck) Check(_ context.Context, _ discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c ErrorCheck) Check(
+	_ context.Context,
+	_ discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	problems = append(problems, c.problem)
 	return problems
 }
@@ -146,8 +150,11 @@ If this file is a template that will be rendered into valid YAML then you can in
 				First: rule.Error.Line,
 				Last:  rule.Error.Line,
 			},
-			Reporter:    yamlParseReporter,
-			Summary:     fmt.Sprintf("This rule is not a valid Prometheus rule: `%s`.", rule.Error.Err.Error()),
+			Reporter: yamlParseReporter,
+			Summary: fmt.Sprintf(
+				"This rule is not a valid Prometheus rule: `%s`.",
+				rule.Error.Err.Error(),
+			),
 			Details:     details,
 			Severity:    Fatal,
 			Diagnostics: nil,

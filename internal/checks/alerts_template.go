@@ -97,7 +97,11 @@ func (c TemplateCheck) Reporter() string {
 	return TemplateCheckName
 }
 
-func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c TemplateCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return nil
 	}
@@ -106,8 +110,16 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 		return nil
 	}
 
-	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
-	data := promTemplate.AlertTemplateData(map[string]string{}, map[string]string{}, "", promql.Sample{})
+	src := utils.LabelsSource(
+		entry.Rule.AlertingRule.Expr.Value.Value,
+		entry.Rule.AlertingRule.Expr.Query.Expr,
+	)
+	data := promTemplate.AlertTemplateData(
+		map[string]string{},
+		map[string]string{},
+		"",
+		promql.Sample{},
+	)
 
 	for _, label := range entry.Labels().Items {
 		if err := checkTemplateSyntax(ctx, label.Key.Value, label.Value.Value, data); err != nil {
@@ -123,7 +135,10 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				Severity: Fatal,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+						Message: fmt.Sprintf(
+							"Template failed to parse with this error: `%s`.",
+							err,
+						),
 						Pos:         label.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(label.Value.Value),
@@ -171,7 +186,10 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 					Severity: Fatal,
 					Diagnostics: []diags.Diagnostic{
 						{
-							Message:     fmt.Sprintf("Template failed to parse with this error: `%s`.", err),
+							Message: fmt.Sprintf(
+								"Template failed to parse with this error: `%s`.",
+								err,
+							),
 							Pos:         annotation.Value.Pos,
 							FirstColumn: 1,
 							LastColumn:  len(annotation.Value.Value),
@@ -179,15 +197,22 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 					},
 				})
 			}
-			problems = append(problems, c.checkQueryLabels(entry.Group, entry.Rule, annotation, src)...)
-			problems = append(problems, c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation)...)
+			problems = append(
+				problems,
+				c.checkQueryLabels(entry.Group, entry.Rule, annotation, src)...)
+			problems = append(
+				problems,
+				c.checkHumanizeIsNeeded(entry.Rule.AlertingRule.Expr, annotation)...)
 		}
 	}
 
 	return problems
 }
 
-func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser.YamlKeyValue) (problems []Problem) {
+func (c TemplateCheck) checkHumanizeIsNeeded(
+	expr parser.PromQLExpr,
+	ann *parser.YamlKeyValue,
+) (problems []Problem) {
 	if !hasValue(ann.Key.Value, ann.Value.Value) {
 		return problems
 	}
@@ -201,7 +226,10 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	for _, call := range utils.HasOuterRate(expr.Query) {
 		dgs := []diags.Diagnostic{
 			{
-				Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
+				Message: fmt.Sprintf(
+					"`%s()` will produce results that are hard to read for humans.",
+					call.Func.Name,
+				),
 				Pos:         expr.Value.Pos,
 				FirstColumn: int(call.PosRange.Start) + 1,
 				LastColumn:  int(call.PosRange.End),
@@ -297,7 +325,10 @@ func checkForValueInLabels(name, text string) (msgs []string) {
 	aliases := aliasesForTemplate(t)
 	for _, node := range t.Root.Nodes {
 		if v, ok := containsAliasedNode(aliases, node, ".Value"); ok {
-			msg := fmt.Sprintf("Using `%s` in labels will generate a new alert on every value change, move it to annotations.", v)
+			msg := fmt.Sprintf(
+				"Using `%s` in labels will generate a new alert on every value change, move it to annotations.",
+				v,
+			)
 			msgs = append(msgs, msg)
 		}
 	}
@@ -466,7 +497,12 @@ func findTemplateVariables(name, text string) (vars []tmplVar, aliases aliasMap,
 	return vars, aliases, true
 }
 
-func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, label *parser.YamlKeyValue, src []utils.Source) (problems []Problem) {
+func (c TemplateCheck) checkQueryLabels(
+	group *parser.Group,
+	rule parser.Rule,
+	label *parser.YamlKeyValue,
+	src []utils.Source,
+) (problems []Problem) {
 	vars, aliases, ok := findTemplateVariables(label.Key.Value, label.Value.Value)
 	if !ok {
 		return nil
@@ -498,7 +534,10 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 							Severity: Bug,
 							Diagnostics: []diags.Diagnostic{
 								{
-									Message:     fmt.Sprintf("Template is using `%s` label but the query results won't have this label.", v.value[1]),
+									Message: fmt.Sprintf(
+										"Template is using `%s` label but the query results won't have this label.",
+										v.value[1],
+									),
 									Pos:         label.Value.Pos,
 									FirstColumn: v.column,
 									LastColumn:  v.column + len(v.value[1]),

@@ -7,8 +7,8 @@ import (
 )
 
 type RangeQuerySettings struct {
-	Max      string `hcl:"max" json:"max"`
-	Comment  string `hcl:"comment,optional" json:"comment,omitempty"`
+	Max      string `hcl:"max"               json:"max"`
+	Comment  string `hcl:"comment,optional"  json:"comment,omitempty"`
 	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 

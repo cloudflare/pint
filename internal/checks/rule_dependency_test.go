@@ -75,7 +75,16 @@ func TestRuleDependencyCheck(t *testing.T) {
 					"prom",
 					uri,
 					[]*promapi.Prometheus{
-						promapi.NewPrometheus("prom", uri, simplePromPublicURI, map[string]string{"X-Debug": "1"}, time.Second, 16, 1000, nil),
+						promapi.NewPrometheus(
+							"prom",
+							uri,
+							simplePromPublicURI,
+							map[string]string{"X-Debug": "1"},
+							time.Second,
+							16,
+							1000,
+							nil,
+						),
 					},
 					true,
 					"up",

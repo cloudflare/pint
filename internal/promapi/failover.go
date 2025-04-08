@@ -86,7 +86,14 @@ type FailoverGroup struct {
 	strictErrors bool
 }
 
-func NewFailoverGroup(name, uri string, servers []*Prometheus, strictErrors bool, uptimeMetric string, include, exclude []*regexp.Regexp, tags []string) *FailoverGroup {
+func NewFailoverGroup(
+	name, uri string,
+	servers []*Prometheus,
+	strictErrors bool,
+	uptimeMetric string,
+	include, exclude []*regexp.Regexp,
+	tags []string,
+) *FailoverGroup {
 	return &FailoverGroup{ // nolint: exhaustruct
 		name:           name,
 		uri:            uri,
@@ -219,7 +226,10 @@ func (fg *FailoverGroup) CleanCache() {
 	}
 }
 
-func (fg *FailoverGroup) Config(ctx context.Context, cacheTTL time.Duration) (cfg *ConfigResult, err error) {
+func (fg *FailoverGroup) Config(
+	ctx context.Context,
+	cacheTTL time.Duration,
+) (cfg *ConfigResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
 		uri = prom.safeURI
@@ -257,7 +267,11 @@ func (fg *FailoverGroup) Query(ctx context.Context, expr string) (qr *QueryResul
 	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 }
 
-func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (rqr *RangeQueryResult, err error) {
+func (fg *FailoverGroup) RangeQuery(
+	ctx context.Context,
+	expr string,
+	params RangeQueryTimes,
+) (rqr *RangeQueryResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
 		uri = prom.safeURI
@@ -272,7 +286,10 @@ func (fg *FailoverGroup) RangeQuery(ctx context.Context, expr string, params Ran
 	return nil, &FailoverGroupError{err: err, uri: uri, isStrict: fg.strictErrors}
 }
 
-func (fg *FailoverGroup) Metadata(ctx context.Context, metric string) (metadata *MetadataResult, err error) {
+func (fg *FailoverGroup) Metadata(
+	ctx context.Context,
+	metric string,
+) (metadata *MetadataResult, err error) {
 	var uri string
 	for _, prom := range fg.servers {
 		uri = prom.safeURI

@@ -13,7 +13,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "doesn't ignore rules with syntax errors",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "some text", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"some text",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -22,7 +30,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "no labels in recording rule / required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -38,7 +54,15 @@ func TestLabelCheck(t *testing.T) {
     level: warning
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					nil,
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -47,7 +71,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "no labels in recording rule / not required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -72,7 +104,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "missing label in recording rule / not required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -80,7 +120,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "invalid value in recording rule / required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: warning\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -89,7 +137,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "invalid value in recording rule / not required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: warning\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -132,7 +188,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "no labels in alerting rule / required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -148,7 +212,15 @@ func TestLabelCheck(t *testing.T) {
     level: warning
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, nil, nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					nil,
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -157,7 +229,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "no labels in alerting rule / not required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -165,7 +245,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "missing label in alerting rule / required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -174,7 +262,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "missing label in alerting rule / not required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    foo: bar\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -182,7 +278,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "invalid value in alerting rule / required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: warning\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -191,7 +295,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "invalid value in alerting rule / not required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: warning\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -200,7 +312,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "valid recording rule / required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: critical\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -208,7 +328,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "valid recording rule / not required",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: critical\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -216,7 +344,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "valid alerting rule / required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: info\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -224,7 +360,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "valid alerting rule / not required",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    severity: info\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, false, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					false,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -232,7 +376,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "templated label value / passing",
 			content:     "- alert: foo\n  expr: sum(foo)\n  for: 5m\n  labels:\n    for: 'must wait 5m to fire'\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("must wait {{$for}} to fire"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("for"),
+					nil,
+					checks.MustTemplatedRegexp("must wait {{$for}} to fire"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -240,7 +392,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "templated label value / not passing",
 			content:     "- alert: foo\n  expr: sum(foo)\n  for: 4m\n  labels:\n    for: 'must wait 5m to fire'\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("for"), nil, checks.MustTemplatedRegexp("must wait {{$for}} to fire"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("for"),
+					nil,
+					checks.MustTemplatedRegexp("must wait {{$for}} to fire"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -249,7 +409,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "invalid value in alerting rule / token / valueRe",
 			content:     "- alert: foo\n  expr: rate(foo[1m])\n  labels:\n    components: api db\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, "", checks.Bug)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("components"),
+					checks.MustRawTemplatedRegexp("\\w+"),
+					checks.MustTemplatedRegexp("api|memcached"),
+					nil,
+					false,
+					"",
+					checks.Bug,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -262,7 +430,17 @@ func TestLabelCheck(t *testing.T) {
 					checks.MustTemplatedRegexp("components"),
 					checks.MustRawTemplatedRegexp("\\w+"),
 					nil,
-					[]string{"api", "memcached", "storage", "prometheus", "kvm", "mysql", "memsql", "haproxy", "postgresql"},
+					[]string{
+						"api",
+						"memcached",
+						"storage",
+						"prometheus",
+						"kvm",
+						"mysql",
+						"memsql",
+						"haproxy",
+						"postgresql",
+					},
 					false,
 					"",
 					checks.Bug,
@@ -275,7 +453,15 @@ func TestLabelCheck(t *testing.T) {
 			description: "invalid value in recording rule / token / valueRe",
 			content:     "- record: foo\n  expr: rate(foo[1m])\n  labels:\n    components: api db\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("components"), checks.MustRawTemplatedRegexp("\\w+"), checks.MustTemplatedRegexp("api|memcached"), nil, false, "", checks.Bug)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("components"),
+					checks.MustRawTemplatedRegexp("\\w+"),
+					checks.MustTemplatedRegexp("api|memcached"),
+					nil,
+					false,
+					"",
+					checks.Bug,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -288,7 +474,16 @@ func TestLabelCheck(t *testing.T) {
 					checks.MustTemplatedRegexp("components"),
 					checks.MustRawTemplatedRegexp("\\w+"),
 					nil,
-					[]string{"api", "memcached", "storage", "prometheus", "kvm", "mysql", "memsql", "haproxy"},
+					[]string{
+						"api",
+						"memcached",
+						"storage",
+						"prometheus",
+						"kvm",
+						"mysql",
+						"memsql",
+						"haproxy",
+					},
 					false,
 					"some text",
 					checks.Warning,
@@ -310,7 +505,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -326,7 +529,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -343,7 +554,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -359,7 +578,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -376,7 +603,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -393,7 +628,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -411,7 +654,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -428,7 +679,15 @@ groups:
     expr: rate(foo[1m])
 `,
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewLabelCheck(checks.MustTemplatedRegexp("severity"), nil, checks.MustTemplatedRegexp("critical|info"), nil, true, "", checks.Warning)
+				return checks.NewLabelCheck(
+					checks.MustTemplatedRegexp("severity"),
+					nil,
+					checks.MustTemplatedRegexp("critical|info"),
+					nil,
+					true,
+					"",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,

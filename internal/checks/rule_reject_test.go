@@ -141,7 +141,13 @@ func TestRejectCheck(t *testing.T) {
 			description: "reject templated regexp / passing",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    foo: alert\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug)
+				return checks.NewRejectCheck(
+					true,
+					true,
+					nil,
+					checks.MustTemplatedRegexp("{{ $alert }}"),
+					checks.Bug,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -149,7 +155,13 @@ func TestRejectCheck(t *testing.T) {
 			description: "reject templated regexp / not passing",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    alert: foo\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRejectCheck(true, true, nil, checks.MustTemplatedRegexp("{{ $alert }}"), checks.Bug)
+				return checks.NewRejectCheck(
+					true,
+					true,
+					nil,
+					checks.MustTemplatedRegexp("{{ $alert }}"),
+					checks.Bug,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,

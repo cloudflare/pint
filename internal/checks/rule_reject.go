@@ -54,13 +54,18 @@ func (c Reject) Reporter() string {
 	return RejectCheckName
 }
 
-func (c Reject) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c Reject) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if c.checkLabels {
 		for _, label := range entry.Labels().Items {
 			problems = append(problems, c.reject(entry.Rule, label)...)
 		}
 	}
-	if c.checkAnnotations && entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Annotations != nil {
+	if c.checkAnnotations && entry.Rule.AlertingRule != nil &&
+		entry.Rule.AlertingRule.Annotations != nil {
 		for _, ann := range entry.Rule.AlertingRule.Annotations.Items {
 			problems = append(problems, c.reject(entry.Rule, ann)...)
 		}
@@ -99,7 +104,10 @@ func (c Reject) reject(rule parser.Rule, label *parser.YamlKeyValue) (problems [
 			Details:  "",
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("value is not allowed to match `%s`.", c.valueRe.anchored),
+					Message: fmt.Sprintf(
+						"value is not allowed to match `%s`.",
+						c.valueRe.anchored,
+					),
 					Pos:         label.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(label.Value.Value) - 1,

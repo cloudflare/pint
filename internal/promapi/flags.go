@@ -119,7 +119,11 @@ func streamFlags(r io.Reader) (flags v1.FlagsResult, err error) {
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, APIError{
+			Status:    status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Sprintf("JSON parse error: %s", err),
+		}
 	}
 
 	if status != "success" {

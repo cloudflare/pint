@@ -239,13 +239,19 @@ func TestChanges(t *testing.T) {
 			title: "rename partial",
 			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
-				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"), 0o644))
+				require.NoError(
+					t,
+					os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"), 0o644),
+				)
 				mustRun(t, "add", "index.txt")
 				gitCommit(t, "init")
 
 				mustRun(t, "checkout", "-b", "v2")
 				mustRun(t, "mv", "index.txt", "second.txt")
-				require.NoError(t, os.WriteFile("second.txt", []byte("1\n2\n3\n4\n5\nX\nX\nX\nX\n"), 0o644))
+				require.NoError(
+					t,
+					os.WriteFile("second.txt", []byte("1\n2\n3\n4\n5\nX\nX\nX\nX\n"), 0o644),
+				)
 				mustRun(t, "add", "second.txt")
 				gitCommit(t, "mv")
 
@@ -277,14 +283,20 @@ func TestChanges(t *testing.T) {
 			title: "rename 100% and edit",
 			setup: func(t *testing.T) git.CommandRunner {
 				mustRun(t, "init", "--initial-branch=main", ".")
-				require.NoError(t, os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"), 0o644))
+				require.NoError(
+					t,
+					os.WriteFile("index.txt", []byte("1\n2\n3\n4\n5\n6\n7\n8\n9\n"), 0o644),
+				)
 				mustRun(t, "add", "index.txt")
 				gitCommit(t, "init")
 
 				mustRun(t, "checkout", "-b", "v2")
 				mustRun(t, "mv", "index.txt", "second.txt")
 				gitCommit(t, "mv")
-				require.NoError(t, os.WriteFile("second.txt", []byte("1\n2\n3\n4\n5\nX\n7\n8\n9\n"), 0o644))
+				require.NoError(
+					t,
+					os.WriteFile("second.txt", []byte("1\n2\n3\n4\n5\nX\n7\n8\n9\n"), 0o644),
+				)
 				mustRun(t, "add", "second.txt")
 				gitCommit(t, "edit")
 
@@ -595,7 +607,10 @@ func TestChanges(t *testing.T) {
 				mustRun(t, "init", "--initial-branch=main", ".")
 				require.NoError(t, os.Mkdir("dir1", 0o755))
 				require.NoError(t, os.Mkdir("dir1/rules", 0o755))
-				require.NoError(t, os.WriteFile("dir1/rules/file1.txt", []byte("a1\na2\na3\n"), 0o644))
+				require.NoError(
+					t,
+					os.WriteFile("dir1/rules/file1.txt", []byte("a1\na2\na3\n"), 0o644),
+				)
 				require.NoError(t, os.WriteFile("dir1/rules/file2.txt", []byte("b1\nb2"), 0o644))
 				mustRun(t, "add", "dir1")
 				gitCommit(t, "init")

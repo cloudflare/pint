@@ -158,12 +158,16 @@ func TestGitHubSettings(t *testing.T) {
 				UploadURI: "http://%41:8080/",
 			},
 			env: map[string]string{"GITHUB_REPOSITORY": ""},
-			err: errors.New(`invalid uploaduri: parse "http://%41:8080/": invalid URL escape "%41"`),
+			err: errors.New(
+				`invalid uploaduri: parse "http://%41:8080/": invalid URL escape "%41"`,
+			),
 		},
 		{
 			conf: GitHub{},
 			env:  map[string]string{"GITHUB_REPOSITORY": "xxx"},
-			err:  errors.New("GITHUB_REPOSITORY is set, but with an invalid repository format: xxx"),
+			err: errors.New(
+				"GITHUB_REPOSITORY is set, but with an invalid repository format: xxx",
+			),
 		},
 		{
 			conf: GitHub{},

@@ -44,7 +44,9 @@ func TestFlags(t *testing.T) {
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`),
+			)
 		}
 	}))
 	defer srv.Close()

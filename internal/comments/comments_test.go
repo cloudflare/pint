@@ -297,8 +297,10 @@ func TestParse(t *testing.T) {
 			input: `# pint file/disable promql/series(http_errors_total{label="this has spaces"})`,
 			output: []comments.Comment{
 				{
-					Type:  comments.FileDisableType,
-					Value: comments.Disable{Match: `promql/series(http_errors_total{label="this has spaces"})`},
+					Type: comments.FileDisableType,
+					Value: comments.Disable{
+						Match: `promql/series(http_errors_total{label="this has spaces"})`,
+					},
 				},
 			},
 		},
@@ -330,8 +332,10 @@ func TestParse(t *testing.T) {
 			input: `# pint disable promql/series(http_errors_total{label="this has spaces"})`,
 			output: []comments.Comment{
 				{
-					Type:  comments.DisableType,
-					Value: comments.Disable{Match: `promql/series(http_errors_total{label="this has spaces"})`},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: `promql/series(http_errors_total{label="this has spaces"})`,
+					},
 				},
 			},
 		},
@@ -339,8 +343,10 @@ func TestParse(t *testing.T) {
 			input: `# pint disable promql/series(http_errors_total{label="this has spaces and a # symbol"})`,
 			output: []comments.Comment{
 				{
-					Type:  comments.DisableType,
-					Value: comments.Disable{Match: `promql/series(http_errors_total{label="this has spaces and a # symbol"})`},
+					Type: comments.DisableType,
+					Value: comments.Disable{
+						Match: `promql/series(http_errors_total{label="this has spaces and a # symbol"})`,
+					},
 				},
 			},
 		},
@@ -423,7 +429,10 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Diagnostic: diags.Diagnostic{
-							Message: fmt.Sprintf("This comment is not a valid pint control comment: invalid snooze timestamp: %s", errUntil("2023-1231")),
+							Message: fmt.Sprintf(
+								"This comment is not a valid pint control comment: invalid snooze timestamp: %s",
+								errUntil("2023-1231"),
+							),
 							Pos: diags.PositionRanges{
 								{
 									Line:        1,
@@ -529,7 +538,10 @@ func TestParse(t *testing.T) {
 					Type: comments.InvalidComment,
 					Value: comments.Invalid{Err: comments.CommentError{
 						Diagnostic: diags.Diagnostic{
-							Message: fmt.Sprintf("This comment is not a valid pint control comment: invalid snooze timestamp: %s", errUntil("2023-1231")),
+							Message: fmt.Sprintf(
+								"This comment is not a valid pint control comment: invalid snooze timestamp: %s",
+								errUntil("2023-1231"),
+							),
 							Pos: diags.PositionRanges{
 								{
 									Line:        1,
@@ -769,7 +781,10 @@ func TestCommentValueString(t *testing.T) {
 			expected: "bob & alice",
 		},
 		{
-			comment:  comments.Snooze{Match: `promql/series({code="500"})`, Until: parseUntil("2023-11-28T00:00:00Z")},
+			comment: comments.Snooze{
+				Match: `promql/series({code="500"})`,
+				Until: parseUntil("2023-11-28T00:00:00Z"),
+			},
 			expected: `2023-11-28T00:00:00Z promql/series({code="500"})`,
 		},
 	}

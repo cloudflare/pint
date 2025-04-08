@@ -53,7 +53,11 @@ func (c VectorMatchingCheck) Reporter() string {
 	return VectorMatchingCheckName
 }
 
-func (c VectorMatchingCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c VectorMatchingCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -62,7 +66,12 @@ func (c VectorMatchingCheck) Check(ctx context.Context, entry discovery.Entry, _
 	return problems
 }
 
-func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode) (problems []Problem) {
+func (c VectorMatchingCheck) checkNode(
+	ctx context.Context,
+	rule parser.Rule,
+	expr parser.PromQLExpr,
+	node *parser.PromQLNode,
+) (problems []Problem) {
 	if n, ok := utils.RemoveConditions(node.Expr.String()).(*promParser.BinaryExpr); ok &&
 		n.VectorMatching != nil &&
 		n.Op != promParser.LOR &&
@@ -71,7 +80,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		q := fmt.Sprintf("count(%s)", n.String())
 		qr, err := c.prom.Query(ctx, q)
 		if err != nil {
-			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+			problems = append(
+				problems,
+				problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug),
+			)
 			return problems
 		}
 		if len(qr.Series) > 0 {
@@ -91,7 +103,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 			lhsVec = true
 			for _, lm := range lhs.LabelMatchers {
 				if lm.Name != labels.MetricName && lm.Type == labels.MatchEqual {
-					if n.VectorMatching.On != slices.Contains(n.VectorMatching.MatchingLabels, lm.Name) {
+					if n.VectorMatching.On != slices.Contains(
+						n.VectorMatching.MatchingLabels,
+						lm.Name,
+					) {
 						continue
 					}
 					lhsMatchers[lm.Name] = lm.Value
@@ -119,7 +134,13 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Severity: Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message:     fmt.Sprintf("The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.", k, lv, k, rv),
+								Message: fmt.Sprintf(
+									"The left hand side uses `{%s=%q}` while the right hand side uses `{%s=%q}`, this will never match.",
+									k,
+									lv,
+									k,
+									rv,
+								),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(n.PositionRange().Start) + 1,
 								LastColumn:  int(n.PositionRange().End),
@@ -133,7 +154,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 
 		leftLabels, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
 		if err != nil {
-			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+			problems = append(
+				problems,
+				problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug),
+			)
 			return problems
 		}
 		if leftLabels == nil {
@@ -142,7 +166,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 
 		rightLabels, err := c.seriesLabels(ctx, n.RHS.String(), ignored...)
 		if err != nil {
-			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+			problems = append(
+				problems,
+				problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug),
+			)
 			return problems
 		}
 		if rightLabels == nil {
@@ -164,7 +191,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 							{
 								Message: fmt.Sprintf(
 									"Using `on(%s)` won't produce any results on %s because results from the left hand side of the query don't have this label: `%s`.",
-									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).LHS),
+									name,
+									promText(c.prom.Name(), qr.URI),
+									node.Expr.(*promParser.BinaryExpr).LHS,
+								),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
@@ -182,8 +212,12 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Severity: Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
-									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).RHS),
+								Message: fmt.Sprintf(
+									"Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
+									name,
+									promText(c.prom.Name(), qr.URI),
+									node.Expr.(*promParser.BinaryExpr).RHS,
+								),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
@@ -201,8 +235,12 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Severity: Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
-									name, promText(c.prom.Name(), qr.URI), node.Expr),
+								Message: fmt.Sprintf(
+									"Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
+									name,
+									promText(c.prom.Name(), qr.URI),
+									node.Expr,
+								),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
@@ -262,7 +300,11 @@ NEXT:
 	return problems
 }
 
-func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, error) {
+func (c VectorMatchingCheck) seriesLabels(
+	ctx context.Context,
+	query string,
+	ignored ...model.LabelName,
+) (labelSets, error) {
 	var expr strings.Builder
 	expr.WriteString("count(")
 	expr.WriteString(query)

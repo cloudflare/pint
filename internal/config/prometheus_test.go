@@ -41,7 +41,9 @@ func TestPrometheusConfig(t *testing.T) {
 		},
 		{
 			conf: PrometheusConfig{URI: "http://user{D@example.com"},
-			err:  errors.New("prometheus URI \"http://user{D@example.com\" is invalid: parse \"http://user{D@example.com\": net/url: invalid userinfo"),
+			err: errors.New(
+				"prometheus URI \"http://user{D@example.com\" is invalid: parse \"http://user{D@example.com\": net/url: invalid userinfo",
+			),
 		},
 		{
 			conf: PrometheusConfig{
@@ -75,7 +77,9 @@ func TestPrometheusConfig(t *testing.T) {
 				Timeout: "5m",
 				Uptime:  "xxx{foo=bar}",
 			},
-			err: errors.New(`invalid Prometheus uptime metric selector "xxx{foo=bar}": 1:8: expected '==', found '='`),
+			err: errors.New(
+				`invalid Prometheus uptime metric selector "xxx{foo=bar}": 1:8: expected '==', found '='`,
+			),
 		},
 		{
 			conf: PrometheusConfig{

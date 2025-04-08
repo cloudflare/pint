@@ -172,7 +172,14 @@ func actionLint(c *cli.Context) error {
 		slog.Info("Problems found", logSeverityCounters(bySeverity)...)
 	}
 	if hiddenProblems > 0 {
-		slog.Info(fmt.Sprintf("%d problem(s) not visible because of --%s=%s flag", hiddenProblems, minSeverityFlag, c.String(minSeverityFlag)))
+		slog.Info(
+			fmt.Sprintf(
+				"%d problem(s) not visible because of --%s=%s flag",
+				hiddenProblems,
+				minSeverityFlag,
+				c.String(minSeverityFlag),
+			),
+		)
 	}
 
 	if failProblems > 0 {
@@ -181,7 +188,10 @@ func actionLint(c *cli.Context) error {
 	return nil
 }
 
-func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (reports []reporter.Report) {
+func verifyOwners(
+	entries []discovery.Entry,
+	allowedOwners []*regexp.Regexp,
+) (reports []reporter.Report) {
 	for _, entry := range entries {
 		if entry.State == discovery.Removed {
 			continue
@@ -203,8 +213,15 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 					Details:  "",
 					Severity: checks.Bug,
 					Diagnostics: []diags.Diagnostic{
-						checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` comments are required in all files, please add a `# pint %s $owner` somewhere in this file and/or `# pint %s $owner` on top of each rule.",
-							discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment)),
+						checks.WholeRuleDiag(
+							entry.Rule,
+							fmt.Sprintf(
+								"`%s` comments are required in all files, please add a `# pint %s $owner` somewhere in this file and/or `# pint %s $owner` on top of each rule.",
+								discovery.RuleOwnerComment,
+								discovery.FileOwnerComment,
+								discovery.RuleOwnerComment,
+							),
+						),
 					},
 				},
 			})
@@ -228,7 +245,14 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 				Details:  "",
 				Severity: checks.Bug,
 				Diagnostics: []diags.Diagnostic{
-					checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", entry.Owner, entry.Owner)),
+					checks.WholeRuleDiag(
+						entry.Rule,
+						fmt.Sprintf(
+							"This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.",
+							entry.Owner,
+							entry.Owner,
+						),
+					),
 				},
 			},
 		})

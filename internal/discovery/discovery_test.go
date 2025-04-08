@@ -23,10 +23,22 @@ func TestReadRules(t *testing.T) {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
 		}
 		if len(file.Groups) != 1 {
-			panic(fmt.Sprintf("wrong number of groups returned: %d\n---\n%s\n---", len(file.Groups), s))
+			panic(
+				fmt.Sprintf(
+					"wrong number of groups returned: %d\n---\n%s\n---",
+					len(file.Groups),
+					s,
+				),
+			)
 		}
 		if len(file.Groups[0].Rules) != 1 {
-			panic(fmt.Sprintf("wrong number of rules returned: %d\n---\n%s\n---", len(file.Groups[0].Rules), s))
+			panic(
+				fmt.Sprintf(
+					"wrong number of rules returned: %d\n---\n%s\n---",
+					len(file.Groups[0].Rules),
+					s,
+				),
+			)
 		}
 		return file.Groups[0].Rules[0]
 	}
@@ -325,7 +337,13 @@ groups:
 
 	for _, tc := range testCases {
 		t.Run(
-			fmt.Sprintf("rPath=%s sPath=%s strict=%v title=%s", tc.reportedPath, tc.sourcePath, tc.isStrict, tc.title),
+			fmt.Sprintf(
+				"rPath=%s sPath=%s strict=%v title=%s",
+				tc.reportedPath,
+				tc.sourcePath,
+				tc.isStrict,
+				tc.title,
+			),
 			func(t *testing.T) {
 				r := tc.sourceFunc(t)
 				p := parser.NewParser(tc.isStrict, parser.PrometheusSchema, model.UTF8Validation)
@@ -341,6 +359,7 @@ groups:
 					require.NoError(t, err, "json(got)")
 					require.Equal(t, string(expected), string(got))
 				}
-			})
+			},
+		)
 	}
 }

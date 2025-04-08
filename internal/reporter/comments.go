@@ -111,14 +111,18 @@ func makeComments(summary Summary) (comments []PendingComment) {
 				}
 			}
 			if report.Path.SymlinkTarget != report.Path.Name {
-				buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
+				buf.WriteString(
+					":leftwards_arrow_with_hook: This problem was detected on a symlinked file ",
+				)
 				buf.WriteRune('`')
 				buf.WriteString(report.Path.Name)
 				buf.WriteString("`.\n\n")
 			}
 		}
 		buf.WriteString("------\n\n")
-		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
+		buf.WriteString(
+			":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/",
+		)
 		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString(".html).\n")
 
@@ -170,7 +174,8 @@ func dedupReports(src []Report) (dst [][]Report) {
 			continue
 		}
 		// Skip this report if we have exact same message already
-		if dst[index][0].Problem.Summary == report.Problem.Summary && dst[index][0].Problem.Details == report.Problem.Details {
+		if dst[index][0].Problem.Summary == report.Problem.Summary &&
+			dst[index][0].Problem.Details == report.Problem.Details {
 			continue
 		}
 		dst[index] = append(dst[index], report)
@@ -228,7 +233,11 @@ func Submit(ctx context.Context, s Summary, c Commenter) error {
 	}
 
 	for _, dst := range dsts {
-		slog.Info("Found a report destination", slog.String("reporter", c.Describe()), slog.Any("dst", dst))
+		slog.Info(
+			"Found a report destination",
+			slog.String("reporter", c.Describe()),
+			slog.Any("dst", dst),
+		)
 		if err = updateDestination(ctx, s, c, dst); err != nil {
 			return err
 		}
@@ -337,12 +346,14 @@ func makePrometheusDetailsComment(s Summary) string {
 	}
 
 	var buf strings.Builder
-	buf.WriteString(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
+	buf.WriteString(
+		`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
 This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
 Since pint uses many of these API endpoint for querying information needed to run online checks only a real Prometheus server will allow it to run all of these checks.
 Below is the list of checks that were disabled for each Prometheus server defined in pint config file.
 
-`)
+`,
+	)
 	for _, pd := range pds {
 		buf.WriteString("- `")
 		buf.WriteString(pd.Name)

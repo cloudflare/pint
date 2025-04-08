@@ -51,7 +51,11 @@ func (c AlertsAbsentCheck) Reporter() string {
 	return AlertsAbsentCheckName
 }
 
-func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AlertsAbsentCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return problems
 	}
@@ -60,7 +64,10 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 		return problems
 	}
 
-	src := utils.LabelsSource(entry.Rule.AlertingRule.Expr.Value.Value, entry.Rule.AlertingRule.Expr.Query.Expr)
+	src := utils.LabelsSource(
+		entry.Rule.AlertingRule.Expr.Value.Value,
+		entry.Rule.AlertingRule.Expr.Query.Expr,
+	)
 	absentSources := make([]utils.Source, 0, len(src))
 	for _, s := range src {
 		if s.Operation != "absent" {
@@ -79,7 +86,10 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning))
+		problems = append(
+			problems,
+			problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning),
+		)
 		return problems
 	}
 
@@ -108,8 +118,10 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 		if forVal > 0 {
 			summary = "absent() based alert with insufficient for"
 			dgs = append(dgs, diags.Diagnostic{
-				Message: fmt.Sprintf("Use a value that's at least twice Prometheus scrape interval (`%s`).",
-					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+				Message: fmt.Sprintf(
+					"Use a value that's at least twice Prometheus scrape interval (`%s`).",
+					output.HumanizeDuration(cfg.Config.Global.ScrapeInterval),
+				),
 				Pos:         entry.Rule.AlertingRule.For.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(entry.Rule.AlertingRule.For.Value),

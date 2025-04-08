@@ -37,7 +37,10 @@ func IsQueryTooExpensive(err error) bool {
 		if e1.ErrorType != v1.ErrExec {
 			return false
 		}
-		if strings.HasPrefix(e1.Err, "query processing would load too many samples into memory in ") {
+		if strings.HasPrefix(
+			e1.Err,
+			"query processing would load too many samples into memory in ",
+		) {
 			return true
 		}
 		if strings.HasSuffix(e1.Err, "expanding series: context deadline exceeded") {

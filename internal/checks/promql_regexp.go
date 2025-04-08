@@ -64,7 +64,11 @@ func (c RegexpCheck) Reporter() string {
 	return RegexpCheckName
 }
 
-func (c RegexpCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RegexpCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -165,7 +169,10 @@ func (c RegexpCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 				case labels.MatchNotRegexp:
 					op = labels.MatchNotEqual
 				}
-				bad = append(bad, badMatcher{pos: selector.PosRange, lm: lm, op: op, isWildcard: isWildcard})
+				bad = append(
+					bad,
+					badMatcher{pos: selector.PosRange, lm: lm, op: op, isWildcard: isWildcard},
+				)
 				isBad = true
 			}
 			if beginText > 1 || endText > 1 {
@@ -184,8 +191,12 @@ func (c RegexpCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 			switch {
 			case b.badAnchor:
 				summary = "redundant regexp anchors"
-				text = fmt.Sprintf("Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
-					b.lm, b.lm.Name, b.lm.Type, b.lm.Value,
+				text = fmt.Sprintf(
+					"Prometheus regexp matchers are automatically fully anchored so match for `%s` will result in `%s%s\"^%s$\"`, remove regexp anchors `^` and/or `$`.",
+					b.lm,
+					b.lm.Name,
+					b.lm.Type,
+					b.lm.Value,
 				)
 			case b.isWildcard && b.op == labels.MatchEqual:
 				summary = "unnecessary wildcard regexp"
@@ -193,15 +204,34 @@ func (c RegexpCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 					makeLabel(name, good...), b.lm.Name)
 			case b.isWildcard && b.op == labels.MatchNotEqual:
 				summary = "unnecessary negative wildcard regexp"
-				text = fmt.Sprintf("Use `%s` if you want to match on all time series for `%s` without the `%s` label.",
-					makeLabel(name, slices.Concat(good, []*labels.Matcher{{Type: labels.MatchEqual, Name: b.lm.Name, Value: ""}})...), name, b.lm.Name)
+				text = fmt.Sprintf(
+					"Use `%s` if you want to match on all time series for `%s` without the `%s` label.",
+					makeLabel(
+						name,
+						slices.Concat(
+							good,
+							[]*labels.Matcher{
+								{Type: labels.MatchEqual, Name: b.lm.Name, Value: ""},
+							},
+						)...),
+					name,
+					b.lm.Name,
+				)
 			case b.isSmelly:
 				summary = "smelly regexp selector"
-				text = fmt.Sprintf("`{%s}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels", b.lm.String())
+				text = fmt.Sprintf(
+					"`{%s}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels",
+					b.lm.String(),
+				)
 			default:
 				summary = "redundant regexp"
-				text = fmt.Sprintf("Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
-					b.lm, b.lm.Name, b.op, b.lm.Value)
+				text = fmt.Sprintf(
+					"Unnecessary regexp match on static string `%s`, use `%s%s%q` instead.",
+					b.lm,
+					b.lm.Name,
+					b.op,
+					b.lm.Value,
+				)
 
 			}
 			pos := findMatcherPos(expr.Value.Value, b.pos, b.lm)
@@ -271,8 +301,16 @@ func isOpSmelly(a, b syntax.Op) bool {
 	return false
 }
 
-func findMatcherPos(expr string, within posrange.PositionRange, m *labels.Matcher) posrange.PositionRange {
-	re := regexp.MustCompile("(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + regexp.QuoteMeta(m.Value) + `"`)
+func findMatcherPos(
+	expr string,
+	within posrange.PositionRange,
+	m *labels.Matcher,
+) posrange.PositionRange {
+	re := regexp.MustCompile(
+		"(" + m.Name + ")(?: *)" + m.Type.String() + "(?: *)" + `"` + regexp.QuoteMeta(
+			m.Value,
+		) + `"`,
+	)
 	idx := re.FindStringSubmatchIndex(utils.GetQueryFragment(expr, within))
 	if idx == nil {
 		return within

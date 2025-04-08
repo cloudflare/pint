@@ -16,7 +16,13 @@ const (
 	AnnotationCheckName = "alerts/annotation"
 )
 
-func NewAnnotationCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isRequired bool, comment string, severity Severity) AnnotationCheck {
+func NewAnnotationCheck(
+	keyRe, tokenRe, valueRe *TemplatedRegexp,
+	values []string,
+	isRequired bool,
+	comment string,
+	severity Severity,
+) AnnotationCheck {
 	return AnnotationCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
@@ -53,7 +59,13 @@ func (c AnnotationCheck) Meta() CheckMeta {
 
 func (c AnnotationCheck) String() string {
 	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", AnnotationCheckName, c.keyRe.original, c.valueRe.anchored, c.isRequired)
+		return fmt.Sprintf(
+			"%s(%s=~%s:%v)",
+			AnnotationCheckName,
+			c.keyRe.original,
+			c.valueRe.anchored,
+			c.isRequired,
+		)
 	}
 	return fmt.Sprintf("%s(%s:%v)", AnnotationCheckName, c.keyRe.original, c.isRequired)
 }
@@ -62,12 +74,17 @@ func (c AnnotationCheck) Reporter() string {
 	return AnnotationCheckName
 }
 
-func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AnnotationCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return nil
 	}
 
-	if entry.Rule.AlertingRule.Annotations == nil || len(entry.Rule.AlertingRule.Annotations.Items) == 0 {
+	if entry.Rule.AlertingRule.Annotations == nil ||
+		len(entry.Rule.AlertingRule.Annotations.Items) == 0 {
 		if c.isRequired {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
@@ -77,7 +94,10 @@ func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+					WholeRuleDiag(
+						entry.Rule,
+						fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+					),
 				},
 			})
 		}
@@ -101,7 +121,10 @@ func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 			Details:  maybeComment(c.comment),
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
-				WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+				WholeRuleDiag(
+					entry.Rule,
+					fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+				),
 			},
 		})
 		return problems
@@ -117,7 +140,10 @@ func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` annotation is required.", c.keyRe.original)),
+					WholeRuleDiag(
+						entry.Rule,
+						fmt.Sprintf("`%s` annotation is required.", c.keyRe.original),
+					),
 				},
 			})
 			return problems
@@ -134,7 +160,11 @@ func (c AnnotationCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 	return problems
 }
 
-func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.YamlNode) (problems []Problem) {
+func (c AnnotationCheck) checkValue(
+	rule parser.Rule,
+	value string,
+	ann *parser.YamlNode,
+) (problems []Problem) {
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
@@ -145,7 +175,11 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s` annotation value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
+					Message: fmt.Sprintf(
+						"`%s` annotation value must match `%s`.",
+						c.keyRe.original,
+						c.valueRe.anchored,
+					),
 					Pos:         ann.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(ann.Value),
@@ -182,7 +216,10 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("`%s` annotation value is not one of valid values.", c.keyRe.original),
+						Message: fmt.Sprintf(
+							"`%s` annotation value is not one of valid values.",
+							c.keyRe.original,
+						),
 						Pos:         ann.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(ann.Value),

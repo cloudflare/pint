@@ -89,7 +89,11 @@ func actionCI(c *cli.Context) error {
 	if err != nil {
 		return errors.New("failed to get the name of current branch")
 	}
-	slog.Debug("Got branch information", slog.String("base", baseBranch), slog.String("current", currentBranch))
+	slog.Debug(
+		"Got branch information",
+		slog.String("base", baseBranch),
+		slog.String("current", currentBranch),
+	)
 	if currentBranch == strings.Split(baseBranch, "/")[len(strings.Split(baseBranch, "/"))-1] {
 		slog.Info("Running from base branch, skipping checks", slog.String("branch", currentBranch))
 		return nil
@@ -107,12 +111,14 @@ func actionCI(c *cli.Context) error {
 	names := parseNames(meta.cfg.Parser.Names)
 	allowedOwners := meta.cfg.Owners.CompileAllowed()
 	var entries []discovery.Entry
-	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, names, allowedOwners).Find()
+	entries, err = discovery.NewGlobFinder([]string{"*"}, filter, schema, names, allowedOwners).
+		Find()
 	if err != nil {
 		return err
 	}
 
-	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema, names, allowedOwners).Find(entries)
+	entries, err = discovery.NewGitBranchFinder(git.RunGit, filter, baseBranch, meta.cfg.CI.MaxCommits, schema, names, allowedOwners).
+		Find(entries)
 	if err != nil {
 		return err
 	}
@@ -165,7 +171,9 @@ func actionCI(c *cli.Context) error {
 	if meta.cfg.Repository != nil && meta.cfg.Repository.BitBucket != nil {
 		token, ok := os.LookupEnv("BITBUCKET_AUTH_TOKEN")
 		if !ok {
-			return errors.New("BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket")
+			return errors.New(
+				"BITBUCKET_AUTH_TOKEN env variable is required when reporting to BitBucket",
+			)
 		}
 
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.BitBucket.Timeout)
@@ -213,7 +221,9 @@ func actionCI(c *cli.Context) error {
 
 		prVal, ok := os.LookupEnv("GITHUB_PULL_REQUEST_NUMBER")
 		if !ok {
-			return errors.New("GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub")
+			return errors.New(
+				"GITHUB_PULL_REQUEST_NUMBER env variable is required when reporting to GitHub",
+			)
 		}
 
 		var prNum int
@@ -311,7 +321,10 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		os.Getenv("GITHUB_REF") != "" {
 		parts := strings.Split(os.Getenv("GITHUB_REF"), "/")
 		if len(parts) >= 4 {
-			slog.Info("Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable", slog.String("pr", parts[2]))
+			slog.Info(
+				"Setting GITHUB_PULL_REQUEST_NUMBER from GITHUB_REF env variable",
+				slog.String("pr", parts[2]),
+			)
 			os.Setenv("GITHUB_PULL_REQUEST_NUMBER", parts[2])
 		}
 	}
@@ -327,12 +340,18 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 		parts := strings.SplitN(repo, "/", 2)
 		if len(parts) == 2 {
 			if gh.Owner == "" {
-				slog.Info("Setting repository owner from GITHUB_REPOSITORY env variable", slog.String("owner", parts[0]))
+				slog.Info(
+					"Setting repository owner from GITHUB_REPOSITORY env variable",
+					slog.String("owner", parts[0]),
+				)
 				gh.Owner = parts[0]
 				isDirty = true
 			}
 			if gh.Repo == "" {
-				slog.Info("Setting repository name from GITHUB_REPOSITORY env variable", slog.String("repo", parts[1]))
+				slog.Info(
+					"Setting repository name from GITHUB_REPOSITORY env variable",
+					slog.String("repo", parts[1]),
+				)
 				gh.Repo = parts[1]
 				isDirty = true
 			}
@@ -341,11 +360,17 @@ func detectGithubActions(gh *config.GitHub) *config.GitHub {
 
 	if api := os.Getenv("GITHUB_API_URL"); api != "" {
 		if gh.BaseURI == "" {
-			slog.Info("Setting repository base URI from GITHUB_API_URL env variable", slog.String("baseuri", api))
+			slog.Info(
+				"Setting repository base URI from GITHUB_API_URL env variable",
+				slog.String("baseuri", api),
+			)
 			gh.BaseURI = api
 		}
 		if gh.UploadURI == "" {
-			slog.Info("Setting repository upload URI from GITHUB_API_URL env variable", slog.String("uploaduri", api))
+			slog.Info(
+				"Setting repository upload URI from GITHUB_API_URL env variable",
+				slog.String("uploaduri", api),
+			)
 			gh.UploadURI = api
 		}
 	}

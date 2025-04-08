@@ -34,7 +34,14 @@ func TestAppendSampleToRanges(t *testing.T) {
 	printRange := func(tr []promapi.MetricTimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339)))
+			buf.WriteString(
+				fmt.Sprintf(
+					"%s %s - %s\n",
+					r.Labels,
+					r.Start.UTC().Format(time.RFC3339),
+					r.End.UTC().Format(time.RFC3339),
+				),
+			)
 		}
 		return buf.String()
 	}
@@ -45,15 +52,27 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "2"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "3"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -83,19 +102,35 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1", "job": "foo"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"job": "bar"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -150,19 +185,35 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T03:00:00Z"), timeParse("2022-06-14T03:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T03:00:00Z"),
+						timeParse("2022-06-14T03:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-13T10:00:00Z"), timeParse("2022-06-13T12:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-13T10:00:00Z"),
+						timeParse("2022-06-13T12:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "2"},
-					Values: generateSamples(timeParse("2022-06-15T10:00:00Z"), timeParse("2022-06-15T12:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-15T10:00:00Z"),
+						timeParse("2022-06-15T12:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-13T23:00:00Z"), timeParse("2022-06-13T23:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-13T23:00:00Z"),
+						timeParse("2022-06-13T23:55:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -204,15 +255,27 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T02:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T02:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T02:00:00Z"), timeParse("2022-06-14T05:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T02:00:00Z"),
+						timeParse("2022-06-14T05:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T03:00:00Z"), timeParse("2022-06-14T07:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T03:00:00Z"),
+						timeParse("2022-06-14T07:55:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -230,31 +293,59 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T09:14:59Z"), timeParse("2022-10-27T09:20:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T09:14:59Z"),
+						timeParse("2022-10-27T09:20:59Z"),
+						time.Minute,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T10:14:59Z"), timeParse("2022-10-27T10:20:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T10:14:59Z"),
+						timeParse("2022-10-27T10:20:59Z"),
+						time.Minute,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T11:14:59Z"), timeParse("2022-10-27T11:15:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T11:14:59Z"),
+						timeParse("2022-10-27T11:15:59Z"),
+						time.Minute,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T12:14:59Z"), timeParse("2022-10-27T12:30:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T12:14:59Z"),
+						timeParse("2022-10-27T12:30:59Z"),
+						time.Minute,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T13:14:59Z"), timeParse("2022-10-27T13:50:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T13:14:59Z"),
+						timeParse("2022-10-27T13:50:59Z"),
+						time.Minute,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T14:14:59Z"), timeParse("2022-10-27T14:50:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T14:14:59Z"),
+						timeParse("2022-10-27T14:50:59Z"),
+						time.Minute,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-10-27T23:14:59Z"), timeParse("2022-10-28T01:14:59Z"), time.Minute),
+					Values: generateSamples(
+						timeParse("2022-10-27T23:14:59Z"),
+						timeParse("2022-10-28T01:14:59Z"),
+						time.Minute,
+					),
 				},
 			},
 			step: time.Minute,
@@ -308,7 +399,11 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T00:00:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T00:00:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -326,15 +421,27 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T00:00:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T00:00:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:05:00Z"), timeParse("2022-06-14T00:05:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:05:00Z"),
+						timeParse("2022-06-14T00:05:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:15:00Z"), timeParse("2022-06-14T00:15:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:15:00Z"),
+						timeParse("2022-06-14T00:15:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -358,15 +465,27 @@ func TestAppendSampleToRanges(t *testing.T) {
 			samples: []model.SampleStream{
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T05:00:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T05:00:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T05:10:00Z"), timeParse("2022-06-14T06:10:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T05:10:00Z"),
+						timeParse("2022-06-14T06:10:00Z"),
+						time.Minute*5,
+					),
 				},
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T06:20:00Z"), timeParse("2022-06-14T06:20:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T06:20:00Z"),
+						timeParse("2022-06-14T06:20:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -397,32 +516,56 @@ func TestAppendSampleToRanges(t *testing.T) {
 				// #5. 06:00 - 06:25
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T06:00:00Z"), timeParse("2022-06-14T06:20:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T06:00:00Z"),
+						timeParse("2022-06-14T06:20:00Z"),
+						time.Minute*5,
+					),
 				},
 				// #1. 00:00 - 05:05
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T00:00:00Z"), timeParse("2022-06-14T05:00:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T00:00:00Z"),
+						timeParse("2022-06-14T05:00:00Z"),
+						time.Minute*5,
+					),
 				},
 				// #2. 05:10 - 05:15
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T05:10:00Z"), timeParse("2022-06-14T05:10:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T05:10:00Z"),
+						timeParse("2022-06-14T05:10:00Z"),
+						time.Minute*5,
+					),
 				},
 				// #6. 06:20 - 06:25
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T06:20:00Z"), timeParse("2022-06-14T06:20:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T06:20:00Z"),
+						timeParse("2022-06-14T06:20:00Z"),
+						time.Minute*5,
+					),
 				},
 				// #4. 05:25 - 06:00
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T05:25:00Z"), timeParse("2022-06-14T05:55:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T05:25:00Z"),
+						timeParse("2022-06-14T05:55:00Z"),
+						time.Minute*5,
+					),
 				},
 				// #3. 05:20 - 05:25
 				{
 					Metric: model.Metric{"instance": "1"},
-					Values: generateSamples(timeParse("2022-06-14T05:20:00Z"), timeParse("2022-06-14T05:20:00Z"), time.Minute*5),
+					Values: generateSamples(
+						timeParse("2022-06-14T05:20:00Z"),
+						timeParse("2022-06-14T05:20:00Z"),
+						time.Minute*5,
+					),
 				},
 			},
 			step: time.Minute * 5,
@@ -484,7 +627,14 @@ func TestMergeRanges(t *testing.T) {
 	printRange := func(tr []promapi.MetricTimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339)))
+			buf.WriteString(
+				fmt.Sprintf(
+					"%s %s - %s\n",
+					r.Labels,
+					r.Start.UTC().Format(time.RFC3339),
+					r.End.UTC().Format(time.RFC3339),
+				),
+			)
 		}
 		return buf.String()
 	}
@@ -502,31 +652,146 @@ func TestMergeRanges(t *testing.T) {
 		},
 		{
 			in: promapi.MetricTimeRanges{
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T00:00:44Z"), End: timeParse("2022-10-20T14:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T16:00:44Z"), End: timeParse("2022-10-19T20:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T14:00:44Z"), End: timeParse("2022-10-19T16:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T18:00:44Z"), End: timeParse("2022-10-25T22:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T22:00:44Z"), End: timeParse("2022-10-20T00:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-23T06:00:44Z"), End: timeParse("2022-10-23T14:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T14:00:44Z"), End: timeParse("2022-10-23T06:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T20:00:44Z"), End: timeParse("2022-10-19T22:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T12:00:44Z"), End: timeParse("2022-10-19T14:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T02:00:44Z"), End: timeParse("2022-10-24T10:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T12:00:44Z"), End: timeParse("2022-10-22T14:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T00:00:44Z"), End: timeParse("2022-10-24T02:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-19T12:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-24T10:00:44Z"), End: timeParse("2022-10-24T18:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-23T14:00:44Z"), End: timeParse("2022-10-23T22:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-25T22:00:44Z"), End: timeParse("2022-10-26T10:55:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-20T14:00:44Z"), End: timeParse("2022-10-21T02:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-21T06:00:44Z"), End: timeParse("2022-10-21T20:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-21T20:00:44Z"), End: timeParse("2022-10-22T06:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-21T02:00:44Z"), End: timeParse("2022-10-21T06:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-23T22:00:44Z"), End: timeParse("2022-10-24T00:00:44Z")},
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-22T06:00:44Z"), End: timeParse("2022-10-22T12:00:44Z")},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-20T00:00:44Z"),
+					End:         timeParse("2022-10-20T14:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T16:00:44Z"),
+					End:         timeParse("2022-10-19T20:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T14:00:44Z"),
+					End:         timeParse("2022-10-19T16:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-24T18:00:44Z"),
+					End:         timeParse("2022-10-25T22:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T22:00:44Z"),
+					End:         timeParse("2022-10-20T00:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-23T06:00:44Z"),
+					End:         timeParse("2022-10-23T14:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-22T14:00:44Z"),
+					End:         timeParse("2022-10-23T06:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T20:00:44Z"),
+					End:         timeParse("2022-10-19T22:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T12:00:44Z"),
+					End:         timeParse("2022-10-19T14:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-24T02:00:44Z"),
+					End:         timeParse("2022-10-24T10:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-22T12:00:44Z"),
+					End:         timeParse("2022-10-22T14:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-24T00:00:44Z"),
+					End:         timeParse("2022-10-24T02:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T10:50:44Z"),
+					End:         timeParse("2022-10-19T12:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-24T10:00:44Z"),
+					End:         timeParse("2022-10-24T18:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-23T14:00:44Z"),
+					End:         timeParse("2022-10-23T22:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-25T22:00:44Z"),
+					End:         timeParse("2022-10-26T10:55:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-20T14:00:44Z"),
+					End:         timeParse("2022-10-21T02:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-21T06:00:44Z"),
+					End:         timeParse("2022-10-21T20:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-21T20:00:44Z"),
+					End:         timeParse("2022-10-22T06:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-21T02:00:44Z"),
+					End:         timeParse("2022-10-21T06:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-23T22:00:44Z"),
+					End:         timeParse("2022-10-24T00:00:44Z"),
+				},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-22T06:00:44Z"),
+					End:         timeParse("2022-10-22T12:00:44Z"),
+				},
 			},
 			out: promapi.MetricTimeRanges{
-				{Fingerprint: labels.EmptyLabels().Hash(), Labels: labels.EmptyLabels(), Start: timeParse("2022-10-19T10:50:44Z"), End: timeParse("2022-10-26T10:56:43Z")},
+				{
+					Fingerprint: labels.EmptyLabels().Hash(),
+					Labels:      labels.EmptyLabels(),
+					Start:       timeParse("2022-10-19T10:50:44Z"),
+					End:         timeParse("2022-10-26T10:56:43Z"),
+				},
 			},
 			step:      time.Minute,
 			wasMerged: true,
@@ -566,7 +831,9 @@ func TestMetricTimeRangeOverlaps(t *testing.T) {
 
 	makeRange := func(ls labels.Labels, startOffset, endOffset time.Duration) promapi.MetricTimeRange {
 		if startOffset >= endOffset {
-			panic(fmt.Sprintf("startOffset must be < endOffset, got %s ~ %s", startOffset, endOffset))
+			panic(
+				fmt.Sprintf("startOffset must be < endOffset, got %s ~ %s", startOffset, endOffset),
+			)
 		}
 		ts := timeParse("2022-10-10T12:00:00Z")
 		return promapi.MetricTimeRange{

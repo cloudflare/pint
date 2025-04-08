@@ -53,7 +53,11 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 	}
 
 	if totalCommits := countCommits(changes); totalCommits > f.maxCommits {
-		return nil, fmt.Errorf("number of commits to check (%d) is higher than maxCommits (%d), exiting", totalCommits, f.maxCommits)
+		return nil, fmt.Errorf(
+			"number of commits to check (%d) is higher than maxCommits (%d), exiting",
+			totalCommits,
+			f.maxCommits,
+		)
 	}
 
 	shouldSkip, err := f.shouldSkipAllChecks(changes)
@@ -75,7 +79,11 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			nil,
 		)
 		if err != nil {
-			slog.Debug("Cannot read before rules", slog.String("path", change.Path.Before.Name), slog.Any("err", err))
+			slog.Debug(
+				"Cannot read before rules",
+				slog.String("path", change.Path.Before.Name),
+				slog.Any("err", err),
+			)
 		}
 		entriesAfter, err = readRules(
 			change.Path.After.EffectivePath(),
@@ -107,14 +115,20 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 			switch {
 			case !me.hasBefore && me.hasAfter:
 				me.after.State = Added
-				me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+				me.after.ModifiedLines = commonLines(
+					change.Body.ModifiedLines,
+					me.after.ModifiedLines,
+				)
 				slog.Debug(
 					"Rule added on HEAD branch",
 					slog.String("name", me.after.Rule.Name()),
 					slog.String("state", me.after.State.String()),
 					slog.String("path", me.after.Path.Name),
 					slog.String("ruleLines", me.after.Rule.Lines.String()),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+					slog.String(
+						"modifiedLines",
+						output.FormatLineRangeString(me.after.ModifiedLines),
+					),
 				)
 				entries = append(entries, me.after)
 			case me.hasBefore && me.hasAfter:
@@ -137,14 +151,20 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					)
 				default:
 					me.after.State = Modified
-					me.after.ModifiedLines = commonLines(change.Body.ModifiedLines, me.after.ModifiedLines)
+					me.after.ModifiedLines = commonLines(
+						change.Body.ModifiedLines,
+						me.after.ModifiedLines,
+					)
 					slog.Debug(
 						"Rule modified on HEAD branch",
 						slog.String("name", me.after.Rule.Name()),
 						slog.String("state", me.after.State.String()),
 						slog.String("path", me.after.Path.Name),
 						slog.String("ruleLines", me.after.Rule.Lines.String()),
-						slog.String("modifiedLines", output.FormatLineRangeString(me.after.ModifiedLines)),
+						slog.String(
+							"modifiedLines",
+							output.FormatLineRangeString(me.after.ModifiedLines),
+						),
 					)
 				}
 				entries = append(entries, me.after)
@@ -160,7 +180,10 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+					slog.String(
+						"modifiedLines",
+						output.FormatLineRangeString(me.before.ModifiedLines),
+					),
 				)
 				entries = append(entries, me.before)
 			case me.hasBefore && !me.hasAfter && len(failedEntries) > 0:
@@ -170,14 +193,20 @@ func (f GitBranchFinder) Find(allEntries []Entry) (entries []Entry, err error) {
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
 					slog.String("ruleLines", me.before.Rule.Lines.String()),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+					slog.String(
+						"modifiedLines",
+						output.FormatLineRangeString(me.before.ModifiedLines),
+					),
 				)
 			default:
 				slog.Warn(
 					"Unknown rule state",
 					slog.String("state", me.before.State.String()),
 					slog.String("path", me.before.Path.Name),
-					slog.String("modifiedLines", output.FormatLineRangeString(me.before.ModifiedLines)),
+					slog.String(
+						"modifiedLines",
+						output.FormatLineRangeString(me.before.ModifiedLines),
+					),
 				)
 				entries = append(entries, me.after)
 			}

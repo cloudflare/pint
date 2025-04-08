@@ -78,7 +78,16 @@ func simpleProm(name, uri string, timeout time.Duration, required bool) *promapi
 		name,
 		uri,
 		[]*promapi.Prometheus{
-			promapi.NewPrometheus(name, uri, simplePromPublicURI, map[string]string{"X-Debug": "1"}, timeout, 16, 1000, nil),
+			promapi.NewPrometheus(
+				name,
+				uri,
+				simplePromPublicURI,
+				map[string]string{"X-Debug": "1"},
+				timeout,
+				16,
+				1000,
+				nil,
+			),
 		},
 		required,
 		"up",
@@ -145,17 +154,25 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 			var uri string
 			if len(tc.mocks) > 0 {
-				srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					defer r.Body.Close()
-					for i := range tc.mocks {
-						if tc.mocks[i].maybeApply(w, r) {
-							return
+				srv := httptest.NewServer(
+					http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						defer r.Body.Close()
+						for i := range tc.mocks {
+							if tc.mocks[i].maybeApply(w, r) {
+								return
+							}
 						}
-					}
-					buf, _ := io.ReadAll(r.Body)
-					t.Errorf("no matching response for %s %s request: %s, body: %s", r.Method, r.URL, r.URL.Query(), string(buf))
-					t.FailNow()
-				}))
+						buf, _ := io.ReadAll(r.Body)
+						t.Errorf(
+							"no matching response for %s %s request: %s, body: %s",
+							r.Method,
+							r.URL,
+							r.URL.Query(),
+							string(buf),
+						)
+						t.FailNow()
+					}),
+				)
 				defer srv.Close()
 				uri = srv.URL
 			}
@@ -193,7 +210,11 @@ func runTests(t *testing.T, testCases []checkTest) {
 						Description: tc.description,
 						Content:     tc.content,
 						Problem:     problem,
-						Output:      diags.InjectDiagnostics(tc.content, problem.Diagnostics, output.None),
+						Output: diags.InjectDiagnostics(
+							tc.content,
+							problem.Diagnostics,
+							output.None,
+						),
 					})
 				}
 
@@ -562,10 +583,18 @@ var (
 		return promError{code: 500, errorType: v1.ErrServer, err: "internal error"}
 	}
 	respondWithTooManySamples = func() responseWriter {
-		return promError{code: 422, errorType: v1.ErrExec, err: "query processing would load too many samples into memory in query execution"}
+		return promError{
+			code:      422,
+			errorType: v1.ErrExec,
+			err:       "query processing would load too many samples into memory in query execution",
+		}
 	}
 	respondWithTimeoutExpandingSeriesSamples = func() responseWriter {
-		return promError{code: 422, errorType: v1.ErrExec, err: "expanding series: context deadline exceeded"}
+		return promError{
+			code:      422,
+			errorType: v1.ErrExec,
+			err:       "expanding series: context deadline exceeded",
+		}
 	}
 	respondWithEmptyVector = func() responseWriter {
 		return vectorResponse{samples: model.Vector{}}
@@ -628,9 +657,19 @@ func generateSampleWithValue(labels map[string]string, val float64) *model.Sampl
 	}
 }
 
-func generateSampleStream(labels map[string]string, from, until time.Time, step time.Duration) (s *model.SampleStream) {
+func generateSampleStream(
+	labels map[string]string,
+	from, until time.Time,
+	step time.Duration,
+) (s *model.SampleStream) {
 	if from.After(until) {
-		panic(fmt.Sprintf("generateSampleStream() got from > until: %s ~ %s", from.UTC().Format(time.RFC3339), until.UTC().Format(time.RFC3339)))
+		panic(
+			fmt.Sprintf(
+				"generateSampleStream() got from > until: %s ~ %s",
+				from.UTC().Format(time.RFC3339),
+				until.UTC().Format(time.RFC3339),
+			),
+		)
 	}
 	metric := model.Metric{}
 	for k, v := range labels {

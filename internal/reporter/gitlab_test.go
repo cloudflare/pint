@@ -83,7 +83,11 @@ func TestGitLabReporter(t *testing.T) {
 	fooDiff := `@@ -1,4 +1,6 @@\n- record: target is down\n-  expr: up == 0\n+  expr: up == 1\n+  labels:\n+    foo: bar\n- record: sum errors\nexpr: sum(errors) by (job)\n`
 
 	summaryWithDetails := reporter.NewSummary([]reporter.Report{})
-	summaryWithDetails.MarkCheckDisabled("prom1", promapi.APIPathConfig, []string{"check1", "check3", "check2"})
+	summaryWithDetails.MarkCheckDisabled(
+		"prom1",
+		promapi.APIPathConfig,
+		[]string{"check1", "check3", "check2"},
+	)
 	summaryWithDetails.MarkCheckDisabled("prom2", promapi.APIPathMetadata, []string{"check1"})
 
 	testCases := []testCaseT{
@@ -127,18 +131,27 @@ func TestGitLabReporter(t *testing.T) {
 					if r.Method == http.MethodGet {
 						_, _ = w.Write([]byte(`[{"iid":1},{"iid":2},{"iid":5}]`))
 					}
-				case "/api/v4/projects/123/merge_requests/1/diffs", "/api/v4/projects/123/merge_requests/2/diffs", "/api/v4/projects/123/merge_requests/5/diffs":
+				case "/api/v4/projects/123/merge_requests/1/diffs",
+					"/api/v4/projects/123/merge_requests/2/diffs",
+					"/api/v4/projects/123/merge_requests/5/diffs":
 					if r.Method == http.MethodGet {
-						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+						_, _ = w.Write(
+							[]byte(
+								`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`,
+							),
+						)
 					}
-				case "/api/v4/projects/123/merge_requests/1/versions", "/api/v4/projects/123/merge_requests/2/versions", "/api/v4/projects/123/merge_requests/5/versions":
+				case "/api/v4/projects/123/merge_requests/1/versions",
+					"/api/v4/projects/123/merge_requests/2/versions",
+					"/api/v4/projects/123/merge_requests/5/versions":
 					if r.Method == http.MethodGet {
 						_, _ = w.Write([]byte(`[
 {"id": 2,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"},
 {"id": 1,"head_commit_sha": "head","base_commit_sha": "base","start_commit_sha": "start"}
 ]`))
 					}
-				case "/api/v4/projects/123/merge_requests/1/discussions", "/api/v4/projects/123/merge_requests/2/discussions":
+				case "/api/v4/projects/123/merge_requests/1/discussions",
+					"/api/v4/projects/123/merge_requests/2/discussions":
 					if r.Method == http.MethodGet {
 						_, _ = w.Write([]byte(`[
 {"id":"100","notes":[
@@ -316,7 +329,11 @@ func TestGitLabReporter(t *testing.T) {
 					}
 				case "/api/v4/projects/123/merge_requests/1/diffs":
 					if r.Method == http.MethodGet {
-						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+						_, _ = w.Write(
+							[]byte(
+								`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`,
+							),
+						)
 					}
 				case "/api/v4/projects/123/merge_requests/1/versions":
 					if r.Method == http.MethodGet {
@@ -401,7 +418,11 @@ func TestGitLabReporter(t *testing.T) {
 					}
 				case "/api/v4/projects/123/merge_requests/1/diffs":
 					if r.Method == http.MethodGet {
-						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+						_, _ = w.Write(
+							[]byte(
+								`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`,
+							),
+						)
 					}
 				case "/api/v4/projects/123/merge_requests/1/versions":
 					if r.Method == http.MethodGet {
@@ -519,7 +540,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 				case "/api/v4/projects/123/merge_requests/1/diffs":
 					w.WriteHeader(http.StatusOK)
 					if r.Method == http.MethodGet {
-						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+						_, _ = w.Write(
+							[]byte(
+								`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`,
+							),
+						)
 					}
 				case "/api/v4/projects/123/merge_requests/1/versions":
 					w.WriteHeader(http.StatusOK)
@@ -658,7 +683,11 @@ Below is the list of checks that were disabled for each Prometheus server define
 				case "/api/v4/projects/123/merge_requests/1/diffs":
 					w.WriteHeader(http.StatusOK)
 					if r.Method == http.MethodGet {
-						_, _ = w.Write([]byte(`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+						_, _ = w.Write(
+							[]byte(
+								`[{"diff":"` + fooDiff + `","new_path":"foo.txt","old_path":"foo.txt"}]`,
+							),
+						)
 					}
 				case "/api/v4/projects/123/merge_requests/1/versions":
 					w.WriteHeader(http.StatusOK)
@@ -677,7 +706,10 @@ Below is the list of checks that were disabled for each Prometheus server define
 				if err == nil {
 					return errors.New("expected list discussions to fail")
 				}
-				if strings.HasSuffix(err.Error(), `/api/v4/projects/123/merge_requests/1/discussions: 400 {error: foo}`) {
+				if strings.HasSuffix(
+					err.Error(),
+					`/api/v4/projects/123/merge_requests/1/discussions: 400 {error: foo}`,
+				) {
 					return nil
 				}
 				return err
@@ -849,7 +881,11 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 	}
 }
 
-func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff string, t *testing.T) http.HandlerFunc {
+func getHTTPHandlerForCommentingLines(
+	expectedNewLine, expectedOldLine int,
+	diff string,
+	t *testing.T,
+) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		switch r.URL.Path {
@@ -863,7 +899,9 @@ func getHTTPHandlerForCommentingLines(expectedNewLine, expectedOldLine int, diff
 			}
 		case "/api/v4/projects/123/merge_requests/1/diffs":
 			if r.Method == http.MethodGet {
-				_, _ = w.Write([]byte(`[{"diff":"` + diff + `","new_path":"foo.txt","old_path":"foo.txt"}]`))
+				_, _ = w.Write(
+					[]byte(`[{"diff":"` + diff + `","new_path":"foo.txt","old_path":"foo.txt"}]`),
+				)
 			}
 		case "/api/v4/projects/123/merge_requests/1/versions":
 			if r.Method == http.MethodGet {

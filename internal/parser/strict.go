@@ -44,14 +44,22 @@ func describeTag(tag string) string {
 	}
 }
 
-func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (groups []Group, _ ParseError) {
+func parseGroups(
+	doc *yaml.Node,
+	schema Schema,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+) (groups []Group, _ ParseError) {
 	names := map[string]struct{}{}
 
 	for _, node := range unpackNodes(doc) {
 		if !isTag(node.ShortTag(), mapTag) {
 			return nil, ParseError{
 				Line: node.Line,
-				Err:  fmt.Errorf("top level field must be a groups key, got %s", describeTag(node.ShortTag())),
+				Err: fmt.Errorf(
+					"top level field must be a groups key, got %s",
+					describeTag(node.ShortTag()),
+				),
 			}
 		}
 
@@ -59,7 +67,11 @@ func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if entry.key.ShortTag() != strTag {
 				return nil, ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("groups key must be a %s, got a %s", describeTag(strTag), describeTag(entry.key.ShortTag())),
+					Err: fmt.Errorf(
+						"groups key must be a %s, got a %s",
+						describeTag(strTag),
+						describeTag(entry.key.ShortTag()),
+					),
 				}
 			}
 			if entry.key.Value != "groups" {
@@ -71,7 +83,11 @@ func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if !isTag(entry.val.ShortTag(), seqTag) {
 				return nil, ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("groups value must be a %s, got %s", describeTag(seqTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"groups value must be a %s, got %s",
+						describeTag(seqTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 			}
 			for _, group := range unpackNodes(entry.val) {
@@ -90,11 +106,20 @@ func parseGroups(doc *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 	return groups, ParseError{}
 }
 
-func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, contentLines []string) (group Group) {
+func parseGroup(
+	node *yaml.Node,
+	schema Schema,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+) (group Group) {
 	if !isTag(node.ShortTag(), mapTag) {
 		group.Error = ParseError{
 			Line: node.Line,
-			Err:  fmt.Errorf("group must be a %s, got %s", describeTag(mapTag), describeTag(node.ShortTag())),
+			Err: fmt.Errorf(
+				"group must be a %s, got %s",
+				describeTag(mapTag),
+				describeTag(node.ShortTag()),
+			),
 		}
 		return group
 	}
@@ -108,7 +133,11 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group name must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"group name must be a %s, got %s",
+						describeTag(strTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -124,7 +153,12 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"group %s must be a %s, got %s",
+						entry.key.Value,
+						describeTag(strTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -141,7 +175,12 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != strTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group %s must be a %s, got %s", entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"group %s must be a %s, got %s",
+						entry.key.Value,
+						describeTag(strTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -158,7 +197,11 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if entry.val.Kind != yaml.ScalarNode || entry.val.ShortTag() != intTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group limit must be a %s, got %s", describeTag(intTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"group limit must be a %s, got %s",
+						describeTag(intTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -167,7 +210,11 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if entry.val.ShortTag() != mapTag {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("group labels must be a %s, got %s", describeTag(mapTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"group labels must be a %s, got %s",
+						describeTag(mapTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -186,7 +233,11 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if !isTag(entry.val.ShortTag(), seqTag) {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("rules must be a %s, got %s", describeTag(seqTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"rules must be a %s, got %s",
+						describeTag(seqTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -197,14 +248,20 @@ func parseGroup(node *yaml.Node, schema Schema, offsetLine, offsetColumn int, co
 			if schema != ThanosSchema {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
+					Err: errors.New(
+						"partial_response_strategy is only valid when parser is configured to use the Thanos rule schema",
+					),
 				}
 				return group
 			}
 			if !isTag(entry.val.ShortTag(), strTag) {
 				group.Error = ParseError{
 					Line: entry.key.Line,
-					Err:  fmt.Errorf("partial_response_strategy must be a %s, got %s", describeTag(strTag), describeTag(entry.val.ShortTag())),
+					Err: fmt.Errorf(
+						"partial_response_strategy must be a %s, got %s",
+						describeTag(strTag),
+						describeTag(entry.val.ShortTag()),
+					),
 				}
 				return group
 			}
@@ -254,7 +311,11 @@ func parseRuleStrict(rule *yaml.Node, contentLines []string) Rule {
 		return Rule{
 			Error: ParseError{
 				Line: rule.Line,
-				Err:  fmt.Errorf("rule definion must be a %s, got %s", describeTag(mapTag), describeTag(rule.ShortTag())),
+				Err: fmt.Errorf(
+					"rule definion must be a %s, got %s",
+					describeTag(mapTag),
+					describeTag(rule.ShortTag()),
+				),
 			},
 		}
 	}

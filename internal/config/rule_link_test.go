@@ -34,7 +34,9 @@ func TestRuleLinkSettings(t *testing.T) {
 			conf: RuleLinkSettings{
 				Regex: "{{nil}}",
 			},
-			err: errors.New(`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`),
+			err: errors.New(
+				`template: regexp:1:125: executing "regexp" at <nil>: nil is not a command`,
+			),
 		},
 		{
 			conf: RuleLinkSettings{

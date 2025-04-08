@@ -57,7 +57,7 @@ func isEqualFailoverGroup(a, b *promapi.FailoverGroup) bool {
 }
 
 type Discovery struct {
-	FilePath        []FilePath        `hcl:"filepath,block" json:"filepath,omitempty"`
+	FilePath        []FilePath        `hcl:"filepath,block"        json:"filepath,omitempty"`
 	PrometheusQuery []PrometheusQuery `hcl:"prometheusQuery,block" json:"prometheusQuery,omitempty"`
 }
 
@@ -75,7 +75,11 @@ func (d Discovery) validate() (err error) {
 	return nil
 }
 
-func (d *Discovery) discover(ctx context.Context, pd Discoverer, servers []*promapi.FailoverGroup) ([]*promapi.FailoverGroup, error) {
+func (d *Discovery) discover(
+	ctx context.Context,
+	pd Discoverer,
+	servers []*promapi.FailoverGroup,
+) ([]*promapi.FailoverGroup, error) {
 	ds, err := pd.Discover(ctx)
 	if err != nil {
 		return nil, err
@@ -118,20 +122,20 @@ func (d *Discovery) merge(dst, src []*promapi.FailoverGroup) ([]*promapi.Failove
 }
 
 type PrometheusTemplate struct {
-	Headers     map[string]string `hcl:"headers,optional" json:"headers,omitempty"`
-	TLS         *TLSConfig        `hcl:"tls,block" json:"tls,omitempty"`
-	Name        string            `hcl:"name" json:"name"`
-	URI         string            `hcl:"uri" json:"uri"`
-	PublicURI   string            `hcl:"publicURI,optional" json:"publicURI,omitempty"`
-	Timeout     string            `hcl:"timeout,optional"  json:"timeout"`
-	Uptime      string            `hcl:"uptime,optional" json:"uptime"`
-	Failover    []string          `hcl:"failover,optional" json:"failover,omitempty"`
-	Include     []string          `hcl:"include,optional" json:"include,omitempty"`
-	Exclude     []string          `hcl:"exclude,optional" json:"exclude,omitempty"`
-	Tags        []string          `hcl:"tags,optional" json:"tags,omitempty"`
+	Headers     map[string]string `hcl:"headers,optional"     json:"headers,omitempty"`
+	TLS         *TLSConfig        `hcl:"tls,block"            json:"tls,omitempty"`
+	Name        string            `hcl:"name"                 json:"name"`
+	URI         string            `hcl:"uri"                  json:"uri"`
+	PublicURI   string            `hcl:"publicURI,optional"   json:"publicURI,omitempty"`
+	Timeout     string            `hcl:"timeout,optional"     json:"timeout"`
+	Uptime      string            `hcl:"uptime,optional"      json:"uptime"`
+	Failover    []string          `hcl:"failover,optional"    json:"failover,omitempty"`
+	Include     []string          `hcl:"include,optional"     json:"include,omitempty"`
+	Exclude     []string          `hcl:"exclude,optional"     json:"exclude,omitempty"`
+	Tags        []string          `hcl:"tags,optional"        json:"tags,omitempty"`
 	Concurrency int               `hcl:"concurrency,optional" json:"concurrency"`
-	RateLimit   int               `hcl:"rateLimit,optional" json:"rateLimit"`
-	Required    bool              `hcl:"required,optional" json:"required"`
+	RateLimit   int               `hcl:"rateLimit,optional"   json:"rateLimit"`
+	Required    bool              `hcl:"required,optional"    json:"required"`
 }
 
 func (pt PrometheusTemplate) validate() (err error) {
@@ -269,10 +273,10 @@ func (pt PrometheusTemplate) Render(data map[string]string) (*promapi.FailoverGr
 }
 
 type FilePath struct {
-	Directory string               `hcl:"directory" json:"directory"`
-	Match     string               `hcl:"match" json:"match"`
+	Directory string               `hcl:"directory"       json:"directory"`
+	Match     string               `hcl:"match"           json:"match"`
 	Ignore    []string             `hcl:"ignore,optional" json:"ignore,omitempty"`
-	Template  []PrometheusTemplate `hcl:"template,block" json:"template"`
+	Template  []PrometheusTemplate `hcl:"template,block"  json:"template"`
 }
 
 func (fp FilePath) validate() (err error) {
@@ -334,7 +338,10 @@ func (fp FilePath) Discover(_ context.Context) ([]*promapi.FailoverGroup, error)
 				for _, t := range fp.Template {
 					server, err := t.Render(data)
 					if err != nil {
-						return fmt.Errorf("filepath discovery failed to generate Prometheus config from a template: %w", err)
+						return fmt.Errorf(
+							"filepath discovery failed to generate Prometheus config from a template: %w",
+							err,
+						)
 					}
 					servers = append(servers, server)
 				}
@@ -346,12 +353,12 @@ func (fp FilePath) Discover(_ context.Context) ([]*promapi.FailoverGroup, error)
 }
 
 type PrometheusQuery struct {
-	URI      string               `hcl:"uri" json:"uri"`
+	URI      string               `hcl:"uri"              json:"uri"`
 	Headers  map[string]string    `hcl:"headers,optional" json:"headers,omitempty"`
-	Timeout  string               `hcl:"timeout,optional"  json:"timeout"`
-	TLS      *TLSConfig           `hcl:"tls,block" json:"tls,omitempty"`
-	Query    string               `hcl:"query" json:"query"`
-	Template []PrometheusTemplate `hcl:"template,block" json:"template"`
+	Timeout  string               `hcl:"timeout,optional" json:"timeout"`
+	TLS      *TLSConfig           `hcl:"tls,block"        json:"tls,omitempty"`
+	Query    string               `hcl:"query"            json:"query"`
+	Template []PrometheusTemplate `hcl:"template,block"   json:"template"`
 }
 
 func (pq PrometheusQuery) validate() (err error) {
@@ -398,7 +405,10 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 	)
 	res, err := prom.Query(ctx, pq.Query)
 	if err != nil {
-		return nil, fmt.Errorf("prometheusQuery discovery failed to execute Prometheus query: %w", err)
+		return nil, fmt.Errorf(
+			"prometheusQuery discovery failed to execute Prometheus query: %w",
+			err,
+		)
 	}
 
 	servers := []*promapi.FailoverGroup{}
@@ -406,7 +416,10 @@ func (pq PrometheusQuery) Discover(ctx context.Context) ([]*promapi.FailoverGrou
 		for _, t := range pq.Template {
 			server, err := t.Render(s.Labels.Map())
 			if err != nil {
-				return nil, fmt.Errorf("prometheusQuery discovery  failed to generate Prometheus config from a template: %w", err)
+				return nil, fmt.Errorf(
+					"prometheusQuery discovery  failed to generate Prometheus config from a template: %w",
+					err,
+				)
 			}
 			servers = append(servers, server)
 		}
@@ -449,6 +462,10 @@ func findNamedMatches(re *regexp.Regexp, str string) map[string]string {
 			results[key] = val
 		}
 	}
-	slog.Debug("Extracted regexp variables", slog.String("regexp", re.String()), slog.Any("vars", results))
+	slog.Debug(
+		"Extracted regexp variables",
+		slog.String("regexp", re.String()),
+		slog.Any("vars", results),
+	)
 	return results
 }

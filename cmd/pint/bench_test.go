@@ -103,11 +103,15 @@ func BenchmarkCheckRules(b *testing.B) {
 		case promapi.APIPathConfig:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`),
+			)
 		case promapi.APIPathFlags:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"storage.tsdb.retention.time": "1d"}}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"success","data":{"storage.tsdb.retention.time": "1d"}}`),
+			)
 		case promapi.APIPathMetadata:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -115,11 +119,15 @@ func BenchmarkCheckRules(b *testing.B) {
 		case promapi.APIPathQuery:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"vector","result":[]}}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"success","data":{"resultType":"vector","result":[]}}`),
+			)
 		case promapi.APIPathQueryRange:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`),
+			)
 		default:
 			b.Logf("%s %s", r.Method, r.URL.Path)
 			w.WriteHeader(http.StatusNotFound)

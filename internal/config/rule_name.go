@@ -5,8 +5,8 @@ import (
 )
 
 type RuleNameSettings struct {
-	Regex    string `hcl:",label" json:"key,omitempty"`
-	Comment  string `hcl:"comment,optional" json:"comment,omitempty"`
+	Regex    string `hcl:",label"            json:"key,omitempty"`
+	Comment  string `hcl:"comment,optional"  json:"comment,omitempty"`
 	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
 }
 

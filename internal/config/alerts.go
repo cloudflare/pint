@@ -7,10 +7,10 @@ import (
 )
 
 type AlertsSettings struct {
-	Range    string `hcl:"range" json:"range"`
-	Step     string `hcl:"step" json:"step"`
-	Resolve  string `hcl:"resolve" json:"resolve"`
-	Comment  string `hcl:"comment,optional" json:"comment,omitempty"`
+	Range    string `hcl:"range"             json:"range"`
+	Step     string `hcl:"step"              json:"step"`
+	Resolve  string `hcl:"resolve"           json:"resolve"`
+	Comment  string `hcl:"comment,optional"  json:"comment,omitempty"`
 	Severity string `hcl:"severity,optional" json:"severity,omitempty"`
 	MinCount int    `hcl:"minCount,optional" json:"minCount,omitempty"`
 }

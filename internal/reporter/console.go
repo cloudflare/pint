@@ -11,7 +11,11 @@ import (
 	"github.com/cloudflare/pint/internal/output"
 )
 
-func NewConsoleReporter(output io.Writer, minSeverity checks.Severity, noColor bool) ConsoleReporter {
+func NewConsoleReporter(
+	output io.Writer,
+	minSeverity checks.Severity,
+	noColor bool,
+) ConsoleReporter {
 	return ConsoleReporter{
 		output:      output,
 		minSeverity: minSeverity,
@@ -56,20 +60,30 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 				color = output.Dim
 			}
 
-			buf.WriteString(output.MaybeColor(color, cr.noColor, report.Problem.Severity.String()+": "))
+			buf.WriteString(
+				output.MaybeColor(color, cr.noColor, report.Problem.Severity.String()+": "),
+			)
 			buf.WriteString(output.MaybeColor(output.Bold, cr.noColor, report.Problem.Summary))
-			buf.WriteString(output.MaybeColor(output.Magenta, cr.noColor, " ("+report.Problem.Reporter+")\n"))
+			buf.WriteString(
+				output.MaybeColor(output.Magenta, cr.noColor, " ("+report.Problem.Reporter+")\n"),
+			)
 
 			buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, "  ---> "+report.Path.Name))
 			if report.Path.Name != report.Path.SymlinkTarget {
-				buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, " ~> "+report.Path.SymlinkTarget))
+				buf.WriteString(
+					output.MaybeColor(output.Cyan, cr.noColor, " ~> "+report.Path.SymlinkTarget),
+				)
 			}
-			buf.WriteString(output.MaybeColor(output.Cyan, cr.noColor, ":"+report.Problem.Lines.String()))
+			buf.WriteString(
+				output.MaybeColor(output.Cyan, cr.noColor, ":"+report.Problem.Lines.String()),
+			)
 			if report.Problem.Anchor == checks.AnchorBefore {
 				buf.WriteString(output.MaybeColor(output.Red, cr.noColor, " (deleted)"))
 			}
 			if report.Rule.Name() != "" {
-				buf.WriteString(output.MaybeColor(output.Bold, cr.noColor, " -> `"+report.Rule.Name()+"`"))
+				buf.WriteString(
+					output.MaybeColor(output.Bold, cr.noColor, " -> `"+report.Rule.Name()+"`"),
+				)
 			}
 			buf.WriteRune('\n')
 

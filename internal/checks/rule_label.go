@@ -16,7 +16,13 @@ const (
 	LabelCheckName = "rule/label"
 )
 
-func NewLabelCheck(keyRe, tokenRe, valueRe *TemplatedRegexp, values []string, isRequired bool, comment string, severity Severity) LabelCheck {
+func NewLabelCheck(
+	keyRe, tokenRe, valueRe *TemplatedRegexp,
+	values []string,
+	isRequired bool,
+	comment string,
+	severity Severity,
+) LabelCheck {
 	return LabelCheck{
 		keyRe:      keyRe,
 		tokenRe:    tokenRe,
@@ -53,7 +59,13 @@ func (c LabelCheck) Meta() CheckMeta {
 
 func (c LabelCheck) String() string {
 	if c.valueRe != nil {
-		return fmt.Sprintf("%s(%s=~%s:%v)", LabelCheckName, c.keyRe.original, c.valueRe.anchored, c.isRequired)
+		return fmt.Sprintf(
+			"%s(%s=~%s:%v)",
+			LabelCheckName,
+			c.keyRe.original,
+			c.valueRe.anchored,
+			c.isRequired,
+		)
 	}
 	return fmt.Sprintf("%s(%s:%v)", LabelCheckName, c.keyRe.original, c.isRequired)
 }
@@ -62,7 +74,11 @@ func (c LabelCheck) Reporter() string {
 	return LabelCheckName
 }
 
-func (c LabelCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c LabelCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.RecordingRule != nil {
 		problems = append(problems, c.checkRecordingRule(entry)...)
 	}
@@ -87,7 +103,10 @@ func (c LabelCheck) checkRecordingRule(entry discovery.Entry) (problems []Proble
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+					WholeRuleDiag(
+						entry.Rule,
+						fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+					),
 				},
 			})
 		}
@@ -141,7 +160,10 @@ func (c LabelCheck) checkAlertingRule(entry discovery.Entry) (problems []Problem
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+					WholeRuleDiag(
+						entry.Rule,
+						fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+					),
 				},
 			})
 		}
@@ -181,7 +203,10 @@ func (c LabelCheck) checkAlertingRule(entry discovery.Entry) (problems []Problem
 				Details:  maybeComment(c.comment),
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
-					WholeRuleDiag(entry.Rule, fmt.Sprintf("`%s` label is required.", c.keyRe.original)),
+					WholeRuleDiag(
+						entry.Rule,
+						fmt.Sprintf("`%s` label is required.", c.keyRe.original),
+					),
 				},
 			})
 			return problems
@@ -198,7 +223,11 @@ func (c LabelCheck) checkAlertingRule(entry discovery.Entry) (problems []Problem
 	return problems
 }
 
-func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlNode) (problems []Problem) {
+func (c LabelCheck) checkValue(
+	rule parser.Rule,
+	value string,
+	lab *parser.YamlNode,
+) (problems []Problem) {
 	if c.valueRe != nil && !c.valueRe.MustExpand(rule).MatchString(value) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
@@ -209,7 +238,11 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("`%s` label value must match `%s`.", c.keyRe.original, c.valueRe.anchored),
+					Message: fmt.Sprintf(
+						"`%s` label value must match `%s`.",
+						c.keyRe.original,
+						c.valueRe.anchored,
+					),
 					Pos:         lab.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(lab.Value),
@@ -246,7 +279,10 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 				Severity: c.severity,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("`%s` label value is not one of valid values.", c.keyRe.original),
+						Message: fmt.Sprintf(
+							"`%s` label value is not one of valid values.",
+							c.keyRe.original,
+						),
 						Pos:         lab.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(lab.Value),

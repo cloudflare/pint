@@ -256,7 +256,11 @@ func TestCounterCheck(t *testing.T) {
 				{
 					conds: []requestCondition{requireMetadataPath},
 					resp: metadataResponse{metadata: map[string][]v1.Metadata{
-						"http_requests_total": {{Type: "counter"}, {Type: "gauge"}, {Type: "counter"}},
+						"http_requests_total": {
+							{Type: "counter"},
+							{Type: "gauge"},
+							{Type: "counter"},
+						},
 					}},
 				},
 			},

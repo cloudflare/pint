@@ -16,7 +16,13 @@ const (
 	BytesPerSampleQuery = "avg(avg_over_time(go_memstats_alloc_bytes[2h]) / avg_over_time(prometheus_tsdb_head_series[2h]))"
 )
 
-func NewCostCheck(prom *promapi.FailoverGroup, maxSeries, maxTotalSamples, maxPeakSamples int, maxEvaluationDuration time.Duration, comment string, severity Severity) CostCheck {
+func NewCostCheck(
+	prom *promapi.FailoverGroup,
+	maxSeries, maxTotalSamples, maxPeakSamples int,
+	maxEvaluationDuration time.Duration,
+	comment string,
+	severity Severity,
+) CostCheck {
 	return CostCheck{
 		prom:                  prom,
 		maxSeries:             maxSeries,
@@ -62,7 +68,11 @@ func (c CostCheck) Reporter() string {
 	return CostCheckName
 }
 
-func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c CostCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -72,7 +82,10 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 	query := fmt.Sprintf("count(%s)", expr.Value.Value)
 	qr, err := c.prom.Query(ctx, query)
 	if err != nil {
-		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(
+			problems,
+			problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug),
+		)
 		return problems
 	}
 
@@ -86,7 +99,10 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 		result, err := c.prom.Query(ctx, BytesPerSampleQuery)
 		if err == nil {
 			for _, s := range result.Series {
-				estimate = fmt.Sprintf(" with %s estimated memory usage", output.HumanizeBytes(int(s.Value*float64(series))))
+				estimate = fmt.Sprintf(
+					" with %s estimated memory usage",
+					output.HumanizeBytes(int(s.Value*float64(series))),
+				)
 				break
 			}
 		}
@@ -102,7 +118,13 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("%s returned %d result(s)%s, maximum allowed series is %d.", promText(c.prom.Name(), qr.URI), series, estimate, c.maxSeries),
+					Message: fmt.Sprintf(
+						"%s returned %d result(s)%s, maximum allowed series is %d.",
+						promText(c.prom.Name(), qr.URI),
+						series,
+						estimate,
+						c.maxSeries,
+					),
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
@@ -122,7 +144,12 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("%s queried %d samples in total when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.TotalQueryableSamples, c.maxTotalSamples),
+					Message: fmt.Sprintf(
+						"%s queried %d samples in total when executing this query, which is more than the configured limit of %d.",
+						promText(c.prom.Name(), qr.URI),
+						qr.Stats.Samples.TotalQueryableSamples,
+						c.maxTotalSamples,
+					),
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
@@ -142,7 +169,12 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("%s queried %d peak samples when executing this query, which is more than the configured limit of %d.", promText(c.prom.Name(), qr.URI), qr.Stats.Samples.PeakSamples, c.maxPeakSamples),
+					Message: fmt.Sprintf(
+						"%s queried %d peak samples when executing this query, which is more than the configured limit of %d.",
+						promText(c.prom.Name(), qr.URI),
+						qr.Stats.Samples.PeakSamples,
+						c.maxPeakSamples,
+					),
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
@@ -163,7 +195,12 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("%s took %s when executing this query, which is more than the configured limit of %s.", promText(c.prom.Name(), qr.URI), output.HumanizeDuration(evalDur), output.HumanizeDuration(c.maxEvaluationDuration)),
+					Message: fmt.Sprintf(
+						"%s took %s when executing this query, which is more than the configured limit of %s.",
+						promText(c.prom.Name(), qr.URI),
+						output.HumanizeDuration(evalDur),
+						output.HumanizeDuration(c.maxEvaluationDuration),
+					),
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
@@ -173,7 +210,8 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 		return problems
 	}
 
-	if series > 0 && c.maxSeries == 0 && c.maxTotalSamples == 0 && c.maxPeakSamples == 0 && c.maxEvaluationDuration == 0 {
+	if series > 0 && c.maxSeries == 0 && c.maxTotalSamples == 0 && c.maxPeakSamples == 0 &&
+		c.maxEvaluationDuration == 0 {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Pos.Lines(),
@@ -183,7 +221,12 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 			Severity: Information,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("%s returned %d result(s)%s.", promText(c.prom.Name(), qr.URI), series, estimate),
+					Message: fmt.Sprintf(
+						"%s returned %d result(s)%s.",
+						promText(c.prom.Name(), qr.URI),
+						series,
+						estimate,
+					),
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),

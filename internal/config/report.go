@@ -7,7 +7,7 @@ import (
 )
 
 type ReportSettings struct {
-	Comment  string `hcl:"comment" json:"comment"`
+	Comment  string `hcl:"comment"  json:"comment"`
 	Severity string `hcl:"severity" json:"severity"`
 }
 

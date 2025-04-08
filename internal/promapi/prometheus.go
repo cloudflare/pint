@@ -144,7 +144,13 @@ type Prometheus struct {
 	concurrency int
 }
 
-func NewPrometheus(name, uri, publicURI string, headers map[string]string, timeout time.Duration, concurrency, rl int, tlsConf *tls.Config) *Prometheus {
+func NewPrometheus(
+	name, uri, publicURI string,
+	headers map[string]string,
+	timeout time.Duration,
+	concurrency, rl int,
+	tlsConf *tls.Config,
+) *Prometheus {
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	if tlsConf != nil {
 		transport.TLSClientConfig = tlsConf
@@ -179,7 +185,11 @@ func (prom *Prometheus) SafeURI() string {
 }
 
 func (prom *Prometheus) Close() {
-	slog.Debug("Stopping query workers", slog.String("name", prom.name), slog.String("uri", prom.safeURI))
+	slog.Debug(
+		"Stopping query workers",
+		slog.String("name", prom.name),
+		slog.String("uri", prom.safeURI),
+	)
 	close(prom.queries)
 	prom.wg.Wait()
 }
@@ -202,7 +212,11 @@ func (prom *Prometheus) StartWorkers() {
 	}
 }
 
-func (prom *Prometheus) doRequest(ctx context.Context, method, path string, args url.Values) (*http.Response, error) {
+func (prom *Prometheus) doRequest(
+	ctx context.Context,
+	method, path string,
+	args url.Values,
+) (*http.Response, error) {
 	u, _ := url.Parse(prom.unsafeURI)
 	u.Path = strings.TrimSuffix(u.Path, "/")
 
@@ -266,7 +280,8 @@ func processJob(prom *Prometheus, job queryRequest) queryResult {
 		if errors.Is(result.err, context.Canceled) {
 			return result
 		}
-		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).Inc()
+		prometheusQueryErrorsTotal.WithLabelValues(prom.name, job.query.Endpoint(), errReason(result.err)).
+			Inc()
 		if isUnsupportedError(result.err) {
 			prom.apis.disable(job.query.Endpoint())
 			slog.Warn(

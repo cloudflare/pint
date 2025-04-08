@@ -13,7 +13,11 @@ func TestRuleName(t *testing.T) {
 			description: "recording rule name doesn't match",
 			content:     "- record: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
+				return checks.NewRuleNameCheck(
+					checks.MustTemplatedRegexp("total:.+"),
+					"some text",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -22,7 +26,11 @@ func TestRuleName(t *testing.T) {
 			description: "recording rule name match",
 			content:     "- record: total:foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
+				return checks.NewRuleNameCheck(
+					checks.MustTemplatedRegexp("total:.+"),
+					"some text",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -30,7 +38,11 @@ func TestRuleName(t *testing.T) {
 			description: "alerting rule name doesn't match",
 			content:     "- alert: foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
+				return checks.NewRuleNameCheck(
+					checks.MustTemplatedRegexp("total:.+"),
+					"some text",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
@@ -39,7 +51,11 @@ func TestRuleName(t *testing.T) {
 			description: "alerting rule name match",
 			content:     "- alert: total:foo\n  expr: sum(foo) without(\n",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleNameCheck(checks.MustTemplatedRegexp("total:.+"), "some text", checks.Warning)
+				return checks.NewRuleNameCheck(
+					checks.MustTemplatedRegexp("total:.+"),
+					"some text",
+					checks.Warning,
+				)
 			},
 			prometheus: noProm,
 		},

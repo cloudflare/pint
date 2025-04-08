@@ -49,7 +49,11 @@ func TestGitHubReporter(t *testing.T) {
 `))
 
 	summaryWithDetails := reporter.NewSummary([]reporter.Report{})
-	summaryWithDetails.MarkCheckDisabled("prom1", promapi.APIPathConfig, []string{"check1", "check3", "check2"})
+	summaryWithDetails.MarkCheckDisabled(
+		"prom1",
+		promapi.APIPathConfig,
+		[]string{"check1", "check3", "check2"},
+	)
 	summaryWithDetails.MarkCheckDisabled("prom2", promapi.APIPathMetadata, []string{"check1"})
 
 	for _, tc := range []testCaseT{

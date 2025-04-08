@@ -11,7 +11,15 @@ import (
 )
 
 func newAlertsCheck(prom *promapi.FailoverGroup) checks.RuleChecker {
-	return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 0, "", checks.Information)
+	return checks.NewAlertsCheck(
+		prom,
+		time.Hour*24,
+		time.Minute,
+		time.Minute*5,
+		0,
+		"",
+		checks.Information,
+	)
 }
 
 func TestAlertsCountCheck(t *testing.T) {
@@ -186,7 +194,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(
@@ -212,7 +223,15 @@ func TestAlertsCountCheck(t *testing.T) {
 			description: "minCount=2",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 2, "rule comment", checks.Information)
+				return checks.NewAlertsCheck(
+					prom,
+					time.Hour*24,
+					time.Minute,
+					time.Minute*5,
+					2,
+					"rule comment",
+					checks.Information,
+				)
 			},
 			prometheus: newSimpleProm,
 			mocks: []*prometheusMock{
@@ -250,7 +269,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(
@@ -276,7 +298,15 @@ func TestAlertsCountCheck(t *testing.T) {
 			description: "minCount=2 severity=bug",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 2, "", checks.Bug)
+				return checks.NewAlertsCheck(
+					prom,
+					time.Hour*24,
+					time.Minute,
+					time.Minute*5,
+					2,
+					"",
+					checks.Bug,
+				)
 			},
 			prometheus: newSimpleProm,
 			mocks: []*prometheusMock{
@@ -314,7 +344,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(
@@ -340,7 +373,15 @@ func TestAlertsCountCheck(t *testing.T) {
 			description: "minCount=10",
 			content:     "- alert: Foo Is Down\n  for: 10m\n  expr: up{job=\"foo\"} == 0\n",
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewAlertsCheck(prom, time.Hour*24, time.Minute, time.Minute*5, 10, "", checks.Information)
+				return checks.NewAlertsCheck(
+					prom,
+					time.Hour*24,
+					time.Minute,
+					time.Minute*5,
+					10,
+					"",
+					checks.Information,
+				)
 			},
 			prometheus: newSimpleProm,
 			mocks: []*prometheusMock{
@@ -378,7 +419,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(
@@ -471,7 +515,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(
@@ -577,7 +624,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(
@@ -639,7 +689,10 @@ func TestAlertsCountCheck(t *testing.T) {
 							generateSampleStream(
 								map[string]string{"job": "foo"},
 								time.Now().Add(time.Hour*-20),
-								time.Now().Add(time.Hour*-20).Add(time.Minute*9).Add(time.Second*59),
+								time.Now().
+									Add(time.Hour*-20).
+									Add(time.Minute*9).
+									Add(time.Second*59),
 								time.Minute,
 							),
 							generateSampleStream(

@@ -27,7 +27,11 @@ func TestBitBucketMakeComments(t *testing.T) {
 	commentBody := func(icon, severity, reporter, text string) string {
 		return fmt.Sprintf(
 			":%s: **%s** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.\n\n------\n\n%s\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/%s.html).\n",
-			icon, severity, reporter, text, reporter,
+			icon,
+			severity,
+			reporter,
+			text,
+			reporter,
 		)
 	}
 
@@ -186,7 +190,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					Text:     commentBody("warning", "Warning", "r1", "second error\n\nsecond details"),
+					Text: commentBody(
+						"warning",
+						"Warning",
+						"r1",
+						"second error\n\nsecond details",
+					),
 					Severity: "NORMAL",
 					Anchor: BitBucketPendingCommentAnchor{
 						Path:     "rule.yaml",
@@ -197,7 +206,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					Text:     commentBody("stop_sign", "Bug", "r2", "third error\n\nthird details\n\n------\n\nfourth error\n\nfourth details\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.yaml`."),
+					Text: commentBody(
+						"stop_sign",
+						"Bug",
+						"r2",
+						"third error\n\nthird details\n\n------\n\nfourth error\n\nfourth details\n\n:leftwards_arrow_with_hook: This problem was detected on a symlinked file `symlink.yaml`.",
+					),
 					Severity: "BLOCKER",
 					Anchor: BitBucketPendingCommentAnchor{
 						Path:     "rule.yaml",
@@ -280,7 +294,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 			},
 			comments: []BitBucketPendingComment{
 				{
-					Text:     commentBody("stop_sign", "Bug", "r1", "first error\n\nfirst details\n\n------\n\nsecond error\n\nsecond details"),
+					Text: commentBody(
+						"stop_sign",
+						"Bug",
+						"r1",
+						"first error\n\nfirst details\n\n------\n\nsecond error\n\nsecond details",
+					),
 					Severity: "BLOCKER",
 					Anchor: BitBucketPendingCommentAnchor{
 						Path:     "rule.yaml",
@@ -402,7 +421,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 			},
 			comments: []BitBucketPendingComment{
 				{
-					Text:     commentBody("stop_sign", "Bug", "r1", "first error\n\n------\n\nsecond error\n\n------\n\nshared details"),
+					Text: commentBody(
+						"stop_sign",
+						"Bug",
+						"r1",
+						"first error\n\n------\n\nsecond error\n\n------\n\nshared details",
+					),
 					Severity: "BLOCKER",
 					Anchor: BitBucketPendingCommentAnchor{
 						Path:     "rule.yaml",
@@ -545,7 +569,12 @@ func TestBitBucketMakeComments(t *testing.T) {
 					},
 				},
 				{
-					Text:     commentBody("warning", "Warning", "r1", "second error\n\nsecond details"),
+					Text: commentBody(
+						"warning",
+						"Warning",
+						"r1",
+						"second error\n\nsecond details",
+					),
 					Severity: "NORMAL",
 					Anchor: BitBucketPendingCommentAnchor{
 						Path:     "rule.yaml",
@@ -595,7 +624,10 @@ func TestBitBucketMakeComments(t *testing.T) {
 			},
 			comments: []BitBucketPendingComment{
 				{
-					Text:     ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **r1** check.\n\n------\n\n" + strings.Repeat("X", maxCommentLength-98-4) + " ...",
+					Text: ":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **r1** check.\n\n------\n\n" + strings.Repeat(
+						"X",
+						maxCommentLength-98-4,
+					) + " ...",
 					Severity: "BLOCKER",
 					Anchor: BitBucketPendingCommentAnchor{
 						Path:     "rule.yaml",

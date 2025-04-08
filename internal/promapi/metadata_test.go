@@ -25,15 +25,27 @@ func TestMetadata(t *testing.T) {
 		case "gauge":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`))
+			_, _ = w.Write(
+				[]byte(
+					`{"status":"success","data":{"gauge":[{"type":"gauge","help":"Text","unit":""}]}}`,
+				),
+			)
 		case "counter":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"counter":[{"type":"counter","help":"Text","unit":""}]}}`))
+			_, _ = w.Write(
+				[]byte(
+					`{"status":"success","data":{"counter":[{"type":"counter","help":"Text","unit":""}]}}`,
+				),
+			)
 		case "mixed":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"mixed":[{"type":"gauge","help":"Text1","unit":"abc"},{"type":"counter","help":"Text2","unit":""}]}}`))
+			_, _ = w.Write(
+				[]byte(
+					`{"status":"success","data":{"mixed":[{"type":"gauge","help":"Text1","unit":"abc"},{"type":"counter","help":"Text2","unit":""}]}}`,
+				),
+			)
 		case "notfound":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -41,12 +53,20 @@ func TestMetadata(t *testing.T) {
 		case "once":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
+			_, _ = w.Write(
+				[]byte(
+					`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`,
+				),
+			)
 		case "slow":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
 			time.Sleep(time.Second * 2)
-			_, _ = w.Write([]byte(`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`))
+			_, _ = w.Write(
+				[]byte(
+					`{"status":"success","data":{"once":[{"type":"gauge","help":"Text","unit":""}]}}`,
+				),
+			)
 		case "empty":
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -57,7 +77,9 @@ func TestMetadata(t *testing.T) {
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled metric"}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"error","errorType":"bad_data","error":"unhandled metric"}`),
+			)
 		}
 	}))
 	defer srv.Close()

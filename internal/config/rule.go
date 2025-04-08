@@ -12,23 +12,23 @@ import (
 )
 
 type Rule struct {
-	Match         []Match              `hcl:"match,block" json:"match,omitempty"`
-	Ignore        []Match              `hcl:"ignore,block" json:"ignore,omitempty"`
-	Enable        []string             `hcl:"enable,optional" json:"enable,omitempty"`
-	Disable       []string             `hcl:"disable,optional" json:"disable,omitempty"`
-	Aggregate     []AggregateSettings  `hcl:"aggregate,block" json:"aggregate,omitempty"`
-	Annotation    []AnnotationSettings `hcl:"annotation,block" json:"annotation,omitempty"`
-	Label         []AnnotationSettings `hcl:"label,block" json:"label,omitempty"`
-	Cost          *CostSettings        `hcl:"cost,block" json:"cost,omitempty"`
-	Alerts        *AlertsSettings      `hcl:"alerts,block" json:"alerts,omitempty"`
-	For           *ForSettings         `hcl:"for,block" json:"for,omitempty"`
+	Match         []Match              `hcl:"match,block"           json:"match,omitempty"`
+	Ignore        []Match              `hcl:"ignore,block"          json:"ignore,omitempty"`
+	Enable        []string             `hcl:"enable,optional"       json:"enable,omitempty"`
+	Disable       []string             `hcl:"disable,optional"      json:"disable,omitempty"`
+	Aggregate     []AggregateSettings  `hcl:"aggregate,block"       json:"aggregate,omitempty"`
+	Annotation    []AnnotationSettings `hcl:"annotation,block"      json:"annotation,omitempty"`
+	Label         []AnnotationSettings `hcl:"label,block"           json:"label,omitempty"`
+	Cost          *CostSettings        `hcl:"cost,block"            json:"cost,omitempty"`
+	Alerts        *AlertsSettings      `hcl:"alerts,block"          json:"alerts,omitempty"`
+	For           *ForSettings         `hcl:"for,block"             json:"for,omitempty"`
 	KeepFiringFor *ForSettings         `hcl:"keep_firing_for,block" json:"keep_firing_for,omitempty"`
-	RangeQuery    *RangeQuerySettings  `hcl:"range_query,block" json:"range_query,omitempty"`
-	Report        *ReportSettings      `hcl:"report,block" json:"report,omitempty"`
-	Reject        []RejectSettings     `hcl:"reject,block" json:"reject,omitempty"`
-	RuleLink      []RuleLinkSettings   `hcl:"link,block" json:"link,omitempty"`
-	RuleName      []RuleNameSettings   `hcl:"name,block" json:"name,omitempty"`
-	Locked        bool                 `hcl:"locked,optional" json:"locked,omitempty"`
+	RangeQuery    *RangeQuerySettings  `hcl:"range_query,block"     json:"range_query,omitempty"`
+	Report        *ReportSettings      `hcl:"report,block"          json:"report,omitempty"`
+	Reject        []RejectSettings     `hcl:"reject,block"          json:"reject,omitempty"`
+	RuleLink      []RuleLinkSettings   `hcl:"link,block"            json:"link,omitempty"`
+	RuleName      []RuleNameSettings   `hcl:"name,block"            json:"name,omitempty"`
+	Locked        bool                 `hcl:"locked,optional"       json:"locked,omitempty"`
 }
 
 func (rule Rule) validate() (err error) {
@@ -131,7 +131,12 @@ func (rule Rule) validate() (err error) {
 	return nil
 }
 
-func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, promTags []string) bool {
+func isDisabledForRule(
+	rule parser.Rule,
+	name string,
+	check checks.RuleChecker,
+	promTags []string,
+) bool {
 	matches := []string{
 		name,
 		check.String(),
@@ -170,7 +175,14 @@ func isDisabledForRule(rule parser.Rule, name string, check checks.RuleChecker, 
 	return false
 }
 
-func isEnabled(enabledChecks, disabledChecks []string, rule parser.Rule, name string, check checks.RuleChecker, promTags []string, locked bool) bool {
+func isEnabled(
+	enabledChecks, disabledChecks []string,
+	rule parser.Rule,
+	name string,
+	check checks.RuleChecker,
+	promTags []string,
+	locked bool,
+) bool {
 	if check.Meta().AlwaysEnabled {
 		return true
 	}

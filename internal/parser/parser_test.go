@@ -93,7 +93,9 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			input: []byte("- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |"),
+			input: []byte(
+				"- 0: 0\n  00000000: 000000\n  000000:00000000000: 00000000\n  00000000000:000000: 0000000000000000000000000000000000\n  000000: 0000000\n  expr: |",
+			),
 			output: parser.File{
 				IsRelaxed: true,
 				Groups: []parser.Group{
@@ -101,7 +103,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 6},
-								Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 6},
+								Error: parser.ParseError{
+									Err:  errors.New("incomplete rule, no alert or record key"),
+									Line: 6,
+								},
 							},
 						},
 					},
@@ -117,7 +122,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 2},
-								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 2},
+								Error: parser.ParseError{
+									Err:  errors.New("missing expr key"),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -161,7 +169,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 5},
-								Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("incomplete rule, no alert or record key"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -177,7 +188,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 1},
-								Error: parser.ParseError{Err: errors.New("incomplete rule, no alert or record key"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("incomplete rule, no alert or record key"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -193,7 +207,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 1},
-								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("missing expr key"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -209,7 +226,12 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 2},
-								Error: parser.ParseError{Err: errors.New("got both record and alert keys in a single rule"), Line: 1},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"got both record and alert keys in a single rule",
+									),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -225,7 +247,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 3},
-								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("missing expr key"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -237,7 +262,9 @@ func TestParse(t *testing.T) {
 			output: parser.File{
 				IsRelaxed: true,
 				Error: parser.ParseError{
-					Err:  errors.New("yaml: block sequence entries are not allowed in this context"),
+					Err: errors.New(
+						"yaml: block sequence entries are not allowed in this context",
+					),
 					Line: 1,
 				},
 			},
@@ -275,7 +302,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 4},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated expr key"),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -295,7 +325,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("duplicated record key"), Line: 4},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated record key"),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -315,7 +348,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
-								Error: parser.ParseError{Err: errors.New("duplicated alert key"), Line: 3},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated alert key"),
+									Line: 3,
+								},
 							},
 						},
 					},
@@ -336,7 +372,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("duplicated for key"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated for key"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -357,7 +396,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("duplicated keep_firing_for key"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated keep_firing_for key"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -378,7 +420,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated labels key"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -399,7 +444,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("duplicated labels key"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated labels key"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -420,7 +468,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("duplicated annotations key"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated annotations key"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -436,7 +487,10 @@ func TestParse(t *testing.T) {
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 3},
-								Error: parser.ParseError{Err: errors.New("invalid key(s) found: extra"), Line: 3},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid key(s) found: extra"),
+									Line: 3,
+								},
 							},
 						},
 					},
@@ -1471,7 +1525,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 2},
-								Error: parser.ParseError{Err: errors.New("alert value cannot be empty"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("alert value cannot be empty"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -1487,7 +1544,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 2},
-								Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
+								Error: parser.ParseError{
+									Err:  errors.New("expr value cannot be empty"),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -1503,7 +1563,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 1},
-								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("missing expr key"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -1519,7 +1582,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 2},
-								Error: parser.ParseError{Err: errors.New("record value cannot be empty"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("record value cannot be empty"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -1535,7 +1601,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 2},
-								Error: parser.ParseError{Err: errors.New("expr value cannot be empty"), Line: 2},
+								Error: parser.ParseError{
+									Err:  errors.New("expr value cannot be empty"),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -1551,7 +1620,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 1, Last: 1},
-								Error: parser.ParseError{Err: errors.New("missing expr key"), Line: 1},
+								Error: parser.ParseError{
+									Err:  errors.New("missing expr key"),
+									Line: 1,
+								},
 							},
 						},
 					},
@@ -1703,7 +1775,11 @@ data:
 										Value: &parser.YamlNode{
 											Value: "up == 0",
 											Pos: diags.PositionRanges{
-												{Line: 7, FirstColumn: 10, LastColumn: 13}, // points at anchor
+												{
+													Line:        7,
+													FirstColumn: 10,
+													LastColumn:  13,
+												}, // points at anchor
 											},
 										},
 									},
@@ -1749,7 +1825,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
-								Error: parser.ParseError{Err: errors.New("invalid recording rule name: invalid metric name"), Line: 2},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"invalid recording rule name: invalid metric name",
+									),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -1822,7 +1903,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid label name: foo bar"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -1843,7 +1927,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("invalid label name: foo bar"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid label name: foo bar"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -1864,7 +1951,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("invalid label name: {{ $value }}"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid label name: {{ $value }}"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -1885,7 +1975,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("invalid annotation name: foo bar"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid annotation name: foo bar"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -1922,7 +2015,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("invalid annotation name: {{ $value }}"), Line: 5},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid annotation name: {{ $value }}"),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -1942,7 +2038,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("invalid field 'keep_firing_for' in recording rule"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"invalid field 'keep_firing_for' in recording rule",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -1962,7 +2063,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("invalid field 'for' in recording rule"), Line: 4},
+								Error: parser.ParseError{
+									Err:  errors.New("invalid field 'for' in recording rule"),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -1983,7 +2087,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("invalid field 'annotations' in recording rule"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"invalid field 'annotations' in recording rule",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2003,7 +2112,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
-								Error: parser.ParseError{Err: errors.New("record value must be a string, got integer instead"), Line: 2},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"record value must be a string, got integer instead",
+									),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -2022,7 +2136,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
-								Error: parser.ParseError{Err: errors.New("alert value must be a string, got integer instead"), Line: 2},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"alert value must be a string, got integer instead",
+									),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -2041,7 +2160,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
-								Error: parser.ParseError{Err: errors.New("expr value must be a string, got integer instead"), Line: 3},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"expr value must be a string, got integer instead",
+									),
+									Line: 3,
+								},
 							},
 						},
 					},
@@ -2061,7 +2185,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("for value must be a string, got integer instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"for value must be a string, got integer instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2081,7 +2210,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("keep_firing_for value must be a string, got integer instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"keep_firing_for value must be a string, got integer instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2101,7 +2235,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got list instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"labels value must be a mapping, got list instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2122,7 +2261,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 5},
-								Error: parser.ParseError{Err: errors.New("annotations value must be a mapping, got list instead"), Line: 5},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"annotations value must be a mapping, got list instead",
+									),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -2145,7 +2289,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 7},
-								Error: parser.ParseError{Err: errors.New("labels foo value must be a string, got integer instead"), Line: 5},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"labels foo value must be a string, got integer instead",
+									),
+									Line: 5,
+								},
 							},
 						},
 					},
@@ -2168,7 +2317,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 7},
-								Error: parser.ParseError{Err: errors.New("annotations bar value must be a string, got integer instead"), Line: 7},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"annotations bar value must be a string, got integer instead",
+									),
+									Line: 7,
+								},
 							},
 						},
 					},
@@ -2188,7 +2342,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got integer instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"labels value must be a mapping, got integer instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2208,7 +2367,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got bool instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"labels value must be a mapping, got bool instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2267,7 +2431,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 3},
-								Error: parser.ParseError{Err: errors.New("record value must be a string, got bool instead"), Line: 2},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"record value must be a string, got bool instead",
+									),
+									Line: 2,
+								},
 							},
 						},
 					},
@@ -2287,7 +2456,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("record value must be a string, got mapping instead"), Line: 3},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"record value must be a string, got mapping instead",
+									),
+									Line: 3,
+								},
 							},
 						},
 					},
@@ -2307,7 +2481,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got string instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"labels value must be a mapping, got string instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2328,7 +2507,9 @@ data:
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
 								Error: parser.ParseError{
-									Err:  errors.New("labels value must be a mapping, got binary data instead"),
+									Err: errors.New(
+										"labels value must be a mapping, got binary data instead",
+									),
 									Line: 4,
 								},
 							},
@@ -2351,7 +2532,9 @@ data:
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
 								Error: parser.ParseError{
-									Err:  errors.New("for value must be a string, got float instead"),
+									Err: errors.New(
+										"for value must be a string, got float instead",
+									),
 									Line: 4,
 								},
 							},
@@ -2373,7 +2556,12 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
-								Error: parser.ParseError{Err: errors.New("labels value must be a mapping, got garbage instead"), Line: 4},
+								Error: parser.ParseError{
+									Err: errors.New(
+										"labels value must be a mapping, got garbage instead",
+									),
+									Line: 4,
+								},
 							},
 						},
 					},
@@ -2408,7 +2596,9 @@ data:
 							{
 								Lines: diags.LineRange{First: 2, Last: 4},
 								Error: parser.ParseError{
-									Err:  errors.New("labels value must be a mapping, got string instead"),
+									Err: errors.New(
+										"labels value must be a mapping, got string instead",
+									),
 									Line: 4,
 								},
 							},
@@ -2504,7 +2694,10 @@ data:
 						Rules: []parser.Rule{
 							{
 								Lines: diags.LineRange{First: 5, Last: 7},
-								Error: parser.ParseError{Err: errors.New("duplicated expr key"), Line: 7},
+								Error: parser.ParseError{
+									Err:  errors.New("duplicated expr key"),
+									Line: 7,
+								},
 							},
 						},
 					},
@@ -2591,7 +2784,9 @@ groups:
 							{
 								Lines: diags.LineRange{First: 5, Last: 9},
 								Error: parser.ParseError{
-									Err:  errors.New("labels foo value must be a string, got mapping instead"),
+									Err: errors.New(
+										"labels foo value must be a string, got mapping instead",
+									),
 									Line: 9,
 								},
 							},
@@ -2720,7 +2915,9 @@ groups:
 				Groups: []parser.Group{
 					{
 						Error: parser.ParseError{
-							Err:  errors.New("incomplete group definition, name is required and must be set"),
+							Err: errors.New(
+								"incomplete group definition, name is required and must be set",
+							),
 							Line: 3,
 						},
 						Rules: []parser.Rule{
@@ -2951,7 +3148,9 @@ groups:
 								Lines: diags.LineRange{First: 8, Last: 8},
 								Error: parser.ParseError{
 									Line: 8,
-									Err:  errors.New("labels value must be a mapping, got binary data instead"),
+									Err: errors.New(
+										"labels value must be a mapping, got binary data instead",
+									),
 								},
 							},
 						},
@@ -3191,7 +3390,9 @@ groups:
 								Lines: diags.LineRange{First: 5, Last: 9},
 								Error: parser.ParseError{
 									Line: 9,
-									Err:  errors.New("labels job value must be a string, got mapping instead"),
+									Err: errors.New(
+										"labels job value must be a string, got mapping instead",
+									),
 								},
 							},
 						},
@@ -3218,7 +3419,9 @@ groups:
 								Lines: diags.LineRange{First: 5, Last: 7},
 								Error: parser.ParseError{
 									Line: 7,
-									Err:  errors.New("expr value must be a string, got mapping instead"),
+									Err: errors.New(
+										"expr value must be a string, got mapping instead",
+									),
 								},
 							},
 						},
@@ -3548,7 +3751,9 @@ groups:
 								Lines: diags.LineRange{First: 5, Last: 6},
 								Error: parser.ParseError{
 									Line: 5,
-									Err:  errors.New("expr value must be a string, got binary data instead"),
+									Err: errors.New(
+										"expr value must be a string, got binary data instead",
+									),
 								},
 							},
 						},
@@ -3573,7 +3778,9 @@ groups:
 								Lines: diags.LineRange{First: 5, Last: 5},
 								Error: parser.ParseError{
 									Line: 5,
-									Err:  errors.New("labels value must be a mapping, got binary data instead"),
+									Err: errors.New(
+										"labels value must be a mapping, got binary data instead",
+									),
 								},
 							},
 						},
@@ -3938,7 +4145,9 @@ groups:
 					{
 						Name: "foo",
 						Error: parser.ParseError{
-							Err:  errors.New("invalid interval value: not a valid duration string: \"xxx\""),
+							Err: errors.New(
+								"invalid interval value: not a valid duration string: \"xxx\"",
+							),
 							Line: 4,
 						},
 					},
@@ -3978,7 +4187,9 @@ groups:
 					{
 						Name: "foo",
 						Error: parser.ParseError{
-							Err:  errors.New("invalid query_offset value: not a valid duration string: \"xxx\""),
+							Err: errors.New(
+								"invalid query_offset value: not a valid duration string: \"xxx\"",
+							),
 							Line: 4,
 						},
 					},
@@ -4050,7 +4261,9 @@ groups:
 								Lines: diags.LineRange{First: 5, Last: 10},
 								Error: parser.ParseError{
 									Line: 6,
-									Err:  errors.New("for value must be a string, got integer instead"),
+									Err: errors.New(
+										"for value must be a string, got integer instead",
+									),
 								},
 							},
 						},
@@ -4081,7 +4294,9 @@ groups:
 								Lines: diags.LineRange{First: 6, Last: 10},
 								Error: parser.ParseError{
 									Line: 7,
-									Err:  errors.New("keep_firing_for value must be a string, got integer instead"),
+									Err: errors.New(
+										"keep_firing_for value must be a string, got integer instead",
+									),
 								},
 							},
 						},
@@ -4216,7 +4431,9 @@ groups:
 												{Line: 7, FirstColumn: 7, LastColumn: 17},
 											},
 										},
-										SyntaxError: errors.New(`1:8: parse error: unexpected "=" in label matching, expected string`),
+										SyntaxError: errors.New(
+											`1:8: parse error: unexpected "=" in label matching, expected string`,
+										),
 									},
 								},
 							},
@@ -4240,7 +4457,9 @@ groups:
 					{
 						Name: "mygroup",
 						Error: parser.ParseError{
-							Err:  errors.New("partial_response_strategy is only valid when parser is configured to use the Thanos rule schema"),
+							Err: errors.New(
+								"partial_response_strategy is only valid when parser is configured to use the Thanos rule schema",
+							),
 							Line: 4,
 						},
 					},
@@ -4268,12 +4487,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -4304,12 +4527,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -4341,12 +4568,16 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "up:count",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 13, LastColumn: 20}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 13, LastColumn: 20},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
 											Value: "count(up)",
-											Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 11, LastColumn: 19}},
+											Pos: diags.PositionRanges{
+												{Line: 7, FirstColumn: 11, LastColumn: 19},
+											},
 										},
 									},
 								},
@@ -4395,7 +4626,9 @@ groups:
 					{
 						Name: "mygroup",
 						Error: parser.ParseError{
-							Err:  errors.New("partial_response_strategy must be a string, got integer"),
+							Err: errors.New(
+								"partial_response_strategy must be a string, got integer",
+							),
 							Line: 4,
 						},
 					},
@@ -4421,7 +4654,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "Multi Line",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 10, LastColumn: 19}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 10, LastColumn: 19},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4462,7 +4697,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "FooBar",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 12, LastColumn: 17},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4504,7 +4741,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "FooBar",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 12, LastColumn: 17},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4518,7 +4757,9 @@ groups:
 									},
 									For: &parser.YamlNode{
 										Value: "1m",
-										Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 10, LastColumn: 11}},
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 10, LastColumn: 11},
+										},
 									},
 								},
 							},
@@ -4547,7 +4788,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "FooBar",
-										Pos:   diags.PositionRanges{{Line: 2, FirstColumn: 12, LastColumn: 17}},
+										Pos: diags.PositionRanges{
+											{Line: 2, FirstColumn: 12, LastColumn: 17},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4561,7 +4804,9 @@ groups:
 									},
 									For: &parser.YamlNode{
 										Value: "1m",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 10, LastColumn: 11}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 10, LastColumn: 11},
+										},
 									},
 								},
 							},
@@ -4593,7 +4838,9 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "colo:foo:sum",
-										Pos:   diags.PositionRanges{{Line: 5, FirstColumn: 13, LastColumn: 24}},
+										Pos: diags.PositionRanges{
+											{Line: 5, FirstColumn: 13, LastColumn: 24},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4641,7 +4888,9 @@ groups:
 								RecordingRule: &parser.RecordingRule{
 									Record: parser.YamlNode{
 										Value: "some_long_name",
-										Pos:   diags.PositionRanges{{Line: 7, FirstColumn: 13, LastColumn: 26}},
+										Pos: diags.PositionRanges{
+											{Line: 7, FirstColumn: 13, LastColumn: 26},
+										},
 									},
 									Labels: &parser.YamlMap{
 										Key: &parser.YamlNode{
@@ -4704,7 +4953,9 @@ groups:
 								AlertingRule: &parser.AlertingRule{
 									Alert: parser.YamlNode{
 										Value: "Director_Is_Not_Advertising_Any_Routes",
-										Pos:   diags.PositionRanges{{Line: 6, FirstColumn: 12, LastColumn: 49}},
+										Pos: diags.PositionRanges{
+											{Line: 6, FirstColumn: 12, LastColumn: 49},
+										},
 									},
 									Expr: parser.PromQLExpr{
 										Value: &parser.YamlNode{
@@ -4725,7 +4976,9 @@ groups:
 									},
 									For: &parser.YamlNode{
 										Value: "1m",
-										Pos:   diags.PositionRanges{{Line: 13, FirstColumn: 10, LastColumn: 11}},
+										Pos: diags.PositionRanges{
+											{Line: 13, FirstColumn: 10, LastColumn: 11},
+										},
 									},
 								},
 							},
@@ -4863,7 +5116,9 @@ groups:
 					{
 						Name: "xxx",
 						Error: parser.ParseError{
-							Err:  errors.New("labels foo value must be a string, got integer instead"),
+							Err: errors.New(
+								"labels foo value must be a string, got integer instead",
+							),
 							Line: 5,
 						},
 					},

@@ -7,12 +7,12 @@ import (
 )
 
 type AnnotationSettings struct {
-	Key      string   `hcl:",label" json:"key"`
-	Token    string   `hcl:"token,optional" json:"token,omitempty"`
-	Value    string   `hcl:"value,optional" json:"value,omitempty"`
-	Comment  string   `hcl:"comment,optional" json:"comment,omitempty"`
+	Key      string   `hcl:",label"            json:"key"`
+	Token    string   `hcl:"token,optional"    json:"token,omitempty"`
+	Value    string   `hcl:"value,optional"    json:"value,omitempty"`
+	Comment  string   `hcl:"comment,optional"  json:"comment,omitempty"`
 	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
-	Values   []string `hcl:"values,optional" json:"values,omitempty"`
+	Values   []string `hcl:"values,optional"   json:"values,omitempty"`
 	Required bool     `hcl:"required,optional" json:"required,omitempty"`
 }
 

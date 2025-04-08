@@ -75,7 +75,14 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "ignores links without regexp match",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: http://foo.example.com",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp("ftp://xxx.com"), "", time.Second, nil, "", checks.Bug)
+				return checks.NewRuleLinkCheck(
+					checks.MustTemplatedRegexp("ftp://xxx.com"),
+					"",
+					time.Second,
+					nil,
+					"",
+					checks.Bug,
+				)
 			},
 			prometheus: noProm,
 		},
@@ -83,14 +90,24 @@ func TestRuleLinkCheck(t *testing.T) {
 			description: "link with no host",
 			content:     "- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: http://",
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewRuleLinkCheck(checks.MustTemplatedRegexp(".*"), "", time.Second, nil, "some text", checks.Bug)
+				return checks.NewRuleLinkCheck(
+					checks.MustTemplatedRegexp(".*"),
+					"",
+					time.Second,
+					nil,
+					"some text",
+					checks.Bug,
+				)
 			},
 			prometheus: noProm,
 			problems:   true,
 		},
 		{
 			description: "link with 200 OK",
-			content:     fmt.Sprintf("- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard", srv.URL),
+			content: fmt.Sprintf(
+				"- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard",
+				srv.URL,
+			),
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLinkCheck(
 					checks.MustTemplatedRegexp("http://.*"),
@@ -105,7 +122,10 @@ func TestRuleLinkCheck(t *testing.T) {
 		},
 		{
 			description: "link with 400 Bad Request",
-			content:     fmt.Sprintf("- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard", srv.URL),
+			content: fmt.Sprintf(
+				"- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard",
+				srv.URL,
+			),
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLinkCheck(
 					checks.MustTemplatedRegexp("http://.*"),
@@ -124,7 +144,11 @@ func TestRuleLinkCheck(t *testing.T) {
 		},
 		{
 			description: "multiple links, 400",
-			content:     fmt.Sprintf("- alert: foo\n  expr: sum(foo)\n  annotations:\n    link1: %s/dashboard\n    link2: %s/graph", srv.URL, srv.URL),
+			content: fmt.Sprintf(
+				"- alert: foo\n  expr: sum(foo)\n  annotations:\n    link1: %s/dashboard\n    link2: %s/graph",
+				srv.URL,
+				srv.URL,
+			),
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLinkCheck(
 					checks.MustTemplatedRegexp("http://.*"),
@@ -143,7 +167,10 @@ func TestRuleLinkCheck(t *testing.T) {
 		},
 		{
 			description: "link with headers set",
-			content:     fmt.Sprintf("- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard", srv.URL),
+			content: fmt.Sprintf(
+				"- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard",
+				srv.URL,
+			),
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLinkCheck(
 					checks.MustTemplatedRegexp("http://.*"),
@@ -158,7 +185,10 @@ func TestRuleLinkCheck(t *testing.T) {
 		},
 		{
 			description: "link with rewrite rule",
-			content:     fmt.Sprintf("- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard", srv.URL),
+			content: fmt.Sprintf(
+				"- alert: foo\n  expr: sum(foo)\n  annotations:\n    link: %s/dashboard",
+				srv.URL,
+			),
 			checker: func(_ *promapi.FailoverGroup) checks.RuleChecker {
 				return checks.NewRuleLinkCheck(
 					checks.MustTemplatedRegexp("http://(.*)"),

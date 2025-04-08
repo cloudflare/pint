@@ -42,7 +42,10 @@ func HasOuterRate(node *parser.PromQLNode) (calls []*promParser.Call) {
 				return HasOuterRate(node.Children[0])
 			case promParser.CardManyToMany:
 			default:
-				slog.Warn("Unsupported VectorMatching operation", slog.String("matching", n.VectorMatching.Card.String()))
+				slog.Warn(
+					"Unsupported VectorMatching operation",
+					slog.String("matching", n.VectorMatching.Card.String()),
+				)
 			}
 		}
 

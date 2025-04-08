@@ -81,7 +81,14 @@ func (q rangeQuery) String() string {
 }
 
 func (q rangeQuery) CacheKey() uint64 {
-	return hash(q.prom.unsafeURI, q.Endpoint(), q.expr, q.r.Start.Format(time.RFC3339), q.r.End.Round(q.r.Step).Format(time.RFC3339), output.HumanizeDuration(q.r.Step))
+	return hash(
+		q.prom.unsafeURI,
+		q.Endpoint(),
+		q.expr,
+		q.r.Start.Format(time.RFC3339),
+		q.r.End.Round(q.r.Step).Format(time.RFC3339),
+		output.HumanizeDuration(q.r.Step),
+	)
 }
 
 func (q rangeQuery) CacheTTL() time.Duration {
@@ -96,7 +103,11 @@ type RangeQueryTimes interface {
 	String() string
 }
 
-func (prom *Prometheus) RangeQuery(ctx context.Context, expr string, params RangeQueryTimes) (*RangeQueryResult, error) {
+func (prom *Prometheus) RangeQuery(
+	ctx context.Context,
+	expr string,
+	params RangeQueryTimes,
+) (*RangeQueryResult, error) {
 	start := params.Start()
 	end := params.End()
 	lookback := params.Dur()
@@ -273,10 +284,17 @@ func (rr RelativeRange) Step() time.Duration {
 }
 
 func (rr RelativeRange) String() string {
-	return fmt.Sprintf("%s/%s", output.HumanizeDuration(rr.lookback), output.HumanizeDuration(rr.step))
+	return fmt.Sprintf(
+		"%s/%s",
+		output.HumanizeDuration(rr.lookback),
+		output.HumanizeDuration(rr.step),
+	)
 }
 
-func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, stats QueryStats, err error) {
+func streamSampleStream(
+	r io.Reader,
+	step time.Duration,
+) (dst MetricTimeRanges, stats QueryStats, err error) {
 	defer dummyReadAll(r)
 
 	var status, errType, errText, resultType string
@@ -340,15 +358,27 @@ func streamSampleStream(r io.Reader, step time.Duration) (dst MetricTimeRanges, 
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, stats, APIError{
+			Status:    status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Sprintf("JSON parse error: %s", err),
+		}
 	}
 
 	if status != "success" {
-		return nil, stats, APIError{Status: status, ErrorType: decodeErrorType(errType), Err: errText}
+		return nil, stats, APIError{
+			Status:    status,
+			ErrorType: decodeErrorType(errType),
+			Err:       errText,
+		}
 	}
 
 	if resultType != "matrix" {
-		return nil, stats, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: "invalid result type, expected matrix, got " + resultType}
+		return nil, stats, APIError{
+			Status:    status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       "invalid result type, expected matrix, got " + resultType,
+		}
 	}
 
 	return dst, stats, nil

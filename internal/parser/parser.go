@@ -98,13 +98,27 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 	return f
 }
 
-func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, offsetColumn int, contentLines []string) (groups []Group) {
+func (p *Parser) parseNode(
+	node, parent *yaml.Node,
+	group *Group,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+) (groups []Group) {
 	switch node.Kind { // nolint: exhaustive
 	case yaml.SequenceNode:
 		if parent != nil && nodeValue(parent) == "groups" {
 			for _, n := range unpackNodes(node) {
 				if g, rulesMap, ok := tryParseGroup(n, offsetLine, offsetColumn, contentLines); ok {
-					groups = append(groups, p.parseNode(rulesMap.val, rulesMap.key, &g, offsetLine, offsetColumn, contentLines)...)
+					groups = append(
+						groups,
+						p.parseNode(
+							rulesMap.val,
+							rulesMap.key,
+							&g,
+							offsetLine,
+							offsetColumn,
+							contentLines,
+						)...)
 				}
 			}
 			return groups
@@ -119,17 +133,21 @@ func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, of
 			}
 		}
 		// Handle empty rules within a group.
-		if len(group.Rules) > 0 || (parent != nil && nodeValue(parent) == "rules" && len(groups) == 0 && group != nil) {
+		if len(group.Rules) > 0 ||
+			(parent != nil && nodeValue(parent) == "rules" && len(groups) == 0 && group != nil) {
 			groups = append(groups, *group)
 		}
 		return groups
 	case yaml.MappingNode:
 		for _, field := range mappingNodes(node) {
-			groups = append(groups, p.parseNode(field.val, field.key, group, offsetLine, offsetColumn, contentLines)...)
+			groups = append(
+				groups,
+				p.parseNode(field.val, field.key, group, offsetLine, offsetColumn, contentLines)...)
 		}
 		return groups
 	case yaml.ScalarNode:
-		if strings.Count(node.Value, "\n") > 1 && node.Value != strings.Join(contentLines, "\n") && node.Line < len(contentLines) {
+		if strings.Count(node.Value, "\n") > 1 && node.Value != strings.Join(contentLines, "\n") &&
+			node.Line < len(contentLines) {
 			var n yaml.Node
 			// FIXME there must be a better way.
 			// If we have YAML inside YAML:
@@ -155,13 +173,19 @@ func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, of
 	}
 
 	for _, child := range unpackNodes(node) {
-		groups = append(groups, p.parseNode(child, node, group, offsetLine, offsetColumn, contentLines)...)
+		groups = append(
+			groups,
+			p.parseNode(child, node, group, offsetLine, offsetColumn, contentLines)...)
 	}
 
 	return groups
 }
 
-func tryParseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (g Group, rules yamlMap, _ bool) {
+func tryParseGroup(
+	node *yaml.Node,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+) (g Group, rules yamlMap, _ bool) {
 	for _, e := range mappingNodes(node) {
 		switch val := nodeValue(e.key); val {
 		case "name":
@@ -189,7 +213,11 @@ func tryParseGroup(node *yaml.Node, offsetLine, offsetColumn int, contentLines [
 	return g, rules, g.Name != "" && rules.key != nil
 }
 
-func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string) (rule Rule, _ bool) {
+func parseRule(
+	node *yaml.Node,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+) (rule Rule, _ bool) {
 	var recordPart *YamlNode
 	var exprPart *PromQLExpr
 	var labelsPart *YamlMap
@@ -362,7 +390,13 @@ func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []str
 		{key: keepFiringForKey, part: keepFiringForNode},
 	} {
 		if entry.part != nil && !isTag(entry.part.ShortTag(), strTag) {
-			return invalidValueError(lines, entry.part.Line+offsetLine, entry.key, describeTag(strTag), describeTag(entry.part.ShortTag()))
+			return invalidValueError(
+				lines,
+				entry.part.Line+offsetLine,
+				entry.key,
+				describeTag(strTag),
+				describeTag(entry.part.ShortTag()),
+			)
 		}
 	}
 
@@ -374,7 +408,13 @@ func parseRule(node *yaml.Node, offsetLine, offsetColumn int, contentLines []str
 		{key: annotationsKey, part: annotationsNode},
 	} {
 		if entry.part != nil && !isTag(entry.part.ShortTag(), mapTag) {
-			return invalidValueError(lines, entry.part.Line+offsetLine, entry.key, describeTag(mapTag), describeTag(entry.part.ShortTag()))
+			return invalidValueError(
+				lines,
+				entry.part.Line+offsetLine,
+				entry.key,
+				describeTag(mapTag),
+				describeTag(entry.part.ShortTag()),
+			)
 		}
 	}
 
@@ -545,7 +585,12 @@ func hasValue(node *YamlNode) bool {
 	return node.Value != ""
 }
 
-func ensureRequiredKeys(lines diags.LineRange, key string, keyVal *YamlNode, expr *PromQLExpr) (Rule, bool) {
+func ensureRequiredKeys(
+	lines diags.LineRange,
+	key string,
+	keyVal *YamlNode,
+	expr *PromQLExpr,
+) (Rule, bool) {
 	if keyVal == nil {
 		return Rule{Lines: lines}, true
 	}
@@ -608,7 +653,11 @@ func duplicatedKeyError(lines diags.LineRange, line int, key string) (Rule, bool
 	return rule, false
 }
 
-func invalidValueError(lines diags.LineRange, line int, key, expectedTag, gotTag string) (Rule, bool) {
+func invalidValueError(
+	lines diags.LineRange,
+	line int,
+	key, expectedTag, gotTag string,
+) (Rule, bool) {
 	rule := Rule{
 		Lines: lines,
 		Error: ParseError{
@@ -687,13 +736,24 @@ func countLeadingSpace(line string) (i int) {
 	return i
 }
 
-func validateStringMap(field string, nodes []yamlMap, offsetLine int, lines diags.LineRange) (bool, ParseError, diags.LineRange) {
+func validateStringMap(
+	field string,
+	nodes []yamlMap,
+	offsetLine int,
+	lines diags.LineRange,
+) (bool, ParseError, diags.LineRange) {
 	names := map[string]struct{}{}
 	for _, entry := range nodes {
 		if !isTag(entry.val.ShortTag(), strTag) {
 			return false, ParseError{
 				Line: entry.val.Line + offsetLine,
-				Err:  fmt.Errorf("%s %s value must be a %s, got %s instead", field, entry.key.Value, describeTag(strTag), describeTag(entry.val.ShortTag())),
+				Err: fmt.Errorf(
+					"%s %s value must be a %s, got %s instead",
+					field,
+					entry.key.Value,
+					describeTag(strTag),
+					describeTag(entry.val.ShortTag()),
+				),
 			}, lines
 		}
 		if _, ok := names[entry.key.Value]; ok {

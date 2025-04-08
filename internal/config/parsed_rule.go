@@ -19,7 +19,13 @@ type parsedRule struct {
 	locked bool
 }
 
-func newParsedRule(rule Rule, defaultStates []string, name string, check checks.RuleChecker, tags []string) parsedRule {
+func newParsedRule(
+	rule Rule,
+	defaultStates []string,
+	name string,
+	check checks.RuleChecker,
+	tags []string,
+) parsedRule {
 	return parsedRule{
 		match:  defaultRuleMatch(rule.Match, defaultStates),
 		ignore: rule.Ignore,
@@ -30,7 +36,12 @@ func newParsedRule(rule Rule, defaultStates []string, name string, check checks.
 	}
 }
 
-func baseParsedRule(match []Match, name string, check checks.RuleChecker, tags []string) parsedRule {
+func baseParsedRule(
+	match []Match,
+	name string,
+	check checks.RuleChecker,
+	tags []string,
+) parsedRule {
 	return parsedRule{
 		match:  match,
 		ignore: nil,
@@ -64,7 +75,14 @@ func isMatch(ctx context.Context, e discovery.Entry, ignore, match []Match) bool
 	return true
 }
 
-func (rule parsedRule) isEnabled(ctx context.Context, enabled, disabled []string, checks []checks.RuleChecker, e discovery.Entry, cfgRules []Rule, locked bool) bool {
+func (rule parsedRule) isEnabled(
+	ctx context.Context,
+	enabled, disabled []string,
+	checks []checks.RuleChecker,
+	e discovery.Entry,
+	cfgRules []Rule,
+	locked bool,
+) bool {
 	// Entry state is not what the check is for.
 	if !slices.Contains(rule.check.Meta().States, e.State) {
 		return false
@@ -128,16 +146,47 @@ func baseRules(proms []*promapi.FailoverGroup, match []Match) (rules []parsedRul
 	)
 
 	for _, p := range proms {
-		rules = append(rules,
+		rules = append(
+			rules,
 			baseParsedRule(match, checks.RateCheckName, checks.NewRateCheck(p), p.Tags()),
 			baseParsedRule(match, checks.SeriesCheckName, checks.NewSeriesCheck(p), p.Tags()),
-			baseParsedRule(match, checks.VectorMatchingCheckName, checks.NewVectorMatchingCheck(p), p.Tags()),
-			baseParsedRule(match, checks.RangeQueryCheckName, checks.NewRangeQueryCheck(p, 0, "", checks.Warning), p.Tags()),
-			baseParsedRule(match, checks.RuleDuplicateCheckName, checks.NewRuleDuplicateCheck(p), p.Tags()),
-			baseParsedRule(match, checks.LabelsConflictCheckName, checks.NewLabelsConflictCheck(p), p.Tags()),
-			baseParsedRule(match, checks.AlertsExternalLabelsCheckName, checks.NewAlertsExternalLabelsCheck(p), p.Tags()),
+			baseParsedRule(
+				match,
+				checks.VectorMatchingCheckName,
+				checks.NewVectorMatchingCheck(p),
+				p.Tags(),
+			),
+			baseParsedRule(
+				match,
+				checks.RangeQueryCheckName,
+				checks.NewRangeQueryCheck(p, 0, "", checks.Warning),
+				p.Tags(),
+			),
+			baseParsedRule(
+				match,
+				checks.RuleDuplicateCheckName,
+				checks.NewRuleDuplicateCheck(p),
+				p.Tags(),
+			),
+			baseParsedRule(
+				match,
+				checks.LabelsConflictCheckName,
+				checks.NewLabelsConflictCheck(p),
+				p.Tags(),
+			),
+			baseParsedRule(
+				match,
+				checks.AlertsExternalLabelsCheckName,
+				checks.NewAlertsExternalLabelsCheck(p),
+				p.Tags(),
+			),
 			baseParsedRule(match, checks.CounterCheckName, checks.NewCounterCheck(p), p.Tags()),
-			baseParsedRule(match, checks.AlertsAbsentCheckName, checks.NewAlertsAbsentCheck(p), p.Tags()),
+			baseParsedRule(
+				match,
+				checks.AlertsAbsentCheckName,
+				checks.NewAlertsAbsentCheck(p),
+				p.Tags(),
+			),
 		)
 	}
 
@@ -158,7 +207,11 @@ func defaultRuleMatch(match []Match, defaultStates []string) []Match {
 	return dst
 }
 
-func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultStates []string) (rules []parsedRule) {
+func parseRule(
+	rule Rule,
+	prometheusServers []*promapi.FailoverGroup,
+	defaultStates []string,
+) (rules []parsedRule) {
 	if len(rule.Aggregate) > 0 {
 		var nameRegex *checks.TemplatedRegexp
 		for _, aggr := range rule.Aggregate {
@@ -195,7 +248,15 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 				rule,
 				defaultStates,
 				checks.CostCheckName,
-				checks.NewCostCheck(prom, rule.Cost.MaxSeries, rule.Cost.MaxTotalSamples, rule.Cost.MaxPeakSamples, evalDur, rule.Cost.Comment, severity),
+				checks.NewCostCheck(
+					prom,
+					rule.Cost.MaxSeries,
+					rule.Cost.MaxTotalSamples,
+					rule.Cost.MaxPeakSamples,
+					evalDur,
+					rule.Cost.Comment,
+					severity,
+				),
 				prom.Tags(),
 			))
 		}
@@ -215,7 +276,15 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 				rule,
 				defaultStates,
 				checks.AnnotationCheckName,
-				checks.NewAnnotationCheck(checks.MustTemplatedRegexp(ann.Key), tokenRegex, valueRegex, ann.Values, ann.Required, ann.Comment, severity),
+				checks.NewAnnotationCheck(
+					checks.MustTemplatedRegexp(ann.Key),
+					tokenRegex,
+					valueRegex,
+					ann.Values,
+					ann.Required,
+					ann.Comment,
+					severity,
+				),
 				nil,
 			))
 		}
@@ -235,7 +304,15 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 				rule,
 				defaultStates,
 				checks.LabelCheckName,
-				checks.NewLabelCheck(checks.MustTemplatedRegexp(lab.Key), tokenRegex, valueRegex, lab.Values, lab.Required, lab.Comment, severity),
+				checks.NewLabelCheck(
+					checks.MustTemplatedRegexp(lab.Key),
+					tokenRegex,
+					valueRegex,
+					lab.Values,
+					lab.Required,
+					lab.Comment,
+					severity,
+				),
 				nil,
 			))
 		}
@@ -260,7 +337,15 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 				rule,
 				defaultStates,
 				checks.AlertsCheckName,
-				checks.NewAlertsCheck(prom, qRange, qStep, qResolve, rule.Alerts.MinCount, rule.Alerts.Comment, severity),
+				checks.NewAlertsCheck(
+					prom,
+					qRange,
+					qStep,
+					qResolve,
+					rule.Alerts.MinCount,
+					rule.Alerts.Comment,
+					severity,
+				),
 				prom.Tags(),
 			))
 		}
@@ -344,7 +429,13 @@ func parseRule(rule Rule, prometheusServers []*promapi.FailoverGroup, defaultSta
 			rule,
 			defaultStates,
 			checks.RuleForCheckName,
-			checks.NewRuleForCheck(checks.RuleForKeepFiringFor, minFor, maxFor, rule.KeepFiringFor.Comment, severity),
+			checks.NewRuleForCheck(
+				checks.RuleForKeepFiringFor,
+				minFor,
+				maxFor,
+				rule.KeepFiringFor.Comment,
+				severity,
+			),
 			nil,
 		))
 	}

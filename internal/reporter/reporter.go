@@ -85,8 +85,11 @@ func (s *Summary) MarkCheckDisabled(prom, api string, checks []string) {
 		s.promDetails[prom] = PrometheusDetails{} // nolint: exhaustruct
 	}
 	s.promDetails[prom] = PrometheusDetails{
-		Name:           prom,
-		DisabledChecks: append(s.promDetails[prom].DisabledChecks, DisabledChecks{API: api, Checks: checks}),
+		Name: prom,
+		DisabledChecks: append(
+			s.promDetails[prom].DisabledChecks,
+			DisabledChecks{API: api, Checks: checks},
+		),
 	}
 }
 
@@ -220,7 +223,8 @@ func isSameDiagnostics(sa, sb []diags.Diagnostic) bool {
 	for _, a := range sa {
 		ok = false
 		for _, b := range sb {
-			if a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn && a.Message == b.Message {
+			if a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn &&
+				a.Message == b.Message {
 				ok = true
 				break
 			}

@@ -86,7 +86,9 @@ func InjectDiagnostics(content string, diags []Diagnostic, color output.Color) s
 		prefix := fmt.Sprintf(nrFmt+" | ", lineIndex+1)
 
 		if lastWriteLine > 0 && lineIndex+1-lastWriteLine > 1 {
-			buf.WriteString(output.MaybeColor(output.White, color == output.None, strings.Repeat(" ", digits)))
+			buf.WriteString(
+				output.MaybeColor(output.White, color == output.None, strings.Repeat(" ", digits)),
+			)
 			buf.WriteString(" | [...]\n")
 		}
 		lastWriteLine = lineIndex + 1
@@ -126,7 +128,9 @@ func InjectDiagnostics(content string, diags []Diagnostic, color output.Color) s
 
 		for i, ok := range needsNextLine {
 			if ok {
-				buf.WriteString(output.MaybeColor(color, color == output.None, nextLine[i].String()))
+				buf.WriteString(
+					output.MaybeColor(color, color == output.None, nextLine[i].String()),
+				)
 				buf.WriteRune(' ')
 				buf.WriteString(output.MaybeColor(color, color == output.None, diags[i].Message))
 				buf.WriteRune('\n')

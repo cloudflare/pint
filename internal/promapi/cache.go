@@ -90,7 +90,8 @@ func (c *queryCache) gc() {
 
 	now := time.Now()
 	for key, ce := range c.entries {
-		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || now.Sub(ce.lastGet) >= c.maxStale {
+		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) ||
+			now.Sub(ce.lastGet) >= c.maxStale {
 			c.evictions++
 			continue
 		}

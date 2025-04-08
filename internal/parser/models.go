@@ -52,7 +52,12 @@ func (yn *YamlNode) IsIdentical(b *YamlNode) bool {
 	return true
 }
 
-func newYamlNode(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *YamlNode {
+func newYamlNode(
+	node *yaml.Node,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+	minColumn int,
+) *YamlNode {
 	pos := diags.NewPositionRange(contentLines, node, minColumn)
 	pos.AddOffset(offsetLine, offsetColumn)
 	return &YamlNode{
@@ -121,7 +126,11 @@ func (ym YamlMap) Lines() (lr diags.LineRange) {
 	return lr
 }
 
-func newYamlMap(key, value *yaml.Node, offsetLine, offsetColumn int, contentLines []string) *YamlMap {
+func newYamlMap(
+	key, value *yaml.Node,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+) *YamlMap {
 	ym := YamlMap{
 		Key:   newYamlNode(key, offsetLine, offsetColumn, contentLines, 1),
 		Items: nil,
@@ -148,7 +157,12 @@ func (pqle PromQLExpr) IsIdentical(b PromQLExpr) bool {
 	return pqle.Value.Value == b.Value.Value
 }
 
-func newPromQLExpr(node *yaml.Node, offsetLine, offsetColumn int, contentLines []string, minColumn int) *PromQLExpr {
+func newPromQLExpr(
+	node *yaml.Node,
+	offsetLine, offsetColumn int,
+	contentLines []string,
+	minColumn int,
+) *PromQLExpr {
 	expr := PromQLExpr{
 		Value:       newYamlNode(node, offsetLine, offsetColumn, contentLines, minColumn),
 		SyntaxError: nil,
@@ -354,10 +368,12 @@ func (r Rule) LastKey() (node *YamlNode) {
 		if r.AlertingRule.Expr.Value.Pos.Lines().Last > node.Pos.Lines().Last {
 			node = r.AlertingRule.Expr.Value
 		}
-		if r.AlertingRule.For != nil && r.AlertingRule.For.Pos.Lines().Last > node.Pos.Lines().Last {
+		if r.AlertingRule.For != nil &&
+			r.AlertingRule.For.Pos.Lines().Last > node.Pos.Lines().Last {
 			node = r.AlertingRule.For
 		}
-		if r.AlertingRule.KeepFiringFor != nil && r.AlertingRule.KeepFiringFor.Pos.Lines().Last > node.Pos.Lines().Last {
+		if r.AlertingRule.KeepFiringFor != nil &&
+			r.AlertingRule.KeepFiringFor.Pos.Lines().Last > node.Pos.Lines().Last {
 			node = r.AlertingRule.KeepFiringFor
 		}
 		if r.AlertingRule.Labels != nil {

@@ -21,15 +21,15 @@ import (
 )
 
 type Config struct {
-	CI         *CI                `hcl:"ci,block" json:"ci,omitempty"`
-	Parser     *Parser            `hcl:"parser,block" json:"parser,omitempty"`
+	CI         *CI                `hcl:"ci,block"         json:"ci,omitempty"`
+	Parser     *Parser            `hcl:"parser,block"     json:"parser,omitempty"`
 	Repository *Repository        `hcl:"repository,block" json:"repository,omitempty"`
-	Discovery  *Discovery         `hcl:"discovery,block" json:"discovery,omitempty"`
-	Checks     *Checks            `hcl:"checks,block" json:"checks,omitempty"`
-	Owners     *Owners            `hcl:"owners,block" json:"owners,omitempty"`
+	Discovery  *Discovery         `hcl:"discovery,block"  json:"discovery,omitempty"`
+	Checks     *Checks            `hcl:"checks,block"     json:"checks,omitempty"`
+	Owners     *Owners            `hcl:"owners,block"     json:"owners,omitempty"`
 	Prometheus []PrometheusConfig `hcl:"prometheus,block" json:"prometheus,omitempty"`
-	Check      []Check            `hcl:"check,block" json:"check,omitempty"`
-	Rules      []Rule             `hcl:"rule,block" json:"rules,omitempty"`
+	Check      []Check            `hcl:"check,block"      json:"check,omitempty"`
+	Rules      []Rule             `hcl:"rule,block"       json:"rules,omitempty"`
 }
 
 func (cfg *Config) DisableOnlineChecks() {
@@ -79,7 +79,11 @@ func (cfg Config) String() string {
 	return string(content)
 }
 
-func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerator, entry discovery.Entry) []checks.RuleChecker {
+func (cfg *Config) GetChecksForEntry(
+	ctx context.Context,
+	gen *PrometheusGenerator,
+	entry discovery.Entry,
+) []checks.RuleChecker {
 	enabled := []checks.RuleChecker{}
 
 	defaultStates := defaultMatchStates(commandFromContext(ctx))
@@ -89,7 +93,10 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 	parsedRules := make([]parsedRule, 0, len(cfg.Rules))
 	if entry.PathError != nil || entry.Rule.Error.Err != nil {
 		check := checks.NewErrorCheck(entry)
-		parsedRules = append(parsedRules, baseParsedRule(defaultMatch, check.Reporter(), check, nil))
+		parsedRules = append(
+			parsedRules,
+			baseParsedRule(defaultMatch, check.Reporter(), check, nil),
+		)
 	} else {
 		parsedRules = append(parsedRules, baseRules(proms, defaultMatch)...)
 		for _, rule := range cfg.Rules {
@@ -100,7 +107,15 @@ func (cfg *Config) GetChecksForEntry(ctx context.Context, gen *PrometheusGenerat
 		if !isMatch(ctx, entry, pr.ignore, pr.match) {
 			continue
 		}
-		if pr.isEnabled(ctx, cfg.Checks.Enabled, cfg.Checks.Disabled, enabled, entry, cfg.Rules, pr.locked) {
+		if pr.isEnabled(
+			ctx,
+			cfg.Checks.Enabled,
+			cfg.Checks.Disabled,
+			enabled,
+			entry,
+			cfg.Rules,
+			pr.locked,
+		) {
 			enabled = append(enabled, pr.check)
 		}
 	}
@@ -199,7 +214,10 @@ func Load(path string, failOnMissing bool) (cfg Config, fromFile bool, err error
 		}
 
 		if slices.Contains(promNames, prom.Name) {
-			return cfg, fromFile, fmt.Errorf("prometheus server name must be unique, found two or more config blocks using %q name", prom.Name)
+			return cfg, fromFile, fmt.Errorf(
+				"prometheus server name must be unique, found two or more config blocks using %q name",
+				prom.Name,
+			)
 		}
 		promNames = append(promNames, prom.Name)
 

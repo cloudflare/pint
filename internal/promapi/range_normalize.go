@@ -179,7 +179,15 @@ type MetricTimeRanges []MetricTimeRange
 func (mtr MetricTimeRanges) String() string {
 	sl := make([]string, 0, len(mtr))
 	for _, tr := range mtr {
-		sl = append(sl, fmt.Sprintf("%s %s > %s", tr.Labels, tr.Start.UTC().Format(time.RFC3339), tr.End.UTC().Format(time.RFC3339)))
+		sl = append(
+			sl,
+			fmt.Sprintf(
+				"%s %s > %s",
+				tr.Labels,
+				tr.Start.UTC().Format(time.RFC3339),
+				tr.End.UTC().Format(time.RFC3339),
+			),
+		)
 	}
 	return strings.Join(sl, " ** ")
 }
@@ -294,7 +302,12 @@ func ExpandRangesEnd(src MetricTimeRanges, step time.Duration) {
 	}
 }
 
-func AppendSampleToRanges(dst MetricTimeRanges, ls labels.Labels, vals []model.SamplePair, step time.Duration) MetricTimeRanges {
+func AppendSampleToRanges(
+	dst MetricTimeRanges,
+	ls labels.Labels,
+	vals []model.SamplePair,
+	step time.Duration,
+) MetricTimeRanges {
 	fp := ls.Hash()
 
 	var ts time.Time

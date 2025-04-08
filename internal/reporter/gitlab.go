@@ -78,7 +78,12 @@ type GitLabReporter struct {
 	maxComments int
 }
 
-func NewGitLabReporter(version, branch, uri string, timeout time.Duration, token string, project, maxComments int) (_ GitLabReporter, err error) {
+func NewGitLabReporter(
+	version, branch, uri string,
+	timeout time.Duration,
+	token string,
+	project, maxComments int,
+) (_ GitLabReporter, err error) {
 	slog.Info(
 		"Will report problems to GitLab",
 		slog.String("uri", uri),
@@ -127,7 +132,11 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 
 	dsts := make([]any, 0, len(ids))
 	for _, id := range ids {
-		slog.Info("Found open GitLab merge request", slog.String("branch", gl.branch), slog.Int("id", id))
+		slog.Info(
+			"Found open GitLab merge request",
+			slog.String("branch", gl.branch),
+			slog.Int("id", id),
+		)
 		dst := gitlabMR{
 			version: nil,
 			diffs:   nil,
@@ -145,7 +154,12 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 	return dsts, nil
 }
 
-func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs []error) (err error) {
+func (gl GitLabReporter) Summary(
+	ctx context.Context,
+	dst any,
+	s Summary,
+	errs []error,
+) (err error) {
 	mr := dst.(gitlabMR)
 	if gl.maxComments > 0 && len(s.reports) > gl.maxComments {
 		if err = gl.generalComment(ctx, mr, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
@@ -219,7 +233,12 @@ func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingCom
 	slog.Debug("Creating a new merge request discussion", loggifyDiscussion(opt)...)
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
-	_, _, err := gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, opt, gitlab.WithContext(reqCtx))
+	_, _, err := gl.client.Discussions.CreateMergeRequestDiscussion(
+		gl.project,
+		mr.mrID,
+		opt,
+		gitlab.WithContext(reqCtx),
+	)
 	return err
 }
 
@@ -274,15 +293,21 @@ func (gl *GitLabReporter) getUserID(ctx context.Context) (int, error) {
 
 func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int, err error) {
 	slog.Debug("Finding merge requests for current branch", slog.String("branch", gl.branch))
-	mrs, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.BasicMergeRequest, *gitlab.Response, error) {
-		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
-		defer cancel()
-		return gl.client.MergeRequests.ListProjectMergeRequests(gl.project, &gitlab.ListProjectMergeRequestsOptions{
-			State:        gitlab.Ptr("opened"),
-			SourceBranch: gitlab.Ptr(gl.branch),
-			ListOptions:  gitlab.ListOptions{Page: pageNum},
-		}, gitlab.WithContext(reqCtx))
-	})
+	mrs, _, err := getGitLabPaginated(
+		func(pageNum int) ([]*gitlab.BasicMergeRequest, *gitlab.Response, error) {
+			reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
+			defer cancel()
+			return gl.client.MergeRequests.ListProjectMergeRequests(
+				gl.project,
+				&gitlab.ListProjectMergeRequestsOptions{
+					State:        gitlab.Ptr("opened"),
+					SourceBranch: gitlab.Ptr(gl.branch),
+					ListOptions:  gitlab.ListOptions{Page: pageNum},
+				},
+				gitlab.WithContext(reqCtx),
+			)
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -292,27 +317,47 @@ func (gl *GitLabReporter) getMRs(ctx context.Context) (ids []int, err error) {
 	return ids, nil
 }
 
-func (gl *GitLabReporter) getDiffs(ctx context.Context, mrNum int) ([]*gitlab.MergeRequestDiff, error) {
+func (gl *GitLabReporter) getDiffs(
+	ctx context.Context,
+	mrNum int,
+) ([]*gitlab.MergeRequestDiff, error) {
 	slog.Debug("Getting the list of merge request diffs", slog.Int("mr", mrNum))
-	diffs, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.MergeRequestDiff, *gitlab.Response, error) {
-		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
-		defer cancel()
-		return gl.client.MergeRequests.ListMergeRequestDiffs(gl.project, mrNum, &gitlab.ListMergeRequestDiffsOptions{
-			ListOptions: gitlab.ListOptions{Page: pageNum},
-		}, gitlab.WithContext(reqCtx))
-	})
+	diffs, _, err := getGitLabPaginated(
+		func(pageNum int) ([]*gitlab.MergeRequestDiff, *gitlab.Response, error) {
+			reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
+			defer cancel()
+			return gl.client.MergeRequests.ListMergeRequestDiffs(
+				gl.project,
+				mrNum,
+				&gitlab.ListMergeRequestDiffsOptions{
+					ListOptions: gitlab.ListOptions{Page: pageNum},
+				},
+				gitlab.WithContext(reqCtx),
+			)
+		},
+	)
 	return diffs, err
 }
 
-func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int) (*gitlab.MergeRequestDiffVersion, error) {
+func (gl *GitLabReporter) getVersions(
+	ctx context.Context,
+	mrNum int,
+) (*gitlab.MergeRequestDiffVersion, error) {
 	slog.Debug("Getting the list of merge request versions", slog.Int("mr", mrNum))
-	vers, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.MergeRequestDiffVersion, *gitlab.Response, error) {
-		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
-		defer cancel()
-		return gl.client.MergeRequests.GetMergeRequestDiffVersions(gl.project, mrNum, &gitlab.GetMergeRequestDiffVersionsOptions{
-			Page: pageNum,
-		}, gitlab.WithContext(reqCtx))
-	})
+	vers, _, err := getGitLabPaginated(
+		func(pageNum int) ([]*gitlab.MergeRequestDiffVersion, *gitlab.Response, error) {
+			reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
+			defer cancel()
+			return gl.client.MergeRequests.GetMergeRequestDiffVersions(
+				gl.project,
+				mrNum,
+				&gitlab.GetMergeRequestDiffVersionsOptions{
+					Page: pageNum,
+				},
+				gitlab.WithContext(reqCtx),
+			)
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -322,15 +367,25 @@ func (gl *GitLabReporter) getVersions(ctx context.Context, mrNum int) (*gitlab.M
 	return vers[0], nil
 }
 
-func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int) ([]*gitlab.Discussion, error) {
+func (gl *GitLabReporter) getDiscussions(
+	ctx context.Context,
+	mrNum int,
+) ([]*gitlab.Discussion, error) {
 	slog.Debug("Getting the list of merge request discussions", slog.Int("mr", mrNum))
-	discs, _, err := getGitLabPaginated(func(pageNum int) ([]*gitlab.Discussion, *gitlab.Response, error) {
-		reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
-		defer cancel()
-		return gl.client.Discussions.ListMergeRequestDiscussions(gl.project, mrNum, &gitlab.ListMergeRequestDiscussionsOptions{
-			Page: pageNum,
-		}, gitlab.WithContext(reqCtx))
-	})
+	discs, _, err := getGitLabPaginated(
+		func(pageNum int) ([]*gitlab.Discussion, *gitlab.Response, error) {
+			reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
+			defer cancel()
+			return gl.client.Discussions.ListMergeRequestDiscussions(
+				gl.project,
+				mrNum,
+				&gitlab.ListMergeRequestDiscussionsOptions{
+					Page: pageNum,
+				},
+				gitlab.WithContext(reqCtx),
+			)
+		},
+	)
 	return discs, err
 }
 
@@ -362,11 +417,20 @@ func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg st
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
 	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: gitlab.Ptr(msg)}
-	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, &opt, gitlab.WithContext(reqCtx))
+	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(
+		gl.project,
+		mr.mrID,
+		&opt,
+		gitlab.WithContext(reqCtx),
+	)
 	return err
 }
 
-func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeRequestDiff, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
+func reportToGitLabDiscussion(
+	pending PendingComment,
+	diffs []*gitlab.MergeRequestDiff,
+	ver *gitlab.MergeRequestDiffVersion,
+) *gitlab.CreateMergeRequestDiscussionOptions {
 	diff := getDiffForPath(diffs, pending.path)
 	if diff == nil {
 		slog.Debug("Skipping report for path with no GitLab diff",
@@ -489,7 +553,9 @@ func parseDiffLines(diff string) (lines []diffLine) {
 	return lines
 }
 
-func getGitLabPaginated[T any](searchFunc func(pageNum int) ([]T, *gitlab.Response, error)) ([]T, *gitlab.Response, error) {
+func getGitLabPaginated[T any](
+	searchFunc func(pageNum int) ([]T, *gitlab.Response, error),
+) ([]T, *gitlab.Response, error) {
 	items := []T{}
 	pageNum := 1
 	for {
@@ -535,6 +601,11 @@ func loggifyDiscussion(opt *gitlab.CreateMergeRequestDiscussionOptions) (attrs [
 }
 
 func tooManyCommentsMsg(nr, m int) string {
-	return fmt.Sprintf(`This pint run would create %d comment(s), which is more than the limit configured for pint (%d).
-%d comment(s) were skipped and won't be visibile on this PR.`, nr, m, nr-m)
+	return fmt.Sprintf(
+		`This pint run would create %d comment(s), which is more than the limit configured for pint (%d).
+%d comment(s) were skipped and won't be visibile on this PR.`,
+		nr,
+		m,
+		nr-m,
+	)
 }

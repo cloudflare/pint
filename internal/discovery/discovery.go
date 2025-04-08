@@ -110,7 +110,12 @@ func (e Entry) Labels() (ym parser.YamlMap) {
 	return ym
 }
 
-func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
+func readRules(
+	reportedPath, sourcePath string,
+	r io.Reader,
+	p parser.Parser,
+	allowedOwners []*regexp.Regexp,
+) (entries []Entry, _ error) {
 	file := p.Parse(r)
 
 	contentLines := diags.LineRange{
@@ -245,7 +250,11 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 				},
 				PathError: comments.OwnerError{
 					Diagnostic: diags.Diagnostic{
-						Message: fmt.Sprintf("This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", owner.Name, owner.Name),
+						Message: fmt.Sprintf(
+							"This file is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.",
+							owner.Name,
+							owner.Name,
+						),
 						Pos: diags.PositionRanges{
 							{
 								Line:        owner.Line,

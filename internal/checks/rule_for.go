@@ -23,7 +23,12 @@ const (
 	RuleForKeepFiringFor RuleForKey = "keep_firing_for"
 )
 
-func NewRuleForCheck(key RuleForKey, minFor, maxFor time.Duration, comment string, severity Severity) RuleForCheck {
+func NewRuleForCheck(
+	key RuleForKey,
+	minFor, maxFor time.Duration,
+	comment string,
+	severity Severity,
+) RuleForCheck {
 	return RuleForCheck{
 		key:      key,
 		minFor:   minFor,
@@ -55,14 +60,23 @@ func (c RuleForCheck) Meta() CheckMeta {
 }
 
 func (c RuleForCheck) String() string {
-	return fmt.Sprintf("%s(%s:%s)", RuleForCheckName, output.HumanizeDuration(c.minFor), output.HumanizeDuration(c.maxFor))
+	return fmt.Sprintf(
+		"%s(%s:%s)",
+		RuleForCheckName,
+		output.HumanizeDuration(c.minFor),
+		output.HumanizeDuration(c.maxFor),
+	)
 }
 
 func (c RuleForCheck) Reporter() string {
 	return RuleForCheckName
 }
 
-func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RuleForCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil {
 		return nil
 	}
@@ -110,7 +124,11 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("This alert rule must have a `%s` field with a minimum duration of %s.", c.key, output.HumanizeDuration(c.minFor)),
+					Message: fmt.Sprintf(
+						"This alert rule must have a `%s` field with a minimum duration of %s.",
+						c.key,
+						output.HumanizeDuration(c.minFor),
+					),
 					Pos:         diag.Pos,
 					FirstColumn: diag.FirstColumn,
 					LastColumn:  diag.LastColumn,
@@ -129,7 +147,11 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			Severity: c.severity,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("This alert rule must have a `%s` field with a maximum duration of %s.", c.key, output.HumanizeDuration(c.maxFor)),
+					Message: fmt.Sprintf(
+						"This alert rule must have a `%s` field with a maximum duration of %s.",
+						c.key,
+						output.HumanizeDuration(c.maxFor),
+					),
 					Pos:         diag.Pos,
 					FirstColumn: diag.FirstColumn,
 					LastColumn:  diag.LastColumn,

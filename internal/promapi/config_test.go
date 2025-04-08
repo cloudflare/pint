@@ -22,11 +22,15 @@ func TestConfig(t *testing.T) {
 		case "/30s" + promapi.APIPathConfig:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`),
+			)
 		case "/1m" + promapi.APIPathConfig:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 1m\n"}}`),
+			)
 		case "/default" + promapi.APIPathConfig:
 			w.WriteHeader(http.StatusOK)
 			w.Header().Set("Content-Type", "application/json")
@@ -50,7 +54,9 @@ func TestConfig(t *testing.T) {
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			w.Header().Set("Content-Type", "application/json")
-			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
+			_, _ = w.Write(
+				[]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`),
+			)
 		}
 	}))
 	defer srv.Close()
@@ -116,13 +122,25 @@ func TestConfig(t *testing.T) {
 		{
 			prefix:  "/badYaml",
 			timeout: time.Second,
-			err:     fmt.Sprintf("failed to decode config data in %s/badYaml response: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `invalid...` into promapi.PrometheusConfig", srv.URL),
+			err: fmt.Sprintf(
+				"failed to decode config data in %s/badYaml response: yaml: unmarshal errors:\n  line 1: cannot unmarshal !!str `invalid...` into promapi.PrometheusConfig",
+				srv.URL,
+			),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
-			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, "", nil, tc.timeout, 1, 100, nil)
+			prom := promapi.NewPrometheus(
+				"test",
+				srv.URL+tc.prefix,
+				"",
+				nil,
+				tc.timeout,
+				1,
+				100,
+				nil,
+			)
 			prom.StartWorkers()
 			defer prom.Close()
 
@@ -162,18 +180,24 @@ func TestConfigHeaders(t *testing.T) {
 
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				for k, v := range tc.request {
-					if tc.shouldFail {
-						assert.NotEqual(t, r.Header.Get(k), v)
-					} else {
-						assert.Equal(t, r.Header.Get(k), v)
+			srv := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					for k, v := range tc.request {
+						if tc.shouldFail {
+							assert.NotEqual(t, r.Header.Get(k), v)
+						} else {
+							assert.Equal(t, r.Header.Get(k), v)
+						}
 					}
-				}
-				w.WriteHeader(http.StatusOK)
-				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
-			}))
+					w.WriteHeader(http.StatusOK)
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write(
+						[]byte(
+							`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`,
+						),
+					)
+				}),
+			)
 			defer srv.Close()
 
 			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{

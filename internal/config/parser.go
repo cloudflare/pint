@@ -14,8 +14,8 @@ const (
 )
 
 type Parser struct {
-	Schema  string   `hcl:"schema,optional" json:"schema,omitempty"`
-	Names   string   `hcl:"names,optional" json:"names,omitempty"`
+	Schema  string   `hcl:"schema,optional"  json:"schema,omitempty"`
+	Names   string   `hcl:"names,optional"   json:"names,omitempty"`
 	Relaxed []string `hcl:"relaxed,optional" json:"relaxed,omitempty"`
 	Include []string `hcl:"include,optional" json:"include,omitempty"`
 	Exclude []string `hcl:"exclude,optional" json:"exclude,omitempty"`

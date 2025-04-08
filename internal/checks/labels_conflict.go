@@ -44,12 +44,18 @@ func (c LabelsConflictCheck) Reporter() string {
 	return LabelsConflictCheckName
 }
 
-func (c LabelsConflictCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c LabelsConflictCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	var labels *parser.YamlMap
-	if entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Expr.SyntaxError == nil && entry.Rule.AlertingRule.Labels != nil {
+	if entry.Rule.AlertingRule != nil && entry.Rule.AlertingRule.Expr.SyntaxError == nil &&
+		entry.Rule.AlertingRule.Labels != nil {
 		labels = entry.Rule.AlertingRule.Labels
 	}
-	if entry.Rule.RecordingRule != nil && entry.Rule.RecordingRule.Expr.SyntaxError == nil && entry.Rule.RecordingRule.Labels != nil {
+	if entry.Rule.RecordingRule != nil && entry.Rule.RecordingRule.Expr.SyntaxError == nil &&
+		entry.Rule.RecordingRule.Labels != nil {
 		labels = entry.Rule.RecordingRule.Labels
 	}
 	if labels == nil {
@@ -62,7 +68,10 @@ func (c LabelsConflictCheck) Check(ctx context.Context, entry discovery.Entry, _
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning))
+		problems = append(
+			problems,
+			problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning),
+		)
 		return problems
 	}
 
@@ -77,11 +86,21 @@ func (c LabelsConflictCheck) Check(ctx context.Context, entry discovery.Entry, _
 					},
 					Reporter: c.Reporter(),
 					Summary:  "conflicting labels",
-					Details:  fmt.Sprintf("[Click here](%s/config) to see `%s` Prometheus runtime configuration.", cfg.URI, c.prom.Name()),
+					Details: fmt.Sprintf(
+						"[Click here](%s/config) to see `%s` Prometheus runtime configuration.",
+						cfg.URI,
+						c.prom.Name(),
+					),
 					Severity: Warning,
 					Diagnostics: []diags.Diagnostic{
 						{
-							Message:     c.formatText(k, label.Value.Value, v, entry.Rule.Type(), cfg),
+							Message: c.formatText(
+								k,
+								label.Value.Value,
+								v,
+								entry.Rule.Type(),
+								cfg,
+							),
 							Pos:         label.Key.Pos,
 							FirstColumn: 1,
 							LastColumn:  len(label.Key.Value),
@@ -95,9 +114,23 @@ func (c LabelsConflictCheck) Check(ctx context.Context, entry discovery.Entry, _
 	return problems
 }
 
-func (c LabelsConflictCheck) formatText(k, lv, ev string, kind parser.RuleType, cfg *promapi.ConfigResult) string {
+func (c LabelsConflictCheck) formatText(
+	k, lv, ev string,
+	kind parser.RuleType,
+	cfg *promapi.ConfigResult,
+) string {
 	if (lv == ev) && kind == parser.AlertingRuleType {
-		return fmt.Sprintf("This label is redundant. %s external_labels already has %s=%q label set and it will be automatically added to all alerts, there's no need to set it manually.", promText(c.prom.Name(), cfg.URI), k, ev)
+		return fmt.Sprintf(
+			"This label is redundant. %s external_labels already has %s=%q label set and it will be automatically added to all alerts, there's no need to set it manually.",
+			promText(c.prom.Name(), cfg.URI),
+			k,
+			ev,
+		)
 	}
-	return fmt.Sprintf("%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.", promText(c.prom.Name(), cfg.URI), k, ev)
+	return fmt.Sprintf(
+		"%s external_labels already has %s=%q label set, please choose a different name for this label to avoid any conflicts.",
+		promText(c.prom.Name(), cfg.URI),
+		k,
+		ev,
+	)
 }

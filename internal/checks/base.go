@@ -148,10 +148,18 @@ func problemFromError(err error, rule parser.Rule, reporter, prom string, s Seve
 	var severity Severity
 	switch {
 	case promapi.IsQueryTooExpensive(err):
-		text = fmt.Sprintf("Couldn't run some online checks on %s because some queries are too expensive: `%s`.", promDesc, err)
+		text = fmt.Sprintf(
+			"Couldn't run some online checks on %s because some queries are too expensive: `%s`.",
+			promDesc,
+			err,
+		)
 		severity = Warning
 	case promapi.IsUnavailableError(err):
-		text = fmt.Sprintf("Couldn't run some online checks due to %s connection error: `%s`.", promDesc, err)
+		text = fmt.Sprintf(
+			"Couldn't run some online checks due to %s connection error: `%s`.",
+			promDesc,
+			err,
+		)
 		severity = Warning
 		if perrOk && perr.IsStrict() {
 			severity = Bug

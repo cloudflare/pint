@@ -26,7 +26,11 @@ func findSymlinks() (slinks []symlink, err error) {
 
 			dest, err := filepath.EvalSymlinks(path)
 			if err != nil {
-				return fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
+				return fmt.Errorf(
+					"%s is a symlink but target file cannot be evaluated: %w",
+					path,
+					err,
+				)
 			}
 
 			info, err := os.Stat(dest)
@@ -67,7 +71,11 @@ func addSymlinkedEntries(entries []Entry) ([]Entry, error) {
 
 		for _, sl := range slinks {
 			if sl.to == entry.Path.Name {
-				slog.Debug("Found a symlink", slog.String("to", sl.to), slog.String("from", sl.from))
+				slog.Debug(
+					"Found a symlink",
+					slog.String("to", sl.to),
+					slog.String("from", sl.from),
+				)
 				nentries = append(nentries, Entry{
 					State: entry.State,
 					Path: Path{

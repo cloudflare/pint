@@ -16,7 +16,13 @@ const (
 		"Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server)."
 )
 
-func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, gitCmd git.CommandRunner) BitBucketReporter {
+func NewBitBucketReporter(
+	version, uri string,
+	timeout time.Duration,
+	token, project, repo string,
+	maxComments int,
+	gitCmd git.CommandRunner,
+) BitBucketReporter {
 	slog.Info(
 		"Will report problems to BitBucket",
 		slog.String("uri", uri),
@@ -78,13 +84,19 @@ func (bb BitBucketReporter) Submit(summary Summary) (err error) {
 		if changes, err = bb.api.getPullRequestChanges(pr); err != nil {
 			return fmt.Errorf("failed to get pull request changes from BitBucket: %w", err)
 		}
-		slog.Debug("Got modified files from BitBucket", slog.Any("files", changes.pathModifiedLines))
+		slog.Debug(
+			"Got modified files from BitBucket",
+			slog.Any("files", changes.pathModifiedLines),
+		)
 
 		var existingComments []bitBucketComment
 		if existingComments, err = bb.api.getPullRequestComments(pr); err != nil {
 			return fmt.Errorf("failed to get pull request comments from BitBucket: %w", err)
 		}
-		slog.Info("Got existing pull request comments from BitBucket", slog.Int("count", len(existingComments)))
+		slog.Info(
+			"Got existing pull request comments from BitBucket",
+			slog.Int("count", len(existingComments)),
+		)
 
 		pendingComments := bb.api.makeComments(summary, changes)
 		slog.Info("Generated comments to add to BitBucket", slog.Int("count", len(pendingComments)))

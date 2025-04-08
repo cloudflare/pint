@@ -14,8 +14,20 @@ import (
 	"github.com/cloudflare/pint/internal/reporter"
 )
 
-func checkRules(ctx context.Context, workers int, isOffline bool, gen *config.PrometheusGenerator, cfg config.Config, entries []discovery.Entry) (summary reporter.Summary, err error) {
-	slog.Info("Checking Prometheus rules", slog.Int("entries", len(entries)), slog.Int("workers", workers), slog.Bool("online", !isOffline))
+func checkRules(
+	ctx context.Context,
+	workers int,
+	isOffline bool,
+	gen *config.PrometheusGenerator,
+	cfg config.Config,
+	entries []discovery.Entry,
+) (summary reporter.Summary, err error) {
+	slog.Info(
+		"Checking Prometheus rules",
+		slog.Int("entries", len(entries)),
+		slog.Int("workers", workers),
+		slog.Bool("online", !isOffline),
+	)
 	if isOffline {
 		slog.Info("Offline mode, skipping Prometheus discovery")
 	} else {

@@ -7,7 +7,7 @@ import (
 )
 
 type Checks struct {
-	Enabled  []string `hcl:"enabled,optional" json:"enabled,omitempty"`
+	Enabled  []string `hcl:"enabled,optional"  json:"enabled,omitempty"`
 	Disabled []string `hcl:"disabled,optional" json:"disabled,omitempty"`
 }
 

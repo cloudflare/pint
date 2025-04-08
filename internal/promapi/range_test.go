@@ -78,7 +78,14 @@ func TestRange(t *testing.T) {
 	printRange := func(tr []promapi.MetricTimeRange) string {
 		var buf strings.Builder
 		for _, r := range tr {
-			buf.WriteString(fmt.Sprintf("%s %s - %s\n", r.Labels, r.Start.UTC().Format(time.RFC3339), r.End.UTC().Format(time.RFC3339)))
+			buf.WriteString(
+				fmt.Sprintf(
+					"%s %s - %s\n",
+					r.Labels,
+					r.Start.UTC().Format(time.RFC3339),
+					r.End.UTC().Format(time.RFC3339),
+				),
+			)
 		}
 		return buf.String()
 	}
@@ -100,17 +107,31 @@ func TestRange(t *testing.T) {
 				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T00:00:00Z").Unix(),
+					start,
+					0.0001,
+					"invalid start",
+				)
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:01:00Z").Unix(), end, 0.0001, "invalid end")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T00:01:00Z").Unix(),
+					end,
+					0.0001,
+					"invalid end",
+				)
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Minute, diff)
 
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
+				_, _ = w.Write(
+					[]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`),
+				)
 			},
 		},
 		{
@@ -141,9 +162,21 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T01:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #0",
+					)
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T03:00:00Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #1",
+					)
 
 				default:
 					t.Fatalf("unknown start: %.2f", start)
@@ -152,9 +185,16 @@ func TestRange(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
 				var values []string
-				values = append(values, fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()))
+				values = append(
+					values,
+					fmt.Sprintf(`[%d.0,"1"]`, timeParse("2022-06-14T01:00:00Z").Unix()),
+				)
 
-				_, _ = fmt.Fprintf(w, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))
+				_, _ = fmt.Fprintf(
+					w,
+					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
+					strings.Join(values, ","),
+				)
 			},
 		},
 		{
@@ -173,17 +213,31 @@ func TestRange(t *testing.T) {
 				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T00:00:00Z").Unix(),
+					start,
+					0.0001,
+					"invalid start",
+				)
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T01:00:00Z").Unix(), end, 0.0001, "invalid end")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T01:00:00Z").Unix(),
+					end,
+					0.0001,
+					"invalid end",
+				)
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Hour, diff)
 
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
+				_, _ = w.Write(
+					[]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`),
+				)
 			},
 		},
 		{
@@ -202,17 +256,31 @@ func TestRange(t *testing.T) {
 				require.Equal(t, "60", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T00:00:00Z").Unix(),
+					start,
+					0.0001,
+					"invalid start",
+				)
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T02:00:00Z").Unix(), end, 0.0001, "invalid end")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T02:00:00Z").Unix(),
+					end,
+					0.0001,
+					"invalid end",
+				)
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Hour*2, diff)
 
 				w.WriteHeader(http.StatusOK)
 				w.Header().Set("Content-Type", "application/json")
-				_, _ = w.Write([]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`))
+				_, _ = w.Write(
+					[]byte(`{"status":"success","data":{"resultType":"matrix","result":[]}}`),
+				)
 			},
 		},
 		{
@@ -243,9 +311,21 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T16:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T17:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T17:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #0",
+					)
 				case float64(timeParse("2022-06-14T18:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T18:35:00Z").Unix(), end, 0.0001, "invalid end for #1")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T18:35:00Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #1",
+					)
 
 				default:
 					t.Fatalf("unknown start: %.2f", start)
@@ -257,7 +337,11 @@ func TestRange(t *testing.T) {
 				for i := float64(timeParse("2022-06-14T16:34:00Z").Unix()); i <= float64(timeParse("2022-06-14T18:35:00Z").Unix()); i += 60 {
 					values = append(values, fmt.Sprintf(`[%3f,"1"]`, i))
 				}
-				_, _ = fmt.Fprintf(w, `{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`, strings.Join(values, ","))
+				_, _ = fmt.Fprintf(
+					w,
+					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]}]}}`,
+					strings.Join(values, ","),
+				)
 			},
 		},
 		{
@@ -298,9 +382,21 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T01:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #0",
+					)
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T03:00:00Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #1",
+					)
 
 				default:
 					t.Fatalf("unknown start: %.2f", start)
@@ -315,7 +411,10 @@ func TestRange(t *testing.T) {
 				_, _ = fmt.Fprintf(
 					w,
 					`{"status":"success","data":{"resultType":"matrix","result":[{"metric":{"instance":"1"}, "values":[%s]},{"metric":{"instance":"2"}, "values":[%s]},{"metric":{"instance":"3"}, "values":[%s]}]}}`,
-					strings.Join(values, ","), strings.Join(values, ","), strings.Join(values, ","))
+					strings.Join(values, ","),
+					strings.Join(values, ","),
+					strings.Join(values, ","),
+				)
 			},
 		},
 		{
@@ -428,13 +527,37 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T01:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #0",
+					)
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:59:59Z").Unix(), end, 0.0001, "invalid end for #1")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T03:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #1",
+					)
 				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T05:59:59Z").Unix(), end, 0.0001, "invalid end for #2")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T05:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #2",
+					)
 				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T07:00:00Z").Unix(), end, 0.0001, "invalid end for #3")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T07:00:00Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #3",
+					)
 				default:
 					t.Fatalf("unknown start: %.2f", start)
 				}
@@ -480,13 +603,33 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case int(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T01:59:59Z").Unix()), end, "invalid end for #0")
+					require.Equal(
+						t,
+						int(timeParse("2022-06-14T01:59:59Z").Unix()),
+						end,
+						"invalid end for #0",
+					)
 				case int(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T03:59:59Z").Unix()), end, "invalid end for #1")
+					require.Equal(
+						t,
+						int(timeParse("2022-06-14T03:59:59Z").Unix()),
+						end,
+						"invalid end for #1",
+					)
 				case int(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T05:59:59Z").Unix()), end, "invalid end for #2")
+					require.Equal(
+						t,
+						int(timeParse("2022-06-14T05:59:59Z").Unix()),
+						end,
+						"invalid end for #2",
+					)
 				case int(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.Equal(t, int(timeParse("2022-06-14T07:30:00Z").Unix()), end, "invalid end for #3")
+					require.Equal(
+						t,
+						int(timeParse("2022-06-14T07:30:00Z").Unix()),
+						end,
+						"invalid end for #3",
+					)
 				default:
 					t.Fatalf("unknown start: %d", start)
 				}
@@ -524,7 +667,13 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T01:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #0",
+					)
 					w.WriteHeader(http.StatusOK)
 					w.Header().Set("Content-Type", "application/json")
 					var values []string
@@ -537,7 +686,13 @@ func TestRange(t *testing.T) {
 						strings.Join(values, ","),
 					)
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:00:00Z").Unix(), end, 0.0001, "invalid end for #1")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T03:00:00Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #1",
+					)
 					w.WriteHeader(http.StatusServiceUnavailable)
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write([]byte(`{
@@ -566,10 +721,22 @@ func TestRange(t *testing.T) {
 				require.Equal(t, "1", r.Form.Get("step"))
 
 				start, _ := strconv.ParseFloat(r.Form.Get("start"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:00:00Z").Unix(), start, 0.0001, "invalid start")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T00:00:00Z").Unix(),
+					start,
+					0.0001,
+					"invalid start",
+				)
 
 				end, _ := strconv.ParseFloat(r.Form.Get("end"), 64)
-				require.InEpsilon(t, timeParse("2022-06-14T00:05:00Z").Unix(), end, 0.0001, "invalid end")
+				require.InEpsilon(
+					t,
+					timeParse("2022-06-14T00:05:00Z").Unix(),
+					end,
+					0.0001,
+					"invalid end",
+				)
 
 				diff := time.Unix(int64(end), 0).Sub(time.Unix(int64(start), 0))
 				require.Equal(t, time.Minute*5, diff)
@@ -627,13 +794,37 @@ func TestRange(t *testing.T) {
 
 				switch start {
 				case float64(timeParse("2022-06-14T00:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T01:59:59Z").Unix(), end, 0.0001, "invalid end for #0")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T01:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #0",
+					)
 				case float64(timeParse("2022-06-14T02:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T03:59:59Z").Unix(), end, 0.0001, "invalid end for #1")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T03:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #1",
+					)
 				case float64(timeParse("2022-06-14T04:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T05:59:59Z").Unix(), end, 0.0001, "invalid end for #2")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T05:59:59Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #2",
+					)
 				case float64(timeParse("2022-06-14T06:00:00Z").Unix()):
-					require.InEpsilon(t, timeParse("2022-06-14T07:00:00Z").Unix(), end, 0.0001, "invalid end for #3")
+					require.InEpsilon(
+						t,
+						timeParse("2022-06-14T07:00:00Z").Unix(),
+						end,
+						0.0001,
+						"invalid end for #3",
+					)
 				default:
 					t.Fatalf("unknown start: %.2f", start)
 				}
@@ -675,9 +866,11 @@ func TestRange(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.query, func(t *testing.T) {
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				tc.handler(t, w, r)
-			}))
+			srv := httptest.NewServer(
+				http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					tc.handler(t, w, r)
+				}),
+			)
 			defer srv.Close()
 
 			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
@@ -689,7 +882,11 @@ func TestRange(t *testing.T) {
 
 			for i := 1; i < 5; i++ {
 				t.Run(tc.query, func(t *testing.T) {
-					qr, err := fg.RangeQuery(t.Context(), tc.query, newAbsoluteRange(tc.start, tc.end, tc.step))
+					qr, err := fg.RangeQuery(
+						t.Context(),
+						tc.query,
+						newAbsoluteRange(tc.start, tc.end, tc.step),
+					)
 					if tc.err != "" {
 						require.EqualError(t, err, tc.err, tc)
 					} else {
@@ -705,7 +902,10 @@ func TestRange(t *testing.T) {
 
 func generateSamples(start, end time.Time, step time.Duration) (samples []model.SamplePair) {
 	for {
-		samples = append(samples, model.SamplePair{Timestamp: model.TimeFromUnix(start.Unix()), Value: 1})
+		samples = append(
+			samples,
+			model.SamplePair{Timestamp: model.TimeFromUnix(start.Unix()), Value: 1},
+		)
 		start = start.Add(step)
 		if start.After(end) {
 			break

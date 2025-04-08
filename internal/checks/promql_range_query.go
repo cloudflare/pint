@@ -20,7 +20,12 @@ const (
 	RangeQueryCheckName = "promql/range_query"
 )
 
-func NewRangeQueryCheck(prom *promapi.FailoverGroup, limit time.Duration, comment string, severity Severity) RangeQueryCheck {
+func NewRangeQueryCheck(
+	prom *promapi.FailoverGroup,
+	limit time.Duration,
+	comment string,
+	severity Severity,
+) RangeQueryCheck {
 	return RangeQueryCheck{prom: prom, limit: limit, comment: comment, severity: severity}
 }
 
@@ -55,7 +60,11 @@ func (c RangeQueryCheck) Reporter() string {
 	return RangeQueryCheckName
 }
 
-func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RangeQueryCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return problems
@@ -82,7 +91,10 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []d
 			c.prom.DisableCheck(promapi.APIPathFlags, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning))
+		problems = append(
+			problems,
+			problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Warning),
+		)
 		return problems
 	}
 
@@ -99,7 +111,11 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []d
 				Severity: Warning,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("Cannot parse --storage.tsdb.retention.time=%q flag value: %s", v, err),
+						Message: fmt.Sprintf(
+							"Cannot parse --storage.tsdb.retention.time=%q flag value: %s",
+							v,
+							err,
+						),
 						Pos:         expr.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(expr.Value.Value),
@@ -118,10 +134,14 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []d
 
 	problems = append(problems, c.checkNode(
 		ctx,
-		expr, expr.Query,
+		expr,
+		expr.Query,
 		retention,
-		fmt.Sprintf("%s is configured to only keep %s of metrics history.", promText(c.prom.Name(), flags.URI),
-			model.Duration(retention)),
+		fmt.Sprintf(
+			"%s is configured to only keep %s of metrics history.",
+			promText(c.prom.Name(), flags.URI),
+			model.Duration(retention),
+		),
 		Warning,
 	)...,
 	)
@@ -129,7 +149,14 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []d
 	return problems
 }
 
-func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, node *parser.PromQLNode, retention time.Duration, reason string, s Severity) (problems []Problem) {
+func (c RangeQueryCheck) checkNode(
+	ctx context.Context,
+	expr parser.PromQLExpr,
+	node *parser.PromQLNode,
+	retention time.Duration,
+	reason string,
+	s Severity,
+) (problems []Problem) {
 	if n, ok := node.Expr.(*promParser.MatrixSelector); ok {
 		if n.Range > retention {
 			problems = append(problems, Problem{
@@ -141,8 +168,12 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, 
 				Severity: s,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message: fmt.Sprintf("`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
-							node.Expr, model.Duration(n.Range), reason),
+						Message: fmt.Sprintf(
+							"`%s` selector is trying to query Prometheus for %s worth of metrics, but %s",
+							node.Expr,
+							model.Duration(n.Range),
+							reason,
+						),
 						Pos:         expr.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(expr.Value.Value),

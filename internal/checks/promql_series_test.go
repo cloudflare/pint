@@ -137,8 +137,11 @@ func TestSeriesCheck(t *testing.T) {
 					resp: respondWithEmptyMatrix(),
 				},
 				{
-					conds: []requestCondition{requireQueryPath, formCond{key: "query", value: "count(found_7)"}},
-					resp:  respondWithSingleInstantVector(),
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: "count(found_7)"},
+					},
+					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{
@@ -179,14 +182,20 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`},
+						formCond{
+							key:   "query",
+							value: `count(disk_info{interface_speed!="6.0 Gb/s",type="sat"})`,
+						},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+						formCond{
+							key:   "query",
+							value: `count(node_filesystem_readonly{mountpoint!=""})`,
+						},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -201,7 +210,10 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+						formCond{
+							key:   "query",
+							value: `count(node_filesystem_readonly{mountpoint!=""})`,
+						},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -216,7 +228,10 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(node_filesystem_readonly{mountpoint!=""})`},
+						formCond{
+							key:   "query",
+							value: `count(node_filesystem_readonly{mountpoint!=""})`,
+						},
 					},
 					resp: respondWithSingleInstantVector(),
 				},
@@ -1579,7 +1594,10 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`},
+						formCond{
+							key:   "query",
+							value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`,
+						},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -1637,7 +1655,10 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`},
+						formCond{
+							key:   "query",
+							value: `count(found{instance!~"bad",instance=~".+",not!="negative",notfound="notfound"})`,
+						},
 					},
 					resp: respondWithEmptyVector(),
 				},
@@ -2807,8 +2828,10 @@ func TestSeriesCheck(t *testing.T) {
 			content:     "- alert: foo\n  expr: sum(foo:count) / sum(foo:sum) > 120\n",
 			checker:     newSeriesCheck,
 			prometheus:  newSimpleProm,
-			entries:     mustParseContent("- record: foo:count\n  expr: count(foo)\n- record: foo:sum\n  expr: sum(foo)\n"),
-			problems:    true,
+			entries: mustParseContent(
+				"- record: foo:count\n  expr: count(foo)\n- record: foo:sum\n  expr: sum(foo)\n",
+			),
+			problems: true,
 			mocks: []*prometheusMock{
 				{
 					conds: []requestCondition{
@@ -2858,14 +2881,20 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+						formCond{
+							key:   "query",
+							value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`,
+						},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
+						formCond{
+							key:   "query",
+							value: `count({__name__=~"(foo|bar)_panics_total"})`,
+						},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
@@ -2908,21 +2937,30 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+						formCond{
+							key:   "query",
+							value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`,
+						},
 					},
 					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total"})`},
+						formCond{
+							key:   "query",
+							value: `count({__name__=~"(foo|bar)_panics_total"})`,
+						},
 					},
 					resp: respondWithSingleRangeVector1W(),
 				},
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `absent({__name__=~"(foo|bar)_panics_total",job=~".+"})`},
+						formCond{
+							key:   "query",
+							value: `absent({__name__=~"(foo|bar)_panics_total",job=~".+"})`,
+						},
 					},
 					resp: matrixResponse{
 						samples: []*model.SampleStream{
@@ -2938,7 +2976,10 @@ func TestSeriesCheck(t *testing.T) {
 				{
 					conds: []requestCondition{
 						requireRangeQueryPath,
-						formCond{key: "query", value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`},
+						formCond{
+							key:   "query",
+							value: `count({__name__=~"(foo|bar)_panics_total",job="myjob"})`,
+						},
 					},
 					resp: respondWithEmptyMatrix(),
 				},
@@ -3142,15 +3183,20 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 5 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
-					resp:  respondWithEmptyVector(),
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+					},
+					resp: respondWithEmptyVector(),
 				},
 				{
 					conds: []requestCondition{requireQueryPath},
@@ -3170,15 +3216,20 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 5 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
-					resp:  respondWithSingleInstantVector(),
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+					},
+					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{requireQueryPath},
@@ -3198,15 +3249,20 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 15 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
-					resp:  respondWithSingleInstantVector(),
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+					},
+					resp: respondWithSingleInstantVector(),
 				},
 				{
 					conds: []requestCondition{requireQueryPath},
@@ -3236,22 +3292,36 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 15 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), fmt.Sprintf("%s/other/%d", uri, i), time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(
+							fmt.Sprintf("prom%d", i),
+							fmt.Sprintf("%s/other/%d", uri, i),
+							time.Second,
+							false,
+						),
+					)
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/0" + promapi.APIPathQuery}},
-					resp:  respondWithSingleInstantVector(),
+					conds: []requestCondition{
+						requestPathCond{path: "/other/0" + promapi.APIPathQuery},
+					},
+					resp: respondWithSingleInstantVector(),
 				},
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/1" + promapi.APIPathQuery}},
-					resp:  respondWithSingleInstantVector(),
+					conds: []requestCondition{
+						requestPathCond{path: "/other/1" + promapi.APIPathQuery},
+					},
+					resp: respondWithSingleInstantVector(),
 				},
 				{
-					conds: []requestCondition{requestPathCond{path: "/other/2" + promapi.APIPathQuery}},
+					conds: []requestCondition{
+						requestPathCond{path: "/other/2" + promapi.APIPathQuery},
+					},
 					resp: sleepResponse{
 						sleep: time.Millisecond * 100,
 						resp:  respondWithSingleInstantVector(),
@@ -3285,14 +3355,19 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 30 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},
 			problems: true,
 			mocks: []*prometheusMock{
 				{
-					conds: []requestCondition{requestPathCond{path: "/other" + promapi.APIPathQuery}},
+					conds: []requestCondition{
+						requestPathCond{path: "/other" + promapi.APIPathQuery},
+					},
 					resp: sleepResponse{
 						sleep: time.Millisecond * 230,
 						resp:  respondWithSingleInstantVector(),
@@ -3395,7 +3470,10 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 30 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},
@@ -3473,7 +3551,10 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 30 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},
@@ -3552,7 +3633,10 @@ func TestSeriesCheck(t *testing.T) {
 			otherProms: func(uri string) []*promapi.FailoverGroup {
 				var proms []*promapi.FailoverGroup
 				for i := range 30 {
-					proms = append(proms, simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false))
+					proms = append(
+						proms,
+						simpleProm(fmt.Sprintf("prom%d", i), uri+"/other", time.Second, false),
+					)
 				}
 				return proms
 			},

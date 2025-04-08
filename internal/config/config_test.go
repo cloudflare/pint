@@ -29,7 +29,11 @@ func TestMain(t *testing.M) {
 
 func TestConfigLoadMissingFile(t *testing.T) {
 	_, ok, err := config.Load("/foo/bar/pint.hcl", true)
-	require.EqualError(t, err, "<nil>: Configuration file not found; The configuration file /foo/bar/pint.hcl does not exist.")
+	require.EqualError(
+		t,
+		err,
+		"<nil>: Configuration file not found; The configuration file /foo/bar/pint.hcl does not exist.",
+	)
 	require.True(t, ok)
 }
 
@@ -785,7 +789,10 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
+				Rule: newRule(
+					t,
+					"- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n",
+				),
 			},
 		},
 		{
@@ -813,7 +820,10 @@ rule {
 					Name:          "rules.yml",
 					SymlinkTarget: "rules.yml",
 				},
-				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
+				Rule: newRule(
+					t,
+					"- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n",
+				),
 			},
 		},
 		{
@@ -1255,7 +1265,13 @@ checks {
 - record: foo
   expr: sum(foo)
 `),
-				DisabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict", "promql/counter"},
+				DisabledChecks: []string{
+					"promql/rate",
+					"promql/vector_matching",
+					"rule/duplicate",
+					"labels/conflict",
+					"promql/counter",
+				},
 			},
 		},
 		{
@@ -1596,7 +1612,11 @@ rule {
 - record: foo
   expr: sum(foo)
 `),
-				DisabledChecks: []string{"alerts/template", "alerts/external_labels", "alerts/absent"},
+				DisabledChecks: []string{
+					"alerts/template",
+					"alerts/external_labels",
+					"alerts/absent",
+				},
 			},
 		},
 		{
@@ -2186,5 +2206,9 @@ prometheus "prom" {
 	require.NoError(t, err)
 
 	_, _, err = config.Load(path, true)
-	require.EqualError(t, err, `prometheus server name must be unique, found two or more config blocks using "prom" name`)
+	require.EqualError(
+		t,
+		err,
+		`prometheus server name must be unique, found two or more config blocks using "prom" name`,
+	)
 }

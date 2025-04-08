@@ -57,21 +57,30 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 	// http response name /200 200 OK
 	case "response":
 		if len(args) < 5 {
-			ts.Fatalf("! http response command requires '$NAME $PATH $CODE $BODY' args, got [%s]", strings.Join(args, " "))
+			ts.Fatalf(
+				"! http response command requires '$NAME $PATH $CODE $BODY' args, got [%s]",
+				strings.Join(args, " "),
+			)
 		}
 		name := args[1]
 		path := regexp.MustCompile(args[2])
 		code, err := strconv.Atoi(args[3])
 		ts.Check(err)
 		body := strings.Join(args[4:], " ")
-		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(code)
-			_, err := w.Write([]byte(body))
-			ts.Check(err)
-		}})
+		mocks.add(
+			name,
+			httpMock{pattern: path, handler: func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(code)
+				_, err := w.Write([]byte(body))
+				ts.Check(err)
+			}},
+		)
 	case "method":
 		if len(args) < 6 {
-			ts.Fatalf("! http response command requires '$NAME $METHOD $PATH $CODE $BODY' args, got [%s]", strings.Join(args, " "))
+			ts.Fatalf(
+				"! http response command requires '$NAME $METHOD $PATH $CODE $BODY' args, got [%s]",
+				strings.Join(args, " "),
+			)
 		}
 		name := args[1]
 		meth := args[2]
@@ -79,15 +88,25 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		code, err := strconv.Atoi(args[4])
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
-		mocks.add(name, httpMock{pattern: path, method: meth, handler: func(w http.ResponseWriter, _ *http.Request) {
-			w.WriteHeader(code)
-			_, err := w.Write([]byte(body))
-			ts.Check(err)
-		}})
+		mocks.add(
+			name,
+			httpMock{
+				pattern: path,
+				method:  meth,
+				handler: func(w http.ResponseWriter, _ *http.Request) {
+					w.WriteHeader(code)
+					_, err := w.Write([]byte(body))
+					ts.Check(err)
+				},
+			},
+		)
 	// http auth-response name /200 user password 200 OK
 	case "auth-response":
 		if len(args) < 7 {
-			ts.Fatalf("! http response command requires '$NAME $PATH $USER $PASS $CODE $BODY' args, got [%s]", strings.Join(args, " "))
+			ts.Fatalf(
+				"! http response command requires '$NAME $PATH $USER $PASS $CODE $BODY' args, got [%s]",
+				strings.Join(args, " "),
+			)
 		}
 		name := args[1]
 		path := regexp.MustCompile(args[2])
@@ -96,20 +115,26 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		code, err := strconv.Atoi(args[5])
 		ts.Check(err)
 		body := strings.Join(args[6:], " ")
-		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
-			username, password, ok := r.BasicAuth()
-			if ok && username == user && password == pass {
-				w.WriteHeader(code)
-				_, err := w.Write([]byte(body))
-				ts.Check(err)
-				return
-			}
-			w.WriteHeader(http.StatusUnauthorized)
-		}})
+		mocks.add(
+			name,
+			httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
+				username, password, ok := r.BasicAuth()
+				if ok && username == user && password == pass {
+					w.WriteHeader(code)
+					_, err := w.Write([]byte(body))
+					ts.Check(err)
+					return
+				}
+				w.WriteHeader(http.StatusUnauthorized)
+			}},
+		)
 	// http response name /200 200 OK
 	case "slow-response":
 		if len(args) < 6 {
-			ts.Fatalf("! http response command requires '$NAME $PATH $DELAY $CODE $BODY' args, got [%s]", strings.Join(args, " "))
+			ts.Fatalf(
+				"! http response command requires '$NAME $PATH $DELAY $CODE $BODY' args, got [%s]",
+				strings.Join(args, " "),
+			)
 		}
 		name := args[1]
 		path := regexp.MustCompile(args[2])
@@ -118,28 +143,40 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		code, err := strconv.Atoi(args[4])
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
-		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, _ *http.Request) {
-			time.Sleep(delay)
-			w.WriteHeader(code)
-			_, err := w.Write([]byte(body))
-			ts.Check(err)
-		}})
+		mocks.add(
+			name,
+			httpMock{pattern: path, handler: func(w http.ResponseWriter, _ *http.Request) {
+				time.Sleep(delay)
+				w.WriteHeader(code)
+				_, err := w.Write([]byte(body))
+				ts.Check(err)
+			}},
+		)
 	// http redirect name /foo/src /dst
 	case "redirect":
 		if len(args) != 4 {
-			ts.Fatalf("! http redirect command requires '$NAME $SRCPATH $DSTPATH' args, got [%s]", strings.Join(args, " "))
+			ts.Fatalf(
+				"! http redirect command requires '$NAME $SRCPATH $DSTPATH' args, got [%s]",
+				strings.Join(args, " "),
+			)
 		}
 		name := args[1]
 		srcpath := regexp.MustCompile(args[2])
 		dstpath := args[3]
-		mocks.add(name, httpMock{pattern: srcpath, handler: func(w http.ResponseWriter, _ *http.Request) {
-			w.Header().Set("Location", dstpath)
-			w.WriteHeader(http.StatusFound)
-		}})
+		mocks.add(
+			name,
+			httpMock{pattern: srcpath, handler: func(w http.ResponseWriter, _ *http.Request) {
+				w.Header().Set("Location", dstpath)
+				w.WriteHeader(http.StatusFound)
+			}},
+		)
 	// http start name 127.0.0.1:7088 [cert.pem cert.key]
 	case "start":
 		if len(args) < 3 {
-			ts.Fatalf("! http start command requires '$NAME $LISTEN [$TLS_CERT $TLS_KEY]' args, got [%s]", strings.Join(args, " "))
+			ts.Fatalf(
+				"! http start command requires '$NAME $LISTEN [$TLS_CERT $TLS_KEY]' args, got [%s]",
+				strings.Join(args, " "),
+			)
 		}
 		name := args[1]
 		listen := args[2]
@@ -230,7 +267,10 @@ func (m *httpMocks) responses() map[string][]httpMock {
 
 func tlsCert(ts *testscript.TestScript, _ bool, args []string) {
 	if len(args) < 2 {
-		ts.Fatalf("! cert command requires '$DIRNAME $NAME' args, got [%s]", strings.Join(args, " "))
+		ts.Fatalf(
+			"! cert command requires '$DIRNAME $NAME' args, got [%s]",
+			strings.Join(args, " "),
+		)
 	}
 	dirname := args[0]
 	name := args[1]
@@ -247,10 +287,13 @@ func tlsCert(ts *testscript.TestScript, _ bool, args []string) {
 			StreetAddress: []string{""},
 			PostalCode:    []string{""},
 		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(10, 0, 0),
-		IsCA:                  true,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		NotBefore: time.Now(),
+		NotAfter:  time.Now().AddDate(10, 0, 0),
+		IsCA:      true,
+		ExtKeyUsage: []x509.ExtKeyUsage{
+			x509.ExtKeyUsageClientAuth,
+			x509.ExtKeyUsageServerAuth,
+		},
 		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		BasicConstraintsValid: true,
 	}
@@ -298,7 +341,13 @@ func tlsCert(ts *testscript.TestScript, _ bool, args []string) {
 		ts.Fatalf("failed to generate cert private key: %s", err)
 	}
 
-	certBytes, err := x509.CreateCertificate(rand.Reader, cert, ca, &certPrivKey.PublicKey, caPrivKey)
+	certBytes, err := x509.CreateCertificate(
+		rand.Reader,
+		cert,
+		ca,
+		&certPrivKey.PublicKey,
+		caPrivKey,
+	)
 	if err != nil {
 		ts.Fatalf("failed to generate cert: %s", err)
 	}

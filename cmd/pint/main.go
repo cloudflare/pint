@@ -114,7 +114,10 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 		return meta, fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
 	}
 	if fromFile {
-		slog.Debug("Adding pint config to the parser exclude list", slog.String("path", c.Path(configFlag)))
+		slog.Debug(
+			"Adding pint config to the parser exclude list",
+			slog.String("path", c.Path(configFlag)),
+		)
 		meta.cfg.Parser.Exclude = append(meta.cfg.Parser.Exclude, c.Path(configFlag))
 	}
 

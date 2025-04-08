@@ -13,7 +13,13 @@ const (
 	AggregationCheckName = "promql/aggregate"
 )
 
-func NewAggregationCheck(nameRegex *TemplatedRegexp, label string, keep bool, comment string, severity Severity) AggregationCheck {
+func NewAggregationCheck(
+	nameRegex *TemplatedRegexp,
+	label string,
+	keep bool,
+	comment string,
+	severity Severity,
+) AggregationCheck {
 	return AggregationCheck{
 		nameRegex: nameRegex,
 		label:     label,
@@ -52,17 +58,23 @@ func (c AggregationCheck) Reporter() string {
 	return AggregationCheckName
 }
 
-func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c AggregationCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
 	}
 
 	if c.nameRegex != nil {
-		if entry.Rule.RecordingRule != nil && !c.nameRegex.MustExpand(entry.Rule).MatchString(entry.Rule.RecordingRule.Record.Value) {
+		if entry.Rule.RecordingRule != nil &&
+			!c.nameRegex.MustExpand(entry.Rule).MatchString(entry.Rule.RecordingRule.Record.Value) {
 			return nil
 		}
-		if entry.Rule.AlertingRule != nil && !c.nameRegex.MustExpand(entry.Rule).MatchString(entry.Rule.AlertingRule.Alert.Value) {
+		if entry.Rule.AlertingRule != nil &&
+			!c.nameRegex.MustExpand(entry.Rule).MatchString(entry.Rule.AlertingRule.Alert.Value) {
 			return nil
 		}
 	}
@@ -104,8 +116,11 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 						LastColumn:  int(el.Fragment.End),
 					},
 					{
-						Message: fmt.Sprintf("`%s` label is required and should be preserved when aggregating %s rules.",
-							c.label, nameDesc),
+						Message: fmt.Sprintf(
+							"`%s` label is required and should be preserved when aggregating %s rules.",
+							c.label,
+							nameDesc,
+						),
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(el.Fragment.Start) + 1,
 						LastColumn:  int(el.Fragment.End),
@@ -120,7 +135,11 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 				posrange = src.Aggregation.PosRange
 				if len(src.Aggregation.Grouping) != 0 {
 					if src.Aggregation.Without {
-						posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "without")
+						posrange = utils.FindPosition(
+							expr.Value.Value,
+							src.Aggregation.PosRange,
+							"without",
+						)
 					} else {
 						posrange = utils.FindPosition(expr.Value.Value, src.Aggregation.PosRange, "by")
 					}
@@ -134,8 +153,11 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 				Details:  maybeComment(c.comment),
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message: fmt.Sprintf("`%s` label should be removed when aggregating %s rules.",
-							c.label, nameDesc),
+						Message: fmt.Sprintf(
+							"`%s` label should be removed when aggregating %s rules.",
+							c.label,
+							nameDesc,
+						),
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(posrange.Start) + 1,
 						LastColumn:  int(posrange.End),

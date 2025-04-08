@@ -78,7 +78,11 @@ func (q metadataQuery) CacheTTL() time.Duration {
 }
 
 func (prom *Prometheus) Metadata(ctx context.Context, metric string) (*MetadataResult, error) {
-	slog.Debug("Scheduling Prometheus metrics metadata query", slog.String("uri", prom.safeURI), slog.String("metric", metric))
+	slog.Debug(
+		"Scheduling Prometheus metrics metadata query",
+		slog.String("uri", prom.safeURI),
+		slog.String("metric", metric),
+	)
 
 	key := APIPathMetadata + metric
 	prom.locker.lock(key)
@@ -126,7 +130,11 @@ func streamMetadata(r io.Reader) (meta map[string][]v1.Metadata, err error) {
 
 	dec := json.NewDecoder(r)
 	if err = decoder.Stream(dec); err != nil {
-		return nil, APIError{Status: status, ErrorType: v1.ErrBadResponse, Err: fmt.Sprintf("JSON parse error: %s", err)}
+		return nil, APIError{
+			Status:    status,
+			ErrorType: v1.ErrBadResponse,
+			Err:       fmt.Sprintf("JSON parse error: %s", err),
+		}
 	}
 
 	if status != "success" {

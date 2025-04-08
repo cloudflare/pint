@@ -128,13 +128,21 @@ func TestReadContent(t *testing.T) {
 			output: []byte("               # pint ignore/line\n"),
 		},
 		{
-			input:   []byte("# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
-			output:  []byte("# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
+			input: []byte(
+				"# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n",
+			),
+			output: []byte(
+				"# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n",
+			),
 			ignored: true,
 		},
 		{
-			input:   []byte("foo\n# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n"),
-			output:  []byte("foo\n# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n"),
+			input: []byte(
+				"foo\n# pint ignore/file\nfoo\nbar\n# pint ignore/begin\nfoo\n# pint ignore/end\n",
+			),
+			output: []byte(
+				"foo\n# pint ignore/file\n   \n   \n# pint ignore/begin\n   \n# pint ignore/end\n",
+			),
 			ignored: true,
 		},
 		{
@@ -160,8 +168,12 @@ func TestReadContent(t *testing.T) {
 			output: []byte("                          # pint ignore/line\n"),
 		},
 		{
-			input:  []byte("# pint ignore/begin\n  - alert: Ignored\n    # pint rule/set foo\n    # pint rule/set bar\n    expr: up\n# pint ignore/end\n"),
-			output: []byte("# pint ignore/begin\n                  \n                       \n                       \n            \n# pint ignore/end\n"),
+			input: []byte(
+				"# pint ignore/begin\n  - alert: Ignored\n    # pint rule/set foo\n    # pint rule/set bar\n    expr: up\n# pint ignore/end\n",
+			),
+			output: []byte(
+				"# pint ignore/begin\n                  \n                       \n                       \n            \n# pint ignore/end\n",
+			),
 		},
 		{
 			input: []byte(`
@@ -325,7 +337,12 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
-			require.Equal(t, string(tc.output), string(output), "ReadContent() returned wrong output")
+			require.Equal(
+				t,
+				string(tc.output),
+				string(output),
+				"ReadContent() returned wrong output",
+			)
 			require.Equal(t, tc.ignored, r.skipAll, "ReadContent() returned wrong skipAll value")
 		})
 	}

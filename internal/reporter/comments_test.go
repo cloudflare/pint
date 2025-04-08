@@ -244,7 +244,8 @@ bar warning
 					return []ExistingComment{fooComment}, nil
 				},
 				create: func(_ context.Context, _ any, p PendingComment) error {
-					if p.path == barComment.path && p.line == barComment.line && p.text == barComment.text {
+					if p.path == barComment.path && p.line == barComment.line &&
+						p.text == barComment.text {
 						return nil
 					}
 					return fmt.Errorf("shouldn't try to create %s:%d", p.path, p.line)
@@ -280,7 +281,8 @@ bar warning
 					return nil, nil
 				},
 				create: func(_ context.Context, _ any, p PendingComment) error {
-					if p.path == barComment.path && p.line == barComment.line && p.text == barComment.text {
+					if p.path == barComment.path && p.line == barComment.line &&
+						p.text == barComment.text {
 						return nil
 					}
 					return fmt.Errorf("shouldn't try to create %s:%d", p.path, p.line)
@@ -316,7 +318,8 @@ bar warning
 					return nil, nil
 				},
 				create: func(_ context.Context, _ any, p PendingComment) error {
-					if p.path == barComment.path && p.line == barComment.line && p.text == barComment.text {
+					if p.path == barComment.path && p.line == barComment.line &&
+						p.text == barComment.text {
 						return nil
 					}
 					return errCreate
@@ -352,13 +355,20 @@ bar warning
 					return nil, nil
 				},
 				create: func(_ context.Context, _ any, p PendingComment) error {
-					if p.path == barComment.path && p.line == barComment.line && p.text == barComment.text {
+					if p.path == barComment.path && p.line == barComment.line &&
+						p.text == barComment.text {
 						return nil
 					}
-					if p.path == fooComment.path && p.line == fooComment.line && p.text == fooComment.text {
+					if p.path == fooComment.path && p.line == fooComment.line &&
+						p.text == fooComment.text {
 						return nil
 					}
-					return fmt.Errorf("unexpected comment at %s:%d: %s", p.path, p.line, cmp.Diff(fooComment.text, p.text))
+					return fmt.Errorf(
+						"unexpected comment at %s:%d: %s",
+						p.path,
+						p.line,
+						cmp.Diff(fooComment.text, p.text),
+					)
 				},
 				delete: func(_ context.Context, _ any, e ExistingComment) error {
 					return fmt.Errorf("shouldn't try to delete %s:%d", e.path, e.line)
@@ -625,7 +635,10 @@ foo details
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
 					if p.line == 3 && p.text != expected {
-						return fmt.Errorf("wrong text on first report: %s", cmp.Diff(expected, p.text))
+						return fmt.Errorf(
+							"wrong text on first report: %s",
+							cmp.Diff(expected, p.text),
+						)
 					}
 					expected2 := `:stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.
 
@@ -643,7 +656,10 @@ foo details
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).
 `
 					if p.line == 2 && p.text != expected2 {
-						return fmt.Errorf("wrong text on second report: %s", cmp.Diff(expected2, p.text))
+						return fmt.Errorf(
+							"wrong text on second report: %s",
+							cmp.Diff(expected2, p.text),
+						)
 					}
 					return nil
 				},

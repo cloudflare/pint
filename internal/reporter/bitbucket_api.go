@@ -253,7 +253,12 @@ type BitBucketCommentSeverityUpdate struct {
 	Version  int    `json:"version"`
 }
 
-func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string, maxComments int) *bitBucketAPI {
+func newBitBucketAPI(
+	pintVersion, uri string,
+	timeout time.Duration,
+	token, project, repo string,
+	maxComments int,
+) *bitBucketAPI {
 	return &bitBucketAPI{
 		pintVersion: pintVersion,
 		uri:         uri,
@@ -276,7 +281,11 @@ type bitBucketAPI struct {
 }
 
 func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, error) {
-	slog.Info("Sending a request to BitBucket", slog.String("method", method), slog.String("path", path))
+	slog.Info(
+		"Sending a request to BitBucket",
+		slog.String("method", method),
+		slog.String("path", path),
+	)
 
 	if body != nil {
 		payload, _ := io.ReadAll(body)
@@ -307,7 +316,11 @@ func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, err
 	}
 
 	slog.Info("BitBucket request completed", slog.Int("status", resp.StatusCode))
-	slog.Debug("BitBucket response body", slog.Int("code", resp.StatusCode), slog.String("body", string(data)))
+	slog.Debug(
+		"BitBucket response body",
+		slog.Int("code", resp.StatusCode),
+		slog.String("body", string(data)),
+	)
 	if resp.StatusCode >= 300 {
 		slog.Error(
 			"Got a non 2xx response",
@@ -332,7 +345,12 @@ func (bb bitBucketAPI) whoami() (string, error) {
 func (bb bitBucketAPI) deleteReport(commit string) error {
 	_, err := bb.request(
 		http.MethodDelete,
-		fmt.Sprintf("/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint", bb.project, bb.repo, commit),
+		fmt.Sprintf(
+			"/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint",
+			bb.project,
+			bb.repo,
+			commit,
+		),
 		nil,
 	)
 	return err
@@ -366,7 +384,12 @@ func (bb bitBucketAPI) createReport(summary Summary, commit string) error {
 
 	_, err := bb.request(
 		http.MethodPut,
-		fmt.Sprintf("/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint", bb.project, bb.repo, commit),
+		fmt.Sprintf(
+			"/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint",
+			bb.project,
+			bb.repo,
+			commit,
+		),
 		bytes.NewReader(payload),
 	)
 	return err
@@ -377,7 +400,11 @@ func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 	for _, report := range summary.reports {
 		ann := reportToAnnotation(report)
 		if !slices.Contains(report.ModifiedLines, ann.Line) {
-			slog.Warn("Annotation for unmodified line, skipping", slog.String("path", ann.Path), slog.Int("line", ann.Line))
+			slog.Warn(
+				"Annotation for unmodified line, skipping",
+				slog.String("path", ann.Path),
+				slog.Int("line", ann.Line),
+			)
 			continue
 		}
 		annotations = append(annotations, ann)
@@ -390,7 +417,12 @@ func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 	payload, _ := json.Marshal(BitBucketAnnotations{Annotations: annotations})
 	_, err := bb.request(
 		http.MethodPost,
-		fmt.Sprintf("/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations", bb.project, bb.repo, commit),
+		fmt.Sprintf(
+			"/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations",
+			bb.project,
+			bb.repo,
+			commit,
+		),
 		bytes.NewReader(payload),
 	)
 	return err
@@ -399,7 +431,12 @@ func (bb bitBucketAPI) createAnnotations(summary Summary, commit string) error {
 func (bb bitBucketAPI) deleteAnnotations(commit string) error {
 	_, err := bb.request(
 		http.MethodDelete,
-		fmt.Sprintf("/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations", bb.project, bb.repo, commit),
+		fmt.Sprintf(
+			"/rest/insights/1.0/projects/%s/repos/%s/commits/%s/reports/pint/annotations",
+			bb.project,
+			bb.repo,
+			commit,
+		),
 		nil,
 	)
 	return err
@@ -410,7 +447,13 @@ func (bb bitBucketAPI) findPullRequestForBranch(branch, commit string) (*bitBuck
 	for {
 		resp, err := bb.request(
 			http.MethodGet,
-			fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/commits/%s/pull-requests?start=%d", bb.project, bb.repo, commit, start),
+			fmt.Sprintf(
+				"/rest/api/1.0/projects/%s/repos/%s/commits/%s/pull-requests?start=%d",
+				bb.project,
+				bb.repo,
+				commit,
+				start,
+			),
 			nil,
 		)
 		if err != nil {
@@ -458,7 +501,13 @@ func (bb bitBucketAPI) getPullRequestChanges(pr *bitBucketPR) (*bitBucketPRChang
 	for {
 		resp, err := bb.request(
 			http.MethodGet,
-			fmt.Sprintf("/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/changes?start=%d", bb.project, bb.repo, pr.ID, start),
+			fmt.Sprintf(
+				"/rest/api/1.0/projects/%s/repos/%s/pull-requests/%d/changes?start=%d",
+				bb.project,
+				bb.repo,
+				pr.ID,
+				start,
+			),
 			nil,
 		)
 		if err != nil {
@@ -493,7 +542,8 @@ func (bb bitBucketAPI) getFileDiff(pr *bitBucketPR, path string) ([]int, map[int
 		http.MethodGet,
 		fmt.Sprintf(
 			"/rest/api/latest/projects/%s/repos/%s/commits/%s/diff/%s?contextLines=10000&since=%s&whitespace=show&withComments=false",
-			bb.project, bb.repo,
+			bb.project,
+			bb.repo,
 			pr.srcHead,
 			path,
 			pr.dstHead,
@@ -596,7 +646,10 @@ func (bb bitBucketAPI) getPullRequestComments(pr *bitBucketPR) ([]bitBucketComme
 	return comments, nil
 }
 
-func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges) []BitBucketPendingComment {
+func (bb bitBucketAPI) makeComments(
+	summary Summary,
+	changes *bitBucketPRChanges,
+) []BitBucketPendingComment {
 	var buf strings.Builder
 	var content string
 	var err error
@@ -652,7 +705,9 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 				buf.WriteString("\n\n")
 			}
 			if report.Path.SymlinkTarget != report.Path.Name {
-				buf.WriteString(":leftwards_arrow_with_hook: This problem was detected on a symlinked file ")
+				buf.WriteString(
+					":leftwards_arrow_with_hook: This problem was detected on a symlinked file ",
+				)
 				buf.WriteRune('`')
 				buf.WriteString(report.Path.Name)
 				buf.WriteString("`.\n\n")
@@ -664,7 +719,9 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 			buf.WriteString("\n\n")
 		}
 		buf.WriteString("------\n\n")
-		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
+		buf.WriteString(
+			":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/",
+		)
 		buf.WriteString(reports[0].Problem.Reporter)
 		buf.WriteString(".html).\n")
 
@@ -703,8 +760,13 @@ func (bb bitBucketAPI) limitComments(src []BitBucketPendingComment) []BitBucketP
 	}
 	comments := src[:bb.maxComments]
 	comments = append(comments, BitBucketPendingComment{
-		Text: fmt.Sprintf(`This pint run would create %d comment(s), which is more than %d limit configured for pint.
-%d comments were skipped and won't be visibile on this PR.`, len(src), bb.maxComments, len(src)-bb.maxComments),
+		Text: fmt.Sprintf(
+			`This pint run would create %d comment(s), which is more than %d limit configured for pint.
+%d comments were skipped and won't be visibile on this PR.`,
+			len(src),
+			bb.maxComments,
+			len(src)-bb.maxComments,
+		),
 		Severity: "NORMAL",
 		Anchor: BitBucketPendingCommentAnchor{ // nolint: exhaustruct
 			DiffType: "EFFECTIVE",
@@ -713,7 +775,11 @@ func (bb bitBucketAPI) limitComments(src []BitBucketPendingComment) []BitBucketP
 	return comments
 }
 
-func (bb bitBucketAPI) pruneComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []BitBucketPendingComment) {
+func (bb bitBucketAPI) pruneComments(
+	pr *bitBucketPR,
+	currentComments []bitBucketComment,
+	pendingComments []BitBucketPendingComment,
+) {
 	for _, cur := range currentComments {
 		slog.Debug(
 			"Existing comment",
@@ -836,7 +902,11 @@ func (bb bitBucketAPI) updateSeverity(pr *bitBucketPR, cur bitBucketComment, sev
 	}
 }
 
-func (bb bitBucketAPI) addComments(pr *bitBucketPR, currentComments []bitBucketComment, pendingComments []BitBucketPendingComment) error {
+func (bb bitBucketAPI) addComments(
+	pr *bitBucketPR,
+	currentComments []bitBucketComment,
+	pendingComments []BitBucketPendingComment,
+) error {
 	var added int
 	for _, pend := range pendingComments {
 		add := true
@@ -880,7 +950,10 @@ func reportToAnnotation(report Report) BitBucketAnnotation {
 	var msgPrefix, severity, atype string
 	reportLine, srcLine := moveReportedLine(report)
 	if reportLine != srcLine {
-		msgPrefix = fmt.Sprintf("Problem reported on unmodified line %d, annotation moved here: ", srcLine)
+		msgPrefix = fmt.Sprintf(
+			"Problem reported on unmodified line %d, annotation moved here: ",
+			srcLine,
+		)
 	}
 	if report.Path.SymlinkTarget != report.Path.Name {
 		if msgPrefix == "" {
@@ -903,11 +976,19 @@ func reportToAnnotation(report Report) BitBucketAnnotation {
 	}
 
 	return BitBucketAnnotation{
-		Path:     report.Path.SymlinkTarget,
-		Line:     reportLine,
-		Message:  fmt.Sprintf("%s%s: %s", msgPrefix, report.Problem.Reporter, report.Problem.Summary),
+		Path: report.Path.SymlinkTarget,
+		Line: reportLine,
+		Message: fmt.Sprintf(
+			"%s%s: %s",
+			msgPrefix,
+			report.Problem.Reporter,
+			report.Problem.Summary,
+		),
 		Severity: severity,
 		Type:     atype,
-		Link:     fmt.Sprintf("https://cloudflare.github.io/pint/checks/%s.html", report.Problem.Reporter),
+		Link: fmt.Sprintf(
+			"https://cloudflare.github.io/pint/checks/%s.html",
+			report.Problem.Reporter,
+		),
 	}
 }

@@ -49,7 +49,10 @@ func (gh GitHub) validate() error {
 	if repo := os.Getenv("GITHUB_REPOSITORY"); repo != "" {
 		parts := strings.SplitN(repo, "/", 2)
 		if len(parts) != 2 {
-			return fmt.Errorf("GITHUB_REPOSITORY is set, but with an invalid repository format: %s", repo)
+			return fmt.Errorf(
+				"GITHUB_REPOSITORY is set, but with an invalid repository format: %s",
+				repo,
+			)
 		}
 		if gh.Repo == "" && parts[1] == "" {
 			return errors.New("repo cannot be empty")
@@ -105,8 +108,8 @@ func (gl GitLab) validate() error {
 
 type Repository struct {
 	BitBucket *BitBucket `hcl:"bitbucket,block" json:"bitbucket,omitempty"`
-	GitHub    *GitHub    `hcl:"github,block" json:"github,omitempty"`
-	GitLab    *GitLab    `hcl:"gitlab,block" json:"gitlab,omitempty"`
+	GitHub    *GitHub    `hcl:"github,block"    json:"github,omitempty"`
+	GitLab    *GitLab    `hcl:"gitlab,block"    json:"gitlab,omitempty"`
 }
 
 func (r *Repository) validate() (err error) {

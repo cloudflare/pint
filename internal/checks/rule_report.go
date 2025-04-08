@@ -41,7 +41,11 @@ func (c ReportCheck) Reporter() string {
 	return ReportCheckName
 }
 
-func (c ReportCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c ReportCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	name := entry.Rule.NameNode()
 	problems = append(problems, Problem{
 		Anchor:   AnchorAfter,

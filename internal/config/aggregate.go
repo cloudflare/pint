@@ -7,11 +7,11 @@ import (
 )
 
 type AggregateSettings struct {
-	Name     string   `hcl:",label" json:"name"`
-	Comment  string   `hcl:"comment,optional" json:"comment,omitempty"`
+	Name     string   `hcl:",label"            json:"name"`
+	Comment  string   `hcl:"comment,optional"  json:"comment,omitempty"`
 	Severity string   `hcl:"severity,optional" json:"severity,omitempty"`
-	Keep     []string `hcl:"keep,optional" json:"keep,omitempty"`
-	Strip    []string `hcl:"strip,optional" json:"strip,omitempty"`
+	Keep     []string `hcl:"keep,optional"     json:"keep,omitempty"`
+	Strip    []string `hcl:"strip,optional"    json:"strip,omitempty"`
 }
 
 func (ag AggregateSettings) validate() error {

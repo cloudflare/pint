@@ -45,7 +45,11 @@ func (c RuleDuplicateCheck) Reporter() string {
 	return RuleDuplicateCheckName
 }
 
-func (c RuleDuplicateCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c RuleDuplicateCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	entries []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return problems
@@ -78,14 +82,22 @@ func (c RuleDuplicateCheck) Check(ctx context.Context, entry discovery.Entry, en
 		}
 
 		// Look for identical recording rules.
-		if other.Rule.RecordingRule != nil && entry.Rule.RecordingRule != nil && other.Rule.RecordingRule.Record.Value == entry.Rule.RecordingRule.Record.Value {
-			problems = append(problems, c.compareRules(ctx, entry.Rule.RecordingRule, other, entry.Rule.Lines)...)
+		if other.Rule.RecordingRule != nil && entry.Rule.RecordingRule != nil &&
+			other.Rule.RecordingRule.Record.Value == entry.Rule.RecordingRule.Record.Value {
+			problems = append(
+				problems,
+				c.compareRules(ctx, entry.Rule.RecordingRule, other, entry.Rule.Lines)...)
 		}
 	}
 	return problems
 }
 
-func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.RecordingRule, entry discovery.Entry, lines diags.LineRange) (problems []Problem) {
+func (c RuleDuplicateCheck) compareRules(
+	_ context.Context,
+	rule *parser.RecordingRule,
+	entry discovery.Entry,
+	lines diags.LineRange,
+) (problems []Problem) {
 	ruleALabels := buildRuleLabels(rule.Labels)
 	ruleBLabels := buildRuleLabels(entry.Rule.RecordingRule.Labels)
 
@@ -103,7 +115,11 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 			Severity: Bug,
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("Duplicated rule, identical rule found at %s:%d.", entry.Path.SymlinkTarget, entry.Rule.RecordingRule.Record.Pos.Lines().First),
+					Message: fmt.Sprintf(
+						"Duplicated rule, identical rule found at %s:%d.",
+						entry.Path.SymlinkTarget,
+						entry.Rule.RecordingRule.Record.Pos.Lines().First,
+					),
 					Pos:         rule.Record.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(rule.Record.Value),

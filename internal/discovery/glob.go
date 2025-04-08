@@ -15,7 +15,13 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 )
 
-func NewGlobFinder(patterns []string, filter git.PathFilter, schema parser.Schema, names model.ValidationScheme, allowedOwners []*regexp.Regexp) GlobFinder {
+func NewGlobFinder(
+	patterns []string,
+	filter git.PathFilter,
+	schema parser.Schema,
+	names model.ValidationScheme,
+	allowedOwners []*regexp.Regexp,
+) GlobFinder {
 	return GlobFinder{
 		patterns:      patterns,
 		filter:        filter,
@@ -160,7 +166,11 @@ func walkDir(dirname string) (paths filePaths, err error) {
 			default:
 				dest, err := filepath.EvalSymlinks(path)
 				if err != nil {
-					return fmt.Errorf("%s is a symlink but target file cannot be evaluated: %w", path, err)
+					return fmt.Errorf(
+						"%s is a symlink but target file cannot be evaluated: %w",
+						path,
+						err,
+					)
 				}
 
 				s, err := os.Stat(dest)

@@ -41,15 +41,15 @@ type (
 )
 
 type Match struct {
-	Label         *MatchLabel        `hcl:"label,block" json:"label,omitempty"`
-	Annotation    *MatchAnnotation   `hcl:"annotation,block" json:"annotation,omitempty"`
-	Command       *ContextCommandVal `hcl:"command,optional" json:"command,omitempty"`
-	Path          string             `hcl:"path,optional" json:"path,omitempty"`
-	Name          string             `hcl:"name,optional" json:"name,omitempty"`
-	Kind          string             `hcl:"kind,optional" json:"kind,omitempty"`
-	For           string             `hcl:"for,optional" json:"for,omitempty"`
+	Label         *MatchLabel        `hcl:"label,block"              json:"label,omitempty"`
+	Annotation    *MatchAnnotation   `hcl:"annotation,block"         json:"annotation,omitempty"`
+	Command       *ContextCommandVal `hcl:"command,optional"         json:"command,omitempty"`
+	Path          string             `hcl:"path,optional"            json:"path,omitempty"`
+	Name          string             `hcl:"name,optional"            json:"name,omitempty"`
+	Kind          string             `hcl:"kind,optional"            json:"kind,omitempty"`
+	For           string             `hcl:"for,optional"             json:"for,omitempty"`
 	KeepFiringFor string             `hcl:"keep_firing_for,optional" json:"keep_firing_for,omitempty"`
-	State         []string           `hcl:"state,optional" json:"state,omitempty"`
+	State         []string           `hcl:"state,optional"           json:"state,omitempty"`
 }
 
 func (m Match) validate(allowEmpty bool) error {
@@ -97,7 +97,11 @@ func (m Match) validate(allowEmpty bool) error {
 		}
 	}
 
-	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil && m.Annotation == nil && m.Command == nil && m.For == "" && m.State == nil {
+	if !allowEmpty && m.Path == "" && m.Name == "" && m.Kind == "" && m.Label == nil &&
+		m.Annotation == nil &&
+		m.Command == nil &&
+		m.For == "" &&
+		m.State == nil {
 		return errors.New("ignore block must have at least one condition")
 	}
 
@@ -186,7 +190,7 @@ func (m Match) IsMatch(ctx context.Context, path string, e discovery.Entry) bool
 
 type MatchLabel struct {
 	Key   string `hcl:",label" json:"key"`
-	Value string `hcl:"value" json:"value"`
+	Value string `hcl:"value"  json:"value"`
 }
 
 func (ml MatchLabel) validate() error {
@@ -214,7 +218,7 @@ func (ml MatchLabel) isMatching(entry discovery.Entry) bool {
 
 type MatchAnnotation struct {
 	Key   string `hcl:",label" json:"key"`
-	Value string `hcl:"value" json:"value"`
+	Value string `hcl:"value"  json:"value"`
 }
 
 func (ma MatchAnnotation) validate() error {

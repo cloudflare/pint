@@ -131,10 +131,14 @@ func TestBitBucketReporter(t *testing.T) {
 				_, _ = w.Write([]byte("Bad Request"))
 			}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to create BitBucket report: PUT request failed" {
+				if err != nil &&
+					err.Error() == "failed to create BitBucket report: PUT request failed" {
 					return nil
 				}
-				return fmt.Errorf("Expected 'failed to create BitBucket report: PUT request failed', got %w", err)
+				return fmt.Errorf(
+					"Expected 'failed to create BitBucket report: PUT request failed', got %w",
+					err,
+				)
 			},
 		},
 		{
@@ -339,10 +343,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(3)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(3),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -598,10 +618,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(4),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -678,10 +714,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(1),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -796,10 +848,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(4),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -968,10 +1036,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(4)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(4),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -1612,17 +1696,22 @@ func TestBitBucketReporter(t *testing.T) {
 					_, _ = w.Write([]byte("pint_user"))
 					return
 				}
-				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002" && r.Method == http.MethodDelete {
+				if r.URL.Path == "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments/1002" &&
+					r.Method == http.MethodDelete {
 					w.WriteHeader(http.StatusOK)
 					return
 				}
 				w.WriteHeader(http.StatusInternalServerError)
 			}),
 			errorHandler: func(err error) error {
-				if err != nil && err.Error() == "failed to create BitBucket pull request comments: POST request failed" {
+				if err != nil &&
+					err.Error() == "failed to create BitBucket pull request comments: POST request failed" {
 					return nil
 				}
-				return fmt.Errorf("Expected failed to create BitBucket pull request comments: POST request failed, got %w", err)
+				return fmt.Errorf(
+					"Expected failed to create BitBucket pull request comments: POST request failed, got %w",
+					err,
+				)
 			},
 		},
 		{
@@ -1726,10 +1815,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(5)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(5),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -1965,10 +2070,26 @@ func TestBitBucketReporter(t *testing.T) {
 				Result:   "FAIL",
 				Data: []reporter.BitBucketReportData{
 					{Title: "Number of rules parsed", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of rules checked", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of problems found", Type: reporter.NumberType, Value: float64(1)},
-					{Title: "Number of offline checks", Type: reporter.NumberType, Value: float64(0)},
-					{Title: "Number of online checks", Type: reporter.NumberType, Value: float64(0)},
+					{
+						Title: "Number of rules checked",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of problems found",
+						Type:  reporter.NumberType,
+						Value: float64(1),
+					},
+					{
+						Title: "Number of offline checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
+					{
+						Title: "Number of online checks",
+						Type:  reporter.NumberType,
+						Value: float64(0),
+					},
 					{Title: "Checks duration", Type: reporter.DurationType, Value: float64(0)},
 				},
 			},
@@ -1992,76 +2113,89 @@ func TestBitBucketReporter(t *testing.T) {
 
 			var srv *httptest.Server
 			if tc.httpHandler == nil {
-				srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					defer r.Body.Close()
+				srv = httptest.NewServer(
+					http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+						defer r.Body.Close()
 
-					if r.Method == http.MethodDelete {
-						w.WriteHeader(http.StatusOK)
-						return
-					}
-
-					if strings.HasPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/") {
-						filename := strings.TrimPrefix(r.URL.Path, "/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/")
-						assert.NotNil(t, tc.pullRequestFileDiffs)
-						v, ok := tc.pullRequestFileDiffs[filename]
-						assert.True(t, ok, "file is missing from pullRequestFileDiffs: %s", filename)
-
-						data, err := json.Marshal(v)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-						return
-					}
-
-					switch r.URL.Path {
-					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint":
-						var resp reporter.BitBucketReport
-						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-							t.Errorf("JSON decode error: %v", err)
+						if r.Method == http.MethodDelete {
+							w.WriteHeader(http.StatusOK)
+							return
 						}
-						assert.Equal(t, tc.report, resp, "Got wrong bitbucket report body")
-					case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations":
-						var resp reporter.BitBucketAnnotations
-						if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
-							t.Errorf("JSON decode error: %s", err)
+
+						if strings.HasPrefix(
+							r.URL.Path,
+							"/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/",
+						) {
+							filename := strings.TrimPrefix(
+								r.URL.Path,
+								"/rest/api/latest/projects/proj/repos/repo/commits/fake-commit-id/diff/",
+							)
+							assert.NotNil(t, tc.pullRequestFileDiffs)
+							v, ok := tc.pullRequestFileDiffs[filename]
+							assert.True(
+								t,
+								ok,
+								"file is missing from pullRequestFileDiffs: %s",
+								filename,
+							)
+
+							data, err := json.Marshal(v)
+							assert.NoError(t, err)
+							w.WriteHeader(http.StatusOK)
+							_, err = w.Write(data)
+							assert.NoError(t, err)
+							return
 						}
-						assert.Equal(t, tc.annotations, resp, "Got wrong bitbucket annotations")
-					case "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests":
-						data, err := json.Marshal(tc.pullRequests)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes":
-						data, err := json.Marshal(tc.pullRequestChanges)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-					case "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities":
-						data, err := json.Marshal(tc.pullRequestActivities)
-						assert.NoError(t, err)
-						w.WriteHeader(http.StatusOK)
-						_, err = w.Write(data)
-						assert.NoError(t, err)
-					case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments":
-						var comment reporter.BitBucketPendingComment
-						if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
-							t.Errorf("JSON decode error: %s", err)
+
+						switch r.URL.Path {
+						case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint":
+							var resp reporter.BitBucketReport
+							if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
+								t.Errorf("JSON decode error: %v", err)
+							}
+							assert.Equal(t, tc.report, resp, "Got wrong bitbucket report body")
+						case "/rest/insights/1.0/projects/proj/repos/repo/commits/fake-commit-id/reports/pint/annotations":
+							var resp reporter.BitBucketAnnotations
+							if err := json.NewDecoder(r.Body).Decode(&resp); err != nil {
+								t.Errorf("JSON decode error: %s", err)
+							}
+							assert.Equal(t, tc.annotations, resp, "Got wrong bitbucket annotations")
+						case "/rest/api/1.0/projects/proj/repos/repo/commits/fake-commit-id/pull-requests":
+							data, err := json.Marshal(tc.pullRequests)
+							assert.NoError(t, err)
+							w.WriteHeader(http.StatusOK)
+							_, err = w.Write(data)
+							assert.NoError(t, err)
+						case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/changes":
+							data, err := json.Marshal(tc.pullRequestChanges)
+							assert.NoError(t, err)
+							w.WriteHeader(http.StatusOK)
+							_, err = w.Write(data)
+							assert.NoError(t, err)
+						case "/rest/api/latest/projects/proj/repos/repo/pull-requests/102/activities":
+							data, err := json.Marshal(tc.pullRequestActivities)
+							assert.NoError(t, err)
+							w.WriteHeader(http.StatusOK)
+							_, err = w.Write(data)
+							assert.NoError(t, err)
+						case "/rest/api/1.0/projects/proj/repos/repo/pull-requests/102/comments":
+							var comment reporter.BitBucketPendingComment
+							if err := json.NewDecoder(r.Body).Decode(&comment); err != nil {
+								t.Errorf("JSON decode error: %s", err)
+							}
+							assert.Equal(t, tc.pullRequestComments[commentIndex], comment)
+							commentIndex++
+						case "/plugins/servlet/applinks/whoami":
+							w.WriteHeader(http.StatusOK)
+							_, err := w.Write([]byte("pint_user"))
+							assert.NoError(t, err)
+						default:
+							w.WriteHeader(http.StatusInternalServerError)
+							_, _ = w.Write([]byte("Unhandled path: " + r.URL.Path))
+							t.Errorf("Unhandled path: %s", r.URL.Path)
 						}
-						assert.Equal(t, tc.pullRequestComments[commentIndex], comment)
-						commentIndex++
-					case "/plugins/servlet/applinks/whoami":
-						w.WriteHeader(http.StatusOK)
-						_, err := w.Write([]byte("pint_user"))
-						assert.NoError(t, err)
-					default:
-						w.WriteHeader(http.StatusInternalServerError)
-						_, _ = w.Write([]byte("Unhandled path: " + r.URL.Path))
-						t.Errorf("Unhandled path: %s", r.URL.Path)
-					}
-				}))
+					}),
+				)
 			} else {
 				srv = httptest.NewServer(tc.httpHandler)
 			}

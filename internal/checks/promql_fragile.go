@@ -46,7 +46,11 @@ func (c FragileCheck) Reporter() string {
 	return FragileCheckName
 }
 
-func (c FragileCheck) Check(_ context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c FragileCheck) Check(
+	_ context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 	if expr.SyntaxError != nil {
 		return nil
@@ -60,7 +64,10 @@ func (c FragileCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			if src.FixedLabels && len(src.IncludedLabels) == 0 {
 				continue
 			}
-			if !slices.Contains([]string{"topk", "bottomk", "limit", "limit_ratio"}, src.Operation) {
+			if !slices.Contains(
+				[]string{"topk", "bottomk", "limit", "limit_ratio"},
+				src.Operation,
+			) {
 				continue
 			}
 			problems = append(problems, Problem{
@@ -72,7 +79,10 @@ func (c FragileCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 				Severity: Warning,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.", src.Operation),
+						Message: fmt.Sprintf(
+							"Using `%s` to select time series might return different set of time series on every query, which would cause flapping alerts.",
+							src.Operation,
+						),
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(src.Position.Start) + 1,
 						LastColumn:  int(src.Position.End),

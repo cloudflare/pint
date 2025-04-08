@@ -19,7 +19,14 @@ const (
 	RuleLinkCheckName = "rule/link"
 )
 
-func NewRuleLinkCheck(re *TemplatedRegexp, uriRewrite string, timeout time.Duration, headers map[string]string, comment string, s Severity) RuleLinkCheck {
+func NewRuleLinkCheck(
+	re *TemplatedRegexp,
+	uriRewrite string,
+	timeout time.Duration,
+	headers map[string]string,
+	comment string,
+	s Severity,
+) RuleLinkCheck {
 	return RuleLinkCheck{
 		scheme:     []string{"http", "https"},
 		re:         re,
@@ -62,7 +69,11 @@ func (c RuleLinkCheck) Reporter() string {
 	return RuleLinkCheckName
 }
 
-func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []discovery.Entry) (problems []Problem) {
+func (c RuleLinkCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	_ []discovery.Entry,
+) (problems []Problem) {
 	if entry.Rule.AlertingRule == nil || entry.Rule.AlertingRule.Annotations == nil {
 		return nil
 	}
@@ -94,7 +105,11 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				result = re.ExpandString(result, c.uriRewrite, uri, submatches)
 			}
 			uri = string(result)
-			slog.Debug("Link URI rewritten by rule", slog.String("link", u.String()), slog.String("uri", uri))
+			slog.Debug(
+				"Link URI rewritten by rule",
+				slog.String("link", u.String()),
+				slog.String("uri", uri),
+			)
 		}
 
 		rctx, cancel := context.WithTimeout(ctx, c.timeout)
@@ -119,7 +134,11 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				Details:  maybeComment(c.comment),
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("GET request for %s returned an error: %s.", uri, err),
+						Message: fmt.Sprintf(
+							"GET request for %s returned an error: %s.",
+							uri,
+							err,
+						),
 						Pos:         ann.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(ann.Value.Value),
@@ -127,7 +146,11 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				},
 				Severity: c.severity,
 			})
-			slog.Debug("Link request returned an error", slog.String("uri", uri), slog.Any("err", err))
+			slog.Debug(
+				"Link request returned an error",
+				slog.String("uri", uri),
+				slog.Any("err", err),
+			)
 			continue
 		}
 		_, _ = io.Copy(io.Discard, resp.Body)
@@ -145,7 +168,11 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				Details:  maybeComment(c.comment),
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     fmt.Sprintf("GET request for %s returned invalid status code: `%s`.", uri, resp.Status),
+						Message: fmt.Sprintf(
+							"GET request for %s returned invalid status code: `%s`.",
+							uri,
+							resp.Status,
+						),
 						Pos:         ann.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(ann.Value.Value),
@@ -153,10 +180,18 @@ func (c RuleLinkCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 				},
 				Severity: c.severity,
 			})
-			slog.Debug("Link request returned invalid status code", slog.String("uri", uri), slog.String("status", resp.Status))
+			slog.Debug(
+				"Link request returned invalid status code",
+				slog.String("uri", uri),
+				slog.String("status", resp.Status),
+			)
 			continue
 		}
-		slog.Debug("Link request returned a valid status code", slog.String("uri", uri), slog.String("status", resp.Status))
+		slog.Debug(
+			"Link request returned a valid status code",
+			slog.String("uri", uri),
+			slog.String("status", resp.Status),
+		)
 	}
 
 	return problems

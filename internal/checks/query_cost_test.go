@@ -424,7 +424,15 @@ func TestCostCheck(t *testing.T) {
 			description: "stats - peak samples",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, 300, 10, time.Second*5, "some text", checks.Information)
+				return checks.NewCostCheck(
+					prom,
+					0,
+					300,
+					10,
+					time.Second*5,
+					"some text",
+					checks.Information,
+				)
 			},
 			prometheus: newSimpleProm,
 			problems:   true,
@@ -464,7 +472,15 @@ func TestCostCheck(t *testing.T) {
 			description: "stats - duration",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 0, 300, 30, time.Second*5, "some text", checks.Information)
+				return checks.NewCostCheck(
+					prom,
+					0,
+					300,
+					30,
+					time.Second*5,
+					"some text",
+					checks.Information,
+				)
 			},
 			prometheus: newSimpleProm,
 			problems:   true,

@@ -62,7 +62,11 @@ func (c RateCheck) Reporter() string {
 	return RateCheckName
 }
 
-func (c RateCheck) Check(ctx context.Context, entry discovery.Entry, entries []discovery.Entry) (problems []Problem) {
+func (c RateCheck) Check(
+	ctx context.Context,
+	entry discovery.Entry,
+	entries []discovery.Entry,
+) (problems []Problem) {
 	expr := entry.Rule.Expr()
 
 	if expr.SyntaxError != nil {
@@ -75,16 +79,38 @@ func (c RateCheck) Check(ctx context.Context, entry discovery.Entry, entries []d
 			c.prom.DisableCheck(promapi.APIPathConfig, c.Reporter())
 			return problems
 		}
-		problems = append(problems, problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug))
+		problems = append(
+			problems,
+			problemFromError(err, entry.Rule, c.Reporter(), c.prom.Name(), Bug),
+		)
 		return problems
 	}
 
-	problems = append(problems, c.checkNode(ctx, entry.Rule, expr, expr.Query, entries, cfg, &completedList{values: nil})...)
+	problems = append(
+		problems,
+		c.checkNode(
+			ctx,
+			entry.Rule,
+			expr,
+			expr.Query,
+			entries,
+			cfg,
+			&completedList{values: nil},
+		)...)
 	return problems
 }
 
-func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.PromQLExpr, node *parser.PromQLNode, entries []discovery.Entry, cfg *promapi.ConfigResult, done *completedList) (problems []Problem) {
-	if n, ok := node.Expr.(*promParser.Call); ok && (n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
+func (c RateCheck) checkNode(
+	ctx context.Context,
+	rule parser.Rule,
+	expr parser.PromQLExpr,
+	node *parser.PromQLNode,
+	entries []discovery.Entry,
+	cfg *promapi.ConfigResult,
+	done *completedList,
+) (problems []Problem) {
+	if n, ok := node.Expr.(*promParser.Call); ok &&
+		(n.Func.Name == "rate" || n.Func.Name == "irate" || n.Func.Name == "deriv") {
 		for _, arg := range n.Args {
 			m, ok := arg.(*promParser.MatrixSelector)
 			if !ok {
@@ -100,8 +126,13 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 					Severity: Bug,
 					Diagnostics: []diags.Diagnostic{
 						{
-							Message: fmt.Sprintf("Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
-								n.Func.Name, c.minIntervals, promText(c.prom.Name(), cfg.URI), output.HumanizeDuration(cfg.Config.Global.ScrapeInterval)),
+							Message: fmt.Sprintf(
+								"Duration for `%s()` must be at least %d x scrape_interval, %s is using `%s` scrape_interval.",
+								n.Func.Name,
+								c.minIntervals,
+								promText(c.prom.Name(), cfg.URI),
+								output.HumanizeDuration(cfg.Config.Global.ScrapeInterval),
+							),
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(n.PosRange.Start) + 1,
 							LastColumn:  int(n.PosRange.End),
@@ -122,7 +153,10 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 					if errors.Is(err, promapi.ErrUnsupported) {
 						continue
 					}
-					problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+					problems = append(
+						problems,
+						problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug),
+					)
 					continue
 				}
 				for _, m := range metadata.Metadata {
@@ -136,8 +170,13 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 							Severity: Bug,
 							Diagnostics: []diags.Diagnostic{
 								{
-									Message: fmt.Sprintf("`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
-										n.Func.Name, s.Name, m.Type, promText(c.prom.Name(), metadata.URI)),
+									Message: fmt.Sprintf(
+										"`%s()` should only be used with counters but `%s` is a %s according to metrics metadata from %s.",
+										n.Func.Name,
+										s.Name,
+										m.Type,
+										promText(c.prom.Name(), metadata.URI),
+									),
 									Pos:         expr.Value.Pos,
 									FirstColumn: int(n.PosRange.Start) + 1,
 									LastColumn:  int(n.PosRange.End),
@@ -154,7 +193,9 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 					if e.Rule.Error.Err != nil {
 						continue
 					}
-					if e.Rule.RecordingRule != nil && e.Rule.RecordingRule.Expr.SyntaxError == nil && e.Rule.RecordingRule.Record.Value == s.Name {
+					if e.Rule.RecordingRule != nil &&
+						e.Rule.RecordingRule.Expr.SyntaxError == nil &&
+						e.Rule.RecordingRule.Record.Value == s.Name {
 						for _, src := range utils.LabelsSource(e.Rule.RecordingRule.Expr.Value.Value, e.Rule.RecordingRule.Expr.Query.Expr) {
 							if src.Type != utils.AggregateSource {
 								continue
@@ -165,7 +206,16 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 									if errors.Is(err, promapi.ErrUnsupported) {
 										continue
 									}
-									problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
+									problems = append(
+										problems,
+										problemFromError(
+											err,
+											rule,
+											c.Reporter(),
+											c.prom.Name(),
+											Bug,
+										),
+									)
 									continue
 								}
 								canReport := true
@@ -191,12 +241,19 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 										"You can only calculate `rate()` directly from a counter metric. "+
 											"Calling `rate()` on `%s()` results will return bogus results because `%s()` will hide information on when each counter resets. "+
 											"You must first calculate `rate()` before calling any aggregation function. Always `sum(rate(counter))`, never `rate(sum(counter))`",
-										src.Operation, src.Operation),
+										src.Operation,
+										src.Operation,
+									),
 									Severity: severity,
 									Diagnostics: []diags.Diagnostic{
 										{
-											Message: fmt.Sprintf("`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
-												src.Operation, node.Expr, src.Operation, src.Selector),
+											Message: fmt.Sprintf(
+												"`rate(%s(counter))` chain detected, `%s` is called here on results of `%s(%s)`.",
+												src.Operation,
+												node.Expr,
+												src.Operation,
+												src.Selector,
+											),
 											Pos:         expr.Value.Pos,
 											FirstColumn: int(src.Position.Start) + 1,
 											LastColumn:  int(src.Position.End),

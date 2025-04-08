@@ -176,7 +176,10 @@ func parseValue(typ Type, s string, line int) (CommentValue, error) {
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", RuleOwnerComment)
 		}
-		return Owner{Name: s, Line: 0}, nil // comment attached to the rule, line numbers are unreliable
+		return Owner{
+			Name: s,
+			Line: 0,
+		}, nil // comment attached to the rule, line numbers are unreliable
 	case FileDisableType:
 		if s == "" {
 			return nil, fmt.Errorf("missing %s value", FileDisableComment)
