@@ -1,0 +1,122 @@
+
+[TestGetChecksForRule/two_prometheus_servers_/_snoozed_checks_via_comment - 1]
+title: two prometheus servers / snoozed checks via comment
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ],
+        "disabled": [
+          "alerts/template",
+          "promql/regexp"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost/1",
+          "timeout": "1s",
+          "uptime": "up",
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        },
+        {
+          "name": "prom2",
+          "uri": "http://localhost/2",
+          "timeout": "1s",
+          "uptime": "up",
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: labels/conflict won't work
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/series(prom1)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T10:24:18Z
+            match: promql/range_query
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: rule/duplicate
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/vector_matching
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/counter
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: alerts/absent
+          type: 12
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - promql/fragile
+    - promql/impossible
+    - labels/conflict(prom1)
+    - alerts/external_labels(prom1)
+    - promql/series(prom2)
+    - labels/conflict(prom2)
+    - alerts/external_labels(prom2)
+
+---

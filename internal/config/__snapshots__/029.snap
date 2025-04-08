@@ -1,0 +1,57 @@
+
+[TestGetChecksForRule/rule_with_ignore_block_/_match - 1]
+title: rule with ignore block / match
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "promql/syntax",
+          "alerts/count"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "ignore": [
+            {
+              "path": "rules.yml"
+            }
+          ],
+          "alerts": {
+            "range": "1h",
+            "step": "1m",
+            "resolve": "5m"
+          }
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+
+---

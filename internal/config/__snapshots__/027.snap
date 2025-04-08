@@ -1,0 +1,53 @@
+
+[TestGetChecksForRule/two_checks_enabled_via_config - 1]
+title: two checks enabled via config
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "promql/syntax",
+          "alerts/count"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "include": [
+            "rules.yml"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "alerts": {
+            "range": "1h",
+            "step": "1m",
+            "resolve": "5m"
+          }
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/count(prom1)
+
+---

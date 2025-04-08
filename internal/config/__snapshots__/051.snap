@@ -1,0 +1,103 @@
+
+[TestGetChecksForRule/check_disabled_globally_but_enabled_via_rule{} - 1]
+title: check disabled globally but enabled via rule{}
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ],
+        "disabled": [
+          "alerts/template",
+          "alerts/external_labels",
+          "rule/duplicate",
+          "alerts/absent",
+          "promql/series",
+          "promql/vector_matching"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ],
+      "rules": [
+        {
+          "disable": [
+            "rule/duplicate"
+          ]
+        },
+        {
+          "match": [
+            {
+              "kind": "alerting"
+            }
+          ],
+          "disable": [
+            "promql/series"
+          ]
+        },
+        {
+          "enable": [
+            "promql/series"
+          ]
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+    - promql/series(prom)
+    - labels/conflict(prom)
+    - promql/counter(prom)
+
+---

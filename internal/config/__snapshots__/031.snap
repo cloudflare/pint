@@ -1,0 +1,76 @@
+
+[TestGetChecksForRule/for_match_/_not_passing - 1]
+title: for match / not passing
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "rules": [
+        {
+          "match": [
+            {
+              "for": "\u003e 15m"
+            }
+          ],
+          "annotation": [
+            {
+              "key": "summary",
+              "comment": "this is rule comment",
+              "required": true
+            }
+          ]
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+
+---

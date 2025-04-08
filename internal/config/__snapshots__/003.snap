@@ -1,0 +1,84 @@
+
+[TestGetChecksForRule/multiple_URIs - 1]
+title: multiple URIs
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom",
+          "uri": "http://localhost",
+          "timeout": "1s",
+          "uptime": "up",
+          "failover": [
+            "http://localhost/1",
+            "http://localhost/2"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments: []
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+    - promql/rate(prom)
+    - promql/series(prom)
+    - promql/vector_matching(prom)
+    - promql/range_query(prom)
+    - rule/duplicate(prom)
+    - labels/conflict(prom)
+    - alerts/external_labels(prom)
+    - promql/counter(prom)
+    - alerts/absent(prom)
+
+---

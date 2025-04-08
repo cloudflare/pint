@@ -1,0 +1,170 @@
+
+[TestGetChecksForRule/tag_snoozes_all_prometheus_checks - 1]
+title: tag snoozes all prometheus checks
+config: |-
+    {
+      "ci": {
+        "baseBranch": "master",
+        "maxCommits": 20
+      },
+      "parser": {},
+      "repository": {},
+      "checks": {
+        "enabled": [
+          "alerts/absent",
+          "alerts/annotation",
+          "alerts/count",
+          "alerts/external_labels",
+          "alerts/for",
+          "alerts/template",
+          "labels/conflict",
+          "promql/aggregate",
+          "alerts/comparison",
+          "promql/impossible",
+          "promql/fragile",
+          "promql/range_query",
+          "promql/rate",
+          "promql/regexp",
+          "promql/syntax",
+          "promql/vector_matching",
+          "query/cost",
+          "promql/counter",
+          "promql/series",
+          "rule/dependency",
+          "rule/duplicate",
+          "rule/for",
+          "rule/name",
+          "rule/label",
+          "rule/link",
+          "rule/reject",
+          "rule/report"
+        ]
+      },
+      "owners": {},
+      "prometheus": [
+        {
+          "name": "prom1",
+          "uri": "http://localhost/1",
+          "timeout": "2m0s",
+          "uptime": "up",
+          "tags": [
+            "foo",
+            "disable",
+            "bar"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        },
+        {
+          "name": "prom2",
+          "uri": "http://localhost/2",
+          "timeout": "2m0s",
+          "uptime": "up",
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        },
+        {
+          "name": "prom3",
+          "uri": "http://localhost/3",
+          "timeout": "2m0s",
+          "uptime": "up",
+          "tags": [
+            "foo"
+          ],
+          "concurrency": 16,
+          "rateLimit": 100,
+          "required": false
+        }
+      ]
+    }
+entry:
+    path:
+        name: rules.yml
+        symlinktarget: rules.yml
+    filecomments: []
+    rulecomments:
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: alerts/count(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: alerts/external_labels(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: labels/conflict(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/range_query(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/regexp(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/counter(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/series(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/rate(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: promql/vector_matching(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: rule/duplicate(+disable)
+          type: 12
+          offset: 0
+        - value:
+            until: 2099-11-28T00:00:00Z
+            match: alerts/absent(+disable)
+          type: 12
+          offset: 0
+checks:
+    - promql/syntax
+    - alerts/for
+    - alerts/comparison
+    - alerts/template
+    - promql/fragile
+    - promql/regexp
+    - promql/impossible
+    - promql/rate(prom2)
+    - promql/series(prom2)
+    - promql/vector_matching(prom2)
+    - promql/range_query(prom2)
+    - rule/duplicate(prom2)
+    - labels/conflict(prom2)
+    - alerts/external_labels(prom2)
+    - promql/counter(prom2)
+    - alerts/absent(prom2)
+    - promql/rate(prom3)
+    - promql/series(prom3)
+    - promql/vector_matching(prom3)
+    - promql/range_query(prom3)
+    - rule/duplicate(prom3)
+    - labels/conflict(prom3)
+    - alerts/external_labels(prom3)
+    - promql/counter(prom3)
+    - alerts/absent(prom3)
+
+---

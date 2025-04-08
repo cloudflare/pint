@@ -12,8 +12,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/require"
+	"gopkg.in/yaml.v3"
 
 	"github.com/cloudflare/pint/internal/checks"
+	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/config"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/parser"
@@ -179,8 +181,20 @@ func TestGetChecksForRule(t *testing.T) {
 	type testCaseT struct {
 		title  string
 		config string
-		checks []string
 		entry  discovery.Entry
+	}
+
+	type SnapEntry struct {
+		Path         discovery.Path
+		FileComments []comments.Comment
+		RuleComments []comments.Comment
+	}
+
+	type Snapshot struct {
+		Title  string
+		Config string
+		Entry  SnapEntry
+		Checks []string
 	}
 
 	testCases := []testCaseT{
@@ -194,15 +208,6 @@ func TestGetChecksForRule(t *testing.T) {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -221,24 +226,6 @@ prometheus "prom" {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom)",
-				checks.SeriesCheckName + "(prom)",
-				checks.VectorMatchingCheckName + "(prom)",
-				checks.RangeQueryCheckName + "(prom)",
-				checks.RuleDuplicateCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.AlertsExternalLabelsCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-				checks.AlertsAbsentCheckName + "(prom)",
-			},
 		},
 		{
 			title: "multiple URIs",
@@ -256,24 +243,6 @@ prometheus "prom" {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom)",
-				checks.SeriesCheckName + "(prom)",
-				checks.VectorMatchingCheckName + "(prom)",
-				checks.RangeQueryCheckName + "(prom)",
-				checks.RuleDuplicateCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.AlertsExternalLabelsCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-				checks.AlertsAbsentCheckName + "(prom)",
 			},
 		},
 		{
@@ -310,14 +279,6 @@ checks {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "single prometheus server / path mismatch",
@@ -335,15 +296,6 @@ prometheus "prom" {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -364,15 +316,6 @@ prometheus "prom" {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "single prometheus server / excluded",
@@ -391,15 +334,6 @@ prometheus "prom" {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "single prometheus server / path match",
@@ -417,24 +351,6 @@ prometheus "prom" {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom)",
-				checks.SeriesCheckName + "(prom)",
-				checks.VectorMatchingCheckName + "(prom)",
-				checks.RangeQueryCheckName + "(prom)",
-				checks.RuleDuplicateCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.AlertsExternalLabelsCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-				checks.AlertsAbsentCheckName + "(prom)",
 			},
 		},
 		{
@@ -459,24 +375,6 @@ prometheus "ignore" {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom)",
-				checks.SeriesCheckName + "(prom)",
-				checks.VectorMatchingCheckName + "(prom)",
-				checks.RangeQueryCheckName + "(prom)",
-				checks.RuleDuplicateCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.AlertsExternalLabelsCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-				checks.AlertsAbsentCheckName + "(prom)",
-			},
 		},
 		{
 			title:  "single empty rule",
@@ -488,15 +386,6 @@ prometheus "ignore" {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -519,18 +408,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AggregationCheckName + "(job:true)",
-				checks.AggregationCheckName + "(instance:false)",
-				checks.AggregationCheckName + "(rack:false)",
 			},
 		},
 		{
@@ -560,16 +437,6 @@ rule {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.AggregationCheckName + "(job:true)",
-				checks.AggregationCheckName + "(rack:false)",
-			},
 		},
 		{
 			title: "prometheus check without prometheus server",
@@ -589,15 +456,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -635,27 +493,6 @@ prometheus "prom2" {
   # pint disable promql/counter(prom1)
   expr: sum(foo)
 `),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom1)",
-				checks.RangeQueryCheckName + "(prom1)",
-				checks.LabelsConflictCheckName + "(prom1)",
-				checks.AlertsExternalLabelsCheckName + "(prom1)",
-				checks.AlertsAbsentCheckName + "(prom1)",
-				checks.SeriesCheckName + "(prom2)",
-				checks.VectorMatchingCheckName + "(prom2)",
-				checks.RangeQueryCheckName + "(prom2)",
-				checks.RuleDuplicateCheckName + "(prom2)",
-				checks.CounterCheckName + "(prom2)",
-				checks.AlertsAbsentCheckName + "(prom2)",
-				checks.CostCheckName + "(prom1)",
 			},
 		},
 		{
@@ -708,19 +545,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.LabelCheckName + "(team:true)",
-				checks.AnnotationCheckName + "(summary:true)",
-				checks.LabelCheckName + "(team:false)",
-				checks.AnnotationCheckName + "(summary=~^foo.+$:true)",
 			},
 		},
 		{
@@ -778,20 +602,6 @@ rule {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.AlertsAbsentCheckName + "(prom1)",
-				checks.AlertsAbsentCheckName + "(prom2)",
-				checks.CostCheckName + "(prom1)",
-				checks.CostCheckName + "(prom2)",
-				checks.CostCheckName + "(prom1:10000)",
-				checks.CostCheckName + "(prom2:10000)",
-				checks.CostCheckName + "(prom1:20000)",
-				checks.CostCheckName + "(prom2:20000)",
-			},
 		},
 		{
 			title: "reject rules",
@@ -821,19 +631,6 @@ rule {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RejectCheckName + "(key=~'^http://.+$')",
-				checks.RejectCheckName + "(val=~'^http://.+$')",
-				checks.RejectCheckName + "(key=~'^.* +.*$')",
-				checks.RejectCheckName + "(val=~'^$')",
-			},
 		},
 		{
 			title: "rule with label match / type mismatch",
@@ -859,15 +656,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -895,15 +683,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "rule with label match / label mismatch",
@@ -929,15 +708,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: dev\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -965,16 +735,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  labels:\n    cluster: prod\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
-			},
 		},
 		{
 			title: "rule with annotation match / no annotation",
@@ -1001,15 +761,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "rule with annotation match / annotation mismatch",
@@ -1035,15 +786,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: dev\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -1072,16 +814,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  annotations:\n    cluster: prod\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.LabelCheckName + "(priority=~^(1|2|3|4|5)$:true)",
 			},
 		},
 		{
@@ -1123,17 +855,6 @@ prometheus "prom1" {
   # pint disable promql/series
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AlertsExternalLabelsCheckName + "(prom1)",
-				checks.AlertsCheckName + "(prom1)",
-			},
 		},
 		{
 			title: "single check enabled via config",
@@ -1164,25 +885,6 @@ prometheus "prom1" {
 - record: foo
   expr: sum(foo)
 `),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom1)",
-				checks.SeriesCheckName + "(prom1)",
-				checks.VectorMatchingCheckName + "(prom1)",
-				checks.RangeQueryCheckName + "(prom1)",
-				checks.RuleDuplicateCheckName + "(prom1)",
-				checks.LabelsConflictCheckName + "(prom1)",
-				checks.AlertsExternalLabelsCheckName + "(prom1)",
-				checks.CounterCheckName + "(prom1)",
-				checks.AlertsAbsentCheckName + "(prom1)",
-				checks.AlertsCheckName + "(prom1)",
 			},
 		},
 		{
@@ -1217,10 +919,6 @@ prometheus "prom1" {
 - record: foo
   expr: sum(foo)
 `),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertsCheckName + "(prom1)",
 			},
 		},
 		{
@@ -1259,10 +957,6 @@ checks {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertsCheckName + "(prom1)",
-			},
 		},
 		{
 			title: "rule with ignore block / match",
@@ -1300,9 +994,6 @@ checks {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-			},
 		},
 		{
 			title: "for match / passing",
@@ -1323,16 +1014,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AnnotationCheckName + "(summary:true)",
 			},
 		},
 		{
@@ -1356,15 +1037,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "for match / passing",
@@ -1386,16 +1058,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 16m\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AnnotationCheckName + "(summary:true)",
-			},
 		},
 		{
 			title: "for match / passing",
@@ -1416,15 +1078,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -1447,15 +1100,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  keep_firing_for: 14m\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "for match / recording rules / not passing",
@@ -1477,15 +1121,6 @@ rule {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "for ignore / passing",
@@ -1506,16 +1141,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 16m\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AnnotationCheckName + "(summary:true)",
 			},
 		},
 		{
@@ -1539,15 +1164,6 @@ rule {
 				},
 				Rule: newRule(t, "- alert: foo\n  expr: sum(foo)\n  for: 14m\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "for ignore / recording rules / passing",
@@ -1568,16 +1184,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AnnotationCheckName + "(summary:true)",
 			},
 		},
 		{
@@ -1603,16 +1209,6 @@ rule {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RuleLinkCheckName + "(^https?://(.+)$)",
-			},
 		},
 		{
 			title: "name",
@@ -1628,16 +1224,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RuleNameCheckName + "(^total:.+$)",
 			},
 		},
 		{
@@ -1670,14 +1256,6 @@ checks {
   expr: sum(foo)
 `),
 				DisabledChecks: []string{"promql/rate", "promql/vector_matching", "rule/duplicate", "labels/conflict", "promql/counter"},
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -1716,18 +1294,6 @@ checks {
 `),
 				DisabledChecks: []string{"promql/rate"},
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.ImpossibleCheckName,
-				checks.LabelsConflictCheckName + "(prom1)",
-				checks.AlertsExternalLabelsCheckName + "(prom1)",
-				checks.SeriesCheckName + "(prom2)",
-				checks.LabelsConflictCheckName + "(prom2)",
-				checks.AlertsExternalLabelsCheckName + "(prom2)",
-			},
 		},
 		{
 			title: "two prometheus servers / expired snooze",
@@ -1760,29 +1326,6 @@ checks {
 # pint file/disable promql/vector_matching
 `),
 				DisabledChecks: []string{"promql/rate"},
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.ImpossibleCheckName,
-				checks.SeriesCheckName + "(prom1)",
-				checks.VectorMatchingCheckName + "(prom1)",
-				checks.RangeQueryCheckName + "(prom1)",
-				checks.RuleDuplicateCheckName + "(prom1)",
-				checks.LabelsConflictCheckName + "(prom1)",
-				checks.AlertsExternalLabelsCheckName + "(prom1)",
-				checks.CounterCheckName + "(prom1)",
-				checks.AlertsAbsentCheckName + "(prom1)",
-				checks.SeriesCheckName + "(prom2)",
-				checks.VectorMatchingCheckName + "(prom2)",
-				checks.RangeQueryCheckName + "(prom2)",
-				checks.RuleDuplicateCheckName + "(prom2)",
-				checks.LabelsConflictCheckName + "(prom2)",
-				checks.AlertsExternalLabelsCheckName + "(prom2)",
-				checks.CounterCheckName + "(prom2)",
-				checks.AlertsAbsentCheckName + "(prom2)",
 			},
 		},
 		{
@@ -1823,33 +1366,6 @@ prometheus "prom3" {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom2)",
-				checks.SeriesCheckName + "(prom2)",
-				checks.VectorMatchingCheckName + "(prom2)",
-				checks.RangeQueryCheckName + "(prom2)",
-				checks.RuleDuplicateCheckName + "(prom2)",
-				checks.LabelsConflictCheckName + "(prom2)",
-				checks.AlertsExternalLabelsCheckName + "(prom2)",
-				checks.CounterCheckName + "(prom2)",
-				checks.AlertsAbsentCheckName + "(prom2)",
-				checks.RateCheckName + "(prom3)",
-				checks.SeriesCheckName + "(prom3)",
-				checks.VectorMatchingCheckName + "(prom3)",
-				checks.RangeQueryCheckName + "(prom3)",
-				checks.RuleDuplicateCheckName + "(prom3)",
-				checks.LabelsConflictCheckName + "(prom3)",
-				checks.AlertsExternalLabelsCheckName + "(prom3)",
-				checks.CounterCheckName + "(prom3)",
-				checks.AlertsAbsentCheckName + "(prom3)",
-			},
 		},
 		{
 			title: "tag snoozes all prometheus checks",
@@ -1889,33 +1405,6 @@ prometheus "prom3" {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom2)",
-				checks.SeriesCheckName + "(prom2)",
-				checks.VectorMatchingCheckName + "(prom2)",
-				checks.RangeQueryCheckName + "(prom2)",
-				checks.RuleDuplicateCheckName + "(prom2)",
-				checks.LabelsConflictCheckName + "(prom2)",
-				checks.AlertsExternalLabelsCheckName + "(prom2)",
-				checks.CounterCheckName + "(prom2)",
-				checks.AlertsAbsentCheckName + "(prom2)",
-				checks.RateCheckName + "(prom3)",
-				checks.SeriesCheckName + "(prom3)",
-				checks.VectorMatchingCheckName + "(prom3)",
-				checks.RangeQueryCheckName + "(prom3)",
-				checks.RuleDuplicateCheckName + "(prom3)",
-				checks.LabelsConflictCheckName + "(prom3)",
-				checks.AlertsExternalLabelsCheckName + "(prom3)",
-				checks.CounterCheckName + "(prom3)",
-				checks.AlertsAbsentCheckName + "(prom3)",
-			},
 		},
 		{
 			title: "alerts/count defaults",
@@ -1940,25 +1429,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom)",
-				checks.SeriesCheckName + "(prom)",
-				checks.VectorMatchingCheckName + "(prom)",
-				checks.RangeQueryCheckName + "(prom)",
-				checks.RuleDuplicateCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.AlertsExternalLabelsCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-				checks.AlertsAbsentCheckName + "(prom)",
-				checks.AlertsCheckName + "(prom)",
 			},
 		},
 		{
@@ -1988,25 +1458,6 @@ rule {
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RateCheckName + "(prom)",
-				checks.SeriesCheckName + "(prom)",
-				checks.VectorMatchingCheckName + "(prom)",
-				checks.RangeQueryCheckName + "(prom)",
-				checks.RuleDuplicateCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.AlertsExternalLabelsCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-				checks.AlertsAbsentCheckName + "(prom)",
-				checks.AlertsCheckName + "(prom)",
-			},
 		},
 		{
 			title: "custom range_query",
@@ -2023,16 +1474,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.RangeQueryCheckName + "(1h)",
 			},
 		},
 		{
@@ -2067,15 +1508,6 @@ rule {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-			},
 		},
 		{
 			title: "state match",
@@ -2108,18 +1540,6 @@ rule {
 - record: foo
   expr: sum(foo)
 `),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AggregationCheckName + "(job:true)",
-				checks.AggregationCheckName + "(instance:false)",
-				checks.AggregationCheckName + "(rack:false)",
 			},
 		},
 		{
@@ -2155,17 +1575,6 @@ rule {
 `),
 				DisabledChecks: []string{"promql/rate", "promql/range_query"},
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.SeriesCheckName + "(prom)",
-				checks.LabelsConflictCheckName + "(prom)",
-				checks.CounterCheckName + "(prom)",
-			},
 		},
 		{
 			title: "check enabled globally but disabled via rule{}",
@@ -2188,14 +1597,6 @@ rule {
   expr: sum(foo)
 `),
 				DisabledChecks: []string{"alerts/template", "alerts/external_labels", "alerts/absent"},
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
 			},
 		},
 		{
@@ -2232,17 +1633,6 @@ rule {
 `),
 				DisabledChecks: []string{"promql/rate"},
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.FragileCheckName,
-				checks.ImpossibleCheckName,
-				checks.LabelsConflictCheckName + "(prom1)",
-				checks.AlertsExternalLabelsCheckName + "(prom1)",
-				checks.LabelsConflictCheckName + "(prom2)",
-				checks.AlertsExternalLabelsCheckName + "(prom2)",
-			},
 		},
 		{
 			title: "reject rules",
@@ -2264,16 +1654,6 @@ rule {
 					SymlinkTarget: "rules.yml",
 				},
 				Rule: newRule(t, "- record: foo\n  expr: sum(foo)\n"),
-			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.ReportCheckName,
 			},
 		},
 		{
@@ -2306,17 +1686,6 @@ rule {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AggregationCheckName + "(instance:false)",
-				checks.AggregationCheckName + "(rack:false)",
-			},
 		},
 		{
 			title: "multiple checks and snooze comment / locked rule",
@@ -2348,17 +1717,6 @@ rule {
   expr: sum(foo)
 `),
 			},
-			checks: []string{
-				checks.SyntaxCheckName,
-				checks.AlertForCheckName,
-				checks.ComparisonCheckName,
-				checks.TemplateCheckName,
-				checks.FragileCheckName,
-				checks.RegexpCheckName,
-				checks.ImpossibleCheckName,
-				checks.AggregationCheckName + "(instance:false)",
-				checks.AggregationCheckName + "(rack:false)",
-			},
 		},
 	}
 
@@ -2384,8 +1742,23 @@ rule {
 			for _, c := range checks {
 				checkNames = append(checkNames, c.String())
 			}
-			require.Equal(t, tc.checks, checkNames)
-			snaps.MatchSnapshot(t, cfg.String())
+
+			var fileComments []comments.Comment
+			if tc.entry.File != nil {
+				fileComments = tc.entry.File.Comments
+			}
+			d, err := yaml.Marshal(Snapshot{
+				Title:  tc.title,
+				Config: cfg.String(),
+				Entry: SnapEntry{
+					Path:         tc.entry.Path,
+					FileComments: fileComments,
+					RuleComments: tc.entry.Rule.Comments,
+				},
+				Checks: checkNames,
+			})
+			require.NoError(t, err)
+			snaps.WithConfig(snaps.Filename(fmt.Sprintf("%03d", i+1))).MatchSnapshot(t, string(d))
 		})
 	}
 }
