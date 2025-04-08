@@ -239,10 +239,13 @@ func (pe ParseError) Error() string {
 }
 
 type File struct {
-	Comments  []comments.Comment
-	Groups    []Group
-	Error     ParseError
-	IsRelaxed bool
+	Diagnostics []diags.Diagnostic
+	Comments    []comments.Comment
+	Groups      []Group
+	Error       ParseError
+	TotalLines  int
+	IsRelaxed   bool
+	IsIgnored   bool
 }
 
 type Group struct {

@@ -49,9 +49,15 @@ type Parser struct {
 	isStrict bool
 }
 
-func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
-	cr = newContentReader(src)
+func (p Parser) Parse(src io.Reader) (f File) {
+	cr := newContentReader(src)
 	dec := yaml.NewDecoder(cr)
+
+	defer func() {
+		f.Diagnostics = cr.diagnostics
+		f.Comments = cr.comments
+		f.TotalLines = cr.lineno
+	}()
 
 	f.IsRelaxed = !p.isStrict
 
@@ -66,14 +72,14 @@ func (p Parser) Parse(src io.Reader) (f File, cr *ContentReader) {
 
 		if decodeErr != nil {
 			f.Error = tryDecodingYamlError(decodeErr)
-			return f, cr
+			return f
 		}
 		index++
 
 		if p.isStrict {
 			g, f.Error = parseGroups(&doc, p.schema, 0, 0, cr.lines)
 			if f.Error.Err != nil {
-				return f, cr
+				return f
 			}
 			f.Groups = append(f.Groups, g...)
 		} else {
@@ -89,7 +95,7 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 			}
 		}
 	}
-	return f, cr
+	return f
 }
 
 func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, offsetColumn int, contentLines []string) (groups []Group) {

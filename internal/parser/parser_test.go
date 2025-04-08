@@ -1,6 +1,7 @@
 package parser_test
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"strconv"
@@ -1576,6 +1577,22 @@ data:
 `)),
 			output: parser.File{
 				IsRelaxed: true,
+				Comments: []comments.Comment{
+					{
+						Type: comments.FileOwnerType,
+						Value: comments.Owner{
+							Name: "bob",
+							Line: 2,
+						},
+					},
+					{
+						Type: comments.FileOwnerType,
+						Value: comments.Owner{
+							Name: "alice",
+							Line: 10,
+						},
+					},
+				},
 				Groups: []parser.Group{
 					{
 						Rules: []parser.Rule{
@@ -5042,8 +5059,13 @@ groups:
 		t.Run(strconv.Itoa(i+1), func(t *testing.T) {
 			t.Logf("\n--- Content ---%s--- END ---", tc.input)
 
+			s := bufio.NewScanner(bytes.NewReader(tc.input))
+			for s.Scan() {
+				tc.output.TotalLines++
+			}
+
 			p := parser.NewParser(tc.strict, tc.schema, tc.names)
-			file, _ := p.Parse(bytes.NewReader(tc.input))
+			file := p.Parse(bytes.NewReader(tc.input))
 
 			if diff := cmp.Diff(tc.output, file,
 				ignorePrometheusExpr,
