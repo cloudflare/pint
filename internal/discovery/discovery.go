@@ -111,17 +111,17 @@ func (e Entry) Labels() (ym parser.YamlMap) {
 }
 
 func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, allowedOwners []*regexp.Regexp) (entries []Entry, _ error) {
-	file, cr := p.Parse(r)
+	file := p.Parse(r)
 
 	contentLines := diags.LineRange{
-		First: min(cr.TotalLines(), 1),
-		Last:  cr.TotalLines(),
+		First: min(file.TotalLines, 1),
+		Last:  file.TotalLines,
 	}
 
 	var badOwners []comments.Comment
 	var fileOwner string
 	var disabledChecks []string
-	for _, comment := range cr.Comments() {
+	for _, comment := range file.Comments {
 		// nolint:exhaustive
 		switch comment.Type {
 		case comments.FileOwnerType:
@@ -163,7 +163,7 @@ func readRules(reportedPath, sourcePath string, r io.Reader, p parser.Parser, al
 		}
 	}
 
-	for _, d := range cr.Diagnostics() {
+	for _, d := range file.Diagnostics {
 		entries = append(entries, Entry{
 			Path: Path{
 				Name:          sourcePath,

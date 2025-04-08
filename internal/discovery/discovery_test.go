@@ -18,7 +18,7 @@ import (
 func TestReadRules(t *testing.T) {
 	mustParse := func(offset int, s string) parser.Rule {
 		p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-		file, _ := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
+		file := p.Parse(strings.NewReader(strings.Repeat("\n", offset) + s))
 		if file.Error.Err != nil {
 			panic(fmt.Sprintf("failed to parse rule:\n---\n%s\n---\nerror: %s", s, file.Error))
 		}

@@ -77,7 +77,7 @@ func (tc testCommenter) IsEqual(_ any, e ExistingComment, p PendingComment) bool
 
 func TestCommenter(t *testing.T) {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockFile, _ := p.Parse(strings.NewReader(`
+	mockFile := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors
@@ -778,7 +778,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockFile, _ := p.Parse(strings.NewReader(`
+	mockFile := p.Parse(strings.NewReader(`
 - record: target is down
   expr: up == 0
 - record: sum errors

@@ -13,7 +13,7 @@ import (
 
 func newMustRule(content string) parser.Rule {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	file, _ := p.Parse(strings.NewReader(content))
+	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
 		panic(file.Error.Err)
 	}

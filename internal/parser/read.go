@@ -49,22 +49,6 @@ type ContentReader struct {
 	inBegin   bool
 }
 
-func (r *ContentReader) Comments() []comments.Comment {
-	return r.comments
-}
-
-func (r *ContentReader) Diagnostics() []diags.Diagnostic {
-	return r.diagnostics
-}
-
-func (r *ContentReader) Ignored() bool {
-	return r.skipAll
-}
-
-func (r *ContentReader) TotalLines() int {
-	return r.lineno
-}
-
 func (r *ContentReader) Read(b []byte) (got int, err error) {
 	for got < cap(b) && err == nil {
 		if len(r.buf) == 0 {

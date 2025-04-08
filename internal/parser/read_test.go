@@ -320,13 +320,13 @@ func TestReadContent(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(tc.comments, r.Comments(), sameErrorText); diff != "" {
+			if diff := cmp.Diff(tc.comments, r.comments, sameErrorText); diff != "" {
 				t.Errorf("ReadContent() returned wrong comments (-want +got):\n%s", diff)
 				return
 			}
 
 			require.Equal(t, string(tc.output), string(output), "ReadContent() returned wrong output")
-			require.Equal(t, tc.ignored, r.Ignored(), "ReadContent() returned wrong Ignored value")
+			require.Equal(t, tc.ignored, r.skipAll, "ReadContent() returned wrong skipAll value")
 		})
 	}
 }

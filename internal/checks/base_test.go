@@ -252,7 +252,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 
 func parseContent(content string, isStrict bool) (entries []discovery.Entry, _ error) {
 	p := parser.NewParser(isStrict, parser.PrometheusSchema, model.UTF8Validation)
-	file, _ := p.Parse(strings.NewReader(content))
+	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
 		return nil, file.Error
 	}

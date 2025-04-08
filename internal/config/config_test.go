@@ -164,7 +164,7 @@ func TestSetDisabledChecks(t *testing.T) {
 
 func newRule(t *testing.T, content string) parser.Rule {
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	file, _ := p.Parse(strings.NewReader(content))
+	file := p.Parse(strings.NewReader(content))
 	if file.Error.Err != nil {
 		t.Error(file.Error)
 		t.FailNow()

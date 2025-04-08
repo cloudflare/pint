@@ -29,7 +29,7 @@ func TestGlobPathFinder(t *testing.T) {
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
 	testRuleBody := "# pint file/owner bob\n\n- record: foo\n  expr: sum(foo)\n"
-	testFile, _ := p.Parse(strings.NewReader(testRuleBody))
+	testFile := p.Parse(strings.NewReader(testRuleBody))
 	require.NoError(t, testFile.Error.Err)
 
 	testCases := []testCaseT{
