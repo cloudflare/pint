@@ -59,6 +59,7 @@ type Source struct {
 	AlwaysReturns    bool // True if this source always returns results.
 	KnownReturn      bool // True if we always know the return value.
 	IsConditional    bool // True if this source is guarded by 'foo > 5' or other condition.
+	IsReturnBool     bool // True if this source uses the 'bool' modifier.
 }
 
 func (s Source) Fragment(expr string) string {
@@ -692,9 +693,9 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 		lhs := walkNode(expr, n.LHS)
 		rhs := walkNode(expr, n.RHS)
 		for _, ls := range lhs {
-			ls.IsConditional = isConditional(ls, n.Op)
+			ls.IsConditional, ls.IsReturnBool = checkConditions(ls, n.Op, n.ReturnBool)
 			for _, rs := range rhs {
-				rs.IsConditional = isConditional(rs, n.Op)
+				rs.IsConditional, rs.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 				var side Source
 				switch {
 				case ls.Returns == promParser.ValueTypeVector, ls.Returns == promParser.ValueTypeMatrix:
@@ -750,7 +751,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					n.VectorMatching.MatchingLabels...,
 				)
 				for _, rs := range rhs {
-					rs.IsConditional = isConditional(rs, n.Op)
+					rs.IsConditional, rs.IsReturnBool = checkConditions(rs, n.Op, n.ReturnBool)
 					if s.AlwaysReturns && rs.AlwaysReturns && s.KnownReturn && rs.KnownReturn {
 						// Both sides always return something
 						s.ReturnedNumber, s.IsDead, s.IsDeadReason, s.IsDeadPosition = calculateStaticReturn(
@@ -775,7 +776,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: rs,
 				})
 			}
-			s.IsConditional = isConditional(s, n.Op)
+			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
 			src = append(src, s)
 		}
 
@@ -804,7 +805,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: ls,
 				})
 			}
-			s.IsConditional = isConditional(s, n.Op)
+			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
 			src = append(src, s)
 		}
 
@@ -830,7 +831,7 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 					Src: rs,
 				})
 			}
-			s.IsConditional = isConditional(s, n.Op)
+			s.IsConditional, s.IsReturnBool = checkConditions(s, n.Op, n.ReturnBool)
 			src = append(src, s)
 		}
 
@@ -852,7 +853,8 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 				lhsCanBeEmpty = true
 			}
 			for _, rs := range rhs {
-				if isConditional(rs, n.Op) {
+				isConditional, _ := checkConditions(rs, n.Op, n.ReturnBool)
+				if isConditional {
 					rhsConditional = true
 				}
 				if ok, s, pos := canJoin(s, rs, n.VectorMatching); !ok {
@@ -899,11 +901,16 @@ func parseBinOps(expr string, n *promParser.BinaryExpr) (src []Source) {
 	return src
 }
 
-func isConditional(s Source, op promParser.ItemType) bool {
-	if s.IsConditional {
-		return true
+func checkConditions(s Source, op promParser.ItemType, isBool bool) (isConditional, isReturnBool bool) {
+	if !s.IsConditional && isBool {
+		isReturnBool = isBool
 	}
-	return op.IsComparisonOperator()
+	if s.IsConditional {
+		isConditional = s.IsConditional
+	} else {
+		isConditional = op.IsComparisonOperator()
+	}
+	return isConditional, isReturnBool
 }
 
 func canJoin(ls, rs Source, vm *promParser.VectorMatching) (bool, string, posrange.PositionRange) {

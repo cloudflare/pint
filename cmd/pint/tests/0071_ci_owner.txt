@@ -34,7 +34,7 @@ Bug: missing owner (rule/owner)
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:5 -> `rule1`
 5 |       expr: sum(foo) by(job)
-                ^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+                    ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Bug: missing owner (rule/owner)
   ---> rules.yml:6-7 -> `rule2`

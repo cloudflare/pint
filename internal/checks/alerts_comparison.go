@@ -5,10 +5,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
-	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/parser/utils"
-
-	promParser "github.com/prometheus/prometheus/promql/parser"
 )
 
 const (
@@ -57,126 +54,59 @@ func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 	}
 
 	expr := entry.Rule.Expr()
+	srcs := utils.LabelsSource(expr.Value.Value, expr.Query.Expr)
+	var msg string
+	for _, src := range srcs {
+		if src.IsDead {
+			continue
+		}
+		if len(src.Unless) > 0 {
+			continue
+		}
+		for _, s := range src.Joins {
+			if !s.Src.IsDead && s.Src.IsConditional {
+				goto NEXT
+			}
+		}
+		if src.Operation == "absent" || src.Operation == "absent_over_time" {
+			continue
+		}
 
-	if n := utils.HasOuterBinaryExpr(expr.Query); n != nil && n.Op == promParser.LOR {
-		if (hasComparision(n.LHS) == nil || hasComparision(n.RHS) == nil) && !isAbsent(n.LHS) && !isAbsent(n.RHS) {
+		switch {
+		case src.AlwaysReturns && !src.IsConditional:
+			if len(srcs) == 1 {
+				msg = "This query will always return a result and so this alert will always fire."
+			} else {
+				msg = "If other parts of this query don't return anything then this part will always return a result and so this alert will fire."
+			}
+		case src.IsReturnBool:
+			msg = "Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire."
+		case !src.IsConditional:
+			msg = "This query doesn't have any condition and so this alert will always fire if it matches anything."
+		default:
+			msg = ""
+		}
+
+		if msg != "" {
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
 				Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
 				Reporter: c.Reporter(),
 				Summary:  "always firing alert",
 				Details:  ComparisonCheckDetails,
-				Severity: rewriteSeverity(Warning, n.LHS, n.RHS),
+				Severity: Warning,
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     "Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.",
-						Pos:         expr.Value.Pos,
-						FirstColumn: int(n.PositionRange().Start) + 1,
-						LastColumn:  int(n.PositionRange().End),
+						Message:     msg,
+						Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
+						FirstColumn: int(src.Position.Start) + 1,
+						LastColumn:  int(src.Position.End),
 					},
 				},
 			})
 		}
+	NEXT:
 	}
-
-	if n := hasComparision(expr.Query.Expr); n != nil {
-		if n.ReturnBool && hasComparision(n.LHS) == nil && hasComparision(n.RHS) == nil {
-			problems = append(problems, Problem{
-				Anchor:   AnchorAfter,
-				Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
-				Reporter: c.Reporter(),
-				Summary:  "always firing alert",
-				Details:  ComparisonCheckDetails,
-				Severity: Bug,
-				Diagnostics: []diags.Diagnostic{
-					{
-						Message:     "Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.",
-						Pos:         expr.Value.Pos,
-						FirstColumn: int(n.PositionRange().Start) + 1,
-						LastColumn:  int(n.PositionRange().End),
-					},
-				},
-			})
-		}
-		return problems
-	}
-
-	if hasAbsent(expr.Query) {
-		return problems
-	}
-
-	problems = append(problems, Problem{
-		Anchor:   AnchorAfter,
-		Lines:    entry.Rule.AlertingRule.Expr.Value.Pos.Lines(),
-		Reporter: c.Reporter(),
-		Summary:  "always firing alert",
-		Details:  ComparisonCheckDetails,
-		Severity: Warning,
-		Diagnostics: []diags.Diagnostic{
-			{
-				Message:     "Alert query doesn't have any condition, it will always fire if the metric exists.",
-				Pos:         expr.Value.Pos,
-				FirstColumn: 1,
-				LastColumn:  len(expr.Value.Value),
-			},
-		},
-	})
 
 	return problems
-}
-
-func hasComparision(n promParser.Node) *promParser.BinaryExpr {
-	if node, ok := n.(*promParser.BinaryExpr); ok {
-		if node.Op.IsComparisonOperator() {
-			return node
-		}
-		if node.Op == promParser.LUNLESS {
-			return node
-		}
-	}
-
-	for _, child := range promParser.Children(n) {
-		if node := hasComparision(child); node != nil {
-			return node
-		}
-	}
-
-	return nil
-}
-
-func isAbsent(node promParser.Node) bool {
-	if node, ok := node.(*promParser.Call); ok {
-		if node.Func.Name == "absent" || node.Func.Name == "absent_over_time" {
-			return true
-		}
-	}
-
-	for _, child := range promParser.Children(node) {
-		if isAbsent(child) {
-			return true
-		}
-	}
-
-	return false
-}
-
-func hasAbsent(n *parser.PromQLNode) bool {
-	if isAbsent(n.Expr) {
-		return true
-	}
-	for _, child := range n.Children {
-		if hasAbsent(child) {
-			return true
-		}
-	}
-	return false
-}
-
-func rewriteSeverity(s Severity, nodes ...promParser.Node) Severity {
-	for _, node := range nodes {
-		if n, ok := node.(*promParser.Call); ok && n.Func.Name == "vector" {
-			return Bug
-		}
-	}
-	return s
 }

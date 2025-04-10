@@ -208,7 +208,7 @@ Bug: missing owner (rule/owner)
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:8 -> `missing required fields`
 8 |     expr: no_such_metric{job="fake"}
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Bug: missing owner (rule/owner)
   ---> rules.yml:10-11 -> `vector_matching`
@@ -238,7 +238,7 @@ Bug: missing owner (rule/owner)
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:20 -> `for_and_rate`
 20 |     expr: rate(no_such_metric[10s])
-               ^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+                    ^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:21 -> `for_and_rate`
@@ -321,7 +321,7 @@ Bug: missing owner (rule/owner)
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:33 -> `fragile`
 33 |     expr: errors / sum(requests) without(rack)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+               ^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Bug: missing owner (rule/owner)
   ---> rules.yml:35-36 -> `regexp`
@@ -372,6 +372,6 @@ Bug: missing owner (rule/owner)
 Warning: always firing alert (alerts/comparison)
   ---> rules.yml:39 -> `dups`
 39 |     expr: errors / sum(requests) without(rack)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+               ^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 level=ERROR msg="Execution completed with error(s)" err="submitting reports: fatal error(s) reported"

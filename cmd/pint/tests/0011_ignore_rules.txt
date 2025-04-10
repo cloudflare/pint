@@ -25,7 +25,7 @@ Fatal: PromQL syntax error (promql/syntax)
 Warning: always firing alert (alerts/comparison)
   ---> rules/1.yaml:33 -> `active`
 33 |   expr: sum(errors_total) without(job)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+                 ^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/1.yaml:33 -> `active`
