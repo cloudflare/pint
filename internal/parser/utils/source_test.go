@@ -86,6 +86,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -108,6 +109,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -130,6 +132,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -149,6 +152,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -171,6 +175,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -193,6 +198,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -359,6 +365,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -378,6 +385,7 @@ func TestLabelsSource(t *testing.T) {
 						},
 					},
 					IsConditional: true,
+					IsReturnBool:  true,
 				},
 			},
 		},
@@ -404,6 +412,211 @@ func TestLabelsSource(t *testing.T) {
 					Type:     utils.SelectorSource,
 					Returns:  promParser.ValueTypeVector,
 					Selector: mustParse[*promParser.VectorSelector](t, "foo", 0),
+				},
+			},
+		},
+		{
+			expr: "(foo > 1) > bool 1",
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 1),
+					IsConditional: true,
+				},
+			},
+		},
+		{
+			expr: "foo > bool 5",
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 0),
+					IsConditional: true,
+					IsReturnBool:  true,
+				},
+			},
+		},
+		{
+			expr: "foo > bool 5 == 1",
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 0),
+					IsConditional: true,
+				},
+			},
+		},
+		{
+			expr: "foo > bool bar",
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Operation:     promParser.CardOneToOne.String(),
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 0),
+					IsConditional: true,
+					IsReturnBool:  true,
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 11),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(foo > bool bar) == 0",
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Operation:     promParser.CardOneToOne.String(),
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 1),
+					IsConditional: true,
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 12),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "foo > bool on(instance) bar",
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Operation:      promParser.CardOneToOne.String(),
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, "foo", 0),
+					IsConditional:  true,
+					IsReturnBool:   true,
+					FixedLabels:    true,
+					IncludedLabels: []string{"instance"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: posrange.PositionRange{Start: 11, End: 13},
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 24),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "(foo > bool on(instance) bar) == 1",
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Operation:      promParser.CardOneToOne.String(),
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, "foo", 1),
+					IsConditional:  true,
+					FixedLabels:    true,
+					IncludedLabels: []string{"instance"},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason:   "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+							Fragment: posrange.PositionRange{Start: 12, End: 14},
+						},
+					},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 25),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "foo > bool on(instance) group_left(version) bar",
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Operation:      promParser.CardManyToOne.String(),
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, "foo", 0),
+					IsConditional:  true,
+					IsReturnBool:   true,
+					IncludedLabels: []string{"version", "instance"},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 44),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "bar > bool on(instance) group_right(version) foo",
+			output: []utils.Source{
+				{
+					Type:           utils.SelectorSource,
+					Operation:      promParser.CardOneToMany.String(),
+					Returns:        promParser.ValueTypeVector,
+					Selector:       mustParse[*promParser.VectorSelector](t, "foo", 45),
+					IsConditional:  true,
+					IsReturnBool:   true,
+					IncludedLabels: []string{"version", "instance"},
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:     utils.SelectorSource,
+								Returns:  promParser.ValueTypeVector,
+								Selector: mustParse[*promParser.VectorSelector](t, "bar", 0),
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			expr: "foo and bar > bool 0",
+			output: []utils.Source{
+				{
+					Type:          utils.SelectorSource,
+					Operation:     promParser.CardManyToMany.String(),
+					Returns:       promParser.ValueTypeVector,
+					Selector:      mustParse[*promParser.VectorSelector](t, "foo", 0),
+					IsConditional: true,
+					Joins: []utils.Join{
+						{
+							Src: utils.Source{
+								Type:          utils.SelectorSource,
+								Returns:       promParser.ValueTypeVector,
+								Selector:      mustParse[*promParser.VectorSelector](t, "bar", 8),
+								IsConditional: true,
+								IsReturnBool:  true,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -3176,6 +3389,7 @@ or
 					AlwaysReturns:  true,
 					KnownReturn:    true,
 					IsConditional:  true,
+					IsReturnBool:   true,
 					IsDead:         true,
 					IsDeadReason:   "this query always evaluates to `1 > 5` which is not possible, so it will never return anything",
 					ReturnedNumber: 1,
@@ -4073,7 +4287,7 @@ sum by (foo, bar) (
 			require.Len(t, output, len(tc.output))
 			if diff := cmp.Diff(tc.output, output,
 				cmpopts.EquateNaNs(),
-				cmpopts.IgnoreUnexported(labels.Matcher{}),
+				cmpopts.IgnoreUnexported(labels.Matcher{}, utils.Source{}),
 				cmpopts.IgnoreFields(utils.ExcludedLabel{}, "Fragment"),
 				cmpopts.IgnoreFields(utils.Source{}, "Position", "IsDeadPosition"),
 			); diff != "" {

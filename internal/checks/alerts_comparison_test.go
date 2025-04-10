@@ -143,6 +143,38 @@ func TestComparisonCheck(t *testing.T) {
 			prometheus:  noProm,
 			problems:    true,
 		},
+		{
+			description: "(foo or vector(0)) / bar > 0",
+			content:     "- alert: Foo Is Missing\n  expr: (foo or vector(0)) / bar > 0\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+		},
+		{
+			// FIXME this should warn because missing foo makes this `0 / <something> <= 0`, so <something> > 0 makes it `0 <= 0`.
+			description: "(foo or vector(0)) / bar <= 0",
+			content:     "- alert: Foo Is Missing\n  expr: (foo or vector(0)) / bar <= 0\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+		},
+		{
+			description: "max() * group_right label_replace(...)",
+			content: `
+- alert: Foo Is Missing
+  expr: |
+    max(kernel_xfs_corruption_errors > 0) by (instance)
+    * on (instance) group_right
+    label_replace(salt_highstate_runner_configured_minions, "instance", "$1", "minion", "(.+)")
+`,
+			checker:    newComparisonCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "vector(0)",
+			content:     "- alert: Foo Is Down\n  expr: vector(0)\n",
+			checker:     newComparisonCheck,
+			prometheus:  noProm,
+			problems:    true,
+		},
 	}
 
 	runTests(t, testCases)

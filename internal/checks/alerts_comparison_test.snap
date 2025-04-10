@@ -6,7 +6,7 @@
       expr: (foo > 0) or vector(0)
   output: |
     2 |   expr: (foo > 0) or vector(0)
-                ^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+                             ^^^^^^^^^ If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -17,22 +17,32 @@
         For example `up == 0` or `rate(error_total[2m]) > 0`.
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+        - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 30
-          firstcolumn: 1
+          firstcolumn: 14
           lastcolumn: 22
     lines:
         first: 2
         last: 2
-    severity: 2
+    severity: 1
     anchor: 0
 
 ---
 
 [TestComparisonCheck/(foo_>_1)_>_bool_1 - 1]
+[]
+
+---
+
+[TestComparisonCheck/(foo_or_vector(0))_/_bar_<=_0 - 1]
+[]
+
+---
+
+[TestComparisonCheck/(foo_or_vector(0))_/_bar_>_0 - 1]
 []
 
 ---
@@ -44,7 +54,7 @@
       expr: (foo > 0) or vector(0)
   output: |
     2 |   expr: (foo > 0) or vector(0)
-                ^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+                             ^^^^^^^^^ If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -55,17 +65,17 @@
         For example `up == 0` or `rate(error_total[2m]) > 0`.
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+        - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 30
-          firstcolumn: 1
+          firstcolumn: 14
           lastcolumn: 22
     lines:
         first: 2
         last: 2
-    severity: 2
+    severity: 1
     anchor: 0
 
 ---
@@ -102,7 +112,7 @@
       expr: rate(error_count[5m]) > bool 5
   output: |
     2 |   expr: rate(error_count[5m]) > bool 5
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.
+                     ^^^^^^^^^^^^^^^ Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -113,17 +123,17 @@
         For example `up == 0` or `rate(error_total[2m]) > 0`.
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Alert query uses `bool` modifier for comparison, this means it will always return a result and the alert will always fire.
+        - message: Results of this query are using the `bool` modifier, which means it will always return a result and the alert will always fire.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 38
-          firstcolumn: 1
-          lastcolumn: 30
+          firstcolumn: 6
+          lastcolumn: 20
     lines:
         first: 2
         last: 2
-    severity: 2
+    severity: 1
     anchor: 0
 
 ---
@@ -140,7 +150,7 @@
       expr: up{job="foo"}
   output: |
     2 |   expr: up{job="foo"}
-                ^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+                ^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -151,7 +161,7 @@
         For example `up == 0` or `rate(error_total[2m]) > 0`.
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Alert query doesn't have any condition, it will always fire if the metric exists.
+        - message: This query doesn't have any condition and so this alert will always fire if it matches anything.
           pos:
             - line: 2
               firstcolumn: 9
@@ -195,9 +205,9 @@
             rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
   output: |
     3 |   expr: quantile_over_time(0.7,(irate(udp_packets_drops[2m]))[10m:2m])
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
     4 |         AND ON (instance)
     5 |         rate(node_netstat_Udp_RcvbufErrors[5m])+rate(node_netstat_Udp6_RcvbufErrors[5m])
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -208,7 +218,7 @@
         For example `up == 0` or `rate(error_total[2m]) > 0`.
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Alert query doesn't have any condition, it will always fire if the metric exists.
+        - message: This query doesn't have any condition and so this alert will always fire if it matches anything.
           pos:
             - line: 3
               firstcolumn: 9
@@ -219,8 +229,8 @@
             - line: 5
               firstcolumn: 9
               lastcolumn: 88
-          firstcolumn: 1
-          lastcolumn: 161
+          firstcolumn: 24
+          lastcolumn: 61
     lines:
         first: 3
         last: 5
@@ -239,14 +249,19 @@
 
 ---
 
-[TestComparisonCheck/vector(0)_or_(foo_>_0) - 1]
-- description: vector(0) or (foo > 0)
+[TestComparisonCheck/max()_*_group_right_label_replace(...) - 1]
+[]
+
+---
+
+[TestComparisonCheck/vector(0) - 1]
+- description: vector(0)
   content: |
     - alert: Foo Is Down
-      expr: (foo > 0) or vector(0)
+      expr: vector(0)
   output: |
-    2 |   expr: (foo > 0) or vector(0)
-                ^^^^^^^^^^^^^^^^^^^^^^ Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+    2 |   expr: vector(0)
+                ^^^^^^^^^ This query will always return a result and so this alert will always fire.
   problem:
     reporter: alerts/comparison
     summary: always firing alert
@@ -257,17 +272,50 @@
         For example `up == 0` or `rate(error_total[2m]) > 0`.
         Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
     diagnostics:
-        - message: Alert query uses `or` operator with one side of the query that will always return a result, this alert will always fire.
+        - message: This query will always return a result and so this alert will always fire.
+          pos:
+            - line: 2
+              firstcolumn: 9
+              lastcolumn: 17
+          firstcolumn: 1
+          lastcolumn: 9
+    lines:
+        first: 2
+        last: 2
+    severity: 1
+    anchor: 0
+
+---
+
+[TestComparisonCheck/vector(0)_or_(foo_>_0) - 1]
+- description: vector(0) or (foo > 0)
+  content: |
+    - alert: Foo Is Down
+      expr: (foo > 0) or vector(0)
+  output: |
+    2 |   expr: (foo > 0) or vector(0)
+                             ^^^^^^^^^ If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
+  problem:
+    reporter: alerts/comparison
+    summary: always firing alert
+    details: |-
+        Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+        Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+        In most cases this can be achieved by having some condition in the query expression.
+        For example `up == 0` or `rate(error_total[2m]) > 0`.
+        Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+    diagnostics:
+        - message: If other parts of this query don't return anything then this part will always return a result and so this alert will fire.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 30
-          firstcolumn: 1
+          firstcolumn: 14
           lastcolumn: 22
     lines:
         first: 2
         last: 2
-    severity: 2
+    severity: 1
     anchor: 0
 
 ---

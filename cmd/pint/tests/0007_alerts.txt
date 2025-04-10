@@ -19,7 +19,7 @@ Bug: required annotation not set (alerts/annotation)
 Warning: always firing alert (alerts/comparison)
   ---> rules/0001.yml:2 -> `Always`
 2 |   expr: up
-            ^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+            ^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Warning: required label not set (rule/label)
   ---> rules/0001.yml:9-10 -> `ServiceIsDown`

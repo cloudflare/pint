@@ -23,7 +23,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
 Warning: always firing alert (alerts/comparison)
   ---> rules/0001.yml:8 -> `colo:alerting`
 8 |     expr: sum(bar) without(job)
-              ^^^^^^^^^^^^^^^^^^^^^ Alert query doesn't have any condition, it will always fire if the metric exists.
+                  ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 level=INFO msg="Problems found" Warning=2
 -- rules/0001.yml --
