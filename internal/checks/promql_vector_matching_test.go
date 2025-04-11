@@ -1124,6 +1124,60 @@ func TestVectorMatchingCheck(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "max() by(a) and on(a) foo",
+			content: `
+- record: foo
+  expr: |
+    max by (cluster, env) (
+      increase(error_total{}[10m])
+    ) > 0
+    and on (cluster)
+    cluster_metadata{cluster="foo", environment="prod"} > 0
+  `,
+			checker:    newVectorMatchingCheck,
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(max by (cluster, env) (increase(error_total[10m])) and on (cluster) cluster_metadata{cluster="foo",environment="prod"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(max by (cluster, env) (increase(error_total[10m]))) without(__name__)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"instance": "a",
+								"job":      "a",
+							}),
+						},
+					},
+				},
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(cluster_metadata{cluster="foo",environment="prod"}) without(__name__)`},
+					},
+					resp: vectorResponse{
+						samples: []*model.Sample{
+							generateSample(map[string]string{
+								"cluster":     "foo",
+								"environment": "prod",
+								"status":      "green",
+								"job":         "b",
+							}),
+						},
+					},
+				},
+			},
+			problems: true,
+		},
 	}
 	runTests(t, testCases)
 }

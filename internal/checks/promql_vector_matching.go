@@ -3,6 +3,7 @@ package checks
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"slices"
 	"strings"
 
@@ -131,7 +132,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 			}
 		}
 
-		leftLabels, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
+		leftLabels, leftURI, err := c.seriesLabels(ctx, n.LHS.String(), ignored...)
 		if err != nil {
 			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			return problems
@@ -140,7 +141,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 			goto NEXT
 		}
 
-		rightLabels, err := c.seriesLabels(ctx, n.RHS.String(), ignored...)
+		rightLabels, rightURI, err := c.seriesLabels(ctx, n.RHS.String(), ignored...)
 		if err != nil {
 			problems = append(problems, problemFromError(err, rule, c.Reporter(), c.prom.Name(), Bug))
 			return problems
@@ -150,9 +151,10 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 		}
 
 		if n.VectorMatching.On {
-			pos := utils.FindPosition(expr.Value.Value, n.PositionRange(), "on")
 			for _, name := range n.VectorMatching.MatchingLabels {
 				if !leftLabels.hasName(name) && rightLabels.hasName(name) {
+					pos := node.Expr.(*promParser.BinaryExpr).LHS.PositionRange()
+					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.LHS.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
 						Lines:    expr.Value.Pos.Lines(),
@@ -163,8 +165,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf(
-									"Using `on(%s)` won't produce any results on %s because results from the left hand side of the query don't have this label: `%s`.",
-									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).LHS),
+									"Using `on(%s)` won't produce any results on %s because [series returned by this query](%s) don't have the `%s` label.",
+									name, promText(c.prom.Name(), qr.URI), link, name),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
@@ -173,6 +175,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					})
 				}
 				if leftLabels.hasName(name) && !rightLabels.hasName(name) {
+					pos := node.Expr.(*promParser.BinaryExpr).RHS.PositionRange()
+					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", rightURI, url.QueryEscape(n.RHS.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
 						Lines:    expr.Value.Pos.Lines(),
@@ -182,8 +186,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Severity: Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from the right hand side of the query don't have this label: `%s`.",
-									name, promText(c.prom.Name(), qr.URI), node.Expr.(*promParser.BinaryExpr).RHS),
+								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because [series returned by this query](%s) don't have the `%s` label.",
+									name, promText(c.prom.Name(), qr.URI), link, name),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
@@ -192,6 +196,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 					})
 				}
 				if !leftLabels.hasName(name) && !rightLabels.hasName(name) {
+					pos := utils.FindPosition(expr.Value.Value, node.Expr.PositionRange(), "on")
+					link := fmt.Sprintf("%s/query?g0.expr=%s&&g0.tab=table", leftURI, url.QueryEscape(n.String()))
 					problems = append(problems, Problem{
 						Anchor:   AnchorAfter,
 						Lines:    expr.Value.Pos.Lines(),
@@ -201,8 +207,8 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Severity: Bug,
 						Diagnostics: []diags.Diagnostic{
 							{
-								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because results from both sides of the query don't have this label: `%s`.",
-									name, promText(c.prom.Name(), qr.URI), node.Expr),
+								Message: fmt.Sprintf("Using `on(%s)` won't produce any results on %s because [series returned from both sides of the query](%s) don't have the `%s` label.",
+									name, promText(c.prom.Name(), qr.URI), name, link),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
@@ -262,7 +268,7 @@ NEXT:
 	return problems
 }
 
-func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, error) {
+func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ignored ...model.LabelName) (labelSets, string, error) {
 	var expr strings.Builder
 	expr.WriteString("count(")
 	expr.WriteString(query)
@@ -276,11 +282,11 @@ func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ign
 	expr.WriteString(")")
 	qr, err := c.prom.Query(ctx, expr.String())
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if len(qr.Series) == 0 {
-		return nil, nil
+		return nil, qr.URI, nil
 	}
 
 	var lsets labelSets
@@ -295,7 +301,7 @@ func (c VectorMatchingCheck) seriesLabels(ctx context.Context, query string, ign
 		lsets = append(lsets, ls)
 	}
 
-	return lsets, nil
+	return lsets, qr.URI, nil
 }
 
 type labelSet struct {

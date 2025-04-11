@@ -208,14 +208,16 @@
 
 ---
 
-[TestVectorMatchingCheck/nested_query - 1]
-- description: nested query
-  content: |
-    - alert: foo
-      expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
+[TestVectorMatchingCheck/max()_by(a)_and_on(a)_foo - 1]
+- description: max() by(a) and on(a) foo
+  content: "\n- record: foo\n  expr: |\n    max by (cluster, env) (\n      increase(error_total{}[10m])\n    ) > 0\n    and on (cluster)\n    cluster_metadata{cluster=\"foo\", environment=\"prod\"} > 0\n  "
   output: |
-    2 |   expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
-                ^^^^^^^^^^^^ Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because results from the left hand side of the query don't have this label: `(memory_bytes / ignoring (job) (memory_limit > 0))`.
+    4 |     max by (cluster, env) (
+    5 |       increase(error_total{}[10m])
+    6 |     ) > 0
+            ^^^^^ Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) don't have the `cluster` label.
+    7 |     and on (cluster)
+    8 |     cluster_metadata{cluster="foo", environment="prod"} > 0
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -224,13 +226,56 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'Using `on(app_name)` won''t produce any results on `prom` Prometheus server at https://simple.example.com because results from the left hand side of the query don''t have this label: `(memory_bytes / ignoring (job) (memory_limit > 0))`.'
+        - message: Using `on(cluster)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=max+by+%28cluster%2C+env%29+%28increase%28error_total%5B10m%5D%29%29&&g0.tab=table) don't have the `cluster` label.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 28
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 35
+            - line: 6
+              firstcolumn: 5
+              lastcolumn: 10
+            - line: 7
+              firstcolumn: 5
+              lastcolumn: 21
+            - line: 8
+              firstcolumn: 5
+              lastcolumn: 59
+          firstcolumn: 1
+          lastcolumn: 60
+    lines:
+        first: 4
+        last: 8
+    severity: 2
+    anchor: 0
+
+---
+
+[TestVectorMatchingCheck/nested_query - 1]
+- description: nested query
+  content: |
+    - alert: foo
+      expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
+  output: |
+    2 |   expr: (memory_bytes / ignoring(job) (memory_limit > 0)) * on(app_name) group_left(a,b,c) app_registry
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) don't have the `app_name` label.
+  problem:
+    reporter: promql/vector_matching
+    summary: impossible binary operation
+    details: |-
+        Trying to match two different time series together will only work if both have the exact same set of labels.
+        You can match time series with different labels by using special keywords and follow the rules set by PromQL.
+        [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
+    diagnostics:
+        - message: Using `on(app_name)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=%28memory_bytes+%2F+ignoring+%28job%29+memory_limit%29&&g0.tab=table) don't have the `app_name` label.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 103
           firstcolumn: 1
-          lastcolumn: 12
+          lastcolumn: 49
     lines:
         first: 2
         last: 2
@@ -312,7 +357,7 @@
       expr: foo / on(notfound) bar
   output: |
     2 |   expr: foo / on(notfound) bar
-                ^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because results from both sides of the query don't have this label: `foo / on (notfound) bar`.
+                      ^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -321,13 +366,13 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'Using `on(notfound)` won''t produce any results on `prom` Prometheus server at https://simple.example.com because results from both sides of the query don''t have this label: `foo / on (notfound) bar`.'
+        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned from both sides of the query](notfound) don't have the `https://simple.example.com/query?g0.expr=foo+%2F+on+%28notfound%29+bar&&g0.tab=table` label.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 30
-          firstcolumn: 1
-          lastcolumn: 3
+          firstcolumn: 7
+          lastcolumn: 8
     lines:
         first: 2
         last: 2
@@ -343,7 +388,7 @@
       expr: foo / on(notfound) bar_with_notfound
   output: |
     2 |   expr: foo / on(notfound) bar_with_notfound
-                      ^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because results from the left hand side of the query don't have this label: `foo`.
+                ^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) don't have the `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -352,13 +397,13 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'Using `on(notfound)` won''t produce any results on `prom` Prometheus server at https://simple.example.com because results from the left hand side of the query don''t have this label: `foo`.'
+        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=foo&&g0.tab=table) don't have the `notfound` label.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 44
-          firstcolumn: 7
-          lastcolumn: 8
+          firstcolumn: 1
+          lastcolumn: 3
     lines:
         first: 2
         last: 2
@@ -374,7 +419,7 @@
       expr: foo_with_notfound / on(notfound) bar
   output: |
     2 |   expr: foo_with_notfound / on(notfound) bar
-                ^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because results from the right hand side of the query don't have this label: `bar`.
+                                                 ^^^ Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't have the `notfound` label.
   problem:
     reporter: promql/vector_matching
     summary: impossible binary operation
@@ -383,13 +428,13 @@
         You can match time series with different labels by using special keywords and follow the rules set by PromQL.
         [Click here](https://prometheus.io/docs/prometheus/latest/querying/operators/#vector-matching) to read PromQL documentation that explains it.
     diagnostics:
-        - message: 'Using `on(notfound)` won''t produce any results on `prom` Prometheus server at https://simple.example.com because results from the right hand side of the query don''t have this label: `bar`.'
+        - message: Using `on(notfound)` won't produce any results on `prom` Prometheus server at https://simple.example.com because [series returned by this query](https://simple.example.com/query?g0.expr=bar&&g0.tab=table) don't have the `notfound` label.
           pos:
             - line: 2
               firstcolumn: 9
               lastcolumn: 44
-          firstcolumn: 1
-          lastcolumn: 3
+          firstcolumn: 34
+          lastcolumn: 36
     lines:
         first: 2
         last: 2
