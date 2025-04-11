@@ -2066,6 +2066,26 @@
 
 ---
 
+[TestTemplateCheck/no_humanize_on_rate()_but_wrapped_in_count() - 1]
+[]
+
+---
+
+[TestTemplateCheck/no_humanize_on_rate()_but_wrapped_in_count_values() - 1]
+[]
+
+---
+
+[TestTemplateCheck/no_humanize_on_rate()_but_wrapped_in_group() - 1]
+[]
+
+---
+
+[TestTemplateCheck/no_variables_used - 1]
+[]
+
+---
+
 [TestTemplateCheck/rate()_but_no_$value - 1]
 []
 

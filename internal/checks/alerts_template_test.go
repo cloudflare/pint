@@ -874,6 +874,50 @@ func TestTemplateCheck(t *testing.T) {
 			prometheus: noProm,
 			problems:   true,
 		},
+		{
+			description: "no humanize on rate() but wrapped in group()",
+			content: `
+- alert: Foo
+  expr: group(rate(errors[2m]) > 0)
+  annotations:
+    summary: "Seeing {{ $value }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "no humanize on rate() but wrapped in count()",
+			content: `
+- alert: Foo
+  expr: count(rate(errors[2m]) > 0)
+  annotations:
+    summary: "Seeing {{ $value }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "no humanize on rate() but wrapped in count_values()",
+			content: `
+- alert: Foo
+  expr: count_values("rate", rate(errors[2m]) > 0)
+  annotations:
+    summary: "Seeing {{ $value }} errors"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
+		{
+			description: "no variables used",
+			content: `
+- alert: Foo
+  expr: rate(errors[2m]) > 0
+  annotations:
+    summary: "errors present"
+`,
+			checker:    newTemplateCheck,
+			prometheus: noProm,
+		},
 	}
 	runTests(t, testCases)
 }
