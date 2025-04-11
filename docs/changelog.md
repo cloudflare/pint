@@ -6,10 +6,11 @@
 
 - Labels set on [the group level](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/#rule_group) are now supported by pint.
 
-### Changed
+### Fixed
 
 - [alerts/comparison](checks/alerts/comparison.md) was refactored to output more accurate reports.
 - [alerts/template](checks/alerts/template.md) was refactored to output more accurate reports.
+- [promql/vector_matching](checks/promql/vector_matching.md) will now produce more accurate messages with more details.
 
 ## v0.71.8
 
