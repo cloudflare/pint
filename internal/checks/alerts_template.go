@@ -198,43 +198,60 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 	if !ok {
 		return problems
 	}
-	for _, call := range utils.HasOuterRate(expr.Query) {
-		dgs := []diags.Diagnostic{
-			{
-				Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", call.Func.Name),
-				Pos:         expr.Value.Pos,
-				FirstColumn: int(call.PosRange.Start) + 1,
-				LastColumn:  int(call.PosRange.End),
-			},
-		}
-		labelsAliases := aliases.varAliases(".Value")
-		for _, v := range vars {
-			for _, a := range labelsAliases {
-				if v.value[0] == a {
-					dgs = append(dgs, diags.Diagnostic{
-						Message:     "Use one of humanize template functions to make the result more readable.",
-						Pos:         ann.Value.Pos,
-						FirstColumn: v.column,
-						LastColumn:  v.column + len(v.value[0]),
-					})
+	for _, src := range utils.LabelsSource(expr.Value.Value, expr.Query.Expr) {
+		if src.Call != nil && isRateResult(src) {
+			dgs := []diags.Diagnostic{
+				{
+					Message:     fmt.Sprintf("`%s()` will produce results that are hard to read for humans.", src.Call.Func.Name),
+					Pos:         expr.Value.Pos,
+					FirstColumn: int(src.Call.PosRange.Start) + 1,
+					LastColumn:  int(src.Call.PosRange.End),
+				},
+			}
+			labelsAliases := aliases.varAliases(".Value")
+			for _, v := range vars {
+				for _, a := range labelsAliases {
+					if v.value[0] == a {
+						dgs = append(dgs, diags.Diagnostic{
+							Message:     "Use one of humanize template functions to make the result more readable.",
+							Pos:         ann.Value.Pos,
+							FirstColumn: v.column,
+							LastColumn:  v.column + len(v.value[0]),
+						})
+					}
 				}
 			}
-		}
 
-		problems = append(problems, Problem{
-			Anchor: AnchorAfter,
-			Lines: diags.LineRange{
-				First: min(expr.Value.Pos.Lines().First, ann.Value.Pos.Lines().First),
-				Last:  max(expr.Value.Pos.Lines().Last, ann.Value.Pos.Lines().Last),
-			},
-			Reporter:    c.Reporter(),
-			Summary:     "use humanize filters for the results",
-			Details:     TemplateCheckReferenceDetails,
-			Diagnostics: dgs,
-			Severity:    Information,
-		})
+			problems = append(problems, Problem{
+				Anchor: AnchorAfter,
+				Lines: diags.LineRange{
+					First: min(expr.Value.Pos.Lines().First, ann.Value.Pos.Lines().First),
+					Last:  max(expr.Value.Pos.Lines().Last, ann.Value.Pos.Lines().Last),
+				},
+				Reporter:    c.Reporter(),
+				Summary:     "use humanize filters for the results",
+				Details:     TemplateCheckReferenceDetails,
+				Diagnostics: dgs,
+				Severity:    Information,
+			})
+		}
 	}
 	return problems
+}
+
+func isRateResult(src utils.Source) bool {
+	if src.Type == utils.AggregateSource {
+		switch src.Operation {
+		case "count", "count_values", "group":
+			return false
+		}
+	}
+	switch src.Call.Func.Name {
+	case "rate", "irate", "deriv":
+		return true
+	default:
+		return false
+	}
 }
 
 func queryFunc(_ context.Context, expr string, _ time.Time) (promql.Vector, error) {

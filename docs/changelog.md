@@ -9,6 +9,7 @@
 ### Changed
 
 - [alerts/comparison](checks/alerts/comparison.md) was refactored to output more accurate reports.
+- [alerts/template](checks/alerts/template.md) was refactored to output more accurate reports.
 
 ## v0.71.8
 
