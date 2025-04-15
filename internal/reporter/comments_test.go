@@ -899,6 +899,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 			},
 			func(uri string) Commenter {
 				r, err := NewGithubReporter(
+					t.Context(),
 					"v0.0.0",
 					uri,
 					uri,

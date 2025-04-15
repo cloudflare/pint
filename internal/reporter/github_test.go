@@ -967,6 +967,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 			srv := httptest.NewServer(handler)
 			defer srv.Close()
 			r, err := reporter.NewGithubReporter(
+				t.Context(),
 				"v0.0.0",
 				srv.URL,
 				srv.URL,

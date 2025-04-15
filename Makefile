@@ -77,3 +77,8 @@ benchmark-diff:
 	echo '```' | tee -a benchstat.txt
 	go tool -modfile=tools/benchstat/go.mod benchstat old.txt new.txt | tee -a benchstat.txt
 	echo '```' | tee -a benchstat.txt
+
+.PHONY: update-major-imports
+update-major-imports:
+	@grep '/v' go.mod | grep -v '// indirect' | cut -d/ -f -3 | while read L ; do echo ">>> $$L" ; go tool -modfile=tools/gomajor/go.mod gomajor get -major "$$L"@latest ; done
+	go mod tidy
