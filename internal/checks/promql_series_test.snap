@@ -2098,8 +2098,159 @@
 
 ---
 
+[TestSeriesCheck/series_missing,_multi-label_selector_snoozed_with_subset_of_labels - 1]
+[]
+
+---
+
 [TestSeriesCheck/series_missing,_selector_disabled - 1]
 []
+
+---
+
+[TestSeriesCheck/series_missing,_selector_snoozed - 1]
+[]
+
+---
+
+[TestSeriesCheck/series_missing,_selector_snoozed_/_bad_snooze_selector - 1]
+- description: series missing, selector snoozed / bad snooze selector
+  content: |4
+    # pint snooze 2099-12-31 promql/series(notfound{job=foo})
+    - record: foo
+      expr: count(notfound{job="foo"}) == 0
+  output: |
+    4 |   expr: count(notfound{job="foo"}) == 0
+                      ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+  problem:
+    reporter: promql/series
+    summary: query on nonexistent series
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for `notfound` metric in the last 1w.'
+          pos:
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 7
+          lastcolumn: 25
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+- description: series missing, selector snoozed / bad snooze selector
+  content: |4
+    # pint snooze 2099-12-31 promql/series(notfound{job=foo})
+    - record: foo
+      expr: count(notfound{job="foo"}) == 0
+  output: |
+    4 |   expr: count(notfound{job="foo"}) == 0
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
+  problem:
+    reporter: promql/series
+    summary: invalid comment
+    details: |-
+        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+    diagnostics:
+        - message: pint snooze comment `promql/series(notfound{job=foo})` doesn't match any selector in this query
+          pos:
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 1
+          lastcolumn: 31
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
+
+---
+
+[TestSeriesCheck/series_missing,_selector_snoozed_/_snooze_expired - 1]
+- description: series missing, selector snoozed / snooze expired
+  content: |4
+    # pint snooze 2000-12-31 promql/series(notfound{job="foo"})
+    - record: foo
+      expr: count(notfound{job="foo"}) == 0
+  output: |
+    4 |   expr: count(notfound{job="foo"}) == 0
+                      ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+  problem:
+    reporter: promql/series
+    summary: query on nonexistent series
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for `notfound` metric in the last 1w.'
+          pos:
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 7
+          lastcolumn: 25
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+
+---
+
+[TestSeriesCheck/series_missing,_selector_snoozed_/_snooze_mismatch - 1]
+- description: series missing, selector snoozed / snooze mismatch
+  content: |4
+    # pint snooze 2099-12-31 promql/series(notfound{job="bob"})
+    - record: foo
+      expr: count(notfound{job="foo"}) == 0
+  output: |
+    4 |   expr: count(notfound{job="foo"}) == 0
+                      ^^^^^^^^^^^^^^^^^^^ `prom` Prometheus server at https://simple.example.com didn't have any series for `notfound` metric in the last 1w.
+  problem:
+    reporter: promql/series
+    summary: query on nonexistent series
+    details: '[Click here](https://cloudflare.github.io/pint/checks/promql/series.html#common-problems) to see a list of common problems that might cause this.'
+    diagnostics:
+        - message: '`prom` Prometheus server at https://simple.example.com didn''t have any series for `notfound` metric in the last 1w.'
+          pos:
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 7
+          lastcolumn: 25
+    lines:
+        first: 4
+        last: 4
+    severity: 2
+    anchor: 0
+- description: series missing, selector snoozed / snooze mismatch
+  content: |4
+    # pint snooze 2099-12-31 promql/series(notfound{job="bob"})
+    - record: foo
+      expr: count(notfound{job="foo"}) == 0
+  output: |
+    4 |   expr: count(notfound{job="foo"}) == 0
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this query
+  problem:
+    reporter: promql/series
+    summary: invalid comment
+    details: |-
+        One of the `# pint disable promql/series` comments used in this rule doesn't have any effect and won't disable anything. Make sure that the comment targets series that are used in the rule query and are not already ignored.
+        [Click here](https://cloudflare.github.io/pint/checks/promql/series.html#how-to-disable-it) to see docs about disable comment syntax.
+    diagnostics:
+        - message: pint snooze comment `promql/series(notfound{job="bob"})` doesn't match any selector in this query
+          pos:
+            - line: 4
+              firstcolumn: 9
+              lastcolumn: 39
+          firstcolumn: 1
+          lastcolumn: 31
+    lines:
+        first: 4
+        last: 4
+    severity: 1
+    anchor: 0
 
 ---
 

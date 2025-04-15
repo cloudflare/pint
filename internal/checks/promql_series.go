@@ -162,6 +162,10 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 			done[selector.String()] = true
 			continue
 		}
+		if isSnoozed(entry.Rule, selector) {
+			done[selector.String()] = true
+			continue
+		}
 
 		metricName := selector.Name
 		if metricName == "" {
@@ -653,7 +657,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 		}
 	}
 
-	for _, disable := range orphanedDisableComments(ctx, entry.Rule, selectors) {
+	for _, comment := range orphanedComments(ctx, entry.Rule, selectors) {
 		problems = append(problems, Problem{
 			Anchor:   AnchorAfter,
 			Lines:    expr.Value.Pos.Lines(),
@@ -663,7 +667,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 			Summary:  "invalid comment",
 			Diagnostics: []diags.Diagnostic{
 				{
-					Message:     fmt.Sprintf("pint %s comment `%s` doesn't match any selector in this query", comments.DisableComment, disable.Match),
+					Message:     fmt.Sprintf("pint %s comment `%s` doesn't match any selector in this query", comment.kind, comment.match),
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
@@ -995,6 +999,27 @@ func isDisabled(rule parser.Rule, selector *promParser.VectorSelector) bool {
 	return false
 }
 
+func isSnoozed(rule parser.Rule, selector *promParser.VectorSelector) bool {
+	for _, snooze := range comments.Only[comments.Snooze](rule.Comments, comments.SnoozeType) {
+		if !snooze.Until.After(time.Now()) {
+			continue
+		}
+		if strings.HasPrefix(snooze.Match, SeriesCheckName+"(") && strings.HasSuffix(snooze.Match, ")") {
+			cs := strings.TrimSuffix(strings.TrimPrefix(snooze.Match, SeriesCheckName+"("), ")")
+			isMatch, ok := matchSelectorToMetric(selector, cs)
+			if !ok {
+				continue
+			}
+			if !isMatch {
+				goto NEXT
+			}
+			return true
+		}
+	NEXT:
+	}
+	return false
+}
+
 func matchSelectorToMetric(selector *promParser.VectorSelector, metric string) (bool, bool) {
 	// Try full string or name match first.
 	if metric == selector.String() || metric == selector.Name {
@@ -1037,7 +1062,37 @@ func parseRuleSet(s string) (matcher, key, value string) {
 	return matcher, key, value
 }
 
-func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []*promParser.VectorSelector) (orhpaned []comments.Disable) {
+func wasCommentUsed(commentMatch string, promNames, promTags []string, selectors []*promParser.VectorSelector) bool {
+	match := strings.TrimSuffix(strings.TrimPrefix(commentMatch, SeriesCheckName+"("), ")")
+	// Skip matching tags.
+	if strings.HasPrefix(match, "+") && slices.Contains(promTags, strings.TrimPrefix(match, "+")) {
+		return true
+	}
+	// Skip matching Prometheus servers.
+	if slices.Contains(promNames, match) {
+		return true
+	}
+	if !strings.HasPrefix(commentMatch, SeriesCheckName+"(") || !strings.HasSuffix(commentMatch, ")") {
+		return true
+	}
+	for _, selector := range selectors {
+		isMatch, ok := matchSelectorToMetric(selector, match)
+		if !ok {
+			continue
+		}
+		if isMatch {
+			return true
+		}
+	}
+	return false
+}
+
+type orphanedComment struct {
+	kind  string
+	match string
+}
+
+func orphanedComments(ctx context.Context, rule parser.Rule, selectors []*promParser.VectorSelector) (orhpaned []orphanedComment) {
 	var promNames, promTags []string
 	if val := ctx.Value(promapi.AllPrometheusServers); val != nil {
 		for _, server := range val.([]*promapi.FailoverGroup) {
@@ -1045,34 +1100,20 @@ func orphanedDisableComments(ctx context.Context, rule parser.Rule, selectors []
 			promTags = append(promTags, server.Tags()...)
 		}
 	}
-
 	for _, disable := range comments.Only[comments.Disable](rule.Comments, comments.DisableType) {
-		match := strings.TrimSuffix(strings.TrimPrefix(disable.Match, SeriesCheckName+"("), ")")
-		// Skip matching tags.
-		if strings.HasPrefix(match, "+") && slices.Contains(promTags, strings.TrimPrefix(match, "+")) {
-			continue
+		if !wasCommentUsed(disable.Match, promNames, promTags, selectors) {
+			orhpaned = append(orhpaned, orphanedComment{
+				kind:  comments.DisableComment,
+				match: disable.Match,
+			})
 		}
-		// Skip matching Prometheus servers.
-		if slices.Contains(promNames, match) {
-			continue
-		}
-		var wasUsed bool
-		if !strings.HasPrefix(disable.Match, SeriesCheckName+"(") || !strings.HasSuffix(disable.Match, ")") {
-			continue
-		}
-		for _, selector := range selectors {
-			isMatch, ok := matchSelectorToMetric(selector, match)
-			if !ok {
-				continue
-			}
-			if isMatch {
-				wasUsed = true
-				goto NEXT
-			}
-		}
-	NEXT:
-		if !wasUsed {
-			orhpaned = append(orhpaned, disable)
+	}
+	for _, snooze := range comments.Only[comments.Snooze](rule.Comments, comments.SnoozeType) {
+		if !wasCommentUsed(snooze.Match, promNames, promTags, selectors) {
+			orhpaned = append(orhpaned, orphanedComment{
+				kind:  comments.SnoozeComment,
+				match: snooze.Match,
+			})
 		}
 	}
 	return orhpaned

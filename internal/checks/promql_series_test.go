@@ -2627,6 +2627,118 @@ func TestSeriesCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 		},
 		{
+			description: "series missing, selector snoozed",
+			content: `
+# pint snooze 2099-12-31 promql/series(notfound{job="foo"})
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "series missing, selector snoozed / snooze expired",
+			content: `
+# pint snooze 2000-12-31 promql/series(notfound{job="foo"})
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(notfound{job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(notfound)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+			problems: true,
+		},
+		{
+			description: "series missing, selector snoozed / snooze mismatch",
+			content: `
+# pint snooze 2099-12-31 promql/series(notfound{job="bob"})
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(notfound{job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(notfound)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+			problems: true,
+		},
+		{
+			description: "series missing, selector snoozed / bad snooze selector",
+			content: `
+# pint snooze 2099-12-31 promql/series(notfound{job=foo})
+- record: foo
+  expr: count(notfound{job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+			mocks: []*prometheusMock{
+				{
+					conds: []requestCondition{
+						requireQueryPath,
+						formCond{key: "query", value: `count(notfound{job="foo"})`},
+					},
+					resp: respondWithEmptyVector(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: `count(notfound)`},
+					},
+					resp: respondWithEmptyMatrix(),
+				},
+				{
+					conds: []requestCondition{
+						requireRangeQueryPath,
+						formCond{key: "query", value: "count(up)"},
+					},
+					resp: respondWithSingleRangeVector1W(),
+				},
+			},
+			problems: true,
+		},
+		{
 			description: "series missing, multi-label selector disabled",
 			content: `
 # pint disable promql/series(notfound{job="foo", instance="xxx"})
@@ -2650,6 +2762,16 @@ func TestSeriesCheck(t *testing.T) {
 			description: "series missing, multi-label selector disabled with subset of labels",
 			content: `
 # pint disable promql/series(notfound{job="foo"})    
+- record: foo
+  expr: count(notfound{instance="xxx",job="foo"}) == 0
+`,
+			checker:    newSeriesCheck,
+			prometheus: newSimpleProm,
+		},
+		{
+			description: "series missing, multi-label selector snoozed with subset of labels",
+			content: `
+# pint snooze 2099-12-31 promql/series(notfound{job="foo"})
 - record: foo
   expr: count(notfound{instance="xxx",job="foo"}) == 0
 `,
