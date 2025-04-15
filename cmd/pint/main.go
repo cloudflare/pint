@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log/slog"
 	"os"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.uber.org/automaxprocs/maxprocs"
 
 	"github.com/cloudflare/pint/internal/config"
@@ -26,11 +27,11 @@ var (
 	commit  = "unknown"
 )
 
-func newApp() *cli.App {
-	return &cli.App{
+func newApp() *cli.Command {
+	return &cli.Command{
 		Usage: "Prometheus rule linter/validator.",
 		Flags: []cli.Flag{
-			&cli.PathFlag{
+			&cli.StringFlag{
 				Name:    configFlag,
 				Aliases: []string{"c"},
 				Value:   ".pint.hcl",
@@ -53,18 +54,16 @@ func newApp() *cli.App {
 				Aliases: []string{"n"},
 				Value:   false,
 				Usage:   "Disable output colouring.",
-				EnvVars: []string{"NO_COLOR"},
+				Sources: cli.EnvVars("NO_COLOR"),
 			},
 			&cli.StringSliceFlag{
 				Name:    disabledFlag,
 				Aliases: []string{"d"},
-				Value:   cli.NewStringSlice(),
 				Usage:   "List of checks to disable (example: promql/cost).",
 			},
 			&cli.StringSliceFlag{
 				Name:    enabledFlag,
 				Aliases: []string{"e"},
-				Value:   cli.NewStringSlice(),
 				Usage:   "Only enable these checks (example: promql/cost).",
 			},
 			&cli.BoolFlag{
@@ -91,7 +90,7 @@ type actionMeta struct {
 	workers   int
 }
 
-func actionSetup(c *cli.Context) (meta actionMeta, err error) {
+func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {
 		return meta, fmt.Errorf("failed to set log level: %w", err)
@@ -103,19 +102,19 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 		slog.Error("failed to set GOMAXPROCS", slog.Any("err", err))
 	}
 
-	meta.workers = c.Int(workersFlag)
+	meta.workers = int(c.Int(workersFlag))
 	if meta.workers < 1 {
 		return meta, fmt.Errorf("--%s flag must be > 0", workersFlag)
 	}
 
 	var fromFile bool
-	meta.cfg, fromFile, err = config.Load(c.Path(configFlag), c.IsSet(configFlag))
+	meta.cfg, fromFile, err = config.Load(c.String(configFlag), c.IsSet(configFlag))
 	if err != nil {
-		return meta, fmt.Errorf("failed to load config file %q: %w", c.Path(configFlag), err)
+		return meta, fmt.Errorf("failed to load config file %q: %w", c.String(configFlag), err)
 	}
 	if fromFile {
-		slog.Debug("Adding pint config to the parser exclude list", slog.String("path", c.Path(configFlag)))
-		meta.cfg.Parser.Exclude = append(meta.cfg.Parser.Exclude, c.Path(configFlag))
+		slog.Debug("Adding pint config to the parser exclude list", slog.String("path", c.String(configFlag)))
+		meta.cfg.Parser.Exclude = append(meta.cfg.Parser.Exclude, c.String(configFlag))
 	}
 
 	meta.cfg.SetDisabledChecks(c.StringSlice(disabledFlag))
@@ -134,7 +133,7 @@ func actionSetup(c *cli.Context) (meta actionMeta, err error) {
 
 func main() {
 	app := newApp()
-	err := app.Run(os.Args)
+	err := app.Run(context.Background(), os.Args)
 	if err != nil {
 		slog.Error("Execution completed with error(s)", slog.Any("err", err))
 		os.Exit(1)

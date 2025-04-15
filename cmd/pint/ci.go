@@ -19,7 +19,7 @@ import (
 	"github.com/cloudflare/pint/internal/parser"
 	"github.com/cloudflare/pint/internal/reporter"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var (
@@ -74,7 +74,7 @@ var ciCmd = &cli.Command{
 	},
 }
 
-func actionCI(c *cli.Context) error {
+func actionCI(ctx context.Context, c *cli.Command) error {
 	meta, err := actionSetup(c)
 	if err != nil {
 		return err
@@ -117,7 +117,7 @@ func actionCI(c *cli.Context) error {
 		return err
 	}
 
-	ctx := context.WithValue(context.Background(), config.CommandKey, config.CICommand)
+	ctx = context.WithValue(ctx, config.CommandKey, config.CICommand)
 
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 	defer gen.Stop()
@@ -230,6 +230,7 @@ func actionCI(c *cli.Context) error {
 		timeout, _ := time.ParseDuration(meta.cfg.Repository.GitHub.Timeout)
 		var gr reporter.GithubReporter
 		if gr, err = reporter.NewGithubReporter(
+			ctx,
 			version,
 			meta.cfg.Repository.GitHub.BaseURI,
 			meta.cfg.Repository.GitHub.UploadURI,

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var versionCmd = &cli.Command{
@@ -12,7 +13,7 @@ var versionCmd = &cli.Command{
 	Action: actionVersion,
 }
 
-func actionVersion(_ *cli.Context) error {
+func actionVersion(_ context.Context, _ *cli.Command) error {
 	fmt.Printf("%s (revision: %s)\n", version, commit)
 	return nil
 }

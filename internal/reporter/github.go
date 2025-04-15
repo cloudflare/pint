@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/go-github/v68/github"
+	"github.com/google/go-github/v71/github"
 	"golang.org/x/oauth2"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -55,7 +55,7 @@ func (pr ghPR) getFile(path string) *github.CommitFile {
 
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
-func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, headCommit string) (_ GithubReporter, err error) {
+func NewGithubReporter(ctx context.Context, version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, headCommit string) (_ GithubReporter, err error) {
 	slog.Info(
 		"Will report problems to GitHub",
 		slog.String("baseURL", baseURL),
@@ -71,7 +71,7 @@ func NewGithubReporter(version, baseURL, uploadURL string, timeout time.Duration
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token}, // nolint: exhaustruct
 	)
-	tc := oauth2.NewClient(context.Background(), ts)
+	tc := oauth2.NewClient(ctx, ts)
 
 	gr := GithubReporter{
 		client:      github.NewClient(tc),

@@ -15,7 +15,7 @@ import (
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/reporter"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 var requireOwnerFlag = "require-owner"
@@ -64,7 +64,7 @@ var lintCmd = &cli.Command{
 	},
 }
 
-func actionLint(c *cli.Context) error {
+func actionLint(ctx context.Context, c *cli.Command) error {
 	meta, err := actionSetup(c)
 	if err != nil {
 		return err
@@ -93,7 +93,7 @@ func actionLint(c *cli.Context) error {
 		return err
 	}
 
-	ctx := context.WithValue(context.Background(), config.CommandKey, config.LintCommand)
+	ctx = context.WithValue(ctx, config.CommandKey, config.LintCommand)
 
 	gen := config.NewPrometheusGenerator(meta.cfg, metricsRegistry)
 	defer gen.Stop()

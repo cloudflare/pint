@@ -30,7 +30,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/prometheus/common/model"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 const (
@@ -44,11 +44,11 @@ const (
 var watchCmd = &cli.Command{
 	Name:  "watch",
 	Usage: "Run in the foreground and continuesly check specified rules.",
-	Subcommands: []*cli.Command{
+	Commands: []*cli.Command{
 		{
 			Name:  "glob",
 			Usage: "Check a list of files or directories (can be a glob).",
-			Action: func(c *cli.Context) error {
+			Action: func(_ context.Context, c *cli.Command) error {
 				meta, err := actionSetup(c)
 				if err != nil {
 					return err
@@ -68,7 +68,7 @@ var watchCmd = &cli.Command{
 		{
 			Name:  "rule_files",
 			Usage: "Check the list of rule files from paths loaded by Prometheus.",
-			Action: func(c *cli.Context) error {
+			Action: func(_ context.Context, c *cli.Command) error {
 				meta, err := actionSetup(c)
 				if err != nil {
 					return err
@@ -134,7 +134,7 @@ var watchCmd = &cli.Command{
 	},
 }
 
-func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
+func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	minSeverity, err := checks.ParseSeverity(c.String(minSeverityFlag))
 	if err != nil {
 		return fmt.Errorf("invalid --%s value: %w", minSeverityFlag, err)
@@ -158,7 +158,7 @@ func actionWatch(c *cli.Context, meta actionMeta, f pathFinderFunc) error {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(meta.cfg, f, minSeverity, c.Int(maxProblemsFlag))
+	collector := newProblemCollector(meta.cfg, f, minSeverity, int(c.Int(maxProblemsFlag)))
 	// register all metrics
 	metricsRegistry.MustRegister(collector)
 	metricsRegistry.MustRegister(checkDuration)

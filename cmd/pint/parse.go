@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/prometheus/prometheus/promql/parser"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 )
 
 const levelStep = 2
@@ -122,7 +123,7 @@ func parseQuery(query string) error {
 	return nil
 }
 
-func actionParse(c *cli.Context) (err error) {
+func actionParse(_ context.Context, c *cli.Command) (err error) {
 	err = initLogger(c.String(logLevelFlag), c.Bool(noColorFlag))
 	if err != nil {
 		return fmt.Errorf("failed to set log level: %w", err)
