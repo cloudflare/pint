@@ -5,6 +5,7 @@
 ### Added
 
 - Labels set on [the group level](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/#rule_group) are now supported by pint.
+- [promql/series](checks/promql/series.md) check now supports `snooze` comments with a metric selector.
 
 ### Fixed
 
