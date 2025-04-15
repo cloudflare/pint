@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.72.1
+
+### Fixed
+
+- `pint_problem` metrics exposed when running `pint watch` were lacking problem details.
+
 ## v0.72.0
 
 ### Added

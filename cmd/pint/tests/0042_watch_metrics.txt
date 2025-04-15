@@ -9,30 +9,37 @@ curl -s http://127.0.0.1:6042/metrics | grep -vE 'process_|go_info' | perl -pe "
 cat pint.pid | xargs kill
 
 -- rules/unknown.yml --
-- record: broken
-  expr: foo / count())
-
-- record: aggregate
-  expr: sum(foo) without(job)
+groups:
+- name: unknown
+  rules:
+  - record: broken
+    expr: foo / count())
+  - record: aggregate
+    expr: sum(foo) without(job)
 
 -- rules/bob.yml --
 # pint file/owner bob
 
-- alert: ok
-  expr: foo > 0
-
-- alert: broken
-  expr: foo / count())
+groups:
+- name: bob
+  rules:
+  - alert: ok
+    expr: foo > 0
+  - alert: broken
+    expr: foo / count())
 
 -- rules/alice.yml --
-- alert: broken
-  expr: foo / count())
-  # pint rule/owner alice
+groups:
+- name: alice
+  rules:
+  - alert: broken
+    expr: foo / count())
+    # pint rule/owner alice
+
+-- rules/badyaml.yml --
+- {}
 
 -- .pint.hcl --
-parser {
-  relaxed = [".*"]
-}
 rule {
     match {
       kind = "recording"
@@ -151,6 +158,8 @@ pint_check_duration_seconds_sum{check="promql/regexp"}
 pint_check_duration_seconds_count{check="promql/regexp"}
 pint_check_duration_seconds_sum{check="promql/syntax"}
 pint_check_duration_seconds_count{check="promql/syntax"}
+pint_check_duration_seconds_sum{check="yaml/parse"}
+pint_check_duration_seconds_count{check="yaml/parse"}
 # HELP pint_check_iterations_total Total number of completed check iterations since pint start
 # TYPE pint_check_iterations_total counter
 pint_check_iterations_total
@@ -168,9 +177,10 @@ pint_last_run_duration_seconds
 pint_last_run_time_seconds
 # HELP pint_problem Prometheus rule problem reported by pint
 # TYPE pint_problem gauge
-pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="PromQL syntax error",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/bob.yml",kind="alerting",name="broken",owner="bob",problem="PromQL syntax error",reporter="promql/syntax",severity="fatal"}
-pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/badyaml.yml",kind="invalid",name="unknown",owner="",problem="top level field must be a groups key, got list",reporter="yaml/parse",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken",owner="bob",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems

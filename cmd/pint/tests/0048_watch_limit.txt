@@ -1,6 +1,6 @@
 exec bash -x ./test.sh &
 
-exec pint watch --listen=127.0.0.1:6048 --max-problems=2 --pidfile=pint.pid glob rules
+exec pint watch --listen=127.0.0.1:6048 --max-problems=2 --min-severity=info --pidfile=pint.pid glob rules
 cmp curl.txt metrics.txt
 
 -- test.sh --
@@ -9,19 +9,23 @@ curl -s http://127.0.0.1:6048/metrics | grep -E '^pint_problem' > curl.txt
 cat pint.pid | xargs kill
 
 -- rules/1.yml --
-- record: broken
-  expr: foo / count())
-
-- record: aggregate
-  expr: sum(foo) without(job)
-
-- alert: comparison
-  expr: foo
+groups:
+- name: foo
+  rules:
+  - record: broken
+    expr: foo / count())
+  - record: aggregate
+    expr: sum(foo) without(job)
+  - alert: comparison1
+    expr: foo
+  - alert: comparison2
+    expr: bar
+  - record: bad:join:1
+    expr: foo{job="a"} / foo{job="b"}
+  - record: bad:join:2
+    expr: foo{job="b"} / foo{job="a"}
 
 -- .pint.hcl --
-parser {
-  relaxed = [".*"]
-}
 rule {
     match {
       kind = "recording"
@@ -32,5 +36,6 @@ rule {
 }
 
 -- metrics.txt --
-pint_problem{filename="rules/1.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error",reporter="promql/syntax",severity="fatal"} 1
-pint_problems 1
+pint_problem{filename="rules/1.yml",kind="alerting",name="comparison1",owner="",problem="always firing alert: This query doesn't have any condition and so this alert will always fire if it matches anything.",reporter="alerts/comparison",severity="warning"} 1
+pint_problem{filename="rules/1.yml",kind="alerting",name="comparison2",owner="",problem="always firing alert: This query doesn't have any condition and so this alert will always fire if it matches anything.",reporter="alerts/comparison",severity="warning"} 1
+pint_problems 4
