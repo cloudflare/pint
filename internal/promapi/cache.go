@@ -21,16 +21,20 @@ type endpointStats struct {
 func (e *endpointStats) hit()  { e.hits++ }
 func (e *endpointStats) miss() { e.misses++ }
 
-func newQueryCache(maxStale time.Duration) *queryCache {
+func newQueryCache(maxStale time.Duration, now nowFunc) *queryCache {
 	// nolint: exhaustruct
 	return &queryCache{
+		now:      now,
 		entries:  map[uint64]*cacheEntry{},
 		stats:    map[string]*endpointStats{},
 		maxStale: maxStale,
 	}
 }
 
+type nowFunc func() time.Time
+
 type queryCache struct {
+	now       nowFunc
 	entries   map[uint64]*cacheEntry
 	stats     map[string]*endpointStats
 	maxStale  time.Duration
@@ -60,7 +64,7 @@ func (c *queryCache) get(key uint64, endpoint string) (v any, ok bool) {
 		return v, ok
 	}
 
-	ce.lastGet = time.Now()
+	ce.lastGet = c.now()
 	c.endpointStats(endpoint).hit()
 
 	return ce.data, true
@@ -74,11 +78,11 @@ func (c *queryCache) set(key uint64, val any, ttl time.Duration) {
 
 	c.entries[key] = &cacheEntry{
 		data:      val,
-		lastGet:   time.Now(),
+		lastGet:   c.now(),
 		expiresAt: time.Time{},
 	}
 	if ttl > 0 {
-		c.entries[key].expiresAt = time.Now().Add(ttl)
+		c.entries[key].expiresAt = c.now().Add(ttl)
 	}
 }
 
@@ -88,7 +92,7 @@ func (c *queryCache) gc() {
 
 	entries := make(map[uint64]*cacheEntry, len(c.entries)/2)
 
-	now := time.Now()
+	now := c.now()
 	for key, ce := range c.entries {
 		if (!ce.expiresAt.IsZero() && ce.expiresAt.Before(now)) || now.Sub(ce.lastGet) >= c.maxStale {
 			c.evictions++
