@@ -371,7 +371,7 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(c.fileOwnersMetric, prometheus.GaugeValue, 1, filename, owner)
 	}
 
-	done := map[string]prometheus.Metric{}
+	done := map[string][]prometheus.Metric{}
 	keys := []string{}
 
 	for _, report := range c.summary.Reports() {
@@ -384,39 +384,24 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 			continue
 		}
 
-		kind := "invalid"
-		name := "unknown"
-		if report.Rule.AlertingRule != nil {
-			kind = "alerting"
-			name = report.Rule.AlertingRule.Alert.Value
+		var metrics []prometheus.Metric
+		for _, diag := range report.Problem.Diagnostics {
+			metrics = append(metrics, metricFromProblem(report, c.problem, fmt.Sprintf("%s: %s", report.Problem.Summary, diag.Message)))
 		}
-		if report.Rule.RecordingRule != nil {
-			kind = "recording"
-			name = report.Rule.RecordingRule.Record.Value
+
+		if len(metrics) == 0 {
+			metrics = append(metrics, metricFromProblem(report, c.problem, report.Problem.Summary))
 		}
-		metric := prometheus.MustNewConstMetric(
-			c.problem,
-			prometheus.GaugeValue,
-			1,
-			report.Path.Name,
-			kind,
-			name,
-			strings.ToLower(report.Problem.Severity.String()),
-			report.Problem.Reporter,
-			report.Problem.Summary,
-			report.Owner,
-		)
 
 		var out dto.Metric
-		err := metric.Write(&out)
-		if err != nil {
-			slog.Error("Failed to write metric to a buffer", slog.Any("err", err))
-			continue
+		for _, metric := range metrics {
+			// This uses constMetric from client_golang and it never fails.
+			_ = metric.Write(&out)
 		}
 
 		key := out.String()
 		if _, ok := done[key]; !ok {
-			done[key] = metric
+			done[key] = metrics
 			keys = append(keys, key)
 		}
 	}
@@ -426,12 +411,33 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 	slices.Sort(keys)
 	var reported int
 	for _, key := range keys {
-		ch <- done[key]
-		reported++
-		if c.maxProblems > 0 && reported >= c.maxProblems {
-			break
+		for _, metric := range done[key] {
+			ch <- metric
+			reported++
+			if c.maxProblems > 0 && reported >= c.maxProblems {
+				return
+			}
 		}
 	}
+}
+
+func metricFromProblem(report reporter.Report, problem *prometheus.Desc, summary string) prometheus.Metric {
+	name := report.Rule.Name()
+	if name == "" {
+		name = "unknown"
+	}
+	return prometheus.MustNewConstMetric(
+		problem,
+		prometheus.GaugeValue,
+		1,
+		report.Path.Name,
+		string(report.Rule.Type()),
+		name,
+		strings.ToLower(report.Problem.Severity.String()),
+		report.Problem.Reporter,
+		summary,
+		report.Owner,
+	)
 }
 
 type pathFinderFunc func(ctx context.Context) ([]string, error)
