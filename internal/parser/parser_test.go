@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
+	"os"
 	"strconv"
 	"testing"
 	"time"
 
 	"github.com/prometheus/common/model"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cloudflare/pint/internal/comments"
 	"github.com/cloudflare/pint/internal/diags"
@@ -5076,5 +5078,25 @@ groups:
 				return
 			}
 		})
+	}
+}
+
+func BenchmarkParse(b *testing.B) {
+	data, err := os.ReadFile("testrules.yml")
+	require.NoError(b, err)
+
+	p := parser.NewParser(true, parser.PrometheusSchema, model.LegacyValidation)
+	for b.Loop() {
+		b.StopTimer()
+		r := bytes.NewReader(data)
+		b.StartTimer()
+
+		f := p.Parse(r)
+
+		b.StopTimer()
+		require.Len(b, f.Groups, 69)
+		require.NoError(b, f.Error.Err)
+		require.Equal(b, 4669, f.TotalLines)
+		b.StartTimer()
 	}
 }
