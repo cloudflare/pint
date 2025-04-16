@@ -186,7 +186,7 @@ func (fg *FailoverGroup) StartWorkers(reg *prometheus.Registry) {
 		return
 	}
 
-	queryCache := newQueryCache(time.Hour)
+	queryCache := newQueryCache(time.Hour, time.Now)
 	fg.quitChan = make(chan bool)
 	go cacheCleaner(queryCache, time.Minute*2, fg.quitChan)
 

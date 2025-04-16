@@ -13,7 +13,7 @@ import (
 
 func TestQueryCacheOnlySet(t *testing.T) {
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	var i uint64
 	for i = 1; i <= 100; i++ {
@@ -26,7 +26,7 @@ func TestQueryCacheOnlySet(t *testing.T) {
 
 func TestQueryCacheReplace(t *testing.T) {
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	cache.set(6, mockErr, 0)
 	cache.set(6, mockErr, 0)
@@ -38,7 +38,7 @@ func TestQueryCacheReplace(t *testing.T) {
 
 func TestQueryCacheGetAndSet(t *testing.T) {
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	var i uint64
 	for i = 1; i <= 100; i++ {
@@ -72,7 +72,7 @@ func TestQueryCacheGetAndSet(t *testing.T) {
 func TestQueryCachePurgeZeroTTL(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -92,7 +92,7 @@ func TestQueryCachePurgeZeroTTL(t *testing.T) {
 func TestQueryCachePurgeExpired(t *testing.T) {
 	const maxSize = 100
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -115,7 +115,7 @@ func TestQueryCachePurgeExpired(t *testing.T) {
 
 func TestQueryCacheEvictMaxStale(t *testing.T) {
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Second)
+	cache := newQueryCache(time.Second, time.Now)
 
 	var i, j uint64
 	for i = 1; i <= 100; i++ {
@@ -151,7 +151,7 @@ func TestQueryCacheEvictMaxStale(t *testing.T) {
 }
 
 func TestCacheCollector(t *testing.T) {
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	names := []string{
 		"pint_prometheus_cache_size",
@@ -266,7 +266,7 @@ pint_prometheus_cache_size{name="prom"} 110
 
 func BenchmarkQueryCacheOnlySet(b *testing.B) {
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	b.ResetTimer()
 	for b.Loop() {
@@ -277,7 +277,7 @@ func BenchmarkQueryCacheOnlySet(b *testing.B) {
 func BenchmarkQueryCacheSetGrow(b *testing.B) {
 	const maxSize = 1000
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	var i uint64
 	for i = 1; i <= maxSize; i++ {
@@ -291,7 +291,7 @@ func BenchmarkQueryCacheSetGrow(b *testing.B) {
 }
 
 func BenchmarkQueryCacheGetMiss(b *testing.B) {
-	cache := newQueryCache(time.Minute)
+	cache := newQueryCache(time.Minute, time.Now)
 
 	b.ResetTimer()
 	for n := 0; b.Loop(); n++ {
@@ -301,7 +301,10 @@ func BenchmarkQueryCacheGetMiss(b *testing.B) {
 
 func BenchmarkQueryCacheGC(b *testing.B) {
 	mockErr := errors.New("Fake Error")
-	cache := newQueryCache(time.Minute)
+	var now time.Time
+	cache := newQueryCache(time.Minute, func() time.Time {
+		return now
+	})
 
 	var i uint64
 	var ttl time.Duration
@@ -317,14 +320,17 @@ func BenchmarkQueryCacheGC(b *testing.B) {
 		for i = 1; i <= 1000; i++ {
 			cache.set(i, mockErr, ttl)
 		}
-		time.Sleep(time.Millisecond * 2)
+		now = now.Add(time.Millisecond * 2)
 		b.StartTimer()
 		cache.gc()
 	}
 }
 
 func BenchmarkQueryCacheGCNoop(b *testing.B) {
-	cache := newQueryCache(time.Minute)
+	var now time.Time
+	cache := newQueryCache(time.Minute, func() time.Time {
+		return now
+	})
 	mockErr := errors.New("Fake Error")
 	var i uint64
 	for i = 1; i <= 1000; i++ {
