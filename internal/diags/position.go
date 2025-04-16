@@ -86,9 +86,7 @@ func appendPosition(src PositionRanges, line, column int) PositionRanges {
 	})
 }
 
-func NewPositionRange(lines []string, val *yaml.Node, minColumn int) PositionRanges {
-	offsets := make(PositionRanges, 0, 10)
-
+func NewPositionRange(lines []string, val *yaml.Node, minColumn int) (offsets PositionRanges) {
 	if len(val.Value) == 0 {
 		return PositionRanges{
 			{Line: val.Line, FirstColumn: val.Column, LastColumn: val.Column},
