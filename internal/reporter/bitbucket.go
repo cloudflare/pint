@@ -16,7 +16,7 @@ const (
 		"Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server)."
 )
 
-func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, gitCmd git.CommandRunner) BitBucketReporter {
+func NewBitBucketReporter(version, uri string, timeout time.Duration, token, project, repo string, maxComments int, showDuplicates bool, gitCmd git.CommandRunner) BitBucketReporter {
 	slog.Info(
 		"Will report problems to BitBucket",
 		slog.String("uri", uri),
@@ -26,7 +26,7 @@ func NewBitBucketReporter(version, uri string, timeout time.Duration, token, pro
 		slog.Int("maxComments", maxComments),
 	)
 	return BitBucketReporter{
-		api:    newBitBucketAPI(version, uri, timeout, token, project, repo, maxComments),
+		api:    newBitBucketAPI(version, uri, timeout, token, project, repo, maxComments, showDuplicates),
 		gitCmd: gitCmd,
 	}
 }

@@ -14,7 +14,7 @@ Warning: required label is being removed via aggregation (promql/aggregate)
                                                          `job` label is required and should be preserved when aggregating all rules.
 
 Warning: label must be removed in aggregations (promql/aggregate)
-  ---> rules/0001.yml:6 -> `colo_job:foo:irate3m`
+  ---> rules/0001.yml:6 -> `colo_job:foo:irate3m` [+3 duplicates]
 6 |   expr: sum(irate(foo[3m])) WITHOUT (colo_id)
                                 ^^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
@@ -28,13 +28,8 @@ Warning: redundant regexp (promql/regexp)
 5 |   expr: up{job!~"foo"} == 0
                ^^^^^^^^^^ Unnecessary regexp match on static string `job!~"foo"`, use `job!="foo"` instead.
 
-Warning: label must be removed in aggregations (promql/aggregate)
-  ---> rules/0003.yaml:11 -> `colo_job:up:count`
-11 |   expr: sum(foo) without(job)
-                      ^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
-
 Warning: required label is being removed via aggregation (promql/aggregate)
-  ---> rules/0003.yaml:11 -> `colo_job:up:count`
+  ---> rules/0003.yaml:11 -> `colo_job:up:count` [+1 duplicates]
 11 |   expr: sum(foo) without(job)
                       ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
                               `job` label is required and should be preserved when aggregating all rules.
@@ -45,40 +40,12 @@ Fatal: PromQL syntax error (promql/syntax)
                            ^ unexpected right parenthesis ')'
 
 Warning: required label is being removed via aggregation (promql/aggregate)
-  ---> rules/0003.yaml:23-25 -> `colo:multiline`
+  ---> rules/0003.yaml:23-25 -> `colo:multiline` [+1 duplicates]
 23 |     sum(
 24 |       multiline
 25 |     ) without(job, instance)
            ^^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
                    `job` label is required and should be preserved when aggregating all rules.
-
-Warning: label must be removed in aggregations (promql/aggregate)
-  ---> rules/0003.yaml:29-31 -> `colo:multiline:sum`
-29 |     sum(sum) without(job)
-                  ^^^^^^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
-30 |     +
-31 |     sum(sum) without(job)
-
-Warning: required label is being removed via aggregation (promql/aggregate)
-  ---> rules/0003.yaml:29-31 -> `colo:multiline:sum`
-29 |     sum(sum) without(job)
-                  ^^^^^^^ Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
-                          `job` label is required and should be preserved when aggregating all rules.
-30 |     +
-31 |     sum(sum) without(job)
-
-Warning: required label is being removed via aggregation (promql/aggregate)
-  ---> rules/0003.yaml:35-37 -> `colo:multiline2`
-35 |     sum(
-36 |       multiline2
-37 |     ) without(job, instance)
-           ^^^^^^^ Query is using aggregation with `without(job, instance)`, all labels included inside `without(...)` will be removed from the results.
-                   `job` label is required and should be preserved when aggregating all rules.
-
-Warning: label must be removed in aggregations (promql/aggregate)
-  ---> rules/0003.yaml:40 -> `colo_job:up:byinstance`
-40 |   expr: sum(byinstance) by(instance)
-                             ^^ `instance` label should be removed when aggregating `^colo(?:_.+)?:.+$` rules.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
   ---> rules/0003.yaml:40 -> `colo_job:up:byinstance`
@@ -94,6 +61,7 @@ Information: use humanize filters for the results (alerts/template)
 61 |     summary: 'error rate: {{ $value }}'
                                   ^^^^^^^ Use one of humanize template functions to make the result more readable.
 
+level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=14 duplicates=5 shown=9
 level=INFO msg="Problems found" Fatal=1 Warning=12 Information=1
 level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
 -- rules/0001.yml --

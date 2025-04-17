@@ -23,4 +23,4 @@ Warning: redundant regexp (promql/regexp)
                    ^^^^^^^^^^ Unnecessary regexp match on static string `job=~"xxx"`, use `job="xxx"` instead.
 
 level=INFO msg="Problems found" Warning=2
-level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Warning or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Warning or higher"

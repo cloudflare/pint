@@ -21,15 +21,16 @@ var reviewBody = "### This pull request was validated by [pint](https://github.c
 type GithubReporter struct {
 	headCommit string
 
-	client      *github.Client
-	version     string
-	baseURL     string
-	uploadURL   string
-	owner       string
-	repo        string
-	timeout     time.Duration
-	prNum       int
-	maxComments int
+	client         *github.Client
+	version        string
+	baseURL        string
+	uploadURL      string
+	owner          string
+	repo           string
+	timeout        time.Duration
+	prNum          int
+	maxComments    int
+	showDuplicates bool
 }
 
 type ghCommentMeta struct {
@@ -55,7 +56,15 @@ func (pr ghPR) getFile(path string) *github.CommitFile {
 
 // NewGithubReporter creates a new GitHub reporter that reports
 // problems via comments on a given pull request number (integer).
-func NewGithubReporter(ctx context.Context, version, baseURL, uploadURL string, timeout time.Duration, token, owner, repo string, prNum, maxComments int, headCommit string) (_ GithubReporter, err error) {
+func NewGithubReporter(
+	ctx context.Context,
+	version, baseURL, uploadURL string,
+	timeout time.Duration,
+	token, owner, repo string,
+	prNum, maxComments int,
+	headCommit string,
+	showDuplicates bool,
+) (_ GithubReporter, err error) {
 	slog.Info(
 		"Will report problems to GitHub",
 		slog.String("baseURL", baseURL),
@@ -74,16 +83,17 @@ func NewGithubReporter(ctx context.Context, version, baseURL, uploadURL string, 
 	tc := oauth2.NewClient(ctx, ts)
 
 	gr := GithubReporter{
-		client:      github.NewClient(tc),
-		version:     version,
-		baseURL:     baseURL,
-		uploadURL:   uploadURL,
-		timeout:     timeout,
-		owner:       owner,
-		repo:        repo,
-		prNum:       prNum,
-		maxComments: maxComments,
-		headCommit:  headCommit,
+		client:         github.NewClient(tc),
+		version:        version,
+		baseURL:        baseURL,
+		uploadURL:      uploadURL,
+		timeout:        timeout,
+		owner:          owner,
+		repo:           repo,
+		prNum:          prNum,
+		maxComments:    maxComments,
+		headCommit:     headCommit,
+		showDuplicates: showDuplicates,
 	}
 
 	if gr.uploadURL != "" && gr.baseURL != "" {
@@ -259,7 +269,7 @@ func (gr GithubReporter) updateReview(ctx context.Context, review *github.PullRe
 		gr.repo,
 		gr.prNum,
 		review.GetID(),
-		formatGHReviewBody(gr.version, summary),
+		formatGHReviewBody(gr.version, summary, gr.showDuplicates),
 	)
 	return err
 }
@@ -272,7 +282,7 @@ func (gr GithubReporter) createReview(ctx context.Context, summary Summary) erro
 
 	review := github.PullRequestReviewRequest{
 		CommitID: github.Ptr(gr.headCommit),
-		Body:     github.Ptr(formatGHReviewBody(gr.version, summary)),
+		Body:     github.Ptr(formatGHReviewBody(gr.version, summary, gr.showDuplicates)),
 		Event:    github.Ptr("COMMENT"),
 	}
 	slog.Debug("Creating a review",
@@ -305,7 +315,7 @@ func (gr GithubReporter) listPRFiles(ctx context.Context) ([]*github.CommitFile,
 	return files, nil
 }
 
-func formatGHReviewBody(version string, summary Summary) string {
+func formatGHReviewBody(version string, summary Summary, showDuplicates bool) string {
 	var b strings.Builder
 
 	b.WriteString(reviewBody)
@@ -366,7 +376,7 @@ func formatGHReviewBody(version string, summary Summary) string {
 	b.WriteString("<details><summary>Problems</summary>\n<p>\n\n")
 	if len(summary.Reports()) > 0 {
 		buf := bytes.NewBuffer(nil)
-		cr := NewConsoleReporter(buf, checks.Information, true)
+		cr := NewConsoleReporter(buf, checks.Information, true, showDuplicates)
 		err := cr.Submit(summary)
 		if err != nil {
 			b.WriteString(fmt.Sprintf("Failed to generate list of problems: %s", err))

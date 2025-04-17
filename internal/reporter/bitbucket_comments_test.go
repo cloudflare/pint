@@ -17,11 +17,12 @@ import (
 
 func TestBitBucketMakeComments(t *testing.T) {
 	type testCaseT struct {
-		changes     *bitBucketPRChanges
-		description string
-		comments    []BitBucketPendingComment
-		summary     Summary
-		maxComments int
+		changes        *bitBucketPRChanges
+		description    string
+		comments       []BitBucketPendingComment
+		summary        Summary
+		maxComments    int
+		showDuplicates bool
 	}
 
 	commentBody := func(icon, severity, reporter, text string) string {
@@ -620,6 +621,7 @@ func TestBitBucketMakeComments(t *testing.T) {
 				"proj",
 				"repo",
 				tc.maxComments,
+				tc.showDuplicates,
 				nil,
 			)
 			comments := r.api.limitComments(r.api.makeComments(tc.summary, tc.changes))

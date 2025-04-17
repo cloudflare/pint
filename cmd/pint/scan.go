@@ -174,6 +174,8 @@ func scanWorker(ctx context.Context, jobs <-chan scanJob, results chan<- reporte
 					Rule:          job.entry.Rule,
 					Problem:       problem,
 					Owner:         job.entry.Owner,
+					IsDuplicate:   false, // unused
+					Duplicates:    nil,
 				}
 			}
 		}

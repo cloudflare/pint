@@ -31,13 +31,14 @@ func TestGitHubReporter(t *testing.T) {
 
 		description string
 
-		owner       string
-		repo        string
-		token       string
-		summary     reporter.Summary
-		prNum       int
-		maxComments int
-		timeout     time.Duration
+		owner          string
+		repo           string
+		token          string
+		summary        reporter.Summary
+		prNum          int
+		maxComments    int
+		timeout        time.Duration
+		showDuplicates bool
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -939,6 +940,235 @@ Below is the list of checks that were disabled for each Prometheus server define
 			}),
 			summary: summaryWithDetails,
 		},
+		{
+			description:    "show duplicates",
+			owner:          "foo",
+			repo:           "bar",
+			token:          "something",
+			prNum:          123,
+			maxComments:    50,
+			showDuplicates: true,
+			timeout:        time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,5 +1,4 @@\n - record: target is down\n   expr: up == 0\n-  labels: {}\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					switch b {
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":3,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":4,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":5,"side":"RIGHT","commit_id":"HEAD"}`:
+					default:
+						t.Errorf("Unexpected comment: %s", b)
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: "different",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Warning,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Bug,
+					},
+				},
+			}),
+		},
+		{
+			description: "hide duplicates",
+			owner:       "foo",
+			repo:        "bar",
+			token:       "something",
+			prNum:       123,
+			maxComments: 50,
+			timeout:     time.Second,
+			httpHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/reviews" {
+					_, _ = w.Write([]byte(`[{"id":1,"body":"### This pull request was validated by [pint](https://github.com/cloudflare/pint).\nxxxx"}]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					_, _ = w.Write([]byte(`[]`))
+					return
+				}
+				if r.Method == http.MethodGet && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/files" {
+					w.WriteHeader(http.StatusOK)
+					_, _ = w.Write([]byte(`[{"filename":"foo.txt", "patch": "@@ -1,5 +1,4 @@\n - record: target is down\n   expr: up == 0\n-  labels: {}\n - record: sum errors\n   expr: sum(errors) by (job)"}]`))
+					return
+				}
+				if r.Method == http.MethodPost && r.URL.Path == "/api/v3/repos/foo/bar/pulls/123/comments" {
+					body, _ := io.ReadAll(r.Body)
+					b := strings.TrimSpace(strings.TrimRight(string(body), "\n\t\r"))
+					switch b {
+					case `{"body":":stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **mock** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\nThe same issue was reported 2 more time(s), duplicates where suppressed.\n\n<details>\n<summary>Show affected rules</summary>\n\n- ` + "`sum errors` at `foo.txt:4`" + `\n` + "- `sum errors` at `foo.txt:5`" + `\n\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/mock.html).\n","path":"foo.txt","line":2,"side":"RIGHT","commit_id":"HEAD"}`:
+					case `{"body":":warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **different** check.\n\n------\n\nsyntax error\n\n<details>\n<summary>More information</summary>\nsyntax details\n</details>\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/different.html).\n","path":"foo.txt","line":3,"side":"RIGHT","commit_id":"HEAD"}`:
+					default:
+						t.Errorf("Unexpected comment: %s", b)
+					}
+				}
+				_, _ = w.Write([]byte(""))
+			}),
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 2,
+							Last:  2,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 4,
+							Last:  4,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Bug,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 3,
+							Last:  3,
+						},
+						Reporter: "different",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Warning,
+					},
+				},
+				{
+					Path: discovery.Path{
+						Name:          "foo.txt",
+						SymlinkTarget: "foo.txt",
+					},
+
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[1],
+					Problem: checks.Problem{
+						Lines: diags.LineRange{
+							First: 5,
+							Last:  5,
+						},
+						Reporter: "mock",
+						Summary:  "syntax error",
+						Details:  "syntax details",
+						Severity: checks.Bug,
+					},
+				},
+			}),
+		},
 	} {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
@@ -978,10 +1208,13 @@ Below is the list of checks that were disabled for each Prometheus server define
 				tc.prNum,
 				tc.maxComments,
 				"HEAD",
+				tc.showDuplicates,
 			)
 			require.NoError(t, err)
+			tc.summary.SortReports()
+			tc.summary.Dedup()
 
-			err = reporter.Submit(t.Context(), tc.summary, r)
+			err = reporter.Submit(t.Context(), tc.summary, r, tc.showDuplicates)
 			if tc.error == nil {
 				require.NoError(t, err)
 			} else {

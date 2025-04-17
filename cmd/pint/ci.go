@@ -141,7 +141,10 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	if c.Bool(teamCityFlag) {
 		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, checks.Information, c.Bool(noColorFlag)))
+		reps = append(
+			reps,
+			reporter.NewConsoleReporter(os.Stderr, checks.Information, c.Bool(noColorFlag), c.Bool(showDupsFlag)),
+		)
 	}
 	if c.String(checkStyleFlag) != "" {
 		var f *os.File
@@ -177,6 +180,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			meta.cfg.Repository.BitBucket.Project,
 			meta.cfg.Repository.BitBucket.Repository,
 			meta.cfg.Repository.BitBucket.MaxComments,
+			c.Bool(showDupsFlag),
 			git.RunGit,
 		)
 		reps = append(reps, br)
@@ -201,7 +205,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 		); err != nil {
 			return err
 		}
-		reps = append(reps, reporter.NewCommentReporter(gl))
+		reps = append(reps, reporter.NewCommentReporter(gl, c.Bool(showDupsFlag)))
 	}
 
 	meta.cfg.Repository = detectRepository(meta.cfg.Repository)
@@ -241,10 +245,11 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 			prNum,
 			meta.cfg.Repository.GitHub.MaxComments,
 			headCommit,
+			c.Bool(showDupsFlag),
 		); err != nil {
 			return err
 		}
-		reps = append(reps, reporter.NewCommentReporter(gr))
+		reps = append(reps, reporter.NewCommentReporter(gr, c.Bool(showDupsFlag)))
 	}
 
 	minSeverity, err := checks.ParseSeverity(c.String(failOnFlag))
@@ -265,6 +270,7 @@ func actionCI(ctx context.Context, c *cli.Command) error {
 	}
 
 	summary.SortReports()
+	summary.Dedup()
 	for _, rep := range reps {
 		err = rep.Submit(summary)
 		if err != nil {

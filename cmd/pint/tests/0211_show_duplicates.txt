@@ -1,0 +1,78 @@
+exec pint --no-color --show-duplicates lint rules
+! stdout .
+cmp stderr stderr.txt
+
+-- stderr.txt --
+level=INFO msg="Loading configuration file" path=.pint.hcl
+level=INFO msg="Finding all rules to check" paths=["rules"]
+level=INFO msg="Checking Prometheus rules" entries=9 workers=10 online=true
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:5 -> `events:a`
+5 |     expr: events_total{instance="a", job=~"foo.+"}
+                                         ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:7 -> `events:b`
+7 |     expr: events_total{instance="b", job=~"foo.+"}
+                                         ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:9 -> `events:c`
+9 |     expr: events_total{instance="c", job=~"foo.+"}
+                                         ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:11 -> `events:d`
+11 |     expr: events_total{instance="d", job=~"foo.+"}
+                                          ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:13 -> `events:e`
+13 |     expr: events_total{instance="e", job=~"foo.+"}
+                                          ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:15 -> `events:f`
+15 |     expr: events_total{instance="f", job=~"foo.+"}
+                                          ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:17 -> `events:g`
+17 |     expr: events_total{instance="g", job=~"foo.+"}
+                                          ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:19 -> `events:h`
+19 |     expr: events_total{instance="h", job=~"foo.+"}
+                                          ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+Warning: smelly regexp selector (promql/regexp)
+  ---> rules/1.yaml:21 -> `events:i`
+21 |     expr: events_total{instance="i", job=~"foo.+"}
+                                          ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector that tries to extract substrings from the value, please consider breaking down the value of this label into multiple smaller labels
+
+level=INFO msg="Problems found" Warning=9
+-- .pint.hcl --
+
+-- rules/1.yaml --
+groups:
+- name: foo
+  rules:
+  - record: events:a
+    expr: events_total{instance="a", job=~"foo.+"}
+  - record: events:b
+    expr: events_total{instance="b", job=~"foo.+"}
+  - record: events:c
+    expr: events_total{instance="c", job=~"foo.+"}
+  - record: events:d
+    expr: events_total{instance="d", job=~"foo.+"}
+  - record: events:e
+    expr: events_total{instance="e", job=~"foo.+"}
+  - record: events:f
+    expr: events_total{instance="f", job=~"foo.+"}
+  - record: events:g
+    expr: events_total{instance="g", job=~"foo.+"}
+  - record: events:h
+    expr: events_total{instance="h", job=~"foo.+"}
+  - record: events:i
+    expr: events_total{instance="i", job=~"foo.+"}

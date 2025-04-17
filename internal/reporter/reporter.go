@@ -15,8 +15,10 @@ type Report struct {
 	Path          discovery.Path
 	Owner         string
 	ModifiedLines []int
+	Duplicates    []*Report
 	Rule          parser.Rule
 	Problem       checks.Problem
+	IsDuplicate   bool
 }
 
 func (r Report) isEqual(nr Report) bool {
@@ -48,6 +50,22 @@ func (r Report) isEqual(nr Report) bool {
 		return false
 	}
 	if nr.Problem.Severity != r.Problem.Severity {
+		return false
+	}
+	return true
+}
+
+func (r Report) isSameIssue(nr Report) bool {
+	if nr.Problem.Reporter != r.Problem.Reporter {
+		return false
+	}
+	if nr.Problem.Summary != r.Problem.Summary {
+		return false
+	}
+	if nr.Problem.Severity != r.Problem.Severity {
+		return false
+	}
+	if !isSameDiagnosticsMessage(r.Problem.Diagnostics, nr.Problem.Diagnostics) {
 		return false
 	}
 	return true
@@ -148,6 +166,29 @@ func (s *Summary) SortReports() {
 	})
 }
 
+func (s *Summary) Dedup() {
+	for i := range s.reports {
+		if s.reports[i].IsDuplicate {
+			continue
+		}
+		for j := range s.reports {
+			if i == j {
+				continue
+			}
+			if s.reports[j].IsDuplicate {
+				continue
+			}
+			if len(s.reports[j].Duplicates) > 0 {
+				continue
+			}
+			if s.reports[i].isSameIssue(s.reports[j]) {
+				s.reports[j].IsDuplicate = true
+				s.reports[i].Duplicates = append(s.reports[i].Duplicates, &s.reports[j])
+			}
+		}
+	}
+}
+
 func (s Summary) Reports() (reports []Report) {
 	return s.reports
 }
@@ -221,6 +262,28 @@ func isSameDiagnostics(sa, sb []diags.Diagnostic) bool {
 		ok = false
 		for _, b := range sb {
 			if a.FirstColumn == b.FirstColumn && a.LastColumn == b.LastColumn && a.Message == b.Message {
+				ok = true
+				break
+			}
+		}
+		if !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+func isSameDiagnosticsMessage(sa, sb []diags.Diagnostic) bool {
+	if len(sa) != len(sb) {
+		return false
+	}
+
+	var ok bool
+	for _, a := range sa {
+		ok = false
+		for _, b := range sb {
+			if a.Message == b.Message {
 				ok = true
 				break
 			}

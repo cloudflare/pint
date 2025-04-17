@@ -27,7 +27,7 @@ cmp stderr stderr.txt
 
 -- stderr.txt --
 Bug: missing owner (rule/owner)
-  ---> rules.yml:4-5 -> `rule1`
+  ---> rules.yml:4-5 -> `rule1` [+1 duplicates]
 5 |       expr: sum(foo) by(job)
                 ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
@@ -35,11 +35,6 @@ Warning: always firing alert (alerts/comparison)
   ---> rules.yml:5 -> `rule1`
 5 |       expr: sum(foo) by(job)
                     ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:6-7 -> `rule2`
-7 |       expr: sum(foo) by(job) > 0
-                ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 level=ERROR msg="Execution completed with error(s)" err="problems found"
 -- src/v1.yml --

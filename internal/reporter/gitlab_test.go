@@ -50,10 +50,11 @@ func TestGitLabReporter(t *testing.T) {
 		branch      string
 		token       string
 
-		summary     reporter.Summary
-		timeout     time.Duration
-		project     int
-		maxComments int
+		summary        reporter.Summary
+		timeout        time.Duration
+		project        int
+		maxComments    int
+		showDuplicates bool
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -702,7 +703,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 				tc.maxComments,
 			)
 			if err == nil {
-				err = reporter.Submit(t.Context(), tc.summary, r)
+				err = reporter.Submit(t.Context(), tc.summary, r, tc.showDuplicates)
 				require.NoError(t, tc.errorHandler(err))
 			}
 			require.NoError(t, tc.errorHandler(err))
@@ -717,6 +718,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 		expectedNewLine int
 		expectedOldLine int
 		anchor          checks.Anchor
+		showDuplicates  bool
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -842,7 +844,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 						},
 					},
 				})
-				err = reporter.Submit(t.Context(), summary, r)
+				err = reporter.Submit(t.Context(), summary, r, tc.showDuplicates)
 			}
 			require.NoError(t, errorHandler(err))
 		})

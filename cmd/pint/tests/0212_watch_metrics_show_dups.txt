@@ -1,11 +1,11 @@
 exec bash -x ./test.sh &
 
-exec pint watch --listen=127.0.0.1:6042 --pidfile=pint.pid glob rules
+exec pint --show-duplicates watch --listen=127.0.0.1:6212 --pidfile=pint.pid glob rules
 cmp curl.txt metrics.txt
 
 -- test.sh --
 sleep 3
-curl -s http://127.0.0.1:6042/metrics | grep -vE 'process_|go_info' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
+curl -s http://127.0.0.1:6212/metrics | grep -vE 'process_|go_info' | perl -pe "s/^([a-zA-Z].+)[ ]([0-9\.\-\+eE]+)$/\1/g" > curl.txt
 cat pint.pid | xargs kill
 
 -- rules/unknown.yml --
@@ -183,6 +183,9 @@ pint_last_run_time_seconds
 # TYPE pint_problem gauge
 pint_problem{filename="rules/alice.yml",kind="alerting",name="broken",owner="alice",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 pint_problem{filename="rules/badyaml.yml",kind="invalid",name="unknown",owner="",problem="top level field must be a groups key, got list",reporter="yaml/parse",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken1",owner="bob",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/bob.yml",kind="alerting",name="broken2",owner="bob",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
+pint_problem{filename="rules/unknown.yml",kind="recording",name="broken",owner="",problem="PromQL syntax error: no arguments for aggregate expression provided",reporter="promql/syntax",severity="fatal"}
 # HELP pint_problems Total number of problems reported by pint
 # TYPE pint_problems gauge
 pint_problems

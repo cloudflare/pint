@@ -7,22 +7,13 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=5 workers=10 online=true
 Bug: missing owner (rule/owner)
-  ---> rules/1.yml:4-5 -> `No Owner`
+  ---> rules/1.yml:4-5 -> `No Owner` [+2 duplicates]
 5 |     expr: up > 0
               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
-Bug: missing owner (rule/owner)
-  ---> rules/1.yml:9-10 -> `No Owner`
-10 |     expr: up > 0
-               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
-Bug: missing owner (rule/owner)
-  ---> rules/3.yml:1-2 -> `No Owner`
-2 |   expr: up{job="foo"} == 0
-            ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
+level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=3 duplicates=2 shown=1
 level=INFO msg="Problems found" Bug=3
-level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 3 problem(s) with severity Bug or higher"
 -- rules/1.yml --
 groups:
 - name: foo
