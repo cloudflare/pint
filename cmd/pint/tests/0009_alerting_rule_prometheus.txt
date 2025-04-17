@@ -7,13 +7,8 @@ level=INFO msg="Loading configuration file" path=.pint.hcl
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=2 workers=10 online=true
 Bug: required annotation not set (alerts/annotation)
-  ---> rules/0001.yml:6-13 -> `InstanceDown`
+  ---> rules/0001.yml:6-13 -> `InstanceDown` [+1 duplicates]
 13 |       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
-           ^^^ `link` annotation is required.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules/0001.yml:16-21 -> `APIHighRequestLatency`
-21 |       description: "{{ $labels.instance }} has a median request latency above 1s (current value: {{ $value }}s)"
            ^^^ `link` annotation is required.
 
 Warning: required label is being removed via aggregation (promql/aggregate)
@@ -22,8 +17,9 @@ Warning: required label is being removed via aggregation (promql/aggregate)
                    ^^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                        `job` label is required and should be preserved when aggregating all rules.
 
+level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=3 duplicates=1 shown=2
 level=INFO msg="Problems found" Bug=2 Warning=1
-level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 2 problem(s) with severity Bug or higher"
 -- rules/0001.yml --
 groups:
 - name: example

@@ -141,32 +141,32 @@ rule {
 
 -- stderr.txt --
 Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:4-5 -> `syntax error`
+  ---> rules.yml:4-5 -> `syntax error` [+6 duplicates]
 5 |     expr: sum(foo) bar
               ^^^ `link` annotation is required.
 
 Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:4-5 -> `syntax error`
+  ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
               ^^^ `summary` annotation is required.
 
 Bug: required label not set (rule/label)
-  ---> rules.yml:4-5 -> `syntax error`
+  ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
               ^^^ `component` label is required.
 
 Bug: required label not set (rule/label)
-  ---> rules.yml:4-5 -> `syntax error`
+  ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
               ^^^ `notify` label is required.
 
 Bug: required label not set (rule/label)
-  ---> rules.yml:4-5 -> `syntax error`
+  ---> rules.yml:4-5 -> `syntax error` [+4 duplicates]
 5 |     expr: sum(foo) bar
               ^^^ `priority` label is required.
 
 Bug: missing owner (rule/owner)
-  ---> rules.yml:4-5 -> `syntax error`
+  ---> rules.yml:4-5 -> `syntax error` [+8 duplicates]
 5 |     expr: sum(foo) bar
               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
@@ -175,85 +175,15 @@ Fatal: PromQL syntax error (promql/syntax)
 5 |     expr: sum(foo) bar
                        ^^^ unexpected identifier "bar"
 
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:7-8 -> `missing required fields`
-8 |     expr: no_such_metric{job="fake"}
-              ^^^ `link` annotation is required.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:7-8 -> `missing required fields`
-8 |     expr: no_such_metric{job="fake"}
-              ^^^ `summary` annotation is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:7-8 -> `missing required fields`
-8 |     expr: no_such_metric{job="fake"}
-              ^^^ `component` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:7-8 -> `missing required fields`
-8 |     expr: no_such_metric{job="fake"}
-              ^^^ `notify` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:7-8 -> `missing required fields`
-8 |     expr: no_such_metric{job="fake"}
-              ^^^ `priority` label is required.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:7-8 -> `missing required fields`
-8 |     expr: no_such_metric{job="fake"}
-              ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
 Warning: always firing alert (alerts/comparison)
-  ---> rules.yml:8 -> `missing required fields`
+  ---> rules.yml:8 -> `missing required fields` [+3 duplicates]
 8 |     expr: no_such_metric{job="fake"}
               ^^^^^^^^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:10-11 -> `vector_matching`
-11 |     expr: up{job="prometheus"} / prometheus_build_info{job="prometheus"}
-               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:13-17 -> `count`
-17 |       notify: blackhole
-           ^^^ `link` annotation is required.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:13-17 -> `count`
-17 |       notify: blackhole
-           ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:19-23 -> `for_and_rate`
-23 |       notify: blackhole
-           ^^^ `link` annotation is required.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:19-23 -> `for_and_rate`
-23 |       notify: blackhole
-           ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
-Warning: always firing alert (alerts/comparison)
-  ---> rules.yml:20 -> `for_and_rate`
-20 |     expr: rate(no_such_metric[10s])
-                    ^^^^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 Information: redundant field with default value (alerts/for)
   ---> rules.yml:21 -> `for_and_rate`
 21 |     for: 0m
               ^^ `0m` is the default value of `for`, this line is unnecessary.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:25-30 -> `template`
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-           ^^^ `link` annotation is required.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:25-30 -> `template`
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-           ^^^ `summary` annotation is required.
 
 Bug: template uses non-existent label (alerts/template)
   ---> rules.yml:25-30 -> `template`
@@ -263,70 +193,10 @@ Bug: template uses non-existent label (alerts/template)
 30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
                                        ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
 
-Bug: required label not set (rule/label)
-  ---> rules.yml:25-30 -> `template`
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-           ^^^ `component` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:25-30 -> `template`
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-           ^^^ `notify` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:25-30 -> `template`
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-           ^^^ `priority` label is required.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:25-30 -> `template`
-30 |       instance: 'sum on {{ $labels.instance }} is {{ $value }}'
-           ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
 Bug: value used in labels (alerts/template)
   ---> rules.yml:28 -> `template`
 28 |       value: '{{ $value }}'
                    ^^^^^^^^^^^^ Using `$value` in labels will generate a new alert on every value change, move it to annotations.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:32-33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^ `link` annotation is required.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:32-33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^ `summary` annotation is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:32-33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^ `component` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:32-33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^ `notify` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:32-33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^ `priority` label is required.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:32-33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
-Warning: always firing alert (alerts/comparison)
-  ---> rules.yml:33 -> `fragile`
-33 |     expr: errors / sum(requests) without(rack)
-               ^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:35-36 -> `regexp`
-36 |     expr: sum(no_such_metric{job=~"fake"})
-               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
 
 Warning: redundant regexp (promql/regexp)
   ---> rules.yml:36 -> `regexp`
@@ -338,40 +208,5 @@ Bug: required label is being removed via aggregation (promql/aggregate)
 36 |     expr: sum(no_such_metric{job=~"fake"})
                ^^^ Query is using aggregation that removes all labels.
                    `job` label is required and should be preserved when aggregating all rules.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:38-39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^ `link` annotation is required.
-
-Bug: required annotation not set (alerts/annotation)
-  ---> rules.yml:38-39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^ `summary` annotation is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:38-39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^ `component` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:38-39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^ `notify` label is required.
-
-Bug: required label not set (rule/label)
-  ---> rules.yml:38-39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^ `priority` label is required.
-
-Bug: missing owner (rule/owner)
-  ---> rules.yml:38-39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^ `rule/owner` comments are required in all files, please add a `# pint file/owner $owner` somewhere in this file and/or `# pint rule/owner $owner` on top of each rule.
-
-Warning: always firing alert (alerts/comparison)
-  ---> rules.yml:39 -> `dups`
-39 |     expr: errors / sum(requests) without(rack)
-               ^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
 level=ERROR msg="Execution completed with error(s)" err="submitting reports: fatal error(s) reported"

@@ -6,37 +6,23 @@ cmp stderr stderr.txt
 level=INFO msg="Finding all rules to check" paths=["rules.yml"]
 level=INFO msg="Checking Prometheus rules" entries=6 workers=10 online=true
 Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
-  ---> rules.yml:4
+  ---> rules.yml:4 [+1 duplicates]
  4 |       - record:
      ^^^ This rule is not a valid Prometheus rule: `record value cannot be empty`.
 
-Fatal: This rule is not a valid Prometheus rule: `record value cannot be empty`. (yaml/parse)
-  ---> rules.yml:6
- 6 |       - record:
-     ^^^ This rule is not a valid Prometheus rule: `record value cannot be empty`.
-
 Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
-  ---> rules.yml:9
+  ---> rules.yml:9 [+1 duplicates]
  9 |         expr:
      ^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
 
 Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
-  ---> rules.yml:10
+  ---> rules.yml:10 [+1 duplicates]
  10 |       - alert:
       ^^^ This rule is not a valid Prometheus rule: `alert value cannot be empty`.
 
-Fatal: This rule is not a valid Prometheus rule: `alert value cannot be empty`. (yaml/parse)
-  ---> rules.yml:12
- 12 |       - alert:
-      ^^^ This rule is not a valid Prometheus rule: `alert value cannot be empty`.
-
-Fatal: This rule is not a valid Prometheus rule: `expr value cannot be empty`. (yaml/parse)
-  ---> rules.yml:15
- 15 |         expr:
-      ^^^ This rule is not a valid Prometheus rule: `expr value cannot be empty`.
-
+level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=6 duplicates=3 shown=3
 level=INFO msg="Problems found" Fatal=6
-level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 6 problem(s) with severity Bug or higher"
 -- rules.yml --
 groups:
   - name: rules

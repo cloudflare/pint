@@ -154,10 +154,11 @@ bar warning
 	}
 
 	type testCaseT struct {
-		commenter   Commenter
-		checkErr    func(t *testing.T, err error)
-		description string
-		reports     []Report
+		commenter      Commenter
+		checkErr       func(t *testing.T, err error)
+		description    string
+		reports        []Report
+		showDuplicates bool
 	}
 
 	testCases := []testCaseT{
@@ -755,7 +756,7 @@ foo details
 			slog.SetDefault(slogt.New(t))
 
 			summary := NewSummary(tc.reports)
-			tc.checkErr(t, Submit(t.Context(), summary, tc.commenter))
+			tc.checkErr(t, Submit(t.Context(), summary, tc.commenter, tc.showDuplicates))
 		})
 	}
 }
@@ -771,10 +772,11 @@ func TestCommentsCommonPaths(t *testing.T) {
 		branch      string
 		token       string
 
-		reports     []Report
-		timeout     time.Duration
-		project     int
-		maxComments int
+		reports        []Report
+		timeout        time.Duration
+		project        int
+		maxComments    int
+		showDuplicates bool
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -910,6 +912,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 					123,
 					tc.maxComments,
 					"fake-commit-id",
+					false,
 				)
 				require.NoError(t, err, "can't create gitlab reporter")
 				return r
@@ -922,7 +925,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 				defer srv.Close()
 
 				summary := NewSummary(tc.reports)
-				err := Submit(t.Context(), summary, c(srv.URL))
+				err := Submit(t.Context(), summary, c(srv.URL), tc.showDuplicates)
 				require.NoError(t, tc.errorHandler(err))
 			})
 		}

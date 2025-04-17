@@ -158,7 +158,7 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(meta.cfg, f, minSeverity, int(c.Int(maxProblemsFlag)))
+	collector := newProblemCollector(meta.cfg, f, minSeverity, int(c.Int(maxProblemsFlag)), c.Bool(showDupsFlag))
 	// register all metrics
 	metricsRegistry.MustRegister(collector)
 	metricsRegistry.MustRegister(checkDuration)
@@ -282,9 +282,10 @@ type problemCollector struct {
 	minSeverity      checks.Severity
 	maxProblems      int
 	lock             sync.Mutex
+	showDuplicates   bool
 }
 
-func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks.Severity, maxProblems int) *problemCollector {
+func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks.Severity, maxProblems int, showDuplicates bool) *problemCollector {
 	return &problemCollector{ // nolint: exhaustruct
 		finder:     f,
 		cfg:        cfg,
@@ -307,8 +308,9 @@ func newProblemCollector(cfg config.Config, f pathFinderFunc, minSeverity checks
 			[]string{"filename", "owner"},
 			prometheus.Labels{},
 		),
-		minSeverity: minSeverity,
-		maxProblems: maxProblems,
+		minSeverity:    minSeverity,
+		maxProblems:    maxProblems,
+		showDuplicates: showDuplicates,
 	}
 }
 
@@ -341,6 +343,9 @@ func (c *problemCollector) scan(ctx context.Context, workers int, isOffline bool
 
 	c.lock.Lock()
 	defer c.lock.Unlock()
+
+	s.SortReports()
+	s.Dedup()
 
 	c.summary = &s
 
@@ -381,6 +386,9 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 				slog.String("severity", report.Problem.Severity.String()),
 				slog.String("minimum", c.minSeverity.String()),
 			)
+			continue
+		}
+		if report.IsDuplicate && !c.showDuplicates {
 			continue
 		}
 

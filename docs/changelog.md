@@ -1,5 +1,53 @@
 # Changelog
 
+## v0.73.0
+
+### Changed
+
+- When pint finds the exact same problem generating multiple problem reports it will now hide duplicated reports.
+  There is a new flag `pint --show-duplicates ...` that you can use to show all instances of each problem.
+  For example if we have three different rules with the same smelly selector:
+
+  ```yaml
+  groups:
+  - name: foo
+    rules:
+    - record: events:a
+      expr: events_total{instance="a", job=~"foo.+"}
+    - record: events:b
+      expr: events_total{instance="b", job=~"foo.+"}
+    - record: events:c
+      expr: events_total{instance="c", job=~"foo.+"}
+  ```
+
+  Previous versions of pint would print each problem:
+
+  ```yaml
+  Warning: smelly regexp selector (promql/regexp)
+    ---> rules/1.yaml:5 -> `events:a`
+  5 |     expr: events_total{instance="a", job=~"foo.+"}
+                                           ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector ...
+  
+  Warning: smelly regexp selector (promql/regexp)
+    ---> rules/1.yaml:7 -> `events:b`
+  7 |     expr: events_total{instance="b", job=~"foo.+"}
+                                           ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector ...
+  
+  Warning: smelly regexp selector (promql/regexp)
+    ---> rules/1.yaml:9 -> `events:c`
+  9 |     expr: events_total{instance="c", job=~"foo.+"}
+                                           ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector ...
+  ```
+  
+  This release of pint will (by default) show it only once:
+
+  ```yaml
+  Warning: smelly regexp selector (promql/regexp)
+    ---> rules/1.yaml:5 -> `events:a` [+2 duplicates]
+  5 |     expr: events_total{instance="a", job=~"foo.+"}
+                                           ^^^^^^^^^^^^ `{job=~"foo.+"}` looks like a smelly selector ...
+  ```
+
 ## v0.72.1
 
 ### Fixed

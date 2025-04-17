@@ -4,6 +4,7 @@ import (
 	"context"
 	"log/slog"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -37,23 +38,27 @@ type Commenter interface {
 	IsEqual(any, ExistingComment, PendingComment) bool
 }
 
-func NewCommentReporter(c Commenter) CommentReporter {
-	return CommentReporter{c: c}
+func NewCommentReporter(c Commenter, showDuplicates bool) CommentReporter {
+	return CommentReporter{
+		c:              c,
+		showDuplicates: showDuplicates,
+	}
 }
 
 type CommentReporter struct {
-	c Commenter
+	c              Commenter
+	showDuplicates bool
 }
 
 func (cr CommentReporter) Submit(summary Summary) (err error) {
-	return Submit(context.Background(), summary, cr.c)
+	return Submit(context.Background(), summary, cr.c, cr.showDuplicates)
 }
 
-func makeComments(summary Summary) (comments []PendingComment) {
+func makeComments(summary Summary, showDuplicates bool) (comments []PendingComment) {
 	var buf strings.Builder
 	var content string
 	var err error
-	for _, reports := range dedupReports(summary.reports) {
+	for _, reports := range dedupReports(summary.reports, showDuplicates) {
 		if reports[0].Problem.Anchor == checks.AnchorAfter {
 			content, err = readFile(reports[0].Path.Name)
 			if err != nil {
@@ -117,6 +122,24 @@ func makeComments(summary Summary) (comments []PendingComment) {
 				buf.WriteString("`.\n\n")
 			}
 		}
+		if !showDuplicates && len(reports[0].Duplicates) > 0 {
+			buf.WriteString("------\n\n")
+			buf.WriteString("The same issue was reported ")
+			buf.WriteString(strconv.Itoa(len(reports[0].Duplicates)))
+			buf.WriteString(" more time(s), duplicates where suppressed.\n\n")
+			buf.WriteString("<details>\n")
+			buf.WriteString("<summary>Show affected rules</summary>\n\n")
+			for _, dup := range reports[0].Duplicates {
+				buf.WriteString("- `")
+				buf.WriteString(dup.Rule.Name())
+				buf.WriteString("` at `")
+				buf.WriteString(dup.Path.Name)
+				buf.WriteRune(':')
+				buf.WriteString(strconv.Itoa(dup.Problem.Lines.First))
+				buf.WriteString("`\n")
+			}
+			buf.WriteString("\n</details>\n\n")
+		}
 		buf.WriteString("------\n\n")
 		buf.WriteString(":information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/")
 		buf.WriteString(reports[0].Problem.Reporter)
@@ -140,8 +163,12 @@ func makeComments(summary Summary) (comments []PendingComment) {
 	return comments
 }
 
-func dedupReports(src []Report) (dst [][]Report) {
+func dedupReports(src []Report, showDuplicates bool) (dst [][]Report) {
 	for _, report := range src {
+		if !showDuplicates && report.IsDuplicate {
+			continue
+		}
+
 		index := -1
 		for i, d := range dst {
 			if d[0].Problem.Severity != report.Problem.Severity {
@@ -220,7 +247,7 @@ func errsToComment(errs []error) string {
 	return buf.String()
 }
 
-func Submit(ctx context.Context, s Summary, c Commenter) error {
+func Submit(ctx context.Context, s Summary, c Commenter, showDuplicates bool) error {
 	slog.Info("Will now report problems", slog.String("reporter", c.Describe()))
 	dsts, err := c.Destinations(ctx)
 	if err != nil {
@@ -229,7 +256,7 @@ func Submit(ctx context.Context, s Summary, c Commenter) error {
 
 	for _, dst := range dsts {
 		slog.Info("Found a report destination", slog.String("reporter", c.Describe()), slog.Any("dst", dst))
-		if err = updateDestination(ctx, s, c, dst); err != nil {
+		if err = updateDestination(ctx, s, c, dst, showDuplicates); err != nil {
 			return err
 		}
 	}
@@ -238,7 +265,7 @@ func Submit(ctx context.Context, s Summary, c Commenter) error {
 	return nil
 }
 
-func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) (err error) {
+func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, showDuplicates bool) (err error) {
 	slog.Info("Listing existing comments", slog.String("reporter", c.Describe()))
 	existingComments, err := c.List(ctx, dst)
 	if err != nil {
@@ -247,7 +274,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any) (er
 
 	var created int
 	var errs []error
-	pendingComments := makeComments(s)
+	pendingComments := makeComments(s, showDuplicates)
 	for _, pending := range pendingComments {
 		slog.Debug("Got pending comment",
 			slog.String("reporter", c.Describe()),

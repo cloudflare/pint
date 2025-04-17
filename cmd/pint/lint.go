@@ -124,7 +124,10 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 	if c.Bool(teamCityFlag) {
 		reps = append(reps, reporter.NewTeamCityReporter(os.Stderr))
 	} else {
-		reps = append(reps, reporter.NewConsoleReporter(os.Stderr, minSeverity, c.Bool(noColorFlag)))
+		reps = append(
+			reps,
+			reporter.NewConsoleReporter(os.Stderr, minSeverity, c.Bool(noColorFlag), c.Bool(showDupsFlag)),
+		)
 	}
 
 	if c.String(checkStyleFlag) != "" {
@@ -148,6 +151,7 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 	}
 
 	summary.SortReports()
+	summary.Dedup()
 	for _, rep := range reps {
 		err = rep.Submit(summary)
 		if err != nil {
@@ -159,10 +163,10 @@ func actionLint(ctx context.Context, c *cli.Command) error {
 	var problems, hiddenProblems, failProblems int
 	for s, c := range bySeverity {
 		if s >= failOn {
-			failProblems++
+			failProblems += c
 		}
 		if s < minSeverity {
-			hiddenProblems++
+			hiddenProblems += c
 		}
 		if s >= checks.Bug {
 			problems += c
@@ -207,6 +211,8 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 							discovery.RuleOwnerComment, discovery.FileOwnerComment, discovery.RuleOwnerComment)),
 					},
 				},
+				IsDuplicate: false,
+				Duplicates:  nil,
 			})
 			goto NEXT
 		}
@@ -231,6 +237,8 @@ func verifyOwners(entries []discovery.Entry, allowedOwners []*regexp.Regexp) (re
 					checks.WholeRuleDiag(entry.Rule, fmt.Sprintf("This rule is set as owned by `%s` but `%s` doesn't match any of the allowed owner values.", entry.Owner, entry.Owner)),
 				},
 			},
+			IsDuplicate: false,
+			Duplicates:  nil,
 		})
 	NEXT:
 	}

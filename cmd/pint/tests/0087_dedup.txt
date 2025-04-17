@@ -6,20 +6,12 @@ cmp stderr stderr.txt
 level=INFO msg="Finding all rules to check" paths=["rules"]
 level=INFO msg="Checking Prometheus rules" entries=1 workers=10 online=true
 Bug: template uses non-existent label (alerts/template)
-  ---> rules/01.yml:4-13 -> `foo`
+  ---> rules/01.yml:4-13 -> `foo` [+1 duplicates]
  5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
                ^^^ Query is using aggregation that removes all labels.
    | [...]
 13 |         dashboard: "https://grafana.example.com/dashboard?var-cluster={{ $labels.cluster }}&var-instance={{ $labels.cluster }}"
                                                                                      ^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
-
-Bug: template uses non-existent label (alerts/template)
-  ---> rules/01.yml:4-13 -> `foo`
- 5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
-               ^^^ Query is using aggregation that removes all labels.
-   | [...]
-12 |         summary: "Server {{ $labels.instance }} in cluster {{ $labels.cluster }} has gone down"
-                                                                          ^^^^^^^^ Template is using `cluster` label but the query results won't have this label.
 
 Bug: template uses non-existent label (alerts/template)
   ---> rules/01.yml:4-13 -> `foo`
@@ -34,8 +26,9 @@ Warning: always firing alert (alerts/comparison)
 5 |     expr: sum(up{job="bar"}) / sum(foo) / sum(bar)
                   ^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
 
+level=INFO msg="Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them" total=4 duplicates=1 shown=3
 level=INFO msg="Problems found" Bug=3 Warning=1
-level=ERROR msg="Execution completed with error(s)" err="found 1 problem(s) with severity Bug or higher"
+level=ERROR msg="Execution completed with error(s)" err="found 3 problem(s) with severity Bug or higher"
 -- rules/01.yml --
 groups:
 - name: foo

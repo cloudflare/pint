@@ -253,26 +253,28 @@ type BitBucketCommentSeverityUpdate struct {
 	Version  int    `json:"version"`
 }
 
-func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string, maxComments int) *bitBucketAPI {
+func newBitBucketAPI(pintVersion, uri string, timeout time.Duration, token, project, repo string, maxComments int, showDuplicates bool) *bitBucketAPI {
 	return &bitBucketAPI{
-		pintVersion: pintVersion,
-		uri:         uri,
-		timeout:     timeout,
-		authToken:   token,
-		project:     project,
-		repo:        repo,
-		maxComments: maxComments,
+		pintVersion:    pintVersion,
+		uri:            uri,
+		timeout:        timeout,
+		authToken:      token,
+		project:        project,
+		repo:           repo,
+		maxComments:    maxComments,
+		showDuplicates: showDuplicates,
 	}
 }
 
 type bitBucketAPI struct {
-	pintVersion string
-	uri         string
-	authToken   string
-	project     string
-	repo        string
-	timeout     time.Duration
-	maxComments int
+	pintVersion    string
+	uri            string
+	authToken      string
+	project        string
+	repo           string
+	timeout        time.Duration
+	maxComments    int
+	showDuplicates bool
 }
 
 func (bb bitBucketAPI) request(method, path string, body io.Reader) ([]byte, error) {
@@ -601,7 +603,7 @@ func (bb bitBucketAPI) makeComments(summary Summary, changes *bitBucketPRChanges
 	var content string
 	var err error
 	comments := []BitBucketPendingComment{}
-	for _, reports := range dedupReports(summary.reports) {
+	for _, reports := range dedupReports(summary.reports, bb.showDuplicates) {
 		if _, ok := changes.pathModifiedLines[reports[0].Path.SymlinkTarget]; !ok {
 			continue
 		}

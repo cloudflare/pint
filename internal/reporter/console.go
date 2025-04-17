@@ -3,7 +3,9 @@ package reporter
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/cloudflare/pint/internal/checks"
@@ -11,27 +13,35 @@ import (
 	"github.com/cloudflare/pint/internal/output"
 )
 
-func NewConsoleReporter(output io.Writer, minSeverity checks.Severity, noColor bool) ConsoleReporter {
+func NewConsoleReporter(output io.Writer, minSeverity checks.Severity, noColor, showDuplicates bool) ConsoleReporter {
 	return ConsoleReporter{
-		output:      output,
-		minSeverity: minSeverity,
-		noColor:     noColor,
+		output:         output,
+		minSeverity:    minSeverity,
+		noColor:        noColor,
+		showDuplicates: showDuplicates,
 	}
 }
 
 type ConsoleReporter struct {
-	output      io.Writer
-	minSeverity checks.Severity
-	noColor     bool
+	output         io.Writer
+	minSeverity    checks.Severity
+	noColor        bool
+	showDuplicates bool
 }
 
 func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 	var buf strings.Builder
 	var content string
+	var allReports, hiddenDupes int
 	for _, reports := range summary.ReportsPerPath() {
 		content = ""
 		for _, report := range reports {
 			if report.Problem.Severity < cr.minSeverity {
+				continue
+			}
+			allReports++
+			if !cr.showDuplicates && report.IsDuplicate {
+				hiddenDupes++
 				continue
 			}
 			if content == "" && report.Problem.Anchor == checks.AnchorAfter {
@@ -71,6 +81,10 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 			if report.Rule.Name() != "" {
 				buf.WriteString(output.MaybeColor(output.Bold, cr.noColor, " -> `"+report.Rule.Name()+"`"))
 			}
+			if !cr.showDuplicates && len(report.Duplicates) > 0 {
+				buf.WriteRune(' ')
+				buf.WriteString(output.MaybeColor(output.Blue, cr.noColor, "[+"+strconv.Itoa(len(report.Duplicates))+" duplicates]"))
+			}
 			buf.WriteRune('\n')
 
 			if report.Problem.Anchor == checks.AnchorAfter {
@@ -96,6 +110,15 @@ func (cr ConsoleReporter) Submit(summary Summary) (err error) {
 
 			fmt.Fprintln(cr.output, buf.String())
 		}
+	}
+
+	if hiddenDupes > 0 {
+		slog.Info(
+			"Some problems are duplicated between rules and all the duplicates were hidden, pass `--show-duplicates` to see them",
+			slog.Int("total", allReports),
+			slog.Int("duplicates", hiddenDupes),
+			slog.Int("shown", allReports-hiddenDupes),
+		)
 	}
 
 	return nil

@@ -20,6 +20,7 @@ const (
 	offlineFlag  = "offline"
 	noColorFlag  = "no-color"
 	workersFlag  = "workers"
+	showDupsFlag = "show-duplicates"
 )
 
 var (
@@ -71,6 +72,12 @@ func newApp() *cli.Command {
 				Aliases: []string{"o"},
 				Value:   false,
 				Usage:   "Disable all check that send live queries to Prometheus servers.",
+			},
+			&cli.BoolFlag{
+				Name:    showDupsFlag,
+				Aliases: []string{"s"},
+				Value:   false,
+				Usage:   "Show all reported problems including the same issue duplicated across multiple rules.",
 			},
 		},
 		Commands: []*cli.Command{

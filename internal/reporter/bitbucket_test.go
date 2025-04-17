@@ -41,6 +41,7 @@ func TestBitBucketReporter(t *testing.T) {
 		pullRequests          reporter.BitBucketPullRequests
 		pullRequestChanges    reporter.BitBucketPullRequestChanges
 		pullRequestActivities reporter.BitBucketPullRequestActivities
+		showDuplicates        bool
 	}
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -2075,6 +2076,7 @@ func TestBitBucketReporter(t *testing.T) {
 				"proj",
 				"repo",
 				50,
+				tc.showDuplicates,
 				tc.gitCmd)
 			summary := reporter.NewSummary(tc.reports)
 			err := r.Submit(summary)
