@@ -109,7 +109,7 @@ func actionSetup(c *cli.Command) (meta actionMeta, err error) {
 		slog.Error("failed to set GOMAXPROCS", slog.Any("err", err))
 	}
 
-	meta.workers = int(c.Int(workersFlag))
+	meta.workers = c.Int(workersFlag)
 	if meta.workers < 1 {
 		return meta, fmt.Errorf("--%s flag must be > 0", workersFlag)
 	}

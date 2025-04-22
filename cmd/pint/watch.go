@@ -158,7 +158,7 @@ func actionWatch(c *cli.Command, meta actionMeta, f pathFinderFunc) error {
 	}
 
 	// start HTTP server for metrics
-	collector := newProblemCollector(meta.cfg, f, minSeverity, int(c.Int(maxProblemsFlag)), c.Bool(showDupsFlag))
+	collector := newProblemCollector(meta.cfg, f, minSeverity, c.Int(maxProblemsFlag), c.Bool(showDupsFlag))
 	// register all metrics
 	metricsRegistry.MustRegister(collector)
 	metricsRegistry.MustRegister(checkDuration)
