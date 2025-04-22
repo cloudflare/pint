@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.73.1
+
+### Fixed
+
+- Fixed `relaxed` parsing mode not finding all rules in some files - [#1405](https://github.com/cloudflare/pint/issues/1405).
+
 ## v0.73.0
 
 ### Changed
