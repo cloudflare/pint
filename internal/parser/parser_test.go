@@ -5037,6 +5037,100 @@ groups:
 				},
 			},
 		},
+		{
+			input: []byte(`
+- name: xxx
+  interval: 3m
+  query_offset: 1s
+  limit: 5
+  labels:
+    foo: bar
+  rules:
+  - record: up:count
+    expr: count(up)
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name:        "xxx",
+						Interval:    time.Minute * 3,
+						QueryOffset: time.Second,
+						Limit:       5,
+						Labels: &parser.YamlMap{
+							Key: &parser.YamlNode{
+								Value: "labels",
+							},
+							Items: []*parser.YamlKeyValue{
+								{
+									Key: &parser.YamlNode{
+										Value: "foo",
+									},
+									Value: &parser.YamlNode{
+										Value: "bar",
+									},
+								},
+							},
+						},
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 9, Last: 10},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos:   diags.PositionRanges{{Line: 9, FirstColumn: 13, LastColumn: 20}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos:   diags.PositionRanges{{Line: 10, FirstColumn: 11, LastColumn: 19}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			input: []byte(`
+
+- interval: 3m
+  query_offset: 1s
+  limit: 5
+  labels:
+    foo: bar
+  rules:
+  - record: up:count
+    expr: count(up)
+`),
+			output: parser.File{
+				IsRelaxed: true,
+				Groups: []parser.Group{
+					{
+						Name: "",
+						Rules: []parser.Rule{
+							{
+								Lines: diags.LineRange{First: 9, Last: 10},
+								RecordingRule: &parser.RecordingRule{
+									Record: parser.YamlNode{
+										Value: "up:count",
+										Pos:   diags.PositionRanges{{Line: 9, FirstColumn: 13, LastColumn: 20}},
+									},
+									Expr: parser.PromQLExpr{
+										Value: &parser.YamlNode{
+											Value: "count(up)",
+											Pos:   diags.PositionRanges{{Line: 10, FirstColumn: 11, LastColumn: 19}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	alwaysEqual := cmp.Comparer(func(_, _ any) bool { return true })

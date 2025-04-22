@@ -101,18 +101,20 @@ To allow for multi-document YAML files set parser->relaxed option in pint config
 func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, offsetColumn int, contentLines []string) (groups []Group) {
 	switch node.Kind { // nolint: exhaustive
 	case yaml.SequenceNode:
-		if parent != nil && nodeValue(parent) == "groups" {
-			for _, n := range unpackNodes(node) {
-				if g, rulesMap, ok := tryParseGroup(n, offsetLine, offsetColumn, contentLines); ok {
-					groups = append(groups, p.parseNode(rulesMap.val, rulesMap.key, &g, offsetLine, offsetColumn, contentLines)...)
-				}
+		// First check for group list
+		for _, n := range unpackNodes(node) {
+			if g, rulesMap, ok := tryParseGroup(n, offsetLine, offsetColumn, contentLines); ok {
+				groups = append(groups, p.parseNode(rulesMap.val, rulesMap.key, &g, offsetLine, offsetColumn, contentLines)...)
 			}
+		}
+		if len(groups) > 0 {
 			return groups
 		}
-		// Try parsing rules.
+
 		if group == nil {
 			group = &Group{} // nolint: exhaustruct
 		}
+		// Try parsing rules.
 		for _, n := range unpackNodes(node) {
 			if ret, isEmpty := parseRule(n, offsetLine, offsetColumn, contentLines); !isEmpty {
 				group.Rules = append(group.Rules, ret)
@@ -122,7 +124,9 @@ func (p *Parser) parseNode(node, parent *yaml.Node, group *Group, offsetLine, of
 		if len(group.Rules) > 0 || (parent != nil && nodeValue(parent) == "rules" && len(groups) == 0 && group != nil) {
 			groups = append(groups, *group)
 		}
-		return groups
+		if len(groups) > 0 {
+			return groups
+		}
 	case yaml.MappingNode:
 		for _, field := range mappingNodes(node) {
 			groups = append(groups, p.parseNode(field.val, field.key, group, offsetLine, offsetColumn, contentLines)...)
