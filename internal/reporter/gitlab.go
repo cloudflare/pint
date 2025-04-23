@@ -233,11 +233,11 @@ func (gl GitLabReporter) Delete(ctx context.Context, dst any, comment ExistingCo
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
 
-	_, err := gl.client.Discussions.DeleteMergeRequestDiscussionNote(
+	_, _, err := gl.client.Discussions.ResolveMergeRequestDiscussion(
 		gl.project,
 		mr.mrID,
 		c.discussionID,
-		c.noteID,
+		&gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
 		gitlab.WithContext(reqCtx),
 	)
 	return err

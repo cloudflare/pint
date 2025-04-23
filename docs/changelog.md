@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.73.2
+
+### Fixed
+
+- Fixed handling of stale comments when using GitLab with `pint ci` command.
+
 ## v0.73.1
 
 ### Fixed
