@@ -31,7 +31,7 @@ var (
 
 type testCommenter struct {
 	destinations func(context.Context) ([]any, error)
-	summary      func(context.Context, any, Summary, []error) error
+	summary      func(context.Context, any, Summary, []PendingComment, []error) error
 	list         func(context.Context, any) ([]ExistingComment, error)
 	create       func(context.Context, any, PendingComment) error
 	delete       func(context.Context, any, ExistingComment) error
@@ -47,8 +47,8 @@ func (tc testCommenter) Destinations(ctx context.Context) ([]any, error) {
 	return tc.destinations(ctx)
 }
 
-func (tc testCommenter) Summary(ctx context.Context, dst any, s Summary, errs []error) error {
-	return tc.summary(ctx, dst, s, errs)
+func (tc testCommenter) Summary(ctx context.Context, dst any, s Summary, comments []PendingComment, errs []error) error {
+	return tc.summary(ctx, dst, s, comments, errs)
 }
 
 func (tc testCommenter) List(ctx context.Context, dst any) ([]ExistingComment, error) {
@@ -181,7 +181,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -202,7 +202,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -235,7 +235,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -271,7 +271,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -307,7 +307,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -343,7 +343,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -415,7 +415,7 @@ bar warning
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -502,7 +502,7 @@ foo details
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -594,7 +594,7 @@ foo details
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -669,7 +669,7 @@ foo details
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 1 {
 						return fmt.Errorf("Expected errDelete in errs, got %v", errs)
 					}
@@ -705,7 +705,7 @@ foo details
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, errs []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, errs []error) error {
 					if len(errs) != 0 {
 						return fmt.Errorf("Expected empty errs, got %v", errs)
 					}
@@ -738,7 +738,7 @@ foo details
 				destinations: func(_ context.Context) ([]any, error) {
 					return []any{1}, nil
 				},
-				summary: func(_ context.Context, _ any, _ Summary, _ []error) error {
+				summary: func(_ context.Context, _ any, _ Summary, _ []PendingComment, _ []error) error {
 					return errSummary
 				},
 				list: func(_ context.Context, _ any) ([]ExistingComment, error) {

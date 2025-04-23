@@ -116,7 +116,7 @@ func (gr GithubReporter) Destinations(ctx context.Context) (_ []any, err error) 
 	return []any{pr}, err
 }
 
-func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, errs []error) error {
+func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, pendingComments []PendingComment, errs []error) error {
 	review, err := gr.findExistingReview(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to list pull request reviews: %w", err)
@@ -131,8 +131,8 @@ func (gr GithubReporter) Summary(ctx context.Context, _ any, s Summary, errs []e
 		}
 	}
 
-	if gr.maxComments > 0 && len(s.reports) > gr.maxComments {
-		if err = gr.generalComment(ctx, tooManyCommentsMsg(len(s.reports), gr.maxComments)); err != nil {
+	if gr.maxComments > 0 && len(pendingComments) > gr.maxComments {
+		if err = gr.generalComment(ctx, tooManyCommentsMsg(len(pendingComments), gr.maxComments)); err != nil {
 			errs = append(errs, fmt.Errorf("failed to create general comment: %w", err))
 		}
 	}

@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.73.3
+
+### Fixed
+
+- Fixed incorrect value in `This pint run would create N comment(s), which is more than the limit ...` comments
+  when using GitHub or GitLab with `pint ci` command.
+
 ## v0.73.2
 
 ### Fixed
