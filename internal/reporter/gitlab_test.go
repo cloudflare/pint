@@ -263,8 +263,8 @@ func TestGitLabReporter(t *testing.T) {
 					ModifiedLines: []int{1},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
-						Summary:  "foo error",
+						Reporter: "a",
+						Summary:  "foo error1",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
@@ -279,8 +279,8 @@ func TestGitLabReporter(t *testing.T) {
 					ModifiedLines: []int{2},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
-						Summary:  "foo error",
+						Reporter: "b",
+						Summary:  "foo error2",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
@@ -295,8 +295,8 @@ func TestGitLabReporter(t *testing.T) {
 					ModifiedLines: []int{3},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
-						Summary:  "foo error",
+						Reporter: "c",
+						Summary:  "foo error3",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
 						Severity: checks.Fatal,
@@ -464,7 +464,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					ModifiedLines: []int{1},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
+						Reporter: "foo1",
 						Summary:  "foo error",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
@@ -480,7 +480,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					ModifiedLines: []int{2},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
+						Reporter: "foo2",
 						Summary:  "foo error",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
@@ -496,7 +496,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					ModifiedLines: []int{3},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
+						Reporter: "foo3",
 						Summary:  "foo error",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
@@ -603,7 +603,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					ModifiedLines: []int{1},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
+						Reporter: "foo1",
 						Summary:  "foo error",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
@@ -619,7 +619,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					ModifiedLines: []int{2},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
+						Reporter: "foo2",
 						Summary:  "foo error",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},
@@ -635,7 +635,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					ModifiedLines: []int{3},
 					Rule:          mockFile.Groups[0].Rules[0],
 					Problem: checks.Problem{
-						Reporter: "foo",
+						Reporter: "foo3",
 						Summary:  "foo error",
 						Details:  "foo details",
 						Lines:    diags.LineRange{First: 1, Last: 3},

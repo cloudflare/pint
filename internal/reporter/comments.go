@@ -29,7 +29,7 @@ type ExistingComment struct {
 type Commenter interface {
 	Describe() string
 	Destinations(context.Context) ([]any, error)
-	Summary(context.Context, any, Summary, []error) error
+	Summary(context.Context, any, Summary, []PendingComment, []error) error
 	List(context.Context, any) ([]ExistingComment, error)
 	Create(context.Context, any, PendingComment) error
 	Delete(context.Context, any, ExistingComment) error
@@ -307,6 +307,11 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 			goto NEXTCreate
 		}
 
+		slog.Info("Creating a new comment",
+			slog.String("reporter", c.Describe()),
+			slog.String("path", pending.path),
+			slog.Int("line", pending.line),
+		)
 		if err := c.Create(ctx, dst, pending); err != nil {
 			slog.Error("Failed to create a new comment",
 				slog.String("reporter", c.Describe()),
@@ -350,7 +355,7 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 		slog.Int("entries", s.TotalEntries),
 		slog.Int("checked", int(s.CheckedEntries)),
 	)
-	if err := c.Summary(ctx, dst, s, errs); err != nil {
+	if err := c.Summary(ctx, dst, s, pendingComments, errs); err != nil {
 		return err
 	}
 

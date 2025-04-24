@@ -145,10 +145,10 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 	return dsts, nil
 }
 
-func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, errs []error) (err error) {
+func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, pendingComments []PendingComment, errs []error) (err error) {
 	mr := dst.(gitlabMR)
-	if gl.maxComments > 0 && len(s.reports) > gl.maxComments {
-		if err = gl.generalComment(ctx, mr, tooManyCommentsMsg(len(s.reports), gl.maxComments)); err != nil {
+	if gl.maxComments > 0 && len(pendingComments) > gl.maxComments {
+		if err = gl.generalComment(ctx, mr, tooManyCommentsMsg(len(pendingComments), gl.maxComments)); err != nil {
 			errs = append(errs, fmt.Errorf("failed to create general comment: %w", err))
 		}
 	}
