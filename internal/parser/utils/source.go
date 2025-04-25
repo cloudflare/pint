@@ -466,13 +466,13 @@ func parseAggregation(expr string, n *promParser.AggregateExpr) (src []Source) {
 				// Check if source of labels already fixes them.
 				if !s.FixedLabels {
 					s = maybeIncludeLabel(s, n.Grouping...)
-					s = excludeAllLabels(
-						s,
-						fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
-							strings.Join(n.Grouping, ", ")),
-						FindPosition(expr, n.PosRange, "by"),
-					)
 				}
+				s = excludeAllLabels(
+					s,
+					fmt.Sprintf("Query is using aggregation with `by(%s)`, only labels included inside `by(...)` will be present on the results.",
+						strings.Join(n.Grouping, ", ")),
+					FindPosition(expr, n.PosRange, "by"),
+				)
 				s = restrictGuaranteedLabels(s, n.Grouping)
 				s = restrictIncludedLabels(s, n.Grouping)
 			}

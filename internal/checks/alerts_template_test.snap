@@ -1795,6 +1795,68 @@
 
 ---
 
+[TestTemplateCheck/multiple_aggregations - 1]
+- description: multiple aggregations
+  content: |4
+      - alert: High_CPU_Imbalance_On_Many_Colos
+        expr: |
+          count by (region) (
+            stddev by (colo_name, region) (
+              instance_mode:node_cpu:used_p90:rate2m{node_type="metal",node_status="v"}
+            ) > 0.1
+          ) >= 5
+        for: 10m
+        annotations:
+          summary: "Errors in {{ $labels.colo_name }}"
+  output: |4
+     4 |       count by (region) (
+                     ^^^ Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+     5 |         stddev by (colo_name, region) (
+     6 |           instance_mode:node_cpu:used_p90:rate2m{node_type="metal",node_status="v"}
+     7 |         ) > 0.1
+     8 |       ) >= 5
+       | [...]
+    11 |       summary: "Errors in {{ $labels.colo_name }}"
+                                             ^^^^^^^^^^ Template is using `colo_name` label but the query results won't have this label.
+  problem:
+    reporter: alerts/template
+    summary: template uses non-existent label
+    details: ""
+    diagnostics:
+        - message: Template is using `colo_name` label but the query results won't have this label.
+          pos:
+            - line: 11
+              firstcolumn: 17
+              lastcolumn: 49
+          firstcolumn: 21
+          lastcolumn: 30
+        - message: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+          pos:
+            - line: 4
+              firstcolumn: 7
+              lastcolumn: 26
+            - line: 5
+              firstcolumn: 7
+              lastcolumn: 40
+            - line: 6
+              firstcolumn: 7
+              lastcolumn: 84
+            - line: 7
+              firstcolumn: 7
+              lastcolumn: 16
+            - line: 8
+              firstcolumn: 7
+              lastcolumn: 12
+          firstcolumn: 7
+          lastcolumn: 9
+    lines:
+        first: 2
+        last: 11
+    severity: 2
+    anchor: 0
+
+---
+
 [TestTemplateCheck/multiple_or - 1]
 []
 
