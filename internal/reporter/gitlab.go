@@ -51,10 +51,11 @@ func keysAndValuesToAttrs(keysAndValues ...any) (attrs []any) {
 }
 
 type gitlabMR struct {
-	version *gitlab.MergeRequestDiffVersion
-	diffs   []*gitlab.MergeRequestDiff
-	userID  int
-	mrID    int
+	version     *gitlab.MergeRequestDiffVersion
+	diffs       []*gitlab.MergeRequestDiff
+	discussions []*gitlab.Discussion
+	userID      int
+	mrID        int
 }
 
 func (glmr gitlabMR) String() string {
@@ -129,16 +130,20 @@ func (gl GitLabReporter) Destinations(ctx context.Context) ([]any, error) {
 	for _, id := range ids {
 		slog.Info("Found open GitLab merge request", slog.String("branch", gl.branch), slog.Int("id", id))
 		dst := gitlabMR{
-			version: nil,
-			diffs:   nil,
-			userID:  userID,
-			mrID:    id,
+			version:     nil,
+			diffs:       nil,
+			discussions: nil,
+			userID:      userID,
+			mrID:        id,
 		}
 		if dst.version, err = gl.getVersions(ctx, id); err != nil {
 			return nil, fmt.Errorf("failed to get GitLab merge request versions: %w", err)
 		}
 		if dst.diffs, err = gl.getDiffs(ctx, id); err != nil {
 			return nil, fmt.Errorf("failed to get GitLab merge request changes: %w", err)
+		}
+		if dst.discussions, err = gl.getDiscussions(ctx, id); err != nil {
+			return nil, fmt.Errorf("failed to get GitLab merge request discussions: %w", err)
 		}
 		dsts = append(dsts, dst)
 	}
@@ -165,14 +170,10 @@ func (gl GitLabReporter) Summary(ctx context.Context, dst any, s Summary, pendin
 	return nil
 }
 
-func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingComment, error) {
+func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, error) {
 	mr := dst.(gitlabMR)
-	discs, err := gl.getDiscussions(ctx, mr.mrID)
-	if err != nil {
-		return nil, err
-	}
-	comments := make([]ExistingComment, 0, len(discs))
-	for _, disc := range discs {
+	comments := make([]ExistingComment, 0, len(mr.discussions))
+	for _, disc := range mr.discussions {
 		var c ExistingComment
 		for _, note := range disc.Notes {
 			if note.System {
@@ -184,24 +185,10 @@ func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingComment, 
 			if note.Position == nil {
 				goto NEXT
 			}
-			if note.Position.NewPath != "" {
-				c.path = note.Position.NewPath
-			} else {
-				c.path = note.Position.OldPath
+			if note.Resolved {
+				goto NEXT
 			}
-			if note.Position.NewLine > 0 {
-				c.line = note.Position.NewLine
-			} else {
-				c.line = note.Position.OldLine
-			}
-			c.text = note.Body
-			c.meta = gitlabComment{
-				discussionID: disc.ID,
-				noteID:       note.ID,
-				baseSHA:      note.Position.BaseSHA,
-				headSHA:      note.Position.HeadSHA,
-				startSHA:     note.Position.StartSHA,
-			}
+			c = gl.noteToExisting(disc.ID, note)
 			break
 		}
 		comments = append(comments, c)
@@ -211,6 +198,19 @@ func (gl GitLabReporter) List(ctx context.Context, dst any) ([]ExistingComment, 
 }
 
 func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingComment) error {
+	unresolved, err := gl.unresolveIfPresent(ctx, dst, comment)
+	if err != nil {
+		slog.Warn("Failed to un-resolved existing comment, will create a new one",
+			slog.String("path", comment.path),
+			slog.Int("line", comment.line),
+			slog.Any("err", err),
+		)
+	}
+	if unresolved {
+		slog.Debug("Existing comment was un-resolved, skipping creating new one")
+		return nil
+	}
+
 	mr := dst.(gitlabMR)
 	opt := reportToGitLabDiscussion(comment, mr.diffs, mr.version)
 	if opt == nil {
@@ -219,7 +219,7 @@ func (gl GitLabReporter) Create(ctx context.Context, dst any, comment PendingCom
 	slog.Debug("Creating a new merge request discussion", loggifyDiscussion(opt)...)
 	reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
 	defer cancel()
-	_, _, err := gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, opt, gitlab.WithContext(reqCtx))
+	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, opt, gitlab.WithContext(reqCtx))
 	return err
 }
 
@@ -334,14 +334,10 @@ func (gl *GitLabReporter) getDiscussions(ctx context.Context, mrNum int) ([]*git
 	return discs, err
 }
 
-func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg string) error {
+func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg string) (err error) {
 	slog.Debug("Creating a PR comment", slog.String("body", msg))
 
-	discs, err := gl.getDiscussions(ctx, mr.mrID)
-	if err != nil {
-		return err
-	}
-	for _, disc := range discs {
+	for _, disc := range mr.discussions {
 		for _, note := range disc.Notes {
 			if note.System {
 				continue
@@ -364,6 +360,69 @@ func (gl GitLabReporter) generalComment(ctx context.Context, mr gitlabMR, msg st
 	opt := gitlab.CreateMergeRequestDiscussionOptions{Body: gitlab.Ptr(msg)}
 	_, _, err = gl.client.Discussions.CreateMergeRequestDiscussion(gl.project, mr.mrID, &opt, gitlab.WithContext(reqCtx))
 	return err
+}
+
+func (gl GitLabReporter) noteToExisting(discID string, note *gitlab.Note) (c ExistingComment) {
+	if note.Position.NewPath != "" {
+		c.path = note.Position.NewPath
+	} else {
+		c.path = note.Position.OldPath
+	}
+	if note.Position.NewLine > 0 {
+		c.line = note.Position.NewLine
+	} else {
+		c.line = note.Position.OldLine
+	}
+	c.text = note.Body
+	c.meta = gitlabComment{
+		discussionID: discID,
+		noteID:       note.ID,
+		baseSHA:      note.Position.BaseSHA,
+		headSHA:      note.Position.HeadSHA,
+		startSHA:     note.Position.StartSHA,
+	}
+	return c
+}
+
+func (gl GitLabReporter) unresolveIfPresent(ctx context.Context, dst any, comment PendingComment) (_ bool, err error) {
+	mr := dst.(gitlabMR)
+	for _, disc := range mr.discussions {
+		var c ExistingComment
+		for _, note := range disc.Notes {
+			if note.System {
+				continue
+			}
+			if note.Author.ID != mr.userID {
+				continue
+			}
+			if note.Position == nil {
+				continue
+			}
+			if !note.Resolved {
+				continue
+			}
+			c = gl.noteToExisting(disc.ID, note)
+			if gl.IsEqual(dst, c, comment) {
+				meta := c.meta.(gitlabComment)
+				slog.Debug("Un-resolving merge request discussion note",
+					slog.String("discussion", meta.discussionID),
+					slog.Int("note", meta.noteID),
+				)
+				reqCtx, cancel := context.WithTimeout(ctx, gl.timeout)
+				defer cancel()
+
+				_, _, err = gl.client.Discussions.ResolveMergeRequestDiscussion(
+					gl.project,
+					mr.mrID,
+					meta.discussionID,
+					&gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(false)},
+					gitlab.WithContext(reqCtx),
+				)
+				return err == nil, err
+			}
+		}
+	}
+	return false, nil
 }
 
 func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeRequestDiff, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
