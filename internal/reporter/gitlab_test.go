@@ -182,14 +182,21 @@ func TestGitLabReporter(t *testing.T) {
 			OldLine:      oldLine,
 		})
 	}
-	discNote := func(id, authorID int, system bool, body string, pos *gitlab.NotePosition) *gitlab.Note {
+	discNote := func(id, authorID int, body string, pos *gitlab.NotePosition) *gitlab.Note {
 		return gitlab.Ptr(gitlab.Note{
 			ID:       id,
 			Author:   gitlab.NoteAuthor{ID: authorID},
-			System:   system,
 			Position: pos,
 			Body:     body,
 		})
+	}
+	resolvedNote := func(n *gitlab.Note) *gitlab.Note {
+		n.Resolved = true
+		return n
+	}
+	systemNote := func(n *gitlab.Note) *gitlab.Note {
+		n.System = true
+		return n
 	}
 
 	testCases := []struct {
@@ -234,16 +241,21 @@ func TestGitLabReporter(t *testing.T) {
 					s.ExpectGet(apiDiffs(i)).ReturnJSON([]gitlab.MergeRequestDiff{
 						{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
 					})
+					if i == 5 {
+						s.ExpectGet(apiDiscussions(i, true)).ReturnJSON([]gitlab.Discussion{})
+					} else {
+						s.ExpectGet(apiDiscussions(i, true)).ReturnJSON([]gitlab.Discussion{
+							{ID: "100", Notes: []*gitlab.Note{systemNote(discNote(101, 123, "system message", nil))}},
+							{ID: "200", Notes: []*gitlab.Note{discNote(201, 321, "different user", notePos("foo.txt", "foo.txt", 2, 0))}},
+							{ID: "300", Notes: []*gitlab.Note{discNote(301, 123, "stale comment", notePos("foo.txt", "foo.txt", 2, 0))}},
+							{ID: "400", Notes: []*gitlab.Note{discNote(401, 123, "stale comment on unmodified line", notePos("foo.txt", "foo.txt", 1, 0))}},
+							{ID: "500", Notes: []*gitlab.Note{discNote(101, 123, "no position", nil)}},
+						})
+					}
+
 				}
 
 				for _, i := range []int{1, 2} {
-					s.ExpectGet(apiDiscussions(i, true)).ReturnJSON([]gitlab.Discussion{
-						{ID: "100", Notes: []*gitlab.Note{discNote(101, 123, true, "system message", nil)}},
-						{ID: "200", Notes: []*gitlab.Note{discNote(201, 321, false, "different user", notePos("foo.txt", "foo.txt", 2, 0))}},
-						{ID: "300", Notes: []*gitlab.Note{discNote(301, 123, false, "stale comment", notePos("foo.txt", "foo.txt", 2, 0))}},
-						{ID: "400", Notes: []*gitlab.Note{discNote(401, 123, false, "stale comment on unmodified line", notePos("foo.txt", "foo.txt", 1, 0))}},
-						{ID: "500", Notes: []*gitlab.Note{discNote(101, 123, false, "no position", nil)}},
-					})
 					s.ExpectPost(apiDiscussions(i, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 						Body:     discBody("foo", "foo error", "foo details"),
 						Position: discPosition("foo.txt", 2),
@@ -257,7 +269,6 @@ func TestGitLabReporter(t *testing.T) {
 					).ReturnJSON(gitlab.Response{})
 				}
 
-				s.ExpectGet(apiDiscussions(5, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(5, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body:     gitlab.Ptr(":stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **foo** check.\n\n------\n\nfoo error\n\n\u003cdetails\u003e\n\u003csummary\u003eMore information\u003c/summary\u003e\nfoo details\n\u003c/details\u003e\n\n------\n\n:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/foo.html).\n"),
 					Position: discPosition("foo.txt", 2),
@@ -319,27 +330,24 @@ func TestGitLabReporter(t *testing.T) {
 				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
 					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
 				})
-				// Problem comment
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
+					{
+						ID:    "100",
+						Notes: []*gitlab.Note{systemNote(discNote(101, 123, "system comment", nil))},
+					},
+					{
+						ID:    "200",
+						Notes: []*gitlab.Note{discNote(201, 321, "different user", nil)},
+					},
+					{
+						ID:    "300",
+						Notes: []*gitlab.Note{resolvedNote(discNote(301, 123, "different line", notePos("foo.txt", "foo.txt", 1, 0)))},
+					},
+				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body:     discBody("a", "foo error1", "foo details"),
 					Position: discPosition("foo.txt", 1),
 				}).ReturnJSON(gitlab.Response{})
-				// Too many comments comment
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
-					{
-						ID:    "100",
-						Notes: []*gitlab.Note{discNote(101, 123, true, "system comment", nil)},
-					},
-					{
-						ID:    "200",
-						Notes: []*gitlab.Note{discNote(201, 321, false, "different user", nil)},
-					},
-					{
-						ID:    "300",
-						Notes: []*gitlab.Note{discNote(301, 123, false, "different user", notePos("foo.txt", "foo.txt", 1, 0))},
-					},
-				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: gitlab.Ptr("This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR."),
 				}).ReturnJSON(gitlab.Response{})
@@ -453,7 +461,6 @@ func TestGitLabReporter(t *testing.T) {
 					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body: gitlab.Ptr(`Some checks were disabled because one or more configured Prometheus server doesn't seem to support all required Prometheus APIs.
 This usually means that you're running pint against a service like Thanos or Mimir that allows to query metrics but doesn't implement all APIs documented [here](https://prometheus.io/docs/prometheus/latest/querying/api/).
@@ -493,7 +500,6 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
 				})
 				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
 				s.ExpectPost(apiDiscussions(1, false)).
 					ReturnCode(http.StatusBadRequest).
 					ReturnJSON(map[string]string{"error": "Mock error"})
@@ -522,31 +528,24 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
 					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
 				})
-				// Problem comment
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
+					{
+						ID:    "100",
+						Notes: []*gitlab.Note{systemNote(discNote(101, 123, "system comment", nil))},
+					},
+					{
+						ID:    "200",
+						Notes: []*gitlab.Note{discNote(201, 321, "different user", nil)},
+					},
+					{
+						ID:    "300",
+						Notes: []*gitlab.Note{discNote(301, 123, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR.", nil)},
+					},
+				})
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body:     discBody("a", "foo error1", "foo details"),
 					Position: discPosition("foo.txt", 1),
 				}).ReturnJSON(gitlab.Response{})
-				// Too many comments comment
-				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
-					{
-						ID:    "100",
-						Notes: []*gitlab.Note{discNote(101, 123, true, "system comment", nil)},
-					},
-					{
-						ID:    "200",
-						Notes: []*gitlab.Note{discNote(201, 321, true, "different user", nil)},
-					},
-					{
-						ID:    "300",
-						Notes: []*gitlab.Note{discNote(301, 123, true, "different user", notePos("foo.txt", "foo.txt", 1, 0))},
-					},
-					{
-						ID:    "400",
-						Notes: []*gitlab.Note{discNote(401, 123, false, "This pint run would create 3 comment(s), which is more than the limit configured for pint (1).\n2 comment(s) were skipped and won't be visibile on this PR.", nil)},
-					},
-				})
 			}),
 			errorHandler: func(err error) error {
 				return err
@@ -576,7 +575,7 @@ Below is the list of checks that were disabled for each Prometheus server define
 					Position: discPosition("foo.txt", 1),
 				}).ReturnJSON(gitlab.Response{})
 				// Too many comments comment
-				s.ExpectGet(apiDiscussions(1, true)).
+				s.ExpectPost(apiDiscussions(1, false)).
 					Times(2).
 					ReturnCode(http.StatusBadRequest).
 					ReturnJSON(map[string]string{"error": "Mock error"})
@@ -638,43 +637,43 @@ Below is the list of checks that were disabled for each Prometheus server define
 					{
 						ID: "100",
 						Notes: []*gitlab.Note{
-							discNote(101, 321, true, "system note", nil),
+							systemNote(discNote(101, 321, "system note", nil)),
 						},
 					},
 					{
 						ID: "200",
 						Notes: []*gitlab.Note{
-							discNote(201, 123, false, "different path", notePos("bar.txt", "bar.txt", 5, 0)),
+							discNote(201, 123, "different path", notePos("bar.txt", "bar.txt", 5, 0)),
 						},
 					},
 					{
 						ID: "300",
 						Notes: []*gitlab.Note{
-							discNote(301, 123, false, "different path", notePos("bar.txt", "", 1, 0)),
+							discNote(301, 123, "different path", notePos("bar.txt", "", 1, 0)),
 						},
 					},
 					{
 						ID: "400",
 						Notes: []*gitlab.Note{
-							discNote(401, 123, false, "different line", notePos("foo.txt", "", 0, 1)),
+							discNote(401, 123, "different line", notePos("foo.txt", "", 0, 1)),
 						},
 					},
 					{
 						ID: "500",
 						Notes: []*gitlab.Note{
-							discNote(501, 123, false, *discBody("a", "foo error1", "foo details"), notePos("foo.txt", "foo.txt", 1, 0)),
+							discNote(501, 123, *discBody("a", "foo error1", "foo details"), notePos("foo.txt", "foo.txt", 1, 0)),
 						},
 					},
 					{
 						ID: "600",
 						Notes: []*gitlab.Note{
-							discNote(601, 123, false, *discBody("b", "foo error2", "foo details"), notePos("foo.txt", "foo.txt", 2, 0)),
+							discNote(601, 123, *discBody("b", "foo error2", "foo details"), notePos("foo.txt", "foo.txt", 2, 0)),
 						},
 					},
 					{
 						ID: "700",
 						Notes: []*gitlab.Note{
-							discNote(701, 123, false, *discBody("c", "foo error3", "foo details"), notePos("foo.txt", "foo.txt", 3, 0)),
+							discNote(701, 123, *discBody("c", "foo error3", "foo details"), notePos("foo.txt", "foo.txt", 3, 0)),
 						},
 					},
 				})
@@ -687,6 +686,104 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectPut(apiDiscussions(1, false) + "/400").WithBodyJSON(
 					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(true)},
 				).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "comments already exist but resolved",
+			timeout:     time.Minute,
+			maxComments: 10,
+			summary:     summaryABC,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
+					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
+					{
+						ID: "100",
+						Notes: []*gitlab.Note{
+							discNote(101, 123, *discBody("a", "foo error1", "foo details"), notePos("foo.txt", "foo.txt", 1, 0)),
+						},
+					},
+					{
+						ID: "200",
+						Notes: []*gitlab.Note{
+							resolvedNote(
+								discNote(201, 123, *discBody("b", "foo error2", "foo details"), notePos("foo.txt", "foo.txt", 2, 0)),
+							),
+						},
+					},
+					{
+						ID: "300",
+						Notes: []*gitlab.Note{
+							discNote(301, 123, *discBody("c", "foo error3", "foo details"), notePos("foo.txt", "foo.txt", 3, 0)),
+						},
+					},
+				})
+				s.ExpectPut(apiDiscussions(1, false) + "/200").WithBodyJSON(
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(false)},
+				).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "comments already exist but resolved / resolve error",
+			timeout:     time.Minute,
+			maxComments: 10,
+			summary:     summaryABC,
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
+					{OldPath: "foo.txt", NewPath: "foo.txt", Diff: fooDiff},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{
+					{
+						ID: "100",
+						Notes: []*gitlab.Note{
+							discNote(101, 123, *discBody("a", "foo error1", "foo details"), notePos("foo.txt", "foo.txt", 1, 0)),
+						},
+					},
+					{
+						ID: "200",
+						Notes: []*gitlab.Note{
+							resolvedNote(
+								discNote(201, 123, *discBody("b", "foo error2", "foo details"), notePos("foo.txt", "foo.txt", 2, 0)),
+							),
+						},
+					},
+					{
+						ID: "300",
+						Notes: []*gitlab.Note{
+							discNote(301, 123, *discBody("c", "foo error3", "foo details"), notePos("foo.txt", "foo.txt", 3, 0)),
+						},
+					},
+				})
+				s.ExpectPut(apiDiscussions(1, false) + "/200").WithBodyJSON(
+					gitlab.ResolveMergeRequestDiscussionOptions{Resolved: gitlab.Ptr(false)},
+				).Times(6).ReturnCode(http.StatusInternalServerError).Return("Mock error")
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body:     discBody("b", "foo error2", "foo details"),
+					Position: discPosition("foo.txt", 2),
+				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {
 				return err

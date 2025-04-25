@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.73.4
+
+### Fixed
+
+- Fixed handling of resolved comments when using GitLab with `pint ci` command.
+
 ## v0.73.3
 
 ### Fixed
