@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.73.5
+
+### Fixed
+
+- Fixed incorrect error message for some problems reported by [alerts/template](checks/alerts/template.md) check.
+
 ## v0.73.4
 
 ### Fixed

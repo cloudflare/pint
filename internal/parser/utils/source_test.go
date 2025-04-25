@@ -2643,7 +2643,7 @@ sum by (region, target, colo_name) (
 					ExcludedLabels: []string{labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
-							Reason: "Calling `vector()` will return a vector value with no labels.",
+							Reason: "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
@@ -4271,6 +4271,29 @@ sum by (foo, bar) (
 					},
 					Aggregation: mustParse[*promParser.AggregateExpr](t, "sum(foo or vector(0))", 0),
 					Call:        mustParse[*promParser.Call](t, "vector(0)", 11),
+				},
+			},
+		},
+		{
+			expr: `count by (region) (stddev by (colo_name, region) (error_total))`,
+			output: []utils.Source{
+				{
+					Type:           utils.AggregateSource,
+					Returns:        promParser.ValueTypeVector,
+					Operation:      "count",
+					FixedLabels:    true,
+					IncludedLabels: []string{"region"},
+					ExcludedLabels: []string{labels.MetricName},
+					ExcludeReason: map[string]utils.ExcludedLabel{
+						"": {
+							Reason: "Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						labels.MetricName: {
+							Reason: "Aggregation removes metric name.",
+						},
+					},
+					Aggregation: mustParse[*promParser.AggregateExpr](t, "count by (region) (stddev by (colo_name, region) (error_total))", 0),
+					Selector:    mustParse[*promParser.VectorSelector](t, "error_total", 50),
 				},
 			},
 		},

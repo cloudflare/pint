@@ -918,6 +918,24 @@ func TestTemplateCheck(t *testing.T) {
 			checker:    newTemplateCheck,
 			prometheus: noProm,
 		},
+		{
+			description: "multiple aggregations",
+			content: `
+  - alert: High_CPU_Imbalance_On_Many_Colos
+    expr: |
+      count by (region) (
+        stddev by (colo_name, region) (
+          instance_mode:node_cpu:used_p90:rate2m{node_type="metal",node_status="v"}
+        ) > 0.1
+      ) >= 5
+    for: 10m
+    annotations:
+      summary: "Errors in {{ $labels.colo_name }}"
+`,
+			checker:    newTemplateCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
 	}
 	runTests(t, testCases)
 }
