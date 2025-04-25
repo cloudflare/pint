@@ -126,7 +126,7 @@ func BenchmarkCheckRules(b *testing.B) {
 			_, _ = w.Write([]byte(`Not found`))
 		}
 	}))
-	defer srv.Close()
+	b.Cleanup(srv.Close)
 
 	tmp := b.TempDir()
 	content := fmt.Appendf(nil, `prometheus "prom" {

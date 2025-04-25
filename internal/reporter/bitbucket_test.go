@@ -2066,7 +2066,7 @@ func TestBitBucketReporter(t *testing.T) {
 			} else {
 				srv = httptest.NewServer(tc.httpHandler)
 			}
-			defer srv.Close()
+			t.Cleanup(srv.Close)
 
 			r := reporter.NewBitBucketReporter(
 				"v0.0.0",

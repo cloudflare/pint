@@ -129,7 +129,7 @@ func TestQuery(t *testing.T) {
 			}`))
 		}
 	}))
-	defer srv.Close()
+	t.Cleanup(srv.Close)
 
 	type testCaseT struct {
 		query   string

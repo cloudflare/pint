@@ -47,7 +47,7 @@ func TestFlags(t *testing.T) {
 			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
 		}
 	}))
-	defer srv.Close()
+	t.Cleanup(srv.Close)
 
 	type testCaseT struct {
 		flags   promapi.FlagsResult

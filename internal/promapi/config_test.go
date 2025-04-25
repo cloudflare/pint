@@ -53,7 +53,7 @@ func TestConfig(t *testing.T) {
 			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled path"}`))
 		}
 	}))
-	defer srv.Close()
+	t.Cleanup(srv.Close)
 
 	type testCaseT struct {
 		prefix  string
@@ -124,7 +124,7 @@ func TestConfig(t *testing.T) {
 		t.Run(strings.TrimPrefix(tc.prefix, "/"), func(t *testing.T) {
 			prom := promapi.NewPrometheus("test", srv.URL+tc.prefix, "", nil, tc.timeout, 1, 100, nil)
 			prom.StartWorkers()
-			defer prom.Close()
+			t.Cleanup(prom.Close)
 
 			cfg, err := prom.Config(t.Context(), time.Minute)
 			if tc.err != "" {
@@ -174,7 +174,7 @@ func TestConfigHeaders(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				_, _ = w.Write([]byte(`{"status":"success","data":{"yaml":"global:\n  scrape_interval: 30s\n"}}`))
 			}))
-			defer srv.Close()
+			t.Cleanup(srv.Close)
 
 			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, "", tc.config, time.Second, 1, 100, nil),
