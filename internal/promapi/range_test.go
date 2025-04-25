@@ -678,7 +678,7 @@ func TestRange(t *testing.T) {
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				tc.handler(t, w, r)
 			}))
-			defer srv.Close()
+			t.Cleanup(srv.Close)
 
 			fg := promapi.NewFailoverGroup("test", srv.URL, []*promapi.Prometheus{
 				promapi.NewPrometheus("test", srv.URL, "", nil, tc.timeout, 1, 100, nil),

@@ -40,7 +40,7 @@ func TestGitLabReporterBadBaseURI(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestGitLabReporterV2(t *testing.T) {
+func TestGitLabReporter(t *testing.T) {
 	type errorCheck func(err error) error
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
@@ -697,10 +697,12 @@ Below is the list of checks that were disabled for each Prometheus server define
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
+			srv := tc.mock(t)
+			t.Cleanup(srv.Close)
 			r, err := reporter.NewGitLabReporter(
 				"v0.0.0",
 				"fakeBranch",
-				tc.mock(t).URL(),
+				srv.URL(),
 				tc.timeout,
 				"fakeToken",
 				123,
@@ -815,7 +817,7 @@ func TestGitLabReporterCommentLine(t *testing.T) {
 
 			srv := httptest.NewServer(getHTTPHandlerForCommentingLines(
 				tc.expectedNewLine, tc.expectedOldLine, multipleDiffs, t))
-			defer srv.Close()
+			t.Cleanup(srv.Close)
 
 			r, err := reporter.NewGitLabReporter(
 				"v0.0.0",

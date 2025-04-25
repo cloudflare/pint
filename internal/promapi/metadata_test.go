@@ -60,7 +60,7 @@ func TestMetadata(t *testing.T) {
 			_, _ = w.Write([]byte(`{"status":"error","errorType":"bad_data","error":"unhandled metric"}`))
 		}
 	}))
-	defer srv.Close()
+	t.Cleanup(srv.Close)
 
 	type testCaseT struct {
 		metric   string

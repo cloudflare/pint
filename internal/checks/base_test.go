@@ -156,7 +156,7 @@ func runTests(t *testing.T, testCases []checkTest) {
 					t.Errorf("no matching response for %s %s request: %s, body: %s", r.Method, r.URL, r.URL.Query(), string(buf))
 					t.FailNow()
 				}))
-				defer srv.Close()
+				t.Cleanup(srv.Close)
 				uri = srv.URL
 			}
 

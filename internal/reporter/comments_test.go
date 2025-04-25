@@ -754,7 +754,6 @@ foo details
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			slog.SetDefault(slogt.New(t))
-
 			summary := NewSummary(tc.reports)
 			tc.checkErr(t, Submit(t.Context(), summary, tc.commenter, tc.showDuplicates))
 		})
@@ -922,7 +921,7 @@ func TestCommentsCommonPaths(t *testing.T) {
 				slog.SetDefault(slogt.New(t))
 
 				srv := httptest.NewServer(tc.httpHandler)
-				defer srv.Close()
+				t.Cleanup(srv.Close)
 
 				summary := NewSummary(tc.reports)
 				err := Submit(t.Context(), summary, c(srv.URL), tc.showDuplicates)

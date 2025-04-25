@@ -44,7 +44,7 @@ func TestRuleLinkCheck(t *testing.T) {
 			w.WriteHeader(http.StatusBadRequest)
 		}
 	}))
-	defer srv.Close()
+	t.Cleanup(srv.Close)
 
 	testCases := []checkTest{
 		{
