@@ -238,7 +238,7 @@ func TestCostCheck(t *testing.T) {
 			description: "6 results with 5 series max",
 			content:     content,
 			checker: func(prom *promapi.FailoverGroup) checks.RuleChecker {
-				return checks.NewCostCheck(prom, 5, 0, 0, 0, "", checks.Bug)
+				return checks.NewCostCheck(prom, 5, 0, 0, 0, "Rule comment", checks.Bug)
 			},
 			prometheus: newSimpleProm,
 			problems:   true,

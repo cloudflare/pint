@@ -43,7 +43,7 @@
   problem:
     reporter: query/cost
     summary: query is too expensive
-    details: ""
+    details: 'Rule comment: Rule comment'
     diagnostics:
         - message: '`prom` Prometheus server at https://simple.example.com returned 6 result(s), maximum allowed series is 5.'
           pos:

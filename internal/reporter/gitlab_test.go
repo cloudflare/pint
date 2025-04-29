@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -44,12 +46,16 @@ func TestGitLabReporter(t *testing.T) {
 	type errorCheck func(err error) error
 
 	p := parser.NewParser(false, parser.PrometheusSchema, model.UTF8Validation)
-	mockFile := p.Parse(strings.NewReader(`
+	mockRules := `
 - record: target is down
   expr: up == 0
 - record: sum errors
   expr: sum(errors) by (job)
-`))
+`
+	tmpDir := t.TempDir()
+	mockPath := filepath.Join(tmpDir, "foo.txt")
+	require.NoError(t, os.WriteFile(mockPath, []byte(mockRules), 0o644))
+	mockFile := p.Parse(strings.NewReader(mockRules))
 
 	fooReport := reporter.Report{
 		Path: discovery.Path{
@@ -158,6 +164,26 @@ func TestGitLabReporter(t *testing.T) {
 :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/%s.html).
 `, reporter, summary, details, reporter))
 	}
+	discBodyWithDiag := func(reporter, summary, details, yml, diag string) *string {
+		return gitlab.Ptr(fmt.Sprintf(
+			`:stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **%s** check.
+
+<details>
+<summary>%s</summary>
+
+%s
+
+%s
+
+%s
+
+</details>
+
+------
+
+:information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/a.html).
+`, reporter, summary, yml, diag, details))
+	}
 	discPosition := func(path string, line int) *gitlab.PositionOptions {
 		return gitlab.Ptr(gitlab.PositionOptions{
 			BaseSHA:      gitlab.Ptr("base"),
@@ -220,6 +246,69 @@ func TestGitLabReporter(t *testing.T) {
 				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
 				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{})
 			}),
+		},
+		{
+			description: "single MR with diagnostics",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: mockPath,
+						Name:          mockPath,
+					},
+					ModifiedLines: []int{2},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Reporter: "a",
+						Summary:  "foo error1",
+						Details:  "foo details",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Diagnostic message",
+								Pos: diags.PositionRanges{
+									{
+										Line:        2,
+										FirstColumn: 3,
+										LastColumn:  24,
+									},
+									{
+										Line:        3,
+										FirstColumn: 3,
+										LastColumn:  15,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  24,
+							},
+						},
+						Lines:    diags.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
+					{OldPath: mockPath, NewPath: mockPath, Diff: fooDiff},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body:     discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
+					Position: discPosition(mockPath, 2),
+				}).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
 		},
 		{
 			description: "multiple merge requests",
