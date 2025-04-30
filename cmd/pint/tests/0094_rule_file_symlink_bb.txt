@@ -68,6 +68,8 @@ stderr '{"path":"rules.yml","message":"Problem detected on symlinked file double
 stderr 'Problem detected on symlinked file symlink.yml:'
 stderr 'Problem detected on symlinked file double.yml:'
 
+cmp bitbucket.got ../bitbucket.expected
+
 -- src/v1.yml --
 groups:
 - name: foo
@@ -110,3 +112,86 @@ prometheus "5m" {
   required = true
   include = ["symlink.yml", "double.yml"]
 }
+
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: FAIL
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 6
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 6
+    title: Number of rules checked
+    type: NUMBER
+  - value: 4
+    title: Number of problems found
+    type: NUMBER
+  - value: 48
+    title: Number of offline checks
+    type: NUMBER
+  - value: 42
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+annotations:
+  - path: rules.yml
+    message: "Problem detected on symlinked file double.yml: promql/rate: duration too small"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/promql/rate.html
+    line: 5
+  - path: rules.yml
+    message: "Problem detected on symlinked file double.yml: promql/rate: duration too small"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/promql/rate.html
+    line: 7
+  - path: rules.yml
+    message: "Problem detected on symlinked file symlink.yml: promql/rate: duration too small"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/promql/rate.html
+    line: 5
+  - path: rules.yml
+    message: "Problem detected on symlinked file symlink.yml: promql/rate: duration too small"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/promql/rate.html
+    line: 7
+--- END ---
+

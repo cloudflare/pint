@@ -23,6 +23,7 @@ env BITBUCKET_AUTH_TOKEN="12345"
 exec pint -l error --no-color ci
 ! stdout .
 cmp stderr ../stderr.txt
+cmp bitbucket.got ../bitbucket.expected
 
 -- stderr.txt --
 Warning: always firing alert (alerts/comparison)
@@ -70,3 +71,98 @@ repository {
     repository = "rules"
   }
 }
+
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: PASS
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 4
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 4
+    title: Number of rules checked
+    type: NUMBER
+  - value: 6
+    title: Number of problems found
+    type: NUMBER
+  - value: 16
+    title: Number of offline checks
+    type: NUMBER
+  - value: 0
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+annotations:
+  - path: rules.yml
+    message: "Problem reported on unmodified line 2, annotation moved here: alerts/comparison: always firing alert"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
+    line: 1
+  - path: rules.yml
+    message: "Problem reported on unmodified line 2, annotation moved here: promql/regexp: redundant regexp"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/promql/regexp.html
+    line: 1
+  - path: rules.yml
+    message: "alerts/for: redundant field with default value"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/for.html
+    line: 3
+  - path: rules.yml
+    message: "alerts/comparison: always firing alert"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
+    line: 5
+  - path: rules.yml
+    message: "promql/regexp: redundant regexp"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/promql/regexp.html
+    line: 5
+  - path: rules.yml
+    message: "alerts/for: redundant field with default value"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/for.html
+    line: 6
+--- END ---
+

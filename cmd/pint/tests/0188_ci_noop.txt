@@ -23,11 +23,7 @@ exec git commit -am 'v2'
 env BITBUCKET_AUTH_TOKEN="12345"
 exec pint -l debug --no-color ci
 ! stdout .
-stderr '{"value":2,"title":"Number of rules parsed","type":"NUMBER"}'
-stderr '{"value":2,"title":"Number of rules checked","type":"NUMBER"}'
-stderr '{"value":0,"title":"Number of problems found","type":"NUMBER"}'
-stderr '{"value":0,"title":"Number of offline checks","type":"NUMBER"}'
-stderr '{"value":0,"title":"Number of online checks","type":"NUMBER"}'
+cmp bitbucket.got ../bitbucket.expected
 
 -- src/rules.yml --
 - alert: alert1
@@ -66,3 +62,54 @@ rule {
     resolve    = "5m"
   }
 }
+
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: PASS
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 2
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 2
+    title: Number of rules checked
+    type: NUMBER
+  - value: 0
+    title: Number of problems found
+    type: NUMBER
+  - value: 0
+    title: Number of offline checks
+    type: NUMBER
+  - value: 0
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+

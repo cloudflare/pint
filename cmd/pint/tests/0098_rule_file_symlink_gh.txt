@@ -1,4 +1,4 @@
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml"}]
+http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
@@ -28,6 +28,7 @@ env GITHUB_PULL_REQUEST_NUMBER=1
 exec pint -l debug -d promql/series --no-color ci
 ! stdout .
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
+cmp github.got ../github.expected
 
 -- src/v1.yml --
 groups:
@@ -59,3 +60,118 @@ repository {
     repo      = "pint"
   }
 }
+
+-- github.expected --
+GET /api/v3/repos/cloudflare/pint/pulls/1/files
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+GET /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+body: |
+  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
+
+  <details>
+  <summary>always firing alert</summary>
+
+  ```yaml
+  7 |     expr: rate(errors_total[2m])
+                     ^^^^^^^^^^^^^^^^ 
+  ```
+
+  This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+  In most cases this can be achieved by having some condition in the query expression.
+  For example `up == 0` or `rate(error_total[2m]) > 0`.
+  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+
+  </details>
+
+  ------
+
+  The same issue was reported 1 more time(s), duplicates where suppressed.
+
+  <details>
+  <summary>Show affected rules</summary>
+
+  - `rule2` at `symlink.yml:7`
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+path: rules.yml
+line: 1
+side: RIGHT
+commit_id: <COMMIT ID>
+--- END ---
+
+GET /api/v3/repos/cloudflare/pint/pulls/1/reviews
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+commit_id: <COMMIT ID>
+body: |+
+  ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+  :heavy_exclamation_mark:	Problems found.
+  | Severity | Number of problems |
+  | --- | --- |
+  | Warning | 2 |
+  <details><summary>Stats</summary>
+  <p>
+
+  | Stat | Value |
+  | --- | --- |
+  | Version | unknown |
+  | Number of rules parsed | 4 |
+  | Number of rules checked | 4 |
+  | Number of problems found | 2 |
+  | Number of offline checks | 28 |
+  | Number of online checks | 0 |
+  | Checks duration | 0 |
+
+  </p>
+  </details>
+
+  <details><summary>Problems</summary>
+  <p>
+
+  ```
+  Warning: always firing alert (alerts/comparison)
+    ---> rules.yml:7 -> `rule2` [+1 duplicates]
+  7 |     expr: rate(errors_total[2m])
+                     ^^^^^^^^^^^^^^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+  ```
+
+  </p>
+  </details>
+
+event: COMMENT
+--- END ---
+

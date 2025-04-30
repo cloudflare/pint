@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
@@ -9,18 +10,21 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"io"
 	"math/big"
 	"net"
 	"net/http"
 	"os"
 	"path"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/itchyny/json2yaml"
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
@@ -54,7 +58,6 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 	cmd := args[0]
 
 	switch cmd {
-	// http response name /200 200 OK
 	case "response":
 		if len(args) < 5 {
 			ts.Fatalf("! http response command requires '$NAME $PATH $CODE $BODY' args, got [%s]", strings.Join(args, " "))
@@ -64,9 +67,10 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		code, err := strconv.Atoi(args[3])
 		ts.Check(err)
 		body := strings.Join(args[4:], " ")
-		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, _ *http.Request) {
+		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
+			snapshotRequest(ts, r, name, path)
 			w.WriteHeader(code)
-			_, err := w.Write([]byte(body))
+			_, err = w.Write([]byte(body))
 			ts.Check(err)
 		}})
 	case "method":
@@ -79,7 +83,8 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		code, err := strconv.Atoi(args[4])
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
-		mocks.add(name, httpMock{pattern: path, method: meth, handler: func(w http.ResponseWriter, _ *http.Request) {
+		mocks.add(name, httpMock{pattern: path, method: meth, handler: func(w http.ResponseWriter, r *http.Request) {
+			snapshotRequest(ts, r, name, path)
 			w.WriteHeader(code)
 			_, err := w.Write([]byte(body))
 			ts.Check(err)
@@ -99,6 +104,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
 			username, password, ok := r.BasicAuth()
 			if ok && username == user && password == pass {
+				snapshotRequest(ts, r, name, path)
 				w.WriteHeader(code)
 				_, err := w.Write([]byte(body))
 				ts.Check(err)
@@ -118,7 +124,8 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		code, err := strconv.Atoi(args[4])
 		ts.Check(err)
 		body := strings.Join(args[5:], " ")
-		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, _ *http.Request) {
+		mocks.add(name, httpMock{pattern: path, handler: func(w http.ResponseWriter, r *http.Request) {
+			snapshotRequest(ts, r, name, path)
 			time.Sleep(delay)
 			w.WriteHeader(code)
 			_, err := w.Write([]byte(body))
@@ -132,7 +139,8 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 		name := args[1]
 		srcpath := regexp.MustCompile(args[2])
 		dstpath := args[3]
-		mocks.add(name, httpMock{pattern: srcpath, handler: func(w http.ResponseWriter, _ *http.Request) {
+		mocks.add(name, httpMock{pattern: srcpath, handler: func(w http.ResponseWriter, r *http.Request) {
+			snapshotRequest(ts, r, name, srcpath)
 			w.Header().Set("Location", dstpath)
 			w.WriteHeader(http.StatusFound)
 		}})
@@ -151,6 +159,7 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 			tlsKey = args[4]
 		}
 
+		var mtx sync.Mutex
 		mux := http.NewServeMux()
 		mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			var done bool
@@ -163,8 +172,10 @@ func httpServer(ts *testscript.TestScript, _ bool, args []string) {
 						if !mock.pattern.MatchString(r.URL.Path) {
 							continue
 						}
+						mtx.Lock()
 						mock.handler(w, r)
 						done = true
+						mtx.Unlock()
 						break
 					}
 					break
@@ -330,4 +341,68 @@ func writeCert(ts *testscript.TestScript, dirname, filename string, block *pem.B
 	}
 
 	ts.Logf("Wrote PEM file to %s", filename)
+}
+
+func snapshotRequest(ts *testscript.TestScript, r *http.Request, name string, path *regexp.Regexp) {
+	payload, err := io.ReadAll(r.Body)
+	ts.Check(err)
+	r.Body.Close()
+
+	var buf strings.Builder
+	buf.WriteString(r.Method)
+	buf.WriteRune(' ')
+	buf.WriteString(path.String())
+	buf.WriteRune('\n')
+
+	hKeys := make([]string, 0, len(r.Header))
+	for k := range r.Header {
+		if k == "Content-Length" || k == "User-Agent" {
+			continue
+		}
+		hKeys = append(hKeys, k)
+	}
+	slices.Sort(hKeys)
+	for _, k := range hKeys {
+		buf.WriteString("  ")
+		buf.WriteString(k)
+		buf.WriteRune(':')
+		buf.WriteRune(' ')
+		buf.WriteString(strings.Join(r.Header.Values(k), ";"))
+		buf.WriteRune('\n')
+	}
+
+	if len(payload) > 0 {
+		payload = sanitizePayload(payload)
+		buf.WriteString("--- BODY ---\n")
+		buf.Write(payload)
+		if !bytes.HasSuffix(payload, []byte("\n")) {
+			buf.WriteRune('\n')
+		}
+		buf.WriteString("--- END ---\n")
+	}
+	buf.WriteRune('\n')
+
+	f, err := os.OpenFile(ts.MkAbs(name+".got"), os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
+	ts.Check(err)
+	_, err = f.WriteString(buf.String())
+	ts.Check(err)
+	ts.Check(f.Close())
+}
+
+func sanitizePayload(payload []byte) []byte {
+	bbDurationRe := regexp.MustCompile(`\{"value":([0-9]+),"title":"Checks duration","type":"DURATION"\}`)
+	payload = bbDurationRe.ReplaceAll(payload, []byte(`{"value":0,"title":"Checks duration","type":"DURATION"}`))
+
+	ghDurationRe := regexp.MustCompile(`\| Checks duration \| ([0-9]+[a-z]+) \|`)
+	payload = ghDurationRe.ReplaceAll(payload, []byte(`| Checks duration | 0 |`))
+
+	commitIDRe := regexp.MustCompile(`"commit_id":"([0-9a-zA-Z]{40})"`)
+	payload = commitIDRe.ReplaceAll(payload, []byte(`"commit_id":"<COMMIT ID>"`))
+
+	var output bytes.Buffer
+	if err := json2yaml.Convert(&output, bytes.NewReader(payload)); err != nil {
+		return payload
+	}
+
+	return output.Bytes()
 }
