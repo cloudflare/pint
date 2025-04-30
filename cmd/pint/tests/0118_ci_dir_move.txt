@@ -1,4 +1,4 @@
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml"}]
+http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
@@ -30,6 +30,7 @@ exec pint -l debug --no-color ci
 ! stdout .
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
 stderr 'msg="Skipping directory entry change"'
+cmp github.got ../github.expected
 
 -- src/rules.yml --
 groups:
@@ -52,3 +53,60 @@ repository {
     repo      = "pint"
   }
 }
+
+-- github.expected --
+GET /api/v3/repos/cloudflare/pint/pulls/1/files
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+GET /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+GET /api/v3/repos/cloudflare/pint/pulls/1/reviews
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+commit_id: <COMMIT ID>
+body: |+
+  ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+  :heavy_check_mark: No problems found
+  <details><summary>Stats</summary>
+  <p>
+
+  | Stat | Value |
+  | --- | --- |
+  | Version | unknown |
+  | Number of rules parsed | 2 |
+  | Number of rules checked | 2 |
+  | Number of problems found | 0 |
+  | Number of offline checks | 0 |
+  | Number of online checks | 0 |
+  | Checks duration | 0 |
+
+  </p>
+  </details>
+
+  <details><summary>Problems</summary>
+  <p>
+
+  No problems reported
+  </p>
+  </details>
+
+event: COMMENT
+--- END ---
+

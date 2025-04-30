@@ -23,6 +23,7 @@ env BITBUCKET_AUTH_TOKEN="12345"
 ! exec pint -l warn --no-color ci --require-owner
 ! stdout .
 cmp stderr ../stderr.txt
+cmp bitbucket.got ../bitbucket.expected
 
 -- src/v1.yml --
 groups:
@@ -210,3 +211,337 @@ Bug: required label is being removed via aggregation (promql/aggregate)
                    `job` label is required and should be preserved when aggregating all rules.
 
 level=ERROR msg="Execution completed with error(s)" err="submitting reports: fatal error(s) reported"
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: FAIL
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 10
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 10
+    title: Number of rules checked
+    type: NUMBER
+  - value: 46
+    title: Number of problems found
+    type: NUMBER
+  - value: 98
+    title: Number of offline checks
+    type: NUMBER
+  - value: 0
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+annotations:
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 5
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 5
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 5
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 5
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 5
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 5
+  - path: rules.yml
+    message: "promql/syntax: PromQL syntax error"
+    severity: HIGH
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/promql/syntax.html
+    line: 5
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 8
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 8
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 8
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 8
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 8
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 8
+  - path: rules.yml
+    message: "alerts/comparison: always firing alert"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
+    line: 8
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 11
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 17
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 17
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 23
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 23
+  - path: rules.yml
+    message: "alerts/comparison: always firing alert"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
+    line: 20
+  - path: rules.yml
+    message: "alerts/for: redundant field with default value"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/for.html
+    line: 21
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 30
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 30
+  - path: rules.yml
+    message: "alerts/template: template uses non-existent label"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/template.html
+    line: 30
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 30
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 30
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 30
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 30
+  - path: rules.yml
+    message: "alerts/template: value used in labels"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/template.html
+    line: 28
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 33
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 33
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 33
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 33
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 33
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 33
+  - path: rules.yml
+    message: "alerts/comparison: always firing alert"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
+    line: 33
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 36
+  - path: rules.yml
+    message: "promql/regexp: redundant regexp"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/promql/regexp.html
+    line: 36
+  - path: rules.yml
+    message: "promql/aggregate: required label is being removed via aggregation"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/promql/aggregate.html
+    line: 36
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 39
+  - path: rules.yml
+    message: "alerts/annotation: required annotation not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/alerts/annotation.html
+    line: 39
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 39
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 39
+  - path: rules.yml
+    message: "rule/label: required label not set"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/label.html
+    line: 39
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 39
+  - path: rules.yml
+    message: "alerts/comparison: always firing alert"
+    severity: LOW
+    type: CODE_SMELL
+    link: https://cloudflare.github.io/pint/checks/alerts/comparison.html
+    line: 39
+--- END ---
+

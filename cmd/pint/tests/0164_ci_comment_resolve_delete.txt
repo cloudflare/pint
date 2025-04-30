@@ -27,37 +27,21 @@ cp ../src/v1.yml rules.yml
 exec git commit -am 'v1'
 ! exec pint --no-color ci
 stderr 'msg="Problems found" Fatal=1'
-stderr 'msg="Sending a request to BitBucket" method=DELETE path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'
-stderr 'msg="Sending a request to BitBucket" method=PUT path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests'
 stderr 'msg="Found open pull request, reporting problems using comments" id=123 srcBranch=modify srcCommit=fake-commit-id dstBranch=main dstCommit=fake-commit-id'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/changes'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/latest/projects/prometheus/repos/rules/commits/fake-commit-id/diff/rules.yml'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/plugins/servlet/applinks/whoami'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/latest/projects/prometheus/repos/rules/pull-requests/123/activities'
 stderr 'msg="Got existing pull request comments from BitBucket" count=1'
 stderr 'msg="Generated comments to add to BitBucket" count=1'
-stderr 'msg="Sending a request to BitBucket" method=PUT path=/rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments/1'
-stderr 'msg="Sending a request to BitBucket" method=POST path=/rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments'
 stderr 'msg="Added pull request comments to BitBucket" count=1'
+cmp bitbucket.got ../bitbucket.expected
 
 cp ../src/v2.yml rules.yml
 exec git commit -am 'v2'
 exec pint --no-color ci
 ! stdout .
 ! stderr 'msg="Problems found"'
-stderr 'msg="Sending a request to BitBucket" method=DELETE path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'
-stderr 'msg="Sending a request to BitBucket" method=PUT path=/rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests'
 stderr 'msg="Found open pull request, reporting problems using comments" id=123 srcBranch=modify srcCommit=fake-commit-id dstBranch=main dstCommit=fake-commit-id'
 stderr 'msg="Getting pull request changes from BitBucket"'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/changes'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/latest/projects/prometheus/repos/rules/commits/fake-commit-id/diff/rules.yml'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/plugins/servlet/applinks/whoami'
-stderr 'msg="Sending a request to BitBucket" method=GET path=/rest/api/latest/projects/prometheus/repos/rules/pull-requests/123/activities'
 stderr 'msg="Got existing pull request comments from BitBucket" count=1'
 stderr 'msg="Generated comments to add to BitBucket" count=0'
-stderr 'msg="Sending a request to BitBucket" method=PUT path=/rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments/1'
 stderr 'msg="Added pull request comments to BitBucket" count=0'
 
 -- src/v0.yml --
@@ -89,3 +73,120 @@ repository {
     repository = "rules"
   }
 }
+
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: FAIL
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 1
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 1
+    title: Number of rules checked
+    type: NUMBER
+  - value: 1
+    title: Number of problems found
+    type: NUMBER
+  - value: 7
+    title: Number of offline checks
+    type: NUMBER
+  - value: 0
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/changes
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+GET /rest/api/latest/projects/prometheus/repos/rules/commits/fake-commit-id/diff/rules.yml
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+GET /plugins/servlet/applinks/whoami
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+GET /rest/api/latest/projects/prometheus/repos/rules/pull-requests/123/activities
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+severity: BLOCKER
+version: 0
+--- END ---
+
+PUT /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+state: RESOLVED
+version: 0
+--- END ---
+
+POST /rest/api/1.0/projects/prometheus/repos/rules/pull-requests/123/comments
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+text: |
+  :stop_sign: **Fatal** reported by [pint](https://cloudflare.github.io/pint/) **promql/syntax** check.
+
+  ------
+
+  PromQL syntax error
+
+  ```yaml
+  5 |     expr: count(up == 1) bie(job)
+                               ^^^ 
+  ```
+
+  unexpected identifier "bie"
+
+  [Click here](https://prometheus.io/docs/prometheus/latest/querying/basics/) for PromQL documentation.
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/syntax.html).
+severity: BLOCKER
+anchor:
+  path: rules.yml
+  lineType: ADDED
+  fileType: TO
+  diffType: EFFECTIVE
+  line: 5
+--- END ---
+

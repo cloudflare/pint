@@ -1,4 +1,4 @@
-http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml"}]
+http method github GET /api/v3/repos/cloudflare/pint/pulls/1/files 200 [{"filename":"rules.yml", "patch": "@@ -1,4 +1,4 @@ - record: target is down\n-  expr: up == 1\n+  expr: up == 0\n - record: sum errors\n   expr: sum(errors) by (job)"}]http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 []
 http method github POST /api/v3/repos/cloudflare/pint/pulls/1/reviews 200 {}
 http method github GET /api/v3/repos/cloudflare/pint/pulls/1/comments 200 []
@@ -27,6 +27,7 @@ env GITHUB_PULL_REQUEST_NUMBER=1
 ! exec pint -l debug --no-color ci
 ! stdout .
 stderr 'level=INFO msg="Pull request review created" status="200 OK"'
+cmp github.got ../github.expected
 
 -- src/v1.yml --
 - alert: rule1
@@ -64,3 +65,176 @@ repository {
     repo      = "pint"
   }
 }
+
+-- github.expected --
+GET /api/v3/repos/cloudflare/pint/pulls/1/files
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+GET /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+body: |
+  :stop_sign: **Bug** reported by [pint](https://cloudflare.github.io/pint/) **alerts/template** check.
+
+  <details>
+  <summary>template uses non-existent label</summary>
+
+  ```yaml
+  4 |     summary: 'foo is down on {{ $labels.instance }}'
+                                             ^^^^^^^^^ 
+  ```
+
+  Template is using `instance` label but the query results won't have this label.
+
+  ```yaml
+  2 |   expr: sum(foo)
+              ^^^ 
+  ```
+
+  Query is using aggregation that removes all labels.
+
+  </details>
+
+  ------
+
+  The same issue was reported 1 more time(s), duplicates where suppressed.
+
+  <details>
+  <summary>Show affected rules</summary>
+
+  - `rule2` at `rules.yml:5`
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/template.html).
+path: rules.yml
+line: 1
+side: RIGHT
+commit_id: <COMMIT ID>
+--- END ---
+
+POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+body: |
+  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **alerts/comparison** check.
+
+  <details>
+  <summary>always firing alert</summary>
+
+  ```yaml
+  2 |   expr: sum(foo)
+                  ^^^ 
+  ```
+
+  This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+  Prometheus alerting rules will trigger an alert for each query that returns *any* result.
+  Unless you do want an alert to always fire you should write your query in a way that returns results only when some condition is met.
+  In most cases this can be achieved by having some condition in the query expression.
+  For example `up == 0` or `rate(error_total[2m]) > 0`.
+  Be careful as some PromQL operations will cause the query to always return the results, for example using the [bool modifier](https://prometheus.io/docs/prometheus/latest/querying/operators/#comparison-binary-operators).
+
+  </details>
+
+  ------
+
+  The same issue was reported 1 more time(s), duplicates where suppressed.
+
+  <details>
+  <summary>Show affected rules</summary>
+
+  - `rule2` at `rules.yml:6`
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/alerts/comparison.html).
+path: rules.yml
+line: 1
+side: RIGHT
+commit_id: <COMMIT ID>
+--- END ---
+
+GET /api/v3/repos/cloudflare/pint/pulls/1/reviews
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  X-Github-Api-Version: 2022-11-28
+
+POST /api/v3/repos/cloudflare/pint/pulls/1/reviews
+  Accept: application/vnd.github.v3+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+commit_id: <COMMIT ID>
+body: |+
+  ### This pull request was validated by [pint](https://github.com/cloudflare/pint).
+  :heavy_exclamation_mark:	Problems found.
+  | Severity | Number of problems |
+  | --- | --- |
+  | Bug | 2 |
+  | Warning | 2 |
+  <details><summary>Stats</summary>
+  <p>
+
+  | Stat | Value |
+  | --- | --- |
+  | Version | unknown |
+  | Number of rules parsed | 2 |
+  | Number of rules checked | 2 |
+  | Number of problems found | 4 |
+  | Number of offline checks | 14 |
+  | Number of online checks | 0 |
+  | Checks duration | 0 |
+
+  </p>
+  </details>
+
+  <details><summary>Problems</summary>
+  <p>
+
+  ```
+  Bug: template uses non-existent label (alerts/template)
+    ---> rules.yml:1-4 -> `rule1` [+1 duplicates]
+  2 |   expr: sum(foo)
+              ^^^ Query is using aggregation that removes all labels.
+    | [...]
+  4 |     summary: 'foo is down on {{ $labels.instance }}'
+                                             ^^^^^^^^^ Template is using `instance` label but the query results won't have this label.
+
+  Warning: always firing alert (alerts/comparison)
+    ---> rules.yml:2 -> `rule1` [+1 duplicates]
+  2 |   expr: sum(foo)
+                  ^^^ This query doesn't have any condition and so this alert will always fire if it matches anything.
+
+  ```
+
+  </p>
+  </details>
+
+event: COMMENT
+--- END ---
+

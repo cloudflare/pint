@@ -23,12 +23,7 @@ env BITBUCKET_AUTH_TOKEN="12345"
 ! exec pint --no-color -l debug ci
 ! stdout .
 stderr 'level=INFO msg="Problems found" Fatal=1'
-stderr 'result":"FAIL"'
-stderr ',"line":3}'
-stderr 'msg="Sending a request to BitBucket" method=PUT'
-stderr 'msg="BitBucket request completed" status=200'
-stderr 'msg="Sending a request to BitBucket" method=DELETE'
-stderr 'msg="BitBucket request completed" status=200'
+cmp bitbucket.got ../bitbucket.expected
 
 -- src/v1.yml --
 - alert: rule1
@@ -57,3 +52,68 @@ repository {
     repository = "rules"
   }
 }
+
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: FAIL
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 1
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 1
+    title: Number of rules checked
+    type: NUMBER
+  - value: 1
+    title: Number of problems found
+    type: NUMBER
+  - value: 1
+    title: Number of offline checks
+    type: NUMBER
+  - value: 0
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+annotations:
+  - path: rules.yml
+    message: "Problem reported on unmodified line 2, annotation moved here: yaml/parse: did not find expected key"
+    severity: HIGH
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/yaml/parse.html
+    line: 3
+--- END ---
+

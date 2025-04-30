@@ -24,6 +24,7 @@ env BITBUCKET_AUTH_TOKEN="12345"
 ! stdout .
 cd ..
 cmp stderr stderr.txt
+cmp testrepo/bitbucket.got bitbucket.expected
 
 -- stderr.txt --
 Bug: missing owner (rule/owner)
@@ -79,3 +80,74 @@ repository {
     repository = "rules"
   }
 }
+
+-- bitbucket.expected --
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+PUT /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+reporter: Prometheus rule linter
+title: pint unknown
+result: FAIL
+details: |-
+  pint is a Prometheus rule linter/validator.
+  It will inspect all Prometheus recording and alerting rules for problems that could prevent these from working correctly.
+  Checks can be either offline (static checks using only rule definition) or online (validate rule against live Prometheus server).
+link: https://cloudflare.github.io/pint/
+data:
+  - value: 6
+    title: Number of rules parsed
+    type: NUMBER
+  - value: 6
+    title: Number of rules checked
+    type: NUMBER
+  - value: 2
+    title: Number of problems found
+    type: NUMBER
+  - value: 24
+    title: Number of offline checks
+    type: NUMBER
+  - value: 0
+    title: Number of online checks
+    type: NUMBER
+  - value: 0
+    title: Checks duration
+    type: DURATION
+--- END ---
+
+GET /rest/api/1.0/projects/prometheus/repos/rules/commits/.*/pull-requests
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+DELETE /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+
+POST /rest/insights/1.0/projects/prometheus/repos/rules/commits/.*/reports/pint
+  Accept-Encoding: gzip
+  Authorization: Bearer "12345"
+  Content-Type: application/json
+--- BODY ---
+annotations:
+  - path: rules.yml
+    message: "rule/owner: missing owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 4
+  - path: rules.yml
+    message: "rule/owner: invalid owner"
+    severity: MEDIUM
+    type: BUG
+    link: https://cloudflare.github.io/pint/checks/rule/owner.html
+    line: 8
+--- END ---
+
