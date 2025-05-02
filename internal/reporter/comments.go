@@ -335,6 +335,10 @@ func updateDestination(ctx context.Context, s Summary, c Commenter, dst any, sho
 		if !c.CanDelete(existing) {
 			goto NEXTDelete
 		}
+		slog.Info("Trying to delete a stale existing comment",
+			slog.String("path", existing.path),
+			slog.Int("line", existing.line),
+		)
 		if err := c.Delete(ctx, dst, existing); err != nil {
 			slog.Error("Failed to delete a stale comment",
 				slog.String("reporter", c.Describe()),

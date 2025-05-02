@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -234,6 +235,19 @@ func TestGitLabReporter(t *testing.T) {
 		maxComments    int
 		showDuplicates bool
 	}{
+		{
+			description: "bogus JSON responses",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(regexp.MustCompile(".+")).Times(4).Return(`[{"iid": 333}]`)
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
 		{
 			description: "empty list of merge requests",
 			timeout:     time.Minute,
@@ -872,6 +886,90 @@ Below is the list of checks that were disabled for each Prometheus server define
 				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
 					Body:     discBody("b", "foo error2", "foo details"),
 					Position: discPosition("foo.txt", 2),
+				}).ReturnJSON(gitlab.Response{})
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
+		{
+			description: "rule moved to a different file, old deleted",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary: reporter.NewSummary([]reporter.Report{
+				{
+					Path: discovery.Path{
+						SymlinkTarget: mockPath,
+						Name:          mockPath,
+					},
+					ModifiedLines: []int{2, 3},
+					Rule:          mockFile.Groups[0].Rules[0],
+					Problem: checks.Problem{
+						Reporter: "a",
+						Summary:  "foo error1",
+						Details:  "foo details",
+						Diagnostics: []diags.Diagnostic{
+							{
+								Message: "Diagnostic message",
+								Pos: diags.PositionRanges{
+									{
+										Line:        2,
+										FirstColumn: 3,
+										LastColumn:  24,
+									},
+									{
+										Line:        3,
+										FirstColumn: 3,
+										LastColumn:  15,
+									},
+								},
+								FirstColumn: 1,
+								LastColumn:  24,
+							},
+						},
+						Lines:    diags.LineRange{First: 1, Last: 3},
+						Severity: checks.Fatal,
+						Anchor:   checks.AnchorAfter,
+					},
+				},
+			}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(apiOpenMergeRequests).ReturnJSON([]gitlab.BasicMergeRequest{
+					{IID: 1},
+				})
+				s.ExpectGet(apiVersions(1)).ReturnJSON([]gitlab.MergeRequestDiffVersion{
+					{ID: 2, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+					{ID: 1, HeadCommitSHA: "head", BaseCommitSHA: "base", StartCommitSHA: "start"},
+				})
+				s.ExpectGet(apiDiffs(1)).ReturnJSON([]gitlab.MergeRequestDiff{
+					{
+						Diff:        "",
+						NewPath:     mockPath,
+						OldPath:     "foo.old",
+						AMode:       "100644",
+						BMode:       "100644",
+						RenamedFile: true,
+					},
+					{
+						Diff:    fooDiff,
+						NewPath: "foo.txt",
+						OldPath: "foo.txt",
+					},
+				})
+				s.ExpectGet(apiDiscussions(1, true)).ReturnJSON([]gitlab.Discussion{})
+				s.ExpectPost(apiDiscussions(1, false)).WithBodyJSON(gitlab.CreateMergeRequestDiscussionOptions{
+					Body: discBodyWithDiag("a", "foo error1", "foo details", "```yaml\n2 | - record: target is down\n3 |   expr: up == 0\n      ^^ \n```", "Diagnostic message"),
+					Position: gitlab.Ptr(gitlab.PositionOptions{
+						BaseSHA:      gitlab.Ptr("base"),
+						StartSHA:     gitlab.Ptr("start"),
+						HeadSHA:      gitlab.Ptr("head"),
+						OldPath:      gitlab.Ptr("foo.old"),
+						NewPath:      gitlab.Ptr(mockPath),
+						PositionType: gitlab.Ptr("text"),
+						NewLine:      gitlab.Ptr(3),
+						// Old file is gone so we don't have OldLine here at all
+					}),
 				}).ReturnJSON(gitlab.Response{})
 			}),
 			errorHandler: func(err error) error {

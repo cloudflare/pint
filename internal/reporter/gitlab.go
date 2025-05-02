@@ -191,7 +191,9 @@ func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, er
 			c = gl.noteToExisting(disc.ID, note)
 			break
 		}
-		comments = append(comments, c)
+		if c.path != "" && c.line > 0 && c.meta != nil {
+			comments = append(comments, c)
+		}
 	NEXT:
 	}
 	return comments, nil
@@ -426,8 +428,8 @@ func (gl GitLabReporter) unresolveIfPresent(ctx context.Context, dst any, commen
 }
 
 func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeRequestDiff, ver *gitlab.MergeRequestDiffVersion) *gitlab.CreateMergeRequestDiscussionOptions {
-	diff := getDiffForPath(diffs, pending.path)
-	if diff == nil {
+	pathDiffs := getDiffsForPath(diffs, pending.path)
+	if len(pathDiffs) == 0 {
 		slog.Debug("Skipping report for path with no GitLab diff",
 			slog.String("path", pending.path),
 		)
@@ -441,39 +443,51 @@ func reportToGitLabDiscussion(pending PendingComment, diffs []*gitlab.MergeReque
 			BaseSHA:      gitlab.Ptr(ver.BaseCommitSHA),
 			HeadSHA:      gitlab.Ptr(ver.HeadCommitSHA),
 			StartSHA:     gitlab.Ptr(ver.StartCommitSHA),
-			OldPath:      gitlab.Ptr(diff.OldPath),
-			NewPath:      gitlab.Ptr(diff.NewPath),
 		},
 	}
 
-	dl, ok := diffLineFor(parseDiffLines(diff.Diff), pending.line)
-	switch {
-	case !ok:
-		// No diffLine for this line, most likely unmodified ?.
-		d.Position.NewLine = gitlab.Ptr(pending.line)
-		d.Position.OldLine = gitlab.Ptr(pending.line)
-	case pending.anchor == checks.AnchorBefore:
-		// Comment on removed line.
-		d.Position.OldLine = gitlab.Ptr(dl.old)
-	case ok && !dl.wasModified:
-		// Comment on unmodified line.
-		d.Position.NewLine = gitlab.Ptr(dl.new)
-		d.Position.OldLine = gitlab.Ptr(dl.old)
-	default:
-		// Comment on new or modified line.
-		d.Position.NewLine = gitlab.Ptr(dl.new)
+	var renamed bool
+	for _, diff := range pathDiffs {
+		d.Position.OldPath = gitlab.Ptr(diff.OldPath)
+		if d.Position.NewPath == nil {
+			d.Position.NewPath = gitlab.Ptr(diff.NewPath)
+		}
+		if diff.OldPath != diff.NewPath {
+			renamed = true
+		}
+
+		dl, ok := diffLineFor(parseDiffLines(diff.Diff), pending.line)
+		switch {
+		case !ok:
+			// No diffLine for this line, could be a file rename.
+			d.Position.NewLine = gitlab.Ptr(pending.line)
+			d.Position.OldLine = gitlab.Ptr(pending.line)
+		case pending.anchor == checks.AnchorBefore:
+			// Comment on removed line.
+			d.Position.OldLine = gitlab.Ptr(dl.old)
+		case ok && !dl.wasModified:
+			// Comment on unmodified line.
+			d.Position.NewLine = gitlab.Ptr(dl.new)
+			d.Position.OldLine = gitlab.Ptr(dl.old)
+		default:
+			// Comment on new or modified line.
+			d.Position.NewLine = gitlab.Ptr(dl.new)
+		}
+	}
+	if renamed {
+		d.Position.OldLine = nil
 	}
 
 	return &d
 }
 
-func getDiffForPath(diffs []*gitlab.MergeRequestDiff, path string) *gitlab.MergeRequestDiff {
+func getDiffsForPath(diffs []*gitlab.MergeRequestDiff, path string) (changes []*gitlab.MergeRequestDiff) {
 	for _, change := range diffs {
 		if change.NewPath == path {
-			return change
+			changes = append(changes, change)
 		}
 	}
-	return nil
+	return changes
 }
 
 type diffLine struct {
