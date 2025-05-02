@@ -191,7 +191,9 @@ func (gl GitLabReporter) List(_ context.Context, dst any) ([]ExistingComment, er
 			c = gl.noteToExisting(disc.ID, note)
 			break
 		}
-		comments = append(comments, c)
+		if c.path != "" && c.line > 0 && c.meta != nil {
+			comments = append(comments, c)
+		}
 	NEXT:
 	}
 	return comments, nil

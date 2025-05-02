@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"testing"
@@ -234,6 +235,19 @@ func TestGitLabReporter(t *testing.T) {
 		maxComments    int
 		showDuplicates bool
 	}{
+		{
+			description: "bogus JSON responses",
+			timeout:     time.Minute,
+			maxComments: 1,
+			summary:     reporter.NewSummary([]reporter.Report{fooReport}),
+			mock: httpmock.New(func(s *httpmock.Server) {
+				s.ExpectGet(apiUser).ReturnJSON(gitlab.User{ID: 123})
+				s.ExpectGet(regexp.MustCompile(".+")).Times(4).Return(`[{"iid": 333}]`)
+			}),
+			errorHandler: func(err error) error {
+				return err
+			},
+		},
 		{
 			description: "empty list of merge requests",
 			timeout:     time.Minute,
