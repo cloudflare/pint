@@ -37,7 +37,9 @@ const (
 )
 
 func NewParser(isStrict bool, schema Schema, names model.ValidationScheme) Parser {
-	model.NameValidationScheme = names
+	// FIXME Use IsValidLegacyMetricName() & LabelName.IsValidLegacy() instead
+	// https://pkg.go.dev/github.com/prometheus/common@v0.63.0/model#NameValidationScheme
+	model.NameValidationScheme = names // nolint: staticcheck
 	return Parser{
 		isStrict: isStrict,
 		schema:   schema,
