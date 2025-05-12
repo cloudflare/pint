@@ -43,6 +43,8 @@ cmp github.got ../github.expected
 - alert: rule2
   expr: sum(foo) by(job)
   for: 0s
+- record: foo
+  expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
 
 -- src/.pint.hcl --
 ci {
@@ -57,6 +59,16 @@ repository {
 	  uploaduri = "http://127.0.0.1:6032"
     owner     = "cloudflare"
     repo      = "pint"
+  }
+}
+rule {
+  match {
+    kind = "recording"
+  }
+  aggregate ".+" {
+    comment  = "job label is required to track ownership."
+    severity = "warning"
+    keep     = ["job"]
   }
 }
 
@@ -141,6 +153,46 @@ side: RIGHT
 commit_id: <COMMIT ID>
 --- END ---
 
+POST /api/v3/repos/cloudflare/pint/pulls/1/comments
+  Accept: application/vnd.github.squirrel-girl-preview, application/vnd.github.comfort-fade-preview+json
+  Accept-Encoding: gzip
+  Authorization: Bearer 12345
+  Content-Type: application/json
+  X-Github-Api-Version: 2022-11-28
+--- BODY ---
+body: |
+  :warning: **Warning** reported by [pint](https://cloudflare.github.io/pint/) **promql/aggregate** check.
+
+  <details>
+  <summary>required label is being removed via aggregation</summary>
+
+  ```yaml
+  8 |   expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
+                                                                                            ^^^^^^ 
+  ```
+
+  Calling `vector()` will return a vector value with no labels.
+
+  ```yaml
+  8 |   expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
+                                                                                            ^^^^^^ 
+  ```
+
+  `job` label is required and should be preserved when aggregating all rules.
+
+  Rule comment: job label is required to track ownership.
+
+  </details>
+
+  ------
+
+  :information_source: To see documentation covering this check and instructions on how to resolve it [click here](https://cloudflare.github.io/pint/checks/promql/aggregate.html).
+path: rules.yml
+line: 1
+side: RIGHT
+commit_id: <COMMIT ID>
+--- END ---
+
 GET /api/v3/repos/cloudflare/pint/pulls/1/reviews
   Accept: application/vnd.github.v3+json
   Accept-Encoding: gzip
@@ -160,7 +212,7 @@ body: |+
   :heavy_exclamation_mark:	Problems found.
   | Severity | Number of problems |
   | --- | --- |
-  | Warning | 1 |
+  | Warning | 2 |
   | Information | 1 |
   <details><summary>Stats</summary>
   <p>
@@ -168,10 +220,10 @@ body: |+
   | Stat | Value |
   | --- | --- |
   | Version | unknown |
-  | Number of rules parsed | 2 |
-  | Number of rules checked | 2 |
-  | Number of problems found | 2 |
-  | Number of offline checks | 7 |
+  | Number of rules parsed | 3 |
+  | Number of rules checked | 3 |
+  | Number of problems found | 3 |
+  | Number of offline checks | 15 |
   | Number of online checks | 0 |
   | Checks duration | 0 |
 
@@ -191,6 +243,12 @@ body: |+
     ---> rules.yml:3 -> `rule1`
   3 |   for: 0s
              ^^ `0s` is the default value of `for`, this line is unnecessary.
+
+  Warning: required label is being removed via aggregation (promql/aggregate)
+    ---> rules.yml:8 -> `foo`
+  8 |   expr: sum without (instance, node_status, node_type) ((rate(http_responses[2m])) or vector(0))
+                                                                                            ^^^^^^ Calling `vector()` will return a vector value with no labels.
+                                                                                                   `job` label is required and should be preserved when aggregating all rules.
 
   ```
 

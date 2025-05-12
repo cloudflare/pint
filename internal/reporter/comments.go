@@ -96,13 +96,12 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 					))
 					buf.WriteString("```\n\n")
 					buf.WriteString(diag.Message)
-					buf.WriteRune('\n')
-					if report.Problem.Details != "" {
-						buf.WriteRune('\n')
-						buf.WriteString(report.Problem.Details)
-						buf.WriteRune('\n')
-					}
-					buf.WriteRune('\n')
+					buf.WriteString("\n\n")
+
+				}
+				if report.Problem.Details != "" {
+					buf.WriteString(report.Problem.Details)
+					buf.WriteString("\n\n")
 				}
 				buf.WriteString("</details>\n\n")
 			} else {
