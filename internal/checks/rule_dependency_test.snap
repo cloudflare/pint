@@ -29,7 +29,7 @@
           lastcolumn: 3
     lines:
         first: 1
-        last: 2
+        last: 1
     severity: 1
     anchor: 1
 
@@ -101,7 +101,7 @@
           lastcolumn: 3
     lines:
         first: 1
-        last: 2
+        last: 1
     severity: 1
     anchor: 1
 
@@ -133,7 +133,7 @@
           lastcolumn: 12
     lines:
         first: 1
-        last: 2
+        last: 1
     severity: 1
     anchor: 1
 
@@ -165,7 +165,7 @@
           lastcolumn: 12
     lines:
         first: 1
-        last: 2
+        last: 1
     severity: 1
     anchor: 1
 
@@ -197,7 +197,7 @@
           lastcolumn: 3
     lines:
         first: 1
-        last: 2
+        last: 1
     severity: 1
     anchor: 1
 
@@ -229,7 +229,7 @@
           lastcolumn: 3
     lines:
         first: 1
-        last: 2
+        last: 1
     severity: 1
     anchor: 1
 

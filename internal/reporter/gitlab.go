@@ -545,17 +545,19 @@ func parseDiffLines(diff string) (lines []diffLine) {
 			matches := diffRe.FindStringSubmatch(line)
 			if len(matches) == 5 {
 				oldLine, _ = strconv.Atoi(matches[1])
+				oldLine--
 				newLine, _ = strconv.Atoi(matches[3])
+				newLine--
 			}
 		case strings.HasPrefix(line, "-"):
 			oldLine++
 		case strings.HasPrefix(line, "+"):
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: true})
 			newLine++
+			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: true})
 		default:
-			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: false})
 			oldLine++
 			newLine++
+			lines = append(lines, diffLine{old: oldLine, new: newLine, wasModified: false})
 		}
 	}
 

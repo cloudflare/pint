@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.73.7
+
+### Fixed
+
+- Fixed a bug in GitLab integration causing incorrect line numbers to be used for comments.
+
 ## v0.73.6
 
 ### Fixed

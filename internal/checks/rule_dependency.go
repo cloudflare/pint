@@ -115,7 +115,7 @@ func (c RuleDependencyCheck) Check(_ context.Context, entry discovery.Entry, ent
 	name := entry.Rule.NameNode()
 	problems = append(problems, Problem{
 		Anchor:   AnchorBefore,
-		Lines:    entry.Rule.Lines,
+		Lines:    name.Pos.Lines(),
 		Reporter: c.Reporter(),
 		Summary:  "rule results used by another rule",
 		Details:  details.String(),

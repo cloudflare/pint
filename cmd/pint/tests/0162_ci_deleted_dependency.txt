@@ -23,7 +23,7 @@ cmp stderr ../stderr.txt
 
 -- stderr.txt --
 Warning: rule results used by another rule (rule/dependency)
-  ---> rules.yml:4-5 (deleted) -> `up:sum`
+  ---> rules.yml:4 (deleted) -> `up:sum`
 
 -- src/alert.yml --
 groups:
