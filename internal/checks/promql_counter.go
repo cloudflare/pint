@@ -134,6 +134,7 @@ LOOP:
 					Pos:         expr.Value.Pos,
 					FirstColumn: int(selector.PosRange.Start) + 1,
 					LastColumn:  int(selector.PosRange.End),
+					Kind:        diags.Issue,
 				},
 			},
 		})

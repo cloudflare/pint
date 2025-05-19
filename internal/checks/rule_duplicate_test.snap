@@ -54,6 +54,7 @@
               lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 2
@@ -82,6 +83,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 10
+          kind: 0
     lines:
         first: 1
         last: 2

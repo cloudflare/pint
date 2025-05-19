@@ -101,6 +101,7 @@ func (c ComparisonCheck) Check(_ context.Context, entry discovery.Entry, _ []dis
 						Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
 						FirstColumn: int(src.Position.Start) + 1,
 						LastColumn:  int(src.Position.End),
+						Kind:        diags.Issue,
 					},
 				},
 			})

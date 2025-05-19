@@ -50,6 +50,7 @@ func (c SyntaxCheck) Check(_ context.Context, entry discovery.Entry, _ []discove
 			Pos:         expr.Value.Pos,
 			FirstColumn: 1,
 			LastColumn:  len(expr.Value.Value) - 1,
+			Kind:        diags.Issue,
 		}
 
 		var perrs promParser.ParseErrors
@@ -61,6 +62,7 @@ func (c SyntaxCheck) Check(_ context.Context, entry discovery.Entry, _ []discove
 					Pos:         expr.Value.Pos,
 					FirstColumn: int(perr.PositionRange.Start) + 1,
 					LastColumn:  int(perr.PositionRange.End),
+					Kind:        diags.Issue,
 				}
 			}
 		}

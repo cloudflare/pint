@@ -218,6 +218,7 @@ func (c RegexpCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(pos.Start) + 1,
 						LastColumn:  int(pos.End) + 1,
+						Kind:        diags.Issue,
 					},
 				},
 			})

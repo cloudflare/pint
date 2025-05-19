@@ -38,6 +38,7 @@
               lastcolumn: 21
           firstcolumn: 10
           lastcolumn: 12
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -70,6 +71,7 @@
               lastcolumn: 48
           firstcolumn: 17
           lastcolumn: 19
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -98,6 +100,7 @@
               lastcolumn: 48
           firstcolumn: 37
           lastcolumn: 39
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -130,6 +133,7 @@
               lastcolumn: 28
           firstcolumn: 17
           lastcolumn: 19
+          kind: 0
     lines:
         first: 2
         last: 2

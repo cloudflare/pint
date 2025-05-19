@@ -317,6 +317,7 @@ func parseComment(s string, line int) (parsed []Comment) {
 						},
 						FirstColumn: 1,
 						LastColumn:  len(s),
+						Kind:        diags.Issue,
 					},
 				},
 			}

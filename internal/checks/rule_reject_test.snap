@@ -56,6 +56,7 @@
               lastcolumn: 14
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -91,6 +92,7 @@
               lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -121,6 +123,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -151,6 +154,7 @@
               lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -184,6 +188,7 @@
               lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -224,6 +229,7 @@
               lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -257,6 +263,7 @@
               lastcolumn: 7
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -297,6 +304,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -327,6 +335,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 4
         last: 4

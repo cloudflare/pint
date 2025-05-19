@@ -24,6 +24,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 2
@@ -57,6 +58,7 @@
               lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
+          kind: 0
         - message: Use a value that's at least twice Prometheus scrape interval (`1m`).
           pos:
             - line: 3
@@ -64,6 +66,7 @@
               lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -97,6 +100,7 @@
               lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
+          kind: 0
         - message: Use a value that's at least twice Prometheus scrape interval (`53s`).
           pos:
             - line: 3
@@ -104,6 +108,7 @@
               lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -137,6 +142,7 @@
               lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
+          kind: 0
         - message: Use a value that's at least twice Prometheus scrape interval (`1m`).
           pos:
             - line: 3
@@ -144,6 +150,7 @@
               lastcolumn: 10
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -179,6 +186,7 @@
               lastcolumn: 19
           firstcolumn: 1
           lastcolumn: 11
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -207,6 +215,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 2
@@ -237,6 +246,7 @@
               lastcolumn: 37
           firstcolumn: 19
           lastcolumn: 29
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -285,6 +295,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 2
@@ -313,6 +324,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 2

@@ -124,6 +124,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(n.PositionRange().Start) + 1,
 								LastColumn:  int(n.PositionRange().End),
+								Kind:        diags.Issue,
 							},
 						},
 					})
@@ -165,11 +166,12 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 						Diagnostics: []diags.Diagnostic{
 							{
 								Message: fmt.Sprintf(
-									"Using `on(%s)` won't produce any results on %s because [series returned by this query](%s) don't have the `%s` label.",
+									"Using `on(%s)` won't produce any results on %s because [series returned by this query](%s) doesn't have the `%s` label.",
 									name, promText(c.prom.Name(), qr.URI), link, name),
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
+								Kind:        diags.Issue,
 							},
 						},
 					})
@@ -191,6 +193,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
+								Kind:        diags.Issue,
 							},
 						},
 					})
@@ -212,6 +215,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(pos.Start) + 1,
 								LastColumn:  int(pos.End),
+								Kind:        diags.Issue,
 							},
 						},
 					})
@@ -234,6 +238,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(n.PositionRange().Start) + 1,
 							LastColumn:  int(n.PositionRange().End),
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -253,6 +258,7 @@ func (c VectorMatchingCheck) checkNode(ctx context.Context, rule parser.Rule, ex
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(pos.Start) + 1,
 							LastColumn:  int(pos.End),
+							Kind:        diags.Issue,
 						},
 					},
 				})

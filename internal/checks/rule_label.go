@@ -110,6 +110,7 @@ func (c LabelCheck) checkRecordingRule(entry discovery.Entry) (problems []Proble
 						Pos:         entry.Rule.RecordingRule.Labels.Key.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(entry.Rule.RecordingRule.Labels.Key.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -213,6 +214,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 					Pos:         lab.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(lab.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -250,6 +252,7 @@ func (c LabelCheck) checkValue(rule parser.Rule, value string, lab *parser.YamlN
 						Pos:         lab.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(lab.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})

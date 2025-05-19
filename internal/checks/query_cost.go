@@ -106,6 +106,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -126,6 +127,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -146,6 +148,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -167,6 +170,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -187,6 +191,7 @@ func (c CostCheck) Check(ctx context.Context, entry discovery.Entry, _ []discove
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})

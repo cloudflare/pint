@@ -46,6 +46,7 @@
               lastcolumn: 42
           firstcolumn: 1
           lastcolumn: 32
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -86,6 +87,7 @@
               lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 7
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -122,6 +124,7 @@
               lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 32
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -149,6 +152,7 @@
               lastcolumn: 39
           firstcolumn: 1
           lastcolumn: 28
+          kind: 0
     lines:
         first: 5
         last: 5

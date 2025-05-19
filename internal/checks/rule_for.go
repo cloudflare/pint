@@ -80,6 +80,7 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			Pos:         entry.Rule.AlertingRule.For.Pos,
 			FirstColumn: 1,
 			LastColumn:  len(entry.Rule.AlertingRule.For.Value),
+			Kind:        diags.Issue,
 		}
 	case c.key == RuleForKeepFiringFor && entry.Rule.AlertingRule.KeepFiringFor != nil:
 		forDur, _ = model.ParseDuration(entry.Rule.AlertingRule.KeepFiringFor.Value)
@@ -89,6 +90,7 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			Pos:         entry.Rule.AlertingRule.KeepFiringFor.Pos,
 			FirstColumn: 1,
 			LastColumn:  len(entry.Rule.AlertingRule.KeepFiringFor.Value),
+			Kind:        diags.Issue,
 		}
 	default:
 		lines = entry.Rule.AlertingRule.Alert.Pos.Lines()
@@ -97,6 +99,7 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 			Pos:         entry.Rule.AlertingRule.Alert.Pos,
 			FirstColumn: 1,
 			LastColumn:  len(entry.Rule.AlertingRule.Alert.Value),
+			Kind:        diags.Issue,
 		}
 	}
 
@@ -114,6 +117,7 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 					Pos:         diag.Pos,
 					FirstColumn: diag.FirstColumn,
 					LastColumn:  diag.LastColumn,
+					Kind:        diag.Kind,
 				},
 			},
 		})
@@ -133,6 +137,7 @@ func (c RuleForCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 					Pos:         diag.Pos,
 					FirstColumn: diag.FirstColumn,
 					LastColumn:  diag.LastColumn,
+					Kind:        diag.Kind,
 				},
 			},
 		})

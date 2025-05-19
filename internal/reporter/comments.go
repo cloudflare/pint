@@ -90,6 +90,7 @@ func makeComments(summary Summary, showDuplicates bool) (comments []PendingComme
 								Pos:         diag.Pos,
 								FirstColumn: diag.FirstColumn,
 								LastColumn:  diag.LastColumn,
+								Kind:        diag.Kind,
 							},
 						},
 						output.None,

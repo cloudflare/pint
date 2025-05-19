@@ -16,11 +16,19 @@ func countDigits(n int) (c int) {
 	return c
 }
 
+type Kind uint8
+
+const (
+	Issue Kind = iota
+	Context
+)
+
 type Diagnostic struct {
 	Message     string
 	Pos         PositionRanges
 	FirstColumn int // 1-indexed
 	LastColumn  int // 1-indexed
+	Kind        Kind
 }
 
 func lineCoverage(diags []Diagnostic) (lines []int) {

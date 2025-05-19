@@ -105,6 +105,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(n.PosRange.Start) + 1,
 							LastColumn:  int(n.PosRange.End),
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -141,6 +142,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 									Pos:         expr.Value.Pos,
 									FirstColumn: int(n.PosRange.Start) + 1,
 									LastColumn:  int(n.PosRange.End),
+									Kind:        diags.Issue,
 								},
 							},
 						})
@@ -200,6 +202,7 @@ func (c RateCheck) checkNode(ctx context.Context, rule parser.Rule, expr parser.
 											Pos:         expr.Value.Pos,
 											FirstColumn: int(src.Position.Start) + 1,
 											LastColumn:  int(src.Position.End),
+											Kind:        diags.Issue,
 										},
 									},
 								})

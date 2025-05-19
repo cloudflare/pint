@@ -21,6 +21,7 @@
               lastcolumn: 41
           firstcolumn: 1
           lastcolumn: 27
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -50,6 +51,7 @@
               lastcolumn: 24
           firstcolumn: 1
           lastcolumn: 16
+          kind: 1
         - message: Use one of humanize template functions to make the result more readable.
           pos:
             - line: 5
@@ -57,6 +59,7 @@
               lastcolumn: 41
           firstcolumn: 4
           lastcolumn: 10
+          kind: 0
     lines:
         first: 3
         last: 5
@@ -90,6 +93,7 @@
               lastcolumn: 71
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation that removes all labels.
           pos:
             - line: 3
@@ -97,6 +101,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -126,6 +131,7 @@
               lastcolumn: 71
           firstcolumn: 46
           lastcolumn: 54
+          kind: 0
         - message: Aggregation removes metric name.
           pos:
             - line: 3
@@ -133,6 +139,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 8
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -175,6 +182,7 @@
               lastcolumn: 91
           firstcolumn: 39
           lastcolumn: 46
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -187,6 +195,7 @@
               lastcolumn: 54
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -220,6 +229,7 @@
               lastcolumn: 91
           firstcolumn: 60
           lastcolumn: 63
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -232,6 +242,7 @@
               lastcolumn: 54
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -270,6 +281,7 @@
               lastcolumn: 85
           firstcolumn: 30
           lastcolumn: 38
+          kind: 0
         - message: This query returns a number value with no labels.
           pos:
             - line: 2
@@ -277,6 +289,7 @@
               lastcolumn: 18
           firstcolumn: 1
           lastcolumn: 1
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -306,6 +319,7 @@
               lastcolumn: 85
           firstcolumn: 55
           lastcolumn: 58
+          kind: 0
         - message: This query returns a number value with no labels.
           pos:
             - line: 2
@@ -313,6 +327,7 @@
               lastcolumn: 18
           firstcolumn: 1
           lastcolumn: 1
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -346,6 +361,7 @@
               lastcolumn: 65
           firstcolumn: 30
           lastcolumn: 38
+          kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
           pos:
             - line: 2
@@ -353,6 +369,7 @@
               lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -386,6 +403,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation with `by(notjob)`, only labels included inside `by(...)` will be present on the results.
           pos:
             - line: 2
@@ -393,6 +411,7 @@
               lastcolumn: 31
           firstcolumn: 14
           lastcolumn: 15
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -430,6 +449,7 @@
               lastcolumn: 60
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -442,6 +462,7 @@
               lastcolumn: 34
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -479,6 +500,7 @@
               lastcolumn: 68
           firstcolumn: 11
           lastcolumn: 19
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -491,6 +513,7 @@
               lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -524,6 +547,7 @@
               lastcolumn: 68
           firstcolumn: 37
           lastcolumn: 40
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -536,6 +560,7 @@
               lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -573,6 +598,7 @@
               lastcolumn: 42
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -585,6 +611,7 @@
               lastcolumn: 27
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -625,6 +652,7 @@
               lastcolumn: 37
           firstcolumn: 11
           lastcolumn: 19
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -637,6 +665,7 @@
               lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 8
@@ -673,6 +702,7 @@
               lastcolumn: 68
           firstcolumn: 11
           lastcolumn: 19
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -685,6 +715,7 @@
               lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 8
@@ -721,6 +752,7 @@
               lastcolumn: 68
           firstcolumn: 37
           lastcolumn: 40
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -733,6 +765,7 @@
               lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 8
@@ -769,6 +802,7 @@
               lastcolumn: 28
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -781,6 +815,7 @@
               lastcolumn: 46
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 8
@@ -814,6 +849,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation that removes all labels.
           pos:
             - line: 2
@@ -821,6 +857,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -854,6 +891,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation that removes all labels.
           pos:
             - line: 2
@@ -861,6 +899,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -895,6 +934,7 @@
               lastcolumn: 32
           firstcolumn: 11
           lastcolumn: 18
+          kind: 0
         - message: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
           pos:
             - line: 3
@@ -902,6 +942,7 @@
               lastcolumn: 142
           firstcolumn: 19
           lastcolumn: 21
+          kind: 1
     lines:
         first: 2
         last: 6
@@ -935,6 +976,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation that removes all labels.
           pos:
             - line: 2
@@ -942,6 +984,7 @@
               lastcolumn: 36
           firstcolumn: 21
           lastcolumn: 23
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -975,6 +1018,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
           pos:
             - line: 2
@@ -982,6 +1026,7 @@
               lastcolumn: 33
           firstcolumn: 10
           lastcolumn: 16
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -1015,6 +1060,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
           pos:
             - line: 2
@@ -1022,6 +1068,7 @@
               lastcolumn: 33
           firstcolumn: 10
           lastcolumn: 16
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -1059,6 +1106,7 @@
               lastcolumn: 68
           firstcolumn: 11
           lastcolumn: 19
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -1071,6 +1119,7 @@
               lastcolumn: 42
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -1104,6 +1153,7 @@
               lastcolumn: 68
           firstcolumn: 37
           lastcolumn: 40
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -1116,6 +1166,7 @@
               lastcolumn: 42
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -1154,6 +1205,7 @@
               lastcolumn: 91
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
           pos:
             - line: 3
@@ -1161,6 +1213,7 @@
               lastcolumn: 31
           firstcolumn: 7
           lastcolumn: 14
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -1198,6 +1251,7 @@
               lastcolumn: 91
           firstcolumn: 39
           lastcolumn: 46
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -1210,6 +1264,7 @@
               lastcolumn: 55
           firstcolumn: 26
           lastcolumn: 31
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -1243,6 +1298,7 @@
               lastcolumn: 91
           firstcolumn: 60
           lastcolumn: 63
+          kind: 0
         - message: |-
             The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
             You will only get any results back if the metric selector you pass doesn't match anything.
@@ -1255,6 +1311,7 @@
               lastcolumn: 55
           firstcolumn: 26
           lastcolumn: 31
+          kind: 1
     lines:
         first: 2
         last: 5
@@ -1303,6 +1360,7 @@
               lastcolumn: 34
           firstcolumn: 11
           lastcolumn: 15
+          kind: 0
         - message: Query is using aggregation that removes all labels.
           pos:
             - line: 7
@@ -1310,6 +1368,7 @@
               lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
     lines:
         first: 6
         last: 9
@@ -1358,6 +1417,7 @@
               lastcolumn: 34
           firstcolumn: 11
           lastcolumn: 15
+          kind: 0
         - message: Query is using aggregation that removes all labels.
           pos:
             - line: 7
@@ -1365,6 +1425,7 @@
               lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
     lines:
         first: 6
         last: 9
@@ -1410,6 +1471,7 @@
               lastcolumn: 32
           firstcolumn: 11
           lastcolumn: 19
+          kind: 0
         - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
           pos:
             - line: 2
@@ -1417,6 +1479,7 @@
               lastcolumn: 108
           firstcolumn: 30
           lastcolumn: 32
+          kind: 1
     lines:
         first: 1
         last: 6
@@ -1448,6 +1511,7 @@
               lastcolumn: 63
           firstcolumn: 11
           lastcolumn: 19
+          kind: 0
         - message: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
           pos:
             - line: 2
@@ -1455,6 +1519,7 @@
               lastcolumn: 108
           firstcolumn: 30
           lastcolumn: 32
+          kind: 1
     lines:
         first: 1
         last: 6
@@ -1533,6 +1598,7 @@
               lastcolumn: 34
           firstcolumn: 1
           lastcolumn: 22
+          kind: 1
         - message: Use one of humanize template functions to make the result more readable.
           pos:
             - line: 5
@@ -1540,6 +1606,7 @@
               lastcolumn: 73
           firstcolumn: 30
           lastcolumn: 36
+          kind: 0
     lines:
         first: 3
         last: 5
@@ -1575,6 +1642,7 @@
               lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 18
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -1605,6 +1673,7 @@
               lastcolumn: 32
           firstcolumn: 1
           lastcolumn: 18
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -1635,6 +1704,7 @@
               lastcolumn: 49
           firstcolumn: 1
           lastcolumn: 35
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -1665,6 +1735,7 @@
               lastcolumn: 49
           firstcolumn: 1
           lastcolumn: 35
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -1698,6 +1769,7 @@
               lastcolumn: 31
           firstcolumn: 11
           lastcolumn: 14
+          kind: 0
         - message: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
           pos:
             - line: 2
@@ -1705,6 +1777,7 @@
               lastcolumn: 33
           firstcolumn: 10
           lastcolumn: 16
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -1738,6 +1811,7 @@
               lastcolumn: 65
           firstcolumn: 30
           lastcolumn: 38
+          kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
           pos:
             - line: 2
@@ -1745,6 +1819,7 @@
               lastcolumn: 17
           firstcolumn: 1
           lastcolumn: 6
+          kind: 1
     lines:
         first: 1
         last: 4
@@ -1780,6 +1855,7 @@
               lastcolumn: 52
           firstcolumn: 26
           lastcolumn: 35
+          kind: 0
         - message: Calling `vector()` will return a vector value with no labels.
           pos:
             - line: 4
@@ -1787,6 +1863,7 @@
               lastcolumn: 97
           firstcolumn: 79
           lastcolumn: 84
+          kind: 1
     lines:
         first: 2
         last: 7
@@ -1830,6 +1907,7 @@
               lastcolumn: 49
           firstcolumn: 21
           lastcolumn: 30
+          kind: 0
         - message: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
           pos:
             - line: 4
@@ -1849,6 +1927,7 @@
               lastcolumn: 12
           firstcolumn: 7
           lastcolumn: 9
+          kind: 1
     lines:
         first: 2
         last: 11
@@ -1914,6 +1993,7 @@
               lastcolumn: 46
           firstcolumn: 21
           lastcolumn: 27
+          kind: 0
         - message: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
           pos:
             - line: 4
@@ -1960,6 +2040,7 @@
               lastcolumn: 11
           firstcolumn: 444
           lastcolumn: 445
+          kind: 1
     lines:
         first: 2
         last: 19
@@ -1993,6 +2074,7 @@
               lastcolumn: 29
           firstcolumn: 1
           lastcolumn: 17
+          kind: 1
         - message: Use one of humanize template functions to make the result more readable.
           pos:
             - line: 5
@@ -2000,6 +2082,7 @@
               lastcolumn: 40
           firstcolumn: 11
           lastcolumn: 17
+          kind: 0
     lines:
         first: 3
         last: 5
@@ -2033,6 +2116,7 @@
               lastcolumn: 29
           firstcolumn: 1
           lastcolumn: 17
+          kind: 1
         - message: Use one of humanize template functions to make the result more readable.
           pos:
             - line: 5
@@ -2040,6 +2124,7 @@
               lastcolumn: 40
           firstcolumn: 11
           lastcolumn: 17
+          kind: 0
     lines:
         first: 3
         last: 5
@@ -2073,6 +2158,7 @@
               lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 16
+          kind: 1
         - message: Use one of humanize template functions to make the result more readable.
           pos:
             - line: 5
@@ -2080,6 +2166,7 @@
               lastcolumn: 40
           firstcolumn: 11
           lastcolumn: 17
+          kind: 0
     lines:
         first: 3
         last: 5
@@ -2113,6 +2200,7 @@
               lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 16
+          kind: 1
         - message: Use one of humanize template functions to make the result more readable.
           pos:
             - line: 5
@@ -2120,6 +2208,7 @@
               lastcolumn: 77
           firstcolumn: 50
           lastcolumn: 54
+          kind: 0
     lines:
         first: 3
         last: 5
@@ -2196,6 +2285,7 @@
               lastcolumn: 15
           firstcolumn: 1
           lastcolumn: 101
+          kind: 0
     lines:
         first: 5
         last: 8
@@ -2237,6 +2327,7 @@
               lastcolumn: 15
           firstcolumn: 1
           lastcolumn: 73
+          kind: 0
     lines:
         first: 5
         last: 8
@@ -2278,6 +2369,7 @@
               lastcolumn: 15
           firstcolumn: 1
           lastcolumn: 105
+          kind: 0
     lines:
         first: 5
         last: 8
@@ -2334,6 +2426,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 10
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -2365,6 +2458,7 @@
               lastcolumn: 22
           firstcolumn: 1
           lastcolumn: 12
+          kind: 0
     lines:
         first: 4
         last: 4
@@ -2392,6 +2486,7 @@
               lastcolumn: 20
           firstcolumn: 1
           lastcolumn: 10
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -2423,6 +2518,7 @@
               lastcolumn: 40
           firstcolumn: 1
           lastcolumn: 30
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -2454,6 +2550,7 @@
               lastcolumn: 40
           firstcolumn: 1
           lastcolumn: 30
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -2485,6 +2582,7 @@
               lastcolumn: 28
           firstcolumn: 1
           lastcolumn: 18
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -2516,6 +2614,7 @@
               lastcolumn: 31
           firstcolumn: 1
           lastcolumn: 21
+          kind: 0
     lines:
         first: 5
         last: 5
@@ -2548,6 +2647,7 @@
               lastcolumn: 48
           firstcolumn: 1
           lastcolumn: 43
+          kind: 0
     lines:
         first: 5
         last: 6
@@ -2580,6 +2680,7 @@
               lastcolumn: 43
           firstcolumn: 1
           lastcolumn: 38
+          kind: 0
     lines:
         first: 5
         last: 6

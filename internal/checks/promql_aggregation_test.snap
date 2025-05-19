@@ -20,6 +20,7 @@
               lastcolumn: 51
           firstcolumn: 11
           lastcolumn: 17
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -27,6 +28,7 @@
               lastcolumn: 51
           firstcolumn: 11
           lastcolumn: 17
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -56,6 +58,7 @@
               lastcolumn: 51
           firstcolumn: 11
           lastcolumn: 12
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -63,6 +66,7 @@
               lastcolumn: 51
           firstcolumn: 11
           lastcolumn: 12
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -92,6 +96,7 @@
               lastcolumn: 77
           firstcolumn: 5
           lastcolumn: 11
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -99,6 +104,7 @@
               lastcolumn: 77
           firstcolumn: 5
           lastcolumn: 11
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -128,6 +134,7 @@
               lastcolumn: 68
           firstcolumn: 5
           lastcolumn: 6
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -135,6 +142,7 @@
               lastcolumn: 68
           firstcolumn: 5
           lastcolumn: 6
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -194,6 +202,7 @@
               lastcolumn: 78
           firstcolumn: 53
           lastcolumn: 59
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -201,6 +210,7 @@
               lastcolumn: 78
           firstcolumn: 53
           lastcolumn: 59
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -230,6 +240,7 @@
               lastcolumn: 69
           firstcolumn: 48
           lastcolumn: 49
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -237,6 +248,7 @@
               lastcolumn: 69
           firstcolumn: 48
           lastcolumn: 49
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -276,6 +288,7 @@
               lastcolumn: 39
           firstcolumn: 10
           lastcolumn: 16
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -283,6 +296,7 @@
               lastcolumn: 39
           firstcolumn: 10
           lastcolumn: 16
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -312,6 +326,7 @@
               lastcolumn: 29
           firstcolumn: 10
           lastcolumn: 11
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -319,6 +334,7 @@
               lastcolumn: 29
           firstcolumn: 10
           lastcolumn: 11
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -348,6 +364,7 @@
               lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -355,6 +372,7 @@
               lastcolumn: 16
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -384,6 +402,7 @@
               lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 3
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -391,6 +410,7 @@
               lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -420,6 +440,7 @@
               lastcolumn: 39
           firstcolumn: 10
           lastcolumn: 16
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -427,6 +448,7 @@
               lastcolumn: 39
           firstcolumn: 10
           lastcolumn: 16
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -456,6 +478,7 @@
               lastcolumn: 29
           firstcolumn: 10
           lastcolumn: 11
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -463,6 +486,7 @@
               lastcolumn: 29
           firstcolumn: 10
           lastcolumn: 11
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -491,6 +515,7 @@
               lastcolumn: 34
           firstcolumn: 10
           lastcolumn: 16
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -519,6 +544,7 @@
               lastcolumn: 24
           firstcolumn: 10
           lastcolumn: 11
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -562,6 +588,7 @@
               lastcolumn: 26
           firstcolumn: 1
           lastcolumn: 18
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -606,6 +633,7 @@
               lastcolumn: 47
           firstcolumn: 28
           lastcolumn: 34
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -613,6 +641,7 @@
               lastcolumn: 47
           firstcolumn: 28
           lastcolumn: 34
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -642,6 +671,7 @@
               lastcolumn: 51
           firstcolumn: 32
           lastcolumn: 38
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -649,6 +679,7 @@
               lastcolumn: 51
           firstcolumn: 32
           lastcolumn: 38
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -678,6 +709,7 @@
               lastcolumn: 52
           firstcolumn: 14
           lastcolumn: 15
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -685,6 +717,7 @@
               lastcolumn: 52
           firstcolumn: 14
           lastcolumn: 15
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -713,6 +746,7 @@
               lastcolumn: 47
           firstcolumn: 28
           lastcolumn: 34
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -757,6 +791,7 @@
               lastcolumn: 42
           firstcolumn: 14
           lastcolumn: 20
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -764,6 +799,7 @@
               lastcolumn: 42
           firstcolumn: 14
           lastcolumn: 20
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -793,6 +829,7 @@
               lastcolumn: 42
           firstcolumn: 14
           lastcolumn: 15
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -800,6 +837,7 @@
               lastcolumn: 42
           firstcolumn: 14
           lastcolumn: 15
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -829,6 +867,7 @@
               lastcolumn: 52
           firstcolumn: 14
           lastcolumn: 20
+          kind: 1
         - message: '`job` label is required and should be preserved when aggregating all rules.'
           pos:
             - line: 2
@@ -836,6 +875,7 @@
               lastcolumn: 52
           firstcolumn: 14
           lastcolumn: 20
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -864,6 +904,7 @@
               lastcolumn: 47
           firstcolumn: 14
           lastcolumn: 20
+          kind: 0
     lines:
         first: 2
         last: 2

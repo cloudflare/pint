@@ -85,6 +85,7 @@ func (c LabelsConflictCheck) Check(ctx context.Context, entry discovery.Entry, _
 							Pos:         label.Key.Pos,
 							FirstColumn: 1,
 							LastColumn:  len(label.Key.Value),
+							Kind:        diags.Issue,
 						},
 					},
 				})

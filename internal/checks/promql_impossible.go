@@ -69,6 +69,7 @@ func (c ImpossibleCheck) checkSource(expr parser.PromQLExpr, s utils.Source) (pr
 					FirstColumn: int(s.IsDeadPosition.Start) + 1,
 					LastColumn:  int(s.IsDeadPosition.End),
 					Message:     s.IsDeadReason,
+					Kind:        diags.Issue,
 				},
 			},
 			Severity: Warning,

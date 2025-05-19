@@ -19,6 +19,7 @@ import (
 
 	"github.com/cloudflare/pint/internal/checks"
 	"github.com/cloudflare/pint/internal/config"
+	"github.com/cloudflare/pint/internal/diags"
 	"github.com/cloudflare/pint/internal/discovery"
 	"github.com/cloudflare/pint/internal/git"
 	"github.com/cloudflare/pint/internal/parser"
@@ -279,9 +280,9 @@ type problemCollector struct {
 	problems         *prometheus.Desc
 	fileOwnersMetric *prometheus.Desc
 	cfg              config.Config
-	minSeverity      checks.Severity
 	maxProblems      int
 	lock             sync.Mutex
+	minSeverity      checks.Severity
 	showDuplicates   bool
 }
 
@@ -394,7 +395,9 @@ func (c *problemCollector) Collect(ch chan<- prometheus.Metric) {
 
 		var metrics []prometheus.Metric
 		for _, diag := range report.Problem.Diagnostics {
-			metrics = append(metrics, metricFromProblem(report, c.problem, fmt.Sprintf("%s: %s", report.Problem.Summary, diag.Message)))
+			if diag.Kind == diags.Issue {
+				metrics = append(metrics, metricFromProblem(report, c.problem, fmt.Sprintf("%s: %s", report.Problem.Summary, diag.Message)))
+			}
 		}
 
 		if len(metrics) == 0 {

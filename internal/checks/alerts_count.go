@@ -131,6 +131,7 @@ func (c AlertsCheck) Check(ctx context.Context, entry discovery.Entry, _ []disco
 				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(entry.Rule.AlertingRule.Expr.Value.Value),
+				Kind:        diags.Issue,
 			},
 		},
 	})
