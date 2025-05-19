@@ -46,7 +46,7 @@ parser {
 repository {
   github {
     baseuri   = "http://127.0.0.1:6120"
-	  uploaduri = "http://127.0.0.1:6120"
+    uploaduri = "http://127.0.0.1:6120"
     owner     = "cloudflare"
     repo      = "pint"
   }

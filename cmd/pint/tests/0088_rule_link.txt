@@ -52,6 +52,6 @@ rule {
   link "https://xxxx.example.com/(.+)" {
     uri = "http://127.0.0.1:7088/$1"
     severity = "warning"
-	timeout  = "10s"
+  timeout  = "10s"
   }
 }
