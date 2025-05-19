@@ -103,6 +103,7 @@ func (c RangeQueryCheck) Check(ctx context.Context, entry discovery.Entry, _ []d
 						Pos:         expr.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(expr.Value.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -146,6 +147,7 @@ func (c RangeQueryCheck) checkNode(ctx context.Context, expr parser.PromQLExpr, 
 						Pos:         expr.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(expr.Value.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})

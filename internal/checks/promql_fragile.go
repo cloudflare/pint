@@ -76,6 +76,7 @@ func (c FragileCheck) Check(_ context.Context, entry discovery.Entry, _ []discov
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(src.Position.Start) + 1,
 						LastColumn:  int(src.Position.End),
+						Kind:        diags.Issue,
 					},
 				},
 			})

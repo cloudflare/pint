@@ -127,6 +127,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 						Pos:         label.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(label.Value.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -148,6 +149,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 						Pos:         label.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(label.Value.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -175,6 +177,7 @@ func (c TemplateCheck) Check(ctx context.Context, entry discovery.Entry, _ []dis
 							Pos:         annotation.Value.Pos,
 							FirstColumn: 1,
 							LastColumn:  len(annotation.Value.Value),
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -206,6 +209,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 					Pos:         expr.Value.Pos,
 					FirstColumn: int(src.Call.PosRange.Start) + 1,
 					LastColumn:  int(src.Call.PosRange.End),
+					Kind:        diags.Context,
 				},
 			}
 			labelsAliases := aliases.varAliases(".Value")
@@ -217,6 +221,7 @@ func (c TemplateCheck) checkHumanizeIsNeeded(expr parser.PromQLExpr, ann *parser
 							Pos:         ann.Value.Pos,
 							FirstColumn: v.column,
 							LastColumn:  v.column + len(v.value[0]),
+							Kind:        diags.Issue,
 						})
 					}
 				}
@@ -519,12 +524,14 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 									Pos:         label.Value.Pos,
 									FirstColumn: v.column,
 									LastColumn:  v.column + len(v.value[1]),
+									Kind:        diags.Issue,
 								},
 								{
 									Message:     er.Reason,
 									Pos:         rule.AlertingRule.Expr.Value.Pos,
 									FirstColumn: int(er.Fragment.Start) + 1,
 									LastColumn:  int(er.Fragment.End),
+									Kind:        diags.Context,
 								},
 							},
 						})

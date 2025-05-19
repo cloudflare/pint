@@ -107,6 +107,7 @@ func (c RuleDuplicateCheck) compareRules(_ context.Context, rule *parser.Recordi
 					Pos:         rule.Record.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(rule.Record.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})

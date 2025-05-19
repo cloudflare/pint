@@ -19,6 +19,7 @@
               lastcolumn: 13
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 2
@@ -49,6 +50,7 @@
               lastcolumn: 12
           firstcolumn: 1
           lastcolumn: 3
+          kind: 0
     lines:
         first: 1
         last: 4

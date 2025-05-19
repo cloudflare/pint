@@ -75,7 +75,7 @@ func parseRuleError(rule parser.Rule, err error) Problem {
 			},
 			Reporter: ignoreFileReporter,
 			Summary:  ignoreErr.Error(),
-			Details:  "checks disabled",
+			Details:  "",
 			Severity: Information,
 			Diagnostics: []diags.Diagnostic{
 				ignoreErr.Diagnostic,

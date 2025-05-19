@@ -103,6 +103,7 @@ func (r *ContentReader) parseComments() {
 				},
 				FirstColumn: comment.Offset + 1,
 				LastColumn:  len(r.buf) - 1,
+				Kind:        diags.Issue,
 			})
 		case comments.IgnoreLineType:
 			skip = skipCurrentLine

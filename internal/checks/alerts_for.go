@@ -74,6 +74,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 					Pos:         value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -94,6 +95,7 @@ func (c AlertsForChecksFor) checkField(name string, value *parser.YamlNode) (pro
 					Pos:         value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})

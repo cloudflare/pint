@@ -82,6 +82,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry discovery.En
 						Pos:         label.Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(label.Value.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -107,6 +108,7 @@ func (c AlertsExternalLabelsCheck) Check(ctx context.Context, entry discovery.En
 							Pos:         annotation.Value.Pos,
 							FirstColumn: 1,
 							LastColumn:  len(annotation.Value.Value),
+							Kind:        diags.Issue,
 						},
 					},
 				})

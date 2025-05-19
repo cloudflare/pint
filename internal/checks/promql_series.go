@@ -215,6 +215,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 								Pos:         expr.Value.Pos,
 								FirstColumn: int(selector.PosRange.Start) + 1,
 								LastColumn:  int(selector.PosRange.End),
+								Kind:        diags.Issue,
 							},
 						},
 					})
@@ -328,6 +329,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(selector.PosRange.Start) + 1,
 							LastColumn:  int(selector.PosRange.End),
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -358,6 +360,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(selector.PosRange.Start) + 1,
 							LastColumn:  int(selector.PosRange.End),
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -406,6 +409,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(selector.PosRange.Start) + 1,
 							LastColumn:  int(selector.PosRange.End),
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -458,6 +462,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(selector.PosRange.Start) + 1,
 						LastColumn:  int(selector.PosRange.End),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -514,6 +519,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(pos.Start) + 1,
 							LastColumn:  int(pos.End) + 1,
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -584,6 +590,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(pos.Start) + 1,
 							LastColumn:  int(pos.End) + 1,
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -614,6 +621,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 							Pos:         expr.Value.Pos,
 							FirstColumn: int(pos.Start) + 1,
 							LastColumn:  int(pos.End) + 1,
+							Kind:        diags.Issue,
 						},
 					},
 				})
@@ -646,6 +654,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 						Pos:         expr.Value.Pos,
 						FirstColumn: int(selector.PosRange.Start) + 1,
 						LastColumn:  int(selector.PosRange.End),
+						Kind:        diags.Issue,
 					},
 				},
 			})
@@ -671,6 +680,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -689,6 +699,7 @@ func (c SeriesCheck) Check(ctx context.Context, entry discovery.Entry, entries [
 					Pos:         expr.Value.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(expr.Value.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -852,6 +863,7 @@ func (c SeriesCheck) getMinAge(rule parser.Rule, selector *promParser.VectorSele
 						Pos:         rule.Expr().Value.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(rule.Expr().Value.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})

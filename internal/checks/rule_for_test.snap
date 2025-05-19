@@ -40,6 +40,7 @@
               lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -69,6 +70,7 @@
               lastcolumn: 9
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 2
         last: 2
@@ -103,6 +105,7 @@
               lastcolumn: 21
           firstcolumn: 1
           lastcolumn: 2
+          kind: 0
     lines:
         first: 2
         last: 2

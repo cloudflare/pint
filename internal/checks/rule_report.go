@@ -56,6 +56,7 @@ func (c ReportCheck) Check(_ context.Context, entry discovery.Entry, _ []discove
 				Pos:         name.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(name.Value),
+				Kind:        diags.Issue,
 			},
 		},
 	})

@@ -126,6 +126,7 @@ func (c RuleDependencyCheck) Check(_ context.Context, entry discovery.Entry, ent
 				Pos:         name.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(name.Value),
+				Kind:        diags.Issue,
 			},
 		},
 	})

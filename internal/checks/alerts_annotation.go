@@ -149,6 +149,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 					Pos:         ann.Pos,
 					FirstColumn: 1,
 					LastColumn:  len(ann.Value),
+					Kind:        diags.Issue,
 				},
 			},
 		})
@@ -186,6 +187,7 @@ func (c AnnotationCheck) checkValue(rule parser.Rule, value string, ann *parser.
 						Pos:         ann.Pos,
 						FirstColumn: 1,
 						LastColumn:  len(ann.Value),
+						Kind:        diags.Issue,
 					},
 				},
 			})

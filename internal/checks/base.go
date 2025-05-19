@@ -57,7 +57,7 @@ var (
 )
 
 // Severity of the problem reported.
-type Severity int
+type Severity uint8
 
 func (s Severity) String() string {
 	switch s {
@@ -175,6 +175,7 @@ func problemFromError(err error, rule parser.Rule, reporter, prom string, s Seve
 				Pos:         name.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(name.Value),
+				Kind:        diags.Issue,
 			},
 		},
 	}
@@ -191,5 +192,6 @@ func WholeRuleDiag(rule parser.Rule, msg string) diags.Diagnostic {
 		Pos:         node.Pos,
 		FirstColumn: 1,
 		LastColumn:  min(3, len(node.Value)),
+		Kind:        diags.Issue,
 	}
 }

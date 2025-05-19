@@ -103,6 +103,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 				Pos:         entry.Rule.AlertingRule.Expr.Value.Pos,
 				FirstColumn: int(s.Call.PosRange.Start) + 1,
 				LastColumn:  int(s.Call.PosRange.End),
+				Kind:        diags.Issue,
 			},
 		}
 		if forVal > 0 {
@@ -113,6 +114,7 @@ func (c AlertsAbsentCheck) Check(ctx context.Context, entry discovery.Entry, _ [
 				Pos:         entry.Rule.AlertingRule.For.Pos,
 				FirstColumn: 1,
 				LastColumn:  len(entry.Rule.AlertingRule.For.Value),
+				Kind:        diags.Issue,
 			})
 		} else {
 			summary = "absent() based alert without for"
