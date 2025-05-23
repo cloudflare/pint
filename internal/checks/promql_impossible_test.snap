@@ -103,7 +103,7 @@
         {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
   output: |
     4 |     {job="foo"} unless on(__name__) count(sum({job="foo"})) by(__name__)
-                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
+                                                  ^^^^^^^^^^^^^^^^^ The right hand side will never be matched because it doesn't have the `__name__` label from `on(...)`. Aggregation removes metric name.
   problem:
     reporter: promql/impossible
     summary: dead code in query
@@ -114,8 +114,8 @@
             - line: 4
               firstcolumn: 5
               lastcolumn: 72
-          firstcolumn: 33
-          lastcolumn: 68
+          firstcolumn: 39
+          lastcolumn: 55
           kind: 0
     lines:
         first: 4
@@ -185,6 +185,58 @@
 
 [TestImpossibleCheck/ignores_rules_with_syntax_errors - 1]
 []
+
+---
+
+[TestImpossibleCheck/or_vector()_labels_are_missing - 1]
+- description: or vector() labels are missing
+  content: |4
+    - alert: Foo
+      expr: |
+        (
+          max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+          +
+          max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+        ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
+      annotations:
+        summary: Throughput in region {{ $labels.region }}
+  output: |
+    4 |     (
+    5 |       max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+    6 |       +
+    7 |       max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+                                                                                                 ^^^^^^ The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+    8 |     ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
+  problem:
+    reporter: promql/impossible
+    summary: dead code in query
+    details: ""
+    diagnostics:
+        - message: The right hand side will never be matched because it doesn't have the `region` label while the left hand side will. Calling `vector()` will return a vector value with no labels.
+          pos:
+            - line: 4
+              firstcolumn: 5
+              lastcolumn: 6
+            - line: 5
+              firstcolumn: 5
+              lastcolumn: 111
+            - line: 6
+              firstcolumn: 5
+              lastcolumn: 8
+            - line: 7
+              firstcolumn: 5
+              lastcolumn: 111
+            - line: 8
+              firstcolumn: 5
+              lastcolumn: 76
+          firstcolumn: 199
+          lastcolumn: 204
+          kind: 0
+    lines:
+        first: 4
+        last: 8
+    severity: 1
+    anchor: 0
 
 ---
 

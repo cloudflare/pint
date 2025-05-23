@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.74.0
+
+### Fixed
+
+- Improved accuracy of messages produced by the [promql/impossible](checks/promql/impossible.md) check.
+
 ## v0.73.7
 
 ### Fixed

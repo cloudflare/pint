@@ -99,6 +99,23 @@ func TestImpossibleCheck(t *testing.T) {
 			prometheus: newSimpleProm,
 			problems:   true,
 		},
+		{
+			description: "or vector() labels are missing",
+			content: `
+- alert: Foo
+  expr: |
+    (
+      max(job:writes_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+      +
+      max(job:skipps_total:rate5m{region=~"wnam|weur", job="myjob", cluster=~"(a|b)"} or vector(0)) by(region)
+    ) / sum(rate(records_total{region=~"wnam|weur"}[5m])) by (region) < 0.90
+  annotations:
+    summary: Throughput in region {{ $labels.region }}
+`,
+			checker:    newImpossibleCheck,
+			prometheus: newSimpleProm,
+			problems:   true,
+		},
 	}
 
 	runTests(t, testCases)

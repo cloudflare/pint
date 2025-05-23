@@ -815,14 +815,14 @@
       expr: sum(sum(foo) by(instance)) by(job)
   output: |
     2 |   expr: sum(sum(foo) by(instance)) by(job)
-                             ^^ Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+                             ^^ Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                                 `job` label is required and should be preserved when aggregating all rules.
   problem:
     reporter: promql/aggregate
     summary: required label is being removed via aggregation
     details: ""
     diagnostics:
-        - message: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+        - message: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
           pos:
             - line: 2
               firstcolumn: 9
