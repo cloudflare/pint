@@ -775,6 +775,9 @@ func TestLabelsSource(t *testing.T) {
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"job": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
 					},
 				},
 			},
@@ -797,6 +800,12 @@ func TestLabelsSource(t *testing.T) {
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"instance": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
+						"job": {
+							Reason: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
+						},
 					},
 				},
 			},
@@ -818,6 +827,9 @@ func TestLabelsSource(t *testing.T) {
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
+						},
+						"job": {
+							Reason: "Query is using aggregation that removes all labels.",
 						},
 					},
 					IsConditional: true,
@@ -1005,6 +1017,9 @@ func TestLabelsSource(t *testing.T) {
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"job": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
 					},
 					Joins: []utils.Join{
 						{
@@ -1022,6 +1037,9 @@ func TestLabelsSource(t *testing.T) {
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"job": {
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 							},
@@ -1048,6 +1066,9 @@ func TestLabelsSource(t *testing.T) {
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"job": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
 					},
 					Joins: []utils.Join{
 						{
@@ -1065,6 +1086,9 @@ func TestLabelsSource(t *testing.T) {
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"job": {
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 							},
@@ -1409,6 +1433,9 @@ func TestLabelsSource(t *testing.T) {
 						"": {
 							Reason: "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
 						},
+						"job": {
+							Reason: "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+						},
 					},
 					Joins: []utils.Join{
 						{
@@ -1539,6 +1566,9 @@ func TestLabelsSource(t *testing.T) {
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"job": {
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+						},
 					},
 					Joins: []utils.Join{
 						{
@@ -1570,6 +1600,12 @@ func TestLabelsSource(t *testing.T) {
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
+						},
+						"env": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
+						"job": {
+							Reason: "Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -2031,6 +2067,9 @@ sum(foo:count) by(job) > 20`,
 						"": {
 							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
+						"instance": {
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(foo{job="bar", cluster!="dev", instance=~".+", env="prod"})`, 0),
 				},
@@ -2053,6 +2092,12 @@ sum(foo:count) by(job) > 20`,
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
+						},
+						"job": {
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
+						},
+						"instance": {
+							Reason: "The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.\nYou will only get any results back if the metric selector you pass doesn't match anything.\nSince there are no matching time series there are also no labels. If some time series is missing you cannot read its labels.\nThis means that the only labels you can get back from absent call are the ones you pass to it.\nIf you're hoping to get instance specific labels this way and alert when some target is down then that won't work, use the `up` metric instead.",
 						},
 					},
 					Call: mustParse[*promParser.Call](t, `absent(sum(foo) by(job, instance))`, 0),
@@ -2518,6 +2563,9 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"cidr_use_case": {
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+						},
 					},
 					IsConditional: true,
 					Joins: []utils.Join{
@@ -2537,6 +2585,12 @@ or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_us
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"router": {
+										Reason: "Query is using aggregation that removes all labels.",
+									},
+									"tier": {
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 							},
@@ -2619,6 +2673,9 @@ sum by (region, target, colo_name) (
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"job": {
+							Reason: "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
+						},
 					},
 					IsConditional: true,
 				},
@@ -2640,13 +2697,22 @@ sum by (region, target, colo_name) (
 					IsDeadPosition: posrange.PositionRange{Start: 91, End: 102},
 					IsDeadReason:   "this query always evaluates to `1 == 0` which is not possible, so it will never return anything",
 					ReturnedNumber: 1,
-					ExcludedLabels: []string{labels.MetricName},
+					ExcludedLabels: []string{"region", "target", "colo_name", labels.MetricName},
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
 							Reason: "Query is using aggregation with `by(region, target, colo_name)`, only labels included inside `by(...)` will be present on the results.",
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
+						},
+						"region": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+						"target": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
+						},
+						"colo_name": {
+							Reason: "Calling `vector()` will return a vector value with no labels.",
 						},
 					},
 					IsConditional: true,
@@ -3335,6 +3401,9 @@ or
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"job": {
+							Reason: "Query is using aggregation that removes all labels.",
+						},
 					},
 				},
 			},
@@ -3526,6 +3595,12 @@ unless
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"kubernetes_role": {
+							Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						"role": {
+							Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
+						},
 					},
 					Unless: []utils.Join{
 						{
@@ -3544,6 +3619,9 @@ unless
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"name": {
+										Reason: "Query is using aggregation with `by(instance, cluster)`, only labels included inside `by(...)` will be present on the results.",
 									},
 								},
 								Joins: []utils.Join{
@@ -3573,6 +3651,9 @@ unless
 					FixedLabels: true,
 					ExcludeReason: map[string]utils.ExcludedLabel{
 						"": {
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+						},
+						"a": {
 							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
 						},
 					},
@@ -3649,6 +3730,9 @@ unless
 						"": {
 							Reason: "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
 						},
+						"a": {
+							Reason: "Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.",
+						},
 					},
 					Joins: []utils.Join{
 						{
@@ -3666,6 +3750,9 @@ unless
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"b": {
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 								IsDead:       true,
@@ -3703,6 +3790,9 @@ unless
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
 									},
+									"b": {
+										Reason: "Query is using aggregation that removes all labels.",
+									},
 								},
 								IsDead:       true,
 								IsDeadReason: "The right hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation that removes all labels.",
@@ -3738,6 +3828,9 @@ unless
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"a": {
+										Reason: "Query is using aggregation that removes all labels.",
 									},
 								},
 								IsDead:       true,
@@ -3927,6 +4020,12 @@ unless
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
 						},
+						"a": {
+							Reason: "Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						"job": {
+							Reason: "Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.",
+						},
 					},
 					Joins: []utils.Join{
 						{
@@ -4010,6 +4109,9 @@ label_replace(
 									},
 									labels.MetricName: {
 										Reason: "Aggregation removes metric name.",
+									},
+									"job": {
+										Reason: "Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.",
 									},
 								},
 								Joins: []utils.Join{
@@ -4121,6 +4223,15 @@ sum by (foo, bar) (
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
+						},
+						"alice": {
+							Reason: "Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						"bob": {
+							Reason: "Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.",
+						},
+						"instance": {
+							Reason: "Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 					Joins: []utils.Join{
@@ -4290,6 +4401,9 @@ sum by (foo, bar) (
 						},
 						labels.MetricName: {
 							Reason: "Aggregation removes metric name.",
+						},
+						"colo_name": {
+							Reason: "Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.",
 						},
 					},
 					Aggregation: mustParse[*promParser.AggregateExpr](t, "count by (region) (stddev by (colo_name, region) (error_total))", 0),
