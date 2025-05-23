@@ -6,5 +6,5 @@ tool golang.org/x/perf/cmd/benchstat
 
 require (
 	github.com/aclements/go-moremath v0.0.0-20210112150236-f10218a38794 // indirect
-	golang.org/x/perf v0.0.0-20250305200902-02a15fd477ba // indirect
+	golang.org/x/perf v0.0.0-20250515181355-8f5f3abfb71a // indirect
 )
