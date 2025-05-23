@@ -4,10 +4,9 @@ go 1.24.0
 
 tool github.com/dkorunic/betteralign/cmd/betteralign
 
-require github.com/dkorunic/betteralign v0.6.7 // indirect
-
 require (
 	github.com/KimMachineGun/automemlimit v0.7.1 // indirect
+	github.com/dkorunic/betteralign v0.7.0 // indirect
 	github.com/google/renameio/v2 v2.0.0 // indirect
 	github.com/pbnjay/memory v0.0.0-20210728143218-7b4eea64cf58 // indirect
 	github.com/sirkon/dst v0.26.4 // indirect
