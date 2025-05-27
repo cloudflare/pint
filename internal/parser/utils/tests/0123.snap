@@ -32,47 +32,19 @@ output:
         posrange:
             start: 8
             end: 29
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            name: sometimes
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 1
-                  name: foo
-                  value: bar
-                - type: 0
-                  name: __name__
-                  value: sometimes
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 8
-                end: 29
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 4
-            end: 30
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 4
                 end: 7
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 4
                 end: 30
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -95,17 +67,12 @@ output:
             posrange:
                 start: 57
                 end: 60
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 57
             end: 60
@@ -138,53 +105,24 @@ output:
             posrange:
                 start: 74
                 end: 77
-          call: null
-          aggregation:
-            op: 57414
-            expr:
-                name: bar
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: bar
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 74
-                    end: 77
-            param: null
-            grouping: []
-            without: false
-            posrange:
-                start: 70
-                end: 79
-          excludereason:
+          labels:
             "":
                 reason: Query is using aggregation that removes all labels.
                 fragment:
                     start: 70
                     end: 73
+                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
                 fragment:
                     start: 70
                     end: 79
+                kind: excluded
           operation: sum
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels:
-            - __name__
-          guaranteedlabels: []
           position:
             start: 74
             end: 77
@@ -217,17 +155,12 @@ output:
             posrange:
                 start: 85
                 end: 93
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 85
             end: 93
@@ -243,10 +176,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 8
         end: 29
@@ -262,30 +191,13 @@ output:
       isconditional: true
       isreturnbool: false
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 1
-              duration: false
-              posrange:
-                start: 43
-                end: 44
-        posrange:
-            start: 36
-            end: 45
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 36
                 end: 42
+            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -308,17 +220,12 @@ output:
             posrange:
                 start: 57
                 end: 60
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 57
             end: 60
@@ -351,53 +258,24 @@ output:
             posrange:
                 start: 74
                 end: 77
-          call: null
-          aggregation:
-            op: 57414
-            expr:
-                name: bar
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: bar
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 74
-                    end: 77
-            param: null
-            grouping: []
-            without: false
-            posrange:
-                start: 70
-                end: 79
-          excludereason:
+          labels:
             "":
                 reason: Query is using aggregation that removes all labels.
                 fragment:
                     start: 70
                     end: 73
+                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
                 fragment:
                     start: 70
                     end: 79
+                kind: excluded
           operation: sum
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels:
-            - __name__
-          guaranteedlabels: []
           position:
             start: 74
             end: 77
@@ -430,17 +308,12 @@ output:
             posrange:
                 start: 85
                 end: 93
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: many-to-many
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 85
             end: 93
@@ -456,9 +329,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 36
         end: 45

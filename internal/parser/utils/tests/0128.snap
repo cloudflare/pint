@@ -23,18 +23,18 @@ output:
         posrange:
             start: 2
             end: 18
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 2
+                end: 18
+            kind: guaranteed
       operation: ""
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 2
         end: 18

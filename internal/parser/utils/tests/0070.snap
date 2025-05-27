@@ -20,70 +20,19 @@ output:
         posrange:
             start: 6
             end: 9
-      call: null
-      aggregation:
-        op: 57406
-        expr:
-            op: 57384
-            lhs:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 6
-                    end: 9
-            rhs:
-                name: bar
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: bar
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 12
-                    end: 15
-            vectormatching:
-                card: 0
-                matchinglabels: []
-                "on": false
-                include: []
-            returnbool: false
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 0
-            end: 16
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 0
                 end: 16
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 16
+            kind: excluded
       operation: count
       isdeadreason: ""
       returns: vector
@@ -106,17 +55,12 @@ output:
             posrange:
                 start: 12
                 end: 15
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 12
             end: 15
@@ -132,10 +76,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 6
         end: 9

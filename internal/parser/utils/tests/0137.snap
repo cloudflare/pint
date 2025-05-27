@@ -23,9 +23,31 @@ output:
         posrange:
             start: 43
             end: 53
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        b:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 43
+                end: 53
+            kind: guaranteed
+        c:
+            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 26
+                end: 37
+            kind: included
+        d:
+            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 26
+                end: 37
+            kind: included
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 13
+                end: 15
+            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -51,18 +73,18 @@ output:
             posrange:
                 start: 0
                 end: 10
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels:
+            a:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 0
+                    end: 10
+                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - a
           position:
             start: 0
             end: 10
@@ -78,13 +100,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - c
-        - d
-        - instance
-      excludedlabels: []
-      guaranteedlabels:
-        - b
       position:
         start: 43
         end: 53

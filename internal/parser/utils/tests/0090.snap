@@ -20,14 +20,25 @@ output:
         posrange:
             start: 0
             end: 26
-      call: null
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
             fragment:
                 start: 29
                 end: 32
+            kind: excluded
+        app_name:
+            reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 29
+                end: 32
+            kind: included
+        instance:
+            reason: Query is using one-to-one vector matching with `on(instance, app_name)`, only labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 29
+                end: 32
+            kind: included
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -53,18 +64,18 @@ output:
             posrange:
                 start: 53
                 end: 100
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels:
+            ulimit:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 53
+                    end: 100
+                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - ulimit
           position:
             start: 53
             end: 100
@@ -80,11 +91,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - instance
-        - app_name
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 0
         end: 26

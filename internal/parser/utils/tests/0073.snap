@@ -26,9 +26,19 @@ output:
         posrange:
             start: 0
             end: 28
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        instance:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 28
+            kind: guaranteed
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 28
+            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
@@ -51,17 +61,12 @@ output:
             posrange:
                 start: 33
                 end: 36
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 33
             end: 36
@@ -77,11 +82,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - job
-        - instance
       position:
         start: 0
         end: 28

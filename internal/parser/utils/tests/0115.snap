@@ -3,38 +3,18 @@
 expr: vector(1) or foo
 output:
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 1
-              duration: false
-              posrange:
-                start: 7
-                end: 8
-        posrange:
-            start: 0
-            end: 9
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 0
         end: 9
@@ -67,17 +47,12 @@ output:
         posrange:
             start: 13
             end: 16
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: many-to-many
       isdeadreason: the left hand side always returs something and so the right hand side is never used
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 13
         end: 16

@@ -23,40 +23,7 @@ output:
         posrange:
             start: 44
             end: 58
-      call:
-        func:
-            name: absent
-            argtypes:
-                - vector
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - name: foo
-              originaloffset: 0s
-              originaloffsetexpr: null
-              offset: 0s
-              timestamp: null
-              skiphistogrambuckets: false
-              startorend: 0
-              labelmatchers:
-                - type: 0
-                  name: job
-                  value: xxx
-                - type: 0
-                  name: __name__
-                  value: foo
-              unexpandedseriesset: null
-              series: []
-              bypassemptymatchercheck: false
-              posrange:
-                start: 44
-                end: 58
-        posrange:
-            start: 37
-            end: 59
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -67,6 +34,25 @@ output:
             fragment:
                 start: 37
                 end: 43
+            kind: excluded
+        cluster:
+            reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 11
+                end: 22
+            kind: included
+        env:
+            reason: Query is using one-to-many vector matching with `group_right(cluster, env)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 11
+                end: 22
+            kind: included
+        job:
+            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            fragment:
+                start: 37
+                end: 59
+            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
@@ -89,17 +75,12 @@ output:
             posrange:
                 start: 0
                 end: 3
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 0
             end: 3
@@ -115,13 +96,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - job
-        - cluster
-        - env
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 44
         end: 58

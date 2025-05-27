@@ -20,17 +20,12 @@ output:
         posrange:
             start: 10
             end: 19
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: ""
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 10
         end: 19

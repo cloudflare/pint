@@ -23,53 +23,18 @@ output:
         posrange:
             start: 14
             end: 30
-      call:
-        func:
-            name: sum_over_time
-            argtypes:
-                - matrix
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - vectorselector:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: job
-                      value: myjob
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 14
-                    end: 30
-              range: 5m0s
-              rangeexpr: null
-              endpos: 34
-        posrange:
-            start: 0
-            end: 35
-      aggregation: null
-      excludereason: {}
+      labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 35
+            kind: guaranteed
       operation: sum_over_time
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 14
         end: 34

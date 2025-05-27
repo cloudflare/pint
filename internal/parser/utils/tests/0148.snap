@@ -25,137 +25,49 @@ output:
         posrange:
             start: 30
             end: 42
-      call:
-        func:
-            name: rate
-            argtypes:
-                - matrix
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - vectorselector:
-                name: errors_total
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: errors_total
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 30
-                    end: 42
-              range: 5m0s
-              rangeexpr: null
-              endpos: 46
-        posrange:
-            start: 25
-            end: 47
-      aggregation:
-        op: 57414
-        expr:
-            op: 57395
-            lhs:
-                func:
-                    name: rate
-                    argtypes:
-                        - matrix
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - vectorselector:
-                        name: errors_total
-                        originaloffset: 0s
-                        originaloffsetexpr: null
-                        offset: 0s
-                        timestamp: null
-                        skiphistogrambuckets: false
-                        startorend: 0
-                        labelmatchers:
-                            - type: 0
-                              name: __name__
-                              value: errors_total
-                        unexpandedseriesset: null
-                        series: []
-                        bypassemptymatchercheck: false
-                        posrange:
-                            start: 30
-                            end: 42
-                      range: 5m0s
-                      rangeexpr: null
-                      endpos: 46
-                posrange:
-                    start: 25
-                    end: 47
-            rhs:
-                name: server_errors_total
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: server_errors_total
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 94
-                    end: 113
-            vectormatching:
-                card: 1
-                matchinglabels:
-                    - instance
-                "on": true
-                include:
-                    - bob
-                    - alice
-            returnbool: false
-        param: null
-        grouping:
-            - foo
-            - bar
-        without: false
-        posrange:
-            start: 1
-            end: 115
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 5
                 end: 8
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 1
                 end: 115
+            kind: excluded
         alice:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 5
                 end: 8
+            kind: excluded
+        bar:
+            reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+            kind: included
         bob:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 5
                 end: 8
+            kind: excluded
+        foo:
+            reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 5
+                end: 8
+            kind: included
         instance:
             reason: Query is using aggregation with `by(foo, bar)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 5
                 end: 8
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -178,17 +90,12 @@ output:
             posrange:
                 start: 94
                 end: 113
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 94
             end: 113
@@ -204,12 +111,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - foo
-        - bar
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 30
         end: 46

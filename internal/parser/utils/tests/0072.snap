@@ -23,87 +23,31 @@ output:
         posrange:
             start: 6
             end: 17
-      call: null
-      aggregation:
-        op: 57406
-        expr:
-            op: 57384
-            lhs:
-                name: up
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: job
-                      value: a
-                    - type: 0
-                      name: __name__
-                      value: up
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 6
-                    end: 17
-            rhs:
-                name: up
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: job
-                      value: b
-                    - type: 0
-                      name: __name__
-                      value: up
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 29
-                    end: 40
-            vectormatching:
-                card: 0
-                matchinglabels:
-                    - env
-                "on": true
-                include: []
-            returnbool: false
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 0
-            end: 41
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 0
                 end: 41
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 41
+            kind: excluded
         env:
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 0
                 end: 41
+            kind: excluded
         job:
             reason: Query is using one-to-one vector matching with `on(env)`, only labels included inside `on(...)` will be present on the results.
             fragment:
                 start: 20
                 end: 23
+            kind: excluded
       operation: count
       isdeadreason: ""
       returns: vector
@@ -129,18 +73,18 @@ output:
             posrange:
                 start: 29
                 end: 40
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels:
+            job:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 29
+                    end: 40
+                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - job
           position:
             start: 29
             end: 40
@@ -156,10 +100,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 6
         end: 17

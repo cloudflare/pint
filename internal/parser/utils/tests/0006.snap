@@ -3,22 +3,18 @@
 expr: (2 ^ 5 + 11) % 5 <= bool 3
 output:
     - selector: null
-      call: null
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: This query returns a number value with no labels.
             fragment:
                 start: 1
                 end: 2
+            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: scalar
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 1
         end: 2

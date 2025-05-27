@@ -20,46 +20,37 @@ output:
         posrange:
             start: 6
             end: 30
-      call: null
-      aggregation:
-        op: 57406
-        expr:
-            name: node_exporter_build_info
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: node_exporter_build_info
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 6
-                end: 30
-        param: null
-        grouping:
-            - instance
-            - version
-        without: false
-        posrange:
-            start: 0
-            end: 54
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 32
                 end: 35
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 54
+            kind: excluded
+        foo:
+            reason: Query is using many-to-one vector matching with `group_left(foo)`, all labels included inside `group_left(...)` will be include on the results.
+            fragment:
+                start: 84
+                end: 94
+            kind: included
+        instance:
+            reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 32
+                end: 35
+            kind: included
+        version:
+            reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 32
+                end: 35
+            kind: included
       operation: count
       isdeadreason: ""
       returns: vector
@@ -82,59 +73,42 @@ output:
             posrange:
                 start: 106
                 end: 125
-          call: null
-          aggregation:
-            op: 57406
-            expr:
-                name: deb_package_version
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: deb_package_version
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 106
-                    end: 125
-            param: null
-            grouping:
-                - instance
-                - version
-                - package
-            without: false
-            posrange:
-                start: 100
-                end: 158
-          excludereason:
+          labels:
             "":
                 reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
                 fragment:
                     start: 127
                     end: 130
+                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
                 fragment:
                     start: 100
                     end: 158
+                kind: excluded
+            instance:
+                reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 127
+                    end: 130
+                kind: included
+            package:
+                reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 127
+                    end: 130
+                kind: included
+            version:
+                reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 127
+                    end: 130
+                kind: included
           operation: count
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels:
-            - instance
-            - version
-            - package
-          excludedlabels:
-            - __name__
-          guaranteedlabels: []
           position:
             start: 106
             end: 125
@@ -150,13 +124,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - instance
-        - version
-        - foo
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 6
         end: 30

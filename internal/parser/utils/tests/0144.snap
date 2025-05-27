@@ -23,58 +23,31 @@ output:
         posrange:
             start: 4
             end: 14
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: a
-                  value: "1"
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 4
-                end: 14
-        param: null
-        grouping:
-            - job
-        without: false
-        posrange:
-            start: 0
-            end: 23
-      excludereason:
+      labels:
         "":
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
             fragment:
                 start: 26
                 end: 28
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 23
+            kind: excluded
         a:
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 16
                 end: 18
+            kind: excluded
         job:
             reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
             fragment:
                 start: 26
                 end: 28
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
@@ -100,18 +73,18 @@ output:
             posrange:
                 start: 31
                 end: 41
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels:
+            b:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 31
+                    end: 41
+                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - b
           position:
             start: 31
             end: 41
@@ -127,10 +100,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 4
         end: 14

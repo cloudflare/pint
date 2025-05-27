@@ -23,9 +23,31 @@ output:
         posrange:
             start: 66
             end: 76
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        b:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 66
+                end: 76
+            kind: guaranteed
+        c:
+            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 49
+                end: 60
+            kind: included
+        d:
+            reason: Query is using one-to-many vector matching with `group_right(c, d)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 49
+                end: 60
+            kind: included
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 36
+                end: 38
+            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -51,59 +73,30 @@ output:
             posrange:
                 start: 4
                 end: 14
-          call: null
-          aggregation:
-            op: 57414
-            expr:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: a
-                      value: "1"
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 4
-                    end: 14
-            param: null
-            grouping:
-                - instance
-            without: true
-            posrange:
-                start: 0
-                end: 33
-          excludereason:
+          labels:
             __name__:
                 reason: Aggregation removes metric name.
                 fragment:
                     start: 0
                     end: 33
+                kind: excluded
+            a:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 4
+                    end: 14
+                kind: guaranteed
             instance:
                 reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
                 fragment:
                     start: 16
                     end: 23
+                kind: excluded
           operation: sum
           isdeadreason: The left hand side will never be matched because it doesn't have the `instance` label from `on(...)`. Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels:
-            - instance
-            - __name__
-          guaranteedlabels:
-            - a
           position:
             start: 4
             end: 14
@@ -119,13 +112,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - c
-        - d
-        - instance
-      excludedlabels: []
-      guaranteedlabels:
-        - b
       position:
         start: 66
         end: 76

@@ -20,102 +20,24 @@ output:
         posrange:
             start: 9
             end: 12
-      call:
-        func:
-            name: rate
-            argtypes:
-                - matrix
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - vectorselector:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 9
-                    end: 12
-              range: 10m0s
-              rangeexpr: null
-              endpos: 17
-        posrange:
-            start: 4
-            end: 18
-      aggregation:
-        op: 57414
-        expr:
-            func:
-                name: rate
-                argtypes:
-                    - matrix
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - vectorselector:
-                    name: foo
-                    originaloffset: 0s
-                    originaloffsetexpr: null
-                    offset: 0s
-                    timestamp: null
-                    skiphistogrambuckets: false
-                    startorend: 0
-                    labelmatchers:
-                        - type: 0
-                          name: __name__
-                          value: foo
-                    unexpandedseriesset: null
-                    series: []
-                    bypassemptymatchercheck: false
-                    posrange:
-                        start: 9
-                        end: 12
-                  range: 10m0s
-                  rangeexpr: null
-                  endpos: 17
-            posrange:
-                start: 4
-                end: 18
-        param: null
-        grouping:
-            - instance
-        without: true
-        posrange:
-            start: 0
-            end: 37
-      excludereason:
+      labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 37
+            kind: excluded
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             fragment:
                 start: 20
                 end: 27
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - instance
-        - __name__
-      guaranteedlabels: []
       position:
         start: 9
         end: 17

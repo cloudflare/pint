@@ -20,74 +20,7 @@ output:
         posrange:
             start: 11
             end: 14
-      call:
-        func:
-            name: absent
-            argtypes:
-                - vector
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - op: 57414
-              expr:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 11
-                    end: 14
-              param: null
-              grouping:
-                - job
-                - instance
-              without: false
-              posrange:
-                start: 7
-                end: 33
-        posrange:
-            start: 0
-            end: 34
-      aggregation:
-        op: 57414
-        expr:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 11
-                end: 14
-        param: null
-        grouping:
-            - job
-            - instance
-        without: false
-        posrange:
-            start: 7
-            end: 33
-      excludereason:
+      labels:
         "":
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -98,11 +31,13 @@ output:
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 7
                 end: 33
+            kind: excluded
         instance:
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -113,6 +48,7 @@ output:
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
         job:
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -123,15 +59,12 @@ output:
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
       operation: absent
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 7
         end: 33

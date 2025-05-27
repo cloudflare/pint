@@ -23,9 +23,25 @@ output:
         posrange:
             start: 63
             end: 81
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        cluster:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 63
+                end: 81
+            kind: guaranteed
+        instance:
+            reason: Query is using one-to-many vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 33
+                end: 35
+            kind: included
+        job:
+            reason: Query is using one-to-many vector matching with `group_right(job)`, all labels included inside `group_right(...)` will be include on the results.
+            fragment:
+                start: 46
+                end: 57
+            kind: included
       operation: one-to-many
       isdeadreason: ""
       returns: vector
@@ -54,19 +70,24 @@ output:
             posrange:
                 start: 0
                 end: 30
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels:
+            ignored:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 0
+                    end: 30
+                kind: guaranteed
+            job:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 0
+                    end: 30
+                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - job
-            - ignored
           position:
             start: 0
             end: 30
@@ -82,12 +103,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - job
-        - instance
-      excludedlabels: []
-      guaranteedlabels:
-        - cluster
       position:
         start: 63
         end: 81

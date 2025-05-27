@@ -20,48 +20,12 @@ output:
         posrange:
             start: 9
             end: 12
-      call: null
-      aggregation:
-        op: 57415
-        expr:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 9
-                end: 12
-        param:
-            val: 10
-            duration: false
-            posrange:
-                start: 5
-                end: 7
-        grouping:
-            - cluster
-        without: false
-        posrange:
-            start: 0
-            end: 25
-      excludereason: {}
+      labels: {}
       operation: topk
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 9
         end: 12

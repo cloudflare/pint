@@ -20,41 +20,7 @@ output:
         posrange:
             start: 17
             end: 20
-      call:
-        func:
-            name: absent_over_time
-            argtypes:
-                - matrix
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - vectorselector:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 17
-                    end: 20
-              range: 5m0s
-              rangeexpr: null
-              endpos: 24
-        posrange:
-            start: 0
-            end: 25
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: |-
                 The [absent_over_time()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent_over_time) function is used to check if provided query doesn't match any time series.
@@ -65,14 +31,12 @@ output:
             fragment:
                 start: 0
                 end: 16
+            kind: excluded
       operation: absent_over_time
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 17
         end: 24
@@ -105,37 +69,7 @@ output:
         posrange:
             start: 36
             end: 39
-      call:
-        func:
-            name: absent
-            argtypes:
-                - vector
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - name: bar
-              originaloffset: 0s
-              originaloffsetexpr: null
-              offset: 0s
-              timestamp: null
-              skiphistogrambuckets: false
-              startorend: 0
-              labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: bar
-              unexpandedseriesset: null
-              series: []
-              bypassemptymatchercheck: false
-              posrange:
-                start: 36
-                end: 39
-        posrange:
-            start: 29
-            end: 40
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -146,14 +80,12 @@ output:
             fragment:
                 start: 29
                 end: 35
+            kind: excluded
       operation: absent
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 36
         end: 39

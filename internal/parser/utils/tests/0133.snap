@@ -23,47 +23,31 @@ output:
         posrange:
             start: 0
             end: 34
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 34
+            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless:
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 0
-                  duration: false
-                  posrange:
-                    start: 57
-                    end: 58
-            posrange:
-                start: 50
-                end: 59
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 50
                     end: 56
+                kind: excluded
           operation: vector
           isdeadreason: The right hand side will never be matched because it doesn't have the `job` label from `on(...)`. Calling `vector()` will return a vector value with no labels.
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 50
             end: 59
@@ -78,11 +62,6 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-      includedlabels:
-        - job
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 0
         end: 34

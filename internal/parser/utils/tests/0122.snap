@@ -26,81 +26,24 @@ output:
         posrange:
             start: 5
             end: 26
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            op: 57390
-            lhs:
-                name: sometimes
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 1
-                      name: foo
-                      value: bar
-                    - type: 0
-                      name: __name__
-                      value: sometimes
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 5
-                    end: 26
-            rhs:
-                func:
-                    name: vector
-                    argtypes:
-                        - scalar
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - val: 0
-                      duration: false
-                      posrange:
-                        start: 37
-                        end: 38
-                posrange:
-                    start: 30
-                    end: 39
-            vectormatching:
-                card: 3
-                matchinglabels: []
-                "on": false
-                include: []
-            returnbool: false
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 1
-            end: 41
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 1
                 end: 4
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 1
                 end: 41
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 5
         end: 26
@@ -116,97 +59,24 @@ output:
       isconditional: false
       isreturnbool: false
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 0
-              duration: false
-              posrange:
-                start: 37
-                end: 38
-        posrange:
-            start: 30
-            end: 39
-      aggregation:
-        op: 57414
-        expr:
-            op: 57390
-            lhs:
-                name: sometimes
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 1
-                      name: foo
-                      value: bar
-                    - type: 0
-                      name: __name__
-                      value: sometimes
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 5
-                    end: 26
-            rhs:
-                func:
-                    name: vector
-                    argtypes:
-                        - scalar
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - val: 0
-                      duration: false
-                      posrange:
-                        start: 37
-                        end: 38
-                posrange:
-                    start: 30
-                    end: 39
-            vectormatching:
-                card: 3
-                matchinglabels: []
-                "on": false
-                include: []
-            returnbool: false
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 1
-            end: 41
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 1
                 end: 4
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 1
                 end: 41
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 30
         end: 39
@@ -239,17 +109,12 @@ output:
         posrange:
             start: 47
             end: 50
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 47
         end: 50
@@ -282,53 +147,24 @@ output:
         posrange:
             start: 64
             end: 67
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 64
-                end: 67
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 60
-            end: 68
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 60
                 end: 63
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 60
                 end: 68
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 64
         end: 67
@@ -344,38 +180,18 @@ output:
       isconditional: false
       isreturnbool: false
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 1
-              duration: false
-              posrange:
-                start: 79
-                end: 80
-        posrange:
-            start: 72
-            end: 81
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 72
                 end: 78
+            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 72
         end: 81

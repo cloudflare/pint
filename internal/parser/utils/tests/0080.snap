@@ -20,17 +20,12 @@ output:
         posrange:
             start: 0
             end: 3
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 0
         end: 3
@@ -63,17 +58,12 @@ output:
         posrange:
             start: 7
             end: 10
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 7
         end: 10
@@ -106,17 +96,12 @@ output:
         posrange:
             start: 14
             end: 17
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 14
         end: 17

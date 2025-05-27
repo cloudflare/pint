@@ -29,248 +29,37 @@ output:
         posrange:
             start: 46
             end: 93
-      call:
-        func:
-            name: increase
-            argtypes:
-                - matrix
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - vectorselector:
-                name: kernel_device_io_errors_total
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 3
-                      name: device
-                      value: loop.+
-                    - type: 0
-                      name: __name__
-                      value: kernel_device_io_errors_total
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 46
-                    end: 93
-              range: 2h0m0s
-              rangeexpr: null
-              endpos: 99
-        posrange:
-            start: 37
-            end: 100
-      aggregation:
-        op: 57409
-        expr:
-            op: 57389
-            lhs:
-                op: 57393
-                lhs:
-                    op: 57388
-                    lhs:
-                        func:
-                            name: increase
-                            argtypes:
-                                - matrix
-                            variadic: 0
-                            returntype: vector
-                            experimental: false
-                        args:
-                            - vectorselector:
-                                name: kernel_device_io_errors_total
-                                originaloffset: 0s
-                                originaloffsetexpr: null
-                                offset: 0s
-                                timestamp: null
-                                skiphistogrambuckets: false
-                                startorend: 0
-                                labelmatchers:
-                                    - type: 3
-                                      name: device
-                                      value: loop.+
-                                    - type: 0
-                                      name: __name__
-                                      value: kernel_device_io_errors_total
-                                unexpandedseriesset: null
-                                series: []
-                                bypassemptymatchercheck: false
-                                posrange:
-                                    start: 46
-                                    end: 93
-                              range: 2h0m0s
-                              rangeexpr: null
-                              endpos: 99
-                        posrange:
-                            start: 37
-                            end: 100
-                    rhs:
-                        val: 3
-                        duration: false
-                        posrange:
-                            start: 103
-                            end: 104
-                    vectormatching: null
-                    returnbool: false
-                rhs:
-                    expr:
-                        op: 57388
-                        lhs:
-                            op: 57395
-                            lhs:
-                                func:
-                                    name: increase
-                                    argtypes:
-                                        - matrix
-                                    variadic: 0
-                                    returntype: vector
-                                    experimental: false
-                                args:
-                                    - vectorselector:
-                                        name: kernel_device_io_soft_errors_total
-                                        originaloffset: 0s
-                                        originaloffsetexpr: null
-                                        offset: 0s
-                                        timestamp: null
-                                        skiphistogrambuckets: false
-                                        startorend: 0
-                                        labelmatchers:
-                                            - type: 3
-                                              name: device
-                                              value: loop.+
-                                            - type: 0
-                                              name: __name__
-                                              value: kernel_device_io_soft_errors_total
-                                        unexpandedseriesset: null
-                                        series: []
-                                        bypassemptymatchercheck: false
-                                        posrange:
-                                            start: 149
-                                            end: 201
-                                      range: 2h5m0s
-                                      rangeexpr: null
-                                      endpos: 207
-                                posrange:
-                                    start: 140
-                                    end: 208
-                            rhs:
-                                val: 2
-                                duration: false
-                                posrange:
-                                    start: 209
-                                    end: 210
-                            vectormatching: null
-                            returnbool: false
-                        rhs:
-                            func:
-                                name: increase
-                                argtypes:
-                                    - matrix
-                                variadic: 0
-                                returntype: vector
-                                experimental: false
-                            args:
-                                - vectorselector:
-                                    name: kernel_device_io_errors_total
-                                    originaloffset: 0s
-                                    originaloffsetexpr: null
-                                    offset: 0s
-                                    timestamp: null
-                                    skiphistogrambuckets: false
-                                    startorend: 0
-                                    labelmatchers:
-                                        - type: 0
-                                          name: __name__
-                                          value: kernel_device_io_errors_total
-                                    unexpandedseriesset: null
-                                    series: []
-                                    bypassemptymatchercheck: false
-                                    posrange:
-                                        start: 222
-                                        end: 251
-                                  range: 2h0m0s
-                                  rangeexpr: null
-                                  endpos: 257
-                            posrange:
-                                start: 213
-                                end: 258
-                        vectormatching:
-                            card: 0
-                            matchinglabels: []
-                            "on": false
-                            include: []
-                        returnbool: false
-                    posrange:
-                        start: 133
-                        end: 263
-                vectormatching:
-                    card: 3
-                    matchinglabels:
-                        - instance
-                        - device
-                    "on": true
-                    include: []
-                returnbool: false
-            rhs:
-                func:
-                    name: absent
-                    argtypes:
-                        - vector
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - name: node_disk_info
-                      originaloffset: 0s
-                      originaloffsetexpr: null
-                      offset: 0s
-                      timestamp: null
-                      skiphistogrambuckets: false
-                      startorend: 0
-                      labelmatchers:
-                        - type: 0
-                          name: __name__
-                          value: node_disk_info
-                      unexpandedseriesset: null
-                      series: []
-                      bypassemptymatchercheck: false
-                      posrange:
-                        start: 299
-                        end: 313
-                posrange:
-                    start: 292
-                    end: 314
-            vectormatching:
-                card: 3
-                matchinglabels:
-                    - device
-                    - instance
-                "on": true
-                include: []
-            returnbool: false
-        param: null
-        grouping:
-            - source_instance
-        without: true
-        posrange:
-            start: 2
-            end: 317
-      excludereason:
+      labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 2
                 end: 317
+            kind: excluded
+        device:
+            reason: Query is using many-to-many vector matching with `on(device, instance)`, labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 112
+                end: 114
+            kind: included
+        group:
+            reason: Query is using many-to-one vector matching with `group_left(group)`, all labels included inside `group_left(...)` will be include on the results.
+            fragment:
+                start: 333
+                end: 343
+            kind: included
+        instance:
+            reason: Query is using many-to-one vector matching with `on(instance)`, labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 112
+                end: 114
+            kind: included
         source_instance:
             reason: Query is using aggregation with `without(source_instance)`, all labels included inside `without(...)` will be removed from the results.
             fragment:
                 start: 6
                 end: 14
+            kind: excluded
       operation: max
       isdeadreason: ""
       returns: vector
@@ -293,37 +82,7 @@ output:
             posrange:
                 start: 299
                 end: 313
-          call:
-            func:
-                name: absent
-                argtypes:
-                    - vector
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - name: node_disk_info
-                  originaloffset: 0s
-                  originaloffsetexpr: null
-                  offset: 0s
-                  timestamp: null
-                  skiphistogrambuckets: false
-                  startorend: 0
-                  labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: node_disk_info
-                  unexpandedseriesset: null
-                  series: []
-                  bypassemptymatchercheck: false
-                  posrange:
-                    start: 299
-                    end: 313
-            posrange:
-                start: 292
-                end: 314
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: |-
                     The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -334,6 +93,7 @@ output:
                 fragment:
                     start: 292
                     end: 298
+                kind: excluded
           operation: absent
           isdeadreason: |-
             The right hand side will never be matched because it doesn't have the `device` label from `on(...)`. The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -344,9 +104,6 @@ output:
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 299
             end: 313
@@ -379,66 +136,18 @@ output:
             posrange:
                 start: 365
                 end: 405
-          call:
-            func:
-                name: label_replace
-                argtypes:
-                    - vector
-                    - string
-                    - string
-                    - string
-                    - string
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - name: salt_highstate_runner_configured_minions
-                  originaloffset: 0s
-                  originaloffsetexpr: null
-                  offset: 0s
-                  timestamp: null
-                  skiphistogrambuckets: false
-                  startorend: 0
-                  labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: salt_highstate_runner_configured_minions
-                  unexpandedseriesset: null
-                  series: []
-                  bypassemptymatchercheck: false
-                  posrange:
-                    start: 365
-                    end: 405
-                - val: instance
-                  posrange:
-                    start: 407
-                    end: 417
-                - val: $1
-                  posrange:
-                    start: 419
-                    end: 423
-                - val: minion
-                  posrange:
-                    start: 425
-                    end: 433
-                - val: (.+)
-                  posrange:
-                    start: 435
-                    end: 441
-            posrange:
-                start: 351
-                end: 442
-          aggregation: null
-          excludereason: {}
+          labels:
+            instance:
+                reason: This label will be added to the result by label_replace() call.
+                fragment:
+                    start: 351
+                    end: 442
+                kind: guaranteed
           operation: label_replace
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - instance
           position:
             start: 365
             end: 405
@@ -475,44 +184,7 @@ output:
             posrange:
                 start: 149
                 end: 201
-          call:
-            func:
-                name: increase
-                argtypes:
-                    - matrix
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - vectorselector:
-                    name: kernel_device_io_soft_errors_total
-                    originaloffset: 0s
-                    originaloffsetexpr: null
-                    offset: 0s
-                    timestamp: null
-                    skiphistogrambuckets: false
-                    startorend: 0
-                    labelmatchers:
-                        - type: 3
-                          name: device
-                          value: loop.+
-                        - type: 0
-                          name: __name__
-                          value: kernel_device_io_soft_errors_total
-                    unexpandedseriesset: null
-                    series: []
-                    bypassemptymatchercheck: false
-                    posrange:
-                        start: 149
-                        end: 201
-                  range: 2h5m0s
-                  rangeexpr: null
-                  endpos: 207
-            posrange:
-                start: 140
-                end: 208
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: increase
           isdeadreason: ""
           returns: vector
@@ -535,49 +207,12 @@ output:
                 posrange:
                     start: 222
                     end: 251
-              call:
-                func:
-                    name: increase
-                    argtypes:
-                        - matrix
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - vectorselector:
-                        name: kernel_device_io_errors_total
-                        originaloffset: 0s
-                        originaloffsetexpr: null
-                        offset: 0s
-                        timestamp: null
-                        skiphistogrambuckets: false
-                        startorend: 0
-                        labelmatchers:
-                            - type: 0
-                              name: __name__
-                              value: kernel_device_io_errors_total
-                        unexpandedseriesset: null
-                        series: []
-                        bypassemptymatchercheck: false
-                        posrange:
-                            start: 222
-                            end: 251
-                      range: 2h0m0s
-                      rangeexpr: null
-                      endpos: 257
-                posrange:
-                    start: 213
-                    end: 258
-              aggregation: null
-              excludereason: {}
+              labels: {}
               operation: increase
               isdeadreason: ""
               returns: vector
               joins: []
               unless: []
-              includedlabels: []
-              excludedlabels: []
-              guaranteedlabels: []
               position:
                 start: 222
                 end: 257
@@ -593,9 +228,6 @@ output:
               isconditional: false
               isreturnbool: false
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 149
             end: 207
@@ -610,14 +242,6 @@ output:
           knownreturn: false
           isconditional: true
           isreturnbool: false
-      includedlabels:
-        - instance
-        - device
-        - group
-      excludedlabels:
-        - source_instance
-        - __name__
-      guaranteedlabels: []
       position:
         start: 46
         end: 99

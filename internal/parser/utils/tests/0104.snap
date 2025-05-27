@@ -3,48 +3,18 @@
 expr: vector(0.0  >= bool 0.5) == 1
 output:
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - op: 57387
-              lhs:
-                val: 0
-                duration: false
-                posrange:
-                    start: 7
-                    end: 10
-              rhs:
-                val: 0.5
-                duration: false
-                posrange:
-                    start: 20
-                    end: 23
-              vectormatching: null
-              returnbool: true
-        posrange:
-            start: 0
-            end: 24
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
       operation: vector
       isdeadreason: this query always evaluates to `0 == 1` which is not possible, so it will never return anything
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 0
         end: 24

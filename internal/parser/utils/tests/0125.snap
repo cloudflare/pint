@@ -23,41 +23,7 @@ output:
         posrange:
             start: 7
             end: 14
-      call:
-        func:
-            name: rate
-            argtypes:
-                - matrix
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - vectorselector:
-                name: metric2
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: metric2
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 7
-                    end: 14
-              range: 5m0s
-              rangeexpr: null
-              endpos: 18
-        posrange:
-            start: 2
-            end: 19
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: rate
       isdeadreason: ""
       returns: vector
@@ -80,49 +46,12 @@ output:
             posrange:
                 start: 42
                 end: 49
-          call:
-            func:
-                name: rate
-                argtypes:
-                    - matrix
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - vectorselector:
-                    name: metric1
-                    originaloffset: 0s
-                    originaloffsetexpr: null
-                    offset: 0s
-                    timestamp: null
-                    skiphistogrambuckets: false
-                    startorend: 0
-                    labelmatchers:
-                        - type: 0
-                          name: __name__
-                          value: metric1
-                    unexpandedseriesset: null
-                    series: []
-                    bypassemptymatchercheck: false
-                    posrange:
-                        start: 42
-                        end: 49
-                  range: 5m0s
-                  rangeexpr: null
-                  endpos: 53
-            posrange:
-                start: 37
-                end: 54
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: rate
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 42
             end: 53
@@ -138,38 +67,18 @@ output:
           isconditional: false
           isreturnbool: false
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 1
-                  duration: false
-                  posrange:
-                    start: 65
-                    end: 66
-            posrange:
-                start: 58
-                end: 67
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 58
                     end: 64
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 58
             end: 67
@@ -205,53 +114,18 @@ output:
             posrange:
                 start: 77
                 end: 105
-          call:
-            func:
-                name: rate
-                argtypes:
-                    - matrix
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - vectorselector:
-                    name: metric3
-                    originaloffset: 0s
-                    originaloffsetexpr: null
-                    offset: 0s
-                    timestamp: null
-                    skiphistogrambuckets: false
-                    startorend: 0
-                    labelmatchers:
-                        - type: 0
-                          name: log_name
-                          value: samplerd
-                        - type: 0
-                          name: __name__
-                          value: metric3
-                    unexpandedseriesset: null
-                    series: []
-                    bypassemptymatchercheck: false
-                    posrange:
-                        start: 77
-                        end: 105
-                  range: 5m0s
-                  rangeexpr: null
-                  endpos: 109
-            posrange:
-                start: 72
-                end: 110
-          aggregation: null
-          excludereason: {}
+          labels:
+            log_name:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 72
+                    end: 110
+                kind: guaranteed
           operation: rate
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - log_name
           position:
             start: 77
             end: 109
@@ -267,38 +141,18 @@ output:
           isconditional: false
           isreturnbool: false
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 2
-                  duration: false
-                  posrange:
-                    start: 121
-                    end: 122
-            posrange:
-                start: 114
-                end: 123
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 114
                     end: 120
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 114
             end: 123
@@ -314,9 +168,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 7
         end: 18
@@ -332,30 +183,13 @@ output:
       isconditional: true
       isreturnbool: false
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 0
-              duration: false
-              posrange:
-                start: 30
-                end: 31
-        posrange:
-            start: 23
-            end: 32
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 23
                 end: 29
+            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
@@ -378,49 +212,12 @@ output:
             posrange:
                 start: 42
                 end: 49
-          call:
-            func:
-                name: rate
-                argtypes:
-                    - matrix
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - vectorselector:
-                    name: metric1
-                    originaloffset: 0s
-                    originaloffsetexpr: null
-                    offset: 0s
-                    timestamp: null
-                    skiphistogrambuckets: false
-                    startorend: 0
-                    labelmatchers:
-                        - type: 0
-                          name: __name__
-                          value: metric1
-                    unexpandedseriesset: null
-                    series: []
-                    bypassemptymatchercheck: false
-                    posrange:
-                        start: 42
-                        end: 49
-                  range: 5m0s
-                  rangeexpr: null
-                  endpos: 53
-            posrange:
-                start: 37
-                end: 54
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: rate
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 42
             end: 53
@@ -436,38 +233,18 @@ output:
           isconditional: false
           isreturnbool: false
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 1
-                  duration: false
-                  posrange:
-                    start: 65
-                    end: 66
-            posrange:
-                start: 58
-                end: 67
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 58
                     end: 64
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 58
             end: 67
@@ -503,53 +280,18 @@ output:
             posrange:
                 start: 77
                 end: 105
-          call:
-            func:
-                name: rate
-                argtypes:
-                    - matrix
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - vectorselector:
-                    name: metric3
-                    originaloffset: 0s
-                    originaloffsetexpr: null
-                    offset: 0s
-                    timestamp: null
-                    skiphistogrambuckets: false
-                    startorend: 0
-                    labelmatchers:
-                        - type: 0
-                          name: log_name
-                          value: samplerd
-                        - type: 0
-                          name: __name__
-                          value: metric3
-                    unexpandedseriesset: null
-                    series: []
-                    bypassemptymatchercheck: false
-                    posrange:
-                        start: 77
-                        end: 105
-                  range: 5m0s
-                  rangeexpr: null
-                  endpos: 109
-            posrange:
-                start: 72
-                end: 110
-          aggregation: null
-          excludereason: {}
+          labels:
+            log_name:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 72
+                    end: 110
+                kind: guaranteed
           operation: rate
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - log_name
           position:
             start: 77
             end: 109
@@ -565,38 +307,18 @@ output:
           isconditional: false
           isreturnbool: false
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 2
-                  duration: false
-                  posrange:
-                    start: 121
-                    end: 122
-            posrange:
-                start: 114
-                end: 123
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 114
                     end: 120
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 114
             end: 123
@@ -612,9 +334,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 23
         end: 32

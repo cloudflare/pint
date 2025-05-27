@@ -20,14 +20,19 @@ output:
         posrange:
             start: 1
             end: 4
-      call: null
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
             fragment:
                 start: 12
                 end: 14
+            kind: excluded
+        instance:
+            reason: Query is using one-to-one vector matching with `on(instance)`, only labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 12
+                end: 14
+            kind: included
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -50,17 +55,12 @@ output:
             posrange:
                 start: 25
                 end: 28
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 25
             end: 28
@@ -76,10 +76,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - instance
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 1
         end: 4

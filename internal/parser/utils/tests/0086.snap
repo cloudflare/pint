@@ -3,33 +3,18 @@
 expr: year()
 output:
     - selector: null
-      call:
-        func:
-            name: year
-            argtypes:
-                - vector
-            variadic: 1
-            returntype: vector
-            experimental: false
-        args: []
-        posrange:
-            start: 0
-            end: 6
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `year()` with no arguments will return an empty time series with no labels.
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
       operation: year
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 0
         end: 6

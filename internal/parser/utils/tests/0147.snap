@@ -3,57 +3,30 @@
 expr: (day_of_week() == 6 and hour() < 1) or vector(1)
 output:
     - selector: null
-      call:
-        func:
-            name: day_of_week
-            argtypes:
-                - vector
-            variadic: 1
-            returntype: vector
-            experimental: false
-        args: []
-        posrange:
-            start: 1
-            end: 14
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `day_of_week()` with no arguments will return an empty time series with no labels.
             fragment:
                 start: 1
                 end: 14
+            kind: excluded
       operation: day_of_week
       isdeadreason: ""
       returns: vector
       joins:
         - selector: null
-          call:
-            func:
-                name: hour
-                argtypes:
-                    - vector
-                variadic: 1
-                returntype: vector
-                experimental: false
-            args: []
-            posrange:
-                start: 24
-                end: 30
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `hour()` with no arguments will return an empty time series with no labels.
                 fragment:
                     start: 24
                     end: 30
+                kind: excluded
           operation: hour
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 24
             end: 30
@@ -69,9 +42,6 @@ output:
           isconditional: true
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 1
         end: 14
@@ -87,38 +57,18 @@ output:
       isconditional: true
       isreturnbool: false
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 1
-              duration: false
-              posrange:
-                start: 46
-                end: 47
-        posrange:
-            start: 39
-            end: 48
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 39
                 end: 45
+            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 39
         end: 48

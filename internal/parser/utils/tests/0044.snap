@@ -23,49 +23,18 @@ output:
         posrange:
             start: 4
             end: 30
-      call:
-        func:
-            name: abs
-            argtypes:
-                - vector
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - name: foo
-              originaloffset: 5m0s
-              originaloffsetexpr: null
-              offset: 0s
-              timestamp: null
-              skiphistogrambuckets: false
-              startorend: 0
-              labelmatchers:
-                - type: 0
-                  name: job
-                  value: myjob
-                - type: 0
-                  name: __name__
-                  value: foo
-              unexpandedseriesset: null
-              series: []
-              bypassemptymatchercheck: false
-              posrange:
-                start: 4
-                end: 30
-        posrange:
-            start: 0
-            end: 31
-      aggregation: null
-      excludereason: {}
+      labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 31
+            kind: guaranteed
       operation: abs
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 4
         end: 30

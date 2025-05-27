@@ -3,22 +3,18 @@
 expr: '"test"'
 output:
     - selector: null
-      call: null
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: This query returns a string value with no labels.
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
       operation: ""
       isdeadreason: ""
       returns: string
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 0
         end: 6

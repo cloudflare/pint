@@ -26,14 +26,19 @@ output:
         posrange:
             start: 0
             end: 34
-      call: null
-      aggregation: null
-      excludereason:
+      labels:
+        instance:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 34
+            kind: guaranteed
         job:
             reason: Query is using one-to-one vector matching with `ignoring(job)`, all labels included inside `ignoring(...)` will be removed on the results.
             fragment:
                 start: 37
                 end: 45
+            kind: excluded
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -62,19 +67,24 @@ output:
             posrange:
                 start: 51
                 end: 79
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels:
+            instance:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 51
+                    end: 79
+                kind: guaranteed
+            job:
+                reason: Query will only return series where these labels are present.
+                fragment:
+                    start: 51
+                    end: 79
+                kind: guaranteed
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels:
-            - instance
-            - job
           position:
             start: 51
             end: 79
@@ -90,11 +100,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - job
-      guaranteedlabels:
-        - instance
       position:
         start: 0
         end: 34

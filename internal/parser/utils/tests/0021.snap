@@ -20,9 +20,7 @@ output:
         posrange:
             start: 1
             end: 4
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -45,17 +43,12 @@ output:
             posrange:
                 start: 12
                 end: 15
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 12
             end: 15
@@ -71,9 +64,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 1
         end: 4

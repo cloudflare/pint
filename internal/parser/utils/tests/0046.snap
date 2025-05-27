@@ -23,88 +23,30 @@ output:
         posrange:
             start: 4
             end: 20
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            op: 57390
-            lhs:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: job
-                      value: myjob
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 4
-                    end: 20
-            rhs:
-                name: bar
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: cluster
-                      value: dev
-                    - type: 0
-                      name: __name__
-                      value: bar
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 24
-                    end: 42
-            vectormatching:
-                card: 3
-                matchinglabels: []
-                "on": false
-                include: []
-            returnbool: false
-        param: null
-        grouping:
-            - instance
-        without: true
-        posrange:
-            start: 0
-            end: 61
-      excludereason:
+      labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 61
+            kind: excluded
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             fragment:
                 start: 44
                 end: 51
+            kind: excluded
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 4
+                end: 20
+            kind: guaranteed
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - instance
-        - __name__
-      guaranteedlabels:
-        - job
       position:
         start: 4
         end: 20
@@ -140,88 +82,30 @@ output:
         posrange:
             start: 24
             end: 42
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            op: 57390
-            lhs:
-                name: foo
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: job
-                      value: myjob
-                    - type: 0
-                      name: __name__
-                      value: foo
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 4
-                    end: 20
-            rhs:
-                name: bar
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: cluster
-                      value: dev
-                    - type: 0
-                      name: __name__
-                      value: bar
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 24
-                    end: 42
-            vectormatching:
-                card: 3
-                matchinglabels: []
-                "on": false
-                include: []
-            returnbool: false
-        param: null
-        grouping:
-            - instance
-        without: true
-        posrange:
-            start: 0
-            end: 61
-      excludereason:
+      labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 61
+            kind: excluded
+        cluster:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 24
+                end: 42
+            kind: guaranteed
         instance:
             reason: Query is using aggregation with `without(instance)`, all labels included inside `without(...)` will be removed from the results.
             fragment:
                 start: 44
                 end: 51
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - instance
-        - __name__
-      guaranteedlabels:
-        - cluster
       position:
         start: 24
         end: 42

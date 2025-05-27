@@ -23,64 +23,30 @@ output:
         posrange:
             start: 24
             end: 48
-      call: null
-      aggregation:
-        op: 57407
-        expr:
-            name: build_version
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: job
-                  value: foo
-                - type: 0
-                  name: __name__
-                  value: build_version
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 24
-                end: 48
-        param:
-            val: version
-            posrange:
-                start: 13
-                end: 22
-        grouping:
-            - job
-        without: true
-        posrange:
-            start: 0
-            end: 62
-      excludereason:
+      labels:
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 62
+            kind: excluded
         job:
             reason: Query is using aggregation with `without(job)`, all labels included inside `without(...)` will be removed from the results.
             fragment:
                 start: 50
                 end: 57
+            kind: excluded
+        version:
+            reason: This label will be added to the results by the count_values() call.
+            fragment:
+                start: 0
+                end: 62
+            kind: guaranteed
       operation: count_values
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels:
-        - version
-      excludedlabels:
-        - job
-        - __name__
-      guaranteedlabels:
-        - version
       position:
         start: 24
         end: 48

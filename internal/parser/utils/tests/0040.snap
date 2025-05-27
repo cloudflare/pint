@@ -23,61 +23,30 @@ output:
         posrange:
             start: 4
             end: 20
-      call: null
-      aggregation:
-        op: 57414
-        expr:
-            name: foo
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: job
-                  value: myjob
-                - type: 0
-                  name: __name__
-                  value: foo
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 4
-                end: 20
-        param: null
-        grouping: []
-        without: false
-        posrange:
-            start: 0
-            end: 21
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 0
                 end: 3
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 21
+            kind: excluded
         job:
             reason: Query is using aggregation that removes all labels.
             fragment:
                 start: 0
                 end: 3
+            kind: excluded
       operation: sum
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 4
         end: 20

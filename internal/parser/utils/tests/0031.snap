@@ -23,18 +23,18 @@ output:
         posrange:
             start: 0
             end: 12
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        a:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 12
+            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - a
       position:
         start: 0
         end: 12
@@ -70,18 +70,18 @@ output:
         posrange:
             start: 16
             end: 28
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        b:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 16
+                end: 28
+            kind: guaranteed
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - b
       position:
         start: 16
         end: 28

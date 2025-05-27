@@ -510,7 +510,7 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 						continue
 					}
 					if !s.CanHaveLabel(v.value[1]) {
-						er := s.LabelExcludeReason(v.value[1])
+						reason, fragment := s.LabelExcludeReason(v.value[1])
 						problems = append(problems, Problem{
 							Anchor:   AnchorAfter,
 							Lines:    rule.Lines,
@@ -527,10 +527,10 @@ func (c TemplateCheck) checkQueryLabels(group *parser.Group, rule parser.Rule, l
 									Kind:        diags.Issue,
 								},
 								{
-									Message:     er.Reason,
+									Message:     reason,
 									Pos:         rule.AlertingRule.Expr.Value.Pos,
-									FirstColumn: int(er.Fragment.Start) + 1,
-									LastColumn:  int(er.Fragment.End),
+									FirstColumn: int(fragment.Start) + 1,
+									LastColumn:  int(fragment.End),
 									Kind:        diags.Context,
 								},
 							},

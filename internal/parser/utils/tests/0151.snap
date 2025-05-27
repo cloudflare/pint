@@ -20,70 +20,36 @@ output:
         posrange:
             start: 50
             end: 61
-      call: null
-      aggregation:
-        op: 57406
-        expr:
-            op: 57412
-            expr:
-                name: error_total
-                originaloffset: 0s
-                originaloffsetexpr: null
-                offset: 0s
-                timestamp: null
-                skiphistogrambuckets: false
-                startorend: 0
-                labelmatchers:
-                    - type: 0
-                      name: __name__
-                      value: error_total
-                unexpandedseriesset: null
-                series: []
-                bypassemptymatchercheck: false
-                posrange:
-                    start: 50
-                    end: 61
-            param: null
-            grouping:
-                - colo_name
-                - region
-            without: false
-            posrange:
-                start: 19
-                end: 62
-        param: null
-        grouping:
-            - region
-        without: false
-        posrange:
-            start: 0
-            end: 63
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 6
                 end: 9
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 63
+            kind: excluded
         colo_name:
             reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 6
                 end: 9
+            kind: excluded
+        region:
+            reason: Query is using aggregation with `by(region)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 6
+                end: 9
+            kind: included
       operation: count
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels:
-        - region
-      excludedlabels:
-        - __name__
-      guaranteedlabels: []
       position:
         start: 50
         end: 61

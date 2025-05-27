@@ -29,9 +29,13 @@ output:
         posrange:
             start: 1
             end: 44
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        prometheus:
+            reason: Query is using many-to-one vector matching with `on(prometheus)`, labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 47
+                end: 49
+            kind: included
       operation: many-to-one
       isdeadreason: ""
       returns: vector
@@ -57,193 +61,37 @@ output:
             posrange:
                 start: 110
                 end: 151
-          call:
-            func:
-                name: label_replace
-                argtypes:
-                    - vector
-                    - string
-                    - string
-                    - string
-                    - string
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - op: 57384
-                  lhs:
-                    op: 57409
-                    expr:
-                        func:
-                            name: max_over_time
-                            argtypes:
-                                - matrix
-                            variadic: 0
-                            returntype: vector
-                            experimental: false
-                        args:
-                            - vectorselector:
-                                name: go_memstats_alloc_bytes
-                                originaloffset: 0s
-                                originaloffsetexpr: null
-                                offset: 0s
-                                timestamp: null
-                                skiphistogrambuckets: false
-                                startorend: 0
-                                labelmatchers:
-                                    - type: 0
-                                      name: job
-                                      value: prometheus
-                                    - type: 0
-                                      name: __name__
-                                      value: go_memstats_alloc_bytes
-                                unexpandedseriesset: null
-                                series: []
-                                bypassemptymatchercheck: false
-                                posrange:
-                                    start: 110
-                                    end: 151
-                              range: 2h0m0s
-                              rangeexpr: null
-                              endpos: 155
-                        posrange:
-                            start: 96
-                            end: 156
-                    param: null
-                    grouping:
-                        - instance
-                    without: false
-                    posrange:
-                        start: 92
-                        end: 170
-                  rhs:
-                    op: 57409
-                    expr:
-                        func:
-                            name: max_over_time
-                            argtypes:
-                                - matrix
-                            variadic: 0
-                            returntype: vector
-                            experimental: false
-                        args:
-                            - vectorselector:
-                                name: prometheus_tsdb_head_series
-                                originaloffset: 0s
-                                originaloffsetexpr: null
-                                offset: 0s
-                                timestamp: null
-                                skiphistogrambuckets: false
-                                startorend: 0
-                                labelmatchers:
-                                    - type: 0
-                                      name: __name__
-                                      value: prometheus_tsdb_head_series
-                                unexpandedseriesset: null
-                                series: []
-                                bypassemptymatchercheck: false
-                                posrange:
-                                    start: 195
-                                    end: 222
-                              range: 2h0m0s
-                              rangeexpr: null
-                              endpos: 226
-                        posrange:
-                            start: 181
-                            end: 227
-                    param: null
-                    grouping:
-                        - instance
-                    without: false
-                    posrange:
-                        start: 177
-                        end: 241
-                  vectormatching:
-                    card: 0
-                    matchinglabels: []
-                    "on": false
-                    include: []
-                  returnbool: false
-                - val: prometheus
-                  posrange:
-                    start: 245
-                    end: 257
-                - val: $1
-                  posrange:
-                    start: 259
-                    end: 263
-                - val: instance
-                  posrange:
-                    start: 267
-                    end: 277
-                - val: (.+)
-                  posrange:
-                    start: 279
-                    end: 285
-            posrange:
-                start: 75
-                end: 287
-          aggregation:
-            op: 57409
-            expr:
-                func:
-                    name: max_over_time
-                    argtypes:
-                        - matrix
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - vectorselector:
-                        name: go_memstats_alloc_bytes
-                        originaloffset: 0s
-                        originaloffsetexpr: null
-                        offset: 0s
-                        timestamp: null
-                        skiphistogrambuckets: false
-                        startorend: 0
-                        labelmatchers:
-                            - type: 0
-                              name: job
-                              value: prometheus
-                            - type: 0
-                              name: __name__
-                              value: go_memstats_alloc_bytes
-                        unexpandedseriesset: null
-                        series: []
-                        bypassemptymatchercheck: false
-                        posrange:
-                            start: 110
-                            end: 151
-                      range: 2h0m0s
-                      rangeexpr: null
-                      endpos: 155
-                posrange:
-                    start: 96
-                    end: 156
-            param: null
-            grouping:
-                - instance
-            without: false
-            posrange:
-                start: 92
-                end: 170
-          excludereason:
+          labels:
             "":
                 reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                 fragment:
                     start: 158
                     end: 160
+                kind: excluded
             __name__:
                 reason: Aggregation removes metric name.
                 fragment:
                     start: 92
                     end: 170
+                kind: excluded
+            instance:
+                reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 158
+                    end: 160
+                kind: included
             job:
                 reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                 fragment:
                     start: 158
                     end: 160
+                kind: excluded
+            prometheus:
+                reason: This label will be added to the result by label_replace() call.
+                fragment:
+                    start: 75
+                    end: 287
+                kind: guaranteed
           operation: label_replace
           isdeadreason: ""
           returns: vector
@@ -266,102 +114,30 @@ output:
                 posrange:
                     start: 195
                     end: 222
-              call:
-                func:
-                    name: max_over_time
-                    argtypes:
-                        - matrix
-                    variadic: 0
-                    returntype: vector
-                    experimental: false
-                args:
-                    - vectorselector:
-                        name: prometheus_tsdb_head_series
-                        originaloffset: 0s
-                        originaloffsetexpr: null
-                        offset: 0s
-                        timestamp: null
-                        skiphistogrambuckets: false
-                        startorend: 0
-                        labelmatchers:
-                            - type: 0
-                              name: __name__
-                              value: prometheus_tsdb_head_series
-                        unexpandedseriesset: null
-                        series: []
-                        bypassemptymatchercheck: false
-                        posrange:
-                            start: 195
-                            end: 222
-                      range: 2h0m0s
-                      rangeexpr: null
-                      endpos: 226
-                posrange:
-                    start: 181
-                    end: 227
-              aggregation:
-                op: 57409
-                expr:
-                    func:
-                        name: max_over_time
-                        argtypes:
-                            - matrix
-                        variadic: 0
-                        returntype: vector
-                        experimental: false
-                    args:
-                        - vectorselector:
-                            name: prometheus_tsdb_head_series
-                            originaloffset: 0s
-                            originaloffsetexpr: null
-                            offset: 0s
-                            timestamp: null
-                            skiphistogrambuckets: false
-                            startorend: 0
-                            labelmatchers:
-                                - type: 0
-                                  name: __name__
-                                  value: prometheus_tsdb_head_series
-                            unexpandedseriesset: null
-                            series: []
-                            bypassemptymatchercheck: false
-                            posrange:
-                                start: 195
-                                end: 222
-                          range: 2h0m0s
-                          rangeexpr: null
-                          endpos: 226
-                    posrange:
-                        start: 181
-                        end: 227
-                param: null
-                grouping:
-                    - instance
-                without: false
-                posrange:
-                    start: 177
-                    end: 241
-              excludereason:
+              labels:
                 "":
                     reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
                     fragment:
                         start: 229
                         end: 231
+                    kind: excluded
                 __name__:
                     reason: Aggregation removes metric name.
                     fragment:
                         start: 177
                         end: 241
+                    kind: excluded
+                instance:
+                    reason: Query is using aggregation with `by(instance)`, only labels included inside `by(...)` will be present on the results.
+                    fragment:
+                        start: 229
+                        end: 231
+                    kind: included
               operation: max
               isdeadreason: ""
               returns: vector
               joins: []
               unless: []
-              includedlabels:
-                - instance
-              excludedlabels:
-                - __name__
-              guaranteedlabels: []
               position:
                 start: 195
                 end: 226
@@ -377,12 +153,6 @@ output:
               isconditional: false
               isreturnbool: false
           unless: []
-          includedlabels:
-            - instance
-          excludedlabels:
-            - __name__
-          guaranteedlabels:
-            - prometheus
           position:
             start: 92
             end: 241
@@ -398,10 +168,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels:
-        - prometheus
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 1
         end: 44

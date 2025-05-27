@@ -23,47 +23,31 @@ output:
         posrange:
             start: 0
             end: 34
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 34
+            kind: guaranteed
       operation: many-to-many
       isdeadreason: this query will never return anything because the `unless` query always returns something
       returns: vector
       joins: []
       unless:
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 0
-                  duration: false
-                  posrange:
-                    start: 54
-                    end: 55
-            posrange:
-                start: 47
-                end: 56
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 47
                     end: 53
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 47
             end: 56
@@ -78,10 +62,6 @@ output:
           knownreturn: true
           isconditional: false
           isreturnbool: false
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 0
         end: 34

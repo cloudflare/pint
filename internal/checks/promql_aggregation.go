@@ -89,7 +89,7 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 			continue
 		}
 		if c.keep && !src.CanHaveLabel(c.label) {
-			el := src.LabelExcludeReason(c.label)
+			reason, fragment := src.LabelExcludeReason(c.label)
 			problems = append(problems, Problem{
 				Anchor:   AnchorAfter,
 				Lines:    expr.Value.Pos.Lines(),
@@ -98,18 +98,18 @@ func (c AggregationCheck) Check(_ context.Context, entry discovery.Entry, _ []di
 				Details:  maybeComment(c.comment),
 				Diagnostics: []diags.Diagnostic{
 					{
-						Message:     el.Reason,
+						Message:     reason,
 						Pos:         expr.Value.Pos,
-						FirstColumn: int(el.Fragment.Start) + 1,
-						LastColumn:  int(el.Fragment.End),
+						FirstColumn: int(fragment.Start) + 1,
+						LastColumn:  int(fragment.End),
 						Kind:        diags.Context,
 					},
 					{
 						Message: fmt.Sprintf("`%s` label is required and should be preserved when aggregating %s rules.",
 							c.label, nameDesc),
 						Pos:         expr.Value.Pos,
-						FirstColumn: int(el.Fragment.Start) + 1,
-						LastColumn:  int(el.Fragment.End),
+						FirstColumn: int(fragment.Start) + 1,
+						LastColumn:  int(fragment.End),
 						Kind:        diags.Issue,
 					},
 				},

@@ -20,46 +20,24 @@ output:
         posrange:
             start: 1
             end: 4
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels: {}
       operation: many-to-many
       isdeadreason: ""
       returns: vector
       joins:
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 2
-                  duration: false
-                  posrange:
-                    start: 29
-                    end: 30
-            posrange:
-                start: 22
-                end: 31
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 22
                     end: 28
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 22
             end: 31
@@ -92,17 +70,12 @@ output:
             posrange:
                 start: 35
                 end: 38
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: many-to-many
           isdeadreason: the left hand side always returs something and so the right hand side is never used
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 35
             end: 38
@@ -118,9 +91,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 1
         end: 4
@@ -136,67 +106,30 @@ output:
       isconditional: false
       isreturnbool: false
     - selector: null
-      call:
-        func:
-            name: vector
-            argtypes:
-                - scalar
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - val: 5
-              duration: false
-              posrange:
-                start: 15
-                end: 16
-        posrange:
-            start: 8
-            end: 17
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: Calling `vector()` will return a vector value with no labels.
             fragment:
                 start: 8
                 end: 14
+            kind: excluded
       operation: vector
       isdeadreason: ""
       returns: vector
       joins:
         - selector: null
-          call:
-            func:
-                name: vector
-                argtypes:
-                    - scalar
-                variadic: 0
-                returntype: vector
-                experimental: false
-            args:
-                - val: 2
-                  duration: false
-                  posrange:
-                    start: 29
-                    end: 30
-            posrange:
-                start: 22
-                end: 31
-          aggregation: null
-          excludereason:
+          labels:
             "":
                 reason: Calling `vector()` will return a vector value with no labels.
                 fragment:
                     start: 22
                     end: 28
+                kind: excluded
           operation: vector
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 22
             end: 31
@@ -229,17 +162,12 @@ output:
             posrange:
                 start: 35
                 end: 38
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: many-to-many
           isdeadreason: the left hand side always returs something and so the right hand side is never used
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 35
             end: 38
@@ -255,9 +183,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels: []
       position:
         start: 8
         end: 17

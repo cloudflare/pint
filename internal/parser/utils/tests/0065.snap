@@ -23,9 +23,13 @@ output:
         posrange:
             start: 0
             end: 14
-      call: null
-      aggregation: null
-      excludereason: {}
+      labels:
+        job:
+            reason: Query will only return series where these labels are present.
+            fragment:
+                start: 0
+                end: 14
+            kind: guaranteed
       operation: one-to-one
       isdeadreason: ""
       returns: vector
@@ -48,17 +52,12 @@ output:
             posrange:
                 start: 17
                 end: 20
-          call: null
-          aggregation: null
-          excludereason: {}
+          labels: {}
           operation: ""
           isdeadreason: ""
           returns: vector
           joins: []
           unless: []
-          includedlabels: []
-          excludedlabels: []
-          guaranteedlabels: []
           position:
             start: 17
             end: 20
@@ -74,10 +73,6 @@ output:
           isconditional: false
           isreturnbool: false
       unless: []
-      includedlabels: []
-      excludedlabels: []
-      guaranteedlabels:
-        - job
       position:
         start: 0
         end: 14

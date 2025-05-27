@@ -32,49 +32,7 @@ output:
         posrange:
             start: 7
             end: 65
-      call:
-        func:
-            name: absent
-            argtypes:
-                - vector
-            variadic: 0
-            returntype: vector
-            experimental: false
-        args:
-            - name: foo
-              originaloffset: 0s
-              originaloffsetexpr: null
-              offset: 0s
-              timestamp: null
-              skiphistogrambuckets: false
-              startorend: 0
-              labelmatchers:
-                - type: 0
-                  name: job
-                  value: bar
-                - type: 1
-                  name: cluster
-                  value: dev
-                - type: 2
-                  name: instance
-                  value: .+
-                - type: 0
-                  name: env
-                  value: prod
-                - type: 0
-                  name: __name__
-                  value: foo
-              unexpandedseriesset: null
-              series: []
-              bypassemptymatchercheck: false
-              posrange:
-                start: 7
-                end: 65
-        posrange:
-            start: 0
-            end: 66
-      aggregation: null
-      excludereason:
+      labels:
         "":
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -85,6 +43,13 @@ output:
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
+        env:
+            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            fragment:
+                start: 0
+                end: 66
+            kind: guaranteed
         instance:
             reason: |-
                 The [absent()](https://prometheus.io/docs/prometheus/latest/querying/functions/#absent) function is used to check if provided query doesn't match any time series.
@@ -95,18 +60,18 @@ output:
             fragment:
                 start: 0
                 end: 6
+            kind: excluded
+        job:
+            reason: All labels passed to absent() call will be present on the results if the query doesn't match anything.
+            fragment:
+                start: 0
+                end: 66
+            kind: guaranteed
       operation: absent
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels:
-        - job
-        - env
-      excludedlabels: []
-      guaranteedlabels:
-        - job
-        - env
       position:
         start: 7
         end: 65

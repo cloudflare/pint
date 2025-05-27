@@ -20,61 +20,36 @@ output:
         posrange:
             start: 24
             end: 37
-      call: null
-      aggregation:
-        op: 57407
-        expr:
-            name: build_version
-            originaloffset: 0s
-            originaloffsetexpr: null
-            offset: 0s
-            timestamp: null
-            skiphistogrambuckets: false
-            startorend: 0
-            labelmatchers:
-                - type: 0
-                  name: __name__
-                  value: build_version
-            unexpandedseriesset: null
-            series: []
-            bypassemptymatchercheck: false
-            posrange:
-                start: 24
-                end: 37
-        param:
-            val: version
-            posrange:
-                start: 13
-                end: 22
-        grouping:
-            - job
-        without: false
-        posrange:
-            start: 0
-            end: 46
-      excludereason:
+      labels:
         "":
             reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
             fragment:
                 start: 39
                 end: 41
+            kind: excluded
         __name__:
             reason: Aggregation removes metric name.
             fragment:
                 start: 0
                 end: 46
+            kind: excluded
+        job:
+            reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 39
+                end: 41
+            kind: included
+        version:
+            reason: This label will be added to the results by the count_values() call.
+            fragment:
+                start: 0
+                end: 46
+            kind: guaranteed
       operation: count_values
       isdeadreason: ""
       returns: vector
       joins: []
       unless: []
-      includedlabels:
-        - job
-        - version
-      excludedlabels:
-        - __name__
-      guaranteedlabels:
-        - version
       position:
         start: 24
         end: 37
