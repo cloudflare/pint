@@ -549,6 +549,8 @@ func parseDiffLines(diff string) (lines []diffLine) {
 				newLine, _ = strconv.Atoi(matches[3])
 				newLine--
 			}
+		case strings.HasPrefix(line, "--- "):
+		case strings.HasPrefix(line, "+++ "):
 		case strings.HasPrefix(line, "-"):
 			oldLine++
 		case strings.HasPrefix(line, "+"):

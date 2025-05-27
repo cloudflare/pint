@@ -3,6 +3,7 @@ module github.com/cloudflare/pint
 go 1.24.0
 
 require (
+	github.com/akedrou/textdiff v0.1.0
 	github.com/cespare/xxhash/v2 v2.3.0
 	github.com/gkampitakis/go-snaps v0.5.11
 	github.com/google/go-cmp v0.7.0
