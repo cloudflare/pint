@@ -1,0 +1,129 @@
+
+[TestLabelsSource/88 - 1]
+expr: label_join(up{job="api-server",src1="a",src2="b",src3="c"}, "foo", ",", "src1", "src2", "src3")
+output:
+    - selector:
+        name: up
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: job
+              value: api-server
+            - type: 0
+              name: src1
+              value: a
+            - type: 0
+              name: src2
+              value: b
+            - type: 0
+              name: src3
+              value: c
+            - type: 0
+              name: __name__
+              value: up
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 11
+            end: 58
+      call:
+        func:
+            name: label_join
+            argtypes:
+                - vector
+                - string
+                - string
+                - string
+            variadic: -1
+            returntype: vector
+            experimental: false
+        args:
+            - name: up
+              originaloffset: 0s
+              originaloffsetexpr: null
+              offset: 0s
+              timestamp: null
+              skiphistogrambuckets: false
+              startorend: 0
+              labelmatchers:
+                - type: 0
+                  name: job
+                  value: api-server
+                - type: 0
+                  name: src1
+                  value: a
+                - type: 0
+                  name: src2
+                  value: b
+                - type: 0
+                  name: src3
+                  value: c
+                - type: 0
+                  name: __name__
+                  value: up
+              unexpandedseriesset: null
+              series: []
+              bypassemptymatchercheck: false
+              posrange:
+                start: 11
+                end: 58
+            - val: foo
+              posrange:
+                start: 60
+                end: 65
+            - val: ','
+              posrange:
+                start: 67
+                end: 70
+            - val: src1
+              posrange:
+                start: 72
+                end: 78
+            - val: src2
+              posrange:
+                start: 80
+                end: 86
+            - val: src3
+              posrange:
+                start: 88
+                end: 94
+        posrange:
+            start: 0
+            end: 95
+      aggregation: null
+      excludereason: {}
+      operation: label_join
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels:
+        - job
+        - src1
+        - src2
+        - src3
+        - foo
+      position:
+        start: 11
+        end: 58
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 4
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

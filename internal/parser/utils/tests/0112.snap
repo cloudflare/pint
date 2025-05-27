@@ -1,0 +1,427 @@
+
+[TestLabelsSource/112 - 1]
+expr: |4
+    avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case!~".*offpeak.*"})
+    < 0.5 > 0
+    or sum without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*tier1.*"})
+    < on() count(colo_router_tier:disabled_pops:max{tier="1",router=~"edge.*"}) * 0.4 > 0
+    or avg without(router, colo_id, instance) (router_anycast_prefix_enabled{cidr_use_case=~".*regional.*"})
+    < 0.1 > 0
+output:
+    - selector:
+        name: router_anycast_prefix_enabled
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 3
+              name: cidr_use_case
+              value: .*offpeak.*
+            - type: 0
+              name: __name__
+              value: router_anycast_prefix_enabled
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 41
+            end: 100
+      call: null
+      aggregation:
+        op: 57404
+        expr:
+            name: router_anycast_prefix_enabled
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 3
+                  name: cidr_use_case
+                  value: .*offpeak.*
+                - type: 0
+                  name: __name__
+                  value: router_anycast_prefix_enabled
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 41
+                end: 100
+        param: null
+        grouping:
+            - router
+            - colo_id
+            - instance
+        without: true
+        posrange:
+            start: 1
+            end: 101
+      excludereason:
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 101
+        colo_id:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 5
+                end: 12
+        instance:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 5
+                end: 12
+        router:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 5
+                end: 12
+      operation: avg
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - router
+        - colo_id
+        - instance
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 41
+        end: 100
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+    - selector:
+        name: router_anycast_prefix_enabled
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 2
+              name: cidr_use_case
+              value: .*tier1.*
+            - type: 0
+              name: __name__
+              value: router_anycast_prefix_enabled
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 155
+            end: 212
+      call: null
+      aggregation:
+        op: 57414
+        expr:
+            name: router_anycast_prefix_enabled
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 2
+                  name: cidr_use_case
+                  value: .*tier1.*
+                - type: 0
+                  name: __name__
+                  value: router_anycast_prefix_enabled
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 155
+                end: 212
+        param: null
+        grouping:
+            - router
+            - colo_id
+            - instance
+        without: true
+        posrange:
+            start: 115
+            end: 213
+      excludereason:
+        "":
+            reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 216
+                end: 218
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 115
+                end: 213
+        cidr_use_case:
+            reason: Query is using one-to-one vector matching with `on()`, only labels included inside `on(...)` will be present on the results.
+            fragment:
+                start: 216
+                end: 218
+        colo_id:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 119
+                end: 126
+        instance:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 119
+                end: 126
+        router:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 119
+                end: 126
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: colo_router_tier:disabled_pops:max
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: tier
+                  value: "1"
+                - type: 2
+                  name: router
+                  value: edge.*
+                - type: 0
+                  name: __name__
+                  value: colo_router_tier:disabled_pops:max
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 227
+                end: 288
+          call: null
+          aggregation:
+            op: 57406
+            expr:
+                name: colo_router_tier:disabled_pops:max
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: tier
+                      value: "1"
+                    - type: 2
+                      name: router
+                      value: edge.*
+                    - type: 0
+                      name: __name__
+                      value: colo_router_tier:disabled_pops:max
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 227
+                    end: 288
+            param: null
+            grouping: []
+            without: false
+            posrange:
+                start: 221
+                end: 289
+          excludereason:
+            "":
+                reason: Query is using aggregation that removes all labels.
+                fragment:
+                    start: 221
+                    end: 289
+            __name__:
+                reason: Aggregation removes metric name.
+                fragment:
+                    start: 221
+                    end: 289
+            router:
+                reason: Query is using aggregation that removes all labels.
+                fragment:
+                    start: 221
+                    end: 289
+            tier:
+                reason: Query is using aggregation that removes all labels.
+                fragment:
+                    start: 221
+                    end: 289
+          operation: count
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels:
+            - __name__
+          guaranteedlabels: []
+          position:
+            start: 227
+            end: 288
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 5
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - router
+        - colo_id
+        - instance
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 155
+        end: 212
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+    - selector:
+        name: router_anycast_prefix_enabled
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 2
+              name: cidr_use_case
+              value: .*regional.*
+            - type: 0
+              name: __name__
+              value: router_anycast_prefix_enabled
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 343
+            end: 403
+      call: null
+      aggregation:
+        op: 57404
+        expr:
+            name: router_anycast_prefix_enabled
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 2
+                  name: cidr_use_case
+                  value: .*regional.*
+                - type: 0
+                  name: __name__
+                  value: router_anycast_prefix_enabled
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 343
+                end: 403
+        param: null
+        grouping:
+            - router
+            - colo_id
+            - instance
+        without: true
+        posrange:
+            start: 303
+            end: 404
+      excludereason:
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 303
+                end: 404
+        colo_id:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 307
+                end: 314
+        instance:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 307
+                end: 314
+        router:
+            reason: Query is using aggregation with `without(router, colo_id, instance)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 307
+                end: 314
+      operation: avg
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - router
+        - colo_id
+        - instance
+        - __name__
+      guaranteedlabels:
+        - cidr_use_case
+      position:
+        start: 343
+        end: 403
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+
+---

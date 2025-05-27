@@ -1,0 +1,394 @@
+
+[TestLabelsSource/122 - 1]
+expr: |-
+    (sum(sometimes{foo!="bar"} or vector(0)))
+    or
+    ((bob > 10) or sum(foo) or vector(1))
+output:
+    - selector:
+        name: sometimes
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 1
+              name: foo
+              value: bar
+            - type: 0
+              name: __name__
+              value: sometimes
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 5
+            end: 26
+      call: null
+      aggregation:
+        op: 57414
+        expr:
+            op: 57390
+            lhs:
+                name: sometimes
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 1
+                      name: foo
+                      value: bar
+                    - type: 0
+                      name: __name__
+                      value: sometimes
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 5
+                    end: 26
+            rhs:
+                func:
+                    name: vector
+                    argtypes:
+                        - scalar
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - val: 0
+                      duration: false
+                      posrange:
+                        start: 37
+                        end: 38
+                posrange:
+                    start: 30
+                    end: 39
+            vectormatching:
+                card: 3
+                matchinglabels: []
+                "on": false
+                include: []
+            returnbool: false
+        param: null
+        grouping: []
+        without: false
+        posrange:
+            start: 1
+            end: 41
+      excludereason:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 1
+                end: 4
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 41
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 5
+        end: 26
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+    - selector: null
+      call:
+        func:
+            name: vector
+            argtypes:
+                - scalar
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - val: 0
+              duration: false
+              posrange:
+                start: 37
+                end: 38
+        posrange:
+            start: 30
+            end: 39
+      aggregation:
+        op: 57414
+        expr:
+            op: 57390
+            lhs:
+                name: sometimes
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 1
+                      name: foo
+                      value: bar
+                    - type: 0
+                      name: __name__
+                      value: sometimes
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 5
+                    end: 26
+            rhs:
+                func:
+                    name: vector
+                    argtypes:
+                        - scalar
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - val: 0
+                      duration: false
+                      posrange:
+                        start: 37
+                        end: 38
+                posrange:
+                    start: 30
+                    end: 39
+            vectormatching:
+                card: 3
+                matchinglabels: []
+                "on": false
+                include: []
+            returnbool: false
+        param: null
+        grouping: []
+        without: false
+        posrange:
+            start: 1
+            end: 41
+      excludereason:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 1
+                end: 4
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 41
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 30
+        end: 39
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: false
+      isreturnbool: false
+    - selector:
+        name: bob
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: bob
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 47
+            end: 50
+      call: null
+      aggregation: null
+      excludereason: {}
+      operation: many-to-many
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 47
+        end: 50
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 3
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 64
+            end: 67
+      call: null
+      aggregation:
+        op: 57414
+        expr:
+            name: foo
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: foo
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 64
+                end: 67
+        param: null
+        grouping: []
+        without: false
+        posrange:
+            start: 60
+            end: 68
+      excludereason:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 60
+                end: 63
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 60
+                end: 68
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 64
+        end: 67
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+    - selector: null
+      call:
+        func:
+            name: vector
+            argtypes:
+                - scalar
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - val: 1
+              duration: false
+              posrange:
+                start: 79
+                end: 80
+        posrange:
+            start: 72
+            end: 81
+      aggregation: null
+      excludereason:
+        "":
+            reason: Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 72
+                end: 78
+      operation: vector
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 72
+        end: 81
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 1
+      type: 4
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: false
+      isreturnbool: false
+
+---

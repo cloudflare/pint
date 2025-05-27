@@ -1,0 +1,48 @@
+
+[TestLabelsSource/106 - 1]
+expr: days_in_month()
+output:
+    - selector: null
+      call:
+        func:
+            name: days_in_month
+            argtypes:
+                - vector
+            variadic: 1
+            returntype: vector
+            experimental: false
+        args: []
+        posrange:
+            start: 0
+            end: 15
+      aggregation: null
+      excludereason:
+        "":
+            reason: Calling `days_in_month()` with no arguments will return an empty time series with no labels.
+            fragment:
+                start: 0
+                end: 15
+      operation: days_in_month
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 0
+        end: 15
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 4
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

@@ -1,0 +1,58 @@
+
+[TestLabelsSource/29 - 1]
+expr: foo{job=""}
+output:
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: job
+              value: ""
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 0
+            end: 11
+      call: null
+      aggregation: null
+      excludereason:
+        job:
+            reason: Query uses `{job=""}` selector which will filter out any time series with the `job` label set.
+            fragment:
+                start: 0
+                end: 11
+      operation: ""
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - job
+      guaranteedlabels: []
+      position:
+        start: 0
+        end: 11
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 3
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

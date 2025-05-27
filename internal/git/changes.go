@@ -22,7 +22,7 @@ const (
 	FileTypeChanged FileStatus = 'T'
 )
 
-type PathType int
+type PathType uint8
 
 const (
 	Missing PathType = iota

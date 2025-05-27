@@ -1,0 +1,96 @@
+
+[TestLabelsSource/115 - 1]
+expr: vector(1) or foo
+output:
+    - selector: null
+      call:
+        func:
+            name: vector
+            argtypes:
+                - scalar
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - val: 1
+              duration: false
+              posrange:
+                start: 7
+                end: 8
+        posrange:
+            start: 0
+            end: 9
+      aggregation: null
+      excludereason:
+        "":
+            reason: Calling `vector()` will return a vector value with no labels.
+            fragment:
+                start: 0
+                end: 6
+      operation: vector
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 0
+        end: 9
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 1
+      type: 4
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: false
+      isreturnbool: false
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 13
+            end: 16
+      call: null
+      aggregation: null
+      excludereason: {}
+      operation: many-to-many
+      isdeadreason: the left hand side always returs something and so the right hand side is never used
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 13
+        end: 16
+      isdeadposition:
+        start: 13
+        end: 16
+      returnednumber: 0
+      type: 3
+      fixedlabels: false
+      isdead: true
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: false
+      isreturnbool: false
+
+---

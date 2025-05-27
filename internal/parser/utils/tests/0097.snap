@@ -1,0 +1,175 @@
+
+[TestLabelsSource/97 - 1]
+expr: count(node_exporter_build_info) by (instance, version) != ignoring(package,version) group_left(foo) count(deb_package_version) by (instance, version, package)
+output:
+    - selector:
+        name: node_exporter_build_info
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: node_exporter_build_info
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 6
+            end: 30
+      call: null
+      aggregation:
+        op: 57406
+        expr:
+            name: node_exporter_build_info
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: node_exporter_build_info
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 6
+                end: 30
+        param: null
+        grouping:
+            - instance
+            - version
+        without: false
+        posrange:
+            start: 0
+            end: 54
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(instance, version)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 32
+                end: 35
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 0
+                end: 54
+      operation: count
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: deb_package_version
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: deb_package_version
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 106
+                end: 125
+          call: null
+          aggregation:
+            op: 57406
+            expr:
+                name: deb_package_version
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: deb_package_version
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 106
+                    end: 125
+            param: null
+            grouping:
+                - instance
+                - version
+                - package
+            without: false
+            posrange:
+                start: 100
+                end: 158
+          excludereason:
+            "":
+                reason: Query is using aggregation with `by(instance, version, package)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 127
+                    end: 130
+            __name__:
+                reason: Aggregation removes metric name.
+                fragment:
+                    start: 100
+                    end: 158
+          operation: count
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels:
+            - instance
+            - version
+            - package
+          excludedlabels:
+            - __name__
+          guaranteedlabels: []
+          position:
+            start: 106
+            end: 125
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 5
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+      unless: []
+      includedlabels:
+        - instance
+        - version
+        - foo
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 6
+        end: 30
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+
+---

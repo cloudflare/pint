@@ -1,0 +1,49 @@
+
+[TestLabelsSource/110 - 1]
+expr: (time() - my_metric) > 5*3600
+output:
+    - selector:
+        name: my_metric
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: my_metric
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 10
+            end: 19
+      call: null
+      aggregation: null
+      excludereason: {}
+      operation: ""
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels: []
+      guaranteedlabels: []
+      position:
+        start: 10
+        end: 19
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 3
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+
+---

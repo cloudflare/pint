@@ -1,0 +1,213 @@
+
+[TestLabelsSource/120 - 1]
+expr: (sum(foo or vector(1)) > 0) != 2
+output:
+    - selector:
+        name: foo
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: foo
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 5
+            end: 8
+      call: null
+      aggregation:
+        op: 57414
+        expr:
+            op: 57390
+            lhs:
+                name: foo
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: foo
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 5
+                    end: 8
+            rhs:
+                func:
+                    name: vector
+                    argtypes:
+                        - scalar
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - val: 1
+                      duration: false
+                      posrange:
+                        start: 19
+                        end: 20
+                posrange:
+                    start: 12
+                    end: 21
+            vectormatching:
+                card: 3
+                matchinglabels: []
+                "on": false
+                include: []
+            returnbool: false
+        param: null
+        grouping: []
+        without: false
+        posrange:
+            start: 1
+            end: 22
+      excludereason:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 1
+                end: 4
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 22
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 5
+        end: 8
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+    - selector: null
+      call:
+        func:
+            name: vector
+            argtypes:
+                - scalar
+            variadic: 0
+            returntype: vector
+            experimental: false
+        args:
+            - val: 1
+              duration: false
+              posrange:
+                start: 19
+                end: 20
+        posrange:
+            start: 12
+            end: 21
+      aggregation:
+        op: 57414
+        expr:
+            op: 57390
+            lhs:
+                name: foo
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: foo
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 5
+                    end: 8
+            rhs:
+                func:
+                    name: vector
+                    argtypes:
+                        - scalar
+                    variadic: 0
+                    returntype: vector
+                    experimental: false
+                args:
+                    - val: 1
+                      duration: false
+                      posrange:
+                        start: 19
+                        end: 20
+                posrange:
+                    start: 12
+                    end: 21
+            vectormatching:
+                card: 3
+                matchinglabels: []
+                "on": false
+                include: []
+            returnbool: false
+        param: null
+        grouping: []
+        without: false
+        posrange:
+            start: 1
+            end: 22
+      excludereason:
+        "":
+            reason: Query is using aggregation that removes all labels.
+            fragment:
+                start: 1
+                end: 4
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 1
+                end: 22
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 12
+        end: 21
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 1
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: true
+      knownreturn: true
+      isconditional: true
+      isreturnbool: false
+
+---

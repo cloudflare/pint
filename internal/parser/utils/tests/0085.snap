@@ -1,0 +1,131 @@
+
+[TestLabelsSource/85 - 1]
+expr: count(sum(up{job="foo", cluster="dev"}) by(job, cluster) == 0) without(job, cluster)
+output:
+    - selector:
+        name: up
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: job
+              value: foo
+            - type: 0
+              name: cluster
+              value: dev
+            - type: 0
+              name: __name__
+              value: up
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 10
+            end: 38
+      call: null
+      aggregation:
+        op: 57406
+        expr:
+            op: 57385
+            lhs:
+                op: 57414
+                expr:
+                    name: up
+                    originaloffset: 0s
+                    originaloffsetexpr: null
+                    offset: 0s
+                    timestamp: null
+                    skiphistogrambuckets: false
+                    startorend: 0
+                    labelmatchers:
+                        - type: 0
+                          name: job
+                          value: foo
+                        - type: 0
+                          name: cluster
+                          value: dev
+                        - type: 0
+                          name: __name__
+                          value: up
+                    unexpandedseriesset: null
+                    series: []
+                    bypassemptymatchercheck: false
+                    posrange:
+                        start: 10
+                        end: 38
+                param: null
+                grouping:
+                    - job
+                    - cluster
+                without: false
+                posrange:
+                    start: 6
+                    end: 56
+            rhs:
+                val: 0
+                duration: false
+                posrange:
+                    start: 60
+                    end: 61
+            vectormatching: null
+            returnbool: false
+        param: null
+        grouping:
+            - job
+            - cluster
+        without: true
+        posrange:
+            start: 0
+            end: 84
+      excludereason:
+        "":
+            reason: Query is using aggregation with `by(job, cluster)`, only labels included inside `by(...)` will be present on the results.
+            fragment:
+                start: 40
+                end: 42
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 0
+                end: 84
+        cluster:
+            reason: Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 63
+                end: 70
+        job:
+            reason: Query is using aggregation with `without(job, cluster)`, all labels included inside `without(...)` will be removed from the results.
+            fragment:
+                start: 63
+                end: 70
+      operation: count
+      isdeadreason: ""
+      returns: vector
+      joins: []
+      unless: []
+      includedlabels: []
+      excludedlabels:
+        - __name__
+        - job
+        - cluster
+      guaranteedlabels: []
+      position:
+        start: 10
+        end: 38
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: true
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+
+---

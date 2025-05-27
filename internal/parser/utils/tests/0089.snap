@@ -1,0 +1,224 @@
+
+[TestLabelsSource/89 - 1]
+expr: |4-
+    (
+     sum(foo:sum > 0) without(notify)
+     * on(job) group_left(notify)
+     job:notify
+    )
+    and on(job)
+    sum(foo:count) by(job) > 20
+output:
+    - selector:
+        name: foo:sum
+        originaloffset: 0s
+        originaloffsetexpr: null
+        offset: 0s
+        timestamp: null
+        skiphistogrambuckets: false
+        startorend: 0
+        labelmatchers:
+            - type: 0
+              name: __name__
+              value: foo:sum
+        unexpandedseriesset: null
+        series: []
+        bypassemptymatchercheck: false
+        posrange:
+            start: 8
+            end: 15
+      call: null
+      aggregation:
+        op: 57414
+        expr:
+            op: 57388
+            lhs:
+                name: foo:sum
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: foo:sum
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 8
+                    end: 15
+            rhs:
+                val: 0
+                duration: false
+                posrange:
+                    start: 18
+                    end: 19
+            vectormatching: null
+            returnbool: false
+        param: null
+        grouping:
+            - notify
+        without: true
+        posrange:
+            start: 4
+            end: 36
+      excludereason:
+        __name__:
+            reason: Aggregation removes metric name.
+            fragment:
+                start: 4
+                end: 36
+      operation: sum
+      isdeadreason: ""
+      returns: vector
+      joins:
+        - selector:
+            name: job:notify
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: job:notify
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 68
+                end: 78
+          call: null
+          aggregation: null
+          excludereason: {}
+          operation: ""
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels: []
+          excludedlabels: []
+          guaranteedlabels: []
+          position:
+            start: 68
+            end: 78
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 3
+          fixedlabels: false
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: false
+          isreturnbool: false
+        - selector:
+            name: foo:count
+            originaloffset: 0s
+            originaloffsetexpr: null
+            offset: 0s
+            timestamp: null
+            skiphistogrambuckets: false
+            startorend: 0
+            labelmatchers:
+                - type: 0
+                  name: __name__
+                  value: foo:count
+            unexpandedseriesset: null
+            series: []
+            bypassemptymatchercheck: false
+            posrange:
+                start: 97
+                end: 106
+          call: null
+          aggregation:
+            op: 57414
+            expr:
+                name: foo:count
+                originaloffset: 0s
+                originaloffsetexpr: null
+                offset: 0s
+                timestamp: null
+                skiphistogrambuckets: false
+                startorend: 0
+                labelmatchers:
+                    - type: 0
+                      name: __name__
+                      value: foo:count
+                unexpandedseriesset: null
+                series: []
+                bypassemptymatchercheck: false
+                posrange:
+                    start: 97
+                    end: 106
+            param: null
+            grouping:
+                - job
+            without: false
+            posrange:
+                start: 93
+                end: 115
+          excludereason:
+            "":
+                reason: Query is using aggregation with `by(job)`, only labels included inside `by(...)` will be present on the results.
+                fragment:
+                    start: 108
+                    end: 110
+            __name__:
+                reason: Aggregation removes metric name.
+                fragment:
+                    start: 93
+                    end: 115
+          operation: sum
+          isdeadreason: ""
+          returns: vector
+          joins: []
+          unless: []
+          includedlabels:
+            - job
+          excludedlabels:
+            - __name__
+          guaranteedlabels: []
+          position:
+            start: 97
+            end: 106
+          isdeadposition:
+            start: 0
+            end: 0
+          returnednumber: 0
+          type: 5
+          fixedlabels: true
+          isdead: false
+          alwaysreturns: false
+          knownreturn: false
+          isconditional: true
+          isreturnbool: false
+      unless: []
+      includedlabels:
+        - notify
+        - job
+      excludedlabels:
+        - __name__
+      guaranteedlabels: []
+      position:
+        start: 8
+        end: 15
+      isdeadposition:
+        start: 0
+        end: 0
+      returnednumber: 0
+      type: 5
+      fixedlabels: false
+      isdead: false
+      alwaysreturns: false
+      knownreturn: false
+      isconditional: true
+      isreturnbool: false
+
+---
